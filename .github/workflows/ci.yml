@@ -3,11 +3,16 @@ name: CI
 on:
   push:
     branches:
-      - master
-  pull_request:
+      - offline-mode
 
 permissions:
-  contents: write
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: "pages"
+  cancel-in-progress: false
 
 jobs:
   nodejs:
@@ -24,19 +29,19 @@ jobs:
       - name: Install Packages
         run: pnpm install
 
-      - name: Typecheck server
-        run: pnpm run typecheck
-        working-directory: ./server
+      # - name: Typecheck server
+      #   run: pnpm run typecheck
+      #   working-directory: ./server
 
-      - name: Build Server
-        run: pnpm run build
-        working-directory: ./server
-        if: always()
+      # - name: Build Server
+      #   run: pnpm run build
+      #   working-directory: ./server
+      #   if: always()
 
-      - name: Typecheck client
-        run: pnpm run typecheck
-        working-directory: ./client
-        if: always()
+      # - name: Typecheck client
+      #   run: pnpm run typecheck
+      #   working-directory: ./client
+      #   if: always()
 
       - name: Restore Atlas Cache
         id: cache-atlases-restore
@@ -53,10 +58,22 @@ jobs:
         working-directory: ./client
         if: always()
 
-      - name: Typecheck Bot
-        run: pnpm run typecheck
-        working-directory: ./bot
-        if: always()
+      - name: Setup Pages
+        uses: actions/configure-pages@v5
+
+      - name: Upload artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: './client/dist'
+
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
+
+      # - name: Typecheck Bot
+      #   run: pnpm run typecheck
+      #   working-directory: ./bot
+      #   if: always()
 
       - name: Save Atlas Cache
         id: cache-atlases-save

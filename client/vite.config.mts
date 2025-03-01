@@ -8,8 +8,8 @@ import { atlasBuilderPlugin } from "./atlas-builder/vitePlugin";
 import { codefendPlugin } from "./vite-plugins/codefendPlugin";
 import { ejsPlugin } from "./vite-plugins/ejsPlugin";
 
-export default defineConfig(({ mode }) => {
-    const isDev = mode === "development";
+export default defineConfig(() => {
+    const isDev = true;
 
     const Config = getConfig(!isDev, "");
 
