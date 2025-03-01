@@ -1,7 +1,3 @@
-import { randomBytes } from "node:crypto";
-import fs from "node:fs";
-import path from "node:path";
-import hjson from "hjson";
 import type { ConfigType, PartialConfig } from "./configType";
 import { TeamMode } from "./shared/gameConfig";
 import { util } from "./shared/utils/util";
@@ -72,12 +68,13 @@ export function getConfig(isProduction: boolean, dir: string) {
         defaultItems: {},
     };
 
-    const dirname = import.meta?.dirname || __dirname;
+    let localConfig: PartialConfig = {};
 
+    /*
+    const dirname = import.meta?.dirname || __dirname;
     const configPath = path.join(dirname, dir, configFileName);
     const legacyConfigPath = path.join(dirname, dir, "survev-config.json");
 
-    let localConfig: PartialConfig = {};
 
     if (fs.existsSync(configPath)) {
         console.log(`Sourcing config ${configPath}`);
@@ -123,6 +120,7 @@ export function getConfig(isProduction: boolean, dir: string) {
             hjson.stringify(localConfig, { bracesSameLine: true }),
         );
     }
+    */
 
     util.mergeDeep(config, localConfig);
 
@@ -163,6 +161,7 @@ export function getConfig(isProduction: boolean, dir: string) {
     return config;
 }
 
+/*
 export function saveConfig(dir: string, config: PartialConfig) {
     try {
         const dirname = import.meta?.dirname || __dirname;
@@ -256,3 +255,4 @@ function migrateConfig(localConfig: PartialConfig, legacyConfigPath: string) {
 
     util.mergeDeep(localConfig, oldConfig);
 }
+*/
