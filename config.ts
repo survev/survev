@@ -1,7 +1,3 @@
-import { randomBytes } from "node:crypto";
-import fs from "node:fs";
-import path from "node:path";
-import hjson from "hjson";
 import type { ConfigType, PartialConfig } from "./configType";
 import { TeamMode } from "./shared/gameConfig";
 import { util } from "./shared/utils/util";
@@ -73,11 +69,12 @@ export function getConfig(isProduction: boolean, dir: string) {
         defaultItems: {},
     };
 
-    const dirname = import.meta?.dirname || __dirname;
+    let localConfig: PartialConfig = {};
 
+    /*
+    const dirname = import.meta?.dirname || __dirname;
     const configPath = path.join(dirname, dir, configFileName);
 
-    let localConfig: PartialConfig = {};
 
     if (fs.existsSync(configPath)) {
         console.log(`Sourcing config ${configPath}`);
@@ -99,6 +96,7 @@ export function getConfig(isProduction: boolean, dir: string) {
             hjson.stringify(localConfig, { bracesSameLine: true }),
         );
     }
+    */
 
     util.mergeDeep(config, localConfig);
 
@@ -139,6 +137,7 @@ export function getConfig(isProduction: boolean, dir: string) {
     return config;
 }
 
+/*
 export function saveConfig(dir: string, config: PartialConfig) {
     try {
         const dirname = import.meta?.dirname || __dirname;
@@ -159,3 +158,4 @@ export function saveConfig(dir: string, config: PartialConfig) {
         console.error("Failed saving config", err);
     }
 }
+*/
