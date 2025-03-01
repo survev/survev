@@ -42,6 +42,7 @@ import { type Player, PlayerBarn } from "./objects/player.ts";
 import { ProjectileBarn } from "./objects/projectile.ts";
 import { ShotBarn } from "./objects/shot.ts";
 import { SmokeBarn } from "./objects/smoke.ts";
+import type { OfflineServer, Socket } from "./offlineServer.ts";
 import { Renderer } from "./renderer.ts";
 import type { ResourceManager } from "./resources.ts";
 import { SDK } from "./sdk/sdk.ts";
@@ -64,7 +65,9 @@ export class Game {
     teamMode: TeamMode = TeamMode.Solo;
 
     victoryMusic: SoundHandle | null = null;
-    m_ws: WebSocket | null = null;
+
+    m_ws: Socket | null = null;
+
     connecting = false;
     connected = false;
 
@@ -134,13 +137,14 @@ export class Game {
         public m_resourceManager: ResourceManager,
         public onJoin: () => void,
         public onQuit: (err?: GameWsDisconnectReason) => void,
+        public offlineServer: OfflineServer,
     ) {
         if (IS_DEV) {
             this.editor = new Editor(this.m_config);
         }
     }
 
-    tryJoinGame(url: string, joinToken: string, onConnectFail: () => void) {
+    tryJoinGame(gameId: string, joinToken: string, onConnectFail: () => void) {
         if (!this.connecting && !this.connected && !this.initialized) {
             if (this.m_ws) {
                 this.m_ws.onerror = function() {};
@@ -153,7 +157,7 @@ export class Game {
             this.connecting = true;
             this.connected = false;
             try {
-                this.m_ws = new WebSocket(url);
+                this.m_ws = this.offlineServer.connect(gameId);
                 this.m_ws.binaryType = "arraybuffer";
                 this.m_ws.onerror = (_err) => {
                     this.m_ws?.close();
@@ -186,7 +190,7 @@ export class Game {
                         msgStream.stream.buffer.byteLength,
                     );
                 };
-                this.m_ws.onclose = (e) => {
+                this.m_ws.onclose = (_code, reason) => {
                     const displayingStats = this.m_uiManager?.displayingStats;
                     const connecting = this.connecting;
                     const connected = this.connected;
@@ -195,7 +199,7 @@ export class Game {
                     if (connecting) {
                         onConnectFail();
                     } else if (connected && !this.m_gameOver && !displayingStats) {
-                        const errMsg = (e.reason as GameWsDisconnectReason) || "host_closed";
+                        const errMsg = (reason as GameWsDisconnectReason) || "host_closed";
                         this.onQuit(errMsg);
                     }
                 };
