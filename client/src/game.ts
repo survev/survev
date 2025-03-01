@@ -51,6 +51,8 @@ import { Touch } from "./ui/touch.ts";
 import { UiManager } from "./ui/ui.ts";
 import { UiManager2 } from "./ui/ui2.ts";
 
+import type { OfflineServer } from "./offlineMode/offlineServer.ts";
+
 export interface Ctx {
     audioManager: AudioManager;
     renderer: Renderer;
@@ -136,6 +138,7 @@ export class Game {
         public m_resourceManager: ResourceManager,
         public onJoin: () => void,
         public onQuit: (err?: GameWsDisconnectReason) => void,
+        public offlineServer: OfflineServer,
     ) {
         if (IS_DEV) {
             this.editor = new Editor(this.m_config);
@@ -153,7 +156,7 @@ export class Game {
         this.connecting = true;
         this.connected = false;
         try {
-            this.m_connection = new WebsocketConnection(url);
+            this.m_connection = this.offlineServer.connect(url);
             this.m_connection.onError = () => {
                 this.m_connection?.close();
             };
