@@ -1,7 +1,6 @@
 import type { HttpRequest, HttpResponse } from "uWebSockets.js";
 import type { Context } from "hono";
 import { hc } from "hono/client";
-import { isIP } from "net";
 import {
     DataSet,
     englishDataset,
@@ -35,7 +34,7 @@ export function getHonoIp(c: Context, proxyHeader?: string): string | undefined 
         ? c.req.header(proxyHeader)
         : c.env?.incoming?.socket?.remoteAddress;
 
-    if (!ip || isIP(ip) == 0) return undefined;
+    if (!ip) return undefined;
     if (ip.includes("::ffff:")) return ip.split("::ffff:")[1];
     return ip;
 }
@@ -213,7 +212,7 @@ export function getIp(res: HttpResponse, req: HttpRequest, proxyHeader?: string)
         ? req.getHeader(proxyHeader.toLowerCase())
         : textDecoder.decode(res.getRemoteAddressAsText());
 
-    if (!ip || isIP(ip) == 0) return undefined;
+    // if (!ip || isIP(ip) == 0) return undefined;
     return ip;
 }
 
