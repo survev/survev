@@ -1,7 +1,10 @@
 // dont use this on client because nodejs module lol
 // but its used by server, bot and atlas builder so i put it on shared
 
-import { styleText } from "node:util";
+// import { styleText } from "node:util";
+function styleText(_color: string, params: any) {
+    return params;
+}
 
 interface LoggerConfig {
     /**
