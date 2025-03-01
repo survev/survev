@@ -189,3 +189,25 @@ export const UnlockDefs: Record<UnlockDefKey, UnlockDef> = {
         unlocks: ["outfitDarkShirt"],
     },
 };
+
+import { EmoteCategory, EmotesDefs } from "./emoteDefs.ts";
+import { HealEffectDefs } from "./healEffectDefs.ts";
+import { MeleeDefs } from "./meleeDefs.ts";
+import { OutfitDefs } from "./outfitDefs.ts";
+
+UnlockDefs.unlock_default.unlocks = [
+    ...new Set([
+        ...UnlockDefs.unlock_default.unlocks,
+        ...Object.entries(EmotesDefs).filter(([_, def]) => {
+            return def.category != EmoteCategory.Locked && !def.noCustom;
+        }).map(([t]) => t),
+        ...Object.entries(OutfitDefs).filter(([_, def]) => {
+            return !def.obstacleType;
+        }).map(([t]) => t),
+        ...Object.keys(HealEffectDefs),
+        ...Object.entries(MeleeDefs).filter(([_, def]) => {
+            // kinda silly but meh
+            return def.damage === MeleeDefs["fists"].damage;
+        }).map(([t]) => t),
+    ]),
+];
