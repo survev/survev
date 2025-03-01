@@ -41,6 +41,7 @@ import { type Player, PlayerBarn } from "./objects/player.ts";
 import { ProjectileBarn } from "./objects/projectile.ts";
 import { ShotBarn } from "./objects/shot.ts";
 import { SmokeBarn } from "./objects/smoke.ts";
+import type { OfflineServer, Socket } from "./offlineServer.ts";
 import { Renderer } from "./renderer.ts";
 import type { ResourceManager } from "./resources.ts";
 import { SDK } from "./sdk/sdk.ts";
@@ -63,7 +64,9 @@ export class Game {
     teamMode: TeamMode = TeamMode.Solo;
 
     victoryMusic: SoundHandle | null = null;
-    m_ws: WebSocket | null = null;
+
+    m_ws: Socket | null = null;
+
     connecting = false;
     connected = false;
 
@@ -134,6 +137,7 @@ export class Game {
         public m_resourceManager: ResourceManager,
         public onJoin: () => void,
         public onQuit: (err?: string) => void,
+        public offlineServer: OfflineServer,
     ) {
         if (IS_DEV) {
             this.editor = new Editor(this.m_config);
@@ -141,7 +145,7 @@ export class Game {
     }
 
     tryJoinGame(
-        url: string,
+        gameId: string,
         matchPriv: string,
         onConnectFail: () => void,
     ) {
@@ -157,7 +161,7 @@ export class Game {
             this.connecting = true;
             this.connected = false;
             try {
-                this.m_ws = new WebSocket(url);
+                this.m_ws = this.offlineServer.connect(gameId);
                 this.m_ws.binaryType = "arraybuffer";
                 this.m_ws.onerror = (_err) => {
                     this.m_ws?.close();
