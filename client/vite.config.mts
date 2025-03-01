@@ -11,7 +11,7 @@ import { svgoPlugin } from "./vite-plugins/svgoPlugin.ts";
 
 export default defineConfig(({ mode }) => {
     const viteEnv = loadEnv(mode, process.cwd(), "VITE_");
-    const isDev = mode === "development";
+    const isDev = true;
 
     const Config = getConfig(!isDev, "");
 
