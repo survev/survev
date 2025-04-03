@@ -525,6 +525,7 @@ export class Game {
             if (!player.disconnected) {
                 this.closeSocket(player.socketId);
             }
+            player.stopRecording();
         }
         this.logger.info("Game Ended");
         this.updateData();

@@ -64,6 +64,7 @@ const defaultConfig = {
     sessionCookie: "" as string | null,
     binds: "",
     version: 1,
+    recordGame: false,
     /* STRIP_FROM_PROD_CLIENT:START */
     debug: defaultDebugConfig,
     /* STRIP_FROM_PROD_CLIENT:END */

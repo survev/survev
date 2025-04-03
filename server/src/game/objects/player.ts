@@ -1,3 +1,5 @@
+import { writeFile } from "node:fs/promises";
+import { resolve } from "node:path";
 import {
     GameObjectDefs,
     type LootDef,
@@ -33,6 +35,7 @@ import type { GroupStatus } from "../../../../shared/net/updateMsg";
 import { type Circle, coldet } from "../../../../shared/utils/coldet";
 import { collider } from "../../../../shared/utils/collider";
 import { math } from "../../../../shared/utils/math";
+import { PacketRecorder, PacketType } from "../../../../shared/utils/packetRecorder";
 import { assert, util } from "../../../../shared/utils/util";
 import { type Vec2, v2 } from "../../../../shared/utils/v2";
 import { Config } from "../../config";
@@ -2163,7 +2166,10 @@ export class Player extends BaseGameObject {
     visibleObjects = new Set<GameObject>();
     visibleMapIndicators = new Set<MapIndicator>();
 
-    msgStream = new net.MsgStream(new ArrayBuffer(65536));
+    msgStream = new net.MsgStream(new ArrayBuffer(1 << 16));
+
+    recorder?: PacketRecorder;
+
     sendMsgs(): void {
         const msgStream = this.msgStream;
         const game = this.game;
@@ -2431,7 +2437,11 @@ export class Player extends BaseGameObject {
         const globalMsgStream = this.game.msgsToSend.stream;
         msgStream.stream.writeBytes(globalMsgStream, 0, globalMsgStream.byteIndex);
 
-        this.sendData(msgStream.getBuffer());
+        const buff = msgStream.getBuffer();
+
+        this.recorder?.addPacket(PacketType.Server, buff);
+        this.sendData(buff);
+
         this._firstUpdate = false;
     }
 
@@ -4247,6 +4257,14 @@ export class Player extends BaseGameObject {
             }
         }
 
+        if (!this.bot) {
+            if (!this.recorder) {
+                this.startRecording();
+            } else {
+                this.recorder.stopRecording();
+            }
+        }
+
         this.emoteCounter++;
         if (this.emoteCounter >= GameConfig.player.emoteThreshold) {
             this.emoteHardTicker =
@@ -4583,5 +4601,112 @@ export class Player extends BaseGameObject {
 
     sendData(buffer: Uint8Array): void {
         this.game.sendSocketMsg(this.socketId, buffer);
+    }
+
+    /**
+     * Initializes the recording by saving initial data
+     * Like the map msg, joinedMsg and an updateMsg with everything set to dirty
+     * So the incremental updates on the next updateMsgs work
+     */
+    startRecording() {
+        if (this.recorder) return;
+
+        const game = this.game;
+        const msgStream = this.msgStream;
+        msgStream.stream.index = 0;
+
+        console.log(`Started recording`);
+
+        const joinedMsg = new net.JoinedMsg();
+        joinedMsg.teamMode = game.teamMode;
+        joinedMsg.playerId = this.__id;
+        joinedMsg.started = game.started;
+        joinedMsg.teamMode = game.teamMode;
+        joinedMsg.emotes = this.loadout.emotes;
+        msgStream.serializeMsg(net.MsgType.Joined, joinedMsg);
+
+        this.recorder = PacketRecorder.create();
+
+        this.recorder.onStop = async () => {
+            const now = new Date();
+            const date = now.toISOString().substring(0, 10);
+
+            const fileName = `recording-${date}_${now.getHours()}-${now.getMinutes()}-${now.getSeconds()}.surv`;
+            const path = resolve(`./${fileName}`);
+
+            const buff = this.recorder!.getData();
+            this.recorder = undefined;
+
+            await writeFile(path, buff);
+            console.log(`Saved recording to ${path}`);
+        };
+
+        this.recorder.startRecording();
+
+        this.recorder.addPacket(PacketType.Server, msgStream.getBuffer());
+
+        msgStream.stream.index = 0;
+
+        this.recorder.addPacket(PacketType.Server, game.map.mapStream.getBuffer());
+
+        const updateMsg = new net.UpdateMsg();
+
+        updateMsg.activePlayerData = {
+            healthDirty: true,
+            boostDirty: true,
+            zoomDirty: true,
+            actionDirty: true,
+            inventoryDirty: true,
+            weapsDirty: true,
+            spectatorCountDirty: true,
+
+            action: this.action,
+            health: this.health,
+            zoom: this.zoom,
+            boost: this.boost,
+            scope: this.scope,
+            curWeapIdx: this.curWeapIdx,
+            inventory: this.inventory,
+            weapons: this.weapons,
+            spectatorCount: this.spectatorCount,
+        };
+
+        updateMsg.activePlayerIdDirty = true;
+        updateMsg.activePlayerId = this.__id;
+
+        updateMsg.playerInfos = game.playerBarn.players;
+
+        updateMsg.fullObjects.push(...this.visibleObjects);
+
+        if (this.group) {
+            updateMsg.groupStatusDirty = true;
+            updateMsg.groupStatus.players = this.group.players;
+        }
+
+        updateMsg.playerStatus.players = game.modeManager.getPlayerStatuses(this);
+        updateMsg.playerStatusDirty = true;
+
+        updateMsg.gasDirty = true;
+        updateMsg.gasData = game.gas;
+        updateMsg.gasTDirty = true;
+        updateMsg.gasT = game.gas.gasT;
+
+        if (game.playerBarn.killLeader) {
+            updateMsg.killLeaderDirty = true;
+            updateMsg.killLeaderId = game.playerBarn.killLeader.__id;
+            updateMsg.killLeaderKills = game.playerBarn.killLeader.kills;
+        }
+
+        updateMsg.mapIndicators = game.mapIndicatorBarn.mapIndicators;
+
+        msgStream.serializeMsg(net.MsgType.Update, updateMsg);
+
+        const aliveMsg = new net.AliveCountsMsg();
+        this.game.modeManager.updateAliveCounts(aliveMsg.teamAliveCounts);
+        msgStream.serializeMsg(net.MsgType.AliveCounts, aliveMsg);
+
+        this.recorder.addPacket(PacketType.Server, msgStream.getBuffer());
+
+        msgStream.stream.index = 0;
     }
 }

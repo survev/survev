@@ -794,7 +794,7 @@
               <div class="login-options-content"></div>
             </div>
           </div>
-        </div> 
+        </div>
 
         <div id="start-main-center">
           <div id="start-row-header">
@@ -1121,6 +1121,7 @@
               <select class="language-select"></select>
             </div>
             <div class="btn-settings menu-option btn-darken btn-start-option"></div>
+            <div class="btn-recorder menu-option btn-darken btn-start-option"></div>
             <div class="btn-keybind menu-option btn-darken btn-start-option"></div>
             <div id="btn-start-fullscreen" class="btn-fullscreen-toggle menu-option btn-darken btn-start-option"></div>
             <div class="btn-start-mute btn-sound-toggle menu-option btn-darken btn-start-option audio-on-icon"></div>
@@ -1128,6 +1129,31 @@
         </div>
       </div>
       <!-- Modals -->
+
+      <div id="ui-modal-recorder" class="ui-modal-recorder modal" oncontextmenu="return false;">
+        <div class="ui-modal-recorder-content modal-content modal-close">
+          <div id="ui-modal-recorder-header" class="modal-header">
+            <span id="ui-close-keybind" class="close close-corner"></span>
+            <h2 data-l10n="index-recorder">Recorder</h2>
+          </div>
+          <div id="ui-modal-recorder-body" class="modal-body">
+            <div class="modal-settings-item">
+              <input id="recordGame" type="checkbox"><p class="modal-settings-checkbox-text" data-l10n="index-record-game">Record all games</p>
+            </div>
+            <label for="recorder-play-local-file" class="menu-option btn-darken btn-game-menu">
+              <input id="recorder-play-local-file" style="display: none;" type="file" accept=".surv" multiple="false"></input>
+              Play from local file
+            </label>
+            <div id="ui-modal-recorder-url">
+              <input type="text" class="menu-option recording-url-input" tabindex="0" placeholder="Enter URL to play" id="recording-url-input">
+              <a class="btn-game-menu btn-darken" id="btn-recorder-load-url">Load</a>
+            </div>
+          </div>
+          <div id="ui-modal-recorder-footer" class="modal-footer modal-footer-round">
+          </div>
+        </div>
+      </div>
+
       <div id="ui-modal-keybind" class="ui-modal-keybind modal" oncontextmenu="return false;">
         <div class="ui-modal-keybind-content modal-content modal-close">
           <div id="ui-modal-keybind-header" class="modal-header">

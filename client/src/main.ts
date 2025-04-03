@@ -55,6 +55,7 @@ class Application {
     errorModal = new MenuModal($("#modal-notification"));
     refreshModal = new MenuModal($("#modal-refresh"));
     ipBanModal = new MenuModal($("#modal-ip-banned"));
+    modalRecorder = new MenuModal($("#ui-modal-recorder"));
     config = new ConfigManager();
     localization = new Localization();
 
@@ -268,6 +269,39 @@ class Application {
             if (a > i) {
                 $(".news-toggle").find(".account-alert").css("display", "block");
             }
+
+            $<HTMLInputElement>("#recorder-play-local-file").on("change", async (e) => {
+                const file = e.target.files![0];
+                if (!file) return;
+
+                const buff = await file.arrayBuffer();
+                this.game?.startPacketPlayBack(buff);
+            });
+
+            this.modalRecorder.onShow(() => {});
+
+            this.modalRecorder.onHide(() => {});
+
+            $(".btn-recorder").on("click", () => {
+                this.modalRecorder.show();
+                return false;
+            });
+
+            $("#btn-recorder-load-url").on("click", (_e) => {
+                const url = $("#recording-url-input").val() as string;
+                this.quickPlayPendingModeIdx = 0;
+                this.refreshUi();
+                this.modalRecorder.hide();
+                try {
+                    fetch(url).then(async (res) => {
+                        this.game?.startPacketPlayBack(await res.arrayBuffer());
+                    });
+                } catch {
+                    this.quickPlayPendingModeIdx = -1;
+                    this.refreshUi();
+                }
+            });
+
             this.setDOMFromConfig();
             this.setAppActive(true);
             const domCanvas = document.querySelector<HTMLCanvasElement>("#cvs")!;
