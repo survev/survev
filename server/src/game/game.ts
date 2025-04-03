@@ -69,6 +69,7 @@ export class Game {
     objectRegister: ObjectRegister;
 
     joinTokens = new Map<string, JoinTokenData>();
+    reportedPlayersIds = new Set<number>();
 
     get aliveCount(): number {
         return this.playerBarn.livingPlayers.length;
@@ -354,6 +355,7 @@ export class Game {
             | net.EmoteMsg
             | net.DropItemMsg
             | net.SpectateMsg
+            | net.ReportMsg
             | net.PerkModeRoleSelectMsg
             | net.EditMsg
             | undefined = undefined;
@@ -383,6 +385,10 @@ export class Game {
                 break;
             case net.MsgType.PerkModeRoleSelect:
                 msg = new net.PerkModeRoleSelectMsg();
+                msg.deserialize(stream);
+                break;
+            case net.MsgType.Report:
+                msg = new net.ReportMsg();
                 msg.deserialize(stream);
                 break;
             case net.MsgType.Edit:
@@ -442,6 +448,14 @@ export class Game {
             }
             case net.MsgType.Spectate: {
                 player.spectate(msg as net.SpectateMsg);
+                break;
+            }
+            case net.MsgType.Report: {
+                if ( player.recorder?.recording ) {
+                    player.recorder.stopRecording();
+                    break;
+                }
+                player.startRecording();
                 break;
             }
             case net.MsgType.PerkModeRoleSelect: {
@@ -528,6 +542,7 @@ export class Game {
             if (!player.disconnected) {
                 this.closeSocket(player.socketId);
             }
+            player.recorder?.stopRecording();
         }
         this.logger.info("Game Ended");
         this.updateData();

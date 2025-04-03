@@ -21,6 +21,7 @@ import {
     itemsTable,
     type MatchDataTable,
     matchDataTable,
+    reportsTable,
     usersTable,
 } from "../../db/schema";
 import { MOCK_USER_ID } from "../user/auth/mock";
@@ -190,6 +191,27 @@ export const PrivateRouter = new Hono<Context>()
         await client.flushAll();
         return c.json({ success: true }, 200);
     })
+    .post(
+        "/save_game_recording",
+        validateParams(
+            z.object({
+                gameId: z.string(),
+                userId: z.string(),
+                recording: z.string(),
+            }),
+        ),
+        async (c) => {
+            const { gameId, recording, userId } = c.req.valid("json");
+
+            await db.insert(reportsTable).values({
+                gameId,
+                recording,
+                reportedBy: userId,
+            });
+
+            return c.json({ success: true }, 200);
+        },
+    )
     .post(
         "/test/insert_game",
         databaseEnabledMiddleware,

@@ -147,3 +147,20 @@ export const bannedIpsTable = pgTable("banned_ips", {
     reason: text("reason").notNull().default(""),
     bannedBy: text("banned_by").notNull().default("admin"),
 });
+
+export const reportsTable = pgTable("reports", {
+    reportedBy: text("reported_by")
+        .notNull()
+        .references(() => usersTable.id, {
+            onUpdate: "cascade",
+        }),
+    recording: text("recording").notNull(),
+    gameId: uuid("game_id").notNull(),
+    status: text("status")
+        .notNull()
+        .$type<"unreviewed" | "ignored">()
+        .default("unreviewed"),
+    createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+    // discordId of the game mod, or the user who reported the game
+    reviewdBy: text("reviewed_by").notNull().default(""),
+});

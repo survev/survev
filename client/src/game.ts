@@ -34,6 +34,7 @@ import { type Player, PlayerBarn } from "./objects/player";
 import { ProjectileBarn } from "./objects/projectile";
 import { ShotBarn } from "./objects/shot";
 import { SmokeBarn } from "./objects/smoke";
+import { PacketPlayer } from "./packetPlayer";
 import { Renderer } from "./renderer";
 import type { ResourceManager } from "./resources";
 import { SDK } from "./sdk";
@@ -51,12 +52,36 @@ export interface Ctx {
     decalBarn: DecalBarn;
 }
 
+// copied from the DOM typings
+// with only stuff the game actually needs
+// to use as an abstraction to the recorder playback socket
+export interface GameWebSocket {
+    binaryType: BinaryType;
+
+    onclose: ((this: GameWebSocket, ev: CloseEvent) => any) | null;
+    onerror: ((this: GameWebSocket, ev: Event) => any) | null;
+    onmessage: ((this: GameWebSocket, ev: MessageEvent) => any) | null;
+    onopen: ((this: GameWebSocket, ev: Event) => any) | null;
+
+    readonly readyState: number;
+
+    close(code?: number, reason?: string): void;
+    send(data: string | ArrayBufferLike | Blob | ArrayBufferView): void;
+
+    readonly CONNECTING: 0;
+    readonly OPEN: 1;
+    readonly CLOSING: 2;
+    readonly CLOSED: 3;
+}
+
 export class Game {
     initialized = false;
     teamMode: TeamMode = TeamMode.Solo;
 
     victoryMusic: SoundHandle | null = null;
-    m_ws: WebSocket | null = null;
+    m_ws: GameWebSocket | null = null;
+    m_packetPlayer: PacketPlayer | null = null;
+
     connecting = false;
     connected = false;
 
@@ -156,7 +181,8 @@ export class Game {
             this.connecting = true;
             this.connected = false;
             try {
-                this.m_ws = new WebSocket(url);
+                this.m_ws = new WebSocket(url) as GameWebSocket;
+
                 this.m_ws.binaryType = "arraybuffer";
                 this.m_ws.onerror = (_err) => {
                     this.m_ws?.close();
@@ -205,6 +231,65 @@ export class Game {
                 this.connecting = false;
                 this.connected = false;
                 onConnectFail();
+            }
+        }
+    }
+
+    startPacketPlayBack(buff: ArrayBuffer) {
+        if (!this.connected && !this.initialized) {
+            if (this.m_ws) {
+                this.m_ws.onerror = function () {};
+                this.m_ws.onopen = function () {};
+                this.m_ws.onmessage = function () {};
+                this.m_ws.onclose = function () {};
+                this.m_ws.close();
+                this.m_ws = null;
+            }
+            this.connecting = true;
+            this.connected = false;
+
+            try {
+                this.m_packetPlayer = new PacketPlayer(buff);
+
+                this.m_ws = this.m_packetPlayer.socket;
+
+                this.m_ws.onerror = (_err) => {
+                    this.m_ws?.close();
+                };
+
+                this.m_ws.onopen = () => {
+                    this.connecting = false;
+                    this.connected = true;
+                };
+
+                this.m_ws.onmessage = (e) => {
+                    const msgStream = new net.MsgStream(e.data);
+
+                    while (true) {
+                        const type = msgStream.deserializeMsgType();
+                        if (type == net.MsgType.None) {
+                            break;
+                        }
+                        this.m_onMsg(type, msgStream.getStream());
+                    }
+                };
+
+                this.m_ws.onclose = () => {
+                    const displayingStats = this.m_uiManager?.displayingStats;
+                    const connected = this.connected;
+                    this.connecting = false;
+                    this.connected = false;
+
+                    if (connected && !this.m_gameOver && !displayingStats) {
+                        const errMsg = this.m_disconnectMsg || "index-host-closed";
+                        this.onQuit(errMsg);
+                    }
+                };
+                this.m_packetPlayer.start();
+            } catch (err) {
+                console.error(err);
+                this.connecting = false;
+                this.connected = false;
             }
         }
     }
@@ -740,9 +825,15 @@ export class Game {
             specMsg.specForce = specForce;
             this.m_sendMessage(net.MsgType.Spectate, specMsg, 128);
         }
+        if ( this.m_spectating && this.m_uiManager.recording ) {
+            const reportMsg = new net.ReportMsg();
+            reportMsg.startRecording = true;
+            this.m_sendMessage(net.MsgType.Report, reportMsg, 128);
+        }
         this.m_uiManager.specBegin = false;
         this.m_uiManager.specNext = false;
         this.m_uiManager.specPrev = false;
+        this.m_uiManager.recording = false;
         this.m_uiManager.reloadTouched = false;
         this.m_uiManager.interactionTouched = false;
         this.m_uiManager.swapWeapSlots = false;
@@ -1249,6 +1340,7 @@ export class Game {
             case net.MsgType.Joined: {
                 const msg = new net.JoinedMsg();
                 msg.deserialize(stream);
+
                 this.onJoin();
                 this.teamMode = msg.teamMode;
                 this.m_localId = msg.playerId;
