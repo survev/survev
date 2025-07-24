@@ -119,7 +119,11 @@ const badWordsdataSet = new DataSet<{ originalWord: string }>()
             .addPattern(pattern`faggot`),
     )
     .addPhrase((phrase) =>
-        phrase.setMetadata({ originalWord: "hitler" }).addPattern(pattern`hitler`),
+        phrase
+            .setMetadata({ originalWord: "hitler" })
+            .addPattern(pattern`hitler`),
+            .addPattern(pattern`hitla`),
+            .addPattern(pattern`hitlr`),
     )
     .addPhrase((phrase) =>
         phrase
@@ -128,6 +132,28 @@ const badWordsdataSet = new DataSet<{ originalWord: string }>()
             .addPattern(pattern`kill yourself`)
             .addPattern(pattern`hang yourself`)
             .addPattern(pattern`unalive yourself`),
+    )
+    .addPhrase((phrase) =>
+		phrase
+			.setMetadata({ originalWord: 'nigger' })
+			.addPattern(pattern`nlgger`)
+			.addPattern(pattern`n1gga`)
+			.addPattern(pattern`nigg`)
+			.addPattern(pattern`nlgg`)
+            .addPattern(pattern`nl99er`)
+            .addPattern(pattern`nl99a`)
+            .addPattern(pattern`niggr`)
+            .addPattern(pattern`n1ggr`)
+            .addPattern(pattern`n199r`)
+            .addPattern(pattern`nl99r`)
+            .addPattern(pattern`nlggr`)
+            .addPattern(pattern`n199er`)
+            .addPattern(pattern`n199a`)
+    )
+    .addPhrase((phrase) =>
+		phrase
+			.setMetadata({ originalWord: 'dick' })
+			.addPattern(pattern`dlck`)
     );
 
 const matcher = new RegExpMatcher({
