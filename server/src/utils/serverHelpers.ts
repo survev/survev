@@ -121,8 +121,8 @@ const badWordsdataSet = new DataSet<{ originalWord: string }>()
     .addPhrase((phrase) =>
         phrase
             .setMetadata({ originalWord: "hitler" })
-            .addPattern(pattern`hitler`),
-            .addPattern(pattern`hitla`),
+            .addPattern(pattern`hitler`)
+            .addPattern(pattern`hitla`)
             .addPattern(pattern`hitlr`),
     )
     .addPhrase((phrase) =>
