@@ -165,13 +165,10 @@ export class BitStream extends bb.BitStream {
         };
     }
 
-    // private field L
-    declare _view: { _view: Uint8Array };
-
     writeBytes(src: BitStream, offset: number, length: number) {
         assert(this.index % 8 == 0);
-        const data = new Uint8Array(src._view._view.buffer, offset, length);
-        this._view._view.set(data, this.index / 8);
+        const data = new Uint8Array(src._view.view.buffer, offset, length);
+        this._view.view.set(data, this.index / 8);
         this.index += length * 8;
     }
 
