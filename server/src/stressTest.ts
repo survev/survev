@@ -189,6 +189,7 @@ class Bot {
                     break;
                 }
                 this.onMsg(type, stream.getStream());
+                stream.stream.readAlignToNextByte();
             }
         };
     }

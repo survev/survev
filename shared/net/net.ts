@@ -239,7 +239,7 @@ export class MsgStream {
         assert(this.stream.index % 8 == 0);
         this.stream.writeUint8(type);
         msg.serialize(this.stream);
-        assert(this.stream.index % 8 == 0);
+        this.stream.writeAlignToNextByte();
     }
 
     serializeMsgStream(type: number, stream: BitStream) {

@@ -253,14 +253,12 @@ export const ObjectSerializeFns: {
                     s.writeBoolean(perk.droppable);
                 }
             }
-
-            s.writeAlignToNextByte();
         },
         deserializePart: (s, data) => {
             data.pos = s.readVec(0, 0, 1024, 1024, 16); // position
             data.dir = s.readUnitVec(8); // rotation
         },
-        deserializeFull(s, data) {
+        deserializeFull: (s, data) => {
             data.outfit = s.readGameType(); // outfit
             data.backpack = s.readGameType(); // pack
             data.helmet = s.readGameType(); // helmet
@@ -309,7 +307,6 @@ export const ObjectSerializeFns: {
                     });
                 }
             }
-            s.readAlignToNextByte();
         },
     },
     [ObjectType.Obstacle]: {
@@ -323,7 +320,6 @@ export const ObjectSerializeFns: {
                 Constants.MapObjectMaxScale,
                 8,
             );
-            s.writeBits(0, 6);
         },
         serializeFull: (s, data) => {
             s.writeFloat(data.healthT, 0, 1, 8);
@@ -350,8 +346,6 @@ export const ObjectSerializeFns: {
 
             s.writeBoolean(data.isSkin);
             if (data.isSkin) s.writeUint16(data.skinPlayerId!);
-
-            s.writeBits(0, 5); // padding
         },
         deserializePart: (s, data) => {
             data.pos = s.readVec(0, 0, 1024, 1024, 16);
@@ -361,7 +355,6 @@ export const ObjectSerializeFns: {
                 Constants.MapObjectMaxScale,
                 8,
             );
-            s.readBits(6);
         },
         deserializeFull: (s, data) => {
             data.healthT = s.readFloat(0, 1, 8);
@@ -391,7 +384,6 @@ export const ObjectSerializeFns: {
             if (data.isSkin) {
                 data.skinPlayerId = s.readUint16();
             }
-            s.readBits(5);
         },
     },
     [ObjectType.Building]: {
@@ -405,7 +397,6 @@ export const ObjectSerializeFns: {
                 s.writeBoolean(data.puzzleSolved);
                 s.writeBits(data.puzzleErrSeq, 7);
             }
-            s.writeBits(0, 4); // padding
         },
         serializeFull: (s, data) => {
             s.writeVec(data.pos, 0, 0, 1024, 1024, 16);
@@ -422,7 +413,6 @@ export const ObjectSerializeFns: {
                 data.puzzleSolved = s.readBoolean();
                 data.puzzleErrSeq = s.readBits(7);
             }
-            s.readBits(4);
         },
         deserializeFull: (s, data) => {
             data.pos = s.readVec(0, 0, 1024, 1024, 16);
@@ -464,14 +454,12 @@ export const ObjectSerializeFns: {
             s.writeVec(data.pos, 0, 0, 1024, 1024, 16);
             s.writeMapType(data.type);
             s.writeBits(data.layer, 2);
-            s.writeBits(0, 2);
         },
         serializeFull: () => {},
         deserializePart: (s, data) => {
             data.pos = s.readVec(0, 0, 1024, 1024, 16);
             data.type = s.readMapType();
             data.layer = s.readBits(2);
-            s.readBits(2);
         },
         deserializeFull: () => {},
     },
@@ -490,7 +478,6 @@ export const ObjectSerializeFns: {
             if (data.ownerId != 0) {
                 s.writeUint16(data.ownerId);
             }
-            s.writeBits(0, 1);
         },
         deserializePart: (s, data) => {
             data.pos = s.readVec(0, 0, 1024, 1024, 16);
@@ -505,7 +492,6 @@ export const ObjectSerializeFns: {
             if (data.hasOwner) {
                 data.ownerId = s.readUint16();
             }
-            s.readBits(1);
         },
     },
     [ObjectType.DeadBody]: {
@@ -565,7 +551,6 @@ export const ObjectSerializeFns: {
         serializeFull: (s, data) => {
             s.writeGameType(data.type);
             s.writeBits(data.layer, 2);
-            s.writeBits(0, 4);
         },
         deserializePart: (s, data) => {
             data.pos = s.readVec(0, 0, 1024, 1024, 16);
@@ -575,7 +560,6 @@ export const ObjectSerializeFns: {
         deserializeFull: (s, data) => {
             data.type = s.readGameType();
             data.layer = s.readBits(2);
-            s.readBits(4);
         },
     },
     [ObjectType.Smoke]: {
