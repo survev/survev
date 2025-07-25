@@ -14202,6 +14202,7 @@ export const MapObjectDefs: Record<string, MapObjectDef> = {
     logging_complex_02su: createLoggingComplex2({ groundTintDk: 0x4e7d13 }),
     logging_complex_03: createLoggingComplex3({}),
     logging_complex_03sp: createLoggingComplex3({ groundTintDk: 0x253210 }),
+    logging_complex_03su: createLoggingComplex3({ groundTintDk: 0x4e7d13 }),
     junkyard_01: {
         type: "building",
         map: { display: true, shapes: [] },
