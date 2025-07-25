@@ -202,6 +202,7 @@ export abstract class BaseGameObject {
                 data: this,
             ) => void
         )(this.partialStream, this);
+        this.partialStream.writeAlignToNextByte();
     }
 
     serializeFull(): void {
@@ -220,6 +221,7 @@ export abstract class BaseGameObject {
                 data: this,
             ) => void
         )(this.fullStream, this);
+        this.fullStream.writeAlignToNextByte();
     }
 
     setDirty() {

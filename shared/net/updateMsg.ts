@@ -470,6 +470,7 @@ export class UpdateMsg implements AbstractMsg {
                 s.writeFloat(zone.rad, 0, Constants.AirstrikeZoneMaxRad, 8);
                 s.writeFloat(zone.duration, 0, Constants.AirstrikeZoneMaxDuration, 8);
             }
+            s.writeAlignToNextByte();
             flags |= UpdateExtFlags.AirstrikeZones;
         }
 
@@ -527,12 +528,14 @@ export class UpdateMsg implements AbstractMsg {
                         d: typeof data,
                     ) => void
                 )(s, data);
+                s.readAlignToNextByte();
                 (
                     ObjectSerializeFns[data.__type].deserializeFull as (
                         s: BitStream,
                         d: typeof data,
                     ) => void
                 )(s, data);
+                s.readAlignToNextByte();
                 this.fullObjects.push(data);
             }
         }
@@ -547,6 +550,7 @@ export class UpdateMsg implements AbstractMsg {
                     d: typeof data,
                 ) => void
             )(s, data);
+            s.readAlignToNextByte();
             this.partObjects.push(data);
         }
 
@@ -695,6 +699,7 @@ export class UpdateMsg implements AbstractMsg {
                 );
                 this.airstrikeZones.push(airStrikeZone);
             }
+            s.readAlignToNextByte();
         }
 
         if ((flags & UpdateExtFlags.MapIndicators) != 0) {

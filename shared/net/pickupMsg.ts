@@ -9,13 +9,11 @@ export class PickupMsg implements AbstractMsg {
         s.writeUint8(this.type);
         s.writeGameType(this.item);
         s.writeUint8(this.count);
-        s.writeBits(0, 6);
     }
 
     deserialize(s: BitStream) {
         this.type = s.readUint8();
         this.item = s.readGameType();
         this.count = s.readUint8();
-        s.readBits(6);
     }
 }

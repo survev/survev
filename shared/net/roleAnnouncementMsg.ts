@@ -13,7 +13,6 @@ export class RoleAnnouncementMsg implements AbstractMsg {
         s.writeGameType(this.role);
         s.writeBoolean(this.assigned);
         s.writeBoolean(this.killed);
-        s.writeAlignToNextByte();
     }
 
     deserialize(s: BitStream) {
@@ -22,6 +21,5 @@ export class RoleAnnouncementMsg implements AbstractMsg {
         this.role = s.readGameType();
         this.assigned = s.readBoolean();
         this.killed = s.readBoolean();
-        s.readAlignToNextByte();
     }
 }

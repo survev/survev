@@ -39,7 +39,6 @@ export class JoinMsg implements AbstractMsg {
             const emote = s.readGameType();
             this.loadout.emotes.push(emote);
         }
-        s.readAlignToNextByte();
     }
 
     serialize(s: BitStream) {
@@ -62,6 +61,5 @@ export class JoinMsg implements AbstractMsg {
         for (const emote of this.loadout.emotes) {
             s.writeGameType(emote);
         }
-        s.writeAlignToNextByte();
     }
 }
