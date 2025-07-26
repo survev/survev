@@ -14,7 +14,7 @@ import type { ParentMsg } from "./imageWorker";
 
 export const cacheFolder = Path.resolve(
     import.meta.dirname,
-    "../node_modules/.atlas-png-cache/",
+    "../node_modules/.atlas-cache/",
 );
 
 export const imagesCacheFolder = Path.join(cacheFolder, "img");
