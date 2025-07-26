@@ -25,7 +25,7 @@ const commands = {
         optionValidator: zBanIpParams,
         options: [
             {
-                name: "ip",
+                name: "ips",
                 description: "The IP to ban",
                 required: true,
                 type: ApplicationCommandOptionType.String,
