@@ -131,6 +131,21 @@ server {
 
     server_name _;
 
+    # Static files cache
+    location ~* \.(js|css|jpg|jpeg|png|gif|js|css|ico|svg)$ {
+        expires 1y;
+        etag off;
+        if_modified_since off;
+        add_header Cache-Control "public, no-transform";
+        root /var/www/survev;
+    }
+
+    location ~* \.(html)$ {
+        etag on;
+        add_header Cache-Control "no-cache";
+        root /var/www/survev;
+    }
+
     # Client build
     location / {
         root /opt/survev/client/dist;
@@ -138,6 +153,18 @@ server {
 
     # API server
     location /api {
+        proxy_http_version 1.1;
+
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-Host $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+        proxy_set_header Host $http_host;
+
+        proxy_pass "http://127.0.0.1:8000";
+    }
+
+    location /private {
         proxy_http_version 1.1;
 
         proxy_set_header X-Real-IP $remote_addr;
@@ -236,3 +263,33 @@ sudo systemctl enable --now survev-api
 ```
 
 If you've done everything correctly, you should be able to access the server at `http://youriphere` (ex: `http://1.1.1.1`).
+
+### Bot setup (optional)
+
+Create a systemd unit file for the Bot
+
+```sh
+sudo nano /etc/systemd/system/survev-bot.service
+```
+
+populate it with
+
+```sh
+[Unit]
+Description=survev bot.
+
+[Service]
+Type=simple
+WorkingDirectory=/opt/survev/bot
+ExecStart=/usr/bin/pnpm start
+Restart=on-failure
+
+[Install]
+WantedBy=multi-user.target
+```
+
+Save and enable the unit:
+
+```sh
+sudo systemctl enable --now survev-bot
+```
