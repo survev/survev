@@ -1,4 +1,4 @@
-import type { AtlasDef } from "../atlasConfig.ts";
+import type { AtlasDef } from "../atlasDefs";
 
 export const SnowAtlas: AtlasDef = {
     compress: true,

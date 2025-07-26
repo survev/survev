@@ -1,21 +1,16 @@
-// config and shared types
-
-import type { ISpritesheetData } from "pixi.js-legacy";
-
-export type AtlasRes = "high" | "low";
-
-export const AtlasesConfig = {
-    res: {
-        high: 1,
-        low: 0.5,
-    },
-    outDir: "./out/",
-    // change filesDir to ../public/img
-    // and loaderFormat to .svg
-    // if you want to use svgs instead of cached pngs
-    filesDir: "./pngs/",
-    loaderFormat: ".png",
-};
+import type { Atlas } from "../../shared/defs/mapDefs";
+import { CobaltAtlas } from "./defs/cobalt";
+import { DesertAtlas } from "./defs/desert";
+import { FactionAtlas } from "./defs/faction";
+import { GradientAtlas } from "./defs/gradient";
+import { HalloweenAtlas } from "./defs/halloween";
+import { LoadoutAtlas } from "./defs/loadout";
+import { MainAtlas } from "./defs/main";
+import { PotatoAtlas } from "./defs/potato";
+import { SavannahAtlas } from "./defs/savannah";
+import { SharedAtlas } from "./defs/shared";
+import { SnowAtlas } from "./defs/snow";
+import { WoodsAtlas } from "./defs/woods";
 
 export interface AtlasDef {
     /**
@@ -32,15 +27,26 @@ export interface AtlasDef {
     images: string[];
 }
 
-export interface MainToWorkerMsg {
-    name: string;
-    def: AtlasDef;
-}
+export const Atlases: Record<Atlas, AtlasDef> = {
+    gradient: GradientAtlas,
+    loadout: LoadoutAtlas,
+    shared: SharedAtlas,
+    main: MainAtlas,
+    desert: DesertAtlas,
+    faction: FactionAtlas,
+    halloween: HalloweenAtlas,
+    potato: PotatoAtlas,
+    snow: SnowAtlas,
+    woods: WoodsAtlas,
+    cobalt: CobaltAtlas,
+    savannah: SavannahAtlas,
+};
+export type AtlasRes = "high" | "low";
 
-export interface WorkerToMainMsg {
-    res: AtlasRes;
-    data: ISpritesheetData[];
-}
+export const AtlasResolutions: Record<AtlasRes, number> = {
+    high: 1,
+    low: 0.5,
+};
 
 // sprites that are scaled inside the sheets
 export const scaledSprites: Record<string, number> = {
