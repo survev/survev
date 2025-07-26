@@ -14,6 +14,7 @@ import { API_URL, Config, DISCORD_GUILD_ID, DISCORD_ROLE_ID } from "./config";
 // we love enums
 export const enum Command {
     BanIp = "ban_ip",
+    FindDiscordUserSlug = "find_discord_user_slug",
     BanAccount = "ban_account",
     SearchPlayer = "search_player",
     UnbanAccount = "unban_account",

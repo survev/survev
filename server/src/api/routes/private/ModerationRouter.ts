@@ -6,6 +6,7 @@ import { MapId, TeamModeToString } from "../../../../../shared/defs/types/misc";
 import {
     zBanAccountParams,
     zBanIpParams,
+    zFindDiscordUserSlugParams,
     zGetPlayerIpParams,
     zSetAccountNameParams,
     zSetMatchDataNameParams,
@@ -357,6 +358,34 @@ export const ModerationRouter = new Hono()
                 .where(eq(matchDataTable.gameId, gameId));
 
             return c.json({ message: `Deleted ${res.rowCount} rows` }, 200);
+        },
+    )
+    .post(
+        "find_discord_user_slug",
+        validateParams(zFindDiscordUserSlugParams),
+        async (c) => {
+            const { discord_user } = c.req.valid("json");
+
+            const user = await db.query.usersTable.findFirst({
+                where: and(
+                    eq(usersTable.linkedDiscord, true),
+                    eq(usersTable.authId, discord_user),
+                ),
+                columns: {
+                    slug: true,
+                },
+            });
+
+            if (!user?.slug) {
+                return c.json(
+                    {
+                        message: `User not found`,
+                    },
+                    200,
+                );
+            }
+
+            return c.json({ message: `slug: ${user.slug}` }, 200);
         },
     );
 

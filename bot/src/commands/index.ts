@@ -6,6 +6,7 @@ import {
 import {
     zBanAccountParams,
     zBanIpParams,
+    zFindDiscordUserSlugParams,
     zSetAccountNameParams,
     zSetMatchDataNameParams,
     zUnbanAccountParams,
@@ -155,6 +156,19 @@ const commands = {
                 description: "The current slug of the account",
                 required: true,
                 type: ApplicationCommandOptionType.String,
+            },
+        ],
+    }),
+    [Command.FindDiscordUserSlug]: createCommand({
+        name: Command.FindDiscordUserSlug,
+        description: "Find the slug for a discord user",
+        optionValidator: zFindDiscordUserSlugParams,
+        options: [
+            {
+                name: "discord_user",
+                description: "find the in game slug for a discord user",
+                required: true,
+                type: ApplicationCommandOptionType.User,
             },
         ],
     }),
