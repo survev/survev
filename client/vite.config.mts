@@ -4,6 +4,7 @@ import stripBlockPlugin from "vite-plugin-strip-block";
 import { getConfig } from "../config";
 import { version } from "../package.json";
 import { GIT_VERSION } from "../server/src/utils/gitRevision";
+import { atlasBuilderPlugin } from "./atlas-builder/vitePlugin";
 import { codefendPlugin } from "./vite-plugins/codefendPlugin";
 import { ejsPlugin } from "./vite-plugins/ejsPlugin";
 
@@ -93,7 +94,7 @@ export default defineConfig(({ mode }) => {
     process.env.VITE_GAME_VERSION = version;
     process.env.VITE_BACKGROUND_IMG = selectedTheme.splashBg;
 
-    const plugins: Plugin[] = [ejsPlugin()];
+    const plugins: Plugin[] = [ejsPlugin(), ...atlasBuilderPlugin()];
 
     if (!isDev) {
         plugins.push(codefendPlugin());

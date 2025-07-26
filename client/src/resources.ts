@@ -1,7 +1,7 @@
 import * as PIXI from "pixi.js-legacy";
+import highResAtlasDefs from "virtual-atlases-high";
+import lowResAtlasDefs from "virtual-atlases-low";
 import { type Atlas, MapDefs } from "../../shared/defs/mapDefs";
-import fullResAtlasDefs from "../atlas-builder/out/high.json";
-import lowResAtlasDefs from "../atlas-builder/out/low.json";
 import type { AudioManager } from "./audioManager";
 import type { ConfigManager } from "./config";
 import { device } from "./device";
@@ -10,8 +10,8 @@ import SoundDefs from "./soundDefs";
 type AtlasDef = Record<Atlas, PIXI.ISpritesheetData[]>;
 
 const spritesheetDefs = {
-    low: lowResAtlasDefs as unknown as AtlasDef,
-    high: fullResAtlasDefs as unknown as AtlasDef,
+    low: lowResAtlasDefs as AtlasDef,
+    high: highResAtlasDefs as AtlasDef,
 };
 
 function loadTexture(renderer: PIXI.IRenderer, url: string) {
@@ -43,25 +43,8 @@ function loadTexture(renderer: PIXI.IRenderer, url: string) {
     return baseTex;
 }
 
-// since we don't have a vite plugin to process the generated atlas
-// and i didn't want to output them to public with a random hash directly
-// so use a vite glob import to map the original file names
-// to the hashed ones that get written to assets/[filename]-[hash][extension]
-const actualPaths = import.meta.glob("../atlas-builder/out/*.png", {
-    eager: true,
-    import: "default",
-});
-
-// example: cobalt-0-100.png -> assets/cobalt-0-100-Df0tyq7G.png
-const fileNameToURL: Record<string, string> = {};
-
-for (const [key, value] of Object.entries(actualPaths)) {
-    const fileName = key.split("/").at(-1)!;
-    fileNameToURL[fileName] = value as string;
-}
-
 function loadSpritesheet(renderer: PIXI.IRenderer, data: PIXI.ISpritesheetData) {
-    const baseTex = loadTexture(renderer, fileNameToURL[data.meta.image!]);
+    const baseTex = loadTexture(renderer, data.meta.image!);
 
     const sheet = new PIXI.Spritesheet(baseTex, data);
     sheet.resolution = baseTex.resolution;
