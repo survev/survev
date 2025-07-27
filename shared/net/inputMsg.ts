@@ -49,8 +49,6 @@ export class InputMsg implements AbstractMsg {
         }
 
         s.writeGameType(this.useItem);
-
-        s.writeBits(0, 6);
     }
 
     deserialize(s: BitStream) {
@@ -78,7 +76,5 @@ export class InputMsg implements AbstractMsg {
         }
 
         this.useItem = s.readGameType();
-
-        s.readBits(6);
     }
 }

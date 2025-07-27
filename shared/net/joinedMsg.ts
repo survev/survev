@@ -15,7 +15,6 @@ export class JoinedMsg implements AbstractMsg {
         for (let i = 0; i < this.emotes.length; i++) {
             s.writeGameType(this.emotes[i]);
         }
-        s.writeAlignToNextByte();
     }
 
     deserialize(s: BitStream) {
@@ -27,6 +26,5 @@ export class JoinedMsg implements AbstractMsg {
             const emote = s.readGameType();
             this.emotes.push(emote);
         }
-        s.readAlignToNextByte();
     }
 }
