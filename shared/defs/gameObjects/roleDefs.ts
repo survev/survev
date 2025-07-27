@@ -392,7 +392,11 @@ export const RoleDefs: Record<string, RoleDef> = {
         sound: { assign: "last_man_assigned_01" },
         perks: [
             "steelskin",
-            "ap_rounds",
+            () =>
+                util.weightedRandom([
+                    { type: "ap_rounds", weight: 1 },
+                    { type: "splinter", weight: 1 },
+                ]).type,
             "takedown",
             () =>
                 util.weightedRandom([
