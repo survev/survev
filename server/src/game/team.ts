@@ -60,14 +60,13 @@ export class Team {
     }
 
     killAllTeammates() {
-        for (let i = 0; i < this.livingPlayers.length; i++) {
+        for (let i = this.livingPlayers.length - 1; i >= 0; i--) {
             const p = this.livingPlayers[i];
             p.kill({
                 damageType: GameConfig.DamageType.Bleeding,
                 dir: p.dir,
                 source: p.downedBy,
             });
-            i--; // kill() removes the player from the array so we dont want to skip players
         }
     }
     checkAndApplyLastMan() {
