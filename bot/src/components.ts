@@ -160,9 +160,14 @@ export async function createDiscordPlayerInfoCardUI({
                 return;
             }
 
+            const ipsToBan = [selectedPlayer.ip];
+            if (selectedPlayer.findGameIp !== selectedPlayer.ip) {
+                ipsToBan.push(selectedPlayer.findGameIp);
+            }
+
             const res = await honoClient.moderation.ban_ip.$post({
                 json: {
-                    ip: selectedPlayer.ip,
+                    ips: ipsToBan,
                     ip_ban_duration: ipBanDuration,
                     ban_reason: banReason,
                     is_encoded: true,

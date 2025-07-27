@@ -7,7 +7,13 @@ export const zGetPlayerIpParams = z.object({
 });
 
 export const zBanIpParams = z.object({
-    ip: z.string(),
+    ips: z.union([
+        z
+            .string()
+            .min(1)
+            .transform((v) => [v]),
+        z.array(z.string()).min(1),
+    ]),
     is_encoded: z.boolean().default(false),
     permanent: z.boolean().default(false),
     ban_associated_account: z.boolean().default(true),

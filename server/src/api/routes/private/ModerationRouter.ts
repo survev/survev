@@ -1,5 +1,5 @@
 import { createHash } from "node:crypto";
-import { and, desc, eq, lt, ne } from "drizzle-orm";
+import { and, desc, eq, inArray, lt, ne } from "drizzle-orm";
 import { Hono } from "hono";
 import { z } from "zod";
 import { MapId, TeamModeToString } from "../../../../../shared/defs/types/misc";
@@ -143,7 +143,7 @@ export const ModerationRouter = new Hono()
     })
     .post("/ban_ip", validateParams(zBanIpParams), async (c) => {
         const {
-            ip,
+            ips,
             is_encoded,
             permanent,
             ban_associated_account,
@@ -151,18 +151,20 @@ export const ModerationRouter = new Hono()
             ban_reason,
             executor_id,
         } = c.req.valid("json");
+
         const expiresIn = new Date(Date.now() + ip_ban_duration * 24 * 60 * 60 * 1000);
-        const encodedIp = is_encoded ? ip : hashIp(ip);
+        const encodedIps = is_encoded ? ips : ips.map(hashIp);
+        const values = encodedIps.map((encodedIp) => ({
+            encodedIp,
+            expiresIn,
+            permanent,
+            reason: ban_reason,
+            bannedBy: executor_id,
+        }));
 
         await db
             .insert(bannedIpsTable)
-            .values({
-                encodedIp,
-                expiresIn,
-                permanent,
-                reason: ban_reason,
-                bannedBy: executor_id,
-            })
+            .values(values)
             .onConflictDoUpdate({
                 target: bannedIpsTable.encodedIp,
                 set: {
@@ -175,7 +177,7 @@ export const ModerationRouter = new Hono()
         if (ban_associated_account) {
             const user = await db.query.ipLogsTable.findFirst({
                 where: and(
-                    eq(ipLogsTable.encodedIp, encodedIp),
+                    inArray(ipLogsTable.encodedIp, encodedIps),
                     ne(ipLogsTable.userId, ""),
                 ),
                 columns: {
@@ -187,20 +189,22 @@ export const ModerationRouter = new Hono()
             }
         }
 
-        server.teamMenu.disconnectPlayers(encodedIp);
+        for (const encodedIp of encodedIps) {
+            server.teamMenu.disconnectPlayers(encodedIp);
+        }
 
-        if (permanent) {
+        const baseMessage = permanent
+            ? "permanently banned"
+            : `banned for ${ip_ban_duration} days`;
+
+        if (encodedIps.length === 1) {
             return c.json(
-                { message: `IP ${encodedIp} has been permanently banned.` },
+                { message: `IP ${encodedIps[0]} has been ${baseMessage}.` },
                 200,
             );
         }
-        return c.json(
-            {
-                message: `IP ${encodedIp} has been banned for ${ip_ban_duration} days.`,
-            },
-            200,
-        );
+
+        return c.json({ message: `${encodedIps.length} IPs ${baseMessage}.` }, 200);
     })
     .post("/unban_ip", validateParams(zUnbanIpParams), async (c) => {
         const { ip, is_encoded } = c.req.valid("json");
