@@ -1,7 +1,7 @@
 {
   "$schema": "https://biomejs.dev/schemas/2.0.5/schema.json",
   "files": {
-    "includes": ["**", "!**/client/atlas-builder/out/**/*.json"]
+    "includes": ["**", "!**/client/atlas-builder/out/**/*.json", "!**/*.svelte"]
   },
   "assist": { "actions": { "source": { "organizeImports": "on" } } },
   "linter": {

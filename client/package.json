@@ -17,9 +17,11 @@
     "ejs": "^3.1.10",
     "jquery": "^3.7.1",
     "pixi.js-legacy": "^7.4.3",
-    "slugify": "^1.6.6"
+    "slugify": "^1.6.6",
+    "svelte": "^5.37.0"
   },
   "devDependencies": {
+    "@sveltejs/vite-plugin-svelte": "^6.1.0",
     "@types/ejs": "^3.1.5",
     "@types/jquery": "^3.5.32",
     "codefend": "^3.2.0",

@@ -1,5 +1,6 @@
 import { resolve } from "node:path";
-import { defineConfig, type Plugin, type ServerOptions } from "vite";
+import { svelte } from "@sveltejs/vite-plugin-svelte";
+import { defineConfig, type ServerOptions, type UserConfig } from "vite";
 import stripBlockPlugin from "vite-plugin-strip-block";
 import { getConfig } from "../config";
 import { version } from "../package.json";
@@ -94,7 +95,11 @@ export default defineConfig(({ mode }) => {
     process.env.VITE_GAME_VERSION = version;
     process.env.VITE_BACKGROUND_IMG = selectedTheme.splashBg;
 
-    const plugins: Plugin[] = [ejsPlugin(), ...atlasBuilderPlugin()];
+    const plugins: UserConfig["plugins"] = [
+        ejsPlugin(),
+        ...atlasBuilderPlugin(),
+        svelte(),
+    ];
 
     if (!isDev) {
         plugins.push(codefendPlugin());
