@@ -14,7 +14,7 @@ export const zBanIpParams = z.object({
             .transform((v) => [v]),
         z.array(z.string()).min(1),
     ]),
-    is_encoded: z.boolean().default(false),
+    is_encoded: z.boolean().default(true),
     permanent: z.boolean().default(false),
     ban_associated_account: z.boolean().default(true),
     ip_ban_duration: z.number().default(7),
