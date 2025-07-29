@@ -97,10 +97,6 @@ app.post("/api/find_game", validateParams(zFindGameBody), async (c) => {
         return c.json<FindGameResponse>({ error: "rate_limited" }, 429);
     }
 
-    if (await isBehindProxy(ip)) {
-        return c.json<FindGameResponse>({ error: "behind_proxy" });
-    }
-
     const banData = await isBanned(ip);
     if (banData) {
         return c.json<FindGameResponse>({
@@ -128,6 +124,10 @@ app.post("/api/find_game", validateParams(zFindGameBody), async (c) => {
             server.logger.error("/api/find_game: Failed to validate session", err);
             userId = null;
         }
+    }
+
+    if (await isBehindProxy(ip, userId ? 0 : 3)) {
+        return c.json<FindGameResponse>({ error: "behind_proxy" });
     }
 
     const body = c.req.valid("json");
