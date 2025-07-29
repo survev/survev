@@ -223,7 +223,7 @@ app.ws<GameSocketData>("/play", {
         const socketId = randomUUID();
         let disconnectReason = "";
 
-        if (await isBehindProxy(ip)) {
+        if (await isBehindProxy(ip, 0)) {
             disconnectReason = "behind_proxy";
         } else if (await server.isIpBanned(ip)) {
             disconnectReason = "ip_banned";

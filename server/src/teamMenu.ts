@@ -420,10 +420,6 @@ export class TeamMenu {
                     closeReason = "rate_limited";
                 }
 
-                if (!closeReason && (await isBehindProxy(ip!))) {
-                    closeReason = "behind_proxy";
-                }
-
                 if (await isBanned(ip!)) {
                     closeReason = "banned";
                 }
@@ -445,6 +441,10 @@ export class TeamMenu {
                         this.logger.error(`Failed to validate session:`, err);
                         userId = null;
                     }
+                }
+
+                if (!closeReason && (await isBehindProxy(ip!, userId ? 0 : 3))) {
+                    closeReason = "behind_proxy";
                 }
 
                 return {

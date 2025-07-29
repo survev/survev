@@ -363,7 +363,7 @@ const proxyCheckCache = new Map<
     }
 >();
 
-export async function isBehindProxy(ip: string, vpn?: 0 | 1 | 2 | 3): Promise<boolean> {
+export async function isBehindProxy(ip: string, vpn: 0 | 1 | 2 | 3): Promise<boolean> {
     if (!proxyCheck) return false;
 
     let info: IPAddressInfo | undefined = undefined;
