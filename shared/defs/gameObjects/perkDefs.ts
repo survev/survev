@@ -21,7 +21,7 @@ export const PerkProperties = {
     },
     splinter: {
         mainDamageMult: 0.6,
-        splitsDamageMult: 0.45,
+        splitsDamageMult: 0.5,
     },
     ap_rounds: {
         armorPenetration: 0.8,
