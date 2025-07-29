@@ -205,7 +205,10 @@ export const ModerationRouter = new Hono()
             );
         }
 
-        return c.json({ message: `${encodedIps.length} IPs ${baseMessage}.` }, 200);
+        return c.json(
+            { message: `IPs: [${encodedIps.join(", ")}] ${baseMessage}.` },
+            200,
+        );
     })
     .post("/unban_ip", validateParams(zUnbanIpParams), async (c) => {
         const { ip, is_encoded } = c.req.valid("json");
