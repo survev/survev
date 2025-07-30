@@ -7,6 +7,7 @@ import Path from "node:path";
 import { loadImage } from "canvas";
 import type { ISpritesheetData } from "pixi.js-legacy";
 import type { Atlas } from "../../shared/defs/mapDefs";
+import { Logger } from "../../shared/utils/logger";
 import { Atlases, type AtlasRes, scaledSprites } from "./atlasDefs";
 import type { MainToWorkerMsg, WorkerToMainMsg } from "./atlasWorker";
 import type { Edges } from "./detectEdges";
@@ -15,6 +16,17 @@ import type { ParentMsg } from "./imageWorker";
 export const cacheFolder = Path.resolve(
     import.meta.dirname,
     "../node_modules/.atlas-cache/",
+);
+
+export const atlasLogger = new Logger(
+    {
+        logDate: false,
+        debugLogs: true,
+        infoLogs: true,
+        warnLogs: true,
+        errorLogs: true,
+    },
+    "Atlas Builder",
 );
 
 export const imagesCacheFolder = Path.join(cacheFolder, "img");
@@ -81,8 +93,6 @@ export class ImageManager {
     async renderImages() {
         if (this.imagesToRender.size === 0) return;
 
-        const threads = Math.max(os.availableParallelism() - 2, 1);
-
         const imagesToRender = [...this.imagesToRender.entries()].map((a) => {
             return {
                 path: a[0],
@@ -90,15 +100,22 @@ export class ImageManager {
             };
         });
 
-        const imagesPerThread = Math.ceil(imagesToRender.length / threads);
+        const start = Date.now();
 
-        console.log(
-            `Rendering ${imagesToRender.length} images / ${imagesPerThread} per thread`,
-        );
+        let threadsLeft = Math.max(os.availableParallelism() - 2, 1);
+
+        let imagesPerThread = Math.ceil(imagesToRender.length / threadsLeft);
+        let originalCount = imagesToRender.length;
 
         const promises: Promise<void>[] = [];
+
+        let workers = 0;
         while (imagesToRender.length) {
+            threadsLeft--;
+            workers++;
+
             const images = imagesToRender.splice(0, imagesPerThread);
+            imagesPerThread = Math.ceil(imagesToRender.length / threadsLeft);
 
             const proc = cp.fork(Path.resolve(import.meta.dirname, "imageWorker.ts"), {
                 execArgv: ["--import", "tsx"],
@@ -111,7 +128,6 @@ export class ImageManager {
 
                 proc.on("message", (msg: ImgCache) => {
                     Object.assign(this.cache, msg);
-
                     proc.kill();
                     resolve();
                 });
@@ -120,10 +136,15 @@ export class ImageManager {
             promises.push(promise);
         }
 
+        atlasLogger.info(`Rendering ${originalCount} images`, `with ${workers} workers`);
+
         await Promise.all(promises);
         this.writeToDisk();
 
         this.imagesToRender.clear();
+
+        const end = Date.now();
+        atlasLogger.info(`Rendered all images after ${end - start}ms`);
     }
 }
 
@@ -210,38 +231,53 @@ export class AtlasManager {
     async buildAtlases(atlasesToBuild: { name: Atlas; hash: string }[]) {
         await this.imageCache.renderImages();
 
+        const start = Date.now();
+
+        let threadsLeft = Math.max(os.availableParallelism() - 2, 1);
+
+        let atlasesPerThread = Math.ceil(atlasesToBuild.length / threadsLeft);
+        const originalCount = atlasesToBuild.length;
+
         const promises: Promise<void>[] = [];
 
-        for (const atlas of atlasesToBuild) {
+        let workers = 0;
+        while (atlasesToBuild.length) {
+            threadsLeft--;
+            workers++;
+
+            const atlases = atlasesToBuild.splice(0, atlasesPerThread);
+            atlasesPerThread = Math.ceil(atlasesToBuild.length / threadsLeft);
+
             const proc = cp.fork(Path.resolve(import.meta.dirname, "atlasWorker.ts"), {
                 serialization: "advanced",
                 execArgv: ["--import", "tsx"],
             });
 
-            const atlasPath = this.getAtlasFolderPath(atlas.name, atlas.hash);
-            fs.mkdirSync(atlasPath, {
-                recursive: true,
-            });
-
             const promise = new Promise<void>((resolve) => {
-                proc.send({
-                    name: atlas.name,
-                    def: Atlases[atlas.name],
-                } satisfies MainToWorkerMsg);
+                proc.send(atlases satisfies MainToWorkerMsg);
 
                 proc.on("message", (msg: WorkerToMainMsg) => {
                     const data = msg;
 
-                    const atlasJson: Record<string, ISpritesheetData[]> = {};
+                    for (const atlas of data) {
+                        const atlasPath = this.getAtlasFolderPath(atlas.name, atlas.hash);
+                        fs.mkdirSync(atlasPath, {
+                            recursive: true,
+                        });
 
-                    for (const sheet of data) {
-                        const filePath = Path.join(atlasPath, sheet.data.meta.image!);
-                        fs.writeFileSync(filePath, Buffer.from(sheet.buff));
-                        (atlasJson[sheet.res] ??= []).push(sheet.data);
+                        promises.push(promise);
+
+                        const atlasJson: Record<string, ISpritesheetData[]> = {};
+
+                        for (const sheet of atlas.data) {
+                            const filePath = Path.join(atlasPath, sheet.data.meta.image!);
+                            fs.writeFileSync(filePath, Buffer.from(sheet.buff));
+                            (atlasJson[sheet.res] ??= []).push(sheet.data);
+                        }
+
+                        const filePath = Path.join(atlasPath, "data.json");
+                        fs.writeFileSync(filePath, JSON.stringify(atlasJson));
                     }
-
-                    const filePath = Path.join(atlasPath, "data.json");
-                    fs.writeFileSync(filePath, JSON.stringify(atlasJson));
 
                     proc.kill();
                     resolve();
@@ -251,6 +287,10 @@ export class AtlasManager {
             promises.push(promise);
         }
 
+        atlasLogger.info(`Rendering ${originalCount} atlases`, `with ${workers} workers`);
+
         await Promise.all(promises);
+        const end = Date.now();
+        atlasLogger.info(`Built all atlases after ${end - start}ms`);
     }
 }

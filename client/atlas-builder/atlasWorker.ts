@@ -2,8 +2,9 @@ import { createCanvas, type Image } from "canvas";
 import { type Bin, MaxRectsPacker, type Rectangle } from "maxrects-packer";
 import type { ISpritesheetData } from "pixi.js-legacy";
 import sharp from "sharp";
-import { ImageManager } from "./atlasBuilder";
-import { type AtlasDef, type AtlasRes, AtlasResolutions } from "./atlasDefs";
+import type { Atlas } from "../../shared/defs/mapDefs";
+import { atlasLogger, ImageManager } from "./atlasBuilder";
+import { type AtlasDef, Atlases, type AtlasRes, AtlasResolutions } from "./atlasDefs";
 import type { Edges } from "./detectEdges";
 
 interface ImageData {
@@ -14,15 +15,16 @@ interface ImageData {
     height: number;
 }
 
-export interface MainToWorkerMsg {
-    name: string;
-    def: AtlasDef;
-}
+export type MainToWorkerMsg = Array<{ name: Atlas; hash: string }>;
 
 export type WorkerToMainMsg = Array<{
-    res: AtlasRes;
-    data: ISpritesheetData;
-    buff: ArrayBuffer;
+    name: Atlas;
+    hash: string;
+    data: Array<{
+        res: AtlasRes;
+        data: ISpritesheetData;
+        buff: Buffer;
+    }>;
 }>;
 
 const cache = new ImageManager();
@@ -38,16 +40,12 @@ export class AtlasBuilder {
         data: ImageData;
     }> = [];
 
-    atlases: Array<{
-        res: AtlasRes;
-        data: ISpritesheetData;
-        buff: Buffer;
-    }> = [];
+    atlases: WorkerToMainMsg[0]["data"] = [];
 
-    constructor(
-        public name: string,
-        public def: AtlasDef,
-    ) {
+    def: AtlasDef;
+
+    constructor(public name: Atlas) {
+        this.def = Atlases[name];
         this.packer = new MaxRectsPacker(4096, 4096, 4, {
             border: 2,
             square: true,
@@ -55,14 +53,14 @@ export class AtlasBuilder {
     }
 
     async build() {
-        console.log(`Building atlas ${this.name}`);
+        atlasLogger.info(`Building atlas ${this.name}`);
 
         const start = Date.now();
         await this.pack();
         await this.generateAtlases();
 
         const timeTaken = Date.now() - start;
-        console.log(`Finished building ${this.name} after ${timeTaken}ms`);
+        atlasLogger.info(`Finished building ${this.name} after ${timeTaken}ms`);
     }
 
     static imageCache = new Map<
@@ -220,8 +218,17 @@ export class AtlasBuilder {
     }
 }
 
-process.on("message", async (data: MainToWorkerMsg) => {
-    const builder = new AtlasBuilder(data.name, data.def);
-    await builder.build();
-    process.send!(builder.atlases);
+process.on("message", async (msg: MainToWorkerMsg) => {
+    const res: WorkerToMainMsg = [];
+
+    for (const atlas of msg) {
+        const builder = new AtlasBuilder(atlas.name);
+        await builder.build();
+        res.push({
+            name: atlas.name,
+            hash: atlas.hash,
+            data: builder.atlases,
+        });
+    }
+    process.send!(res);
 });

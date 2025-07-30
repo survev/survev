@@ -5,7 +5,7 @@ import type { ISpritesheetData } from "pixi.js-legacy";
 import type { Plugin } from "vite";
 import type { Atlas } from "../../shared/defs/mapDefs";
 import { assert } from "../../shared/utils/util";
-import { AtlasManager } from "./atlasBuilder";
+import { AtlasManager, atlasLogger, imageFolder } from "./atlasBuilder";
 import { type AtlasRes, AtlasResolutions } from "./atlasDefs";
 
 export function atlasBuilderPlugin(): Plugin[] {
@@ -44,12 +44,12 @@ export function atlasBuilderPlugin(): Plugin[] {
         const changedAtlases = atlasManager.getChangedAtlases();
 
         if (changedAtlases.length) {
-            console.log(
+            atlasLogger.info(
                 `Building atlases ${changedAtlases.map((a) => a.name).join(", ")}`,
             );
             await atlasManager.buildAtlases(changedAtlases);
         } else {
-            console.log("No atlases to rebuild :)");
+            atlasLogger.info("No atlases to build :)");
         }
     };
 
@@ -154,10 +154,14 @@ export function atlasBuilderPlugin(): Plugin[] {
                     rebuildTimeout = setTimeout(async () => {
                         buildPromise = build();
                         await buildPromise;
-                    }, 100);
+                    }, 250);
                 };
                 const watchCb = (path: string) => {
-                    if (path.endsWith(".svg")) {
+                    if (path.endsWith(".svg") || path.endsWith(".png")) {
+                        const relative = Path.relative(imageFolder, path);
+                        atlasLogger.info(
+                            `Image ${relative} changed, scheduling atlas rebuild`,
+                        );
                         scheduleRebuild();
                     }
                 };
