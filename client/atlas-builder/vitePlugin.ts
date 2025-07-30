@@ -48,6 +48,13 @@ export function atlasBuilderPlugin(): Plugin[] {
                 `Building atlases ${changedAtlases.map((a) => a.name).join(", ")}`,
             );
             await atlasManager.buildAtlases(changedAtlases);
+
+            // meh
+            // cache building up your storage is only an issue if you rebuild atlases frequently
+            // and if you rebuild them frequently this is surely going to run at some point... right?
+            if (Math.random() < 0.1) {
+                atlasManager.cleanOldFiles();
+            }
         } else {
             atlasLogger.info("No atlases to build :)");
         }

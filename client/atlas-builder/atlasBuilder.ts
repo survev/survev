@@ -146,6 +146,33 @@ export class ImageManager {
         const end = Date.now();
         atlasLogger.info(`Rendered all images after ${end - start}ms`);
     }
+
+    cleanOldFiles() {
+        const files = fs.readdirSync(imagesCacheFolder);
+
+        const validCachedImages = new Set(Object.values(this.cache).map((i) => i.hash));
+
+        let filesRemoved = 0;
+        for (const file of files) {
+            const path = Path.join(imagesCacheFolder, file);
+            const stat = fs.statSync(path);
+            const date = Date.now() - stat.atimeMs;
+
+            // remove files that are over 7 days old and are invalid cache
+            if (date > 7 * 24 * 60 * 60 * 1000) {
+                const hashKey = file.replace(".png", "");
+                const existsInCache = validCachedImages.has(hashKey);
+
+                if (!existsInCache) {
+                    filesRemoved++;
+                    fs.rmSync(path);
+                }
+            }
+        }
+        if (filesRemoved > 0) {
+            atlasLogger.info(`Cleaned ${filesRemoved} old images from cache`);
+        }
+    }
 }
 
 // Atlas key -> hash
@@ -292,5 +319,38 @@ export class AtlasManager {
         await Promise.all(promises);
         const end = Date.now();
         atlasLogger.info(`Built all atlases after ${end - start}ms`);
+    }
+
+    cleanOldFiles() {
+        this.imageCache.cleanOldFiles();
+
+        const files = fs.readdirSync(atlasesCacheFolder);
+
+        const validCachedImages = new Set(
+            Object.entries(this.atlasCache).map(([key, value]) => `${key}-${value}`),
+        );
+
+        let atlasesRemoved = 0;
+        for (const folder of files) {
+            const path = Path.join(atlasesCacheFolder, folder);
+
+            const stat = fs.statSync(path);
+            const date = Date.now() - stat.atimeMs;
+
+            // remove atlases that are over 7 days old and are invalid cache
+            if (date > 7 * 24 * 60 * 60 * 1000) {
+                const existsInCache = validCachedImages.has(folder);
+
+                if (!existsInCache) {
+                    atlasesRemoved++;
+                    fs.rmSync(path, {
+                        recursive: true,
+                    });
+                }
+            }
+        }
+        if (atlasesRemoved > 0) {
+            atlasLogger.info(`Cleaned ${atlasesRemoved} old atlases from cache`);
+        }
     }
 }
