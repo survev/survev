@@ -941,6 +941,9 @@ window.onerror = function (msg, url, lineNo, columnNo, error) {
     msg = msg || "undefined_error_msg";
     const stacktrace = error ? error.stack : "";
 
+    // don't report useless errors lol
+    if (!url && !lineNo && !columnNo) return;
+
     const errObj = {
         msg,
         id: App.sessionId,

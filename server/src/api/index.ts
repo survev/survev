@@ -188,15 +188,25 @@ app.post(
     "/api/report_error",
     rateLimitMiddleware(5, 60 * 1000),
     validateParams(z.object({ loc: z.string(), error: z.any(), data: z.any() })),
-    async (c) => {
-        const content = await c.req.json();
-        if ("error" in content) {
+    (c) => {
+        const content = c.req.valid("json");
+        if (content.error) {
             try {
                 content.error = JSON.parse(content.error);
             } catch {}
         }
 
-        logErrorToWebhook("client", content);
+        let stackTrace: string | undefined;
+        if (
+            "stacktrace" in content.error &&
+            typeof content.error.stacktrace == "string" &&
+            content.error.stacktrace
+        ) {
+            stackTrace = `### Stacktrace:\n \`\`\`${content.error.stacktrace.replaceAll("`", "\\`")}\`\`\``;
+            delete content.error.stacktrace;
+        }
+
+        logErrorToWebhook("client", content, stackTrace);
 
         return c.json({ success: true }, 200);
     },

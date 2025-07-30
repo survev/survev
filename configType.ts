@@ -194,9 +194,14 @@ export interface ConfigType {
         errorLogs: boolean;
     };
     /**
-     * Webhook URL to log errors.
+     * Webhook URL to log server errors.
      */
     errorLoggingWebhook?: string;
+
+    /**
+     * Webhook URL to log client errors.
+     */
+    clientErrorLoggingWebhook?: string;
 
     /**
      * PostgreSQL Database configuration, this will enable features like accounts, IP bans, leaderboards etc.
