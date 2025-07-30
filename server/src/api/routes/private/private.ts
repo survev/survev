@@ -5,6 +5,7 @@ import { saveConfig } from "../../../../../config";
 import { GameObjectDefs } from "../../../../../shared/defs/gameObjectDefs";
 import { MapDefs } from "../../../../../shared/defs/mapDefs";
 import { TeamMode } from "../../../../../shared/gameConfig";
+import { zGiveItemParams } from "../../../../../shared/types/moderation";
 import { serverConfigPath } from "../../../config";
 import { type SaveGameBody, zUpdateRegionBody } from "../../../utils/types";
 import type { Context } from "../..";
@@ -107,20 +108,14 @@ export const PrivateRouter = new Hono<Context>()
     .post(
         "/give_item",
         databaseEnabledMiddleware,
-        validateParams(
-            z.object({
-                item: z.string(),
-                slug: z.string(),
-                source: z.string().default("daddy-has-privileges"),
-            }),
-        ),
+        validateParams(zGiveItemParams),
         async (c) => {
             const { item, slug, source } = c.req.valid("json");
 
             const def = GameObjectDefs[item];
 
             if (!def) {
-                return c.json({ error: "Invalid item type" }, 400);
+                return c.json({ message: "Invalid item type" }, 200);
             }
 
             const userId = await db.query.usersTable.findFirst({
@@ -131,7 +126,7 @@ export const PrivateRouter = new Hono<Context>()
             });
 
             if (!userId) {
-                return c.json({ error: "User not found" }, 404);
+                return c.json({ message: "User not found" }, 200);
             }
 
             const existing = await db.query.itemsTable.findFirst({
@@ -142,7 +137,7 @@ export const PrivateRouter = new Hono<Context>()
             });
 
             if (existing) {
-                return c.json({ error: "User already has item" }, 400);
+                return c.json({ message: "User already has item" }, 200);
             }
 
             await db.insert(itemsTable).values({
@@ -152,7 +147,7 @@ export const PrivateRouter = new Hono<Context>()
                 timeAcquired: Date.now(),
             });
 
-            return c.json({ success: true }, 200);
+            return c.json({ message: `Item "${item}" given to ${slug}` }, 200);
         },
     )
     .post(

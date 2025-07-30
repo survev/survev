@@ -53,3 +53,9 @@ export const zSetAccountNameParams = z.object({
 export const zFindDiscordUserSlugParams = z.object({
     discord_user: z.string(),
 });
+
+export const zGiveItemParams = z.object({
+    item: z.string(),
+    slug: z.string(),
+    source: z.string().default("daddy-has-privileges"),
+});

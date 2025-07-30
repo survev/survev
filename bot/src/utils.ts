@@ -21,6 +21,7 @@ export const enum Command {
     UnbanIp = "unban_ip",
     SetMatchDataName = "set_match_data_name",
     SetAccountName = "set_account_name",
+    GiveItem = "give_item",
 }
 
 export const honoClient = hc<PrivateRouteApp>(API_URL, {
@@ -29,7 +30,19 @@ export const honoClient = hc<PrivateRouteApp>(API_URL, {
     },
 });
 
-export function hasPermission(interaction: Interaction): boolean {
+export function isAdmin(interaction: Interaction) {
+    if (interaction.guild?.id !== DISCORD_GUILD_ID) {
+        return false;
+    }
+
+    if (interaction.inCachedGuild()) {
+        return interaction.member.id === interaction.guild.ownerId;
+    }
+
+    return false;
+}
+
+export function hasBotPermission(interaction: Interaction): boolean {
     if (interaction.guild?.id !== DISCORD_GUILD_ID) {
         return false;
     }

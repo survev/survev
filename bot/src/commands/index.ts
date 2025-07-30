@@ -7,6 +7,7 @@ import {
     zBanAccountParams,
     zBanIpParams,
     zFindDiscordUserSlugParams,
+    zGiveItemParams,
     zSetAccountNameParams,
     zSetMatchDataNameParams,
     zUnbanAccountParams,
@@ -172,6 +173,26 @@ const commands = {
             },
         ],
     }),
+    [Command.GiveItem]: createCommand({
+        name: Command.GiveItem,
+        description: "Give an item to a user",
+        optionValidator: zGiveItemParams,
+        isPrivateRoute: true,
+        options: [
+            {
+                name: "item",
+                description: "The item to give",
+                required: true,
+                type: ApplicationCommandOptionType.String,
+            },
+            {
+                name: "slug",
+                description: "The account slug to give the item to",
+                required: true,
+                type: ApplicationCommandOptionType.String,
+            },
+        ],
+    }),
 };
 
 export type CommandHandlers = {
@@ -183,7 +204,12 @@ export const commandHandlers: CommandHandlers = (
 ).reduce(
     (obj, key) => {
         obj[key] = (interaction) =>
-            genericExecute(key, interaction, commands[key].optionValidator);
+            genericExecute(
+                key,
+                interaction,
+                commands[key].optionValidator,
+                commands[key].isPrivateRoute,
+            );
         return obj;
     },
     {
