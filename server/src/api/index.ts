@@ -198,6 +198,7 @@ app.post(
 
         let stackTrace: string | undefined;
         if (
+            typeof content.error == "object" &&
             "stacktrace" in content.error &&
             typeof content.error.stacktrace == "string" &&
             content.error.stacktrace
