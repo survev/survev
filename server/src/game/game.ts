@@ -3,7 +3,7 @@ import * as net from "../../../shared/net/net";
 import { math } from "../../../shared/utils/math";
 import { v2 } from "../../../shared/utils/v2";
 import { Config } from "../config";
-import { Logger } from "../utils/logger";
+import { ServerLogger } from "../utils/logger";
 import { apiPrivateRouter } from "../utils/serverHelpers";
 import {
     type FindGamePrivateBody,
@@ -104,7 +104,7 @@ export class Game {
     perfTicker = 0;
     tickTimes: number[] = [];
 
-    logger: Logger;
+    logger: ServerLogger;
 
     start = Date.now();
 
@@ -118,7 +118,7 @@ export class Game {
         readonly sendData?: (data: UpdateDataMsg) => void,
     ) {
         this.id = id;
-        this.logger = new Logger(`Game #${this.id.substring(0, 4)}`);
+        this.logger = new ServerLogger(`Game #${this.id.substring(0, 4)}`);
         this.logger.info("Creating");
 
         this.config = config;

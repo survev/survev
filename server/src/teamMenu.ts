@@ -19,7 +19,7 @@ import type { ApiServer } from "./api/apiServer";
 import { validateSessionToken } from "./api/auth";
 import { hashIp, isBanned } from "./api/routes/private/ModerationRouter";
 import { Config } from "./config";
-import { Logger } from "./utils/logger";
+import { ServerLogger } from "./utils/logger";
 import {
     getHonoIp,
     HTTPRateLimit,
@@ -362,7 +362,7 @@ function randomString(len: number) {
 export class TeamMenu {
     rooms = new Map<string, Room>();
 
-    logger = new Logger("TeamMenu");
+    logger = new ServerLogger("TeamMenu");
 
     playersByIp = new Map<string, Set<Player>>();
 

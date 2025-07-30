@@ -7,7 +7,7 @@ import { Config } from "./config";
 import { SingleThreadGameManager } from "./game/gameManager";
 import { GameProcessManager } from "./game/gameProcessManager";
 import { GIT_VERSION } from "./utils/gitRevision";
-import { Logger } from "./utils/logger";
+import { ServerLogger } from "./utils/logger";
 import {
     apiPrivateRouter,
     cors,
@@ -36,7 +36,7 @@ process.on("uncaughtException", async (err) => {
 });
 
 class GameServer {
-    readonly logger = new Logger("GameServer");
+    readonly logger = new ServerLogger("GameServer");
 
     readonly region = Config.regions[Config.gameServer.thisRegion];
     readonly regionId = Config.gameServer.thisRegion;
