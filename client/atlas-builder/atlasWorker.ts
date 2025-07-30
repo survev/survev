@@ -102,8 +102,9 @@ export class AtlasBuilder {
         const imagePromises: Promise<void>[] = [];
 
         for (const file of this.def.images) {
-            const key = file.split("/").at(-1)!.replace(".svg", ".img");
-
+            let key: string | string[] = file.split("/").at(-1)!.split(".");
+            key.pop(); // remove file extension
+            key = `${key.join(".")}.img`;
             imagePromises.push(this.loadImage(key, file));
         }
         await Promise.all(imagePromises);
