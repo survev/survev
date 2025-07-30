@@ -51,29 +51,22 @@ export class Logger {
                 styleText("cyan", dateString),
                 styleText("green", this.prefix),
                 "|",
-                message.join(" "),
+                ...message,
             );
         } else {
-            logFn(styleText("green", this.prefix), "|", message.join(" "));
-        }
-
-        // to print full error messages
-        for (const msg of message) {
-            if (msg instanceof Error) {
-                logFn(msg);
-            }
+            logFn(styleText("green", this.prefix), "|", ...message);
         }
     }
 
     info(...message: any[]): void {
         if (!this.config.infoLogs) return;
-        this.log(undefined, styleText("blue", "[INFO]"), ...message);
+        this.log(console.info, styleText("blue", "[INFO]"), ...message);
     }
 
     debug(...message: any[]): void {
         if (!this.config.debugLogs) return;
         this.log(
-            undefined,
+            console.debug,
             // not a typo, just want it to align with the others :D
             styleText("magenta", "[DEBG]"),
             ...message,
