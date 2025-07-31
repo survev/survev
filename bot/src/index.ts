@@ -6,14 +6,20 @@ import {
     MessageFlags,
 } from "discord.js";
 import { commandHandlers } from "./commands";
+import { sendNoPermissionMessage } from "./commands/helpers";
 import { DISCORD_BOT_TOKEN } from "./config";
-import type { Command } from "./utils";
+import { type Command, hasBotPermission } from "./utils";
 
 const client = new Client({ intents: [GatewayIntentBits.Guilds] });
 
 function setupInteractionHandlers() {
     client.on(Events.InteractionCreate, async (interaction) => {
         if (!interaction.isChatInputCommand()) return;
+
+        if (!hasBotPermission(interaction)) {
+            await sendNoPermissionMessage(interaction);
+            return;
+        }
 
         const commandName = interaction.commandName as Command;
         if (!commandHandlers[commandName]) {

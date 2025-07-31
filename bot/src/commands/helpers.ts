@@ -5,7 +5,7 @@ import {
     SlashCommandBuilder,
 } from "discord.js";
 import type z from "zod";
-import { type Command, hasBotPermission, honoClient, isAdmin } from "../utils";
+import { type Command, honoClient, isAdmin } from "../utils";
 
 export function createCommand<T extends z.ZodSchema>(config: {
     name: Command;
@@ -58,11 +58,6 @@ export async function genericExecute<N extends Exclude<Command, "search_player">
 
     if (isPrivateRoute) {
         await handlePrivateRoute(interaction, name, args.data);
-        return;
-    }
-
-    if (!hasBotPermission(interaction)) {
-        await sendNoPermissionMessage(interaction);
         return;
     }
 
@@ -126,10 +121,14 @@ export function createSlashCommand(config: ReturnType<typeof createCommand>) {
 }
 
 export async function sendNoPermissionMessage(interaction: ChatInputCommandInteraction) {
-    if (interaction.isRepliable()) {
-        await interaction.reply({
-            content: "You do not have permission to use this action.",
-            flags: MessageFlags.Ephemeral,
-        });
+    if (!interaction.isRepliable()) return;
+    const errorMessage = {
+        content: "You do not have permission to use this action.",
+        flags: MessageFlags.Ephemeral,
+    } as const;
+    if (interaction.replied || interaction.deferred) {
+        await interaction.followUp(errorMessage);
+    } else {
+        await interaction.reply(errorMessage);
     }
 }
