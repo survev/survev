@@ -197,6 +197,39 @@ export class BitStream extends bb.BitStream {
     readMapType() {
         return mapTypeSerialization.idToType(this.readBits(12));
     }
+
+    writeArray<T>(array: T[], bits: number, writeFn: (item: T, index: number) => void) {
+        assert(bits > 0 && bits < 31);
+
+        let length = array.length;
+        const maxSize = 1 << bits;
+        if (length > maxSize) {
+            console.trace(
+                `writeArray: Array overflow, size: ${length} max size: ${maxSize}`,
+            );
+            length = maxSize;
+        }
+
+        this.writeBits(length, bits);
+
+        for (let i = 0; i < length; i++) {
+            const item = array[i];
+            writeFn(item, i);
+        }
+    }
+
+    readArray<T>(bits: number, readFn: (index: number) => T): T[] {
+        assert(bits > 0 && bits < 31);
+
+        const length = this.readBits(bits);
+        const array = new Array(length);
+
+        for (let i = 0; i < length; i++) {
+            array[i] = readFn(i);
+        }
+
+        return array;
+    }
 }
 
 //

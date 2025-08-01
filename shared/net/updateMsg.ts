@@ -104,10 +104,8 @@ function deserializeActivePlayer(s: BitStream, data: LocalDataWithDirty) {
     s.readAlignToNextByte();
 }
 
-function serializePlayerStatus(s: BitStream, data: { players: PlayerStatus[] }) {
-    s.writeUint8(data.players.length);
-    for (let i = 0; i < data.players.length; i++) {
-        const info = data.players[i];
+function serializePlayerStatus(s: BitStream, players: PlayerStatus[]) {
+    s.writeArray(players, 8, (info) => {
         s.writeBoolean(info.hasData);
 
         if (info.hasData) {
@@ -121,16 +119,17 @@ function serializePlayerStatus(s: BitStream, data: { players: PlayerStatus[] }) 
                 s.writeGameType(info.role);
             }
         }
-    }
+    });
+
     s.writeAlignToNextByte();
 }
 
-function deserializePlayerStatus(s: BitStream, data: { players: PlayerStatus[] }) {
-    data.players = [];
-    const count = s.readUint8();
-    for (let i = 0; i < count; i++) {
-        const p = {} as PlayerStatus & { hasData: boolean };
-        p.hasData = s.readBoolean();
+function deserializePlayerStatus(s: BitStream): PlayerStatus[] {
+    const players = s.readArray(8, () => {
+        const p = {
+            hasData: s.readBoolean(),
+        } as PlayerStatus;
+
         if (p.hasData) {
             p.pos = s.readVec(0, 0, 1024, 1024, 11);
             p.visible = s.readBoolean();
@@ -141,30 +140,28 @@ function deserializePlayerStatus(s: BitStream, data: { players: PlayerStatus[] }
                 p.role = s.readGameType();
             }
         }
-        data.players.push(p);
-    }
+        return p;
+    });
+
     s.readAlignToNextByte();
+
+    return players;
 }
 
-function serializeGroupStatus(s: BitStream, data: { players: GroupStatus[] }) {
-    s.writeUint8(data.players.length);
-
-    for (let i = 0; i < data.players.length; i++) {
-        const status = data.players[i];
+function serializeGroupStatus(s: BitStream, players: GroupStatus[]) {
+    s.writeArray(players, 8, (status) => {
         s.writeFloat(status.health, 0, 100, 7);
         s.writeBoolean(status.disconnected);
-    }
+    });
 }
 
-function deserializeGroupStatus(s: BitStream, data: { players: GroupStatus[] }) {
-    data.players = [];
-    const count = s.readUint8();
-    for (let i = 0; i < count; i++) {
-        const p = {} as GroupStatus;
-        p.health = s.readFloat(0, 100, 7);
-        p.disconnected = s.readBoolean();
-        data.players.push(p);
-    }
+function deserializeGroupStatus(s: BitStream): GroupStatus[] {
+    return s.readArray(8, () => {
+        return {
+            health: s.readFloat(0, 100, 7),
+            disconnected: s.readBoolean(),
+        };
+    });
 }
 
 export interface PlayerInfo {
@@ -304,29 +301,26 @@ export class UpdateMsg implements AbstractMsg {
         s.writeUint16(flags);
 
         if (this.delObjIds.length) {
-            s.writeUint16(this.delObjIds.length);
-            for (let i = 0; i < this.delObjIds.length; i++) {
-                s.writeUint16(this.delObjIds[i]);
-            }
+            s.writeArray(this.delObjIds, 16, (id) => {
+                s.writeUint16(id);
+            });
+
             flags |= UpdateExtFlags.DeletedObjects;
         }
 
         if (this.fullObjects.length) {
-            s.writeUint16(this.fullObjects.length);
-            for (let i = 0; i < this.fullObjects.length; i++) {
-                const obj = this.fullObjects[i];
+            s.writeArray(this.fullObjects, 16, (obj) => {
                 s.writeUint8(obj.__type);
                 s.writeBytes(obj.partialStream, 0, obj.partialStream.byteIndex);
                 s.writeBytes(obj.fullStream, 0, obj.fullStream.byteIndex);
-            }
+            });
+
             flags |= UpdateExtFlags.FullObjects;
         }
 
-        s.writeUint16(this.partObjects.length);
-        for (let i = 0; i < this.partObjects.length; i++) {
-            const obj = this.partObjects[i];
+        s.writeArray(this.partObjects, 16, (obj) => {
             s.writeBytes(obj.partialStream, 0, obj.partialStream.byteIndex);
-        }
+        });
 
         if (this.activePlayerIdDirty) {
             s.writeUint16(this.activePlayerId);
@@ -346,37 +340,33 @@ export class UpdateMsg implements AbstractMsg {
         }
 
         if (this.playerInfos.length) {
-            s.writeUint8(this.playerInfos.length);
-            for (let i = 0; i < this.playerInfos.length; i++) {
-                serializePlayerInfo(s, this.playerInfos[i]);
-            }
+            s.writeArray(this.playerInfos, 8, (info) => {
+                serializePlayerInfo(s, info);
+            });
+
             flags |= UpdateExtFlags.PlayerInfos;
         }
 
         if (this.deletedPlayerIds.length) {
-            s.writeUint8(this.deletedPlayerIds.length);
-            for (let i = 0; i < this.deletedPlayerIds.length; i++) {
-                s.writeUint16(this.deletedPlayerIds[i]);
-            }
+            s.writeArray(this.deletedPlayerIds, 8, (id) => {
+                s.writeUint16(id);
+            });
+
             flags |= UpdateExtFlags.DeletePlayerIds;
         }
 
         if (this.playerStatusDirty) {
-            serializePlayerStatus(s, this.playerStatus);
+            serializePlayerStatus(s, this.playerStatus.players);
             flags |= UpdateExtFlags.PlayerStatus;
         }
 
         if (this.groupStatusDirty) {
-            serializeGroupStatus(s, this.groupStatus);
+            serializeGroupStatus(s, this.groupStatus.players);
             flags |= UpdateExtFlags.GroupStatus;
         }
 
         if (this.bullets.length) {
-            s.writeUint8(this.bullets.length);
-
-            for (let i = 0; i < this.bullets.length; i++) {
-                const bullet = this.bullets[i];
-
+            s.writeArray(this.bullets, 8, (bullet) => {
                 s.writeUint16(bullet.playerId);
                 s.writeVec(bullet.startPos, 0, 0, 1024, 1024, 16);
                 s.writeUnitVec(bullet.dir, 8);
@@ -410,30 +400,25 @@ export class UpdateMsg implements AbstractMsg {
                     s.writeBoolean(bullet.trailSmall);
                     s.writeBoolean(bullet.trailThick);
                 }
-            }
+            });
 
             s.writeAlignToNextByte();
             flags |= UpdateExtFlags.Bullets;
         }
 
         if (this.explosions.length) {
-            s.writeUint8(this.explosions.length);
-            for (let i = 0; i < this.explosions.length; i++) {
-                const explosion = this.explosions[i];
-
+            s.writeArray(this.explosions, 8, (explosion) => {
                 s.writeVec(explosion.pos, 0, 0, 1024, 1024, 16);
                 s.writeGameType(explosion.type);
                 s.writeBits(explosion.layer, 2);
                 s.writeAlignToNextByte();
-            }
+            });
+
             flags |= UpdateExtFlags.Explosions;
         }
 
         if (this.emotes.length) {
-            s.writeUint8(this.emotes.length);
-            for (let i = 0; i < this.emotes.length; i++) {
-                const emote = this.emotes[i];
-
+            s.writeArray(this.emotes, 8, (emote) => {
                 s.writeUint16(emote.playerId);
                 s.writeGameType(emote.type);
                 s.writeGameType(emote.itemType);
@@ -443,48 +428,43 @@ export class UpdateMsg implements AbstractMsg {
                     s.writeVec(emote.pos!, 0, 0, 1024, 1024, 16);
                 }
                 s.writeAlignToNextByte();
-            }
+            });
+
             flags |= UpdateExtFlags.Emotes;
         }
 
         if (this.planes.length) {
-            s.writeUint8(this.planes.length);
-            for (let i = 0; i < this.planes.length; i++) {
-                const plane = this.planes[i];
-
+            s.writeArray(this.planes, 8, (plane) => {
                 s.writeUint8(plane.id);
                 s.writeVec(v2.add(plane.pos, v2.create(512, 512)), 0, 0, 2048, 2048, 10);
                 s.writeUnitVec(plane.planeDir, 8);
                 s.writeBoolean(plane.actionComplete);
                 s.writeBits(plane.action, 3);
-            }
+            });
+
             flags |= UpdateExtFlags.Planes;
         }
 
         if (this.airstrikeZones.length) {
-            s.writeUint8(this.airstrikeZones.length);
-            for (let i = 0; i < this.airstrikeZones.length; i++) {
-                const zone = this.airstrikeZones[i];
-
+            s.writeArray(this.airstrikeZones, 8, (zone) => {
                 s.writeVec(zone.pos, 0, 0, 1024, 1024, 12);
                 s.writeFloat(zone.rad, 0, Constants.AirstrikeZoneMaxRad, 8);
                 s.writeFloat(zone.duration, 0, Constants.AirstrikeZoneMaxDuration, 8);
-            }
+            });
+
             s.writeAlignToNextByte();
             flags |= UpdateExtFlags.AirstrikeZones;
         }
 
         if (this.mapIndicators.length) {
-            s.writeUint8(this.mapIndicators.length);
-            for (let i = 0; i < this.mapIndicators.length; i++) {
-                const indicator = this.mapIndicators[i];
-
+            s.writeArray(this.mapIndicators, 8, (indicator) => {
                 s.writeBits(indicator.id, 4);
                 s.writeBoolean(indicator.dead);
                 s.writeBoolean(indicator.equipped);
                 s.writeGameType(indicator.type);
                 s.writeVec(indicator.pos, 0, 0, 1024, 1024, 16);
-            }
+            });
+
             s.writeAlignToNextByte();
             flags |= UpdateExtFlags.MapIndicators;
         }
@@ -510,49 +490,37 @@ export class UpdateMsg implements AbstractMsg {
         const flags = s.readUint16();
 
         if ((flags & UpdateExtFlags.DeletedObjects) != 0) {
-            const count = s.readUint16();
-            for (let i = 0; i < count; i++) {
-                this.delObjIds.push(s.readUint16());
-            }
+            this.delObjIds = s.readArray(16, () => {
+                return s.readUint16();
+            });
         }
 
         if ((flags & UpdateExtFlags.FullObjects) != 0) {
-            const count = s.readUint16();
-            for (let i = 0; i < count; i++) {
+            this.fullObjects = s.readArray(16, () => {
                 const data = {} as this["fullObjects"][0];
                 data.__type = s.readUint8();
                 data.__id = s.readUint16();
-                (
-                    ObjectSerializeFns[data.__type].deserializePart as (
-                        s: BitStream,
-                        d: typeof data,
-                    ) => void
-                )(s, data);
+
+                ObjectSerializeFns[data.__type].deserializePart(s, data as any);
                 s.readAlignToNextByte();
-                (
-                    ObjectSerializeFns[data.__type].deserializeFull as (
-                        s: BitStream,
-                        d: typeof data,
-                    ) => void
-                )(s, data);
+
+                ObjectSerializeFns[data.__type].deserializeFull(s, data as any);
                 s.readAlignToNextByte();
-                this.fullObjects.push(data);
-            }
+
+                return data;
+            });
         }
 
-        for (let count = s.readUint16(), i = 0; i < count; i++) {
+        this.partObjects = s.readArray(16, () => {
             const data = {} as this["partObjects"][0];
             data.__id = s.readUint16();
+
             const type = objectCreator.m_getTypeById(data.__id, s);
-            (
-                ObjectSerializeFns[type].deserializePart as (
-                    s: BitStream,
-                    d: typeof data,
-                ) => void
-            )(s, data);
+            ObjectSerializeFns[type].deserializePart(s, data as any);
+
             s.readAlignToNextByte();
-            this.partObjects.push(data);
-        }
+            return data;
+        });
 
         if ((flags & UpdateExtFlags.ActivePlayerId) != 0) {
             this.activePlayerId = s.readUint16();
@@ -576,39 +544,33 @@ export class UpdateMsg implements AbstractMsg {
         }
 
         if ((flags & UpdateExtFlags.PlayerInfos) != 0) {
-            const count = s.readUint8();
-            for (let i = 0; i < count; i++) {
+            this.playerInfos = s.readArray(8, () => {
                 const x = {} as PlayerInfo;
                 deserializePlayerInfo(s, x);
-                this.playerInfos.push(x);
-            }
+                return x;
+            });
         }
 
         if ((flags & UpdateExtFlags.DeletePlayerIds) != 0) {
-            const count = s.readUint8();
-            for (let i = 0; i < count; i++) {
-                const id = s.readUint16();
-                this.deletedPlayerIds.push(id);
-            }
+            this.deletedPlayerIds = s.readArray(8, () => {
+                return s.readUint16();
+            });
         }
 
         if ((flags & UpdateExtFlags.PlayerStatus) != 0) {
-            const playerStatus = {} as this["playerStatus"];
-            deserializePlayerStatus(s, playerStatus);
-            this.playerStatus = playerStatus;
+            this.playerStatus.players = deserializePlayerStatus(s);
             this.playerStatusDirty = true;
         }
 
         if ((flags & UpdateExtFlags.GroupStatus) != 0) {
-            const groupStatus = {} as this["groupStatus"];
-            deserializeGroupStatus(s, groupStatus);
-            this.groupStatus = groupStatus;
+            this.groupStatus.players = deserializeGroupStatus(s);
             this.groupStatusDirty = true;
         }
 
         if ((flags & UpdateExtFlags.Bullets) != 0) {
-            for (let count = s.readUint8(), i = 0; i < count; i++) {
+            this.bullets = s.readArray(8, () => {
                 const bullet = {} as Bullet;
+
                 bullet.playerId = s.readUint16();
                 bullet.pos = s.readVec(0, 0, 1024, 1024, 16);
                 bullet.dir = s.readUnitVec(8);
@@ -641,25 +603,27 @@ export class UpdateMsg implements AbstractMsg {
                     bullet.trailSmall = s.readBoolean();
                     bullet.trailThick = s.readBoolean();
                 }
-                this.bullets.push(bullet);
-            }
+
+                return bullet;
+            });
+
             s.readAlignToNextByte();
         }
 
         if ((flags & UpdateExtFlags.Explosions) != 0) {
-            const count = s.readUint8();
-            for (let i = 0; i < count; i++) {
+            this.explosions = s.readArray(8, () => {
                 const explosion = {} as Explosion;
                 explosion.pos = s.readVec(0, 0, 1024, 1024, 16);
                 explosion.type = s.readGameType();
                 explosion.layer = s.readBits(2);
                 s.readAlignToNextByte();
-                this.explosions.push(explosion);
-            }
+
+                return explosion;
+            });
         }
 
         if ((flags & UpdateExtFlags.Emotes) != 0) {
-            for (let count = s.readUint8(), i = 0; i < count; i++) {
+            this.emotes = s.readArray(8, () => {
                 const emote = {} as Emote;
                 emote.playerId = s.readUint16();
                 emote.type = s.readGameType();
@@ -670,12 +634,12 @@ export class UpdateMsg implements AbstractMsg {
                     emote.pos = s.readVec(0, 0, 1024, 1024, 16);
                 }
                 s.readBits(3);
-                this.emotes.push(emote);
-            }
+                return emote;
+            });
         }
 
         if ((flags & UpdateExtFlags.Planes) != 0) {
-            for (let count = s.readUint8(), i = 0; i < count; i++) {
+            this.planes = s.readArray(8, () => {
                 const plane = {} as Plane;
                 plane.id = s.readUint8();
                 const pos = s.readVec(0, 0, 2048, 2048, 10);
@@ -683,12 +647,12 @@ export class UpdateMsg implements AbstractMsg {
                 plane.planeDir = s.readUnitVec(8);
                 plane.actionComplete = s.readBoolean();
                 plane.action = s.readBits(3);
-                this.planes.push(plane);
-            }
+                return plane;
+            });
         }
 
         if ((flags & UpdateExtFlags.AirstrikeZones) != 0) {
-            for (let count = s.readUint8(), i = 0; i < count; i++) {
+            this.airstrikeZones = s.readArray(8, () => {
                 const airStrikeZone = {} as Airstrike;
                 airStrikeZone.pos = s.readVec(0, 0, 1024, 1024, 12);
                 airStrikeZone.rad = s.readFloat(0, Constants.AirstrikeZoneMaxRad, 8);
@@ -697,21 +661,23 @@ export class UpdateMsg implements AbstractMsg {
                     Constants.AirstrikeZoneMaxDuration,
                     8,
                 );
-                this.airstrikeZones.push(airStrikeZone);
-            }
+                return airStrikeZone;
+            });
+
             s.readAlignToNextByte();
         }
 
         if ((flags & UpdateExtFlags.MapIndicators) != 0) {
-            for (let count = s.readUint8(), i = 0; i < count; i++) {
+            this.mapIndicators = s.readArray(8, () => {
                 const mapIndicator = {} as MapIndicator;
                 mapIndicator.id = s.readBits(4);
                 mapIndicator.dead = s.readBoolean();
                 mapIndicator.equipped = s.readBoolean();
                 mapIndicator.type = s.readGameType();
                 mapIndicator.pos = s.readVec(0, 0, 1024, 1024, 16);
-                this.mapIndicators.push(mapIndicator);
-            }
+                return mapIndicator;
+            });
+
             s.readAlignToNextByte();
         }
 

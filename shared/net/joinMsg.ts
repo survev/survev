@@ -17,30 +17,6 @@ export class JoinMsg implements AbstractMsg {
         emotes: [] as string[],
     };
 
-    deserialize(s: BitStream) {
-        this.protocol = s.readUint32();
-        this.matchPriv = s.readString();
-        this.loadoutPriv = s.readString();
-        this.questPriv = s.readString();
-
-        this.name = s.readString(Constants.PlayerNameMaxLen);
-        this.useTouch = s.readBoolean();
-        this.isMobile = s.readBoolean();
-        this.bot = s.readBoolean();
-
-        this.loadout.outfit = s.readGameType();
-        this.loadout.melee = s.readGameType();
-        this.loadout.heal = s.readGameType();
-        this.loadout.boost = s.readGameType();
-        this.loadout.emotes = [];
-        const count = s.readUint8();
-
-        for (let i = 0; i < count; i++) {
-            const emote = s.readGameType();
-            this.loadout.emotes.push(emote);
-        }
-    }
-
     serialize(s: BitStream) {
         s.writeUint32(this.protocol);
         s.writeString(this.matchPriv);
@@ -57,9 +33,29 @@ export class JoinMsg implements AbstractMsg {
         s.writeGameType(this.loadout.heal);
         s.writeGameType(this.loadout.boost);
 
-        s.writeUint8(this.loadout.emotes.length);
-        for (const emote of this.loadout.emotes) {
+        s.writeArray(this.loadout.emotes, 8, (emote) => {
             s.writeGameType(emote);
-        }
+        });
+    }
+
+    deserialize(s: BitStream) {
+        this.protocol = s.readUint32();
+        this.matchPriv = s.readString();
+        this.loadoutPriv = s.readString();
+        this.questPriv = s.readString();
+
+        this.name = s.readString(Constants.PlayerNameMaxLen);
+        this.useTouch = s.readBoolean();
+        this.isMobile = s.readBoolean();
+        this.bot = s.readBoolean();
+
+        this.loadout.outfit = s.readGameType();
+        this.loadout.melee = s.readGameType();
+        this.loadout.heal = s.readGameType();
+        this.loadout.boost = s.readGameType();
+
+        this.loadout.emotes = s.readArray(8, () => {
+            return s.readGameType();
+        });
     }
 }
