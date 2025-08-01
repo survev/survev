@@ -192,7 +192,7 @@ export const ObjectSerializeFns: {
     [ObjectType.Player]: {
         serializedFullSize: 32,
         serializePart: (s, data) => {
-            s.writeVec(data.pos, 0, 0, 1024, 1024, 16);
+            s.writeMapPos(data.pos);
             s.writeUnitVec(data.dir, 8);
         },
         serializeFull: (s, data) => {
@@ -255,7 +255,7 @@ export const ObjectSerializeFns: {
             }
         },
         deserializePart: (s, data) => {
-            data.pos = s.readVec(0, 0, 1024, 1024, 16); // position
+            data.pos = s.readMapPos(); // position
             data.dir = s.readUnitVec(8); // rotation
         },
         deserializeFull: (s, data) => {
@@ -312,7 +312,7 @@ export const ObjectSerializeFns: {
     [ObjectType.Obstacle]: {
         serializedFullSize: 0,
         serializePart: (s, data) => {
-            s.writeVec(data.pos, 0, 0, 1024, 1024, 16);
+            s.writeMapPos(data.pos);
             s.writeBits(data.ori, 2);
             s.writeFloat(
                 data.scale,
@@ -348,7 +348,7 @@ export const ObjectSerializeFns: {
             if (data.isSkin) s.writeUint16(data.skinPlayerId!);
         },
         deserializePart: (s, data) => {
-            data.pos = s.readVec(0, 0, 1024, 1024, 16);
+            data.pos = s.readMapPos();
             data.ori = s.readBits(2);
             data.scale = s.readFloat(
                 Constants.MapObjectMinScale,
@@ -399,7 +399,7 @@ export const ObjectSerializeFns: {
             }
         },
         serializeFull: (s, data) => {
-            s.writeVec(data.pos, 0, 0, 1024, 1024, 16);
+            s.writeMapPos(data.pos);
             s.writeMapType(data.type);
             s.writeBits(data.ori, 2);
             s.writeBits(data.layer, 2);
@@ -415,7 +415,7 @@ export const ObjectSerializeFns: {
             }
         },
         deserializeFull: (s, data) => {
-            data.pos = s.readVec(0, 0, 1024, 1024, 16);
+            data.pos = s.readMapPos();
             data.type = s.readMapType();
             data.ori = s.readBits(2);
             data.layer = s.readBits(2);
@@ -425,7 +425,7 @@ export const ObjectSerializeFns: {
         serializedFullSize: 0,
         serializePart: () => {},
         serializeFull: (s, data) => {
-            s.writeVec(data.pos, 0, 0, 1024, 1024, 16);
+            s.writeMapPos(data.pos);
             s.writeMapType(data.type);
             s.writeBits(data.ori, 2);
             s.writeBoolean(data.interiorSoundEnabled);
@@ -436,7 +436,7 @@ export const ObjectSerializeFns: {
         },
         deserializePart: () => {},
         deserializeFull: (s, data) => {
-            data.pos = s.readVec(0, 0, 1024, 1024, 16);
+            data.pos = s.readMapPos();
             data.type = s.readMapType();
             data.ori = s.readBits(2);
             data.interiorSoundEnabled = s.readBoolean();
@@ -451,13 +451,13 @@ export const ObjectSerializeFns: {
     [ObjectType.LootSpawner]: {
         serializedFullSize: 0,
         serializePart: (s, data) => {
-            s.writeVec(data.pos, 0, 0, 1024, 1024, 16);
+            s.writeMapPos(data.pos);
             s.writeMapType(data.type);
             s.writeBits(data.layer, 2);
         },
         serializeFull: () => {},
         deserializePart: (s, data) => {
-            data.pos = s.readVec(0, 0, 1024, 1024, 16);
+            data.pos = s.readMapPos();
             data.type = s.readMapType();
             data.layer = s.readBits(2);
         },
@@ -466,7 +466,7 @@ export const ObjectSerializeFns: {
     [ObjectType.Loot]: {
         serializedFullSize: 5,
         serializePart: (s, data) => {
-            s.writeVec(data.pos, 0, 0, 1024, 1024, 16);
+            s.writeMapPos(data.pos);
         },
         serializeFull: (s, data) => {
             s.writeGameType(data.type);
@@ -480,7 +480,7 @@ export const ObjectSerializeFns: {
             }
         },
         deserializePart: (s, data) => {
-            data.pos = s.readVec(0, 0, 1024, 1024, 16);
+            data.pos = s.readMapPos();
         },
         deserializeFull: (s, data) => {
             data.type = s.readGameType();
@@ -497,14 +497,14 @@ export const ObjectSerializeFns: {
     [ObjectType.DeadBody]: {
         serializedFullSize: 0,
         serializePart: (s, data) => {
-            s.writeVec(data.pos, 0, 0, 1024, 1024, 16);
+            s.writeMapPos(data.pos);
         },
         serializeFull: (s, data) => {
             s.writeUint8(data.layer);
             s.writeUint16(data.playerId);
         },
         deserializePart: (s, data) => {
-            data.pos = s.readVec(0, 0, 1024, 1024, 16);
+            data.pos = s.readMapPos();
         },
         deserializeFull: (s, data) => {
             data.layer = s.readUint8();
@@ -515,7 +515,7 @@ export const ObjectSerializeFns: {
         serializedFullSize: 0,
         serializePart: () => {},
         serializeFull: (s, data) => {
-            s.writeVec(data.pos, 0, 0, 1024, 1024, 16);
+            s.writeMapPos(data.pos);
             s.writeFloat(
                 data.scale,
                 Constants.MapObjectMinScale,
@@ -529,7 +529,7 @@ export const ObjectSerializeFns: {
         },
         deserializePart: () => {},
         deserializeFull: (s, data) => {
-            data.pos = s.readVec(0, 0, 1024, 1024, 16);
+            data.pos = s.readMapPos();
             data.scale = s.readFloat(
                 Constants.MapObjectMinScale,
                 Constants.MapObjectMaxScale,
@@ -544,7 +544,7 @@ export const ObjectSerializeFns: {
     [ObjectType.Projectile]: {
         serializedFullSize: 0,
         serializePart: (s, data) => {
-            s.writeVec(data.pos, 0, 0, 1024, 1024, 16);
+            s.writeMapPos(data.pos);
             s.writeFloat(data.posZ, 0, GameConfig.projectile.maxHeight, 10);
             s.writeUnitVec(data.dir, 7);
         },
@@ -553,7 +553,7 @@ export const ObjectSerializeFns: {
             s.writeBits(data.layer, 2);
         },
         deserializePart: (s, data) => {
-            data.pos = s.readVec(0, 0, 1024, 1024, 16);
+            data.pos = s.readMapPos();
             data.posZ = s.readFloat(0, GameConfig.projectile.maxHeight, 10);
             data.dir = s.readUnitVec(7);
         },
@@ -565,7 +565,7 @@ export const ObjectSerializeFns: {
     [ObjectType.Smoke]: {
         serializedFullSize: 0,
         serializePart: (s, data) => {
-            s.writeVec(data.pos, 0, 0, 1024, 1024, 16);
+            s.writeMapPos(data.pos);
             s.writeFloat(data.rad, 0, Constants.SmokeMaxRad, 8);
         },
         serializeFull: (s, data) => {
@@ -573,7 +573,7 @@ export const ObjectSerializeFns: {
             s.writeBits(data.interior, 6);
         },
         deserializePart: (s, data) => {
-            data.pos = s.readVec(0, 0, 1024, 1024, 16);
+            data.pos = s.readMapPos();
             data.rad = s.readFloat(0, Constants.SmokeMaxRad, 8);
         },
         deserializeFull: (s, data) => {
@@ -588,14 +588,14 @@ export const ObjectSerializeFns: {
             s.writeBoolean(data.landed);
         },
         serializeFull: (s, data) => {
-            s.writeVec(data.pos, 0, 0, 1024, 1024, 16);
+            s.writeMapPos(data.pos);
         },
         deserializePart: (s, data) => {
             data.fallT = s.readFloat(0, 1, 7);
             data.landed = s.readBoolean();
         },
         deserializeFull: (s, data) => {
-            data.pos = s.readVec(0, 0, 1024, 1024, 16);
+            data.pos = s.readMapPos();
         },
     },
     // * to please ts

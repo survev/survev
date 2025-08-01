@@ -109,7 +109,7 @@ function serializePlayerStatus(s: BitStream, players: PlayerStatus[]) {
         s.writeBoolean(info.hasData);
 
         if (info.hasData) {
-            s.writeVec(info.pos, 0, 0, 1024, 1024, 11);
+            s.writeMapPos(info.pos, 11);
             s.writeBoolean(info.visible);
             s.writeBoolean(info.dead);
             s.writeBoolean(info.downed);
@@ -131,7 +131,7 @@ function deserializePlayerStatus(s: BitStream): PlayerStatus[] {
         } as PlayerStatus;
 
         if (p.hasData) {
-            p.pos = s.readVec(0, 0, 1024, 1024, 11);
+            p.pos = s.readMapPos(11);
             p.visible = s.readBoolean();
             p.dead = s.readBoolean();
             p.downed = s.readBoolean();
@@ -211,8 +211,8 @@ export interface GasData {
 function serializeGasData(s: BitStream, data: GasData) {
     s.writeUint8(data.mode);
     s.writeFloat32(data.duration);
-    s.writeVec(data.posOld, 0, 0, 1024, 1024, 16);
-    s.writeVec(data.posNew, 0, 0, 1024, 1024, 16);
+    s.writeMapPos(data.posOld);
+    s.writeMapPos(data.posNew);
     s.writeFloat(data.radOld, 0, 2048, 16);
     s.writeFloat(data.radNew, 0, 2048, 16);
 }
@@ -220,8 +220,8 @@ function serializeGasData(s: BitStream, data: GasData) {
 function deserializeGasData(s: BitStream, data: GasData) {
     data.mode = s.readUint8();
     data.duration = s.readFloat32();
-    data.posOld = s.readVec(0, 0, 1024, 1024, 16);
-    data.posNew = s.readVec(0, 0, 1024, 1024, 16);
+    data.posOld = s.readMapPos();
+    data.posNew = s.readMapPos();
     data.radOld = s.readFloat(0, 2048, 16);
     data.radNew = s.readFloat(0, 2048, 16);
 }
@@ -368,7 +368,7 @@ export class UpdateMsg implements AbstractMsg {
         if (this.bullets.length) {
             s.writeArray(this.bullets, 8, (bullet) => {
                 s.writeUint16(bullet.playerId);
-                s.writeVec(bullet.startPos, 0, 0, 1024, 1024, 16);
+                s.writeMapPos(bullet.startPos);
                 s.writeUnitVec(bullet.dir, 8);
                 s.writeGameType(bullet.bulletType);
                 s.writeBits(bullet.layer, 2);
@@ -376,7 +376,7 @@ export class UpdateMsg implements AbstractMsg {
                 s.writeBits(bullet.distAdjIdx, 4);
                 s.writeBoolean(bullet.clipDistance);
                 if (bullet.clipDistance) {
-                    s.writeFloat(bullet.distance, 0, 1024, 16);
+                    s.writeFloat(bullet.distance, 0, Constants.MaxPosition, 16);
                 }
                 s.writeBoolean(bullet.shotFx);
                 if (bullet.shotFx) {
@@ -408,7 +408,7 @@ export class UpdateMsg implements AbstractMsg {
 
         if (this.explosions.length) {
             s.writeArray(this.explosions, 8, (explosion) => {
-                s.writeVec(explosion.pos, 0, 0, 1024, 1024, 16);
+                s.writeMapPos(explosion.pos);
                 s.writeGameType(explosion.type);
                 s.writeBits(explosion.layer, 2);
                 s.writeAlignToNextByte();
@@ -425,7 +425,7 @@ export class UpdateMsg implements AbstractMsg {
                 s.writeBoolean(emote.isPing);
 
                 if (emote.isPing) {
-                    s.writeVec(emote.pos!, 0, 0, 1024, 1024, 16);
+                    s.writeMapPos(emote.pos!);
                 }
                 s.writeAlignToNextByte();
             });
@@ -447,7 +447,7 @@ export class UpdateMsg implements AbstractMsg {
 
         if (this.airstrikeZones.length) {
             s.writeArray(this.airstrikeZones, 8, (zone) => {
-                s.writeVec(zone.pos, 0, 0, 1024, 1024, 12);
+                s.writeMapPos(zone.pos, 12);
                 s.writeFloat(zone.rad, 0, Constants.AirstrikeZoneMaxRad, 8);
                 s.writeFloat(zone.duration, 0, Constants.AirstrikeZoneMaxDuration, 8);
             });
@@ -462,7 +462,7 @@ export class UpdateMsg implements AbstractMsg {
                 s.writeBoolean(indicator.dead);
                 s.writeBoolean(indicator.equipped);
                 s.writeGameType(indicator.type);
-                s.writeVec(indicator.pos, 0, 0, 1024, 1024, 16);
+                s.writeMapPos(indicator.pos);
             });
 
             s.writeAlignToNextByte();
@@ -572,7 +572,7 @@ export class UpdateMsg implements AbstractMsg {
                 const bullet = {} as Bullet;
 
                 bullet.playerId = s.readUint16();
-                bullet.pos = s.readVec(0, 0, 1024, 1024, 16);
+                bullet.pos = s.readMapPos();
                 bullet.dir = s.readUnitVec(8);
                 bullet.bulletType = s.readGameType();
                 bullet.layer = s.readBits(2);
@@ -580,7 +580,7 @@ export class UpdateMsg implements AbstractMsg {
                 bullet.distAdjIdx = s.readBits(4);
                 bullet.clipDistance = s.readBoolean();
                 if (bullet.clipDistance) {
-                    bullet.distance = s.readFloat(0, 1024, 16);
+                    bullet.distance = s.readFloat(0, Constants.MaxPosition, 16);
                 }
                 bullet.shotFx = s.readBoolean();
                 if (bullet.shotFx) {
@@ -613,7 +613,7 @@ export class UpdateMsg implements AbstractMsg {
         if ((flags & UpdateExtFlags.Explosions) != 0) {
             this.explosions = s.readArray(8, () => {
                 const explosion = {} as Explosion;
-                explosion.pos = s.readVec(0, 0, 1024, 1024, 16);
+                explosion.pos = s.readMapPos();
                 explosion.type = s.readGameType();
                 explosion.layer = s.readBits(2);
                 s.readAlignToNextByte();
@@ -631,7 +631,7 @@ export class UpdateMsg implements AbstractMsg {
                 emote.isPing = s.readBoolean();
 
                 if (emote.isPing) {
-                    emote.pos = s.readVec(0, 0, 1024, 1024, 16);
+                    emote.pos = s.readMapPos();
                 }
                 s.readBits(3);
                 return emote;
@@ -654,7 +654,7 @@ export class UpdateMsg implements AbstractMsg {
         if ((flags & UpdateExtFlags.AirstrikeZones) != 0) {
             this.airstrikeZones = s.readArray(8, () => {
                 const airStrikeZone = {} as Airstrike;
-                airStrikeZone.pos = s.readVec(0, 0, 1024, 1024, 12);
+                airStrikeZone.pos = s.readMapPos(12);
                 airStrikeZone.rad = s.readFloat(0, Constants.AirstrikeZoneMaxRad, 8);
                 airStrikeZone.duration = s.readFloat(
                     0,
@@ -674,7 +674,7 @@ export class UpdateMsg implements AbstractMsg {
                 mapIndicator.dead = s.readBoolean();
                 mapIndicator.equipped = s.readBoolean();
                 mapIndicator.type = s.readGameType();
-                mapIndicator.pos = s.readVec(0, 0, 1024, 1024, 16);
+                mapIndicator.pos = s.readMapPos();
                 return mapIndicator;
             });
 

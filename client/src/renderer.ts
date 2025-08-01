@@ -1,4 +1,5 @@
 import * as PIXI from "pixi.js-legacy";
+import { Constants } from "../../shared/net/net";
 import { v2 } from "../../shared/utils/v2";
 import type { Camera } from "./camera";
 import { errorLogManager } from "./errorLogs";
@@ -158,7 +159,7 @@ export class Renderer {
                 this.layerMaskDirty = false;
                 mask.clear();
                 mask.beginFill(0xffffff, 1.0);
-                drawRect(mask, 0.0, 0.0, 1024.0, 1024.0);
+                drawRect(mask, 0.0, 0.0, Constants.MaxPosition, Constants.MaxPosition);
                 const structures = map.m_structurePool.m_getPool();
                 for (let i = 0; i < structures.length; i++) {
                     const structure = structures[i];

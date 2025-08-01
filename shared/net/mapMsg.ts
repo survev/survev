@@ -8,7 +8,7 @@ function serializeMapRiver(s: BitStream, data: MapRiverData) {
     s.writeUint8(data.looped as unknown as number);
 
     s.writeArray(data.points, 8, (pos) => {
-        s.writeVec(pos, 0, 0, 1024, 1024, 16);
+        s.writeMapPos(pos);
     });
 }
 
@@ -16,7 +16,7 @@ function deserializeMapRiver(s: BitStream): MapRiverData {
     return {
         width: s.readUint8(),
         looped: !!s.readUint8(),
-        points: s.readArray(8, () => s.readVec(0, 0, 1024, 1024, 16)),
+        points: s.readArray(8, () => s.readMapPos()),
     };
 }
 
@@ -24,13 +24,13 @@ type Place = MapDef["mapGen"]["places"][number];
 
 function serializeMapPlace(s: BitStream, place: Place) {
     s.writeString(place.name);
-    s.writeVec(place.pos, 0, 0, 1024, 1024, 16);
+    s.writeMapPos(place.pos);
 }
 
 function deserializeMapPlaces(s: BitStream): Place {
     return {
         name: s.readString(),
-        pos: s.readVec(0, 0, 1024, 1024, 16),
+        pos: s.readMapPos(),
     };
 }
 
@@ -45,8 +45,8 @@ export interface GroundPatch {
 }
 
 function serializeMapGroundPatch(s: BitStream, patch: GroundPatch) {
-    s.writeVec(patch.min, 0, 0, 1024, 1024, 16);
-    s.writeVec(patch.max, 0, 0, 1024, 1024, 16);
+    s.writeMapPos(patch.min);
+    s.writeMapPos(patch.max);
     s.writeUint32(patch.color);
     s.writeFloat32(patch.roughness);
     s.writeFloat32(patch.offsetDist);
@@ -56,8 +56,8 @@ function serializeMapGroundPatch(s: BitStream, patch: GroundPatch) {
 
 function deserializeMapGroundPatch(s: BitStream): GroundPatch {
     return {
-        min: s.readVec(0, 0, 1024, 1024, 16),
-        max: s.readVec(0, 0, 1024, 1024, 16),
+        min: s.readMapPos(),
+        max: s.readMapPos(),
         color: s.readUint32(),
         roughness: s.readFloat32(),
         offsetDist: s.readFloat32(),
@@ -74,7 +74,7 @@ interface MapObj {
 }
 
 function serializeMapObj(s: BitStream, obj: MapObj) {
-    s.writeVec(obj.pos, 0, 0, 1024, 1024, 16);
+    s.writeMapPos(obj.pos);
     s.writeFloat(obj.scale, Constants.MapObjectMinScale, Constants.MapObjectMaxScale, 8);
     s.writeMapType(obj.type);
     s.writeBits(obj.ori, 2);
@@ -84,7 +84,7 @@ function serializeMapObj(s: BitStream, obj: MapObj) {
 
 function deserializeMapObj(s: BitStream): MapObj {
     const obj: MapObj = {
-        pos: s.readVec(0, 0, 1024, 1024, 16),
+        pos: s.readMapPos(),
         scale: s.readFloat(Constants.MapObjectMinScale, Constants.MapObjectMaxScale, 8),
         type: s.readMapType(),
         ori: s.readBits(2),

@@ -7,6 +7,23 @@ import type { Vec2 } from "../utils/v2";
 
 const DEV_MODE = false;
 
+export const Constants = {
+    MaxPosition: 1024,
+    MapNameMaxLen: 24,
+    PlayerNameMaxLen: 16,
+    MouseMaxDist: 64,
+    SmokeMaxRad: 10,
+    ActionMaxDuration: 8.5,
+    AirstrikeZoneMaxRad: 256,
+    AirstrikeZoneMaxDuration: 60,
+    PlayerMinScale: 0.75,
+    PlayerMaxScale: 2,
+    MapObjectMinScale: 0.125,
+    MapObjectMaxScale: 2.5,
+    MaxPerks: 8,
+    MaxMapIndicators: 16,
+};
+
 export interface Msg {
     serialize: (s: BitStream) => void;
 }
@@ -143,6 +160,14 @@ export class BitStream extends bb.BitStream {
             x: this.readFloat(minX, maxX, bitCount),
             y: this.readFloat(minY, maxY, bitCount),
         };
+    }
+
+    writeMapPos(vec: Vec2, bitCount = 16) {
+        this.writeVec(vec, 0, 0, Constants.MaxPosition, Constants.MaxPosition, bitCount);
+    }
+
+    readMapPos(bitCount = 16): Vec2 {
+        return this.readVec(0, 0, Constants.MaxPosition, Constants.MaxPosition, bitCount);
     }
 
     writeUnitVec(vec: Vec2, bitCount: number) {
@@ -285,22 +310,6 @@ export class MsgStream {
         return MsgType.None;
     }
 }
-
-export const Constants = {
-    MapNameMaxLen: 24,
-    PlayerNameMaxLen: 16,
-    MouseMaxDist: 64,
-    SmokeMaxRad: 10,
-    ActionMaxDuration: 8.5,
-    AirstrikeZoneMaxRad: 256,
-    AirstrikeZoneMaxDuration: 60,
-    PlayerMinScale: 0.75,
-    PlayerMaxScale: 2,
-    MapObjectMinScale: 0.125,
-    MapObjectMaxScale: 2.5,
-    MaxPerks: 8,
-    MaxMapIndicators: 16,
-};
 
 export enum MsgType {
     None,
