@@ -218,5 +218,16 @@ export interface MapDef {
         }>;
         spawnReplacements: Array<Record<string, string>>;
         importantSpawns: string[];
+        paddingRules?: Array<
+            Record<
+                string,
+                {
+                    distStart?: number;
+                    distEnd?: number;
+                    scaleStart?: number;
+                    scaleEnd?: number;
+                }
+            >
+        >
     };
 }
