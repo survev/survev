@@ -277,10 +277,10 @@ export class UpdateMsg implements AbstractMsg {
     playerInfos: PlayerInfo[] = [];
     deletedPlayerIds: number[] = [];
 
-    playerStatus: { players: PlayerStatus[] } = { players: [] };
+    playerStatus: PlayerStatus[] = [];
     playerStatusDirty = false;
 
-    groupStatus: { players: GroupStatus[] } = { players: [] };
+    groupStatus: GroupStatus[] = [];
     groupStatusDirty = false;
 
     bullets: Bullet[] = [];
@@ -356,12 +356,12 @@ export class UpdateMsg implements AbstractMsg {
         }
 
         if (this.playerStatusDirty) {
-            serializePlayerStatus(s, this.playerStatus.players);
+            serializePlayerStatus(s, this.playerStatus);
             flags |= UpdateExtFlags.PlayerStatus;
         }
 
         if (this.groupStatusDirty) {
-            serializeGroupStatus(s, this.groupStatus.players);
+            serializeGroupStatus(s, this.groupStatus);
             flags |= UpdateExtFlags.GroupStatus;
         }
 
@@ -558,12 +558,12 @@ export class UpdateMsg implements AbstractMsg {
         }
 
         if ((flags & UpdateExtFlags.PlayerStatus) != 0) {
-            this.playerStatus.players = deserializePlayerStatus(s);
+            this.playerStatus = deserializePlayerStatus(s);
             this.playerStatusDirty = true;
         }
 
         if ((flags & UpdateExtFlags.GroupStatus) != 0) {
-            this.groupStatus.players = deserializeGroupStatus(s);
+            this.groupStatus = deserializeGroupStatus(s);
             this.groupStatusDirty = true;
         }
 

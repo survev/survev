@@ -2775,7 +2775,7 @@ export class PlayerBarn {
 
     updatePlayerStatus(
         teamId: number,
-        playerStatus: { players: PlayerStatus[] },
+        playerStatus: PlayerStatus[],
         factionMode: boolean,
     ) {
         // In factionMode, playerStatus refers to all playerIds in the game.
@@ -2783,16 +2783,16 @@ export class PlayerBarn {
         const team = this.getTeamInfo(teamId);
         const playerIds = factionMode ? this.playerIds : team.playerIds;
 
-        if (playerIds.length != playerStatus.players.length) {
+        if (playerIds.length != playerStatus.length) {
             errorLogManager.logError(
-                `PlayerIds and playerStatus.players out of sync. OurLen: ${playerIds.length} MsgLen: ${playerStatus.players.length} FactionMode: ${factionMode}`,
+                `PlayerIds and playerStatus out of sync. OurLen: ${playerIds.length} MsgLen: ${playerStatus.length} FactionMode: ${factionMode}`,
             );
             return;
         }
 
         for (let i = 0; i < playerIds.length; i++) {
             const playerId = playerIds[i];
-            const status = playerStatus.players[i];
+            const status = playerStatus[i];
             if (status.hasData) {
                 this.setPlayerStatus(playerId, status);
             }
@@ -2848,15 +2848,15 @@ export class PlayerBarn {
         return this.playerStatus[playerId];
     }
 
-    updateGroupStatus(groupId: number, groupStatus: { players: GroupStatus[] }) {
+    updateGroupStatus(groupId: number, groupStatus: GroupStatus[]) {
         const info = this.getGroupInfo(groupId);
-        if (info.playerIds.length != groupStatus.players.length) {
-            errorLogManager.logError("PlayerIds and groupStatus.players out of sync");
+        if (info.playerIds.length != groupStatus.length) {
+            errorLogManager.logError("PlayerIds and groupStatus out of sync");
             return;
         }
         for (let i = 0; i < info.playerIds.length; i++) {
             const playerId = info.playerIds[i];
-            const playerStatus = groupStatus.players[i];
+            const playerStatus = groupStatus[i];
 
             // Stash groupStatus values into playerStatus
             const status = this.getPlayerStatus(playerId);
