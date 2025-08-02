@@ -1,5 +1,4 @@
 import { GameConfig, HasteType } from "../gameConfig";
-import { math } from "../utils/math";
 import type { Vec2 } from "../utils/v2";
 import { type BitStream, Constants } from "./net";
 
@@ -90,19 +89,15 @@ export interface ObjectsFullData {
         frozen: boolean;
         frozenOri: number;
 
-        hasHaste: boolean;
         hasteType: number;
         hasteSeq: number;
 
         actionItem: string;
 
-        hasScale: boolean;
         scale: number;
 
-        hasRole: boolean;
         role: string;
 
-        hasPerks: boolean;
         perks: Array<{
             type: string;
             droppable: boolean;
@@ -208,6 +203,7 @@ export const ObjectSerializeFns: {
 
             s.writeBits(data.animType, 3);
             s.writeBits(data.animSeq, 3);
+
             s.writeBits(data.actionType, 3);
             s.writeBits(data.actionSeq, 3);
 
@@ -215,7 +211,9 @@ export const ObjectSerializeFns: {
             s.writeBoolean(data.healEffect);
 
             s.writeBoolean(data.frozen);
-            s.writeBits(data.frozenOri, 2);
+            if (data.frozen) {
+                s.writeBits(data.frozenOri, 2);
+            }
 
             s.writeBoolean(data.hasteType !== HasteType.None);
             if (data.hasteType !== HasteType.None) {
@@ -228,8 +226,9 @@ export const ObjectSerializeFns: {
                 s.writeGameType(data.actionItem);
             }
 
-            s.writeBoolean(data.hasScale);
-            if (data.hasScale) {
+            const hasScale = data.scale !== 1;
+            s.writeBoolean(hasScale);
+            if (hasScale) {
                 s.writeFloat(
                     data.scale,
                     Constants.PlayerMinScale,
@@ -238,74 +237,77 @@ export const ObjectSerializeFns: {
                 );
             }
 
-            s.writeBoolean(data.role !== "");
-            if (data.role !== "") {
+            const hasRole = data.role !== "";
+            s.writeBoolean(hasRole);
+            if (hasRole) {
                 s.writeGameType(data.role);
             }
 
-            s.writeBoolean(data.hasPerks);
-            if (data.hasPerks) {
-                const perkAmount = math.min(data.perks.length, Constants.MaxPerks - 1);
-                s.writeBits(perkAmount, 3);
-                for (let i = 0; i < perkAmount; i++) {
-                    const perk = data.perks[i];
+            const hasPerks = data.perks.length > 0;
+            s.writeBoolean(hasPerks);
+            if (hasPerks) {
+                s.writeArray(data.perks, 3, (perk) => {
                     s.writeGameType(perk.type);
                     s.writeBoolean(perk.droppable);
-                }
+                });
             }
         },
         deserializePart: (s, data) => {
-            data.pos = s.readMapPos(); // position
-            data.dir = s.readUnitVec(8); // rotation
+            data.pos = s.readMapPos();
+            data.dir = s.readUnitVec(8);
         },
         deserializeFull: (s, data) => {
-            data.outfit = s.readGameType(); // outfit
-            data.backpack = s.readGameType(); // pack
-            data.helmet = s.readGameType(); // helmet
-            data.chest = s.readGameType(); // chest
-            data.activeWeapon = s.readGameType(); // active weapon
+            data.outfit = s.readGameType();
+            data.backpack = s.readGameType();
+            data.helmet = s.readGameType();
+            data.chest = s.readGameType();
+            data.activeWeapon = s.readGameType();
 
-            data.layer = s.readBits(2); // layer
-            data.dead = s.readBoolean(); // dead
-            data.downed = s.readBoolean(); // downed
+            data.layer = s.readBits(2);
+            data.dead = s.readBoolean();
+            data.downed = s.readBoolean();
 
-            data.animType = s.readBits(3); // anim type
-            data.animSeq = s.readBits(3); // anim seq
-            data.actionType = s.readBits(3); // action type
-            data.actionSeq = s.readBits(3); // action seq
+            data.animType = s.readBits(3);
+            data.animSeq = s.readBits(3);
 
-            data.wearingPan = s.readBoolean(); // wearing pan
-            data.healEffect = s.readBoolean(); // heal effect
-            data.frozen = s.readBoolean(); // frozen
-            data.frozenOri = s.readBits(2); // frozen ori
+            data.actionType = s.readBits(3);
+            data.actionSeq = s.readBits(3);
+
+            data.wearingPan = s.readBoolean();
+            data.healEffect = s.readBoolean();
+
+            data.frozen = s.readBoolean();
+            data.frozenOri = data.frozen ? s.readBits(2) : 0;
+
             data.hasteType = 0;
             data.hasteSeq = -1;
-            if (s.readBoolean()) {
-                // has haste
-                data.hasteType = s.readBits(3); // haste type
-                data.hasteSeq = s.readBits(3); // haste seq
-            }
-            const hasActionItem = s.readBoolean(); // has action item
-            data.actionItem = hasActionItem ? s.readGameType() : ""; // action item
 
-            const hasScale = s.readBoolean(); // scale dirty
+            const hasHaste = s.readBoolean();
+            if (hasHaste) {
+                data.hasteType = s.readBits(3);
+                data.hasteSeq = s.readBits(3);
+            }
+
+            const hasActionItem = s.readBoolean();
+            data.actionItem = hasActionItem ? s.readGameType() : "";
+
+            const hasScale = s.readBoolean();
             data.scale = hasScale
                 ? s.readFloat(Constants.PlayerMinScale, Constants.PlayerMaxScale, 8)
                 : 1;
+
             const hasRole = s.readBoolean();
             data.role = hasRole ? s.readGameType() : "";
+
             data.perks = [];
             const hasPerks = s.readBoolean();
             if (hasPerks) {
-                const perkCount = s.readBits(3);
-                for (let i = 0; i < perkCount; i++) {
-                    const type = s.readGameType();
-                    const droppable = s.readBoolean();
-                    data.perks.push({
-                        type,
-                        droppable,
-                    });
-                }
+                data.perks = s.readArray(3, () => {
+                    return {
+                        type: s.readGameType(),
+                        droppable: s.readBoolean(),
+                    };
+                });
             }
         },
     },

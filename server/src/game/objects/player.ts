@@ -532,10 +532,6 @@ export class Player extends BaseGameObject {
 
     scale = 1;
 
-    get hasScale(): boolean {
-        return this.scale !== 1;
-    }
-
     get rad(): number {
         return GameConfig.player.radius * this.scale;
     }
@@ -1143,10 +1139,6 @@ export class Player extends BaseGameObject {
 
         this.recalculateScale();
         this.recalculateMinBoost();
-    }
-
-    get hasPerks(): boolean {
-        return this.perks.length > 0;
     }
 
     hasPerk(type: string) {
