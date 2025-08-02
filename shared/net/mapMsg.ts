@@ -24,13 +24,13 @@ type Place = MapDef["mapGen"]["places"][number];
 
 function serializeMapPlace(s: BitStream, place: Place) {
     s.writeString(place.name);
-    s.writeMapPos(place.pos);
+    s.writeVec(place.pos, 0, 0, 1, 1, 16);
 }
 
 function deserializeMapPlaces(s: BitStream): Place {
     return {
         name: s.readString(),
-        pos: s.readMapPos(),
+        pos: s.readVec(0, 0, 1, 1, 16),
     };
 }
 
