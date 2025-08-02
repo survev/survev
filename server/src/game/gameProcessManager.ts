@@ -4,7 +4,7 @@ import { randomUUID } from "crypto";
 import { type MapDef, MapDefs } from "../../../shared/defs/mapDefs";
 import type { TeamMode } from "../../../shared/gameConfig";
 import * as net from "../../../shared/net/net";
-import { Logger } from "../utils/logger";
+import { ServerLogger } from "../utils/logger";
 import {
     type FindGamePrivateBody,
     type GameData,
@@ -167,7 +167,7 @@ export class GameProcessManager implements GameManager {
     readonly processById = new Map<string, GameProcess>();
     readonly processes: GameProcess[] = [];
 
-    readonly logger = new Logger("Game Process Manager");
+    readonly logger = new ServerLogger("Game Process Manager");
 
     constructor() {
         process.on("beforeExit", () => {

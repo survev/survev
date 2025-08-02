@@ -1,4 +1,4 @@
-import type { AtlasDef } from "../atlasConfig.ts";
+import type { AtlasDef } from "../atlasDefs";
 
 export const GradientAtlas: AtlasDef = {
     compress: false,
@@ -14,6 +14,7 @@ export const GradientAtlas: AtlasDef = {
         "map/map-light-01.svg",
         "map/map-plane-01.svg",
         "map/map-plane-02.svg",
-        "map/map-decal-flyer-01.svg",
+        // dont use the svg because it breaks with node-canvas due to the embedded base64 png
+        "map/map-decal-flyer-01.png",
     ],
 };

@@ -4,7 +4,7 @@ import type { Info } from "../../../shared/types/api";
 import { Config } from "../config";
 import { TeamMenu } from "../teamMenu";
 import { GIT_VERSION } from "../utils/gitRevision";
-import { defaultLogger, Logger } from "../utils/logger";
+import { defaultLogger, ServerLogger } from "../utils/logger";
 import type { FindGamePrivateBody, FindGamePrivateRes } from "../utils/types";
 
 class Region {
@@ -53,7 +53,7 @@ interface RegionData {
 }
 
 export class ApiServer {
-    readonly logger = new Logger("Server");
+    readonly logger = new ServerLogger("Server");
 
     teamMenu = new TeamMenu(this);
 

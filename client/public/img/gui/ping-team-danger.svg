@@ -1,1 +1,4 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="128" height="128"><circle cx="64" cy="64" r="57.822" fill="none" stroke="#fff" stroke-width="8.907" stroke-linejoin="round"/><text style="line-height:1.25;-inkscape-font-specification:'Arial Bold'" x="47.947" y="99.021" font-weight="700" font-size="97.849" font-family="Arial" letter-spacing="0" word-spacing="0" fill="#fff" stroke-width="2.446"><tspan x="47.947" y="99.021">!</tspan></text></svg>
+<svg height="128" width="128" xmlns="http://www.w3.org/2000/svg">
+  <circle cx="64" cy="64" fill="none" r="57.822" stroke="#fff" stroke-linejoin="round" stroke-width="8.907"/>
+  <path d="m60.225901 80.960983-3.487781-35.546706v-16.435574h14.52446v16.435574l-3.440003 35.546706zm-2.914447 18.060021v-13.425571h13.42557v13.425571z" fill="#fff" stroke-width="2.446"/>
+</svg>
