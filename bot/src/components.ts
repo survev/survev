@@ -170,7 +170,6 @@ export async function createDiscordPlayerInfoCardUI({
                     ips: ipsToBan,
                     ip_ban_duration: ipBanDuration,
                     ban_reason: banReason,
-                    is_encoded: true,
                     executor_id: executorId,
                 },
             });
