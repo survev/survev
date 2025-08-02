@@ -1,5 +1,6 @@
 import { GameObjectDefs } from "../defs/gameObjectDefs";
 import { MapObjectDefs } from "../defs/mapObjectDefs";
+import { GameConfig } from "../gameConfig";
 import * as bb from "../lib/bitBuffer";
 import { math } from "../utils/math";
 import { assert } from "../utils/util";
@@ -22,6 +23,16 @@ export const Constants = {
     MapObjectMaxScale: 2.5,
     MaxPerks: 8,
     MaxMapIndicators: 16,
+};
+
+const getBits = (n: number) => Math.ceil(Math.log2(n));
+
+export const BitSizes = {
+    Action: getBits(GameConfig.Action.Count),
+    Anim: getBits(GameConfig.Anim.Count),
+    Haste: getBits(GameConfig.HasteType.Count),
+    Perks: getBits(Constants.MaxPerks),
+    MapIndicators: getBits(Constants.MaxMapIndicators),
 };
 
 export interface Msg {

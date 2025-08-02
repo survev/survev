@@ -1,6 +1,6 @@
 import { GameConfig } from "../gameConfig";
 import { type Vec2, v2 } from "./../utils/v2";
-import { type AbstractMsg, type BitStream, Constants } from "./net";
+import { type AbstractMsg, BitSizes, type BitStream, Constants } from "./net";
 import {
     ObjectSerializeFns,
     type ObjectsFullData,
@@ -457,8 +457,8 @@ export class UpdateMsg implements AbstractMsg {
         }
 
         if (this.mapIndicators.length) {
-            s.writeArray(this.mapIndicators, 8, (indicator) => {
-                s.writeBits(indicator.id, 4);
+            s.writeArray(this.mapIndicators, BitSizes.MapIndicators, (indicator) => {
+                s.writeBits(indicator.id, BitSizes.MapIndicators);
                 s.writeBoolean(indicator.dead);
                 s.writeBoolean(indicator.equipped);
                 s.writeGameType(indicator.type);
@@ -668,9 +668,9 @@ export class UpdateMsg implements AbstractMsg {
         }
 
         if ((flags & UpdateExtFlags.MapIndicators) != 0) {
-            this.mapIndicators = s.readArray(8, () => {
+            this.mapIndicators = s.readArray(BitSizes.MapIndicators, () => {
                 const mapIndicator = {} as MapIndicator;
-                mapIndicator.id = s.readBits(4);
+                mapIndicator.id = s.readBits(BitSizes.MapIndicators);
                 mapIndicator.dead = s.readBoolean();
                 mapIndicator.equipped = s.readBoolean();
                 mapIndicator.type = s.readGameType();

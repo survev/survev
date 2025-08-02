@@ -1,3 +1,4 @@
+import { Constants } from "../../../../shared/net/net";
 import { type Vec2, v2 } from "../../../../shared/utils/v2";
 
 export class MapIndicator {
@@ -33,8 +34,7 @@ export class MapIndicatorBarn {
     freeIds: number[] = [];
 
     constructor() {
-        // id on updateMsg uses 4 bits
-        for (let i = 0; i < 15; i++) {
+        for (let i = 0; i < Constants.MaxMapIndicators; i++) {
             this.freeIds.push(i);
         }
     }

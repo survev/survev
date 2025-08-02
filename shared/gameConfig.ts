@@ -28,6 +28,7 @@ export enum Action {
     ReloadAlt,
     UseItem,
     Revive,
+    Count,
 }
 
 export enum Rarity {
@@ -61,6 +62,7 @@ export enum Anim {
     CrawlForward,
     CrawlBackward,
     Revive,
+    Count,
 }
 
 export enum Plane {
@@ -73,6 +75,7 @@ export enum HasteType {
     Windwalk,
     Takedown,
     Inspire,
+    Count,
 }
 
 export enum Input {

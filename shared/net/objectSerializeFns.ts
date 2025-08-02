@@ -1,6 +1,6 @@
 import { GameConfig, HasteType } from "../gameConfig";
 import type { Vec2 } from "../utils/v2";
-import { type BitStream, Constants } from "./net";
+import { BitSizes, type BitStream, Constants } from "./net";
 
 export enum ObjectType {
     Invalid,
@@ -201,10 +201,10 @@ export const ObjectSerializeFns: {
             s.writeBoolean(data.dead);
             s.writeBoolean(data.downed);
 
-            s.writeBits(data.animType, 3);
+            s.writeBits(data.animType, BitSizes.Anim);
             s.writeBits(data.animSeq, 3);
 
-            s.writeBits(data.actionType, 3);
+            s.writeBits(data.actionType, BitSizes.Action);
             s.writeBits(data.actionSeq, 3);
 
             s.writeBoolean(data.wearingPan);
@@ -217,7 +217,7 @@ export const ObjectSerializeFns: {
 
             s.writeBoolean(data.hasteType !== HasteType.None);
             if (data.hasteType !== HasteType.None) {
-                s.writeBits(data.hasteType, 3);
+                s.writeBits(data.hasteType, BitSizes.Haste);
                 s.writeBits(data.hasteSeq, 3);
             }
 
@@ -246,7 +246,7 @@ export const ObjectSerializeFns: {
             const hasPerks = data.perks.length > 0;
             s.writeBoolean(hasPerks);
             if (hasPerks) {
-                s.writeArray(data.perks, 3, (perk) => {
+                s.writeArray(data.perks, BitSizes.Perks, (perk) => {
                     s.writeGameType(perk.type);
                     s.writeBoolean(perk.droppable);
                 });
@@ -267,10 +267,10 @@ export const ObjectSerializeFns: {
             data.dead = s.readBoolean();
             data.downed = s.readBoolean();
 
-            data.animType = s.readBits(3);
+            data.animType = s.readBits(BitSizes.Anim);
             data.animSeq = s.readBits(3);
 
-            data.actionType = s.readBits(3);
+            data.actionType = s.readBits(BitSizes.Action);
             data.actionSeq = s.readBits(3);
 
             data.wearingPan = s.readBoolean();
@@ -279,12 +279,12 @@ export const ObjectSerializeFns: {
             data.frozen = s.readBoolean();
             data.frozenOri = data.frozen ? s.readBits(2) : 0;
 
-            data.hasteType = 0;
+            data.hasteType = HasteType.None;
             data.hasteSeq = -1;
 
             const hasHaste = s.readBoolean();
             if (hasHaste) {
-                data.hasteType = s.readBits(3);
+                data.hasteType = s.readBits(BitSizes.Haste);
                 data.hasteSeq = s.readBits(3);
             }
 
@@ -302,7 +302,7 @@ export const ObjectSerializeFns: {
             data.perks = [];
             const hasPerks = s.readBoolean();
             if (hasPerks) {
-                data.perks = s.readArray(3, () => {
+                data.perks = s.readArray(BitSizes.Perks, () => {
                     return {
                         type: s.readGameType(),
                         droppable: s.readBoolean(),

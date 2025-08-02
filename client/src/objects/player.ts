@@ -337,7 +337,7 @@ export class Player implements AbstractObject {
         m_healEffect: boolean;
         m_frozen: boolean;
         m_frozenOri: number;
-        m_hasteType: HasteType;
+        m_hasteType: Exclude<HasteType, HasteType.Count>;
         m_hasteSeq: number;
         m_actionItem: string;
         m_scale: number;

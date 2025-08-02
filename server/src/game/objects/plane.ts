@@ -5,6 +5,7 @@ import { MapObjectDefs } from "../../../../shared/defs/mapObjectDefs";
 import type { ObstacleDef } from "../../../../shared/defs/mapObjectsTyping";
 import { SpecialAirdropConfig } from "../../../../shared/defs/maps/factionDefs";
 import { GameConfig } from "../../../../shared/gameConfig";
+import { Constants } from "../../../../shared/net/net";
 import { ObjectType } from "../../../../shared/net/objectSerializeFns";
 import { type Collider, coldet } from "../../../../shared/utils/coldet";
 import { collider } from "../../../../shared/utils/collider";
@@ -179,6 +180,9 @@ export class PlaneBarn {
             timeToDropZone +
             planeCount * airstrikeInterval +
             finishBuffer;
+
+        assert(rad <= Constants.AirstrikeZoneMaxRad);
+        assert(duration <= Constants.AirstrikeZoneMaxDuration);
 
         this.newAirstrikeZones.push({
             pos,
