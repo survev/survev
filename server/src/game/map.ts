@@ -123,20 +123,28 @@ export class MapGrid<T extends GridCollider = GridCollider> {
 
     //                        X     Y     Object
     //                      __^__ __^__   __^__
-    private readonly _grid: Array<Array<Array<T>>>;
+    private readonly _grid: Array<Array<Array<T> & { paddingFactor: number }>>;
     private nextQueryId = 1;
+
+    private _collectColliders = true;
+    readonly colliders: T[] = [];
 
     constructor(width: number, height: number) {
         this.width = Math.floor(width / this.cellSize);
         this.height = Math.floor(height / this.cellSize);
 
         this._grid = Array.from({ length: this.width + 1 }, () =>
-            Array.from({ length: this.height + 1 }, () => []),
+            Array.from({ length: this.height + 1 }, () => {
+                const arr = [] as unknown as T[] & { paddingFactor: number };
+                arr.paddingFactor = 1;
+                return arr;
+            }),
         );
     }
 
     addCollider(coll: T): void {
         coll.__gridQueryId = 0;
+        if (this._collectColliders) this.colliders.push(coll);
         const aabb = collider.toAabb(coll.collision);
         // Get the bounds of the hitbox
         // Round it to the grid cells
@@ -175,6 +183,109 @@ export class MapGrid<T extends GridCollider = GridCollider> {
         }
 
         return colliders;
+    }
+
+    calculateStructurePaddings(mapDef: MapDef, maxReach: number): void {
+        const { _grid: grid, cellSize } = this;
+
+        const inRange = new Map<
+            T[] & { paddingFactor: number }, // < cell
+            [Set<T>, Vec2]
+            // ^^^    ^^^ center of the cell
+            // list of stuff in-range
+        >();
+
+        let collider: Collider;
+        let min = v2.create(0, 0);
+        let max = v2.create(0, 0);
+
+        for (let i = 0; i < this.colliders.length; ++i) {
+            collider = this.colliders[i].collision;
+
+            if (collider.type === 0) {
+                const { pos: { x, y }, rad } = collider;
+                const effRad = rad + maxReach;
+
+                min.x = (x - effRad);
+                max.x = (x + effRad);
+                min.y = (y - effRad);
+                max.y = (y + effRad);
+            } else {
+                min.x = collider.min.x - maxReach;
+                max.x = collider.max.x + maxReach;
+                min.y = collider.min.y - maxReach;
+                max.y = collider.max.y + maxReach;
+            }
+
+            min.x = math.clamp((min.x / cellSize) | 0, 0, this.width);
+            max.x = math.clamp((max.x / cellSize) | 0, 0, this.height);
+            min.y = math.clamp((min.y / cellSize) | 0, 0, this.width);
+            max.y = math.clamp((max.y / cellSize) | 0, 0, this.height);
+
+            for (let x = min.x; x <= max.x; x++) {
+                const xRow = grid[x];
+
+                for (let y = min.y; y <= max.y; y++) {
+                    const cell = xRow[y];
+
+                    let entry = inRange.get(cell);
+                    let set = entry?.[0];
+                    if (entry === undefined) {
+                        entry = [
+                            set = new Set(),
+                            v2.create((x + 0.5) * cellSize, (y + 0.5) * cellSize)
+                        ];
+                        inRange.set(cell, entry);
+                    }
+
+                    for (const col of cell) {
+                        set!.add(col);
+                    }
+                }
+            }
+        }
+
+        for (const [cell, [colliders, center]] of inRange) {
+            let smallestDist = Number.MAX_VALUE;
+            let blocker: string | undefined;
+
+            for (const collider of colliders) {
+                if (!collider.useForPadding || collider.layer !== 0) continue;
+
+                let dist: number;
+                if (collider.collision.type === 0) {
+                    dist = math.distToCircle(center, collider.collision.pos, collider.collision.rad);
+                } else {
+                    dist = math.distToAabb(center, collider.collision.min, collider.collision.max);
+                }
+
+                if (dist < smallestDist) {
+                    blocker = collider.defType;
+                    smallestDist = dist;
+                }
+            }
+
+            if (blocker !== undefined) {
+                const padding = mapDef.mapGen.paddingRules?.[0][blocker];
+                if (padding !== undefined) {
+                    cell.paddingFactor = math.remap(
+                        smallestDist,
+                        padding.distStart ?? 5,
+                        padding.distEnd ?? 50,
+                        padding.scaleStart ?? 3,
+                        padding.scaleEnd ?? 1
+                    );
+                }
+            }
+        }
+
+        this._collectColliders = false;
+        this.colliders.length = 0;
+    }
+
+    getPaddingAtPos(pos: Vec2): number {
+        const coord = this._roundToCells(pos);
+        return this._grid[coord.x][coord.y].paddingFactor;
     }
 
     private _roundToCells(vector: Vec2): Vec2 {
@@ -921,6 +1032,8 @@ export class GameMap {
         }
         this.timerEnd("Generating fixed spawns");
 
+        this.grid.calculateStructurePaddings(this.mapDef, 100);
+
         this.timerStart();
         const densitySpawns = mapDef.mapGen.densitySpawns[0];
         for (const type in densitySpawns) {
@@ -1495,22 +1608,7 @@ export class GameMap {
             const pos = getPos();
             const { ori, scale } = this.getOriAndScale(type);
 
-            let scaleAdjust = 1;
-            const blocker = this.getClosestObstacleBlocker(pos, 0);
-
-            if (blocker !== undefined) {
-                const padding = this.mapDef.mapGen.paddingRules?.[0][blocker.blocker];
-                if (padding !== undefined) {
-                    scaleAdjust = math.remap(
-                        blocker.dist,
-                        padding.distStart ?? 5,
-                        padding.distEnd ?? 50,
-                        padding.scaleStart ?? 3,
-                        padding.scaleEnd ?? 1
-                    );
-                }
-            }
-
+            const scaleAdjust = this.grid.getPaddingAtPos(pos);
             if (
                 !this.canSpawn(
                     type,
