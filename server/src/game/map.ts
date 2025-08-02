@@ -16,7 +16,7 @@ import { collider } from "../../../shared/utils/collider";
 import { mapHelpers } from "../../../shared/utils/mapHelpers";
 import { math } from "../../../shared/utils/math";
 import type { River } from "../../../shared/utils/river";
-import { type MapRiverData, generateTerrain } from "../../../shared/utils/terrainGen";
+import { generateTerrain, type MapRiverData } from "../../../shared/utils/terrainGen";
 import { assert, util } from "../../../shared/utils/util";
 import { type Vec2, v2 } from "../../../shared/utils/v2";
 import { Config } from "../config";
@@ -203,13 +203,16 @@ export class MapGrid<T extends GridCollider = GridCollider> {
             collider = this.colliders[i].collision;
 
             if (collider.type === 0) {
-                const { pos: { x, y }, rad } = collider;
+                const {
+                    pos: { x, y },
+                    rad,
+                } = collider;
                 const effRad = rad + maxReach;
 
-                min.x = (x - effRad);
-                max.x = (x + effRad);
-                min.y = (y - effRad);
-                max.y = (y + effRad);
+                min.x = x - effRad;
+                max.x = x + effRad;
+                min.y = y - effRad;
+                max.y = y + effRad;
             } else {
                 min.x = collider.min.x - maxReach;
                 max.x = collider.max.x + maxReach;
@@ -232,8 +235,8 @@ export class MapGrid<T extends GridCollider = GridCollider> {
                     let set = entry?.[0];
                     if (entry === undefined) {
                         entry = [
-                            set = new Set(),
-                            v2.create((x + 0.5) * cellSize, (y + 0.5) * cellSize)
+                            (set = new Set()),
+                            v2.create((x + 0.5) * cellSize, (y + 0.5) * cellSize),
                         ];
                         inRange.set(cell, entry);
                     }
@@ -254,9 +257,17 @@ export class MapGrid<T extends GridCollider = GridCollider> {
 
                 let dist: number;
                 if (collider.collision.type === 0) {
-                    dist = math.distToCircle(center, collider.collision.pos, collider.collision.rad);
+                    dist = math.distToCircle(
+                        center,
+                        collider.collision.pos,
+                        collider.collision.rad,
+                    );
                 } else {
-                    dist = math.distToAabb(center, collider.collision.min, collider.collision.max);
+                    dist = math.distToAabb(
+                        center,
+                        collider.collision.min,
+                        collider.collision.max,
+                    );
                 }
 
                 if (dist < smallestDist) {
@@ -273,7 +284,7 @@ export class MapGrid<T extends GridCollider = GridCollider> {
                         padding.distStart ?? 5,
                         padding.distEnd ?? 50,
                         padding.scaleStart ?? 3,
-                        padding.scaleEnd ?? 1
+                        padding.scaleEnd ?? 1,
                     );
                 }
             }
@@ -1157,7 +1168,7 @@ export class GameMap {
                         layer,
                         type: "obstacle",
                         useForPadding: false,
-                        defType: type
+                        defType: type,
                     });
                 }
                 break;
@@ -1382,10 +1393,9 @@ export class GameMap {
 
     getClosestObstacleBlocker(
         pos: Vec2,
-        layer: number
-    ): { blocker: string, dist: number } | undefined {
-        const colliders = this.grid
-            .intersectCollider(collider.createCircle(pos, 100));
+        layer: number,
+    ): { blocker: string; dist: number } | undefined {
+        const colliders = this.grid.intersectCollider(collider.createCircle(pos, 100));
 
         let smallestDist = Number.MAX_VALUE;
         let blocker: string | undefined;
@@ -1393,13 +1403,22 @@ export class GameMap {
         for (let i = 0; i < colliders.length; ++i) {
             const collider = colliders[i];
 
-            if (!collider.useForPadding || (layer === 0 && collider.layer !== 0)) continue;
+            if (!collider.useForPadding || (layer === 0 && collider.layer !== 0))
+                continue;
 
             let dist: number;
             if (collider.collision.type === 0) {
-                dist = math.distToCircle(pos, collider.collision.pos, collider.collision.rad);
+                dist = math.distToCircle(
+                    pos,
+                    collider.collision.pos,
+                    collider.collision.rad,
+                );
             } else {
-                dist = math.distToAabb(pos, collider.collision.min, collider.collision.max);
+                dist = math.distToAabb(
+                    pos,
+                    collider.collision.min,
+                    collider.collision.max,
+                );
             }
 
             if (dist < smallestDist) {
@@ -1408,9 +1427,7 @@ export class GameMap {
             }
         }
 
-        return blocker === undefined
-            ? undefined
-            : { blocker, dist: smallestDist };
+        return blocker === undefined ? undefined : { blocker, dist: smallestDist };
     }
 
     getOriAndScale(type: string): { ori: number; scale: number } {
@@ -1609,14 +1626,7 @@ export class GameMap {
             const { ori, scale } = this.getOriAndScale(type);
 
             const scaleAdjust = this.grid.getPaddingAtPos(pos);
-            if (
-                !this.canSpawn(
-                    type,
-                    pos,
-                    ori,
-                    scale * scaleAdjust
-                )
-            ) return false;
+            if (!this.canSpawn(type, pos, ori, scale * scaleAdjust)) return false;
 
             this.genAuto(type, pos, 0, ori, scale);
 
@@ -2111,7 +2121,8 @@ export class GameMap {
                 }
             } else {
                 // scale found on client debugHelpers
-                const boundScale = def.type === "building" || def.type === "structure" ? 1.1 : 1.0;
+                const boundScale =
+                    def.type === "building" || def.type === "structure" ? 1.1 : 1.0;
 
                 const bounds = collider.transform(
                     mapHelpers.getBoundingCollider(mapObj.type),
@@ -2123,7 +2134,9 @@ export class GameMap {
                     collision: bounds,
                     layer: mapObj.layer,
                     type: "obstacle",
-                    useForPadding: def.type !== "obstacle" && this.mapDef.mapGen.paddingRules?.[0][mapObj.type] !== undefined,
+                    useForPadding:
+                        def.type !== "obstacle" &&
+                        this.mapDef.mapGen.paddingRules?.[0][mapObj.type] !== undefined,
                     defType: mapObj.type,
                 });
             }

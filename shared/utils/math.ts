@@ -299,10 +299,7 @@ export const math = {
 
         return v2.distance(
             pos,
-            v2.create(
-                math.clamp(pos.x, min.x, max.x),
-                math.clamp(pos.y, min.y, max.y),
-            )
+            v2.create(math.clamp(pos.x, min.x, max.x), math.clamp(pos.y, min.y, max.y)),
         );
     },
 

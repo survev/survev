@@ -228,6 +228,6 @@ export interface MapDef {
                     scaleEnd?: number;
                 }
             >
-        >
+        >;
     };
 }
