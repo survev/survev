@@ -30,8 +30,6 @@ export class EditMsg implements AbstractMsg {
         s.writeGameType(this.promoteToRoleType);
         s.writeBoolean(this.spectatorMode);
         s.writeBoolean(this.godMode);
-
-        s.writeAlignToNextByte();
     }
 
     deserialize(s: BitStream) {
@@ -50,6 +48,5 @@ export class EditMsg implements AbstractMsg {
         this.promoteToRoleType = s.readGameType();
         this.spectatorMode = s.readBoolean();
         this.godMode = s.readBoolean();
-        s.readAlignToNextByte();
     }
 }

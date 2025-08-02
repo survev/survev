@@ -73,7 +73,7 @@ class ObjectCreator {
             const err = {
                 id,
                 ids: Object.keys(this.idToObj),
-                stream: s._view._view,
+                stream: s.view.view,
             };
             console.error("objectPoolErr", `getTypeById${JSON.stringify(err)}`);
             return ObjectType.Invalid;
@@ -189,6 +189,7 @@ class Bot {
                     break;
                 }
                 this.onMsg(type, stream.getStream());
+                stream.stream.readAlignToNextByte();
             }
         };
     }

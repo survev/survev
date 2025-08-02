@@ -22,7 +22,6 @@ export class KillMsg implements AbstractMsg {
         s.writeUint8(this.killerKills);
         s.writeBoolean(this.downed);
         s.writeBoolean(this.killed);
-        s.writeAlignToNextByte();
     }
 
     deserialize(s: BitStream) {
@@ -35,6 +34,5 @@ export class KillMsg implements AbstractMsg {
         this.killerKills = s.readUint8();
         this.downed = s.readBoolean();
         this.killed = s.readBoolean();
-        s.readAlignToNextByte();
     }
 }

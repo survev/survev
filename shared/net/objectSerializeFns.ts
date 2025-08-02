@@ -1,7 +1,6 @@
 import { GameConfig, HasteType } from "../gameConfig";
-import { math } from "../utils/math";
 import type { Vec2 } from "../utils/v2";
-import { type BitStream, Constants } from "./net";
+import { BitSizes, type BitStream, Constants } from "./net";
 
 export enum ObjectType {
     Invalid,
@@ -90,19 +89,15 @@ export interface ObjectsFullData {
         frozen: boolean;
         frozenOri: number;
 
-        hasHaste: boolean;
         hasteType: number;
         hasteSeq: number;
 
         actionItem: string;
 
-        hasScale: boolean;
         scale: number;
 
-        hasRole: boolean;
         role: string;
 
-        hasPerks: boolean;
         perks: Array<{
             type: string;
             droppable: boolean;
@@ -192,7 +187,7 @@ export const ObjectSerializeFns: {
     [ObjectType.Player]: {
         serializedFullSize: 32,
         serializePart: (s, data) => {
-            s.writeVec(data.pos, 0, 0, 1024, 1024, 16);
+            s.writeMapPos(data.pos);
             s.writeUnitVec(data.dir, 8);
         },
         serializeFull: (s, data) => {
@@ -206,20 +201,23 @@ export const ObjectSerializeFns: {
             s.writeBoolean(data.dead);
             s.writeBoolean(data.downed);
 
-            s.writeBits(data.animType, 3);
+            s.writeBits(data.animType, BitSizes.Anim);
             s.writeBits(data.animSeq, 3);
-            s.writeBits(data.actionType, 3);
+
+            s.writeBits(data.actionType, BitSizes.Action);
             s.writeBits(data.actionSeq, 3);
 
             s.writeBoolean(data.wearingPan);
             s.writeBoolean(data.healEffect);
 
             s.writeBoolean(data.frozen);
-            s.writeBits(data.frozenOri, 2);
+            if (data.frozen) {
+                s.writeBits(data.frozenOri, 2);
+            }
 
             s.writeBoolean(data.hasteType !== HasteType.None);
             if (data.hasteType !== HasteType.None) {
-                s.writeBits(data.hasteType, 3);
+                s.writeBits(data.hasteType, BitSizes.Haste);
                 s.writeBits(data.hasteSeq, 3);
             }
 
@@ -228,8 +226,9 @@ export const ObjectSerializeFns: {
                 s.writeGameType(data.actionItem);
             }
 
-            s.writeBoolean(data.hasScale);
-            if (data.hasScale) {
+            const hasScale = data.scale !== 1;
+            s.writeBoolean(hasScale);
+            if (hasScale) {
                 s.writeFloat(
                     data.scale,
                     Constants.PlayerMinScale,
@@ -238,84 +237,84 @@ export const ObjectSerializeFns: {
                 );
             }
 
-            s.writeBoolean(data.role !== "");
-            if (data.role !== "") {
+            const hasRole = data.role !== "";
+            s.writeBoolean(hasRole);
+            if (hasRole) {
                 s.writeGameType(data.role);
             }
 
-            s.writeBoolean(data.hasPerks);
-            if (data.hasPerks) {
-                const perkAmount = math.min(data.perks.length, Constants.MaxPerks - 1);
-                s.writeBits(perkAmount, 3);
-                for (let i = 0; i < perkAmount; i++) {
-                    const perk = data.perks[i];
+            const hasPerks = data.perks.length > 0;
+            s.writeBoolean(hasPerks);
+            if (hasPerks) {
+                s.writeArray(data.perks, BitSizes.Perks, (perk) => {
                     s.writeGameType(perk.type);
                     s.writeBoolean(perk.droppable);
-                }
+                });
             }
-
-            s.writeAlignToNextByte();
         },
         deserializePart: (s, data) => {
-            data.pos = s.readVec(0, 0, 1024, 1024, 16); // position
-            data.dir = s.readUnitVec(8); // rotation
+            data.pos = s.readMapPos();
+            data.dir = s.readUnitVec(8);
         },
-        deserializeFull(s, data) {
-            data.outfit = s.readGameType(); // outfit
-            data.backpack = s.readGameType(); // pack
-            data.helmet = s.readGameType(); // helmet
-            data.chest = s.readGameType(); // chest
-            data.activeWeapon = s.readGameType(); // active weapon
+        deserializeFull: (s, data) => {
+            data.outfit = s.readGameType();
+            data.backpack = s.readGameType();
+            data.helmet = s.readGameType();
+            data.chest = s.readGameType();
+            data.activeWeapon = s.readGameType();
 
-            data.layer = s.readBits(2); // layer
-            data.dead = s.readBoolean(); // dead
-            data.downed = s.readBoolean(); // downed
+            data.layer = s.readBits(2);
+            data.dead = s.readBoolean();
+            data.downed = s.readBoolean();
 
-            data.animType = s.readBits(3); // anim type
-            data.animSeq = s.readBits(3); // anim seq
-            data.actionType = s.readBits(3); // action type
-            data.actionSeq = s.readBits(3); // action seq
+            data.animType = s.readBits(BitSizes.Anim);
+            data.animSeq = s.readBits(3);
 
-            data.wearingPan = s.readBoolean(); // wearing pan
-            data.healEffect = s.readBoolean(); // heal effect
-            data.frozen = s.readBoolean(); // frozen
-            data.frozenOri = s.readBits(2); // frozen ori
-            data.hasteType = 0;
+            data.actionType = s.readBits(BitSizes.Action);
+            data.actionSeq = s.readBits(3);
+
+            data.wearingPan = s.readBoolean();
+            data.healEffect = s.readBoolean();
+
+            data.frozen = s.readBoolean();
+            data.frozenOri = data.frozen ? s.readBits(2) : 0;
+
+            data.hasteType = HasteType.None;
             data.hasteSeq = -1;
-            if (s.readBoolean()) {
-                // has haste
-                data.hasteType = s.readBits(3); // haste type
-                data.hasteSeq = s.readBits(3); // haste seq
-            }
-            const hasActionItem = s.readBoolean(); // has action item
-            data.actionItem = hasActionItem ? s.readGameType() : ""; // action item
 
-            const hasScale = s.readBoolean(); // scale dirty
+            const hasHaste = s.readBoolean();
+            if (hasHaste) {
+                data.hasteType = s.readBits(BitSizes.Haste);
+                data.hasteSeq = s.readBits(3);
+            }
+
+            const hasActionItem = s.readBoolean();
+            data.actionItem = hasActionItem ? s.readGameType() : "";
+
+            const hasScale = s.readBoolean();
             data.scale = hasScale
                 ? s.readFloat(Constants.PlayerMinScale, Constants.PlayerMaxScale, 8)
                 : 1;
+
             const hasRole = s.readBoolean();
             data.role = hasRole ? s.readGameType() : "";
+
             data.perks = [];
             const hasPerks = s.readBoolean();
             if (hasPerks) {
-                const perkCount = s.readBits(3);
-                for (let i = 0; i < perkCount; i++) {
-                    const type = s.readGameType();
-                    const droppable = s.readBoolean();
-                    data.perks.push({
-                        type,
-                        droppable,
-                    });
-                }
+                data.perks = s.readArray(BitSizes.Perks, () => {
+                    return {
+                        type: s.readGameType(),
+                        droppable: s.readBoolean(),
+                    };
+                });
             }
-            s.readAlignToNextByte();
         },
     },
     [ObjectType.Obstacle]: {
         serializedFullSize: 0,
         serializePart: (s, data) => {
-            s.writeVec(data.pos, 0, 0, 1024, 1024, 16);
+            s.writeMapPos(data.pos);
             s.writeBits(data.ori, 2);
             s.writeFloat(
                 data.scale,
@@ -323,7 +322,6 @@ export const ObjectSerializeFns: {
                 Constants.MapObjectMaxScale,
                 8,
             );
-            s.writeBits(0, 6);
         },
         serializeFull: (s, data) => {
             s.writeFloat(data.healthT, 0, 1, 8);
@@ -350,18 +348,15 @@ export const ObjectSerializeFns: {
 
             s.writeBoolean(data.isSkin);
             if (data.isSkin) s.writeUint16(data.skinPlayerId!);
-
-            s.writeBits(0, 5); // padding
         },
         deserializePart: (s, data) => {
-            data.pos = s.readVec(0, 0, 1024, 1024, 16);
+            data.pos = s.readMapPos();
             data.ori = s.readBits(2);
             data.scale = s.readFloat(
                 Constants.MapObjectMinScale,
                 Constants.MapObjectMaxScale,
                 8,
             );
-            s.readBits(6);
         },
         deserializeFull: (s, data) => {
             data.healthT = s.readFloat(0, 1, 8);
@@ -391,7 +386,6 @@ export const ObjectSerializeFns: {
             if (data.isSkin) {
                 data.skinPlayerId = s.readUint16();
             }
-            s.readBits(5);
         },
     },
     [ObjectType.Building]: {
@@ -405,10 +399,9 @@ export const ObjectSerializeFns: {
                 s.writeBoolean(data.puzzleSolved);
                 s.writeBits(data.puzzleErrSeq, 7);
             }
-            s.writeBits(0, 4); // padding
         },
         serializeFull: (s, data) => {
-            s.writeVec(data.pos, 0, 0, 1024, 1024, 16);
+            s.writeMapPos(data.pos);
             s.writeMapType(data.type);
             s.writeBits(data.ori, 2);
             s.writeBits(data.layer, 2);
@@ -422,10 +415,9 @@ export const ObjectSerializeFns: {
                 data.puzzleSolved = s.readBoolean();
                 data.puzzleErrSeq = s.readBits(7);
             }
-            s.readBits(4);
         },
         deserializeFull: (s, data) => {
-            data.pos = s.readVec(0, 0, 1024, 1024, 16);
+            data.pos = s.readMapPos();
             data.type = s.readMapType();
             data.ori = s.readBits(2);
             data.layer = s.readBits(2);
@@ -435,7 +427,7 @@ export const ObjectSerializeFns: {
         serializedFullSize: 0,
         serializePart: () => {},
         serializeFull: (s, data) => {
-            s.writeVec(data.pos, 0, 0, 1024, 1024, 16);
+            s.writeMapPos(data.pos);
             s.writeMapType(data.type);
             s.writeBits(data.ori, 2);
             s.writeBoolean(data.interiorSoundEnabled);
@@ -446,7 +438,7 @@ export const ObjectSerializeFns: {
         },
         deserializePart: () => {},
         deserializeFull: (s, data) => {
-            data.pos = s.readVec(0, 0, 1024, 1024, 16);
+            data.pos = s.readMapPos();
             data.type = s.readMapType();
             data.ori = s.readBits(2);
             data.interiorSoundEnabled = s.readBoolean();
@@ -461,24 +453,22 @@ export const ObjectSerializeFns: {
     [ObjectType.LootSpawner]: {
         serializedFullSize: 0,
         serializePart: (s, data) => {
-            s.writeVec(data.pos, 0, 0, 1024, 1024, 16);
+            s.writeMapPos(data.pos);
             s.writeMapType(data.type);
             s.writeBits(data.layer, 2);
-            s.writeBits(0, 2);
         },
         serializeFull: () => {},
         deserializePart: (s, data) => {
-            data.pos = s.readVec(0, 0, 1024, 1024, 16);
+            data.pos = s.readMapPos();
             data.type = s.readMapType();
             data.layer = s.readBits(2);
-            s.readBits(2);
         },
         deserializeFull: () => {},
     },
     [ObjectType.Loot]: {
         serializedFullSize: 5,
         serializePart: (s, data) => {
-            s.writeVec(data.pos, 0, 0, 1024, 1024, 16);
+            s.writeMapPos(data.pos);
         },
         serializeFull: (s, data) => {
             s.writeGameType(data.type);
@@ -490,10 +480,9 @@ export const ObjectSerializeFns: {
             if (data.ownerId != 0) {
                 s.writeUint16(data.ownerId);
             }
-            s.writeBits(0, 1);
         },
         deserializePart: (s, data) => {
-            data.pos = s.readVec(0, 0, 1024, 1024, 16);
+            data.pos = s.readMapPos();
         },
         deserializeFull: (s, data) => {
             data.type = s.readGameType();
@@ -505,20 +494,19 @@ export const ObjectSerializeFns: {
             if (data.hasOwner) {
                 data.ownerId = s.readUint16();
             }
-            s.readBits(1);
         },
     },
     [ObjectType.DeadBody]: {
         serializedFullSize: 0,
         serializePart: (s, data) => {
-            s.writeVec(data.pos, 0, 0, 1024, 1024, 16);
+            s.writeMapPos(data.pos);
         },
         serializeFull: (s, data) => {
             s.writeUint8(data.layer);
             s.writeUint16(data.playerId);
         },
         deserializePart: (s, data) => {
-            data.pos = s.readVec(0, 0, 1024, 1024, 16);
+            data.pos = s.readMapPos();
         },
         deserializeFull: (s, data) => {
             data.layer = s.readUint8();
@@ -529,7 +517,7 @@ export const ObjectSerializeFns: {
         serializedFullSize: 0,
         serializePart: () => {},
         serializeFull: (s, data) => {
-            s.writeVec(data.pos, 0, 0, 1024, 1024, 16);
+            s.writeMapPos(data.pos);
             s.writeFloat(
                 data.scale,
                 Constants.MapObjectMinScale,
@@ -543,7 +531,7 @@ export const ObjectSerializeFns: {
         },
         deserializePart: () => {},
         deserializeFull: (s, data) => {
-            data.pos = s.readVec(0, 0, 1024, 1024, 16);
+            data.pos = s.readMapPos();
             data.scale = s.readFloat(
                 Constants.MapObjectMinScale,
                 Constants.MapObjectMaxScale,
@@ -558,30 +546,28 @@ export const ObjectSerializeFns: {
     [ObjectType.Projectile]: {
         serializedFullSize: 0,
         serializePart: (s, data) => {
-            s.writeVec(data.pos, 0, 0, 1024, 1024, 16);
+            s.writeMapPos(data.pos);
             s.writeFloat(data.posZ, 0, GameConfig.projectile.maxHeight, 10);
             s.writeUnitVec(data.dir, 7);
         },
         serializeFull: (s, data) => {
             s.writeGameType(data.type);
             s.writeBits(data.layer, 2);
-            s.writeBits(0, 4);
         },
         deserializePart: (s, data) => {
-            data.pos = s.readVec(0, 0, 1024, 1024, 16);
+            data.pos = s.readMapPos();
             data.posZ = s.readFloat(0, GameConfig.projectile.maxHeight, 10);
             data.dir = s.readUnitVec(7);
         },
         deserializeFull: (s, data) => {
             data.type = s.readGameType();
             data.layer = s.readBits(2);
-            s.readBits(4);
         },
     },
     [ObjectType.Smoke]: {
         serializedFullSize: 0,
         serializePart: (s, data) => {
-            s.writeVec(data.pos, 0, 0, 1024, 1024, 16);
+            s.writeMapPos(data.pos);
             s.writeFloat(data.rad, 0, Constants.SmokeMaxRad, 8);
         },
         serializeFull: (s, data) => {
@@ -589,7 +575,7 @@ export const ObjectSerializeFns: {
             s.writeBits(data.interior, 6);
         },
         deserializePart: (s, data) => {
-            data.pos = s.readVec(0, 0, 1024, 1024, 16);
+            data.pos = s.readMapPos();
             data.rad = s.readFloat(0, Constants.SmokeMaxRad, 8);
         },
         deserializeFull: (s, data) => {
@@ -604,14 +590,14 @@ export const ObjectSerializeFns: {
             s.writeBoolean(data.landed);
         },
         serializeFull: (s, data) => {
-            s.writeVec(data.pos, 0, 0, 1024, 1024, 16);
+            s.writeMapPos(data.pos);
         },
         deserializePart: (s, data) => {
             data.fallT = s.readFloat(0, 1, 7);
             data.landed = s.readBoolean();
         },
         deserializeFull: (s, data) => {
-            data.pos = s.readVec(0, 0, 1024, 1024, 16);
+            data.pos = s.readMapPos();
         },
     },
     // * to please ts

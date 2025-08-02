@@ -43,14 +43,11 @@ export class InputMsg implements AbstractMsg {
         s.writeUnitVec(this.toMouseDir, 10);
         s.writeFloat(this.toMouseLen, 0, Constants.MouseMaxDist, 8);
 
-        s.writeBits(this.inputs.length, 4);
-        for (let i = 0; i < this.inputs.length; i++) {
-            s.writeUint8(this.inputs[i]);
-        }
+        s.writeArray(this.inputs, 4, (i) => {
+            s.writeUint8(i);
+        });
 
         s.writeGameType(this.useItem);
-
-        s.writeBits(0, 6);
     }
 
     deserialize(s: BitStream) {
@@ -72,13 +69,10 @@ export class InputMsg implements AbstractMsg {
         this.toMouseDir = s.readUnitVec(10);
         this.toMouseLen = s.readFloat(0, Constants.MouseMaxDist, 8);
 
-        const length = s.readBits(4);
-        for (let i = 0; i < length; i++) {
-            this.inputs.push(s.readUint8());
-        }
+        this.inputs = s.readArray(4, () => {
+            return s.readUint8();
+        });
 
         this.useItem = s.readGameType();
-
-        s.readBits(6);
     }
 }

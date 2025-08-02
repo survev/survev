@@ -11,22 +11,19 @@ export class JoinedMsg implements AbstractMsg {
         s.writeUint8(this.teamMode);
         s.writeUint16(this.playerId);
         s.writeBoolean(this.started);
-        s.writeUint8(this.emotes.length);
-        for (let i = 0; i < this.emotes.length; i++) {
-            s.writeGameType(this.emotes[i]);
-        }
-        s.writeAlignToNextByte();
+
+        s.writeArray(this.emotes, 8, (emote) => {
+            s.writeGameType(emote);
+        });
     }
 
     deserialize(s: BitStream) {
         this.teamMode = s.readUint8();
         this.playerId = s.readUint16();
         this.started = s.readBoolean();
-        const count = s.readUint8();
-        for (let i = 0; i < count; i++) {
-            const emote = s.readGameType();
-            this.emotes.push(emote);
-        }
-        s.readAlignToNextByte();
+
+        this.emotes = s.readArray(8, () => {
+            return s.readGameType();
+        });
     }
 }

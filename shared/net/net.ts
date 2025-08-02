@@ -1,11 +1,39 @@
 import { GameObjectDefs } from "../defs/gameObjectDefs";
 import { MapObjectDefs } from "../defs/mapObjectDefs";
+import { GameConfig } from "../gameConfig";
 import * as bb from "../lib/bitBuffer";
 import { math } from "../utils/math";
 import { assert } from "../utils/util";
 import type { Vec2 } from "../utils/v2";
 
 const DEV_MODE = false;
+
+export const Constants = {
+    MaxPosition: 1024,
+    MapNameMaxLen: 24,
+    PlayerNameMaxLen: 16,
+    MouseMaxDist: 64,
+    SmokeMaxRad: 10,
+    ActionMaxDuration: 8.5,
+    AirstrikeZoneMaxRad: 256,
+    AirstrikeZoneMaxDuration: 60,
+    PlayerMinScale: 0.75,
+    PlayerMaxScale: 2,
+    MapObjectMinScale: 0.125,
+    MapObjectMaxScale: 2.5,
+    MaxPerks: 8,
+    MaxMapIndicators: 16,
+};
+
+const getBits = (n: number) => Math.ceil(Math.log2(n));
+
+export const BitSizes = {
+    Action: getBits(GameConfig.Action.Count),
+    Anim: getBits(GameConfig.Anim.Count),
+    Haste: getBits(GameConfig.HasteType.Count),
+    Perks: getBits(Constants.MaxPerks),
+    MapIndicators: getBits(Constants.MaxMapIndicators),
+};
 
 export interface Msg {
     serialize: (s: BitStream) => void;
@@ -145,6 +173,14 @@ export class BitStream extends bb.BitStream {
         };
     }
 
+    writeMapPos(vec: Vec2, bitCount = 16) {
+        this.writeVec(vec, 0, 0, Constants.MaxPosition, Constants.MaxPosition, bitCount);
+    }
+
+    readMapPos(bitCount = 16): Vec2 {
+        return this.readVec(0, 0, Constants.MaxPosition, Constants.MaxPosition, bitCount);
+    }
+
     writeUnitVec(vec: Vec2, bitCount: number) {
         this.writeVec(vec, -1.0001, -1.0001, 1.0001, 1.0001, bitCount);
     }
@@ -165,13 +201,10 @@ export class BitStream extends bb.BitStream {
         };
     }
 
-    // private field L
-    declare _view: { _view: Uint8Array };
-
     writeBytes(src: BitStream, offset: number, length: number) {
         assert(this.index % 8 == 0);
-        const data = new Uint8Array(src._view._view.buffer, offset, length);
-        this._view._view.set(data, this.index / 8);
+        const data = new Uint8Array(src._view.view.buffer, offset, length);
+        this._view.view.set(data, this.index / 8);
         this.index += length * 8;
     }
 
@@ -199,6 +232,39 @@ export class BitStream extends bb.BitStream {
 
     readMapType() {
         return mapTypeSerialization.idToType(this.readBits(12));
+    }
+
+    writeArray<T>(array: T[], bits: number, writeFn: (item: T, index: number) => void) {
+        assert(bits > 0 && bits < 31);
+
+        let length = array.length;
+        const maxSize = 1 << bits;
+        if (length > maxSize) {
+            console.trace(
+                `writeArray: Array overflow, size: ${length} max size: ${maxSize}`,
+            );
+            length = maxSize;
+        }
+
+        this.writeBits(length, bits);
+
+        for (let i = 0; i < length; i++) {
+            const item = array[i];
+            writeFn(item, i);
+        }
+    }
+
+    readArray<T>(bits: number, readFn: (index: number) => T): T[] {
+        assert(bits > 0 && bits < 31);
+
+        const length = this.readBits(bits);
+        const array = new Array(length);
+
+        for (let i = 0; i < length; i++) {
+            array[i] = readFn(i);
+        }
+
+        return array;
     }
 }
 
@@ -239,7 +305,7 @@ export class MsgStream {
         assert(this.stream.index % 8 == 0);
         this.stream.writeUint8(type);
         msg.serialize(this.stream);
-        assert(this.stream.index % 8 == 0);
+        this.stream.writeAlignToNextByte();
     }
 
     serializeMsgStream(type: number, stream: BitStream) {
@@ -255,22 +321,6 @@ export class MsgStream {
         return MsgType.None;
     }
 }
-
-export const Constants = {
-    MapNameMaxLen: 24,
-    PlayerNameMaxLen: 16,
-    MouseMaxDist: 64,
-    SmokeMaxRad: 10,
-    ActionMaxDuration: 8.5,
-    AirstrikeZoneMaxRad: 256,
-    AirstrikeZoneMaxDuration: 60,
-    PlayerMinScale: 0.75,
-    PlayerMaxScale: 2,
-    MapObjectMinScale: 0.125,
-    MapObjectMaxScale: 2.5,
-    MaxPerks: 8,
-    MaxMapIndicators: 16,
-};
 
 export enum MsgType {
     None,
