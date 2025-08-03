@@ -108,7 +108,7 @@ export class PlaneBarn {
                     case GameConfig.Plane.Airstrike: {
                         assert(options.airstrikeZoneRad); // only option that MUST be defined
                         const rad = options.airstrikeZoneRad;
-                        const timeBeforeStart = options.wait ?? 0;
+                        const timeBeforeStart = (options.wait ?? 1.5) - 0.5; // magic number to fix the incorrect delay
                         const airstrikeInterval = options.delay ?? 1;
                         const planeCount = options.numPlanes
                             ? util.weightedRandom(options.numPlanes).count
@@ -138,7 +138,7 @@ export class PlaneBarn {
                             }
                         }
 
-                        pos = v2.add(pos, v2.mul(v2.randomUnit(), 7)); // randomize the point a bit
+                        pos = v2.add(pos, util.randomPointInCircle(3));
                         this.game.map.clampToMapBounds(pos);
 
                         this.addAirstrikeZone(
@@ -488,16 +488,9 @@ class AirstrikeZone {
         this.planeDir = v2.randomUnit();
     }
 
-    /**
-     * gets a random point inside the quarter sector opposite to the zone's planes' direction
-     */
     getRandomPlanePos(): Vec2 {
-        const invertedDir = v2.neg(this.planeDir);
-        const randomDirInSector = v2.rotate(
-            invertedDir,
-            util.random(-Math.PI / 4, Math.PI / 4),
-        );
-        return v2.add(this.pos, v2.mul(randomDirInSector, util.random(0, this.rad)));
+        const offsetPos = v2.add(this.pos, v2.mul(v2.neg(this.planeDir), AIRSTRIKE_PLANE_MAX_BOMB_DIST / 2));
+        return v2.add(offsetPos, util.randomPointInCircle(this.rad));
     }
 
     update(dt: number) {
