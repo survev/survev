@@ -174,7 +174,7 @@ export class PlaneBarn {
         airstrikeInterval: number,
     ) {
         const timeToDropZone = 3; // takes 3 seconds from when a plane is called to reach its drop zone
-        const finishBuffer = 2; // 2 second buffer after all planes are done
+        const finishBuffer = 2.5; // 2.5 second buffer after all planes are done
         const duration =
             timeBeforeStart +
             timeToDropZone +
