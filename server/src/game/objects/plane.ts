@@ -117,7 +117,8 @@ export class PlaneBarn {
                         // airstrike zones should occur over high player density areas
                         // will look for the highest density area until an area with at least 25% of the players is found
                         let pos = v2.copy(this.game.gas.posNew); // defaults to center of safe zone
-                        const livingPlayers = this.game.playerBarn.livingPlayers;
+                        let livingPlayers = [...this.game.playerBarn.livingPlayers];
+                        util.shuffleArray(livingPlayers);
                         let highestPlayerCount = 0;
                         // if this is met, the zone is covering enough players and can break the loop
                         const minPlayerCount = Math.floor(livingPlayers.length / 4);
@@ -494,7 +495,8 @@ class AirstrikeZone {
         // Roll a chance for the airstrike to aim at a random player
         const aimChance = 0.5;
         if (Math.random() < aimChance) {
-            const livingPlayers = this.game.playerBarn.livingPlayers;
+            let livingPlayers = [...this.game.playerBarn.livingPlayers];
+            util.shuffleArray(livingPlayers);
             for (let i = 0; i < livingPlayers.length; i++) {
                 const testPos = v2.add(
                     livingPlayers[i].pos,
