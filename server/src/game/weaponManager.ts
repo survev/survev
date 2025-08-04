@@ -1171,7 +1171,7 @@ export class WeaponManager {
 
         if (oldThrowableType == "strobe") {
             let airstrikesLeft = 3;
-            let strobeTicker = 3
+            let strobeTicker = 3;
 
             if (this.player.hasPerk("broken_arrow")) {
                 airstrikesLeft += PerkProperties.broken_arrow.bonusAirstrikes;
