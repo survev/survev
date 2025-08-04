@@ -6,6 +6,7 @@ import { version } from "../package.json";
 import { GIT_VERSION } from "../server/src/utils/gitRevision";
 import { codefendPlugin } from "./vite-plugins/codefendPlugin";
 import { ejsPlugin } from "./vite-plugins/ejsPlugin";
+import { svelte } from '@sveltejs/vite-plugin-svelte'
 
 export const SplashThemes = {
     main: {
@@ -93,7 +94,8 @@ export default defineConfig(({ mode }) => {
     process.env.VITE_GAME_VERSION = version;
     process.env.VITE_BACKGROUND_IMG = selectedTheme.splashBg;
 
-    const plugins: Plugin[] = [ejsPlugin()];
+    // @ts-expect-error svelte plugin 
+    const plugins: Plugin[] = [ejsPlugin(), svelte()];
 
     if (!isDev) {
         plugins.push(codefendPlugin());
