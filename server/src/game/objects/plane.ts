@@ -494,14 +494,14 @@ class AirstrikeZone {
                     livingPlayers[i].pos,
                     util.randomPointInCircle(AIRSTRIKE_PLANE_MAX_BOMB_DIST / 4),
                 );
-                
+
                 if (v2.distance(this.pos, testPos) <= this.rad) {
                     pos = testPos;
                     break;
                 }
             }
         }
-            
+
         return v2.add(
             pos,
             v2.mul(v2.neg(this.planeDir), AIRSTRIKE_PLANE_MAX_BOMB_DIST / 2),
