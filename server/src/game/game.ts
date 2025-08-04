@@ -47,7 +47,6 @@ export class Game {
     stopped = false;
     allowJoin = false;
     over = false;
-    sentWinEMotes = false;
     startedTime = 0;
     stopTicker = 0;
     id: string;
@@ -481,8 +480,8 @@ export class Game {
 
             // send win emoji after 1 second
             this.playerBarn.sendWinEmoteTicker = 1;
-            // stop game after 2
-            this.stopTicker = 2;
+            // stop game after 1.8s
+            this.stopTicker = 1.8;
 
             this.updateData();
         }

@@ -253,11 +253,11 @@ export class PlayerBarn {
     }
 
     update(dt: number) {
-        let sendWinEmote = false;
+        let sendWinEmotes = false;
         if (this.game.over && !this.sentWinEmotes) {
             this.sendWinEmoteTicker -= dt;
             if (this.sendWinEmoteTicker <= 0) {
-                sendWinEmote = true;
+                sendWinEmotes = true;
                 this.sentWinEmotes = true;
             }
         }
@@ -266,7 +266,7 @@ export class PlayerBarn {
             const player = this.players[i];
             player.update(dt);
 
-            if (!player.dead && sendWinEmote) {
+            if (!player.dead && sendWinEmotes) {
                 player.emoteFromSlot(EmoteSlot.Win);
             }
         }
@@ -566,6 +566,9 @@ export class Player extends BaseGameObject {
     activeIdDirty = true;
     hasFiredFlare = false;
     flareTimer = 0;
+
+    sendDeathEmoteTicker = 0;
+    sentDeathEmote = false;
 
     team: Team | undefined = undefined;
     group: Group | undefined = undefined;
@@ -1352,7 +1355,17 @@ export class Player extends BaseGameObject {
     }
 
     update(dt: number): void {
-        if (this.dead) return;
+        if (this.dead) {
+            if (!this.sentDeathEmote) {
+                this.sendDeathEmoteTicker -= dt;
+                if (this.sendDeathEmoteTicker <= 0) {
+                    this.emoteFromSlot(EmoteSlot.Death);
+                    this.sentDeathEmote = true;
+                }
+            }
+            return;
+        }
+
         this.timeAlive += dt;
 
         if (this.game.map.factionMode) {
@@ -2999,7 +3012,7 @@ export class Player extends BaseGameObject {
         this.perkTypes.length = 0;
 
         // death emote
-        this.emoteFromSlot(GameConfig.EmoteSlot.Death);
+        this.sendDeathEmoteTicker = 0.3;
 
         // Building gore region (club pool)
         const objs = this.game.grid.intersectGameObject(this);
