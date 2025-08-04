@@ -23,7 +23,7 @@ interface ScheduledAirDrop {
 
 // amount of seconds to travel to target
 const AIRDROP_PLANE_SPAWN_DIST = GameConfig.airdrop.planeVel * 15;
-const AIRSTRIKE_PLANE_SPAWN_DIST = GameConfig.airstrike.planeVel * 3;
+const AIRSTRIKE_PLANE_SPAWN_DIST = GameConfig.airstrike.planeVel * 2.5;
 /** relative to the target airstrike position, this is the maximum distance a bomb can be dropped from that position */
 const AIRSTRIKE_PLANE_MAX_BOMB_DIST = 48;
 
@@ -108,7 +108,7 @@ export class PlaneBarn {
                     case GameConfig.Plane.Airstrike: {
                         assert(options.airstrikeZoneRad); // only option that MUST be defined
                         const rad = options.airstrikeZoneRad;
-                        const timeBeforeStart = (options.wait ?? 1.5) - 0.5; // magic number to fix the incorrect delay
+                        const timeBeforeStart = options.wait ?? 1.5;
                         const airstrikeInterval = options.delay ?? 1;
                         const planeCount = options.numPlanes
                             ? util.weightedRandom(options.numPlanes).count
@@ -173,7 +173,7 @@ export class PlaneBarn {
         timeBeforeStart: number,
         airstrikeInterval: number,
     ) {
-        const timeToDropZone = 3; // takes 3 seconds from when a plane is called to reach its drop zone
+        const timeToDropZone = 2.5; // takes 2.5 seconds from when a plane is called to reach its drop zone
         const finishBuffer = 2.5; // 2.5 second buffer after all planes are done
         const duration =
             timeBeforeStart +

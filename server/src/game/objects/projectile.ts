@@ -138,9 +138,7 @@ export class Projectile extends BaseGameObject {
 
             if (this.strobe.strobeTicker <= 0) {
                 this.game.playerBarn.addMapPing("ping_airstrike", this.pos);
-                this.game.planeBarn.addAirStrike(this.pos, this.throwDir, this.playerId);
-                this.strobe.airstrikesLeft--;
-                this.strobe.airstrikeTicker = this.strobe.airstrikeDelay;
+                this.strobe.airstrikeTicker = 1;
             }
         }
 
