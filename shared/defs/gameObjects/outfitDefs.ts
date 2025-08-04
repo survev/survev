@@ -215,10 +215,30 @@ const SkinDefs: Record<string, OutfitDef> = {
             tint: 0xffffff,
         },
         rarity: Rarity.Mythic,
-        lore: "Two-time limited edition print.",
+        lore: "The limited edition print.",
+    }),
+    outfitGD: defineOutfitSkin("outfitBase", {
+        name: "Game Designr",
+        noDropOnDeath: true,
+        skinImg: {
+            baseTint: 0xab3030,
+            baseSprite: "player-base-outfitDC.img",
+            handTint: 0xe35f5f,
+            handSprite: "player-hands-02.img",
+            footTint: 0xe35f5f,
+            footSprite: "player-feet-02.img",
+            backpackTint: 0x6e1010,
+            backpackSprite: "player-circle-base-02.img",
+        },
+        lootImg: {
+            sprite: "loot-shirt-outfitGD.img",
+            tint: 0xffffff,
+        },
+        rarity: Rarity.Epic,
+        lore: "For those who knows.",
     }),
     outfitMod: defineOutfitSkin("outfitBase", {
-        name: "Discord Moderatr",
+        name: "Game Moderatr",
         noDropOnDeath: true,
         skinImg: {
             baseTint: 0x3393db,
@@ -234,7 +254,7 @@ const SkinDefs: Record<string, OutfitDef> = {
             sprite: "loot-shirt-outfitMod.img",
             tint: 0xffffff,
         },
-        rarity: Rarity.Rare,
+        rarity: Rarity.Epic,
         lore: "For those who wield the power of the pan.",
     }),
     outfitWheat: defineOutfitSkin("outfitBase", {

@@ -19,6 +19,7 @@ const _allowedOutfits = [
     "outfitBase",
     "outfitTurkey",
     "outfitDev",
+    "outfitGD",
     "outfitMod",
     "outfitWheat",
     "outfitNoir",
