@@ -488,9 +488,22 @@ class AirstrikeZone {
         this.planeDir = v2.randomUnit();
     }
 
-    getRandomPlanePos(): Vec2 {
-        const offsetPos = v2.add(this.pos, v2.mul(v2.neg(this.planeDir), AIRSTRIKE_PLANE_MAX_BOMB_DIST / 2));
-        return v2.add(offsetPos, util.randomPointInCircle(this.rad));
+    getPlanePos(): Vec2 {
+        let pos = v2.add(this.pos, util.randomPointInCircle(this.rad));
+
+        if (util.random(0, 2) >= 1) {
+            const livingPlayers = this.game.playerBarn.livingPlayers;
+            for (let i = 0; i < livingPlayers.length; i++) {
+                const testPos = v2.add(livingPlayers[i].pos, util.randomPointInCircle(AIRSTRIKE_PLANE_MAX_BOMB_DIST / 4));
+                
+                if (v2.distance(this.pos, testPos) <= this.rad) {
+                    pos = testPos;
+                    break
+                }
+            }
+        }
+            
+        return v2.add(pos, v2.mul(v2.neg(this.planeDir), AIRSTRIKE_PLANE_MAX_BOMB_DIST / 2));
     }
 
     update(dt: number) {
@@ -500,7 +513,7 @@ class AirstrikeZone {
             this.startTicker -= dt;
 
             if (this.startTicker <= 0) {
-                const planePos = this.getRandomPlanePos();
+                const planePos = this.getPlanePos();
                 this.game.planeBarn.addAirStrike(planePos, this.planeDir);
                 this.airstrikeTicker = this.airstrikeInterval;
                 this.planesLeft--;
@@ -517,7 +530,7 @@ class AirstrikeZone {
             this.airstrikeTicker -= dt;
 
             if (this.airstrikeTicker <= 0) {
-                const planePos = this.getRandomPlanePos();
+                const planePos = this.getPlanePos();
                 this.game.planeBarn.addAirStrike(planePos, this.planeDir);
                 this.airstrikeTicker = this.airstrikeInterval;
                 this.planesLeft--;
