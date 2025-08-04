@@ -490,16 +490,22 @@ class AirstrikeZone {
         if (util.random(0, 2) >= 1) {
             const livingPlayers = this.game.playerBarn.livingPlayers;
             for (let i = 0; i < livingPlayers.length; i++) {
-                const testPos = v2.add(livingPlayers[i].pos, util.randomPointInCircle(AIRSTRIKE_PLANE_MAX_BOMB_DIST / 4));
+                const testPos = v2.add(
+                    livingPlayers[i].pos,
+                    util.randomPointInCircle(AIRSTRIKE_PLANE_MAX_BOMB_DIST / 4),
+                );
                 
                 if (v2.distance(this.pos, testPos) <= this.rad) {
                     pos = testPos;
-                    break
+                    break;
                 }
             }
         }
             
-        return v2.add(pos, v2.mul(v2.neg(this.planeDir), AIRSTRIKE_PLANE_MAX_BOMB_DIST / 2));
+        return v2.add(
+            pos,
+            v2.mul(v2.neg(this.planeDir), AIRSTRIKE_PLANE_MAX_BOMB_DIST / 2),
+        );
     }
 
     update(dt: number) {
