@@ -507,10 +507,7 @@ class AirstrikeZone {
         // Offset the final position to make the bomb line centered
         const negPlaneDir = v2.neg(this.planeDir);
         const bombOffset = v2.mul(negPlaneDir, AIRSTRIKE_PLANE_MAX_BOMB_DIST / 2);
-        const offsetPos = v2.add(
-            pos,
-            bombOffset,
-        );
+        const offsetPos = v2.add(pos, bombOffset);
 
         return offsetPos;
     }
