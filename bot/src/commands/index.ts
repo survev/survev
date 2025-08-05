@@ -8,6 +8,7 @@ import {
     zBanIpParams,
     zFindDiscordUserSlugParams,
     zGiveItemParams,
+    zRemoveItemParams,
     zSetAccountNameParams,
     zSetMatchDataNameParams,
     zUnbanAccountParams,
@@ -188,6 +189,32 @@ const commands = {
             {
                 name: "slug",
                 description: "The account slug to give the item to",
+                required: true,
+                type: ApplicationCommandOptionType.String,
+            },
+            {
+                name: "source",
+                description: "The source of the item",
+                required: false,
+                type: ApplicationCommandOptionType.String,
+            },
+        ],
+    }),
+    [Command.RemoveItem]: createCommand({
+        name: Command.RemoveItem,
+        description: "remove an item from a user",
+        optionValidator: zRemoveItemParams,
+        isPrivateRoute: true,
+        options: [
+            {
+                name: "item",
+                description: "The item to remove",
+                required: true,
+                type: ApplicationCommandOptionType.String,
+            },
+            {
+                name: "slug",
+                description: "The account slug to remove the item from",
                 required: true,
                 type: ApplicationCommandOptionType.String,
             },

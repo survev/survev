@@ -59,3 +59,8 @@ export const zGiveItemParams = z.object({
     slug: z.string(),
     source: z.string().default("daddy-has-privileges"),
 });
+
+export const zRemoveItemParams = z.object({
+    item: z.string(),
+    slug: z.string(),
+});

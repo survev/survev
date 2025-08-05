@@ -5,7 +5,7 @@ import { saveConfig } from "../../../../../config";
 import { GameObjectDefs } from "../../../../../shared/defs/gameObjectDefs";
 import { MapDefs } from "../../../../../shared/defs/mapDefs";
 import { TeamMode } from "../../../../../shared/gameConfig";
-import { zGiveItemParams } from "../../../../../shared/types/moderation";
+import { zGiveItemParams, zRemoveItemParams } from "../../../../../shared/types/moderation";
 import { serverConfigPath } from "../../../config";
 import { type SaveGameBody, zUpdateRegionBody } from "../../../utils/types";
 import type { Context } from "../..";
@@ -153,12 +153,7 @@ export const PrivateRouter = new Hono<Context>()
     .post(
         "/remove_item",
         databaseEnabledMiddleware,
-        validateParams(
-            z.object({
-                item: z.string(),
-                slug: z.string(),
-            }),
-        ),
+        validateParams(zRemoveItemParams),
         async (c) => {
             const { item, slug } = c.req.valid("json");
 
@@ -170,14 +165,14 @@ export const PrivateRouter = new Hono<Context>()
             });
 
             if (!user) {
-                return c.json({ error: "User not found" }, 404);
+                return c.json({ message: "User not found" }, 200);
             }
 
             await db
                 .delete(itemsTable)
                 .where(and(eq(itemsTable.userId, user.id), eq(itemsTable.type, item)));
 
-            return c.json({ success: true }, 200);
+            return c.json({ message: `Item "${item}" removed from ${slug}` }, 200);
         },
     )
     .post("/clear_cache", async (c) => {

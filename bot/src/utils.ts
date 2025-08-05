@@ -22,6 +22,7 @@ export const enum Command {
     SetMatchDataName = "set_match_data_name",
     SetAccountName = "set_account_name",
     GiveItem = "give_item",
+    RemoveItem = "remove_item",
 }
 
 export const honoClient = hc<PrivateRouteApp>(API_URL, {
