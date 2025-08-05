@@ -148,15 +148,15 @@ const commands = {
         optionValidator: zSetAccountNameParams,
         options: [
             {
-                name: "new_name",
-                description: "The new name of the account",
+                name: "current_slug",
+                description: "The current slug of the account",
                 required: true,
                 type: ApplicationCommandOptionType.String,
             },
             {
-                name: "current_slug",
-                description: "The current slug of the account",
-                required: true,
+                name: "new_name",
+                description: "The new name of the account (get randomized if not provided)",
+                required: false,
                 type: ApplicationCommandOptionType.String,
             },
         ],
