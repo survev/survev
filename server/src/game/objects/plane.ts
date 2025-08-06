@@ -490,23 +490,21 @@ class AirstrikeZone {
     }
 
     getAirstrikePos(): Vec2 {
+        // Random by default
         let pos = v2.add(this.pos, util.randomPointInCircle(this.rad));
 
-        // Roll a chance for the airstrike to aim at a random player
-        const aimChance = 0.5;
-        if (Math.random() < aimChance) {
-            let livingPlayers = [...this.game.playerBarn.livingPlayers];
-            util.shuffleArray(livingPlayers);
-            for (let i = 0; i < livingPlayers.length; i++) {
-                const testPos = v2.add(
-                    livingPlayers[i].pos,
-                    util.randomPointInCircle(AIRSTRIKE_PLANE_MAX_BOMB_DIST / 4),
-                );
+        // Aims at players in range
+        let livingPlayers = [...this.game.playerBarn.livingPlayers];
+        util.shuffleArray(livingPlayers);
+        for (let i = 0; i < livingPlayers.length; i++) {
+            const testPos = v2.add(
+                livingPlayers[i].pos,
+                util.randomPointInCircle(AIRSTRIKE_PLANE_MAX_BOMB_DIST / 4),
+            );
 
-                if (v2.distance(this.pos, testPos) <= this.rad) {
-                    pos = testPos;
-                    break;
-                }
+            if (v2.distance(this.pos, testPos) <= this.rad) {
+                pos = testPos;
+                break;
             }
         }
 
