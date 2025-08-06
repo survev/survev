@@ -115,13 +115,13 @@ export class PlaneBarn {
                             : 3;
 
                         // airstrike zones should occur over high player density areas
-                        // will look for the highest density area until an area with at least 25% of the players is found
+                        // will look for the highest density area until an area with at least 1/3 of the players is found
                         let pos = v2.copy(this.game.gas.posNew); // defaults to center of safe zone
                         let livingPlayers = [...this.game.playerBarn.livingPlayers];
                         util.shuffleArray(livingPlayers);
                         let highestPlayerCount = 0;
                         // if this is met, the zone is covering enough players and can break the loop
-                        const minPlayerCount = Math.floor(livingPlayers.length / 4);
+                        const minPlayerCount = Math.floor(livingPlayers.length / 3);
                         for (let i = 0; i < livingPlayers.length; i++) {
                             const testPos = livingPlayers[i].pos;
 
@@ -129,7 +129,9 @@ export class PlaneBarn {
                                 .intersectCollider(collider.createCircle(testPos, rad))
                                 .filter(
                                     (obj): obj is Player =>
-                                        obj.__type == ObjectType.Player && !obj.dead && obj.layer != 1,
+                                        obj.__type == ObjectType.Player &&
+                                        !obj.dead &&
+                                        obj.layer != 1,
                                 ).length;
 
                             if (highestPlayerCount < playerPercentage) {
@@ -502,7 +504,10 @@ class AirstrikeZone {
                 util.randomPointInCircle(AIRSTRIKE_PLANE_MAX_BOMB_DIST / 8),
             );
 
-            if (livingPlayers[i].layer != 1 && v2.distance(this.pos, testPos) <= this.rad) {
+            if (
+                livingPlayers[i].layer != 1 &&
+                v2.distance(this.pos, testPos) <= this.rad
+            ) {
                 pos = testPos;
                 break;
             }
