@@ -129,7 +129,7 @@ export class PlaneBarn {
                                 .intersectCollider(collider.createCircle(testPos, rad))
                                 .filter(
                                     (obj): obj is Player =>
-                                        obj.__type == ObjectType.Player && !obj.dead,
+                                        obj.__type == ObjectType.Player && !obj.dead && obj.layer != 1,
                                 ).length;
 
                             if (highestPlayerCount < playerPercentage) {
@@ -493,16 +493,16 @@ class AirstrikeZone {
         // Random by default
         let pos = v2.add(this.pos, util.randomPointInCircle(this.rad));
 
-        // Aims at players in range
+        // Aims at players above ground in range
         let livingPlayers = [...this.game.playerBarn.livingPlayers];
         util.shuffleArray(livingPlayers);
         for (let i = 0; i < livingPlayers.length; i++) {
             const testPos = v2.add(
                 livingPlayers[i].pos,
-                util.randomPointInCircle(AIRSTRIKE_PLANE_MAX_BOMB_DIST / 4),
+                util.randomPointInCircle(AIRSTRIKE_PLANE_MAX_BOMB_DIST / 8),
             );
 
-            if (v2.distance(this.pos, testPos) <= this.rad) {
+            if (livingPlayers[i].layer != 1 && v2.distance(this.pos, testPos) <= this.rad) {
                 pos = testPos;
                 break;
             }
