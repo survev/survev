@@ -447,7 +447,7 @@ const mapDef: PartialMapDef = {
                 shack_03b: 3,
                 greenhouse_01: 1,
                 cache_01: 1,
-                cache_02: 1,
+                cache_02f: 1,
                 cache_07: 1,
                 mansion_structure_01: 1,
                 bunker_structure_01: { odds: 1 },
