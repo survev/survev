@@ -9,43 +9,43 @@
   <defs
      id="defs1" />
   <rect
-     style="fill:none;fill-opacity:1;stroke:#ffffff;stroke-width:4;stroke-dasharray:none"
+     style="fill:none;fill-opacity:1;stroke:#ffffff;stroke-width:5;stroke-dasharray:none"
      id="rect11"
-     width="60.236301"
-     height="12.48246"
-     x="33.881851"
-     y="-70.241226"
+     width="59.253201"
+     height="14.279396"
+     x="34.373398"
+     y="-71.139694"
      transform="rotate(90)" />
   <rect
      style="fill:#ffffff;fill-opacity:1;stroke:#ffffff;stroke-width:0;stroke-dasharray:none"
      id="rect10-8"
      width="64.280556"
-     height="13.870021"
-     x="31.859703"
-     y="-46.144791"
+     height="13.105348"
+     x="31.859699"
+     y="-45.197166"
      transform="rotate(90)" />
   <rect
-     style="fill:none;fill-opacity:1;stroke:#ffffff;stroke-width:4;stroke-dasharray:none"
+     style="fill:none;fill-opacity:1;stroke:#ffffff;stroke-width:5;stroke-dasharray:none"
      id="rect10-7-1"
      width="88.333588"
-     height="37.196297"
-     x="19.833187"
-     y="-57.758774"
+     height="36.431622"
+     x="19.833185"
+     y="-56.860306"
      transform="rotate(90)" />
   <rect
      style="fill:#ffffff;fill-opacity:1;stroke:#ffffff;stroke-width:0;stroke-dasharray:none"
-     id="rect10-8-4"
+     id="rect10-8-2"
      width="64.280556"
-     height="13.870021"
-     x="31.859703"
-     y="-95.823547"
+     height="13.105348"
+     x="31.859699"
+     y="-95.90818"
      transform="rotate(90)" />
   <rect
-     style="fill:none;fill-opacity:1;stroke:#ffffff;stroke-width:4;stroke-dasharray:none"
-     id="rect10-7-1-4"
+     style="fill:none;fill-opacity:1;stroke:#ffffff;stroke-width:5;stroke-dasharray:none"
+     id="rect10-7-1-0"
      width="88.333588"
-     height="37.196297"
-     x="19.833187"
-     y="-107.43753"
+     height="36.431622"
+     x="19.833185"
+     y="-107.57132"
      transform="rotate(90)" />
 </svg>
