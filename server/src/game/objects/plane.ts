@@ -127,11 +127,13 @@ export class PlaneBarn {
         }
     }
 
-    getAirstrikeZonePos(rad: number){
+    getAirstrikeZonePos(rad: number) {
         // airstrike zones should occur over high player density areas
         // will look for the highest density area until an area with at least 1/3 of the players is found
         let pos = v2.copy(this.game.gas.posNew); // defaults to center of safe zone
-        let connectedPlayers = this.game.playerBarn.livingPlayers.filter(p => !p.disconnected);
+        let connectedPlayers = this.game.playerBarn.livingPlayers.filter(
+            (p) => !p.disconnected,
+        );
         util.shuffleArray(connectedPlayers);
         let highestPlayerCount = 0;
         // if this is met, the zone is covering enough players and can break the loop
@@ -213,8 +215,12 @@ export class PlaneBarn {
     isOneTeamWinning(): boolean {
         if (this.helpForLosingTeam.sent || this.game.gas.circleIdx == 0) return false;
 
-        const redConnectedPlayers = this.game.playerBarn.teams[0].livingPlayers.filter(p => !p.disconnected);
-        const blueConnectedPlayers = this.game.playerBarn.teams[1].livingPlayers.filter(p => !p.disconnected);
+        const redConnectedPlayers = this.game.playerBarn.teams[0].livingPlayers.filter(
+            (p) => !p.disconnected,
+        );
+        const blueConnectedPlayers = this.game.playerBarn.teams[1].livingPlayers.filter(
+            (p) => !p.disconnected,
+        );
 
         const redAliveCount = redConnectedPlayers.length;
         const blueAliveCount = blueConnectedPlayers.length;
@@ -223,8 +229,7 @@ export class PlaneBarn {
         const minAliveCount = math.min(redAliveCount, blueAliveCount);
 
         const threshold =
-            (maxAliveCount - minAliveCount) /
-            (maxAliveCount + minAliveCount);
+            (maxAliveCount - minAliveCount) / (maxAliveCount + minAliveCount);
         return threshold >= 0.1;
     }
 
@@ -515,7 +520,9 @@ class AirstrikeZone {
         let pos = v2.add(this.pos, util.randomPointInCircle(this.rad));
 
         // Aims at players above ground in range
-        let connectedPlayers = this.game.playerBarn.livingPlayers.filter(p => !p.disconnected);
+        let connectedPlayers = this.game.playerBarn.livingPlayers.filter(
+            (p) => !p.disconnected,
+        );
         util.shuffleArray(connectedPlayers);
         for (let i = 0; i < connectedPlayers.length; i++) {
             const testPos = v2.add(
