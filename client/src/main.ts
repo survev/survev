@@ -17,7 +17,7 @@ import { ConfigManager, type ConfigType } from "./config";
 import { device } from "./device";
 import { errorLogManager } from "./errorLogs";
 import { Game } from "./game";
-import { helpers } from "./helpers";
+import { getParameterByName, helpers } from "./helpers";
 import { InputHandler } from "./input";
 import { InputBinds, InputBindUi } from "./inputBinds";
 import { PingTest } from "./pingTest";
@@ -282,6 +282,18 @@ class Application {
 
             this.modalRecorder.onHide(() => {});
 
+            const fetchGame = (url: string) => {
+                fetch(url).then(async (res) => {
+                    this.game?.startPacketPlayBack(await res.arrayBuffer());
+                });
+            };
+
+            const replayUrl = getParameterByName("replay");
+
+            if (replayUrl) {
+                fetchGame(replayUrl);
+            }
+
             $(".btn-recorder").on("click", () => {
                 this.modalRecorder.show();
                 return false;
@@ -293,9 +305,7 @@ class Application {
                 this.refreshUi();
                 this.modalRecorder.hide();
                 try {
-                    fetch(url).then(async (res) => {
-                        this.game?.startPacketPlayBack(await res.arrayBuffer());
-                    });
+                    fetchGame(url);
                 } catch {
                     this.quickPlayPendingModeIdx = -1;
                     this.refreshUi();
