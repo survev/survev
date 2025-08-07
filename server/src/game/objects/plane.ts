@@ -3,7 +3,6 @@ import type { ThrowableDef } from "../../../../shared/defs/gameObjects/throwable
 import type { MapDef } from "../../../../shared/defs/mapDefs";
 import { MapObjectDefs } from "../../../../shared/defs/mapObjectDefs";
 import type { ObstacleDef } from "../../../../shared/defs/mapObjectsTyping";
-import { SpecialAirdropConfig } from "../../../../shared/defs/maps/factionDefs";
 import { GameConfig } from "../../../../shared/gameConfig";
 import { Constants } from "../../../../shared/net/net";
 import { ObjectType } from "../../../../shared/net/objectSerializeFns";
@@ -52,9 +51,8 @@ export class PlaneBarn {
     }[] = [];
     airstrikeZones: AirstrikeZone[] = [];
 
-    specialAirdrop = {
-        canDrop: false,
-        dropped: false,
+    helpForLosingTeam = {
+        sent: false,
     };
 
     constructor(readonly game: Game) {}
@@ -113,36 +111,7 @@ export class PlaneBarn {
                         const planeCount = options.numPlanes
                             ? util.weightedRandom(options.numPlanes).count
                             : 3;
-
-                        // airstrike zones should occur over high player density areas
-                        // will look for the highest density area until an area with at least 1/3 of the players is found
-                        let pos = v2.copy(this.game.gas.posNew); // defaults to center of safe zone
-                        let livingPlayers = [...this.game.playerBarn.livingPlayers];
-                        util.shuffleArray(livingPlayers);
-                        let highestPlayerCount = 0;
-                        // if this is met, the zone is covering enough players and can break the loop
-                        const minPlayerCount = Math.floor(livingPlayers.length / 3);
-                        for (let i = 0; i < livingPlayers.length; i++) {
-                            const testPos = livingPlayers[i].pos;
-
-                            const playerPercentage = this.game.grid
-                                .intersectCollider(collider.createCircle(testPos, rad))
-                                .filter(
-                                    (obj): obj is Player =>
-                                        obj.__type == ObjectType.Player &&
-                                        !obj.dead &&
-                                        obj.layer != 1,
-                                ).length;
-
-                            if (highestPlayerCount < playerPercentage) {
-                                highestPlayerCount = playerPercentage;
-                                pos = testPos;
-                                if (highestPlayerCount > minPlayerCount) break;
-                            }
-                        }
-
-                        pos = v2.add(pos, util.randomPointInCircle(3));
-                        this.game.map.clampToMapBounds(pos);
+                        const pos = this.getAirstrikeZonePos(rad);
 
                         this.addAirstrikeZone(
                             pos,
@@ -156,6 +125,41 @@ export class PlaneBarn {
                 }
             }
         }
+    }
+
+    getAirstrikeZonePos(rad: number){
+        // airstrike zones should occur over high player density areas
+        // will look for the highest density area until an area with at least 1/3 of the players is found
+        let pos = v2.copy(this.game.gas.posNew); // defaults to center of safe zone
+        let connectedPlayers = this.game.playerBarn.livingPlayers.filter(p => !p.disconnected);
+        util.shuffleArray(connectedPlayers);
+        let highestPlayerCount = 0;
+        // if this is met, the zone is covering enough players and can break the loop
+        const minPlayerCount = Math.floor(connectedPlayers.length / 3);
+        for (let i = 0; i < connectedPlayers.length; i++) {
+            const testPos = connectedPlayers[i].pos;
+
+            const playerPercentage = this.game.grid
+                .intersectCollider(collider.createCircle(testPos, rad))
+                .filter(
+                    (obj): obj is Player =>
+                        obj.__type == ObjectType.Player &&
+                        !obj.dead &&
+                        obj.layer != 1 &&
+                        !obj.disconnected,
+                ).length;
+
+            if (highestPlayerCount < playerPercentage) {
+                highestPlayerCount = playerPercentage;
+                pos = testPos;
+                if (highestPlayerCount > minPlayerCount) break;
+            }
+        }
+
+        pos = v2.add(pos, util.randomPointInCircle(3));
+        this.game.map.clampToMapBounds(pos);
+
+        return pos;
     }
 
     flush() {
@@ -206,27 +210,28 @@ export class PlaneBarn {
         this.game.playerBarn.addMapPing("ping_airstrike", pos);
     }
 
-    canDropSpecialAirdrop(): boolean {
-        if (this.specialAirdrop.dropped || !this.specialAirdrop.canDrop) return false;
+    isOneTeamWinning(): boolean {
+        if (this.helpForLosingTeam.sent || this.game.gas.circleIdx == 0) return false;
 
-        const red = this.game.playerBarn.teams[0];
-        const blue = this.game.playerBarn.teams[1];
+        const redConnectedPlayers = this.game.playerBarn.teams[0].livingPlayers.filter(p => !p.disconnected);
+        const blueConnectedPlayers = this.game.playerBarn.teams[1].livingPlayers.filter(p => !p.disconnected);
 
-        const redAliveCount = red.livingPlayers.length;
-        const blueAliveCount = blue.livingPlayers.length;
+        const redAliveCount = redConnectedPlayers.length;
+        const blueAliveCount = blueConnectedPlayers.length;
 
         const maxAliveCount = math.max(redAliveCount, blueAliveCount);
         const minAliveCount = math.min(redAliveCount, blueAliveCount);
 
         const threshold =
             (maxAliveCount - minAliveCount) /
-            math.max(red.highestAliveCount, blue.highestAliveCount);
-        return threshold >= SpecialAirdropConfig.aliveCountThreshold;
+            (maxAliveCount + minAliveCount);
+        return threshold >= 0.1;
     }
 
-    addSpecialAirdrop(): void {
+    helpLosingTeam(): void {
         if (!this.game.playerBarn.teams.length) return;
 
+        // Special airdrop
         const losingTeam = this.game.playerBarn.teams.reduce((losingTeam, team) =>
             losingTeam.livingPlayers.length < team.livingPlayers.length
                 ? losingTeam
@@ -264,8 +269,22 @@ export class PlaneBarn {
         const pos = v2.add(furthestLosingTeamPlayer.pos, v2.mul(v2.randomUnit(), 5));
         this.game.planeBarn.addAirdrop(pos, "airdrop_crate_04"); // golden airdrop
 
-        this.specialAirdrop.dropped = true;
-        this.specialAirdrop.canDrop = false;
+        this.helpForLosingTeam.sent = true;
+
+        // Special airstrike
+        const airstrikeRad = 50;
+        const airstrikeTimeBeforeStart = 1.5;
+        const airstrikeInterval = 1;
+        const airstrikePlaneCount = 5;
+        const airstrikePos = this.getAirstrikeZonePos(airstrikeRad);
+
+        this.addAirstrikeZone(
+            airstrikePos,
+            airstrikeRad,
+            airstrikePlaneCount,
+            airstrikeTimeBeforeStart,
+            airstrikeInterval,
+        );
     }
 
     addAirdrop(pos: Vec2, type?: string) {
@@ -496,16 +515,16 @@ class AirstrikeZone {
         let pos = v2.add(this.pos, util.randomPointInCircle(this.rad));
 
         // Aims at players above ground in range
-        let livingPlayers = [...this.game.playerBarn.livingPlayers];
-        util.shuffleArray(livingPlayers);
-        for (let i = 0; i < livingPlayers.length; i++) {
+        let connectedPlayers = this.game.playerBarn.livingPlayers.filter(p => !p.disconnected);
+        util.shuffleArray(connectedPlayers);
+        for (let i = 0; i < connectedPlayers.length; i++) {
             const testPos = v2.add(
-                livingPlayers[i].pos,
+                connectedPlayers[i].pos,
                 util.randomPointInCircle(AIRSTRIKE_PLANE_MAX_BOMB_DIST / 8),
             );
 
             if (
-                livingPlayers[i].layer != 1 &&
+                connectedPlayers[i].layer != 1 &&
                 v2.distance(this.pos, testPos) <= this.rad
             ) {
                 pos = testPos;

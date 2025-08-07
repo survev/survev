@@ -7,8 +7,6 @@ import type { Player } from "./objects/player";
 export class Team {
     players: Player[] = [];
     livingPlayers: Player[] = [];
-    /** number of alive players once the lobby closes, only set and used after lobby close */
-    highestAliveCount = -1;
     /** even if leader becomes lone survivr, this variable remains unchanged since it's used for gameover msgs */
     leader?: Player;
     isLastManApplied = false;
