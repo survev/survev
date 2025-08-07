@@ -949,13 +949,6 @@ export class Player extends BaseGameObject {
                         continue;
                     }
 
-                    const curWeapDef = GameObjectDefs[this.weapons[i].type];
-                    if (curWeapDef.type == "gun") {
-                        // refills the ammo of the existing weapon
-                        this.weapons[i].ammo = this.weaponManager.getTrueAmmoStats(
-                            curWeapDef as GunDef,
-                        ).trueMaxClip;
-                    }
                     continue;
                 }
 
