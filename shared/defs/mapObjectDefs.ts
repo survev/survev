@@ -10726,7 +10726,7 @@ export const MapObjectDefs: Record<string, MapObjectDef> = {
     // halloween cache
     tree_03h: createTree({
         scale: { createMin: 1, createMax: 1.2 },
-        map: { display:false, color: 0x4f5715, scale: 2.5 },
+        map: { display: false, color: 0x4f5715, scale: 2.5 },
         img: { sprite: "map-tree-07.img", tint: 0xb1b1b1 },
         loot: [tierLoot("tier_surviv", 2, 3), autoLoot("mosin", 1)],
     } as unknown as Partial<ObstacleDef>),
