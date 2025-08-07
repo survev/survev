@@ -3,7 +3,7 @@ import type { BuildingDef } from "../defs/mapObjectsTyping";
 import { type AABB, type Collider, coldet } from "./coldet";
 import { collider } from "./collider";
 import { math } from "./math";
-import { assert } from "./util";
+import { assert, util } from "./util";
 import { type Vec2, v2 } from "./v2";
 
 // Memoize computed object colliders
@@ -58,8 +58,8 @@ function computeBoundingCollider(type: string): Collider {
         for (let i = 0; i < def.mapObjects.length; i++) {
             const mapObj = def.mapObjects[i];
             let mt = mapObj.type!;
-            if (typeof mt === "function") {
-                mt = mt();
+            if (typeof mt === "object") {
+                mt = util.weightedRandomObject(mt);
             }
             if (mt !== "") {
                 const rot = math.oriToRad(mapObj.ori);

@@ -53,7 +53,7 @@ export interface BuildingDef {
         collision?: AABBWithHeight[];
     };
     mapObjects: Array<{
-        type?: string | (() => string);
+        type?: string | Record<string, number>;
         pos: Vec2;
         scale: number;
         ori: number;
