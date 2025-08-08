@@ -186,7 +186,6 @@ export const RoleDefs: Record<string, RoleDef> = {
                 })[teamcolor],
             inventory: {
                 "8xscope": 1,
-                healthkit: 1,
                 bandage: 5,
             },
         }),
@@ -217,6 +216,7 @@ export const RoleDefs: Record<string, RoleDef> = {
                 })[teamcolor],
             inventory: {
                 "8xscope": 1,
+                bandage: 5,
             },
         }),
     },
@@ -245,8 +245,7 @@ export const RoleDefs: Record<string, RoleDef> = {
             chest: "chest03",
             inventory: {
                 "4xscope": 1,
-                bandage: 10,
-                soda: 3,
+                bandage: 5,
             },
         }),
     },
@@ -333,8 +332,8 @@ export const RoleDefs: Record<string, RoleDef> = {
             chest: "chest03",
             inventory: {
                 "4xscope": 1,
-                bandage: 5,
                 soda: 6,
+                bandage: 5,
             },
         }),
     },
@@ -381,7 +380,6 @@ export const RoleDefs: Record<string, RoleDef> = {
             inventory: {
                 "4xscope": 1,
                 bandage: 5,
-                soda: 2,
             },
         }),
     },
@@ -437,6 +435,7 @@ export const RoleDefs: Record<string, RoleDef> = {
             inventory: {
                 mirv: 8,
                 "8xscope": 1,
+                bandage: 5,
             },
         }),
     },
