@@ -2337,6 +2337,11 @@ export class Player extends BaseGameObject {
                     return true;
                 }
 
+                // part of the same team
+                if (emotePlayer?.teamId === player.teamId) {
+                    return true;
+                }
+
                 // faction team leader
                 if (
                     (emotePlayer.role === "leader" || emotePlayer.role === "captain") &&
