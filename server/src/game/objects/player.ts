@@ -898,6 +898,16 @@ export class Player extends BaseGameObject {
                     this.scope = key;
                 }
 
+                if (
+                    invDef.type == "heal" ||
+                    invDef.type == "boost" ||
+                    invDef.type == "throwable" ||
+                    invDef.type == "ammo"
+                ) {
+                    this.inventory[key] = Math.max(this.inventory[key], value);
+                    continue;
+                }
+
                 this.inventory[key] = value;
             }
 
@@ -932,6 +942,9 @@ export class Player extends BaseGameObject {
                 this.chest = roleDef.defaultItems.chest;
             }
             if (roleDef.defaultItems.backpack) {
+                if (this.backpack) {
+                    this.dropBackPackCopy(this.backpack);
+                }
                 this.backpack = roleDef.defaultItems.backpack;
             }
 
@@ -952,9 +965,7 @@ export class Player extends BaseGameObject {
                     const curWeapDef = GameObjectDefs[this.weapons[i].type];
                     if (curWeapDef.type == "gun") {
                         // refills the ammo of the existing weapon
-                        this.weapons[i].ammo = this.weaponManager.getTrueAmmoStats(
-                            curWeapDef as GunDef,
-                        ).trueMaxClip;
+                        this.weaponManager.reload(i);
                     }
                     continue;
                 }
@@ -2333,6 +2344,11 @@ export class Player extends BaseGameObject {
 
                 // part of the same group
                 if (emotePlayer?.groupId === player.groupId) {
+                    return true;
+                }
+
+                // part of the same team
+                if (emotePlayer?.teamId === player.teamId) {
                     return true;
                 }
 
@@ -4088,6 +4104,16 @@ export class Player extends BaseGameObject {
         return true;
     }
 
+    dropBackPackCopy(item: string): boolean {
+        const armorDef = GameObjectDefs[item];
+        if (armorDef.type != "backpack") return false;
+        if (this[armorDef.type] !== item) return false;
+        if (armorDef.level == 0) return false;
+
+        this.dropLoot(item, 1);
+        return true;
+    }
+
     splitUpLoot(item: string, amount: number) {
         const dropCount = Math.floor(amount / 60);
         for (let i = 0; i < dropCount; i++) {
@@ -4388,6 +4414,12 @@ export class Player extends BaseGameObject {
             player._lastBreathTicker = 5;
 
             player.giveHaste(GameConfig.HasteType.Inspire, 5);
+            if (player.teamId == 1 && player.__id != this.__id) {
+                this.game.playerBarn.addEmote("emote_bugle_final_red", player.__id);
+            }
+            if (player.teamId == 2 && player.__id != this.__id) {
+                this.game.playerBarn.addEmote("emote_bugle_final_blue", player.__id);
+            }
             player.recalculateScale();
         }
     }
@@ -4403,6 +4435,15 @@ export class Player extends BaseGameObject {
 
         for (const player of affectedPlayers) {
             player.giveHaste(GameConfig.HasteType.Inspire, 3);
+            if (player.teamId == 1 && player.__id != this.__id) {
+                this.game.playerBarn.addEmote("emote_bugle_inspiration_red", player.__id);
+            }
+            if (player.teamId == 2 && player.__id != this.__id) {
+                this.game.playerBarn.addEmote(
+                    "emote_bugle_inspiration_blue",
+                    player.__id,
+                );
+            }
         }
     }
 
