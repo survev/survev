@@ -4098,6 +4098,7 @@ export class Player extends BaseGameObject {
         const armorDef = GameObjectDefs[item];
         if (armorDef.type != "backpack") return false;
         if (this[armorDef.type] !== item) return false;
+        if (armorDef.level == 0) return false;
 
         this.dropLoot(item, 1);
         return true;
