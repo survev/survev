@@ -230,7 +230,8 @@ export class PlaneBarn {
 
         const threshold =
             (maxAliveCount - minAliveCount) / (maxAliveCount + minAliveCount);
-        return threshold >= 0.1;
+        const difference = maxAliveCount - minAliveCount;
+        return threshold >= 0.1 || difference >= 5;
     }
 
     helpLosingTeam(): void {
