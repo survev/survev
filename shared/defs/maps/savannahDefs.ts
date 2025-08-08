@@ -1,7 +1,6 @@
 import { GameConfig } from "../../gameConfig";
 import { util } from "../../utils/util";
 import { v2 } from "../../utils/v2";
-import type { MapDef } from "../mapDefs";
 import { MapId } from "../types/misc";
 import { Main, type PartialMapDef } from "./baseDefs";
 
@@ -90,9 +89,7 @@ const mapDef: PartialMapDef = {
                         },
                     },
                 ],
-                weights: [
-                    { weight: 1, widths: [4] },
-                ],
+                weights: [{ weight: 1, widths: [4] }],
                 smoothness: 0.45,
                 spawnCabins: false,
                 masks: [],
@@ -162,14 +159,14 @@ const mapDef: PartialMapDef = {
         ],
         fixedSpawns: [
             {
-                grassy_cover_01: { small: 8, large: 9},
-                grassy_cover_02: { small: 8, large: 9},
-                grassy_cover_03: { small: 8, large: 9},
+                grassy_cover_01: { small: 8, large: 9 },
+                grassy_cover_02: { small: 8, large: 9 },
+                grassy_cover_03: { small: 8, large: 9 },
                 grassy_cover_complex_01: { small: 2, large: 3 },
-                brush_clump_01: { small: 11, large: 13},
-                brush_clump_02: { small: 11, large: 13},
-                brush_clump_03: { small: 11, large: 13},
-                perch_01: { small: 11, large: 13},
+                brush_clump_01: { small: 11, large: 13 },
+                brush_clump_02: { small: 11, large: 13 },
+                brush_clump_03: { small: 11, large: 13 },
+                perch_01: { small: 11, large: 13 },
                 kopje_patch_01: { small: 2, large: 3 },
                 savannah_patch_01: { small: 4, large: 5 },
                 mansion_structure_01: 1,

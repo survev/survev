@@ -196,7 +196,7 @@ export class RiverCreator {
         for (let i = 0; i < max; i += step) {
             const dir = v2.create(Math.cos(i), Math.sin(i));
             const newNode = v2.add(center, v2.mul(dir, len));
-            points.push(v2.add(newNode, util.randomPointInCircle(len * step / 2)));
+            points.push(v2.add(newNode, util.randomPointInCircle((len * step) / 2)));
         }
 
         points.push(v2.copy(points[0]));
