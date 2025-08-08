@@ -4414,6 +4414,12 @@ export class Player extends BaseGameObject {
             player._lastBreathTicker = 5;
 
             player.giveHaste(GameConfig.HasteType.Inspire, 5);
+            if (player.teamId == 1 && player.__id != this.__id) {
+                this.game.playerBarn.addEmote("emote_bugle_final_red", player.__id);
+            }
+            if (player.teamId == 2 && player.__id != this.__id) {
+                this.game.playerBarn.addEmote("emote_bugle_final_blue", player.__id);
+            }
             player.recalculateScale();
         }
     }
@@ -4429,6 +4435,15 @@ export class Player extends BaseGameObject {
 
         for (const player of affectedPlayers) {
             player.giveHaste(GameConfig.HasteType.Inspire, 3);
+            if (player.teamId == 1 && player.__id != this.__id) {
+                this.game.playerBarn.addEmote("emote_bugle_inspiration_red", player.__id);
+            }
+            if (player.teamId == 2 && player.__id != this.__id) {
+                this.game.playerBarn.addEmote(
+                    "emote_bugle_inspiration_blue",
+                    player.__id,
+                );
+            }
         }
     }
 
