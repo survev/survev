@@ -899,7 +899,10 @@ export class Player extends BaseGameObject {
                 }
 
                 if (
-                    invDef.type == "heal" || invDef.type == "boost" || invDef.type == "throwable" || invDef.type == "ammo"
+                    invDef.type == "heal" ||
+                    invDef.type == "boost" ||
+                    invDef.type == "throwable" ||
+                    invDef.type == "ammo"
                 ) {
                     this.inventory[key] = Math.max(this.inventory[key], value);
                     continue;
