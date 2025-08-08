@@ -2773,8 +2773,8 @@ export class Player extends BaseGameObject {
             this.team!.checkAndApplyCaptain();
 
             // golden airdrops depend on alive counts, so we only do this logic on kill
-            if (this.game.planeBarn.canDropSpecialAirdrop()) {
-                this.game.planeBarn.addSpecialAirdrop();
+            if (this.game.planeBarn.isOneTeamWinning()) {
+                this.game.planeBarn.helpLosingTeam();
             }
         }
 

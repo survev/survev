@@ -93,6 +93,7 @@ export class Projectile extends BaseGameObject {
         strobeTicker: number;
         airstrikesLeft: number;
         airstrikeTicker: number;
+        airstrikeDelay: number;
     };
 
     constructor(
@@ -137,9 +138,7 @@ export class Projectile extends BaseGameObject {
 
             if (this.strobe.strobeTicker <= 0) {
                 this.game.playerBarn.addMapPing("ping_airstrike", this.pos);
-                this.game.planeBarn.addAirStrike(this.pos, this.throwDir, this.playerId);
-                this.strobe.airstrikesLeft--;
-                this.strobe.airstrikeTicker = 0.85;
+                this.strobe.airstrikeTicker = 1;
             }
         }
 
@@ -161,7 +160,7 @@ export class Projectile extends BaseGameObject {
                 const pos = v2.add(this.pos, v2.mul(randomDir, 7));
                 this.game.planeBarn.addAirStrike(pos, this.throwDir, this.playerId);
                 this.strobe.airstrikesLeft--;
-                this.strobe.airstrikeTicker = 0.85;
+                this.strobe.airstrikeTicker = this.strobe.airstrikeDelay;
             }
         }
     }
