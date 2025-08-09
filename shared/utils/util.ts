@@ -322,7 +322,7 @@ export const util = {
         return arr.at(index % arr.length) as T;
     },
 
-    weightedRandom<T extends Object>(
+    weightedRandom<T extends object>(
         items: Array<T & { weight: number }>,
         rand = Math.random,
     ) {
@@ -337,5 +337,30 @@ export const util = {
             idx++;
         }
         return items[idx];
+    },
+
+    weightedRandomObject(items: Record<string, number>) {
+        const arr: Array<{
+            type: string;
+            weight: number;
+        }> = [];
+        for (const key in items) {
+            if (items[key]) {
+                arr.push({ type: key, weight: items[key] });
+            }
+        }
+
+        let total = 0.0;
+        for (let i = 0; i < arr.length; i++) {
+            total += arr[i].weight;
+        }
+
+        let rng = util.random(0, total);
+        let idx = 0;
+        while (rng > arr[idx].weight) {
+            rng -= arr[idx].weight;
+            idx++;
+        }
+        return arr[idx].type;
     },
 };

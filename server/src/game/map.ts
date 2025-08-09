@@ -70,8 +70,8 @@ function getBuildingBounds(type: string, layer = 0, pos: Vec2, rot: number) {
         for (let i = 0; i < def.mapObjects.length; i++) {
             const mapObj = def.mapObjects[i];
             let mt = mapObj.type!;
-            if (typeof mt === "function") {
-                mt = mt();
+            if (typeof mt === "object") {
+                mt = util.weightedRandomObject(mt);
             }
 
             const childDef = MapObjectDefs[mt];
@@ -1841,8 +1841,8 @@ export class GameMap {
         for (const mapObject of def.mapObjects ?? []) {
             let partType = mapObject.type;
 
-            if (typeof partType !== "string") {
-                partType = partType?.();
+            if (typeof partType === "object") {
+                partType = util.weightedRandomObject(partType);
             }
             if (!partType) continue;
 

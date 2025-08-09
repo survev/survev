@@ -620,6 +620,11 @@ export const Main: MapDef = {
             { name: "", count: 1, weight: 25 },
             { name: "tier_perks", count: 1, weight: 1 },
         ],
+
+        // TODO: Savannah loot tables
+        tier_knives: [],
+        tier_snipers: [],
+        tier_cloud_02: [],
     },
     mapGen: {
         map: {

@@ -30,31 +30,7 @@ function autoLoot(type: string, count: number, props?: LootSpawnDef["props"]) {
 }
 
 function randomObstacleType(types: Record<string, number>) {
-    const arr: Array<{
-        type: string;
-        weight: number;
-    }> = [];
-    for (const key in types) {
-        if (types[key]) {
-            arr.push({ type: key, weight: types[key] });
-        }
-    }
-    if (arr.length === 0) {
-        throw new Error("Invalid obstacle types");
-    }
-    let total = 0.0;
-    for (let i = 0; i < arr.length; i++) {
-        total += arr[i].weight;
-    }
-    return function () {
-        let rng = util.random(0, total);
-        let idx = 0;
-        while (rng > arr[idx].weight) {
-            rng -= arr[idx].weight;
-            idx++;
-        }
-        return arr[idx].type;
-    };
+    return types;
 }
 
 function wallImg(img: string, tint = 0xffffff, alpha = 1, zIdx = 10) {
@@ -28829,10 +28805,10 @@ export const MapObjectDefs: Record<string, MapObjectDef> = {
         type: "loot_spawner",
         loot: [tierLoot("tier_woodaxe", 1, 1)],
     },
-    loot_tier_fireaxe: {
-        type: "loot_spawner",
-        loot: [tierLoot("tier_fireaxe", 1, 1)],
-    },
+    // loot_tier_fireaxe: {
+    //     type: "loot_spawner",
+    //     loot: [tierLoot("tier_fireaxe", 1, 1)],
+    // },
     loot_tier_stonehammer: {
         type: "loot_spawner",
         loot: [tierLoot("tier_stonehammer", 1, 1)],
@@ -28881,10 +28857,10 @@ export const MapObjectDefs: Record<string, MapObjectDef> = {
         type: "loot_spawner",
         loot: [tierLoot("tier_spetsnaz_outfit", 1, 1)],
     },
-    loot_tier_eye_01: {
-        type: "loot_spawner",
-        loot: [tierLoot("tier_eye_01", 1, 1)],
-    },
+    // loot_tier_eye_01: {
+    //     type: "loot_spawner",
+    //     loot: [tierLoot("tier_eye_01", 1, 1)],
+    // },
     loot_tier_eye_02: {
         type: "loot_spawner",
         loot: [tierLoot("tier_eye_02", 1, 1)],
@@ -28901,10 +28877,10 @@ export const MapObjectDefs: Record<string, MapObjectDef> = {
         type: "loot_spawner",
         loot: [tierLoot("tier_chrys_02", 1, 1)],
     },
-    loot_tier_chrys_02b: {
-        type: "loot_spawner",
-        loot: [tierLoot("tier_chrys_02b", 1, 1)],
-    },
+    // loot_tier_chrys_02b: {
+    //     type: "loot_spawner",
+    //     loot: [tierLoot("tier_chrys_02b", 1, 1)],
+    // },
     loot_tier_chrys_03: {
         type: "loot_spawner",
         loot: [tierLoot("tier_chrys_03", 1, 1)],
@@ -28918,11 +28894,11 @@ export const MapObjectDefs: Record<string, MapObjectDef> = {
         loot: [tierLoot("tier_forest_helmet", 1, 1)],
         terrain: { grass: true, beach: false },
     },
-    loot_tier_helmet_potato: {
-        type: "loot_spawner",
-        loot: [tierLoot("tier_potato_helmet", 1, 1)],
-        terrain: { grass: true, beach: false },
-    },
+    // loot_tier_helmet_potato: {
+    //     type: "loot_spawner",
+    //     loot: [tierLoot("tier_potato_helmet", 1, 1)],
+    //     terrain: { grass: true, beach: false },
+    // },
     loot_tier_perk_test: {
         type: "loot_spawner",
         loot: [
