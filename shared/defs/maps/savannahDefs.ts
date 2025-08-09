@@ -51,6 +51,113 @@ const mapDef: PartialMapDef = {
             ],
         },
     },
+    lootTable: {
+        tier_scopes: [
+            { name: "4xscope", count: 1, weight: 5 },
+            { name: "8xscope", count: 1, weight: 1 }, // ?
+            { name: "15xscope", count: 1, weight: 0.02 }, // ?
+        ],
+        tier_guns: [
+            { name: "scar", count: 1, weight: 1 },
+            { name: "scorpion", count: 1, weight: 1 },
+            { name: "mp5", count: 1, weight: 5 },
+            { name: "mac10", count: 1, weight: 6 },
+            { name: "ump9", count: 1, weight: 3 },
+            { name: "m1a1", count: 1, weight: 5 },
+            { name: "ot38", count: 1, weight: 4 },
+            { name: "colt45", count: 1, weight: 4 },
+            { name: "m9", count: 1, weight: 9 },
+            { name: "m1911", count: 1, weight: 9 },
+            { name: "flare_gun", count: 1, weight: 0.145 },
+            { name: "flare_gun_dual", count: 1, weight: 0.0025 },
+            { name: "model94", count: 1, weight: 6 }, // ?
+            { name: "blr", count: 1, weight: 6 }, // ?
+            { name: "scout", count: 1, weight: 3 }, // ?
+            { name: "mk12", count: 1, weight: 2 }, // ?
+            { name: "m39", count: 1, weight: 2 }, // ?
+            { name: "vss", count: 1, weight: 1.5 }, // ?
+            { name: "mosin", count: 1, weight: 0.75 }, // ?
+            { name: "mkg45", count: 1, weight: 0.75 }, // ?
+            { name: "l86", count: 1, weight: 0.75 }, // ?
+            { name: "svd", count: 1, weight: 0.75 }, // ?
+            { name: "garand", count: 1, weight: 0.45 }, // ?
+            { name: "scarssr", count: 1, weight: 0.15 }, // ?
+            { name: "awc", count: 1, weight: 0.15 }, // ?
+            { name: "sv98", count: 1, weight: 0.1 }, // ?
+        ],
+        tier_airdrop_uncommon: [
+            { name: "mk12", count: 1, weight: 2.5 },
+            { name: "scar", count: 1, weight: 0.75 },
+            { name: "mosin", count: 1, weight: 2.5 },
+            { name: "m39", count: 1, weight: 2.5 },
+            { name: "sv98", count: 1, weight: 0.5 },
+            { name: "m9", count: 1, weight: 0.01 },
+            { name: "flare_gun", count: 1, weight: 0.5 },
+            { name: "mkg45", count: 1, weight: 2.5 }, // !
+            { name: "vss", count: 1, weight: 2.5 }, // !
+            { name: "l86", count: 1, weight: 0.75 }, // ?
+            { name: "svd", count: 1, weight: 0.75 }, // ?
+            { name: "scarssr", count: 1, weight: 0.15 }, // ?
+            { name: "awc", count: 1, weight: 0.15 }, // ?
+            { name: "sv98", count: 1, weight: 0.1 }, // ?
+        ],
+        tier_airdrop_rare: [
+            { name: "garand", count: 1, weight: 6 },
+            { name: "awc", count: 1, weight: 3 },
+            { name: "scarssr", count: 1, weight: 3 },
+            { name: "sv98", count: 1, weight: 3 },
+            { name: "scorpion", count: 1, weight: 5 }, // ?
+            { name: "ots38_dual", count: 1, weight: 4.5 },
+        ],
+        tier_ammo: [
+            { name: "9mm", count: 30, weight: 3 },
+            { name: "45acp", count: 30, weight: 3 },
+            { name: "762mm", count: 30, weight: 3 },
+            { name: "556mm", count: 30, weight: 3 },
+        ],
+        tier_ammo_crate: [
+            { name: "9mm", count: 30, weight: 3 },
+            { name: "45acp", count: 30, weight: 3 },
+            { name: "762mm", count: 30, weight: 3 },
+            { name: "556mm", count: 30, weight: 3 },
+            { name: "308sub", count: 5, weight: 1 },
+            { name: "flare", count: 1, weight: 1 },
+        ],
+        tier_airdrop_ammo: [
+            { name: "9mm", count: 30, weight: 3 },
+            { name: "45acp", count: 30, weight: 3 },
+            { name: "762mm", count: 30, weight: 3 },
+            { name: "556mm", count: 30, weight: 3 },
+        ],
+        tier_chest: [
+            { name: "mk12", count: 1, weight: 0.55 },
+            { name: "scar", count: 1, weight: 0.27 },
+            { name: "mosin", count: 1, weight: 0.55 },
+            { name: "m39", count: 1, weight: 0.55 },
+            { name: "sv98", count: 1, weight: 0.1 },
+            { name: "helmet02", count: 1, weight: 1 },
+            { name: "helmet03", count: 1, weight: 0.25 },
+            { name: "chest02", count: 1, weight: 1 },
+            { name: "chest03", count: 1, weight: 0.25 },
+            { name: "4xscope", count: 1, weight: 0.5 },
+            { name: "8xscope", count: 1, weight: 0.25 },
+        ],
+        tier_hatchet: [
+            { name: "vss", count: 1, weight: 1 },
+            { name: "svd", count: 1, weight: 1 },
+            { name: "l86", count: 1, weight: 1 },
+        ],
+        tier_throwables: [
+            { name: "frag", count: 2, weight: 1 },
+            { name: "smoke", count: 1, weight: 1 },
+            { name: "strobe", count: 1, weight: 0.2 },
+            { name: "mirv", count: 2, weight: 0.05 },
+        ],
+        tier_airdrop_throwables: [
+            { name: "strobe", count: 1, weight: 1 },
+            { name: "mirv", count: 2, weight: 1 },
+        ],
+    },
     mapGen: {
         map: {
             baseWidth: 512,
@@ -172,10 +279,10 @@ const mapDef: PartialMapDef = {
                 mansion_structure_01: 1,
                 warehouse_01: { small: 4, large: 5 },
                 crate_02sv_lake: 1,
-                cache_01: 1,
+                cache_01sv: 1,
                 cache_02sv: 1, // mosin tree
                 cache_07: 1,
-                bunker_structure_01: 1,
+                bunker_structure_01sv: 1,
                 bunker_structure_03: 1,
                 chest_01: 1,
                 chest_03sv: 1,
@@ -188,7 +295,6 @@ const mapDef: PartialMapDef = {
             {
                 tree_01: "tree_01sv",
                 bush_01: "bush_01sv",
-                crate_02: "crate_02sv",
                 stone_03: "stone_03sv",
             },
         ],
