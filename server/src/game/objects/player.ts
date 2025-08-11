@@ -2339,7 +2339,7 @@ export class Player extends BaseGameObject {
                 }
 
                 // part of the same team
-                if (emotePlayer?.teamId === player.teamId) {
+                if (emotePlayer?.teamId === player.teamId && !emote.isPing) {
                     return true;
                 }
 
