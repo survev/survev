@@ -155,7 +155,8 @@ const commands = {
             },
             {
                 name: "new_name",
-                description: "The new name of the account (get randomized if not provided)",
+                description:
+                    "The new name of the account (get randomized if not provided)",
                 required: false,
                 type: ApplicationCommandOptionType.String,
             },

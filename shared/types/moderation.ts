@@ -47,12 +47,15 @@ export const zSetMatchDataNameParams = z.object({
 
 export const zSetAccountNameParams = z.object({
     current_slug: z.string(),
-    new_name: z.string().optional().transform((v) => {
-        if ( v ) return v;
+    new_name: z
+        .string()
+        .optional()
+        .transform((v) => {
+            if (v) return v;
 
-        const randomNumber = Math.random().toString().slice(2,9); 
-        return `moderated${randomNumber}`;
-    })
+            const randomNumber = Math.random().toString().slice(2, 9);
+            return `moderated${randomNumber}`;
+        }),
 });
 
 export const zFindDiscordUserSlugParams = z.object({

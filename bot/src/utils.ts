@@ -108,15 +108,3 @@ export function createCollector<
         }
     });
 }
-
-export function formatDate(date?: string) {
-    return date
-        ? new Date(date).toLocaleDateString("en-US", {
-              year: "numeric",
-              month: "long",
-              day: "numeric",
-              hour: "2-digit",
-              minute: "2-digit",
-          })
-        : "Unknown";
-}

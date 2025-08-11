@@ -22,6 +22,18 @@ export function defineSkin<Def>(
     return util.mergeDeep({}, baseDefs[baseType], { baseType }, params) as Def;
 }
 
+export function formatDate(date?: string | Date) {
+    return date
+        ? new Date(date).toLocaleDateString("en-US", {
+              year: "numeric",
+              month: "long",
+              day: "numeric",
+              hour: "2-digit",
+              minute: "2-digit",
+          })
+        : "Unknown";
+}
+
 export const util = {
     //
     // Game objects can belong to the following layers:
