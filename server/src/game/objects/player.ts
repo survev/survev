@@ -830,7 +830,7 @@ export class Player extends BaseGameObject {
 
         if (role === "leader") {
             this.hasFiredFlare = false;
-            this.flareTimer = 30;
+            this.flareTimer = 15;
         }
 
         if (this.role == "medic") {
