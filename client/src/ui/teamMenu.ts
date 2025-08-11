@@ -163,11 +163,11 @@ export class TeamMenu {
             });
         }
 
-        setTimeout(() => {
+        setInterval(() => {
             if (this.joined) {
                 this.sendMessage("keepAlive", {});
             }
-        }, 45 * 1000);
+        }, 10 * 1000);
     }
 
     getPlayerById(playerId: number) {
