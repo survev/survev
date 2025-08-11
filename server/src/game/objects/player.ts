@@ -898,17 +898,8 @@ export class Player extends BaseGameObject {
                     this.scope = key;
                 }
 
-                if (
-                    invDef.type == "heal" ||
-                    invDef.type == "boost" ||
-                    invDef.type == "throwable" ||
-                    invDef.type == "ammo"
-                ) {
-                    this.inventory[key] = Math.max(this.inventory[key], value);
-                    continue;
-                }
-
-                this.inventory[key] = value;
+                // HACK: prevent overwriting existing items by picking the highest
+                this.inventory[key] = Math.max(this.inventory[key], value);
             }
 
             // outfit
