@@ -1166,10 +1166,10 @@ export class Player extends BaseGameObject {
                 if (def?.type !== "gun") continue;
                 const ammo = this.weaponManager.getTrueAmmoStats(def);
                 const ammoType = def.ammo;
-                const diff =  weap.ammo - ammo.trueMaxClip;
+                const diff = weap.ammo - ammo.trueMaxClip;
 
                 weap.ammo -= diff;
-                
+
                 let amountToDrop = 0;
                 const backpackLevel = this.getGearLevel(this.backpack);
                 if (this.bagSizes[ammoType] && !this.weaponManager.isInfinite(def)) {
