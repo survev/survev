@@ -1,18 +1,52 @@
 import $ from "jquery";
+import { Pane } from "tweakpane";
 import { GameObjectDefs } from "../../shared/defs/gameObjectDefs";
 import { RoleDefs } from "../../shared/defs/gameObjects/roleDefs";
 import { GameConfig } from "../../shared/gameConfig";
 import { EditMsg } from "../../shared/net/editMsg";
-import { math } from "../../shared/utils/math";
 import { util } from "../../shared/utils/util";
-import type { ConfigKey, ConfigManager } from "./config";
-import { type InputHandler, Key } from "./input";
+import type { ConfigKey, ConfigManager, DebugOptions } from "./config";
+import type { InputHandler } from "./input";
 import type { Map } from "./map";
 import type { Player } from "./objects/player";
 
 const SPEED_DEFAULT = GameConfig.player.moveSpeed;
 
+const availableLoot = Object.entries(GameObjectDefs)
+    .filter(([_, def]) => "lootImg" in def)
+    .reduce(
+        (obj, [type]) => ({
+            ...obj,
+            [type]: type,
+        }),
+        {},
+    );
+
+const invalidRoleTypes = ["kill_leader", "the_hunted"];
+let availableRoles = Object.entries(RoleDefs)
+    .filter(([type]) => !invalidRoleTypes.includes(type))
+    .reduce(
+        (obj, [type]) => ({
+            ...obj,
+            [type]: type,
+        }),
+        {},
+    );
 export class Editor {
+    params: {
+        // player pos
+        pos: {
+            x: number;
+            y: number;
+        };
+        zoom: number;
+        speed: number;
+        layer: number;
+        loot: string;
+        underground: boolean;
+        role: string;
+        printLootStats: boolean;
+    } & DebugOptions;
     config: ConfigManager;
     enabled = false;
     zoom = GameConfig.scopeZoomRadius.desktop["1xscope"];
@@ -39,6 +73,23 @@ export class Editor {
         this.config.addModifiedListener(this.onConfigModified.bind(this));
 
         this.setEnabled(false);
+
+        const debugConfig = this.config.get("debug")!;
+        this.params = {
+            zoom: GameConfig.scopeZoomRadius.desktop["1xscope"],
+            speed: SPEED_DEFAULT,
+            layer: 0,
+            loot: "",
+            underground: false,
+            role: "",
+            printLootStats: false,
+            pos: {
+                x: 0,
+                y: 0,
+            },
+            ...debugConfig,
+        };
+        this.setupPane();
     }
 
     onConfigModified(_key?: string) {
@@ -57,6 +108,78 @@ export class Editor {
         this.sendMsg = true;
     }
 
+    pane: undefined | Pane;
+    setupPane() {
+        if (this.pane) return;
+
+        this.pane = new Pane({
+            container: document.querySelector("#ui-editor-info-list")!,
+            expanded: true,
+            title: "Editor",
+        });
+
+        const pane = this.pane;
+
+        pane.addBinding(this.params, "pos");
+
+        pane.addBinding(this.params, "zoom", {
+            min: 1,
+            max: 255,
+            step: -0.8,
+        });
+        pane.addBinding(this.params, "speed", {
+            min: 1,
+            max: 75,
+        });
+
+        pane.addBinding(this.params, "underground");
+
+        const folder = pane.addFolder({
+            title: "ehhhh",
+            expanded: true,
+        });
+
+        folder.addBinding(this.params, "loot", {
+            options: availableLoot,
+            picker: true,
+        });
+
+        folder.addBinding(this.params, "role", {
+            options: availableRoles,
+            disabled: this.sendMsg,
+        });
+
+        const debugConfig = this.config.get("debug")!;
+        const renderDFolder = pane.addFolder({
+            title: "ehhhh name????",
+            expanded: true,
+        });
+
+        for (const [key] of Object.entries(debugConfig)) {
+            if (key !== "render") {
+                renderDFolder.addBinding(debugConfig, key);
+                continue;
+            }
+            for (const [key, value] of Object.entries(debugConfig.render)) {
+                if (typeof value === "object" && value !== null) {
+                    const subFolder = renderDFolder.addFolder({
+                        title: key,
+                        expanded: true,
+                    });
+
+                    for (const subKey of Object.keys(value)) {
+                        subFolder.addBinding(debugConfig.render[key], subKey);
+                    }
+                    continue;
+                }
+                renderDFolder.addBinding(debugConfig.render, key);
+            }
+        }
+
+        pane.on("change", (ev) => {
+            this.sendMsg = true;
+        });
+    }
     refreshUi() {
         const e = this.enabled;
 
@@ -65,7 +188,8 @@ export class Editor {
             "display",
             !e ? "block" : "none",
         );
-
+        return;
+        // return;
         this.uiPos = $("<div/>");
         this.uiZoom = $("<div/>");
 
@@ -371,35 +495,33 @@ export class Editor {
     }
 
     m_update(_dt: number, input: InputHandler, player: Player, map: Map) {
-        // Camera zoom
-        if (input.keyPressed(Key.Plus)) {
-            this.zoom -= 8.0;
-            this.sendMsg = true;
-        }
-        if (input.keyPressed(Key.Minus)) {
-            this.zoom += 8.0;
-            this.sendMsg = true;
-        }
-        if (input.keyPressed(Key.Zero)) {
-            this.zoom = player.m_getZoom();
-            this.sendMsg = true;
-        }
-        this.zoom = math.clamp(this.zoom, 1.0, 255.0);
+        // // Camera zoom
+        // if (input.keyPressed(Key.Plus)) {
+        //     this.zoom -= 8.0;
+        //     this.sendMsg = true;
+        // }
+        // if (input.keyPressed(Key.Minus)) {
+        //     this.zoom += 8.0;
+        //     this.sendMsg = true;
+        // }
+        // if (input.keyPressed(Key.Zero)) {
+        //     this.zoom = player.m_getZoom();
+        //     this.sendMsg = true;
+        // }
+        // this.zoom = math.clamp(this.zoom, 1.0, 255.0);
 
         // layer changed naturally so need to update the state + ui
         // used != instead of util.sameLayer() because we want every layer change not just ground-underground
         if (!this.layerChangedByToggle && this.layer != player.layer) {
             this.layerChangedByToggle = false;
             this.layer = player.layer;
-            this.uiLayerValueDisplay.text(this.layer);
+            this.uiLayerValueDisplay?.text(this.layer);
         }
 
         // Ui
-        const posX = player.m_pos.x.toFixed(2);
-        const posY = player.m_pos.y.toFixed(2);
-        this.uiPos.html(`Pos:  ${posX}, ${posY}`);
-        this.uiZoom.html(`Zoom: ${this.zoom}`);
-        this.uiMapSeed.html(`Map seed: ${map.seed}`);
+        this.params.pos.x = player.m_pos.x;
+        this.params.pos.y = player.m_pos.y;
+        this.pane?.refresh();
 
         if (!this.loadNewMap) {
             this.mapSeed = map.seed;
@@ -410,15 +532,15 @@ export class Editor {
         const msg = new EditMsg();
         const debug = this.config.get("debug")!;
         msg.overrideZoom = debug.overrideZoom;
-        msg.zoom = this.zoom;
-        msg.speed = this.speed;
-        msg.layer = this.layer;
+        msg.zoom = this.params.zoom;
+        msg.speed = this.params.speed;
+        msg.layer = this.params.underground ? 1 : 0;
         msg.cull = debug.cull;
         msg.printLootStats = this.printLootStats;
         msg.loadNewMap = this.loadNewMap;
         msg.newMapSeed = this.mapSeed;
-        msg.spawnLootType = this.spawnLootType;
-        msg.promoteToRoleType = this.promoteToRoleType;
+        msg.spawnLootType = this.params.loot;
+        msg.promoteToRoleType = this.params.role;
         msg.spectatorMode = debug.spectatorMode;
         msg.godMode = debug.godMode;
 
@@ -426,6 +548,8 @@ export class Editor {
     }
 
     postSerialization() {
+        this.params.loot = "";
+        this.params.role = "";
         this.loadNewMap = false;
         this.printLootStats = false;
         this.spawnLootType = "";
