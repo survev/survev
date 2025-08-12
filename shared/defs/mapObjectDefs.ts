@@ -13049,7 +13049,7 @@ export const MapObjectDefs: Record<string, MapObjectDef> = {
             {
                 type: "tree_03w",
                 pos: v2.create(0, 0),
-                scale: 0.9,
+                scale: 1,
                 ori: 0,
             },
             {
@@ -13121,7 +13121,7 @@ export const MapObjectDefs: Record<string, MapObjectDef> = {
             {
                 type: "tree_03d",
                 pos: v2.create(0, 0),
-                scale: 0.9,
+                scale: 1,
                 ori: 0,
             },
             {
@@ -13157,7 +13157,7 @@ export const MapObjectDefs: Record<string, MapObjectDef> = {
             {
                 type: "tree_03h",
                 pos: v2.create(0, 0),
-                scale: 0.9,
+                scale: 1,
                 ori: 0,
             },
             {
