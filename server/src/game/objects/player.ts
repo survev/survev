@@ -184,7 +184,9 @@ export class PlayerBarn {
 
         if (Config.uniqueInGameNames) {
             let count = 0;
-            const otherPlayers = this.game.playerBarn.players.filter(p => p.userId !== joinData.userId);
+            const otherPlayers = this.game.playerBarn.players.filter(
+                (p) => p.userId !== joinData.userId,
+            );
             while (otherPlayers.find((p) => p.name === finalName)) {
                 const postFix = `-${++count}`;
                 const trimmed = originalName.substring(
