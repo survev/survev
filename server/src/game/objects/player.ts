@@ -891,11 +891,14 @@ export class Player extends BaseGameObject {
 
                 // only sets scope if scope in inventory is higher than current scope
                 const invDef = GameObjectDefs[key];
-                if (
-                    invDef.type == "scope" &&
-                    invDef.level > (GameObjectDefs[this.scope] as ScopeDef).level
-                ) {
-                    this.scope = key;
+                if (invDef.type == "scope") {
+                    const currScope = GameObjectDefs[this.scope] as ScopeDef;
+                    if (value == this.inventory[key] && invDef.level != 1) {
+                        this.dropLoot(key);
+                    }
+                    if (invDef.level > currScope.level) {
+                        this.scope = key;
+                    }
                 }
 
                 // HACK: prevent overwriting existing items by picking the highest
