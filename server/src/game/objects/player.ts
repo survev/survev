@@ -1021,6 +1021,10 @@ export class Player extends BaseGameObject {
                 } else {
                     newPerks.delete(perkType);
                 }
+            } else if (this.perks[i].droppable && newPerks.has(perkType)) {
+                this.dropLoot(perkType);
+                this.removePerk(perkType);
+                i--;
             }
         }
 
