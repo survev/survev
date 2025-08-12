@@ -904,11 +904,21 @@ export class Player extends BaseGameObject {
 
             // outfit
             const newOutfit = roleDef.defaultItems.outfit;
+            const oldOutfit = GameObjectDefs[this.outfit] as OutfitDef;
+
             if (newOutfit instanceof Function) {
+                if (!oldOutfit.noDropOnDeath) {
+                    this.dropLoot(this.outfit);
+                }
                 this.setOutfit(newOutfit(clampedTeamId));
             } else {
                 // string
-                if (newOutfit) this.setOutfit(newOutfit);
+                if (newOutfit) {
+                    if (!oldOutfit.noDropOnDeath) {
+                        this.dropLoot(this.outfit);
+                    }
+                    this.setOutfit(newOutfit);
+                }
             }
 
             const roleHelmet =
@@ -971,7 +981,12 @@ export class Player extends BaseGameObject {
                             this.bagSizes[ammoType][this.getGearLevel(this.backpack)];
                     }
                 } else if (trueWeapDef && trueWeapDef.type == "melee") {
-                    if (this.weapons[i].type) this.weaponManager.dropMelee();
+                    if (this.weapons[i].type) {
+                        const curMelee = GameObjectDefs[this.weapons[i].type] as MeleeDef;
+                        if (!curMelee.noDropOnDeath) {
+                            this.weaponManager.dropMelee();
+                        }
+                    }
                 }
                 this.weaponManager.setWeapon(i, trueWeapon.type, trueWeapon.ammo);
             }
@@ -3814,7 +3829,8 @@ export class Player extends BaseGameObject {
                 }
                 break;
             case "outfit":
-                if (this.role == "leader" || this.role == "captain") {
+                const outfit = GameObjectDefs[this.outfit] as OutfitDef;
+                if (outfit.noDrop) {
                     amountLeft = 1;
                     pickupMsg.type = net.PickupMsgType.BetterItemEquipped;
                     break;
