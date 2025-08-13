@@ -23,8 +23,6 @@ interface ScheduledAirDrop {
 // amount of seconds to travel to target
 const AIRDROP_PLANE_SPAWN_DIST = GameConfig.airdrop.planeVel * 15;
 const AIRSTRIKE_PLANE_SPAWN_DIST = GameConfig.airstrike.planeVel * 2.5;
-/** relative to the target airstrike position, this is the maximum distance a bomb can be dropped from that position */
-const AIRSTRIKE_PLANE_MAX_BOMB_DIST = 48;
 
 type PlaneOptions = MapDef["gameConfig"]["planes"]["timings"][number]["options"];
 
@@ -460,12 +458,11 @@ export class PlaneBarn {
         const invertedDir = v2.neg(dirCopy);
         const planePos = v2.add(posCopy, v2.mul(invertedDir, AIRSTRIKE_PLANE_SPAWN_DIST));
 
-        const config = GameConfig.airstrike;
-        const unitsPerBomb = AIRSTRIKE_PLANE_MAX_BOMB_DIST / config.bombCount;
+        const planeConfig = GameConfig.airstrike;
         const bombPositions: Vec2[] = [];
-        for (let i = 0; i < config.bombCount; i++) {
-            let bombPos = v2.add(posCopy, v2.mul(dirCopy, unitsPerBomb * i));
-            bombPos = v2.add(bombPos, util.randomPointInCircle(config.bombJitter));
+        for (let i = 0; i < planeConfig.bombCount; i++) {
+            let bombPos = v2.add(posCopy, v2.mul(dirCopy, planeConfig.bombOffset * i));
+            bombPos = v2.add(bombPos, util.randomPointInCircle(planeConfig.bombJitter));
             bombPositions.push(bombPos);
         }
 
@@ -520,6 +517,8 @@ class AirstrikeZone {
         // Random by default
         let pos = v2.add(this.pos, util.randomPointInCircle(this.rad));
 
+        const planeConfig = GameConfig.airstrike;
+
         // Aims at players above ground in range
         let connectedPlayers = this.game.playerBarn.livingPlayers.filter(
             (p) => !p.disconnected,
@@ -528,7 +527,7 @@ class AirstrikeZone {
         for (let i = 0; i < connectedPlayers.length; i++) {
             const testPos = v2.add(
                 connectedPlayers[i].pos,
-                util.randomPointInCircle(AIRSTRIKE_PLANE_MAX_BOMB_DIST / 8),
+                util.randomPointInCircle(planeConfig.bombCount * planeConfig.bombOffset / 8),
             );
 
             if (
@@ -542,7 +541,7 @@ class AirstrikeZone {
 
         // Offset the final position to make the bomb line centered
         const negPlaneDir = v2.neg(this.planeDir);
-        const bombOffset = v2.mul(negPlaneDir, AIRSTRIKE_PLANE_MAX_BOMB_DIST / 2);
+        const bombOffset = v2.mul(negPlaneDir, planeConfig.bombCount * planeConfig.bombOffset / 2);
         const offsetPos = v2.add(pos, bombOffset);
 
         return offsetPos;
