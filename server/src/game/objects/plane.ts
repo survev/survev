@@ -527,7 +527,9 @@ class AirstrikeZone {
         for (let i = 0; i < connectedPlayers.length; i++) {
             const testPos = v2.add(
                 connectedPlayers[i].pos,
-                util.randomPointInCircle(planeConfig.bombCount * planeConfig.bombOffset / 8),
+                util.randomPointInCircle(
+                    (planeConfig.bombCount * planeConfig.bombOffset) / 8,
+                ),
             );
 
             if (
@@ -541,7 +543,10 @@ class AirstrikeZone {
 
         // Offset the final position to make the bomb line centered
         const negPlaneDir = v2.neg(this.planeDir);
-        const bombOffset = v2.mul(negPlaneDir, planeConfig.bombCount * planeConfig.bombOffset / 2);
+        const bombOffset = v2.mul(
+            negPlaneDir,
+            (planeConfig.bombCount * planeConfig.bombOffset) / 2,
+        );
         const offsetPos = v2.add(pos, bombOffset);
 
         return offsetPos;
