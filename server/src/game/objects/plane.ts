@@ -465,7 +465,7 @@ export class PlaneBarn {
         const bombPositions: Vec2[] = [];
         for (let i = 0; i < config.bombCount; i++) {
             let bombPos = v2.add(posCopy, v2.mul(dirCopy, unitsPerBomb * i));
-            bombPos = v2.add(bombPos, v2.mul(v2.randomUnit(), config.bombJitter));
+            bombPos = v2.add(bombPos, util.randomPointInCircle(config.bombJitter));
             bombPositions.push(bombPos);
         }
 
