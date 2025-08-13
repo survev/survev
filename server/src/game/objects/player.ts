@@ -908,22 +908,17 @@ export class Player extends BaseGameObject {
             }
 
             // outfit
-            const newOutfit = roleDef.defaultItems.outfit;
             const oldOutfit = GameObjectDefs[this.outfit] as OutfitDef;
+            let newOutfit = roleDef.defaultItems.outfit;
 
             if (newOutfit instanceof Function) {
+                newOutfit = newOutfit(clampedTeamId);
+            }
+            if (newOutfit) {
                 if (!oldOutfit.noDropOnDeath) {
                     this.dropLoot(this.outfit);
                 }
-                this.setOutfit(newOutfit(clampedTeamId));
-            } else {
-                // string
-                if (newOutfit) {
-                    if (!oldOutfit.noDropOnDeath) {
-                        this.dropLoot(this.outfit);
-                    }
-                    this.setOutfit(newOutfit);
-                }
+                this.setOutfit(newOutfit);
             }
 
             const roleHelmet =
