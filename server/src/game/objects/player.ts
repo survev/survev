@@ -547,7 +547,7 @@ export class Player extends BaseGameObject {
         return this.__id;
     }
 
-    dir = v2.create(0, 0);
+    dir = v2.create(1, 0);
 
     posOld = v2.create(0, 0);
     dirOld = v2.create(0, 0);
