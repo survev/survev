@@ -3206,7 +3206,7 @@ export class Player extends BaseGameObject {
                   (input === GameConfig.Input.Cancel &&
                       !this.revivedBy?.hasPerk("aoe_heal")) || // Players can cancel their own revives if they are not revived by aoe heal.
                   (input === GameConfig.Input.Cancel &&
-                      this.game.modeManager.isReviving(this)) || // Players can cancel their own revives if they are reviving themselves.
+                      this.revivedBy == this.playerBeingRevived) || // Players can cancel their own revives if they are reviving themselves.
                   input === GameConfig.Input.Use ||
                   input === GameConfig.Input.Interact // Players can interact with obstacles while downed.
             : true;
