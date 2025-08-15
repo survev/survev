@@ -382,10 +382,8 @@ export class WeaponManager {
     }
 
     weaponDelayTicker = 0;
-    weaponOnDelay = false;
     applyWeaponDelay(delay: number): void {
         this.weaponDelayTicker = delay;
-        this.weaponOnDelay = true;
     }
 
     getTrueAmmoStats(weaponDef: GunDef): {
