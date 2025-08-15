@@ -249,6 +249,7 @@ export const RoleDefs: Record<string, RoleDef> = {
             inventory: {
                 "4xscope": 1,
                 bandage: 5,
+                healthkit: 1,
                 soda: 2,
             },
         }),
