@@ -3693,6 +3693,7 @@ export class Player extends BaseGameObject {
                     const freeGunSlot = this.getFreeGunSlot(obj);
                     pickupMsg.type = freeGunSlot.cause;
                     let newGunIdx = freeGunSlot.slot;
+                    const oldWeaponIdx = this.curWeapIdx;
 
                     if (newGunIdx === null) {
                         this.pickupTicker = 0;
@@ -3778,7 +3779,7 @@ export class Player extends BaseGameObject {
                     }
 
                     // Reload instantly if a gun was dropped, handle duals
-                    if (gunDropped || newGunIdx === this.curWeapIdx) {
+                    if ((gunDropped || newGunIdx === oldWeaponIdx) && this.weapons[newGunIdx].ammo <= 0) {
                         this.cancelAction();
                         this.weaponManager.applyReloadDelay(0);
                         this.weaponManager.scheduleReload();
