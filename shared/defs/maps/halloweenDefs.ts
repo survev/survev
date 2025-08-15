@@ -241,7 +241,7 @@ const mapDef: PartialMapDef = {
                 barn_01h: 1,
                 cache_03: 36,
                 cache_01: 1,
-                cache_02: 1,
+                cache_02h: 1,
                 mansion_structure_02: 1,
                 bunker_structure_01: 1,
                 bunker_structure_03: 1,

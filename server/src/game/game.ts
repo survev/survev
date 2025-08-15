@@ -462,7 +462,7 @@ export class Game {
         player.disconnected = true;
         player.group?.checkPlayers();
         player.spectating = undefined;
-        player.dir = v2.create(0, 0);
+        player.dir = v2.create(1, 0);
         player.setPartDirty();
         if (player.canDespawn()) {
             player.game.playerBarn.removePlayer(player);

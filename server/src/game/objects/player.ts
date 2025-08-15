@@ -185,8 +185,10 @@ export class PlayerBarn {
 
         if (Config.uniqueInGameNames) {
             let count = 0;
-
-            while (this.game.playerBarn.players.find((p) => p.name === finalName)) {
+            const otherPlayers = this.game.playerBarn.players.filter(
+                (p) => p.userId !== joinData.userId,
+            );
+            while (otherPlayers.find((p) => p.name === finalName)) {
                 const postFix = `-${++count}`;
                 const trimmed = originalName.substring(
                     0,
@@ -547,7 +549,7 @@ export class Player extends BaseGameObject {
         return this.__id;
     }
 
-    dir = v2.create(0, 0);
+    dir = v2.create(1, 0);
 
     posOld = v2.create(0, 0);
     dirOld = v2.create(0, 0);
@@ -894,23 +896,32 @@ export class Player extends BaseGameObject {
 
                 // only sets scope if scope in inventory is higher than current scope
                 const invDef = GameObjectDefs[key];
-                if (
-                    invDef.type == "scope" &&
-                    invDef.level > (GameObjectDefs[this.scope] as ScopeDef).level
-                ) {
-                    this.scope = key;
+                if (invDef.type == "scope") {
+                    const currScope = GameObjectDefs[this.scope] as ScopeDef;
+                    if (value == this.inventory[key] && invDef.level != 1) {
+                        this.dropLoot(key);
+                    }
+                    if (invDef.level > currScope.level) {
+                        this.scope = key;
+                    }
                 }
 
-                this.inventory[key] = value;
+                // HACK: prevent overwriting existing items by picking the highest
+                this.inventory[key] = Math.max(this.inventory[key], value);
             }
 
             // outfit
-            const newOutfit = roleDef.defaultItems.outfit;
+            const oldOutfit = GameObjectDefs[this.outfit] as OutfitDef;
+            let newOutfit = roleDef.defaultItems.outfit;
+
             if (newOutfit instanceof Function) {
-                this.setOutfit(newOutfit(clampedTeamId));
-            } else {
-                // string
-                if (newOutfit) this.setOutfit(newOutfit);
+                newOutfit = newOutfit(clampedTeamId);
+            }
+            if (newOutfit) {
+                if (!oldOutfit.noDropOnDeath) {
+                    this.dropLoot(this.outfit);
+                }
+                this.setOutfit(newOutfit);
             }
 
             const roleHelmet =
@@ -935,6 +946,9 @@ export class Player extends BaseGameObject {
                 this.chest = roleDef.defaultItems.chest;
             }
             if (roleDef.defaultItems.backpack) {
+                if (this.backpack) {
+                    this.dropBackPackCopy(this.backpack);
+                }
                 this.backpack = roleDef.defaultItems.backpack;
             }
 
@@ -955,9 +969,7 @@ export class Player extends BaseGameObject {
                     const curWeapDef = GameObjectDefs[this.weapons[i].type];
                     if (curWeapDef.type == "gun") {
                         // refills the ammo of the existing weapon
-                        this.weapons[i].ammo = this.weaponManager.getTrueAmmoStats(
-                            curWeapDef as GunDef,
-                        ).trueMaxClip;
+                        this.weaponManager.reload(i);
                     }
                     continue;
                 }
@@ -972,7 +984,12 @@ export class Player extends BaseGameObject {
                             this.bagSizes[ammoType][this.getGearLevel(this.backpack)];
                     }
                 } else if (trueWeapDef && trueWeapDef.type == "melee") {
-                    if (this.weapons[i].type) this.weaponManager.dropMelee();
+                    if (this.weapons[i].type) {
+                        const curMelee = GameObjectDefs[this.weapons[i].type] as MeleeDef;
+                        if (!curMelee.noDropOnDeath) {
+                            this.weaponManager.dropMelee();
+                        }
+                    }
                 }
                 this.weaponManager.setWeapon(i, trueWeapon.type, trueWeapon.ammo);
             }
@@ -1004,6 +1021,10 @@ export class Player extends BaseGameObject {
                 } else {
                     newPerks.delete(perkType);
                 }
+            } else if (this.perks[i].droppable && newPerks.has(perkType)) {
+                this.dropLoot(perkType);
+                this.removePerk(perkType);
+                i--;
             }
         }
 
@@ -1129,6 +1150,13 @@ export class Player extends BaseGameObject {
             if (slot !== -1) {
                 this.weaponManager.setWeapon(slot, "", 0);
             }
+        } else if (type === "inspiration") {
+            const slot = this.weapons.findIndex((weap) => {
+                return weap.type === "bugle";
+            });
+            if (slot !== -1) {
+                this.weaponManager.setWeapon(slot, "", 0);
+            }
         } else if (type === "fabricate") {
             this.fabricateRefillTicker = 0;
         } else if (type === "firepower") {
@@ -1137,8 +1165,31 @@ export class Player extends BaseGameObject {
                 const def = GameObjectDefs[weap.type];
                 if (def?.type !== "gun") continue;
                 const ammo = this.weaponManager.getTrueAmmoStats(def);
+                const ammoType = def.ammo;
+                const diff = weap.ammo - ammo.trueMaxClip;
 
-                weap.ammo = math.min(weap.ammo, ammo.trueMaxClip);
+                weap.ammo -= diff;
+
+                let amountToDrop = 0;
+                const backpackLevel = this.getGearLevel(this.backpack);
+                if (this.bagSizes[ammoType] && !this.weaponManager.isInfinite(def)) {
+                    const bagSpace = this.bagSizes[ammoType][backpackLevel];
+                    if (this.inventory[ammoType] + diff <= bagSpace) {
+                        this.inventory[ammoType] += diff;
+                        this.inventoryDirty = true;
+                    } else {
+                        const spaceLeft = bagSpace - this.inventory[ammoType];
+                        const amountToAdd = spaceLeft;
+
+                        this.inventory[ammoType] += amountToAdd;
+                        this.inventoryDirty = true;
+                        amountToDrop = diff - amountToAdd;
+                    }
+                }
+
+                if (amountToDrop != 0) {
+                    this.dropLoot(ammoType, amountToDrop);
+                }
                 this.weapsDirty = true;
             }
         }
@@ -2344,6 +2395,11 @@ export class Player extends BaseGameObject {
 
                 // part of the same group
                 if (emotePlayer?.groupId === player.groupId) {
+                    return true;
+                }
+
+                // part of the same team
+                if (emotePlayer?.teamId === player.teamId && !emote.isPing) {
                     return true;
                 }
 
@@ -3846,7 +3902,8 @@ export class Player extends BaseGameObject {
                 }
                 break;
             case "outfit":
-                if (this.role == "leader" || this.role == "captain") {
+                const outfit = GameObjectDefs[this.outfit] as OutfitDef;
+                if (outfit.noDrop) {
                     amountLeft = 1;
                     pickupMsg.type = net.PickupMsgType.BetterItemEquipped;
                     break;
@@ -4124,6 +4181,16 @@ export class Player extends BaseGameObject {
         this.dropLoot(item, 1);
         this[armorDef.type] = "";
         this.setDirty();
+        return true;
+    }
+
+    dropBackPackCopy(item: string): boolean {
+        const armorDef = GameObjectDefs[item];
+        if (armorDef.type != "backpack") return false;
+        if (this[armorDef.type] !== item) return false;
+        if (armorDef.level == 0) return false;
+
+        this.dropLoot(item, 1);
         return true;
     }
 
@@ -4486,6 +4553,12 @@ export class Player extends BaseGameObject {
             player._lastBreathTicker = 5;
 
             player.giveHaste(GameConfig.HasteType.Inspire, 5);
+            if (player.teamId == 1 && player.__id != this.__id) {
+                this.game.playerBarn.addEmote("emote_bugle_final_red", player.__id);
+            }
+            if (player.teamId == 2 && player.__id != this.__id) {
+                this.game.playerBarn.addEmote("emote_bugle_final_blue", player.__id);
+            }
             player.recalculateScale();
         }
     }
@@ -4501,6 +4574,15 @@ export class Player extends BaseGameObject {
 
         for (const player of affectedPlayers) {
             player.giveHaste(GameConfig.HasteType.Inspire, 3);
+            if (player.teamId == 1 && player.__id != this.__id) {
+                this.game.playerBarn.addEmote("emote_bugle_inspiration_red", player.__id);
+            }
+            if (player.teamId == 2 && player.__id != this.__id) {
+                this.game.playerBarn.addEmote(
+                    "emote_bugle_inspiration_blue",
+                    player.__id,
+                );
+            }
         }
     }
 
