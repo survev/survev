@@ -187,6 +187,7 @@ export const RoleDefs: Record<string, RoleDef> = {
             inventory: {
                 "8xscope": 1,
                 bandage: 5,
+                healthkit: 1,
             },
         }),
     },
@@ -217,6 +218,8 @@ export const RoleDefs: Record<string, RoleDef> = {
             inventory: {
                 "8xscope": 1,
                 bandage: 5,
+                healthkit: 1,
+                soda: 2,
             },
         }),
     },
@@ -246,6 +249,7 @@ export const RoleDefs: Record<string, RoleDef> = {
             inventory: {
                 "4xscope": 1,
                 bandage: 5,
+                soda: 2,
             },
         }),
     },
@@ -436,6 +440,8 @@ export const RoleDefs: Record<string, RoleDef> = {
                 mirv: 8,
                 "8xscope": 1,
                 bandage: 5,
+                healthkit: 1,
+                soda: 2,
             },
         }),
     },
