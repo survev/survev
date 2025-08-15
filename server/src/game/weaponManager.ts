@@ -264,11 +264,7 @@ export class WeaponManager {
         }
 
         this.weaponDelayTicker -= dt;
-        if (
-            this.weaponDelayTicker <= 0 &&
-            this.scheduledReload &&
-            player.actionType !== GameConfig.Action.Revive
-        ) {
+        if (this.weaponDelayTicker <= 0 && this.scheduledReload) {
             this.scheduledReload = false;
             this.tryReload();
         }
@@ -433,6 +429,7 @@ export class WeaponManager {
         const weaponDef = GameObjectDefs[this.activeWeapon] as GunDef;
 
         const conditions = [
+            this.player.actionType == GameConfig.Action.Revive,
             this.player.actionType == GameConfig.Action.UseItem,
             this.weapons[this.curWeapIdx].ammo >=
                 this.getTrueAmmoStats(weaponDef).trueMaxClip,
