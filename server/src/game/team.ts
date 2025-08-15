@@ -19,6 +19,16 @@ export class Team {
         public teamId: number,
     ) {}
 
+    getPlayers(playerFilter?: (player: Player) => boolean) {
+        if (!playerFilter) return this.players;
+
+        return this.players.filter((p) => playerFilter(p));
+    }
+
+    getAlivePlayers() {
+        return this.getPlayers((p) => !p.dead && !p.disconnected);
+    }
+
     addPlayer(player: Player): void {
         player.teamId = this.teamId;
         player.team = this;
@@ -42,21 +52,22 @@ export class Team {
         );
     }
 
-    checkAllDowned(player: Player): boolean {
-        // players with self_revive are discarded from the check since they can get downed "independently"
-        // they have no influence over the other downed teammates and how the code measures them
-        const filteredPlayers = this.livingPlayers.filter(
-            (p) => p != player && player.downed && !p.hasPerk("self_revive"),
-        );
-        if (filteredPlayers.length == 0) {
-            // this is necessary since for some dumb reason every() on an empty array returns true????
+    checkAllDowned(player: Player) {
+        for (const p of this.players) {
+            if (p === player) continue;
+            if (p.downed) continue;
+            if (p.dead) continue;
+            if (p.disconnected) continue;
             return false;
         }
-        return filteredPlayers.every((p) => p.downed);
+        return true;
     }
 
-    checkAllDead(player: Player): boolean {
-        return this.livingPlayers.length == 1 && this.livingPlayers[0] == player;
+    checkAllDeadOrDisconnected(player: Player) {
+        const alivePlayers = this.players.filter(
+            (p) => !p.dead && !p.disconnected && p !== player,
+        );
+        return alivePlayers.length <= 0;
     }
 
     killAllTeammates() {
@@ -69,6 +80,17 @@ export class Team {
             });
         }
     }
+
+    checkSelfRevive() {
+        const alivePlayers = this.getAlivePlayers();
+        for (const p of alivePlayers) {
+            if (p.hasPerk("self_revive")) {
+                return true;
+            }
+        }
+        return false;
+    }
+
     checkAndApplyLastMan() {
         if (this.isLastManApplied) return;
 
