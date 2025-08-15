@@ -3777,8 +3777,9 @@ export class Player extends BaseGameObject {
                         this.weaponManager.setCurWeapIndex(newGunIdx); // primary
                     }
 
-                    // Reload instantly if a gun was dropped
-                    if (gunDropped) {
+                    // Reload instantly if a gun was dropped, handle duals
+                    if (gunDropped || newGunIdx === this.curWeapIdx) {
+                        this.cancelAction();
                         this.weaponManager.applyReloadDelay(0);
                         this.weaponManager.scheduleReload();
                     }
