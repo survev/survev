@@ -3779,7 +3779,8 @@ export class Player extends BaseGameObject {
 
                     // Reload instantly if a gun was dropped
                     if (gunDropped) {
-                        this.weaponManager.tryReload();
+                        this.weaponManager.applyReloadDelay(0);
+                        this.weaponManager.scheduleReload();
                     }
                 }
                 break;
