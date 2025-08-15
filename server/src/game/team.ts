@@ -71,8 +71,8 @@ export class Team {
     }
 
     killAllTeammates() {
-        for (let i = this.livingPlayers.length - 1; i >= 0; i--) {
-            const p = this.livingPlayers[i];
+        const alivePlayers = this.getAlivePlayers();
+        for (const p of alivePlayers) {
             p.kill({
                 damageType: GameConfig.DamageType.Bleeding,
                 dir: p.dir,
