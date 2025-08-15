@@ -3559,11 +3559,19 @@ export class Player extends BaseGameObject {
 
         // if none are found use active weapon if its a gun
         if (GameConfig.WeaponType[this.curWeapIdx] === "gun") {
+            const newGunDef = GameObjectDefs[obj.type];
+            let dualToSingle = false;
+            if (
+                newGunDef.type == "gun" &&
+                newGunDef.dualWieldType === this.weapons[this.curWeapIdx].type
+            ) {
+                dualToSingle = true;
+            }
             return {
                 slot: this.curWeapIdx,
                 isDual: false,
                 cause:
-                    this.activeWeapon === obj.type
+                    this.activeWeapon === obj.type || dualToSingle
                         ? net.PickupMsgType.AlreadyOwned
                         : net.PickupMsgType.Success,
             };
@@ -3694,6 +3702,11 @@ export class Player extends BaseGameObject {
                     pickupMsg.type = freeGunSlot.cause;
                     let newGunIdx = freeGunSlot.slot;
                     const oldWeaponIdx = this.curWeapIdx;
+
+                    if (freeGunSlot.cause === net.PickupMsgType.AlreadyOwned) {
+                        amountLeft = 1;
+                        break;
+                    }
 
                     if (newGunIdx === null) {
                         this.pickupTicker = 0;
