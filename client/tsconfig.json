@@ -12,6 +12,7 @@
     "resolveJsonModule": true,
     "isolatedModules": true,
     "allowImportingTsExtensions": true,
+    "noEmit": true,
     "allowJs": true,
     "strict": true,
     "skipLibCheck": true,
@@ -20,6 +21,7 @@
   "include": [
     "src/**/*.ts",
     "src/**/*.js",
+    "src/**/*.svelte",
     "../shared/",
     "atlas-builder/**/*.ts",
     "global.d.ts"
