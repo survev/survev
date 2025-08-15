@@ -1,39 +1,50 @@
+import { GameConfig } from "../../shared/gameConfig";
 import loadout from "../../shared/utils/loadout";
 import { util } from "../../shared/utils/util";
 import type { Locale } from "./ui/localization";
 
-const defaultDebugConfig = {
-    /** drag and drop loot, obstacles, and buildings */
+export const debugToolsConfig = {
+    zoomEnabled: false,
+    zoom: GameConfig.scopeZoomRadius.desktop["1xscope"],
+
+    speedEnabled: false,
+    speed: GameConfig.player.moveSpeed,
+
+    mapSeed: 0,
+
+    loot: "",
+    role: "",
+
+    noClip: false,
     godMode: false,
-    spectatorMode: false,
-    overrideZoom: false,
-    cull: false,
-    render: {
-        enabled: false,
-        players: false,
-        obstacles: false,
-        loot: false,
-        explosions: false,
-        rivers: false,
-        buildings: {
-            buildingBounds: false,
-            obstacleBounds: false,
-            bridge: false,
-            waterEdge: false,
-            ceiling: false,
-            floors: false,
-        },
-        structures: {
-            buildingBounds: false,
-            obstacleBounds: false,
-            bridge: false,
-            waterEdge: false,
-            stairs: false,
-        },
+    moveObjs: false,
+};
+
+export const debugRenderConfig = {
+    enabled: false,
+    players: false,
+    obstacles: false,
+    loot: false,
+    explosions: false,
+    rivers: false,
+    buildings: {
+        buildingBounds: false,
+        obstacleBounds: false,
+        bridge: false,
+        waterEdge: false,
+        ceiling: false,
+        floors: false,
+    },
+    structures: {
+        buildingBounds: false,
+        obstacleBounds: false,
+        bridge: false,
+        waterEdge: false,
+        stairs: false,
     },
 };
 
-export type DebugOptions = typeof defaultDebugConfig;
+export type DebugRenderOpts = typeof debugRenderConfig;
 
 const defaultConfig = {
     muteAudio: false,
@@ -65,7 +76,8 @@ const defaultConfig = {
     binds: "",
     version: 1,
     /* STRIP_FROM_PROD_CLIENT:START */
-    debug: defaultDebugConfig,
+    debugTools: debugToolsConfig,
+    debugRenderer: debugRenderConfig,
     /* STRIP_FROM_PROD_CLIENT:END */
 };
 

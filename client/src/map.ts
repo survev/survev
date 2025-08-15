@@ -15,7 +15,7 @@ import { type Vec2, v2 } from "../../shared/utils/v2";
 import type { Ambiance } from "./ambiance";
 import type { AudioManager } from "./audioManager";
 import type { Camera } from "./camera";
-import type { DebugOptions } from "./config";
+import type { DebugRenderOpts } from "./config";
 import { renderSpline } from "./debugHelpers";
 import { debugLines } from "./debugLines";
 import { device } from "./device";
@@ -238,7 +238,7 @@ export class Map {
         renderer: Renderer,
         camera: Camera,
         _smokeParticles: SmokeParticle[],
-        debug: DebugOptions,
+        debug: DebugRenderOpts,
     ) {
         const obstacles = this.m_obstaclePool.m_getPool();
         for (let i = 0; i < obstacles.length; i++) {
@@ -307,7 +307,7 @@ export class Map {
             );
         }
 
-        if (IS_DEV && debug.render.rivers) {
+        if (IS_DEV && debug.rivers) {
             for (const river of this.terrain!.rivers) {
                 renderRiverDebug(river, camera.m_pos);
             }

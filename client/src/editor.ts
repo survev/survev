@@ -1,44 +1,290 @@
 import $ from "jquery";
+import { type FolderApi, Pane, type TabPageApi } from "tweakpane";
 import { GameObjectDefs } from "../../shared/defs/gameObjectDefs";
 import { RoleDefs } from "../../shared/defs/gameObjects/roleDefs";
-import { GameConfig } from "../../shared/gameConfig";
 import { EditMsg } from "../../shared/net/editMsg";
+import { Constants } from "../../shared/net/net";
 import { math } from "../../shared/utils/math";
 import { util } from "../../shared/utils/util";
-import type { ConfigKey, ConfigManager } from "./config";
+import { v2 } from "../../shared/utils/v2";
+import type { ConfigManager, debugRenderConfig, debugToolsConfig } from "./config";
 import { type InputHandler, Key } from "./input";
-import type { Map } from "./map";
 import type { Player } from "./objects/player";
 
-const SPEED_DEFAULT = GameConfig.player.moveSpeed;
+const availableLoot = Object.entries(GameObjectDefs)
+    .filter(([_, def]) => "lootImg" in def)
+    .map(([key]) => key);
+
+const invalidRoleTypes = ["kill_leader"];
+
+const availableRoles = Object.entries(RoleDefs)
+    .filter(([type]) => !invalidRoleTypes.includes(type))
+    .reduce(
+        (obj, [type]) => {
+            obj[type] = type;
+            return obj;
+        },
+        {} as Record<string, string>,
+    );
+
+availableRoles["None"] = "";
 
 export class Editor {
+    infoParams = {
+        pos: v2.create(0, 0),
+        fps: 0,
+        ping: 0,
+    };
+
+    toolParams: typeof debugToolsConfig;
+
+    renderParams: typeof debugRenderConfig;
+
     config: ConfigManager;
+    pane!: Pane;
+
+    posBind!: ReturnType<Pane["addBinding"]>;
+    zoomBind!: ReturnType<Pane["addBinding"]>;
+
     enabled = false;
-    zoom = GameConfig.scopeZoomRadius.desktop["1xscope"];
+
     loadNewMap = false;
-    mapSeed = 0;
+    spawnLoot = false;
+    promoteToRole = false;
+    toggleLayer = false;
+
     printLootStats = false;
-    spawnLootType = "";
-    promoteToRoleType = "";
-    speed = SPEED_DEFAULT;
-    layer = 0;
 
     sendMsg = false;
-
-    uiPos!: JQuery;
-    uiZoom!: JQuery;
-    uiMapSeed!: JQuery;
-
-    uiLayerValueDisplay!: JQuery;
-    /** differentiates between player movement vs manual toggle when changing layers */
-    layerChangedByToggle = false;
 
     constructor(config: ConfigManager) {
         this.config = config;
         this.config.addModifiedListener(this.onConfigModified.bind(this));
 
         this.setEnabled(false);
+
+        this.toolParams = this.config.get("debugTools")!;
+        this.toolParams.role = "";
+
+        this.renderParams = this.config.get("debugRenderer")!;
+
+        const container = document.querySelector(
+            "#ui-editor-info-list",
+        ) as HTMLDivElement;
+
+        this.pane = new Pane({
+            container,
+            expanded: true,
+            title: "Editor",
+        });
+
+        const events = ["wheel", "mousedown"];
+        for (const event of events) {
+            this.pane.element.addEventListener(event, (e) => {
+                console.log(e);
+                e.stopPropagation();
+            });
+        }
+
+        const pane = this.pane;
+
+        const tabs = pane.addTab({
+            pages: [
+                {
+                    title: "Tools",
+                },
+                {
+                    title: "Render",
+                },
+                {
+                    title: "Info",
+                },
+            ],
+        });
+        const [tools, render, info] = tabs.pages;
+
+        //
+        // Tools
+        //
+
+        const addSlider = (
+            key: keyof Editor["toolParams"],
+            enabledKey: keyof Editor["toolParams"],
+        ) => {
+            const folder = tools.addFolder({
+                title: key,
+            });
+            folder.on("change", () => {
+                this.sendMsg = true;
+                this.config.set("debugTools", this.toolParams);
+            });
+
+            folder.addBinding(this.toolParams, enabledKey, {
+                label: "Enabled: ",
+            });
+
+            return folder.addBinding(this.toolParams, key, {
+                min: 1,
+                max: 255,
+                step: 1,
+            });
+        };
+        this.zoomBind = addSlider("zoom", "zoomEnabled");
+        addSlider("speed", "speedEnabled");
+
+        // Map
+        {
+            const folder = tools.addFolder({
+                title: "Map",
+            });
+            const input = folder.addBinding(this.toolParams, "mapSeed", {
+                label: "Seed:",
+                step: 1,
+                format: (n) => {
+                    return math.clamp(Math.floor(n), 1, 2 ** 32 - 1);
+                },
+            });
+
+            const generate = folder.addButton({
+                title: "Generate",
+            });
+
+            generate.on("click", () => {
+                this.loadNewMap = true;
+                this.sendMsg = true;
+            });
+
+            const random = folder.addButton({
+                title: "Random",
+            });
+            random.on("click", () => {
+                this.toolParams.mapSeed = util.randomInt(1, 2 ** 32 - 1);
+                this.loadNewMap = true;
+                this.sendMsg = true;
+                input.refresh();
+            });
+        }
+
+        {
+            const folder = tools.addFolder({
+                title: "Toggles",
+            });
+
+            folder.addBinding(this.toolParams, "noClip");
+            folder.addBinding(this.toolParams, "godMode");
+            folder.addBinding(this.toolParams, "moveObjs");
+            folder.on("change", () => {
+                this.sendMsg = true;
+                this.config.set("debugTools", this.toolParams);
+            });
+        }
+
+        // Loot
+        {
+            const loot = tools.addBinding(this.toolParams, "loot", {
+                label: "Spawn loot:",
+            });
+            const input = loot.element.querySelector("input") as HTMLInputElement;
+
+            input.addEventListener("keydown", (e) => {
+                e.stopPropagation();
+
+                if (e.key == "Enter" && availableLoot.includes(input.value)) {
+                    this.spawnLoot = true;
+                    this.sendMsg = true;
+                    this.config.set("debugTools", this.toolParams);
+                }
+            });
+            // const form = document.createElement("form");
+
+            const dataList = document.createElement("datalist");
+            dataList.id = "editor-loot-list";
+            input.setAttribute("list", dataList.id);
+
+            input.parentElement?.appendChild(dataList);
+            for (const loot of availableLoot) {
+                const opt = document.createElement("option");
+                opt.value = loot;
+                dataList.appendChild(opt);
+            }
+        }
+
+        // Roles
+        {
+            const roles = tools.addBinding(this.toolParams, "role", {
+                options: availableRoles,
+                label: "Role:",
+            });
+
+            // to stop accidental promotions
+            const elm = roles.element.querySelector("select");
+            elm?.addEventListener("keydown", (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+            });
+            roles.on("change", () => {
+                this.sendMsg = true;
+                this.promoteToRole = true;
+                elm?.blur();
+            });
+        }
+        const toggleLayer = tools.addButton({
+            title: "Toggle layer",
+        });
+
+        toggleLayer.on("click", () => {
+            this.toggleLayer = true;
+            this.sendMsg = true;
+        });
+        //
+        // Renderer
+        //
+
+        const addObject = (
+            obj: Record<string, unknown>,
+            folder: FolderApi | TabPageApi,
+        ) => {
+            for (const key in obj) {
+                const entry = obj[key];
+                if (typeof entry === "object") {
+                    const folder2 = folder.addFolder({
+                        title: key,
+                        expanded: true,
+                    });
+                    addObject(entry as Record<string, unknown>, folder2);
+                } else if (typeof entry === "boolean") {
+                    const bind = folder.addBinding(obj, key);
+                    bind.on("change", () => {
+                        this.config.set("debugRenderer", this.renderParams);
+                    });
+                }
+            }
+        };
+        addObject(this.renderParams, render);
+
+        //
+        // INFO
+        //
+
+        this.posBind = info.addBinding(this.infoParams, "pos", {
+            x: {
+                min: 0,
+                max: Constants.MaxPosition,
+            },
+            y: {
+                inverted: true,
+                min: 0,
+                max: Constants.MaxPosition,
+            },
+        });
+        info.addBinding(this.infoParams, "fps", {
+            readonly: true,
+            view: "graph",
+        });
+        info.addBinding(this.infoParams, "ping", {
+            readonly: true,
+            view: "graph",
+        });
     }
 
     onConfigModified(_key?: string) {
@@ -51,12 +297,6 @@ export class Editor {
         if (e) this.sendMsg = true;
     }
 
-    newMap(seed: number) {
-        this.loadNewMap = true;
-        this.mapSeed = Math.max(seed, 1);
-        this.sendMsg = true;
-    }
-
     refreshUi() {
         const e = this.enabled;
 
@@ -65,372 +305,74 @@ export class Editor {
             "display",
             !e ? "block" : "none",
         );
-
-        this.uiPos = $("<div/>");
-        this.uiZoom = $("<div/>");
-
-        const createButton = (text: string, fn: () => void) => {
-            const btn = $("<div/>", {
-                class: "btn-game-menu btn-darken",
-                css: {
-                    height: "30px",
-                    "line-height": "28px",
-                },
-                html: text,
-            });
-            btn.on("click", (e) => {
-                e.stopPropagation();
-                fn();
-            });
-            return btn;
-        };
-
-        this.uiMapSeed = $("<div/>");
-        const mapBtns = $("<div/>", {
-            css: { display: "flex" },
-        });
-        mapBtns.append(
-            createButton("<", () => {
-                this.newMap(this.mapSeed - 1);
-            }),
-        );
-        mapBtns.append($("<span/>", { css: { width: "12px" } }));
-        mapBtns.append(
-            createButton(">", () => {
-                this.newMap(this.mapSeed + 1);
-            }),
-        );
-        mapBtns.append($("<span/>", { css: { width: "12px" } }));
-        mapBtns.append(
-            createButton("?", () => {
-                this.newMap(util.randomInt(1, 1 << 30));
-            }),
-        );
-
-        const lootSummaryBtn = $("<div/>", {
-            css: { display: "flex" },
-        });
-        lootSummaryBtn.append(
-            createButton("Loot summary", () => {
-                this.printLootStats = true;
-                this.sendMsg = true;
-            }),
-        );
-
-        const createLootUi = $("<div/>", {
-            css: {
-                display: "flex",
-                "align-items": "center",
-            },
-        });
-
-        const label = $("<label/>", {
-            text: "Loot:",
-        });
-        createLootUi.append(label);
-
-        const form = $("<form/>", {
-            css: {
-                display: "flex",
-                height: "30px",
-                "margin-left": "10px",
-                "align-items": "center",
-            },
-        });
-        createLootUi.append(form);
-
-        const input = $("<input/>", {
-            type: "text",
-            list: "editor-loot-list",
-            placeholder: "Type a loot ID here...",
-            css: {
-                height: "20px",
-                border: "none",
-            },
-        });
-        input.on("keydown", (e) => {
-            e.stopImmediatePropagation();
-        });
-        form.append(input);
-
-        const dataList = $("<datalist/>", {
-            id: "editor-loot-list",
-        });
-
-        for (const [type, def] of Object.entries(GameObjectDefs)) {
-            if (!("lootImg" in def)) continue;
-
-            const option = $("<option/>", {
-                value: type,
-            });
-            dataList.append(option);
-        }
-
-        form.append(dataList);
-
-        const spawnButton = $("<input/>", {
-            type: "submit",
-            value: "Spawn",
-            class: "btn-game-menu btn-darken",
-            css: {
-                height: "30px",
-                "line-height": "28px",
-                "margin-left": "10px",
-            },
-        });
-        form.append(spawnButton);
-
-        form.on("submit", (e) => {
-            e.preventDefault();
-            const type = input.val() as string;
-            if (GameObjectDefs[type]) {
-                this.spawnLootType = type as string;
-                this.sendMsg = true;
-            }
-        });
-
-        const createRoleUi = $("<div/>", {
-            css: { display: "flex" },
-        });
-        const roleTypeDropdown = $<HTMLSelectElement>("<select/>", {
-            css: {
-                height: "30px",
-                width: "180px",
-                "line-height": "28px",
-                "margin-top": "5px",
-                "margin-bottom": "5px",
-            },
-        });
-
-        const invalidRoleTypes = ["kill_leader", "the_hunted"];
-
-        for (const [type, _def] of Object.entries(RoleDefs)) {
-            if (invalidRoleTypes.includes(type)) continue;
-
-            const opt = $<HTMLOptionElement>("<option/>", {
-                value: type,
-                html: type,
-            });
-
-            roleTypeDropdown.append(opt);
-        }
-
-        createRoleUi.append(roleTypeDropdown);
-        createRoleUi.append($("<span/>", { css: { width: "12px" } }));
-        createRoleUi.append(
-            createButton("Promote To Role", () => {
-                this.promoteToRoleType = roleTypeDropdown.val() as string;
-                this.sendMsg = true;
-            }),
-        );
-
-        const speedSliderContainer = $("<div/>", {
-            css: { display: "flex", alignItems: "center" },
-        });
-
-        const speedSlider = $("<input/>", {
-            type: "range",
-            min: "1",
-            max: "75",
-            value: this.speed,
-        });
-
-        const ssValueDisplay = $("<span/>").text(this.speed);
-
-        /** doesn't change the slider value */
-        const setSpeed = (speed: number) => {
-            this.speed = speed;
-            ssValueDisplay.text(speed);
-            this.sendMsg = true;
-        };
-
-        speedSlider.on("input", (e) => {
-            e.stopPropagation();
-            const target = $(e.target) as JQuery<HTMLInputElement>;
-            setSpeed(Number(target.val()));
-        });
-
-        const speedSliderLabel = $("<label>", {
-            text: "Speed:",
-            for: speedSlider.attr("id"),
-        });
-
-        speedSliderContainer.append(speedSliderLabel);
-        speedSliderContainer.append($("<span/>", { css: { width: "5px" } }));
-        speedSliderContainer.append(ssValueDisplay);
-        speedSliderContainer.append($("<span/>", { css: { width: "10px" } }));
-        speedSliderContainer.append(speedSlider);
-        speedSliderContainer.append($("<span/>", { css: { width: "10px" } }));
-        speedSliderContainer.append(
-            createButton("Reset", () => {
-                speedSlider.val(SPEED_DEFAULT);
-                setSpeed(SPEED_DEFAULT);
-                this.sendMsg = true;
-            }),
-        );
-
-        const layerToggleContainer = $("<div/>", {
-            css: { display: "flex", alignItems: "center" },
-        });
-
-        const layerToggleValueDisplay = $("<span/>").text(this.layer);
-        this.uiLayerValueDisplay = layerToggleValueDisplay;
-
-        const layerToggle = createButton("Toggle Layer", () => {
-            this.layer = util.toGroundLayer(this.layer) ^ 1;
-            this.layerChangedByToggle = true;
-            layerToggleValueDisplay.text(this.layer);
-            this.sendMsg = true;
-        });
-
-        const layerToggleLabel = $("<label>", {
-            text: "Layer:",
-            for: layerToggle.attr("id"),
-        });
-
-        layerToggleContainer.append(layerToggleLabel);
-        layerToggleContainer.append($("<span/>", { css: { width: "5px" } }));
-        layerToggleContainer.append(layerToggleValueDisplay);
-        layerToggleContainer.append($("<span/>", { css: { width: "10px" } }));
-        layerToggleContainer.append(layerToggle);
-
-        const createCheckbox = (_name: string, key: string) => {
-            const check = $("<input/>", {
-                type: "checkbox",
-                value: "value",
-                checked: this.config.get(key as ConfigKey),
-            });
-            check.on("click", (e) => {
-                e.stopPropagation();
-
-                const val = check.prop("checked");
-                this.config.set(key as ConfigKey, val);
-                this.sendMsg = true;
-            });
-            return check;
-        };
-
-        const createObjectUi = <T extends object = object>(obj: T, objKey: string) => {
-            const parent = $("<ul/>", { class: "ui-editor-list" });
-            if (objKey.split(".").length == 1) {
-                parent.css("padding", "0px");
-            }
-
-            const keys = Object.keys(obj);
-            for (let i = 0; i < keys.length; i++) {
-                const key = keys[i];
-                const val = obj[key as keyof T];
-                const newKey = `${objKey}.${key}`;
-
-                const elem = $("<li/>", { class: "ui-editor-list" });
-                if (typeof val == "object") {
-                    elem.html(`${key}`);
-                    elem.append(createObjectUi(val as object, newKey));
-                } else if (typeof val === "boolean") {
-                    const check = createCheckbox(key, newKey);
-                    const label = $("<div/>", {
-                        css: { display: "inline-block" },
-                        html: key,
-                    });
-                    elem.append(check);
-                    elem.append(label);
-                }
-                parent.append(elem);
-            }
-
-            return parent;
-        };
-
-        const editorConfig = (this.config.get("debug" as ConfigKey) || {}) as object;
-        const uiConfig = $("<div/>");
-        uiConfig.append(createObjectUi(editorConfig, "debug"));
-
-        // Ui
-        const list = $("<div/>");
-        list.append($("<li/>").append(this.uiPos));
-        list.append($("<li/>").append(this.uiZoom));
-        list.append($("<li/>").append($("<hr/>")));
-        list.append($("<li/>").append(this.uiMapSeed));
-        list.append($("<li/>").append(mapBtns));
-        // list.append($("<li/>").append(lootSummaryBtn)); // not implemented yet
-        list.append($("<li/>").append(createLootUi));
-        list.append($("<li/>").append(createRoleUi));
-        list.append($("<li/>").append(speedSliderContainer));
-        list.append($("<li/>").append(layerToggleContainer));
-        list.append($("<li/>").append($("<hr/>")));
-        list.append($("<li/>").append(uiConfig));
-
-        list.on("mousedown", (e) => {
-            e.stopImmediatePropagation();
-        });
-        list.on("wheel", (e) => {
-            e.stopImmediatePropagation();
-        });
-
-        $("#ui-editor-info-list").html(list as unknown as JQuery.Node);
     }
 
-    m_update(_dt: number, input: InputHandler, player: Player, map: Map) {
-        // Camera zoom
+    m_update(dt: number, input: InputHandler, player: Player) {
+        let zoom = this.toolParams.zoom;
         if (input.keyPressed(Key.Plus)) {
-            this.zoom -= 8.0;
-            this.sendMsg = true;
+            zoom -= 8;
         }
         if (input.keyPressed(Key.Minus)) {
-            this.zoom += 8.0;
+            zoom += 8;
+        }
+
+        zoom = math.clamp(zoom, 1, 255);
+        if (zoom !== this.toolParams.zoom) {
+            this.toolParams.zoom = zoom;
             this.sendMsg = true;
-        }
-        if (input.keyPressed(Key.Zero)) {
-            this.zoom = player.m_getZoom();
-            this.sendMsg = true;
-        }
-        this.zoom = math.clamp(this.zoom, 1.0, 255.0);
-
-        // layer changed naturally so need to update the state + ui
-        // used != instead of util.sameLayer() because we want every layer change not just ground-underground
-        if (!this.layerChangedByToggle && this.layer != player.layer) {
-            this.layerChangedByToggle = false;
-            this.layer = player.layer;
-            this.uiLayerValueDisplay.text(this.layer);
+            this.zoomBind.refresh();
         }
 
-        // Ui
-        const posX = player.m_pos.x.toFixed(2);
-        const posY = player.m_pos.y.toFixed(2);
-        this.uiPos.html(`Pos:  ${posX}, ${posY}`);
-        this.uiZoom.html(`Zoom: ${this.zoom}`);
-        this.uiMapSeed.html(`Map seed: ${map.seed}`);
+        this.infoParams.pos.x = player.m_pos.x;
+        this.infoParams.pos.y = player.m_pos.y;
+        this.posBind.refresh();
 
-        if (!this.loadNewMap) {
-            this.mapSeed = map.seed;
-        }
+        this.infoParams.fps = 1 / dt;
+
+        this.config.config.debugRenderer = this.renderParams;
+
+        $("#ui-leaderboard-wrapper,#ui-right-center,#ui-kill-leader-container").css(
+            "display",
+            !this.enabled ? "block" : "none",
+        );
+    }
+
+    m_free() {
+        this.pane?.dispose();
     }
 
     getMsg() {
         const msg = new EditMsg();
-        const debug = this.config.get("debug")!;
-        msg.overrideZoom = debug.overrideZoom;
-        msg.zoom = this.zoom;
-        msg.speed = this.speed;
-        msg.layer = this.layer;
-        msg.cull = debug.cull;
-        msg.printLootStats = this.printLootStats;
+        msg.zoomEnabled = this.toolParams.zoomEnabled;
+        msg.zoom = this.toolParams.zoom;
+
+        msg.speedEnabled = this.toolParams.speedEnabled;
+        msg.speed = this.toolParams.speed;
+
         msg.loadNewMap = this.loadNewMap;
-        msg.newMapSeed = this.mapSeed;
-        msg.spawnLootType = this.spawnLootType;
-        msg.promoteToRoleType = this.promoteToRoleType;
-        msg.spectatorMode = debug.spectatorMode;
-        msg.godMode = debug.godMode;
+        msg.newMapSeed = this.toolParams.mapSeed;
+
+        msg.spawnLootType = this.spawnLoot ? this.toolParams.loot : "";
+        msg.promoteToRole = this.promoteToRole;
+        msg.promoteToRoleType = this.toolParams.role;
+
+        msg.toggleLayer = this.toggleLayer;
+
+        msg.noClip = this.toolParams.noClip;
+        msg.godMode = this.toolParams.godMode;
+        msg.moveObjs = this.toolParams.moveObjs;
 
         return msg;
     }
 
     postSerialization() {
+        this.spawnLoot = false;
+        this.promoteToRole = false;
         this.loadNewMap = false;
+
         this.printLootStats = false;
-        this.spawnLootType = "";
-        this.promoteToRoleType = "";
-        this.layerChangedByToggle = false;
+
+        this.toggleLayer = false;
         this.sendMsg = false;
     }
 }

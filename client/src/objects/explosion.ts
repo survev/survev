@@ -9,7 +9,7 @@ import { util } from "../../../shared/utils/util";
 import { type Vec2, v2 } from "../../../shared/utils/v2";
 import type { AudioManager } from "../audioManager";
 import type { Camera } from "../camera";
-import type { DebugOptions } from "../config";
+import type { DebugRenderOpts } from "../config";
 import { debugLines } from "../debugLines";
 import type { SoundHandle } from "../lib/createJS";
 import type { Map } from "../map";
@@ -308,7 +308,7 @@ export class ExplosionBarn {
         camera: Camera,
         particleBarn: ParticleBarn,
         audioManager: AudioManager,
-        debug: DebugOptions,
+        debug: DebugRenderOpts,
     ) {
         for (let i = 0; i < this.explosions.length; i++) {
             const e = this.explosions[i];
@@ -318,7 +318,7 @@ export class ExplosionBarn {
                     e.free();
                 }
 
-                if (IS_DEV && debug.render.explosions) {
+                if (IS_DEV && debug.explosions) {
                     const def = GameObjectDefs[e.type] as ExplosionDef;
                     debugLines.addCircle(e.pos, def.rad.min, 0xff0000, 0);
                     debugLines.addCircle(e.pos, def.rad.max, 0xff9900, 0);
