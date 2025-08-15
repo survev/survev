@@ -3206,7 +3206,7 @@ export class Player extends BaseGameObject {
                   (input === GameConfig.Input.Cancel &&
                       !this.revivedBy?.hasPerk("aoe_heal")) || // Players can cancel their own revives if they are not revived by aoe heal.
                   (input === GameConfig.Input.Cancel &&
-                      this.game.modeManager.isReviving(this)) || // Players can cancel their own revives if they are reviving themselves.
+                      this.revivedBy == this.playerBeingRevived) || // Players can cancel their own revives if they are reviving themselves.
                   input === GameConfig.Input.Use ||
                   input === GameConfig.Input.Interact // Players can interact with obstacles while downed.
             : true;
@@ -3559,11 +3559,19 @@ export class Player extends BaseGameObject {
 
         // if none are found use active weapon if its a gun
         if (GameConfig.WeaponType[this.curWeapIdx] === "gun") {
+            const newGunDef = GameObjectDefs[obj.type];
+            let dualToSingle = false;
+            if (
+                newGunDef.type == "gun" &&
+                newGunDef.dualWieldType === this.weapons[this.curWeapIdx].type
+            ) {
+                dualToSingle = true;
+            }
             return {
                 slot: this.curWeapIdx,
                 isDual: false,
                 cause:
-                    this.activeWeapon === obj.type
+                    this.activeWeapon === obj.type || dualToSingle
                         ? net.PickupMsgType.AlreadyOwned
                         : net.PickupMsgType.Success,
             };
@@ -3693,6 +3701,12 @@ export class Player extends BaseGameObject {
                     const freeGunSlot = this.getFreeGunSlot(obj);
                     pickupMsg.type = freeGunSlot.cause;
                     let newGunIdx = freeGunSlot.slot;
+                    const oldWeaponIdx = this.curWeapIdx;
+
+                    if (freeGunSlot.cause === net.PickupMsgType.AlreadyOwned) {
+                        amountLeft = 1;
+                        break;
+                    }
 
                     if (newGunIdx === null) {
                         this.pickupTicker = 0;
@@ -3767,26 +3781,19 @@ export class Player extends BaseGameObject {
                         }
                     }
 
-                    // can only reload on pickup if gun empty OR if reload was already in progress
-                    if (
-                        newGunIdx === this.curWeapIdx &&
-                        (this.weapons[newGunIdx].ammo <= 0 ||
-                            this.actionType == GameConfig.Action.Reload)
-                    ) {
-                        this.cancelAction();
-
-                        const switchDelay = (GameObjectDefs[gunType] as GunDef)
-                            .switchDelay;
-                        this.weaponManager.applyWeaponDelay(switchDelay);
-                        this.weaponManager.scheduleReload();
-                    }
-
                     // always select primary slot if melee is selected
                     if (
                         !freeGunSlot.isDual &&
                         this.curWeapIdx === GameConfig.WeaponSlot.Melee
                     ) {
                         this.weaponManager.setCurWeapIndex(newGunIdx); // primary
+                    }
+
+                    // Reload instantly if a gun was dropped, handle duals
+                    if (newGunIdx === oldWeaponIdx && this.weapons[newGunIdx].ammo <= 0) {
+                        this.cancelAction();
+                        this.weaponManager.applyWeaponDelay(0);
+                        this.weaponManager.scheduleReload();
                     }
                 }
                 break;

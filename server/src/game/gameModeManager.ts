@@ -432,19 +432,19 @@ export class GameModeManager {
 
                         player.kill(params);
                         // special case that only happens when the player has self_revive since the teammates wouldnt have previously been finished off
-                        if (team.checkAllDowned(player)) {
+                        if (team.checkAllDowned(player) && !team.checkSelfRevive()) {
                             team.killAllTeammates();
                         }
                         return;
                     }
 
+                    const allDeadOrDisconnected = team.checkAllDeadOrDisconnected(player);
+                    const allDowned = team.checkAllDowned(player);
                     const teamHasSelfRevive = team.livingPlayers.find((p) =>
                         p.hasPerk("self_revive"),
                     );
-                    const allDead = team.checkAllDead(player);
-                    const allDowned = team.checkAllDowned(player);
 
-                    if (!teamHasSelfRevive && (allDead || allDowned)) {
+                    if (!teamHasSelfRevive && (allDeadOrDisconnected || allDowned)) {
                         player.kill(params);
                         if (allDowned) {
                             team.killAllTeammates();
