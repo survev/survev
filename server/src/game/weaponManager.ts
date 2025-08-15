@@ -153,7 +153,9 @@ export class WeaponManager {
             this.player.wearingPan = true;
         }
 
-        this.applyReloadDelay(effectiveSwitchDelay);
+        if (effectiveSwitchDelay != 0) {
+            this.applyReloadDelay(effectiveSwitchDelay);
+        }
 
         if (GameConfig.WeaponType[idx] === "gun" && this.weapons[idx].ammo == 0) {
             this.scheduleReload();
