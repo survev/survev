@@ -14,7 +14,7 @@ import { math } from "../../../shared/utils/math";
 import { type Vec2, v2 } from "../../../shared/utils/v2";
 import type { Ambiance } from "../ambiance";
 import type Camera from "../camera";
-import type { DebugOptions } from "../config";
+import type { DebugRenderOpts } from "../config";
 import {
     renderBridge,
     renderMapBuildingBounds,
@@ -245,22 +245,22 @@ export class Structure implements AbstractObject {
         track1.weight = sound ? weight1 * transitionWeight * this.soundEnabledT : 0;
     }
 
-    render(_camera: Camera, debug: DebugOptions, _layer: number) {
+    render(_camera: Camera, debug: DebugRenderOpts, _layer: number) {
         if (!IS_DEV) return; // only debug rendering code here
 
-        if (debug.render.structures.buildingBounds) {
+        if (debug.structures.buildingBounds) {
             renderMapBuildingBounds(this);
         }
-        if (debug.render.structures.obstacleBounds) {
+        if (debug.structures.obstacleBounds) {
             renderMapObstacleBounds(this);
         }
-        if (debug.render.structures.bridge) {
+        if (debug.structures.bridge) {
             renderBridge(this);
         }
-        if (debug.render.structures.waterEdge) {
+        if (debug.structures.waterEdge) {
             renderWaterEdge(this);
         }
-        if (debug.render.structures.stairs) {
+        if (debug.structures.stairs) {
             for (let i = 0; i < this.stairs.length; i++) {
                 debugLines.addCollider(this.stairs[i].downAabb, 0x0000ff, 0);
                 debugLines.addCollider(this.stairs[i].upAabb, 0x00ff00, 0);

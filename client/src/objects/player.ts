@@ -40,7 +40,7 @@ import { type Vec2, v2 } from "../../../shared/utils/v2";
 import { Animations, Bones, IdlePoses, Pose } from "../animData";
 import type { AudioManager } from "../audioManager";
 import type { Camera } from "../camera";
-import type { DebugOptions } from "../config";
+import type { DebugRenderOpts } from "../config";
 import { debugLines } from "../debugLines";
 import { device } from "../device";
 import { errorLogManager } from "../errorLogs";
@@ -1319,7 +1319,7 @@ export class Player implements AbstractObject {
         this.isNew = false;
     }
 
-    render(camera: Camera, debug: DebugOptions) {
+    render(camera: Camera, debug: DebugRenderOpts) {
         const screenPos = camera.m_pointToScreen(this.m_visualPos);
         const screenScale = camera.m_pixels(1);
         this.container.position.set(screenPos.x, screenPos.y);
@@ -1328,7 +1328,7 @@ export class Player implements AbstractObject {
         this.auraContainer.position.set(screenPos.x, screenPos.y);
         this.auraContainer.scale.set(screenScale, screenScale);
 
-        if (IS_DEV && debug.render.players) {
+        if (IS_DEV && debug.players) {
             debugLines.addCircle(this.m_pos, this.m_rad, 0xff0000, 0);
 
             const weapDef = GameObjectDefs[this.m_netData.m_activeWeapon];
@@ -2662,7 +2662,7 @@ export class PlayerBarn {
         }
     }
 
-    m_render(camera: Camera, debug: DebugOptions) {
+    m_render(camera: Camera, debug: DebugRenderOpts) {
         const players = this.playerPool.m_getPool();
         for (let i = 0; i < players.length; i++) {
             const p = players[i];

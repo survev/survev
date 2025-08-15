@@ -9,7 +9,7 @@ import { util } from "../../../shared/utils/util";
 import { type Vec2, v2 } from "../../../shared/utils/v2";
 import type { AudioManager } from "../audioManager";
 import type { Camera } from "../camera";
-import type { DebugOptions } from "../config";
+import type { DebugRenderOpts } from "../config";
 import { debugLines } from "../debugLines";
 import type { Ctx } from "../game";
 import type { Map } from "../map";
@@ -458,7 +458,7 @@ export class Obstacle implements AbstractObject {
         this.isNew = false;
     }
 
-    render(dt: number, camera: Camera, debug: DebugOptions, layer: number) {
+    render(dt: number, camera: Camera, debug: DebugRenderOpts, layer: number) {
         let pos = this.isDoor ? this.door.interpPos : this.pos;
 
         if (this.isSkin && camera.m_interpEnabled) {
@@ -494,7 +494,7 @@ export class Obstacle implements AbstractObject {
             this.door.casingSprite.visible = !this.dead;
         }
 
-        if (IS_DEV && debug.render.obstacles && util.sameLayer(layer, this.layer)) {
+        if (IS_DEV && debug.obstacles && util.sameLayer(layer, this.layer)) {
             const def = MapObjectDefs[this.type] as ObstacleDef;
 
             const color = def.collidable ? 0xff0000 : 0xffff00;

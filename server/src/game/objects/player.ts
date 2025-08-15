@@ -49,10 +49,9 @@ import { BaseGameObject, type DamageParams, type GameObject } from "./gameObject
 import type { Loot } from "./loot";
 import type { MapIndicator } from "./mapIndicator";
 import type { Obstacle } from "./obstacle";
-import type { Structure } from "./structure";
 
-type GodMode = {
-    isGodMode: boolean;
+type MoveObjsMode = {
+    enabled: boolean;
     selectedObj?: Loot | Obstacle | Building;
     originalPos?: Vec2;
     selectPos?: Vec2;
@@ -647,7 +646,6 @@ export class Player extends BaseGameObject {
         this._zoom = zoom;
         this.zoomDirty = true;
     }
-    cullingZoom = 0;
 
     scopeZoomRadius: Record<string, number>;
 
@@ -1193,15 +1191,18 @@ export class Player extends BaseGameObject {
     bot: boolean;
 
     debug = {
-        zoomOverride: GameConfig.scopeZoomRadius["desktop"]["1xscope"],
-        overrideZoom: false,
-        zoomOverrideCulling: false,
-        /** only overrides base speed so modifiers like haste and freeze still apply */
-        baseSpeedOverride: -1,
-        spectatorMode: false,
+        zoomEnabled: false,
+        zoom: 1,
+
+        speedEnabled: false,
+        speed: 1,
+
+        noClip: false,
+        godMode: false,
+
         /** drag and drop loot, obstacles, and buildings */
-        godMode: <GodMode>{
-            isGodMode: false,
+        moveObjMode: <MoveObjsMode>{
+            enabled: false,
             /** object you're currently dragging */
             selectedObj: undefined,
             /** original position of the selected obj */
@@ -1768,21 +1769,13 @@ export class Player extends BaseGameObject {
             this.pos,
             GameConfig.player.maxVisualRadius * this.scale + this.speed * dt,
         );
-        // can't collide with objects in spectator mode
-        const objs = this.debug.spectatorMode
-            ? // so spectators can go underground, need to be able to interact with stairs
-              this.game.grid
-                  .intersectCollider(circle)
-                  .filter(
-                      (o): o is Structure =>
-                          o.__type == ObjectType.Structure && o.stairs.length != 0,
-                  )
-            : this.game.grid.intersectCollider(circle);
+
+        const objs = this.game.grid.intersectCollider(circle);
 
         for (let i = 0; i < steps; i++) {
             v2.set(this.pos, v2.add(this.pos, v2.mul(movement, speedToAdd)));
 
-            for (let j = 0; j < objs.length; j++) {
+            for (let j = 0; j < objs.length && !this.debug.noClip; j++) {
                 const obj = objs[j];
                 if (obj.__type !== ObjectType.Obstacle) continue;
                 if (!obj.collidable) continue;
@@ -2028,12 +2021,10 @@ export class Player extends BaseGameObject {
             finalZoom = lowestZoom;
         }
 
-        if (this.debug.overrideZoom) {
-            this.zoom = this.debug.zoomOverride;
-            this.cullingZoom = this.debug.zoomOverrideCulling ? finalZoom : this.zoom;
+        if (this.debug.zoomEnabled) {
+            this.zoom = this.debug.zoom;
         } else {
             this.zoom = finalZoom;
-            this.cullingZoom = finalZoom;
         }
 
         if (insideNoZoomRegion) {
@@ -2074,8 +2065,7 @@ export class Player extends BaseGameObject {
 
         if (!v2.eq(this.pos, this.posOld)) {
             this.setPartDirty();
-            // player doesn't exist in grid while in spectator mode
-            if (!this.debug.spectatorMode) this.game.grid.updateObject(this);
+            this.game.grid.updateObject(this);
 
             //
             // Halloween obstacle skin
@@ -2105,7 +2095,7 @@ export class Player extends BaseGameObject {
             }
         }
 
-        if (this.debug.godMode.isGodMode) this.godModeUpdate(occupiedBuilding);
+        if (this.debug.moveObjMode.enabled) this.moveObjUpdate(occupiedBuilding);
 
         //
         // Weapon stuff
@@ -2118,8 +2108,8 @@ export class Player extends BaseGameObject {
         }
     }
 
-    godModeUpdate(occupiedBuilding?: Building): void {
-        if (!this.debug.godMode.isGodMode) return;
+    moveObjUpdate(occupiedBuilding?: Building): void {
+        if (!this.debug.moveObjMode.enabled) return;
         const mouseCollider = collider.createCircle(this.mousePos, 1);
         const childIds = occupiedBuilding
             ? new Set(occupiedBuilding.childObjects.map((o) => o.__id))
@@ -2147,25 +2137,27 @@ export class Player extends BaseGameObject {
             });
 
         if (hoveredObj && this.shootStart) {
-            this.debug.godMode.selectedObj = hoveredObj;
-            this.debug.godMode.originalPos = v2.copy(this.debug.godMode.selectedObj.pos);
-            this.debug.godMode.selectPos = v2.copy(this.mousePos);
+            this.debug.moveObjMode.selectedObj = hoveredObj;
+            this.debug.moveObjMode.originalPos = v2.copy(
+                this.debug.moveObjMode.selectedObj.pos,
+            );
+            this.debug.moveObjMode.selectPos = v2.copy(this.mousePos);
         }
 
         if (
-            this.debug.godMode.selectedObj &&
-            this.debug.godMode.selectPos &&
-            this.debug.godMode.originalPos
+            this.debug.moveObjMode.selectedObj &&
+            this.debug.moveObjMode.selectPos &&
+            this.debug.moveObjMode.originalPos
         ) {
             if (this.shootHold) {
-                const deltaPos = v2.sub(this.mousePos, this.debug.godMode.selectPos);
-                const newPos = v2.add(this.debug.godMode.originalPos, deltaPos);
-                this.debug.godMode.selectedObj.updatePos(newPos);
+                const deltaPos = v2.sub(this.mousePos, this.debug.moveObjMode.selectPos);
+                const newPos = v2.add(this.debug.moveObjMode.originalPos, deltaPos);
+                this.debug.moveObjMode.selectedObj.updatePos(newPos);
             } else {
-                this.debug.godMode.selectedObj.refresh();
-                this.debug.godMode.selectedObj = undefined;
-                this.debug.godMode.selectPos = undefined;
-                this.debug.godMode.originalPos = undefined;
+                this.debug.moveObjMode.selectedObj.refresh();
+                this.debug.moveObjMode.selectedObj = undefined;
+                this.debug.moveObjMode.selectPos = undefined;
+                this.debug.moveObjMode.originalPos = undefined;
             }
         }
     }
@@ -2238,7 +2230,7 @@ export class Player extends BaseGameObject {
             player = this;
         }
 
-        const radius = player.cullingZoom + 4;
+        const radius = player.zoom + 4;
         const rect = coldet.circleToAabb(player.pos, radius);
 
         const newVisibleObjects = game.grid.intersectColliderSet(rect);
@@ -2487,6 +2479,7 @@ export class Player extends BaseGameObject {
     lastDamagedBy: Player | undefined;
 
     damage(params: DamageParams) {
+        if (this.debug.godMode) return;
         if (this._health < 0) this._health = 0;
         if (this.dead) return;
         if (this.downed && this.downedDamageTicker > 0) return;
@@ -3235,9 +3228,6 @@ export class Player extends BaseGameObject {
         this.toMouseLen = msg.toMouseLen;
 
         this.mousePos = v2.add(this.pos, v2.mul(this.dir, this.toMouseLen));
-
-        // spectators are only allowed to send movement related inputs
-        if (this.debug.spectatorMode) return;
 
         this.shootHold = msg.shootHold;
 
@@ -4347,49 +4337,51 @@ export class Player extends BaseGameObject {
             this.game.map.regenerate(msg.newMapSeed);
         }
 
-        this.debug.overrideZoom = msg.overrideZoom;
-        this.debug.zoomOverrideCulling = msg.cull;
-        this.debug.zoomOverride = msg.zoom;
+        this.debug.zoomEnabled = msg.zoomEnabled;
 
-        this.debug.baseSpeedOverride = math.clamp(msg.speed, 1, 10000);
+        this.debug.zoom = msg.zoom;
+
+        this.debug.speedEnabled = msg.speedEnabled;
+        this.debug.speed = math.clamp(msg.speed, 1, 10000);
 
         // only accept ground or underground
-        if ((msg.layer == 0 || msg.layer == 1) && this.layer != msg.layer) {
-            this.layer = msg.layer;
+        if (msg.toggleLayer) {
+            this.layer = this.layer > 0 ? 0 : 1;
             this.setDirty();
         }
 
-        // removed from grid while in spectator mode so other players can't see/interact with the player
-        if (this.debug.spectatorMode != msg.spectatorMode) {
-            msg.spectatorMode
-                ? this.game.grid.remove(this)
-                : this.game.grid.addObject(this);
-        }
+        this.debug.noClip = msg.noClip;
+        this.debug.godMode = msg.godMode;
 
-        this.debug.spectatorMode = msg.spectatorMode;
-        this.debug.godMode.isGodMode = msg.godMode;
+        this.debug.moveObjMode.enabled = msg.moveObjs;
 
         if (msg.spawnLootType) {
             const def = GameObjectDefs[msg.spawnLootType];
-            if (!def || !("lootImg" in def)) return;
-            let count = 1;
-            if (this.bagSizes[msg.spawnLootType]) {
-                count = this.bagSizes[msg.spawnLootType][0];
+            if (def && "lootImg" in def) {
+                let count = 1;
+                if (this.bagSizes[msg.spawnLootType]) {
+                    count = this.bagSizes[msg.spawnLootType][0];
+                }
+                this.game.lootBarn.addLoot(
+                    msg.spawnLootType,
+                    this.pos,
+                    this.layer,
+                    count,
+                    false,
+                    0,
+                );
             }
-            this.game.lootBarn.addLoot(
-                msg.spawnLootType,
-                this.pos,
-                this.layer,
-                count,
-                false,
-                0,
-            );
         }
 
-        if (msg.promoteToRoleType) {
-            const def = GameObjectDefs[msg.promoteToRoleType];
-            if (!def) return;
-            this.promoteToRole(msg.promoteToRoleType);
+        if (msg.promoteToRole) {
+            if (msg.promoteToRoleType) {
+                const def = GameObjectDefs[msg.promoteToRoleType];
+                if (def.type === "role") {
+                    this.promoteToRole(msg.promoteToRoleType);
+                }
+            } else if (this.role) {
+                this.removeRole();
+            }
         }
     }
 
@@ -4596,8 +4588,8 @@ export class Player extends BaseGameObject {
     }
 
     recalculateSpeed(hasTreeClimbing: boolean): void {
-        if (this.debug.baseSpeedOverride != -1) {
-            this.speed = this.debug.baseSpeedOverride;
+        if (this.debug.speedEnabled) {
+            this.speed = this.debug.speed;
         } else if (this.actionType == GameConfig.Action.Revive) {
             // prevents self reviving players from getting an unnecessary speed boost
             if (this.action.targetId && !(this.downed && this.hasPerk("self_revive"))) {
