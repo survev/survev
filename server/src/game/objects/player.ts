@@ -3735,7 +3735,6 @@ export class Player extends BaseGameObject {
                     // replaces the gun
 
                     let newAmmo = 0;
-                    let gunDropped = false;
 
                     if (oldWeapDef) {
                         newAmmo =
@@ -3754,7 +3753,6 @@ export class Player extends BaseGameObject {
                         );
                         if (shouldDrop) {
                             this.weaponManager.dropGun(newGunIdx);
-                            gunDropped = true;
                         }
                     }
 
@@ -3793,11 +3791,11 @@ export class Player extends BaseGameObject {
 
                     // Reload instantly if a gun was dropped, handle duals
                     if (
-                        (gunDropped || newGunIdx === oldWeaponIdx) &&
+                        newGunIdx === oldWeaponIdx &&
                         this.weapons[newGunIdx].ammo <= 0
                     ) {
                         this.cancelAction();
-                        this.weaponManager.applyReloadDelay(0);
+                        this.weaponManager.applyWeaponDelay(0);
                         this.weaponManager.scheduleReload();
                     }
                 }

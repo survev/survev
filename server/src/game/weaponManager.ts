@@ -154,7 +154,7 @@ export class WeaponManager {
         }
 
         if (effectiveSwitchDelay != 0) {
-            this.applyReloadDelay(effectiveSwitchDelay);
+            this.applyWeaponDelay(effectiveSwitchDelay);
         }
 
         if (GameConfig.WeaponType[idx] === "gun" && this.weapons[idx].ammo == 0) {
@@ -387,7 +387,7 @@ export class WeaponManager {
 
     weaponDelayTicker = 0;
     weaponOnDelay = false;
-    applyReloadDelay(delay: number): void {
+    applyWeaponDelay(delay: number): void {
         this.weaponDelayTicker = delay;
         this.weaponOnDelay = true;
     }
@@ -620,7 +620,7 @@ export class WeaponManager {
 
         const weapon = this.weapons[this.curWeapIdx];
 
-        this.applyReloadDelay(itemDef.fireDelay);
+        this.applyWeaponDelay(itemDef.fireDelay);
 
         this.scheduledReload = false;
         if (weapon.ammo <= 1) {
