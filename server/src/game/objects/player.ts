@@ -3779,7 +3779,10 @@ export class Player extends BaseGameObject {
                     }
 
                     // Reload instantly if a gun was dropped, handle duals
-                    if ((gunDropped || newGunIdx === oldWeaponIdx) && this.weapons[newGunIdx].ammo <= 0) {
+                    if (
+                        (gunDropped || newGunIdx === oldWeaponIdx) &&
+                        this.weapons[newGunIdx].ammo <= 0
+                    ) {
                         this.cancelAction();
                         this.weaponManager.applyReloadDelay(0);
                         this.weaponManager.scheduleReload();
