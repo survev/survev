@@ -3721,6 +3721,7 @@ export class Player extends BaseGameObject {
                     // replaces the gun
 
                     let newAmmo = 0;
+                    let gunDropped = false;
 
                     if (oldWeapDef) {
                         newAmmo =
@@ -3739,6 +3740,7 @@ export class Player extends BaseGameObject {
                         );
                         if (shouldDrop) {
                             this.weaponManager.dropGun(newGunIdx);
+                            gunDropped = true;
                         }
                     }
 
@@ -3767,26 +3769,17 @@ export class Player extends BaseGameObject {
                         }
                     }
 
-                    // can only reload on pickup if gun empty OR if reload was already in progress
-                    if (
-                        newGunIdx === this.curWeapIdx &&
-                        (this.weapons[newGunIdx].ammo <= 0 ||
-                            this.actionType == GameConfig.Action.Reload)
-                    ) {
-                        this.cancelAction();
-
-                        const switchDelay = (GameObjectDefs[gunType] as GunDef)
-                            .switchDelay;
-                        this.weaponManager.applyWeaponDelay(switchDelay);
-                        this.weaponManager.scheduleReload();
-                    }
-
                     // always select primary slot if melee is selected
                     if (
                         !freeGunSlot.isDual &&
                         this.curWeapIdx === GameConfig.WeaponSlot.Melee
                     ) {
                         this.weaponManager.setCurWeapIndex(newGunIdx); // primary
+                    }
+
+                    // Reload instantly if a gun was dropped
+                    if (gunDropped) {
+                        this.weaponManager.tryReload();
                     }
                 }
                 break;
