@@ -6,24 +6,20 @@ import {
     MessageFlags,
 } from "discord.js";
 import { commandHandlers } from "./commands";
+import { sendNoPermissionMessage } from "./commands/helpers";
 import { DISCORD_BOT_TOKEN } from "./config";
-import { type Command, hasPermission } from "./utils";
+import { type Command, hasBotPermission } from "./utils";
 
 const client = new Client({ intents: [GatewayIntentBits.Guilds] });
 
 function setupInteractionHandlers() {
     client.on(Events.InteractionCreate, async (interaction) => {
-        if (!hasPermission(interaction)) {
-            if (interaction.isRepliable()) {
-                await interaction.reply({
-                    content: "You do not have permission to use this action.",
-                    flags: MessageFlags.Ephemeral,
-                });
-            }
+        if (!interaction.isChatInputCommand()) return;
+
+        if (!hasBotPermission(interaction)) {
+            await sendNoPermissionMessage(interaction);
             return;
         }
-
-        if (!interaction.isChatInputCommand()) return;
 
         const commandName = interaction.commandName as Command;
         if (!commandHandlers[commandName]) {

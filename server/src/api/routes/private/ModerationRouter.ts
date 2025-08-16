@@ -343,7 +343,7 @@ export const ModerationRouter = new Hono()
 
         if (res.rowCount) {
             return c.json(
-                { message: `updated player's name to ${sanitized.validName}` },
+                { message: `updated ${current_slug}'s name to ${sanitized.validName}` },
                 200,
             );
         }

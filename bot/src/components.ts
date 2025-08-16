@@ -9,8 +9,9 @@ import {
     StringSelectMenuBuilder,
     type StringSelectMenuInteraction,
 } from "discord.js";
+import { formatDate } from "../../shared/utils/util";
 import { BUTTON_PREFIXES, type SelectedPlayer } from "./commands/search-player";
-import { createCollector, formatDate, honoClient } from "./utils";
+import { createCollector, honoClient } from "./utils";
 
 export async function createDiscordDropdownUI(
     interaction: RepliableInteraction,
@@ -170,7 +171,6 @@ export async function createDiscordPlayerInfoCardUI({
                     ips: ipsToBan,
                     ip_ban_duration: ipBanDuration,
                     ban_reason: banReason,
-                    is_encoded: true,
                     executor_id: executorId,
                 },
             });

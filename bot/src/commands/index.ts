@@ -7,6 +7,8 @@ import {
     zBanAccountParams,
     zBanIpParams,
     zFindDiscordUserSlugParams,
+    zGiveItemParams,
+    zRemoveItemParams,
     zSetAccountNameParams,
     zSetMatchDataNameParams,
     zUnbanAccountParams,
@@ -146,15 +148,16 @@ const commands = {
         optionValidator: zSetAccountNameParams,
         options: [
             {
-                name: "new_name",
-                description: "The new name of the account",
+                name: "current_slug",
+                description: "The current slug of the account",
                 required: true,
                 type: ApplicationCommandOptionType.String,
             },
             {
-                name: "current_slug",
-                description: "The current slug of the account",
-                required: true,
+                name: "new_name",
+                description:
+                    "The new name of the account (get randomized if not provided)",
+                required: false,
                 type: ApplicationCommandOptionType.String,
             },
         ],
@@ -172,6 +175,52 @@ const commands = {
             },
         ],
     }),
+    [Command.GiveItem]: createCommand({
+        name: Command.GiveItem,
+        description: "Give an item to a user",
+        optionValidator: zGiveItemParams,
+        isPrivateRoute: true,
+        options: [
+            {
+                name: "item",
+                description: "The item to give",
+                required: true,
+                type: ApplicationCommandOptionType.String,
+            },
+            {
+                name: "slug",
+                description: "The account slug to give the item to",
+                required: true,
+                type: ApplicationCommandOptionType.String,
+            },
+            {
+                name: "source",
+                description: "The source of the item",
+                required: false,
+                type: ApplicationCommandOptionType.String,
+            },
+        ],
+    }),
+    [Command.RemoveItem]: createCommand({
+        name: Command.RemoveItem,
+        description: "remove an item from a user",
+        optionValidator: zRemoveItemParams,
+        isPrivateRoute: true,
+        options: [
+            {
+                name: "item",
+                description: "The item to remove",
+                required: true,
+                type: ApplicationCommandOptionType.String,
+            },
+            {
+                name: "slug",
+                description: "The account slug to remove the item from",
+                required: true,
+                type: ApplicationCommandOptionType.String,
+            },
+        ],
+    }),
 };
 
 export type CommandHandlers = {
@@ -183,7 +232,12 @@ export const commandHandlers: CommandHandlers = (
 ).reduce(
     (obj, key) => {
         obj[key] = (interaction) =>
-            genericExecute(key, interaction, commands[key].optionValidator);
+            genericExecute(
+                key,
+                interaction,
+                commands[key].optionValidator,
+                commands[key].isPrivateRoute,
+            );
         return obj;
     },
     {
