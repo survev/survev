@@ -692,7 +692,7 @@ export class Player implements AbstractObject {
         );
         const pos = v2.add(this.m_pos, v2.rotate(off, ang));
         const rad = meleeDef.attack.rad;
-        return collider.createCircle(pos, rad, 0);
+        return collider.createCircle(pos, rad);
     }
 
     m_hasActivePan() {

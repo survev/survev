@@ -892,7 +892,7 @@ export class WeaponManager {
         );
         const rotated = v2.add(this.player.pos, v2.rotate(pos, rot));
         const rad = meleeDef.attack.rad;
-        return collider.createCircle(rotated, rad, 0);
+        return collider.createCircle(rotated, rad);
     }
 
     meleeDamage(): void {

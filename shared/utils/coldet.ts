@@ -15,9 +15,6 @@ export interface AABB {
 }
 
 export type Collider = Circle | AABB;
-export type AABBWithHeight = AABB & { height?: number };
-export type CircleWithHeight = Circle & { height?: number };
-export type ColliderWithHeight = AABBWithHeight | CircleWithHeight;
 
 export const coldet = {
     circleToAabb(pos: Vec2, rad: number): AABB {

@@ -2,7 +2,7 @@ import * as PIXI from "pixi.js-legacy";
 import { MapObjectDefs } from "../../../shared/defs/mapObjectDefs";
 import type { DecalDef } from "../../../shared/defs/mapObjectsTyping";
 import type { ObjectData, ObjectType } from "../../../shared/net/objectSerializeFns";
-import type { ColliderWithHeight } from "../../../shared/utils/coldet";
+import type { Collider } from "../../../shared/utils/coldet";
 import { collider } from "../../../shared/utils/collider";
 import { math } from "../../../shared/utils/math";
 import { util } from "../../../shared/utils/util";
@@ -36,7 +36,7 @@ class Decal implements AbstractObject {
     scale!: number;
     layer!: number;
     goreKills!: number;
-    collider!: ColliderWithHeight;
+    collider!: Collider;
     surface!: DecalDef["surface"] | null;
 
     m_init() {

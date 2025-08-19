@@ -97,7 +97,7 @@ export class Obstacle implements AbstractObject {
     visualPosOld!: Vec2;
     posInterpTicker!: number;
 
-    collider!: Collider & { height: number };
+    collider!: Collider;
 
     constructor() {
         this.sprite.anchor.set(0.5, 0.5);

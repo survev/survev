@@ -1,13 +1,7 @@
 import { MapObjectDefs } from "../../../shared/defs/mapObjectDefs";
 import type { StructureDef } from "../../../shared/defs/mapObjectsTyping";
 import type { ObjectData, ObjectType } from "./../../../shared/net/objectSerializeFns";
-import {
-    type AABB,
-    type AABBWithHeight,
-    type Collider,
-    type ColliderWithHeight,
-    coldet,
-} from "../../../shared/utils/coldet";
+import { type AABB, type Collider, coldet } from "../../../shared/utils/coldet";
 import { collider } from "../../../shared/utils/collider";
 import { mapHelpers } from "../../../shared/utils/mapHelpers";
 import { math } from "../../../shared/utils/math";
@@ -52,17 +46,17 @@ export class Structure implements AbstractObject {
     interiorSoundAlt!: boolean;
     interiorSoundEnabled!: boolean;
 
-    aabb!: Collider & { height: number };
+    aabb!: Collider;
 
     layers!: Array<{
         objId: number;
-        collision: ColliderWithHeight;
+        collision: Collider;
         underground: boolean;
     }>;
 
     stairs!: Stair[];
 
-    mask!: AABBWithHeight[];
+    mask!: AABB[];
 
     m_init() {
         this.soundTransitionT = 0;
@@ -125,7 +119,7 @@ export class Structure implements AbstractObject {
                     this.pos,
                     this.rot,
                     this.scale,
-                ) as AABBWithHeight;
+                ) as AABB;
                 const downDir = v2.rotate(stairsDef.downDir, this.rot);
                 const childAabbs = coldet.splitAabb(stairsCol, downDir);
 
