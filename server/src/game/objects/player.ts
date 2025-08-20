@@ -4918,7 +4918,7 @@ export class Player extends BaseGameObject {
             updateMsg.groupStatus = playerToReport.group.players;
         }
 
-        updateMsg.playerStatus = game.modeManager.getPlayerStatuses(playerToReport);
+        updateMsg.playerStatus = playerToReport.getPlayerStatus();
         updateMsg.playerStatusDirty = true;
 
         updateMsg.gasDirty = true;
