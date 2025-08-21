@@ -3,15 +3,18 @@ import $ from "jquery";
 import "bootstrap";
 import slugify from "slugify";
 import { ConfigManager } from "../../config";
-import { MainView } from "./mainView";
+// import { MainView } from "./mainView";
 import { PlayerView } from "./playerView";
 import language from "./templates/langauge.ejs";
 
 import "bootstrap/dist/css/bootstrap.css";
 import "../../../css/stats/app.css";
+import { mount } from "svelte";
+import { device } from "../../device";
 import { helpers } from "../../helpers";
 import { Localization } from "../../ui/localization";
 import EnJs from "../en.json";
+import MainView from "../svelte/components/MainView.svelte";
 
 const templates = {
     language,
@@ -36,6 +39,14 @@ class Ads {
     showFreestarAds(_slotIds: unknown) {}
     getFreestarSlotPlacement(_slotId: unknown) {}
 }
+
+const app = mount(MainView, {
+    target: document.getElementById("content")!,
+    props: {
+        phoneDetected: device.mobile && !device.tablet,
+        gameModes: helpers.getGameModes(),
+    },
+});
 
 export class App {
     el = $("#content");
@@ -178,4 +189,4 @@ export class App {
     }
 }
 
-export const app = new App();
+// export const app = new App();
