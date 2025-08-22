@@ -335,6 +335,7 @@ export enum MsgType {
     Pickup,
     Map,
     Spectate,
+    Report,
     DropItem,
     Emote,
     PlayerStats,
@@ -379,4 +380,5 @@ export { PickupMsg } from "./pickupMsg";
 export { PlayerStatsMsg } from "./playerStatsMsg";
 export { RoleAnnouncementMsg } from "./roleAnnouncementMsg";
 export { SpectateMsg } from "./spectateMsg";
+export { ReportMsg } from "./reportMsg";
 export { getPlayerStatusUpdateRate, UpdateMsg } from "./updateMsg";

@@ -168,6 +168,7 @@ export class UiManager {
     specPrev = false;
     specNextButton = $("#btn-spectate-next-player");
     specPrevButton = $("#btn-spectate-prev-player");
+    reportPlayeButton = $("#btn-report-cheater");
 
     // Touch specific buttons
     interactionElems = $("#ui-interaction-press, #ui-interaction");
@@ -392,7 +393,9 @@ export class UiManager {
         this.specPrevButton.on("click", () => {
             this.specPrev = true;
         });
-
+        this.reportPlayeButton.on("click", () => {
+            this.recording = true;
+        });
         // Touch specific buttons
         this.interactionElems.css("pointer-events", "auto");
         this.interactionElems.on("touchstart", (e) => {
@@ -1329,6 +1332,8 @@ export class UiManager {
     beginSpectating() {
         this.specBegin = true;
     }
+
+    recording = false;
 
     hideStats() {
         this.displayingStats = false;
