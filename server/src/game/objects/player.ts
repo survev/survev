@@ -3777,9 +3777,39 @@ export class Player extends BaseGameObject {
                     pickupMsg.type = freeGunSlot.cause;
                     let newGunIdx = freeGunSlot.slot;
                     const oldWeaponIdx = this.curWeapIdx;
+                    
+                    // if "preloaded" gun add ammo to inventory
+                    if (obj.isPreloadedGun) {
+                        const ammoAmount = def.ammoSpawnCount;
+                        const ammoType = def.ammo;
+                        const backpackLevel = this.getGearLevel(this.backpack);
+                        const bagSpace = this.bagSizes[ammoType]
+                            ? this.bagSizes[ammoType][backpackLevel]
+                            : 0;
+                        if (this.inventory[ammoType] + ammoAmount <= bagSpace) {
+                            this.inventory[ammoType] += ammoAmount;
+                            this.inventoryDirty = true;
+                        } else {
+                            // spawn new loot object to animate the pickup rejection
+                            const spaceLeft = bagSpace - this.inventory[ammoType];
+                            const amountToAdd = spaceLeft;
+                            this.inventory[ammoType] += amountToAdd;
+                            this.inventoryDirty = true;
+
+                            const amountLeft = ammoAmount - amountToAdd;
+                            this.dropLoot(ammoType, amountLeft);
+                        }
+                    }
 
                     if (freeGunSlot.cause === net.PickupMsgType.AlreadyOwned) {
                         amountLeft = 1;
+
+                        // Reload gun if it's at 0 ammo, not already being reloaded and pick up some ammo from the same type preloaded gun
+                        if (obj.isPreloadedGun && this.weapons[this.curWeapIdx].ammo <= 0 && !this.isReloading()) {
+                            this.cancelAction();
+                            this.weaponManager.scheduledReload = true;
+                        }
+
                         break;
                     }
 
@@ -3833,28 +3863,6 @@ export class Player extends BaseGameObject {
 
                     this.weaponManager.setWeapon(newGunIdx, gunType, newAmmo);
 
-                    // if "preloaded" gun add ammo to inventory
-                    if (obj.isPreloadedGun) {
-                        const ammoAmount = def.ammoSpawnCount;
-                        const ammoType = def.ammo;
-                        const backpackLevel = this.getGearLevel(this.backpack);
-                        const bagSpace = this.bagSizes[ammoType]
-                            ? this.bagSizes[ammoType][backpackLevel]
-                            : 0;
-                        if (this.inventory[ammoType] + ammoAmount <= bagSpace) {
-                            this.inventory[ammoType] += ammoAmount;
-                            this.inventoryDirty = true;
-                        } else {
-                            // spawn new loot object to animate the pickup rejection
-                            const spaceLeft = bagSpace - this.inventory[ammoType];
-                            const amountToAdd = spaceLeft;
-                            this.inventory[ammoType] += amountToAdd;
-                            this.inventoryDirty = true;
-
-                            const amountLeft = ammoAmount - amountToAdd;
-                            this.dropLoot(ammoType, amountLeft);
-                        }
-                    }
 
                     // always select primary slot if melee is selected
                     if (
