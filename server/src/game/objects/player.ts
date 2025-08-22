@@ -3777,7 +3777,7 @@ export class Player extends BaseGameObject {
                     pickupMsg.type = freeGunSlot.cause;
                     let newGunIdx = freeGunSlot.slot;
                     const oldWeaponIdx = this.curWeapIdx;
-                    
+
                     // if "preloaded" gun add ammo to inventory
                     if (obj.isPreloadedGun) {
                         const ammoAmount = def.ammoSpawnCount;
@@ -3805,7 +3805,11 @@ export class Player extends BaseGameObject {
                         amountLeft = 1;
 
                         // Reload gun if it's at 0 ammo, not already being reloaded and pick up some ammo from the same type preloaded gun
-                        if (obj.isPreloadedGun && this.weapons[this.curWeapIdx].ammo <= 0 && !this.isReloading()) {
+                        if (
+                            obj.isPreloadedGun &&
+                            this.weapons[this.curWeapIdx].ammo <= 0 &&
+                            !this.isReloading()
+                        ) {
                             this.cancelAction();
                             this.weaponManager.scheduledReload = true;
                         }
@@ -3862,7 +3866,6 @@ export class Player extends BaseGameObject {
                     }
 
                     this.weaponManager.setWeapon(newGunIdx, gunType, newAmmo);
-
 
                     // always select primary slot if melee is selected
                     if (
