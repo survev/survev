@@ -1,4 +1,4 @@
-import * as PIXI from "pixi.js-legacy";
+import * as PIXI from "pixi.js";
 import { type BulletDef, BulletDefs } from "../../../shared/defs/gameObjects/bulletDefs";
 import { GameConfig } from "../../../shared/gameConfig";
 import type { Bullet } from "../../../shared/net/updateMsg";

@@ -1,7 +1,7 @@
 import crypto from "node:crypto";
 import fs from "node:fs";
 import Path from "node:path";
-import type { ISpritesheetData } from "pixi.js-legacy";
+import type { ISpritesheetData } from "pixi.js";
 import type { Plugin } from "vite";
 import type { Atlas } from "../../shared/defs/mapDefs";
 import { assert } from "../../shared/utils/util";

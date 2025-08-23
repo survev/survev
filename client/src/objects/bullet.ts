@@ -1,4 +1,4 @@
-import * as PIXI from "pixi.js-legacy";
+import * as PIXI from "pixi.js";
 import { GameObjectDefs } from "../../../shared/defs/gameObjectDefs";
 import { BulletDefs } from "../../../shared/defs/gameObjects/bulletDefs";
 import type { MeleeDef } from "../../../shared/defs/gameObjects/meleeDefs";

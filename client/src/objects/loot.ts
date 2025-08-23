@@ -1,4 +1,4 @@
-import * as PIXI from "pixi.js-legacy";
+import * as PIXI from "pixi.js";
 import { GameObjectDefs, type LootDef } from "../../../shared/defs/gameObjectDefs";
 import type { AmmoDef } from "../../../shared/defs/gameObjects/gearDefs";
 import type { GunDef } from "../../../shared/defs/gameObjects/gunDefs";
@@ -27,7 +27,8 @@ export class Loot implements AbstractObject {
 
     ticker = 0;
     playDropSfx = false;
-    container = new PIXI.Sprite();
+    container = new PIXI.Container();
+    background = new PIXI.Sprite();
     sprite = new PIXI.Sprite();
     emitter: Emitter | null = null;
 
@@ -46,11 +47,11 @@ export class Loot implements AbstractObject {
     imgScale!: number;
 
     constructor() {
-        this.container.anchor.set(0.5, 0.5);
-        this.container.scale.set(1, 1);
+        this.background.anchor.set(0.5, 0.5);
+        this.background.scale.set(1, 1);
         this.sprite.anchor.set(0.5, 0.5);
         this.sprite.scale.set(0.8, 0.8);
-        this.container.addChild(this.sprite);
+        this.container.addChild(this.background, this.sprite);
     }
 
     m_init() {
@@ -120,19 +121,19 @@ export class Loot implements AbstractObject {
             this.sprite.scale.set(innerScale, innerScale);
             this.sprite.texture = PIXI.Texture.from(itemDef.lootImg?.sprite);
             this.sprite.tint = itemDef.lootImg?.tint;
-            this.container.texture = itemDef.lootImg.border
+            this.background.texture = itemDef.lootImg.border
                 ? PIXI.Texture.from(itemDef.lootImg.border)
                 : PIXI.Texture.EMPTY;
             if (this.isPreloadedGun) {
-                this.container.texture = PIXI.Texture.from("loot-circle-outer-06.img");
+                this.background.texture = PIXI.Texture.from("loot-circle-outer-06.img");
             }
             const ammo = GameObjectDefs[(itemDef as GunDef).ammo] as AmmoDef;
             if (ammo) {
-                this.container.tint = ammo.lootImg.tintDark!;
+                this.background.tint = ammo.lootImg.tintDark!;
             } else if (itemDef.lootImg.borderTint) {
-                this.container.tint = itemDef.lootImg.borderTint;
+                this.background.tint = itemDef.lootImg.borderTint;
             } else {
-                this.container.tint = 0;
+                this.background.tint = 0;
             }
 
             if (itemDef.type == "xp" && itemDef.emitter) {

@@ -1,4 +1,4 @@
-import * as PIXI from "pixi.js-legacy";
+import * as PIXI from "pixi.js";
 import { math } from "../../../shared/utils/math";
 import type { Camera } from "../camera";
 import { device } from "../device";
@@ -35,8 +35,10 @@ export class PieTimer {
             fontSize: fontWidth,
             align: "center",
             fill: 0xffffff,
-            stroke: 0,
-            strokeThickness: 3,
+            stroke: {
+                color: 0,
+                width: 3,
+            },
         };
         this.container.addChild(this.counterText);
         this.labelText.anchor.set(0.5, 0.5);
@@ -103,11 +105,11 @@ export class PieTimer {
         const rectY = 87.5 - labelHeight / 2;
         const l = math.min(this.elapsed / this.duration, 1) * Math.PI * 2 - Math.PI * 0.5;
         this.gfx.clear();
-        this.gfx.beginFill(0, 0.5);
-        this.gfx.drawRoundedRect(rectX, rectY, labelWidth, labelHeight, 5);
-        this.gfx.endFill();
-        this.gfx.lineStyle(6, 0xffffff);
+        this.gfx.roundRect(rectX, rectY, labelWidth, labelHeight, 5);
+        this.gfx.fill({ color: 0, alpha: 0.5 });
+        this.gfx.beginPath();
         this.gfx.arc(0, 0, 35, -Math.PI * 0.5, l, false);
+        this.gfx.stroke({ width: 6, color: 0xffffff });
         this.counterText.text = math.max(0, this.duration - this.elapsed).toFixed(1);
         this.labelText.position.y = 87.5;
         this.labelText.text = this.label;

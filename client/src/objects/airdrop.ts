@@ -1,4 +1,4 @@
-import * as PIXI from "pixi.js-legacy";
+import * as PIXI from "pixi.js";
 import { GameConfig } from "../../../shared/gameConfig";
 import type { ObjectData, ObjectType } from "../../../shared/net/objectSerializeFns";
 import { collider } from "../../../shared/utils/collider";

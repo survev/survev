@@ -66,8 +66,8 @@ declare global {
     const TURNSTILE_SITE_KEY: string | undefined;
 }
 
-declare module "pixi.js-legacy" {
-    interface DisplayObject {
+declare module "pixi.js" {
+    interface Container {
         __zOrd: number;
         __zIdx: number;
         __layerIdx: number;

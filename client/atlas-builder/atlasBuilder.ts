@@ -5,7 +5,7 @@ import os from "node:os";
 import Path from "node:path";
 
 import { loadImage } from "canvas";
-import type { ISpritesheetData } from "pixi.js-legacy";
+import type { ISpritesheetData } from "pixi.js";
 import type { Atlas } from "../../shared/defs/mapDefs";
 import { Logger } from "../../shared/utils/logger";
 import { Atlases, type AtlasRes, scaledSprites } from "./atlasDefs";

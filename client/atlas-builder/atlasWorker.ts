@@ -1,6 +1,6 @@
 import { createCanvas, type Image } from "canvas";
 import { type Bin, MaxRectsPacker, type Rectangle } from "maxrects-packer";
-import type { ISpritesheetData } from "pixi.js-legacy";
+import type { ISpritesheetData } from "pixi.js";
 import sharp from "sharp";
 import type { Atlas } from "../../shared/defs/mapDefs";
 import { atlasLogger, ImageManager } from "./atlasBuilder";

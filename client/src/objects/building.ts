@@ -1,4 +1,4 @@
-import * as PIXI from "pixi.js-legacy";
+import * as PIXI from "pixi.js";
 import { MapObjectDefs } from "../../../shared/defs/mapObjectDefs";
 import type { BuildingDef } from "../../../shared/defs/mapObjectsTyping";
 import type { FloorImage } from "../../../shared/defs/types/building";

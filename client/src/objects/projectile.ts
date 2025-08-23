@@ -1,4 +1,4 @@
-import * as PIXI from "pixi.js-legacy";
+import * as PIXI from "pixi.js";
 import { GameObjectDefs } from "../../../shared/defs/gameObjectDefs";
 import type { ThrowableDef } from "../../../shared/defs/gameObjects/throwableDefs";
 import { MapObjectDefs } from "../../../shared/defs/mapObjectDefs";

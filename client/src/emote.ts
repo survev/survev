@@ -1,5 +1,5 @@
 import $ from "jquery";
-import * as PIXI from "pixi.js-legacy";
+import * as PIXI from "pixi.js";
 import { GameObjectDefs } from "../../shared/defs/gameObjectDefs";
 import { EmotesDefs } from "../../shared/defs/gameObjects/emoteDefs";
 import type { AmmoDef } from "../../shared/defs/gameObjects/gearDefs";

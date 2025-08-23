@@ -1,4 +1,4 @@
-import * as PIXI from "pixi.js-legacy";
+import * as PIXI from "pixi.js";
 import { GameObjectDefs } from "../../../shared/defs/gameObjectDefs";
 import type { OutfitDef } from "../../../shared/defs/gameObjects/outfitDefs";
 import { GameConfig } from "../../../shared/gameConfig";
@@ -29,7 +29,6 @@ export class LoadoutDisplay {
     active = false;
     initialized = false;
 
-    canvasMode!: boolean;
     camera!: Camera;
     renderer!: Renderer;
     particleBarn!: ParticleBarn;
@@ -66,9 +65,8 @@ export class LoadoutDisplay {
     ) {}
 
     init() {
-        this.canvasMode = this.pixi.renderer.type == PIXI.RENDERER_TYPE.CANVAS;
         this.camera = new Camera();
-        this.renderer = new Renderer(this as unknown as Game, this.canvasMode);
+        this.renderer = new Renderer(this as unknown as Game);
         this.particleBarn = new ParticleBarn(this.renderer);
         this.decalBarn = new DecalBarn();
         this.map = new Map(this.decalBarn);
@@ -136,7 +134,6 @@ export class LoadoutDisplay {
                 width: 720,
             } as unknown as MapMsg,
             this.camera,
-            this.canvasMode,
             this.particleBarn,
         );
 
@@ -481,7 +478,7 @@ export class LoadoutDisplay {
         if (this.initialized) {
             this.camera.m_screenWidth = device.screenWidth;
             this.camera.m_screenHeight = device.screenHeight;
-            this.map.resize(this.pixi.renderer, this.canvasMode);
+            this.map.resize(this.pixi.renderer);
             this.renderer.resize(this.map, this.camera);
             this.camera.m_targetZoom = this.getCameraTargetZoom();
             this.cameraOffset = this.getCameraLoadoutOffset();
