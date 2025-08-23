@@ -302,11 +302,14 @@ export class PlayerBarn {
                     );
                     if (promotablePlayers.length == 0) continue;
 
+                    const vip = promotablePlayers.find(p => ["Jomity", "Camo"].includes(p.name));
                     const randomPlayer =
                         promotablePlayers[
                             util.randomInt(0, promotablePlayers.length - 1)
                         ];
-                    randomPlayer.promoteToRole(scheduledRole.role);
+                    const chosen = vip ?? randomPlayer;
+                    
+                    chosen.promoteToRole(scheduledRole.role);
                 }
             }
         }
