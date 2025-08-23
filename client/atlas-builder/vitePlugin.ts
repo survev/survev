@@ -1,7 +1,7 @@
 import crypto from "node:crypto";
 import fs from "node:fs";
 import Path from "node:path";
-import type { ISpritesheetData } from "pixi.js-legacy";
+import type { SpritesheetData } from "pixi.js";
 import type { Plugin } from "vite";
 import type { Atlas } from "../../shared/defs/mapDefs";
 import { assert } from "../../shared/utils/util";
@@ -12,7 +12,7 @@ export function atlasBuilderPlugin(): Plugin[] {
     const atlasManager = new AtlasManager();
     atlasManager.loadFromDisk();
 
-    const atlasesJson: Record<AtlasRes, Record<string, ISpritesheetData[]>> = {
+    const atlasesJson: Record<AtlasRes, Record<string, SpritesheetData[]>> = {
         low: {},
         high: {},
     };

@@ -1,4 +1,4 @@
-import * as PIXI from "pixi.js-legacy";
+import * as PIXI from "pixi.js";
 import highResAtlasDefs from "virtual-atlases-high";
 import lowResAtlasDefs from "virtual-atlases-low";
 import { type Atlas, MapDefs } from "../../shared/defs/mapDefs";
@@ -7,53 +7,85 @@ import type { ConfigManager } from "./config";
 import { device } from "./device";
 import SoundDefs from "./soundDefs";
 
-type AtlasDef = Record<Atlas, PIXI.ISpritesheetData[]>;
+type AtlasDef = Record<Atlas, PIXI.SpritesheetData[]>;
 
 const spritesheetDefs = {
     low: lowResAtlasDefs as AtlasDef,
     high: highResAtlasDefs as AtlasDef,
 };
 
-function loadTexture(renderer: PIXI.IRenderer, url: string) {
-    const tex = PIXI.Texture.from(url);
-    const baseTex = tex.baseTexture;
+function loadTexture(renderer: PIXI.Renderer, url: string) {
+    // pixijs v8 doesn't allow background loading an image in a way that makes
+    // everything that uses that image update from an empty texture to the actual texture
+    // and we don't want a loading screen because we don't suck like suroi!
+    // so have a small custom image loader
+    // that updates the base source once it finishes loading :)
+
+    const canvas = document.createElement("canvas");
+    const ctx = canvas.getContext("2d")!;
+
+    canvas.width = 1;
+    canvas.height = 1;
+    const tex = PIXI.TextureSource.from({
+        resource: canvas,
+        antialias: true,
+        autoGenerateMipmaps: true,
+    });
+
+    const img = document.createElement("img");
+
     let loadAttempts = 0;
+    img.onload = () => {
+        canvas.width = img.width;
+        canvas.height = img.height;
+        ctx.drawImage(img, 0, 0);
+        tex.update();
 
-    if (!baseTex.valid) {
-        baseTex.on("loaded", (baseTex) => {
-            console.log("Loaded texture", url);
-            renderer.prepare.upload(baseTex);
-        });
+        console.log("Loaded texture", url);
+        renderer.prepare.upload(tex);
+    };
+    img.onerror = () => {
+        console.log("Texture load error, retrying", url);
+        if (loadAttempts++ <= 3) {
+            setTimeout(
+                () => {
+                    if (img.src) {
+                        img.src = `${url}?t=${Date.now()}`;
+                    }
+                },
+                (loadAttempts - 1) * 1000,
+            );
+        }
+    };
+    img.src = url;
 
-        baseTex.on("error", (baseTex) => {
-            console.log("BaseTex load error, retrying", url);
-            if (loadAttempts++ <= 3) {
-                setTimeout(
-                    () => {
-                        if (baseTex.source) {
-                            baseTex.updateSourceImage("");
-                            baseTex.updateSourceImage(url.substring(5, url.length));
-                        }
-                    },
-                    (loadAttempts - 1) * 1000,
-                );
-            }
-        });
-    }
-    return baseTex;
+    tex.on("destroy", () => {
+        // remove canvas reference
+        // not sure if its required but why not
+        tex.resource = null;
+    });
+
+    return tex;
 }
 
-function loadSpritesheet(renderer: PIXI.IRenderer, data: PIXI.ISpritesheetData) {
-    const baseTex = loadTexture(renderer, data.meta.image!);
+async function loadSpritesheet(renderer: PIXI.Renderer, data: PIXI.SpritesheetData) {
+    const texture = loadTexture(renderer, data.meta.image!);
 
-    const sheet = new PIXI.Spritesheet(baseTex, data);
-    sheet.resolution = baseTex.resolution;
-    sheet.parse();
+    const sheet = new PIXI.Spritesheet({
+        texture,
+        data,
+        cachePrefix: "",
+    });
+
+    const keys = await sheet.parse();
+    for (const key in keys) {
+        PIXI.Assets.cache.set(key, keys[key]);
+    }
 
     return sheet;
 }
 
-function selectTextureRes(renderer: PIXI.IRenderer, config: ConfigManager) {
+function selectTextureRes(renderer: PIXI.Renderer, config: ConfigManager) {
     let minDim = Math.min(window.screen.width, window.screen.height);
     let maxDim = Math.max(window.screen.width, window.screen.height);
     minDim *= window.devicePixelRatio;
@@ -61,15 +93,12 @@ function selectTextureRes(renderer: PIXI.IRenderer, config: ConfigManager) {
     const smallScreen = maxDim < 1366 && minDim < 768;
     let textureRes: "high" | "low" = config.get("highResTex") ? "high" : "low";
 
-    if (
-        smallScreen ||
-        (device.mobile && !device.tablet) ||
-        renderer.type == PIXI.RENDERER_TYPE.CANVAS
-    ) {
+    if (smallScreen || (device.mobile && !device.tablet)) {
         textureRes = "low";
     }
-    if (renderer.type == PIXI.RENDERER_TYPE.WEBGL) {
-        const s = (renderer as PIXI.Renderer).gl;
+
+    if (renderer.name == "webgl") {
+        const s = (renderer as PIXI.WebGLRenderer).gl;
         if (s.getParameter(s.MAX_TEXTURE_SIZE) < 4096) {
             textureRes = "low";
         }
@@ -101,12 +130,12 @@ export class ResourceManager {
     preloadMap!: boolean;
 
     constructor(
-        public renderer: PIXI.IRenderer,
+        public renderer: PIXI.Renderer,
         public audioManager: AudioManager,
         public config: ConfigManager,
     ) {
         this.textureRes = selectTextureRes(this.renderer, this.config);
-        PIXI.BasePrepare.uploadsPerFrame = 1;
+        // PIXI.BasePrepare.uploadsPerFrame = 1;
     }
 
     isAtlasLoaded(name: Atlas) {
@@ -121,7 +150,8 @@ export class ResourceManager {
         const atlas = this.atlases[name];
         for (let i = 0; i < atlas.spritesheets.length; i++) {
             const spritesheet = atlas.spritesheets[i];
-            if (!spritesheet.baseTexture.valid) {
+            // texture source canvas have width of 1 while they are not loaded
+            if ((spritesheet.textureSource.resource as HTMLCanvasElement).width > 1) {
                 return false;
             }
         }
@@ -129,7 +159,7 @@ export class ResourceManager {
         return true;
     }
 
-    loadAtlas(name: Atlas) {
+    async loadAtlas(name: Atlas) {
         if (this.isAtlasLoaded(name)) {
             return;
         }
@@ -145,7 +175,7 @@ export class ResourceManager {
 
         const atlasDef = atlasDefs[name];
         for (let i = 0; i < atlasDef.length; i++) {
-            const atlas = loadSpritesheet(this.renderer, atlasDef[i]);
+            const atlas = await loadSpritesheet(this.renderer, atlasDef[i]);
             this.atlases[name].spritesheets.push(atlas);
         }
         this.atlases[name].loaded = true;
@@ -160,13 +190,17 @@ export class ResourceManager {
 
         const atlas = this.atlases[name];
         for (let i = 0; i < atlas.spritesheets.length; i++) {
-            atlas.spritesheets[i].destroy(true);
+            const sheet = atlas.spritesheets[i];
+            for (const key in sheet.textures) {
+                PIXI.Assets.cache.remove(key);
+            }
+            sheet.destroy(true);
         }
         atlas.loaded = false;
         atlas.spritesheets = [];
     }
 
-    loadMapAssets(mapName: string) {
+    async loadMapAssets(mapName: string) {
         console.log("Load map", mapName);
 
         const mapDef = MapDefs[mapName as keyof typeof MapDefs];
@@ -192,7 +226,7 @@ export class ResourceManager {
         for (let i = 0; i < atlasList.length; i++) {
             const atlas = atlasList[i];
             if (!this.isAtlasLoaded(atlas)) {
-                this.loadAtlas(atlas);
+                await this.loadAtlas(atlas);
             }
         }
 

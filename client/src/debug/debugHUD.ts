@@ -1,4 +1,4 @@
-import * as PIXI from "pixi.js-legacy";
+import * as PIXI from "pixi.js";
 import type { ConfigManager } from "../config";
 import type { Game } from "../game";
 import type { Pool } from "../objects/objectPool";

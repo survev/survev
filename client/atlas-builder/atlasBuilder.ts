@@ -5,7 +5,7 @@ import os from "node:os";
 import Path from "node:path";
 
 import { loadImage } from "canvas";
-import type { ISpritesheetData } from "pixi.js-legacy";
+import type { SpritesheetData } from "pixi.js";
 import type { Atlas } from "../../shared/defs/mapDefs";
 import { Logger } from "../../shared/utils/logger";
 import { util } from "../../shared/utils/util";
@@ -183,7 +183,7 @@ export class ImageManager {
 
 // Atlas key -> hash
 type AtlasCache = Record<string, string>;
-type AtlasData = Record<AtlasRes, ISpritesheetData[]>;
+type AtlasData = Record<AtlasRes, SpritesheetData[]>;
 
 export class AtlasManager {
     atlasCache: AtlasCache = {};
@@ -313,7 +313,7 @@ export class AtlasManager {
 
                         promises.push(promise);
 
-                        const atlasJson: Record<string, ISpritesheetData[]> = {};
+                        const atlasJson: Record<string, SpritesheetData[]> = {};
 
                         for (const sheet of atlas.data) {
                             const filePath = Path.join(atlasPath, sheet.data.meta.image!);

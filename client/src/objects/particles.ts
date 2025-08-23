@@ -1,4 +1,4 @@
-import * as PIXI from "pixi.js-legacy";
+import * as PIXI from "pixi.js";
 import { math } from "../../../shared/utils/math";
 import { util } from "../../../shared/utils/util";
 import { type Vec2, v2 } from "../../../shared/utils/v2";

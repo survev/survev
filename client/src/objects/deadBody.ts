@@ -1,4 +1,4 @@
-import * as PIXI from "pixi.js-legacy";
+import * as PIXI from "pixi.js";
 import type { ObjectData, ObjectType } from "../../../shared/net/objectSerializeFns";
 import { collider } from "../../../shared/utils/collider";
 import { util } from "../../../shared/utils/util";
@@ -12,21 +12,24 @@ import { Pool } from "./objectPool";
 import type { AbstractObject, Player, PlayerBarn } from "./player";
 
 function createDeadBodyText() {
-    const nameStyle: Partial<PIXI.TextStyle> = {
+    const nameStyle: Partial<PIXI.TextStyleOptions> = {
         fontFamily: "Arial",
         fontWeight: "bold",
         fontSize: device.pixelRatio > 1 ? 30 : 24,
         align: "center",
         fill: 0xffffff,
-        stroke: 0,
-        strokeThickness: 0,
-        dropShadow: true,
-        dropShadowColor: "#000000",
-        dropShadowBlur: 1,
-        dropShadowAngle: Math.PI / 3,
-        dropShadowDistance: 1,
+        stroke: {
+            color: 0,
+            width: 0,
+        },
+        dropShadow: {
+            color: "#000000",
+            blur: 1,
+            angle: Math.PI / 3,
+            distance: 1,
+        },
     };
-    const nameText = new PIXI.Text("", nameStyle);
+    const nameText = new PIXI.Text({ text: "", style: nameStyle });
     nameText.anchor.set(0.5, 0.5);
     nameText.scale.set(0.5, 0.5);
     return nameText;

@@ -1,5 +1,5 @@
 import $ from "jquery";
-import * as PIXI from "pixi.js-legacy";
+import * as PIXI from "pixi.js";
 import { GameObjectDefs } from "../../../shared/defs/gameObjectDefs";
 import { BulletDefs } from "../../../shared/defs/gameObjects/bulletDefs";
 import type { GunDef } from "../../../shared/defs/gameObjects/gunDefs";

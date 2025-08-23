@@ -1,4 +1,4 @@
-import type { Graphics } from "pixi.js-legacy";
+import type { Graphics } from "pixi.js";
 import type { Collider } from "../../../shared/utils/coldet";
 import { collider } from "../../../shared/utils/collider";
 import { type Vec2, v2 } from "../../../shared/utils/v2";
@@ -110,13 +110,6 @@ class DebugLines {
         for (let i = 0; i < this.shapes.length; i++) {
             const shape = this.shapes[i];
 
-            gfx.beginFill(shape.color);
-            gfx.fill.alpha = shape.fill;
-            gfx.lineStyle({
-                width: 1,
-                color: shape.color,
-            });
-
             switch (shape.type) {
                 case kShapes.Line: {
                     const start = camera.m_pointToScreen(shape.start);
@@ -147,11 +140,13 @@ class DebugLines {
                 case kShapes.Circle: {
                     const pos = camera.m_pointToScreen(shape.pos);
                     const rad = camera.m_scaleToScreen(shape.rad);
-                    gfx.drawCircle(pos.x, pos.y, rad);
+                    gfx.circle(pos.x, pos.y, rad);
                     break;
                 }
             }
-            gfx.closePath();
+            gfx.closePath()
+                .fill({ color: shape.color, alpha: shape.fill })
+                .stroke(shape.color);
         }
     }
 

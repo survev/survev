@@ -1,6 +1,6 @@
 import { createCanvas, type Image } from "canvas";
 import { type Bin, MaxRectsPacker, type Rectangle } from "maxrects-packer";
-import type { ISpritesheetData } from "pixi.js-legacy";
+import type { SpritesheetData } from "pixi.js";
 import sharp from "sharp";
 import type { Atlas } from "../../shared/defs/mapDefs";
 import { atlasLogger, ImageManager } from "./atlasBuilder";
@@ -22,7 +22,7 @@ export type WorkerToMainMsg = Array<{
     hash: string;
     data: Array<{
         res: AtlasRes;
-        data: ISpritesheetData;
+        data: SpritesheetData;
         buff: Buffer;
     }>;
 }>;
@@ -138,7 +138,7 @@ export class AtlasBuilder {
 
         const ctx = canvas.getContext("2d");
 
-        const sheetData: ISpritesheetData = {
+        const sheetData: SpritesheetData = {
             meta: {
                 image: `${name}-${100 * scale}.png`,
                 size: {
