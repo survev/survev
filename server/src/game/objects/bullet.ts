@@ -17,7 +17,7 @@ import { type Vec2, v2 } from "../../../../shared/utils/v2";
 import type { Game } from "../game";
 import type { DamageParams, GameObject } from "./gameObject";
 import type { Obstacle } from "./obstacle";
-import { Player } from "./player";
+import type { Player } from "./player";
 
 // NOTE: most of this code was copied from surviv client and bit heroes arena client
 // to get bullet collision the most accurate possible
@@ -201,7 +201,7 @@ export class Bullet {
         this.hasOnHitFx = !!this.onHitFx;
 
         const player = this.bulletManager.game.objectRegister.getById(this.playerId);
-        if (player instanceof Player) {
+        if (player?.__type === ObjectType.Player) {
             this.player = player;
         } else {
             this.player = undefined;

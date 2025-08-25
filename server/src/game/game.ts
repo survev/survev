@@ -168,13 +168,13 @@ export class Game {
         this.updateData();
     }
 
-    update(): void {
+    update(dt?: number): void {
         if (!this.allowJoin) return;
         this.profiler.flush();
 
         const now = performance.now();
         if (!this.now) this.now = now;
-        const dt = math.clamp((now - this.now) / 1000, 0.001, 1 / 8);
+        dt ??= math.clamp((now - this.now) / 1000, 0.001, 1 / 8);
 
         this.now = now;
 
@@ -610,6 +610,19 @@ export class Game {
             sqliteDb
                 .prepare("INSERT INTO lost_game_data (data) VALUES (?)")
                 .run(JSON.stringify(values));
+        }
+    }
+
+    /**
+     * Steps the game X seconds in the future
+     * This is done in smaller steps of 0.1 seconds
+     * To make sure everything updates properly
+     *
+     * Used for unit tests, don't call this on actual game code :p
+     */
+    step(seconds: number) {
+        for (let i = 0, steps = seconds * 10; i < steps; i++) {
+            this.update(0.1);
         }
     }
 }

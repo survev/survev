@@ -572,6 +572,46 @@ export class WeaponManager {
         return def.ammo !== "flare" || this.player.hasFiredFlare;
     }
 
+    /**
+     * Used when firepower perk is removed
+     */
+    clampGunsAmmo() {
+        const player = this.player;
+
+        for (let i = 0; i < this.weapons.length; i++) {
+            const weap = this.weapons[i];
+            const def = GameObjectDefs[weap.type];
+            if (def?.type !== "gun") continue;
+            const ammo = this.getTrueAmmoStats(def);
+            const ammoType = def.ammo;
+            const diff = weap.ammo - ammo.trueMaxClip;
+
+            weap.ammo -= diff;
+
+            let amountToDrop = 0;
+            const backpackLevel = player.getGearLevel(player.backpack);
+            if (player.bagSizes[ammoType] && !this.isInfinite(def)) {
+                const bagSpace = player.bagSizes[ammoType][backpackLevel];
+                if (player.inventory[ammoType] + diff <= bagSpace) {
+                    player.inventory[ammoType] += diff;
+                    player.inventoryDirty = true;
+                } else {
+                    const spaceLeft = bagSpace - player.inventory[ammoType];
+                    const amountToAdd = spaceLeft;
+
+                    player.inventory[ammoType] += amountToAdd;
+                    player.inventoryDirty = true;
+                    amountToDrop = diff - amountToAdd;
+                }
+            }
+
+            if (amountToDrop != 0) {
+                player.dropLoot(ammoType, amountToDrop);
+            }
+            player.weapsDirty = true;
+        }
+    }
+
     isBulletSaturated(ammo: string): boolean {
         if (this.player.lastBreathActive) {
             return true;

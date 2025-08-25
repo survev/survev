@@ -129,14 +129,14 @@ export class GameModeManager {
             case GameMode.Team: {
                 const winner = this.game.playerBarn.getAliveGroups()[0];
                 for (const player of winner.getAlivePlayers()) {
-                    player.addGameOverMsg(winner.groupId);
+                    player.addGameOverMsg(winner.id);
                 }
                 return true;
             }
             case GameMode.Faction: {
                 const winner = this.game.playerBarn.getAliveTeams()[0];
                 for (const player of winner.livingPlayers) {
-                    player.addGameOverMsg(winner.teamId);
+                    player.addGameOverMsg(winner.id);
                 }
                 return true;
             }
@@ -202,17 +202,6 @@ export class GameModeManager {
         }
     }
 
-    getIdContext(player: Player): number {
-        switch (this.mode) {
-            case GameMode.Solo:
-                return player.__id;
-            case GameMode.Team:
-                return player.groupId;
-            case GameMode.Faction:
-                return player.teamId;
-        }
-    }
-
     /** includes passed in player */
     getNearbyAlivePlayersContext(player: Player, range: number): Player[] {
         const alivePlayersContext = this.getPlayerAlivePlayersContext(player);
@@ -226,47 +215,16 @@ export class GameModeManager {
             );
         }
 
-        const playerIdContext = this.getIdContext(player);
         return this.game.grid
             .intersectCollider(collider.createCircle(player.pos, range))
             .filter(
                 (obj): obj is Player =>
                     obj.__type == ObjectType.Player &&
-                    playerIdContext == this.getIdContext(obj) &&
+                    player.teamId === obj.teamId &&
                     !obj.dead && // necessary since player isnt deleted from grid on death
                     !!util.sameLayer(player.layer, obj.layer) &&
                     v2.lengthSqr(v2.sub(player.pos, obj.pos)) <= range * range,
             );
-    }
-
-    isReviveSupported(): boolean {
-        return !this.isSolo;
-    }
-
-    isReviving(player: Player): boolean {
-        if (this.isSolo) return false;
-
-        return player.actionType == GameConfig.Action.Revive && !!player.action.targetId;
-    }
-
-    isBeingRevived(player: Player): boolean {
-        if (!player.downed || this.isSolo) return false;
-
-        const normalRevive =
-            player.actionType == GameConfig.Action.Revive && player.action.targetId == 0;
-        if (normalRevive) return true;
-
-        const numMedics = this.game.playerBarn.medics.length;
-        if (numMedics) {
-            return this.game.playerBarn.medics.some((medic) => {
-                return (
-                    medic != player &&
-                    this.isReviving(medic) &&
-                    player.isAffectedByAOE(medic)
-                );
-            });
-        }
-        return false;
     }
 
     showStatsMsg(player: Player): boolean {
@@ -290,8 +248,15 @@ export class GameModeManager {
                 const redLeader = this.game.playerBarn.teams[TeamColor.Red - 1].leader;
                 const blueLeader = this.game.playerBarn.teams[TeamColor.Blue - 1].leader;
                 const highestKiller = this.game.playerBarn.players.reduce(
-                    (highestKiller, p) =>
-                        highestKiller.kills > p.kills ? highestKiller : p,
+                    (highestKiller, p) => {
+                        if (highestKiller.kills === p.kills) {
+                            return highestKiller.damageDealt > p.damageDealt
+                                ? highestKiller
+                                : p;
+                        }
+
+                        return highestKiller.kills > p.kills ? highestKiller : p;
+                    },
                 );
 
                 // if game ends before leaders are promoted, just show the player by himself
@@ -337,92 +302,51 @@ export class GameModeManager {
     }
 
     handlePlayerDeath(player: Player, params: DamageParams): void {
-        switch (this.mode) {
-            case GameMode.Solo:
-                return player.kill(params);
-            case GameMode.Team:
-                {
-                    const sourceIsPlayer = params.source?.__type === ObjectType.Player;
-                    const group = player.group!;
-                    if (player.downed) {
-                        const finishedByTeammate =
-                            player.downedBy &&
-                            sourceIsPlayer &&
-                            player.downedBy.groupId === (params.source as Player).groupId;
+        if (this.isSolo) {
+            player.kill(params);
+        } else {
+            const group = this.mode === GameMode.Faction ? player.team! : player.group!;
 
-                        const bledOut =
-                            player.downedBy &&
-                            params.damageType == GameConfig.DamageType.Bleeding;
+            const playerSource =
+                params.source?.__type === ObjectType.Player
+                    ? (params.source as Player)
+                    : undefined;
+            if (player.downed) {
+                const finishedByTeammate =
+                    player.downedBy &&
+                    playerSource &&
+                    player.downedBy.teamId === playerSource.teamId;
 
-                        if (finishedByTeammate || bledOut) {
-                            params.source = player.downedBy;
-                        }
+                const bledOut =
+                    player.downedBy &&
+                    params.damageType == GameConfig.DamageType.Bleeding;
 
-                        player.kill(params);
-                        // special case that only happens when the player has self_revive since the teammates wouldnt have previously been finished off
-                        if (group.checkAllDowned(player) && !group.checkSelfRevive()) {
-                            // don't kill teammates if any one has self revive
-                            group.killAllTeammates();
-                        }
-                        return;
-                    }
-
-                    const allDeadOrDisconnected =
-                        group.checkAllDeadOrDisconnected(player);
-                    const allDowned = group.checkAllDowned(player);
-                    const groupHasSelfRevive = group.checkSelfRevive();
-
-                    if (!groupHasSelfRevive && (allDeadOrDisconnected || allDowned)) {
-                        group.allDeadOrDisconnected = true; // must set before any kill() calls so the gameovermsgs are accurate
-                        player.kill(params);
-                        if (allDowned) {
-                            group.killAllTeammates();
-                        }
-                    } else {
-                        player.down(params);
-                    }
+                if (finishedByTeammate || bledOut) {
+                    params.killCreditSource = player.downedBy;
                 }
-                break;
-            case GameMode.Faction:
-                {
-                    const sourceIsPlayer = params.source?.__type === ObjectType.Player;
-                    const team = player.team!;
-                    if (player.downed) {
-                        const finishedByTeammate =
-                            player.downedBy &&
-                            sourceIsPlayer &&
-                            player.downedBy.teamId === (params.source as Player).teamId;
 
-                        const bledOut =
-                            player.downedBy &&
-                            params.damageType == GameConfig.DamageType.Bleeding;
-
-                        if (finishedByTeammate || bledOut) {
-                            params.source = player.downedBy;
-                        }
-
-                        player.kill(params);
-                        // special case that only happens when the player has self_revive since the teammates wouldnt have previously been finished off
-                        if (team.checkAllDowned(player) && !team.checkSelfRevive()) {
-                            team.killAllTeammates();
-                        }
-                        return;
-                    }
-
-                    const allDeadOrDisconnected = team.checkAllDeadOrDisconnected(player);
-                    const allDowned = team.checkAllDowned(player);
-                    const teamHasSelfRevive = team.checkSelfRevive();
-
-                    if (!teamHasSelfRevive && (allDeadOrDisconnected || allDowned)) {
-                        player.kill(params);
-                        if (allDowned) {
-                            team.killAllTeammates();
-                        }
-                    } else {
-                        player.down(params);
-                    }
+                player.kill(params);
+                // special case that only happens when the player has self_revive since the teammates wouldnt have previously been finished off
+                if (group.checkAllDowned(player) && !group.checkSelfRevive()) {
+                    // don't kill teammates if any one has self revive
+                    group.killAllTeammates();
                 }
-                break;
+                return;
+            }
+
+            const allDeadOrDisconnected = group.checkAllDeadOrDisconnected(player);
+            const allDowned = group.checkAllDowned(player);
+            const groupHasSelfRevive = group.checkSelfRevive();
+
+            if (!groupHasSelfRevive && (allDeadOrDisconnected || allDowned)) {
+                group.allDeadOrDisconnected = true; // must set before any kill() calls so the gameovermsgs are accurate
+                player.kill(params);
+                if (allDowned) {
+                    group.killAllTeammates();
+                }
+            } else {
+                player.down(params);
+            }
         }
     }
 }

@@ -1,3 +1,4 @@
+import { randomUUID } from "node:crypto";
 import {
     GameObjectDefs,
     type LootDef,
@@ -41,8 +42,7 @@ import { Config } from "../../config";
 import { IDAllocator } from "../../utils/IDAllocator";
 import { validateUserName } from "../../utils/serverHelpers";
 import type { Game, JoinTokenData } from "../game";
-import { Group } from "../group";
-import { Team } from "../team";
+import { Group, Team } from "../group";
 import { throwableList, WeaponManager } from "../weaponManager";
 import type { Building } from "./building";
 import { BaseGameObject, type DamageParams, type GameObject } from "./gameObject";
@@ -85,7 +85,7 @@ export class PlayerBarn {
     killLeaderDirty = false;
     killLeader?: Player;
 
-    medics: Player[] = [];
+    aoeHealPlayers: Player[] = [];
 
     scheduledRoles: Array<{
         role: string;
@@ -217,18 +217,25 @@ export class PlayerBarn {
 
         this.socketIdToPlayer.set(socketId, player);
 
+        this.activatePlayer(player, group, team);
+
+        return player;
+    }
+
+    activatePlayer(player: Player, group?: Group, team?: Team) {
         if (team && group) {
             team.addPlayer(player);
             group.addPlayer(player);
+            player.setGroupStatuses();
         } else if (!team && group) {
             group.addPlayer(player);
-            player.teamId = group.groupId;
+            player.teamId = player.groupId;
+            player.setGroupStatuses();
         } else if (team && !group) {
             team.addPlayer(player);
             player.groupId = this.groupIdAllocator.getNextId();
         } else {
-            player.groupId = this.groupIdAllocator.getNextId();
-            player.teamId = player.groupId;
+            player.groupId = player.teamId = this.groupIdAllocator.getNextId();
         }
 
         if (player.game.map.perkMode) {
@@ -253,6 +260,41 @@ export class PlayerBarn {
         this.game.pluginManager.emit("playerJoin", player);
 
         this.game.updateData();
+    }
+
+    testPlayerCount = 0;
+    addTestPlayer(params: {
+        group?: Group;
+        team?: Team;
+        pos?: Vec2;
+        name?: string;
+    }): Player {
+        let group = params.group;
+        let team = params.team;
+
+        if (!group && this.game.isTeamMode) {
+            group = this.addGroup(false);
+        }
+
+        if (!team && this.game.map.factionMode) {
+            team = this.getSmallestTeam();
+        }
+
+        const socketId = randomUUID();
+
+        const player = new Player(
+            this.game,
+            params.pos ?? v2.create(this.game.map.width / 2, this.game.map.height / 2),
+            0,
+            params.name ?? `TEST-${this.testPlayerCount++}`,
+            socketId,
+            new net.JoinMsg(),
+            "",
+            "",
+            null,
+        );
+
+        this.activatePlayer(player, group, team);
 
         return player;
     }
@@ -439,6 +481,7 @@ export class PlayerBarn {
     addTeam(teamId: number) {
         const team = new Team(this.game, teamId);
         this.teams.push(team);
+        return team;
     }
 
     getGroupAndTeam({ groupData }: JoinTokenData):
@@ -851,10 +894,6 @@ export class Player extends BaseGameObject {
             this.flareTimer = 15;
         }
 
-        if (this.role == "medic") {
-            const index = this.game.playerBarn.medics.indexOf(this);
-            if (index != -1) this.game.playerBarn.medics.splice(index, 1);
-        }
         if (this.role === role) return;
 
         // switching from one role to another
@@ -892,10 +931,6 @@ export class Player extends BaseGameObject {
                 this.health = 100;
                 this.boost = 100;
                 this.giveHaste(GameConfig.HasteType.Windwalk, 5);
-                break;
-            case "medic":
-                // TODO: this should be based on aoe_heal perk not role
-                this.game.playerBarn.medics.push(this);
                 break;
         }
 
@@ -1134,17 +1169,24 @@ export class Player extends BaseGameObject {
         });
         this.perkTypes.push(type);
 
-        if (type === "trick_m9") {
-            const ammo = this.weaponManager.getTrueAmmoStats(
-                GameObjectDefs["m9_cursed"] as GunDef,
-            );
-            this.weaponManager.setWeapon(
-                GameConfig.WeaponSlot.Secondary,
-                "m9_cursed",
-                ammo.trueMaxClip,
-            );
-        } else if (type === "fabricate") {
-            this.fabricateRefillTicker = PerkProperties.fabricate.refillInterval;
+        switch (type) {
+            case "trick_m9": {
+                const ammo = this.weaponManager.getTrueAmmoStats(
+                    GameObjectDefs["m9_cursed"] as GunDef,
+                );
+                this.weaponManager.setWeapon(
+                    GameConfig.WeaponSlot.Secondary,
+                    "m9_cursed",
+                    ammo.trueMaxClip,
+                );
+                break;
+            }
+            case "fabricate":
+                this.fabricateRefillTicker = PerkProperties.fabricate.refillInterval;
+                break;
+            case "aoe_heal":
+                this.game.playerBarn.aoeHealPlayers.push(this);
+                break;
         }
 
         this.recalculateScale();
@@ -1156,54 +1198,37 @@ export class Player extends BaseGameObject {
         this.perks.splice(idx, 1);
         this.perkTypes.splice(this.perkTypes.indexOf(type), 1);
 
-        if (type === "trick_m9") {
-            const slot = this.weapons.findIndex((weap) => {
-                return weap.type === "m9_cursed";
-            });
-            if (slot !== -1) {
-                this.weaponManager.setWeapon(slot, "", 0);
-            }
-        } else if (type === "inspiration") {
-            const slot = this.weapons.findIndex((weap) => {
-                return weap.type === "bugle";
-            });
-            if (slot !== -1) {
-                this.weaponManager.setWeapon(slot, "", 0);
-            }
-        } else if (type === "fabricate") {
-            this.fabricateRefillTicker = 0;
-        } else if (type === "firepower") {
-            for (let i = 0; i < this.weapons.length; i++) {
-                const weap = this.weapons[i];
-                const def = GameObjectDefs[weap.type];
-                if (def?.type !== "gun") continue;
-                const ammo = this.weaponManager.getTrueAmmoStats(def);
-                const ammoType = def.ammo;
-                const diff = weap.ammo - ammo.trueMaxClip;
-
-                weap.ammo -= diff;
-
-                let amountToDrop = 0;
-                const backpackLevel = this.getGearLevel(this.backpack);
-                if (this.bagSizes[ammoType] && !this.weaponManager.isInfinite(def)) {
-                    const bagSpace = this.bagSizes[ammoType][backpackLevel];
-                    if (this.inventory[ammoType] + diff <= bagSpace) {
-                        this.inventory[ammoType] += diff;
-                        this.inventoryDirty = true;
-                    } else {
-                        const spaceLeft = bagSpace - this.inventory[ammoType];
-                        const amountToAdd = spaceLeft;
-
-                        this.inventory[ammoType] += amountToAdd;
-                        this.inventoryDirty = true;
-                        amountToDrop = diff - amountToAdd;
-                    }
+        switch (type) {
+            case "trick_m9": {
+                const slot = this.weapons.findIndex((weap) => {
+                    return weap.type === "m9_cursed";
+                });
+                if (slot !== -1) {
+                    this.weaponManager.setWeapon(slot, "", 0);
                 }
-
-                if (amountToDrop != 0) {
-                    this.dropLoot(ammoType, amountToDrop);
+                break;
+            }
+            case "inspiration": {
+                const slot = this.weapons.findIndex((weap) => {
+                    return weap.type === "bugle";
+                });
+                if (slot !== -1) {
+                    this.weaponManager.setWeapon(slot, "", 0);
                 }
-                this.weapsDirty = true;
+                break;
+            }
+            case "fabricate":
+                this.fabricateRefillTicker = 0;
+                break;
+            case "firepower":
+                this.weaponManager.clampGunsAmmo();
+                break;
+            case "aoe_heal": {
+                const idx = this.game.playerBarn.aoeHealPlayers.indexOf(this);
+                if (idx !== -1) {
+                    this.game.playerBarn.aoeHealPlayers.splice(idx, 1);
+                }
+                break;
             }
         }
 
@@ -1514,10 +1539,7 @@ export class Player extends BaseGameObject {
         //
         // Action logic
         //
-        if (
-            this.game.modeManager.isReviving(this) ||
-            this.game.modeManager.isBeingRevived(this)
-        ) {
+        if (this.isReviving() || this.isBeingRevived()) {
             // cancel revive if either player goes out of range or if player being revived dies
             if (
                 this.playerBeingRevived &&
@@ -1642,6 +1664,7 @@ export class Player extends BaseGameObject {
                     this.applyActionFunc((target: Player) => {
                         if (!target.downed) return;
                         target.downed = false;
+                        target.downedBy = undefined;
                         target.downedDamageTicker = 0;
                         target.health = GameConfig.player.reviveHealth;
 
@@ -2570,21 +2593,14 @@ export class Player extends BaseGameObject {
         // cobalt players on role picker menu
         if (this.game.map.perkMode && !this.role) return;
 
-        const sourceIsPlayer = params.source?.__type === ObjectType.Player;
+        const playerSource =
+            params.source?.__type === ObjectType.Player
+                ? (params.source as Player)
+                : undefined;
 
         // teammates can't deal damage to each other
-        if (sourceIsPlayer && params.source !== this) {
-            if (
-                (params.source as Player).groupId === this.groupId &&
-                !this.disconnected
-            ) {
-                return;
-            }
-            if (
-                this.game.map.factionMode &&
-                (params.source as Player).teamId === this.teamId &&
-                !this.disconnected
-            ) {
+        if (playerSource && params.source !== this) {
+            if (playerSource.teamId === this.teamId && !this.disconnected) {
                 return;
             }
         }
@@ -2647,11 +2663,11 @@ export class Player extends BaseGameObject {
         this.game.pluginManager.emit("playerDamage", { ...params, player: this });
 
         this.damageTaken += finalDamage;
-        if (sourceIsPlayer && params.source !== this) {
-            if ((params.source as Player).groupId !== this.groupId) {
-                (params.source as Player).damageDealt += finalDamage;
+        if (playerSource && params.source !== this) {
+            if (playerSource.groupId !== this.groupId) {
+                playerSource.damageDealt += finalDamage;
             }
-            this.lastDamagedBy = params.source as Player;
+            this.lastDamagedBy = playerSource;
         }
 
         this.health -= finalDamage;
@@ -2737,7 +2753,7 @@ export class Player extends BaseGameObject {
         downedMsg.targetId = this.__id;
         downedMsg.downed = true;
 
-        if (params.source instanceof Player) {
+        if (params.source?.__type === ObjectType.Player) {
             this.downedBy = params.source;
             downedMsg.killerId = params.source.__id;
             downedMsg.killCreditId = params.source.__id;
@@ -2802,31 +2818,36 @@ export class Player extends BaseGameObject {
         killMsg.targetId = this.__id;
         killMsg.killed = true;
 
-        if (params.source instanceof Player) {
-            const source = params.source;
-            this.killedBy = source;
+        const killCreditSource = params.killCreditSource
+            ? params.killCreditSource
+            : params.source;
+        if (killCreditSource?.__type === ObjectType.Player) {
+            this.killedBy = killCreditSource;
 
-            if (source !== this && source.teamId !== this.teamId) {
-                source.killedIds.push(this.matchDataId);
-                source.kills++;
+            if (killCreditSource !== this && killCreditSource.teamId !== this.teamId) {
+                killCreditSource.killedIds.push(this.matchDataId);
+                killCreditSource.kills++;
 
-                if (source.isKillLeader) {
+                if (killCreditSource.isKillLeader) {
                     this.game.playerBarn.killLeaderDirty = true;
                 }
 
-                if (source.hasPerk("takedown")) {
-                    source.health += 25;
-                    source.boost += 25;
-                    source.giveHaste(GameConfig.HasteType.Takedown, 3);
+                if (killCreditSource.hasPerk("takedown")) {
+                    killCreditSource.health += 25;
+                    killCreditSource.boost += 25;
+                    killCreditSource.giveHaste(GameConfig.HasteType.Takedown, 3);
                 }
 
-                if (source.role === "woods_king") {
+                if (killCreditSource.role === "woods_king") {
                     this.game.playerBarn.addMapPing("ping_woodsking", this.pos);
                 }
             }
-            killMsg.killerId = source.__id;
-            killMsg.killCreditId = source.__id;
-            killMsg.killerKills = source.kills;
+            killMsg.killCreditId = killCreditSource.__id;
+            killMsg.killerKills = killCreditSource.kills;
+        }
+
+        if (params.source?.__type === ObjectType.Player) {
+            killMsg.killerId = params.source.__id;
         }
 
         if (this.hasPerk("final_bugle")) {
@@ -2910,15 +2931,15 @@ export class Player extends BaseGameObject {
             const newKillLeader = this.game.playerBarn.getPlayerWithHighestKills();
             if (
                 killLeader !== newKillLeader &&
-                params.source &&
-                newKillLeader === params.source &&
+                killCreditSource &&
+                newKillLeader === killCreditSource &&
                 newKillLeader.kills > killLeaderKills
             ) {
                 if (killLeader && killLeader.role === "the_hunted") {
                     killLeader.removeRole();
                 }
 
-                params.source.promoteToKillLeader();
+                killCreditSource.promoteToKillLeader();
             }
         }
 
@@ -3086,13 +3107,33 @@ export class Player extends BaseGameObject {
         );
     }
 
+    isReviving() {
+        return this.actionType == GameConfig.Action.Revive && !!this.action.targetId;
+    }
+
+    isBeingRevived() {
+        if (!this.downed) return false;
+
+        const normalRevive =
+            this.actionType == GameConfig.Action.Revive && this.action.targetId == 0;
+        if (normalRevive) return true;
+
+        const numMedics = this.game.playerBarn.aoeHealPlayers.length;
+        if (numMedics) {
+            return this.game.playerBarn.aoeHealPlayers.some((medic) => {
+                return medic != this && medic.isReviving() && this.isAffectedByAOE(medic);
+            });
+        }
+        return false;
+    }
+
     /** returns player to revive if can revive */
     getPlayerToRevive(): Player | undefined {
         if (this.actionType != GameConfig.Action.None) return undefined; // action in progress already
 
         if (this.downed && this.hasPerk("self_revive")) return this;
 
-        if (!this.game.modeManager.isReviveSupported()) return undefined; // no revives in solos
+        if (!this.game.isTeamMode) return undefined; // no revives in solos
         if (this.downed) return undefined; // can't revive players while downed
 
         const nearbyDownedTeammates = this.game.grid
@@ -3159,8 +3200,7 @@ export class Player extends BaseGameObject {
                 : GameConfig.player.medicHealRange;
 
         return (
-            this.game.modeManager.getIdContext(medic) ==
-                this.game.modeManager.getIdContext(this) &&
+            medic.teamId == this.teamId &&
             !!util.sameLayer(medic.layer, this.layer) &&
             v2.lengthSqr(v2.sub(medic.pos, this.pos)) <= effectRange * effectRange
         );
@@ -3188,8 +3228,9 @@ export class Player extends BaseGameObject {
         const itemDef = GameObjectDefs[item];
         assert(itemDef.type === "heal", `Invalid heal item ${item}`);
 
+        const hasAoeHeal = this.hasPerk("aoe_heal");
         if (
-            (!this.hasPerk("aoe_heal") && this.health == itemDef.maxHeal) ||
+            (!hasAoeHeal && this.health == itemDef.maxHeal) ||
             this.actionType == GameConfig.Action.UseItem ||
             this.actionType == GameConfig.Action.Revive ||
             this.weaponManager.cookingThrowable
@@ -3201,7 +3242,7 @@ export class Player extends BaseGameObject {
         }
 
         // medics always emote the healing/boost item they're using
-        if (this.role == "medic") {
+        if (hasAoeHeal) {
             this.game.playerBarn.addEmote("emote_loot", this.__id, item);
         }
 
@@ -3209,12 +3250,14 @@ export class Player extends BaseGameObject {
         this.doAction(
             item,
             GameConfig.Action.UseItem,
-            (this.hasPerk("aoe_heal") ? 0.75 : 1) * itemDef.useTime,
+            (hasAoeHeal ? 0.75 : 1) * itemDef.useTime,
         );
     }
 
     applyActionFunc(actionFunc: (target: Player) => void): void {
-        if (this.hasPerk("aoe_heal")) {
+        const hasAoeHeal = this.hasPerk("aoe_heal");
+
+        if (hasAoeHeal) {
             let aoePlayers = this.getAOEPlayers();
 
             // aoe doesnt heal/give boost to downed players
@@ -3249,9 +3292,10 @@ export class Player extends BaseGameObject {
         if (!this.inventory[item]) {
             return;
         }
+        const hasAoeHeal = this.hasPerk("aoe_heal");
 
         // medics always emote the healing/boost item they're using
-        if (this.role == "medic") {
+        if (hasAoeHeal) {
             this.game.playerBarn.addEmote("emote_loot", this.__id, item);
         }
 
@@ -3259,7 +3303,7 @@ export class Player extends BaseGameObject {
         this.doAction(
             item,
             GameConfig.Action.UseItem,
-            (this.hasPerk("aoe_heal") ? 0.75 : 1) * itemDef.useTime,
+            (hasAoeHeal ? 0.75 : 1) * itemDef.useTime,
         );
     }
 

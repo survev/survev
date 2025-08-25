@@ -38,6 +38,7 @@ export interface DamageParams {
     gameSourceType?: string;
     mapSourceType?: string;
     source?: GameObject;
+    killCreditSource?: Player;
     isExplosion?: boolean;
     /**
      * The source weapon that originally triggered the damage

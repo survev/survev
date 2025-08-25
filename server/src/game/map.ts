@@ -21,13 +21,12 @@ import { assert, util } from "../../../shared/utils/util";
 import { type Vec2, v2 } from "../../../shared/utils/v2";
 import { Config } from "../config";
 import type { Game } from "./game";
-import type { Group } from "./group";
+import type { Group, Team } from "./group";
 import { Building } from "./objects/building";
 import { Obstacle } from "./objects/obstacle";
 import type { Player } from "./objects/player";
 import { Structure } from "./objects/structure";
 import { RiverCreator } from "./riverCreator";
-import type { Team } from "./team";
 
 // most of this logic is based on the `renderMapBuildingBounds` from client debugHelpers
 // which was found on BHA leak
@@ -525,7 +524,7 @@ export class GameMap {
 
                 // building
                 const unlockables = unlockObject.childObjects.filter(
-                    (o) => o instanceof Obstacle && o.door && o.door.locked,
+                    (o) => o.__type === ObjectType.Obstacle && o.door && o.door.locked,
                 ) as Obstacle[];
                 this.unlocks.push({
                     unlockables: unlockables,
@@ -2033,7 +2032,7 @@ export class GameMap {
             if (this.factionMode && team) {
                 const rad = math.oriToRad(this.factionModeSplitOri ^ 1);
                 const vec = v2.create(Math.cos(rad), Math.sin(rad));
-                const idx = team.teamId - 1;
+                const idx = team.id - 1;
 
                 // farthest fifth from the center of the team's half. 1/5 * 1/2 = 1/10 hence the 10 divisions
                 const divisions = 10;
@@ -2069,8 +2068,8 @@ export class GameMap {
 
                 for (let i = 0; i < this.game.playerBarn.livingPlayers.length; i++) {
                     const player = this.game.playerBarn.livingPlayers[i];
-                    if (group && player.groupId === group.groupId) continue;
-                    if (team && player.teamId === team.teamId) continue;
+                    if (group && player.groupId === group.id) continue;
+                    if (team && player.teamId === team.id) continue;
 
                     if (v2.distance(player.pos, pos) < GameConfig.player.minSpawnRad) {
                         return false;
@@ -2091,8 +2090,8 @@ export class GameMap {
                     if (projectile.layer !== 0) continue;
                     const player = this.game.objectRegister.getById(projectile.playerId);
                     if (player?.__type !== ObjectType.Player) continue;
-                    if (group && player.groupId === group.groupId) continue;
-                    if (team && player.teamId === team.teamId) continue;
+                    if (group && player.groupId === group.id) continue;
+                    if (team && player.teamId === team.id) continue;
 
                     if (v2.distance(projectile.pos, pos) < 16) {
                         return false;
