@@ -132,21 +132,23 @@ export async function handleAuthUser(c: Context, provider: Provider, authId: str
 }
 
 export async function createNewUser(payload: UsersTableInsert) {
-    await db.insert(usersTable).values(payload);
+    await db.transaction(async (tx) => {
+        await tx.insert(usersTable).values(payload);
 
-    const unlockType = "unlock_new_account";
-    const itemsToUnlock = UnlockDefs[unlockType].unlocks || [];
+        const unlockType = "unlock_new_account";
+        const itemsToUnlock = UnlockDefs[unlockType].unlocks || [];
 
-    const items = itemsToUnlock.map((outfit) => {
-        return {
-            userId: payload.id,
-            source: unlockType,
-            type: outfit,
-            timeAcquired: Date.now(),
-        };
+        const items = itemsToUnlock.map((outfit) => {
+            return {
+                userId: payload.id,
+                source: unlockType,
+                type: outfit,
+                timeAcquired: Date.now(),
+            };
+        });
+
+        await tx.insert(itemsTable).values(items);
     });
-
-    await db.insert(itemsTable).values(items);
 }
 
 export function getRedirectUri(method: Provider) {
