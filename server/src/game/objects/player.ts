@@ -28,6 +28,7 @@ import {
     EmoteSlot,
     GameConfig,
     type HasteType,
+    type InventoryItem,
 } from "../../../../shared/gameConfig";
 import * as net from "../../../../shared/net/net";
 import { ObjectType } from "../../../../shared/net/objectSerializeFns";
@@ -43,7 +44,8 @@ import { IDAllocator } from "../../utils/IDAllocator";
 import { validateUserName } from "../../utils/serverHelpers";
 import type { Game, JoinTokenData } from "../game";
 import { Group, Team } from "../group";
-import { throwableList, WeaponManager } from "../weaponManager";
+import { InventoryManager } from "../inventoryManager";
+import { WeaponManager } from "../weaponManager";
 import type { Building } from "./building";
 import { BaseGameObject, type DamageParams, type GameObject } from "./gameObject";
 import type { Loot } from "./loot";
@@ -711,11 +713,10 @@ export class Player extends BaseGameObject {
 
     scope = "1xscope";
 
-    inventory: Record<string, number> = {};
-
-    get bagSizes() {
-        return this.game.playerBarn.bagSizes;
+    get inventory() {
+        return this.invManager.items;
     }
+    invManager = new InventoryManager(this);
 
     get curWeapIdx() {
         return this.weaponManager.curWeapIdx;
@@ -939,23 +940,20 @@ export class Player extends BaseGameObject {
             const clampedTeamId = ((this.teamId - 1) % 2) + 1;
 
             // inventory and scope
-            for (const [key, value] of Object.entries(roleDef.defaultItems.inventory)) {
+            for (const [key, value] of Object.entries(roleDef.defaultItems.inventory) as [
+                InventoryItem,
+                number,
+            ][]) {
                 if (value == 0) continue; // prevents overwriting existing inventory
 
                 // only sets scope if scope in inventory is higher than current scope
                 const invDef = GameObjectDefs[key];
-                if (invDef.type == "scope") {
-                    const currScope = GameObjectDefs[this.scope] as ScopeDef;
-                    if (value == this.inventory[key] && invDef.level != 1) {
-                        this.dropLoot(key);
-                    }
-                    if (invDef.level > currScope.level) {
-                        this.scope = key;
-                    }
+                const currScope = GameObjectDefs[this.scope] as ScopeDef;
+                if (invDef.type == "scope" && invDef.level > currScope.level) {
+                    this.scope = key;
                 }
 
-                // HACK: prevent overwriting existing items by picking the highest
-                this.inventory[key] = Math.max(this.inventory[key], value);
+                this.invManager.giveAndDrop(key, value);
             }
 
             // outfit
@@ -1017,7 +1015,7 @@ export class Player extends BaseGameObject {
                     const curWeapDef = GameObjectDefs[this.weapons[i].type];
                     if (curWeapDef.type == "gun") {
                         // refills the ammo of the existing weapon
-                        this.weaponManager.reload(i);
+                        this.weaponManager.reload(i, true);
                     }
                     continue;
                 }
@@ -1027,9 +1025,9 @@ export class Player extends BaseGameObject {
                     if (this.weapons[i].type) this.weaponManager.dropGun(i);
 
                     if (trueWeapon.fillInv) {
-                        const ammoType = trueWeapDef.ammo;
-                        this.inventory[ammoType] =
-                            this.bagSizes[ammoType][this.getGearLevel(this.backpack)];
+                        const ammoType = trueWeapDef.ammo as InventoryItem;
+                        const maxSize = this.invManager.getMaxCapacity(ammoType);
+                        this.invManager.set(ammoType, maxSize);
                     }
                 } else if (trueWeapDef && trueWeapDef.type == "melee") {
                     if (this.weapons[i].type) {
@@ -1146,14 +1144,18 @@ export class Player extends BaseGameObject {
     bugleTickerActive = false;
     private _bugleTicker = 0;
 
-    perks: Array<{
+    private _perks: Array<{
         type: string;
         droppable: boolean;
         replaceOnDeath?: string;
         isFromRole?: boolean;
     }> = [];
 
-    perkTypes: string[] = [];
+    get perks(): ReadonlyArray<Player["_perks"][0]> {
+        return this._perks;
+    }
+
+    private _perkTypes: string[] = [];
 
     addPerk(
         type: string,
@@ -1161,23 +1163,23 @@ export class Player extends BaseGameObject {
         replaceOnDeath?: string,
         isFromRole?: boolean,
     ) {
-        this.perks.push({
+        this._perks.push({
             type,
             droppable,
             replaceOnDeath,
             isFromRole,
         });
-        this.perkTypes.push(type);
+        this._perkTypes.push(type);
 
         switch (type) {
             case "trick_m9": {
-                const ammo = this.weaponManager.getTrueAmmoStats(
+                const ammo = this.weaponManager.getAmmoStats(
                     GameObjectDefs["m9_cursed"] as GunDef,
                 );
                 this.weaponManager.setWeapon(
                     GameConfig.WeaponSlot.Secondary,
                     "m9_cursed",
-                    ammo.trueMaxClip,
+                    ammo.maxClip,
                 );
                 break;
             }
@@ -1194,9 +1196,9 @@ export class Player extends BaseGameObject {
     }
 
     removePerk(type: string): void {
-        const idx = this.perks.findIndex((perk) => perk.type === type);
-        this.perks.splice(idx, 1);
-        this.perkTypes.splice(this.perkTypes.indexOf(type), 1);
+        const idx = this._perks.findIndex((perk) => perk.type === type);
+        this._perks.splice(idx, 1);
+        this._perkTypes.splice(this._perkTypes.indexOf(type), 1);
 
         switch (type) {
             case "trick_m9": {
@@ -1237,7 +1239,7 @@ export class Player extends BaseGameObject {
     }
 
     hasPerk(type: string) {
-        return this.perkTypes.includes(type);
+        return this._perkTypes.includes(type);
     }
 
     hasActivePan() {
@@ -1414,16 +1416,12 @@ export class Player extends BaseGameObject {
             this.weaponManager.setWeapon(i, type, weap.ammo ?? 0);
         }
 
-        for (const key in this.bagSizes) {
-            this.inventory[key] = defaultItems.inventory[key] ?? 0;
-        }
-
         this.chest = defaultItems.chest;
         assertType(this.chest, "chest", true);
 
         this.scope = defaultItems.scope;
         assertType(this.scope, "scope", false);
-        this.inventory[this.scope] = 1;
+        this.invManager.set(this.scope as InventoryItem, 1);
 
         this.helmet = defaultItems.helmet;
         assertType(this.helmet, "helmet", true);
@@ -1437,6 +1435,10 @@ export class Player extends BaseGameObject {
         for (const perk of defaultItems.perks) {
             assertType(perk.type, "perk", false);
             this.addPerk(perk.type, perk.droppable);
+        }
+
+        for (const [item, amount] of Object.entries(defaultItems.inventory)) {
+            this.invManager.set(item as InventoryItem, amount);
         }
 
         this.setLoadout(loadout ? loadout : joinMsg.loadout, !loadout);
@@ -1653,8 +1655,7 @@ export class Player extends BaseGameObject {
                             target.boost += itemDef.boost;
                         });
                     }
-                    this.inventory[this.actionItem]--;
-                    this.inventoryDirty = true;
+                    this.invManager.take(this.actionItem as InventoryItem, 1);
                 } else if (this.isReloading()) {
                     this.weaponManager.reload();
                 } else if (
@@ -1766,9 +1767,8 @@ export class Player extends BaseGameObject {
                     bugle.ammo++;
                     if (
                         bugle.ammo <
-                        this.weaponManager.getTrueAmmoStats(
-                            GameObjectDefs["bugle"] as GunDef,
-                        ).trueMaxClip
+                        this.weaponManager.getAmmoStats(GameObjectDefs["bugle"] as GunDef)
+                            .maxClip
                     ) {
                         this.bugleTickerActive = true;
                         this._bugleTicker = 8;
@@ -1783,15 +1783,14 @@ export class Player extends BaseGameObject {
                 this.fabricateGiveTicker -= dt;
                 if (this.fabricateGiveTicker < 0) {
                     this.fabricateGiveTicker = PerkProperties.fabricate.giveInterval;
-                    this.inventory["frag"]++;
-                    this.inventoryDirty = true;
+                    this.invManager.give("frag", 1);
+
                     this.fabricateThrowablesLeft--;
 
                     const msg = new net.PickupMsg();
                     msg.type = net.PickupMsgType.Success;
                     msg.item = "frag";
                     msg.count = 1;
-
                     if (
                         !this.weaponManager.weapons[GameConfig.WeaponSlot.Throwable].type
                     ) {
@@ -1804,11 +1803,10 @@ export class Player extends BaseGameObject {
 
             this.fabricateRefillTicker -= dt;
             if (this.fabricateRefillTicker <= 0) {
-                const backpackLevel = this.getGearLevel(this.backpack);
-                const throwablesToGive = math.max(
-                    this.bagSizes["frag"][backpackLevel] - this.inventory["frag"],
-                    0,
-                );
+                const maxSize = this.invManager.getMaxCapacity("frag");
+                const current = this.invManager.get("frag");
+                const throwablesToGive = math.max(maxSize - current, 0);
+
                 this.fabricateThrowablesLeft = throwablesToGive;
                 this.fabricateGiveTicker = PerkProperties.fabricate.giveInterval;
                 this.fabricateRefillTicker = PerkProperties.fabricate.refillInterval;
@@ -1963,11 +1961,9 @@ export class Player extends BaseGameObject {
                     }
                     default:
                         if (
-                            this.bagSizes[closestLoot.type] &&
-                            this.inventory[closestLoot.type] >=
-                                this.bagSizes[closestLoot.type][
-                                    this.getGearLevel(this.backpack)
-                                ]
+                            this.invManager.isValid(closestLoot.type) &&
+                            this.invManager.get(closestLoot.type) >=
+                                this.invManager.getMaxCapacity(closestLoot.type)
                         ) {
                             break;
                         }
@@ -2634,6 +2630,7 @@ export class Player extends BaseGameObject {
                     finalDamage *= gameSourceDef.headshotMult;
                 }
             }
+            console.log(isHeadShot, params.gameSourceType, finalDamage);
 
             if (this.hasPerk("flak_jacket")) {
                 reduceDamage(
@@ -2996,19 +2993,15 @@ export class Player extends BaseGameObject {
         }
         this.weaponManager.setCurWeapIndex(GameConfig.WeaponSlot.Melee);
 
-        for (const item in this.bagSizes) {
+        for (const item of Object.keys(this.invManager.items) as InventoryItem[]) {
             // const def = GameObjectDefs[item] as AmmoDef | HealDef;
             if (item == "1xscope") {
                 continue;
             }
 
-            if (this.inventory[item] > 0) {
-                this.game.lootBarn.addLoot(
-                    item,
-                    this.pos,
-                    this.layer,
-                    this.inventory[item],
-                );
+            const amount = this.invManager.get(item);
+            if (amount > 0) {
+                this.game.lootBarn.addLoot(item, this.pos, this.layer, amount);
             }
         }
 
@@ -3038,8 +3031,8 @@ export class Player extends BaseGameObject {
                 );
             }
         }
-        this.perks.length = 0;
-        this.perkTypes.length = 0;
+        this._perks.length = 0;
+        this._perkTypes.length = 0;
 
         // death emote
         this.sendDeathEmoteTicker = 0.3;
@@ -3224,7 +3217,7 @@ export class Player extends BaseGameObject {
             );
     }
 
-    useHealingItem(item: string): void {
+    useHealingItem(item: InventoryItem): void {
         const itemDef = GameObjectDefs[item];
         assert(itemDef.type === "heal", `Invalid heal item ${item}`);
 
@@ -3237,7 +3230,7 @@ export class Player extends BaseGameObject {
         ) {
             return;
         }
-        if (!this.inventory[item]) {
+        if (!this.invManager.has(item)) {
             return;
         }
 
@@ -3278,7 +3271,7 @@ export class Player extends BaseGameObject {
         }
     }
 
-    useBoostItem(item: string): void {
+    useBoostItem(item: InventoryItem): void {
         const itemDef = GameObjectDefs[item];
         assert(itemDef.type === "boost", `Invalid boost item ${item}`);
 
@@ -3289,7 +3282,7 @@ export class Player extends BaseGameObject {
         ) {
             return;
         }
-        if (!this.inventory[item]) {
+        if (!this.invManager.has(item)) {
             return;
         }
         const hasAoeHeal = this.hasPerk("aoe_heal");
@@ -3494,7 +3487,7 @@ export class Player extends BaseGameObject {
                     for (let i = scopeIdx + 1; i < SCOPE_LEVELS.length; i++) {
                         const nextScope = SCOPE_LEVELS[i];
 
-                        if (!this.inventory[nextScope]) continue;
+                        if (!this.invManager.has(nextScope as InventoryItem)) continue;
                         this.scope = nextScope;
                         this.inventoryDirty = true;
                         break;
@@ -3507,7 +3500,7 @@ export class Player extends BaseGameObject {
                     for (let i = scopeIdx - 1; i >= 0; i--) {
                         const prevScope = SCOPE_LEVELS[i];
 
-                        if (!this.inventory[prevScope]) continue;
+                        if (!this.invManager.has(prevScope as InventoryItem)) continue;
                         this.scope = prevScope;
                         this.inventoryDirty = true;
                         break;
@@ -3548,21 +3541,18 @@ export class Player extends BaseGameObject {
         // no exceptions for any perks or roles
         if (this.downed) return;
 
-        switch (msg.useItem) {
-            case "bandage":
-            case "healthkit":
+        if (!this.invManager.isValid(msg.useItem) || !this.invManager.has(msg.useItem))
+            return;
+        const def = GameObjectDefs[msg.useItem];
+        switch (def.type) {
+            case "heal":
                 this.useHealingItem(msg.useItem);
                 break;
-            case "soda":
-            case "painkiller":
+            case "boost":
                 this.useBoostItem(msg.useItem);
                 break;
-            case "1xscope":
-            case "2xscope":
-            case "4xscope":
-            case "8xscope":
-            case "15xscope":
-                if (this.inventory[msg.useItem]) {
+            case "scope":
+                if (this.invManager.has(msg.useItem)) {
                     this.scope = msg.useItem;
                     this.inventoryDirty = true;
                 }
@@ -3731,82 +3721,20 @@ export class Player extends BaseGameObject {
             case "boost":
             case "throwable":
                 {
-                    const backpackLevel = this.getGearLevel(this.backpack);
-                    const bagSpace = this.bagSizes[obj.type]
-                        ? this.bagSizes[obj.type][backpackLevel]
-                        : 0;
+                    const itemType = obj.type;
+                    if (!this.invManager.isValid(itemType)) break;
 
-                    if (this.inventory[obj.type] + obj.count <= bagSpace) {
-                        switch (def.type) {
-                            case "scope": {
-                                const currentScope = GameObjectDefs[
-                                    this.scope
-                                ] as ScopeDef;
-                                if (def.level > currentScope.level) {
-                                    // only switch scopes if new scope is highest level player has
-                                    this.scope = obj.type;
-                                }
-                                break;
-                            }
-                            case "throwable": {
-                                if (
-                                    throwableList.includes(obj.type) &&
-                                    !this.weapons[GameConfig.WeaponSlot.Throwable].type
-                                ) {
-                                    // fill empty slot with throwable, otherwise just add to inv
-                                    if (this.inventory[obj.type] == 0) {
-                                        this.weaponManager.setWeapon(
-                                            GameConfig.WeaponSlot.Throwable,
-                                            obj.type,
-                                            0,
-                                        );
-                                    }
-                                }
-                                break;
-                            }
-                        }
-                        this.inventory[obj.type] += obj.count;
-                        this.inventoryDirty = true;
-                    } else {
-                        // spawn new loot object to animate the pickup rejection
-                        const spaceLeft = bagSpace - this.inventory[obj.type];
-                        const amountToAdd = spaceLeft;
+                    const result = this.invManager.give(itemType, obj.count);
 
-                        if (amountToAdd <= 0) {
-                            pickupMsg.type = net.PickupMsgType.Full;
-                            if (def.type === "scope") {
-                                pickupMsg.type = net.PickupMsgType.AlreadyOwned;
-                            }
+                    if (result.added <= 0) {
+                        if (def.type === "scope") {
+                            pickupMsg.type = net.PickupMsgType.AlreadyOwned;
                         } else {
-                            this.inventory[obj.type] += amountToAdd;
-                            this.inventoryDirty = true;
-                            if (
-                                def.type === "throwable" &&
-                                amountToAdd != 0 &&
-                                throwableList.includes(obj.type) &&
-                                !this.weapons[GameConfig.WeaponSlot.Throwable].type
-                            ) {
-                                this.weaponManager.setWeapon(
-                                    GameConfig.WeaponSlot.Throwable,
-                                    obj.type,
-                                    0,
-                                );
-                                this.setDirty();
-                            }
+                            pickupMsg.type = net.PickupMsgType.Full;
                         }
-                        amountLeft = obj.count - amountToAdd;
                     }
-                    // this is here because it needs to execute regardless of what happens above
-                    // automatically reloads gun if inventory has 0 ammo and ammo is picked up
-                    const weaponInfo = GameObjectDefs[this.activeWeapon];
-                    if (
-                        def.type == "ammo" &&
-                        weaponInfo.type === "gun" &&
-                        this.weapons[this.curWeapIdx].ammo == 0 &&
-                        weaponInfo.ammo == obj.type
-                    ) {
-                        this.weaponManager.scheduledReload = true;
-                    }
+
+                    amountLeft = result.remaining;
                 }
                 break;
             case "melee":
@@ -3820,44 +3748,17 @@ export class Player extends BaseGameObject {
                     const freeGunSlot = this.getFreeGunSlot(obj);
                     pickupMsg.type = freeGunSlot.cause;
                     let newGunIdx = freeGunSlot.slot;
-                    const oldWeaponIdx = this.curWeapIdx;
 
                     // if "preloaded" gun add ammo to inventory
                     if (obj.isPreloadedGun) {
-                        const ammoAmount = def.ammoSpawnCount;
-                        const ammoType = def.ammo;
-                        const backpackLevel = this.getGearLevel(this.backpack);
-                        const bagSpace = this.bagSizes[ammoType]
-                            ? this.bagSizes[ammoType][backpackLevel]
-                            : 0;
-                        if (this.inventory[ammoType] + ammoAmount <= bagSpace) {
-                            this.inventory[ammoType] += ammoAmount;
-                            this.inventoryDirty = true;
-                        } else {
-                            // spawn new loot object to animate the pickup rejection
-                            const spaceLeft = bagSpace - this.inventory[ammoType];
-                            const amountToAdd = spaceLeft;
-                            this.inventory[ammoType] += amountToAdd;
-                            this.inventoryDirty = true;
-
-                            const amountLeft = ammoAmount - amountToAdd;
-                            this.dropLoot(ammoType, amountLeft);
-                        }
+                        this.invManager.giveAndDrop(
+                            def.ammo as InventoryItem,
+                            def.ammoSpawnCount,
+                        );
                     }
 
                     if (freeGunSlot.cause === net.PickupMsgType.AlreadyOwned) {
                         amountLeft = 1;
-
-                        // Reload gun if it's at 0 ammo, not already being reloaded and pick up some ammo from the same type preloaded gun
-                        if (
-                            obj.isPreloadedGun &&
-                            this.weapons[this.curWeapIdx].ammo <= 0 &&
-                            !this.isReloading()
-                        ) {
-                            this.cancelAction();
-                            this.weaponManager.scheduledReload = true;
-                        }
-
                         break;
                     }
 
@@ -3917,12 +3818,6 @@ export class Player extends BaseGameObject {
                         this.curWeapIdx === GameConfig.WeaponSlot.Melee
                     ) {
                         this.weaponManager.setCurWeapIndex(newGunIdx); // primary
-                    }
-
-                    // Reload instantly if a gun was dropped, handle duals
-                    if (newGunIdx === oldWeaponIdx && this.weapons[newGunIdx].ammo <= 0) {
-                        this.cancelAction();
-                        this.weaponManager.scheduledReload = true;
                     }
                 }
                 break;
@@ -4176,7 +4071,7 @@ export class Player extends BaseGameObject {
             index,
             chosenWeaponType,
             chosenWeaponDef.type == "gun"
-                ? this.weaponManager.getTrueAmmoStats(chosenWeaponDef).trueMaxClip
+                ? this.weaponManager.getAmmoStats(chosenWeaponDef).maxClip
                 : 0,
         );
 
@@ -4185,37 +4080,23 @@ export class Player extends BaseGameObject {
         }
 
         if (chosenWeaponDef.type == "gun") {
-            const backpackLevel = this.getGearLevel(this.backpack);
-            const bagSpace = this.bagSizes[chosenWeaponDef.ammo]
-                ? this.bagSizes[chosenWeaponDef.ammo][backpackLevel]
-                : 0;
-
-            const ammo = math.clamp(
+            const ammo = math.max(
                 chosenWeaponDef.ammoSpawnCount - chosenWeaponDef.maxClip,
                 0,
-                bagSpace,
             );
 
-            if (this.inventory[chosenWeaponDef.ammo] < ammo) {
-                this.inventory[chosenWeaponDef.ammo] = ammo;
-                this.inventoryDirty = true;
-            }
+            this.invManager.give(chosenWeaponDef.ammo as InventoryItem, ammo);
+
             if (index === this.curWeapIdx) {
                 this.shotSlowdownTimer = 0;
             }
-        } else if (chosenWeaponDef.type == "throwable") {
-            const backpackLevel = this.getGearLevel(this.backpack);
-            const bagSpace = this.bagSizes[chosenWeaponType]
-                ? this.bagSizes[chosenWeaponType][backpackLevel]
-                : 0;
+        } else if (
+            chosenWeaponDef.type == "throwable" &&
+            this.invManager.isValid(chosenWeaponType)
+        ) {
+            const bagSpace = this.invManager.getMaxCapacity(chosenWeaponType) ?? 0;
 
-            const amountToAdd = math.clamp(Math.floor(bagSpace / 3), 1, 511);
-            if (this.inventory[chosenWeaponType] + amountToAdd <= bagSpace) {
-                this.inventory[chosenWeaponType] += amountToAdd;
-            } else {
-                this.inventory[chosenWeaponType] = bagSpace;
-            }
-
+            this.invManager.give(chosenWeaponType, math.max(Math.floor(bagSpace / 3), 1));
             this.inventoryDirty = true;
         }
 
@@ -4291,61 +4172,9 @@ export class Player extends BaseGameObject {
         dropMsg.weapIdx = math.clamp(dropMsg.weapIdx, 0, GameConfig.WeaponSlot.Count - 1);
 
         switch (itemDef.type) {
-            case "ammo": {
-                const inventoryCount = this.inventory[dropMsg.item];
-
-                if (inventoryCount === 0) return;
-
-                let amountToDrop = Math.max(1, Math.floor(inventoryCount / 2));
-
-                if (itemDef.minStackSize && inventoryCount <= itemDef.minStackSize) {
-                    amountToDrop = Math.min(itemDef.minStackSize, inventoryCount);
-                } else if (inventoryCount <= 5) {
-                    amountToDrop = Math.min(5, inventoryCount);
-                }
-
-                this.splitUpLoot(dropMsg.item, amountToDrop);
-                this.inventory[dropMsg.item] -= amountToDrop;
-                this.inventoryDirty = true;
-                break;
-            }
-            case "scope": {
-                if (itemDef.level === 1) break;
-                if (!this.inventory[dropMsg.item]) return;
-                const scopeLevel = `${itemDef.level}xscope`;
-                const scopeIdx = SCOPE_LEVELS.indexOf(scopeLevel);
-
-                this.dropLoot(dropMsg.item, 1);
-                this.inventory[scopeLevel] = 0;
-
-                if (this.scope === scopeLevel) {
-                    for (let i = scopeIdx; i >= 0; i--) {
-                        if (!this.inventory[SCOPE_LEVELS[i]]) continue;
-                        this.scope = SCOPE_LEVELS[i];
-                        break;
-                    }
-                }
-
-                this.inventoryDirty = true;
-                break;
-            }
             case "chest":
             case "helmet": {
                 this.dropArmor(dropMsg.item);
-                break;
-            }
-            case "heal":
-            case "boost": {
-                const inventoryCount = this.inventory[dropMsg.item];
-
-                if (inventoryCount === 0) return;
-
-                let amountToDrop = Math.max(1, Math.floor(inventoryCount / 2));
-
-                this.inventory[dropMsg.item] -= amountToDrop;
-
-                this.dropLoot(dropMsg.item, amountToDrop);
-                this.inventoryDirty = true;
                 break;
             }
             case "gun":
@@ -4356,42 +4185,74 @@ export class Player extends BaseGameObject {
             case "melee":
                 this.weaponManager.dropMelee();
                 break;
-            case "throwable": {
-                if (this.weaponManager.cookingThrowable) return;
-                const inventoryCount = this.inventory[dropMsg.item];
-
-                if (inventoryCount === 0) return;
-
-                const amountToDrop = Math.max(1, Math.floor(inventoryCount / 2));
-
-                this.splitUpLoot(dropMsg.item, amountToDrop);
-
-                this.inventory[dropMsg.item] -= amountToDrop;
-
-                if (this.inventory[dropMsg.item] == 0) {
-                    this.weaponManager.showNextThrowable();
-                }
-                this.inventoryDirty = true;
-                this.weapsDirty = true;
-                break;
-            }
             case "perk": {
                 const perkSlotType = this.perks.find(
                     (p) => p.droppable && p.type === dropMsg.item,
                 )?.type;
-                if (perkSlotType && perkSlotType == dropMsg.item) {
+                if (perkSlotType && perkSlotType === dropMsg.item) {
                     this.dropLoot(dropMsg.item);
                     this.removePerk(dropMsg.item);
                     this.setDirty();
                 }
+                break;
             }
+        }
+
+        if (this.invManager.isValid(dropMsg.item)) {
+            this.dropInventoryItem(dropMsg.item);
         }
 
         const reloading = this.isReloading();
         this.cancelAction();
 
-        if (reloading && this.weapons[this.curWeapIdx].ammo == 0) {
+        if (reloading && this.weapons[this.curWeapIdx].ammo === 0) {
             this.weaponManager.scheduledReload = true;
+        }
+    }
+
+    dropInventoryItem(item: InventoryItem) {
+        const itemDef = GameObjectDefs[item];
+
+        if (!this.invManager.has(item)) return;
+        const inventoryCount = this.invManager.get(item);
+
+        switch (itemDef.type) {
+            case "ammo": {
+                let amountToDrop = math.max(1, Math.floor(inventoryCount / 2));
+
+                if (itemDef.minStackSize && inventoryCount <= itemDef.minStackSize) {
+                    amountToDrop = math.min(itemDef.minStackSize, inventoryCount);
+                } else if (inventoryCount <= 5) {
+                    amountToDrop = math.min(5, inventoryCount);
+                }
+
+                this.splitUpLoot(item, amountToDrop);
+                this.invManager.take(item, amountToDrop);
+                break;
+            }
+            case "scope": {
+                this.dropLoot(item, 1);
+                this.invManager.take(item, 1);
+                break;
+            }
+            case "heal":
+            case "boost": {
+                let amountToDrop = math.max(1, Math.floor(inventoryCount / 2));
+
+                this.invManager.take(item, amountToDrop);
+
+                this.dropLoot(item, amountToDrop);
+                break;
+            }
+            case "throwable": {
+                if (this.weaponManager.cookingThrowable) break;
+
+                const amountToDrop = Math.max(1, Math.floor(inventoryCount / 2));
+                this.splitUpLoot(item, amountToDrop);
+
+                this.invManager.take(item, amountToDrop);
+                break;
+            }
         }
     }
 
@@ -4513,8 +4374,8 @@ export class Player extends BaseGameObject {
             const def = GameObjectDefs[msg.spawnLootType];
             if (def && "lootImg" in def) {
                 let count = 1;
-                if (this.bagSizes[msg.spawnLootType]) {
-                    count = this.bagSizes[msg.spawnLootType][0];
+                if (this.invManager.isValid(msg.spawnLootType)) {
+                    count = this.invManager.getMaxCapacity(msg.spawnLootType);
                 }
                 this.game.lootBarn.addLoot(
                     msg.spawnLootType,

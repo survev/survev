@@ -224,7 +224,7 @@ export const GameConfig = {
                 "4xscope": 0,
                 "8xscope": 0,
                 "15xscope": 0,
-            } as Record<string, number>,
+            },
         },
         /* STRIP_FROM_PROD_CLIENT:END */
     },
@@ -389,7 +389,7 @@ export const GameConfig = {
         "4xscope": [1, 1, 1, 1],
         "8xscope": [1, 1, 1, 1],
         "15xscope": [1, 1, 1, 1],
-    } as Record<string, number[]>,
+    },
     lootRadius: {
         outfit: 1,
         melee: 1.25,
@@ -406,3 +406,5 @@ export const GameConfig = {
         xp: 1,
     } as Record<string, number>,
 };
+
+export type InventoryItem = keyof (typeof GameConfig)["bagSizes"];
