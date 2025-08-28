@@ -93,6 +93,7 @@ const defaultConfig = {
     sessionCookie: "" as string | null,
     binds: "",
     version: 1,
+    recordGame: false,
     /* STRIP_FROM_PROD_CLIENT:START */
     debugTools: debugToolsConfig,
     debugRenderer: debugRenderConfig,
