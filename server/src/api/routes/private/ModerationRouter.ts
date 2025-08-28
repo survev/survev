@@ -20,7 +20,7 @@ import { server } from "../../apiServer";
 import { databaseEnabledMiddleware, validateParams } from "../../auth/middleware";
 import { db } from "../../db";
 import { bannedIpsTable, ipLogsTable, matchDataTable, usersTable } from "../../db/schema";
-import { sanitizeSlug } from "../user/auth/authUtils";
+import { daysToMs, sanitizeSlug } from "../user/auth/authUtils";
 
 export const ModerationRouter = new Hono()
     .use(databaseEnabledMiddleware)
@@ -63,7 +63,7 @@ export const ModerationRouter = new Hono()
                 .groupBy(ipLogsTable.encodedIp, ipLogsTable.findGameEncodedIp);
 
             const expiresIn = new Date(
-                Date.now() + ip_ban_duration * 24 * 60 * 60 * 1000,
+                Date.now() + daysToMs(ip_ban_duration),
             );
 
             const bans = [
@@ -153,7 +153,7 @@ export const ModerationRouter = new Hono()
             executor_id,
         } = c.req.valid("json");
 
-        const expiresIn = new Date(Date.now() + ip_ban_duration * 24 * 60 * 60 * 1000);
+        const expiresIn = new Date(Date.now() + daysToMs(ip_ban_duration));
         const encodedIps = is_encoded ? ips : ips.map(hashIp);
         const values = encodedIps.map((encodedIp) => ({
             encodedIp,
@@ -416,7 +416,7 @@ async function banAccount(userId: string, banReason: string, executorId: string)
 
 export async function cleanupOldLogs() {
     try {
-        const thirtyDaysAgo = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000);
+        const thirtyDaysAgo = new Date(Date.now() - daysToMs(30));
         await db.delete(ipLogsTable).where(lt(ipLogsTable.createdAt, thirtyDaysAgo));
     } catch (err) {
         server.logger.error("Failed to cleanup old logs", err);

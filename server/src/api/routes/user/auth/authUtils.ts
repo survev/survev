@@ -163,8 +163,11 @@ export function getRedirectUri(method: Provider) {
     return `${Config.oauthRedirectURI}/api/auth/${method}/callback`;
 }
 
-export const dayInMs = 24 * 60 * 60 * 1000;
-export const cooldownPeriod = 10 * dayInMs;
+export function daysToMs(days: number) {
+    const dayInMs = 24 * 60 * 60 * 1000;
+    return days * dayInMs;
+}
+export const cooldownPeriod = daysToMs(10);
 
 export function getTimeUntilNextUsernameChange(lastChangeTime: Date | null) {
     if (!(lastChangeTime instanceof Date)) return 0;
