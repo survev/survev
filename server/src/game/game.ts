@@ -543,6 +543,11 @@ export class Game {
          */
         const teamTotal = new Set(players.map(({ player }) => player.teamId)).size;
 
+        const teamKills = players.reduce((acc, curr) => {
+            acc[curr.player.groupId] = (acc[curr.player.groupId] ?? 0) + curr.player.kills;
+            return acc;
+        }, {} as Record<string, number>);
+
         const values: SaveGameBody["matchData"] = players.map(({ player, rank }) => {
             return {
                 // *NOTE: userId is optional; we save the game stats for non logged users too
@@ -557,6 +562,7 @@ export class Game {
                 timeAlive: Math.round(player.timeAlive),
                 died: player.dead,
                 kills: player.kills,
+                team_kills: teamKills[player.groupId] ?? 0,
                 damageDealt: Math.round(player.damageDealt),
                 damageTaken: Math.round(player.damageTaken),
                 killerId: player.killedBy?.matchDataId || 0,
