@@ -87,10 +87,7 @@ matchHistoryRouter.post(
                     eq(matchDataTable.teamMode, teamModeFilter as TeamMode).if(
                         teamModeFilter != ALL_TEAM_MODES,
                     ),
-                    gt(
-                        matchDataTable.createdAt,
-                        new Date(Date.now() - daysToMs(7)),
-                    ),
+                    gt(matchDataTable.createdAt, new Date(Date.now() - daysToMs(7))),
                 ),
             )
             .orderBy(desc(matchDataTable.createdAt))

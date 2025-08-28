@@ -543,10 +543,14 @@ export class Game {
          */
         const teamTotal = new Set(players.map(({ player }) => player.teamId)).size;
 
-        const teamKills = players.reduce((acc, curr) => {
-            acc[curr.player.groupId] = (acc[curr.player.groupId] ?? 0) + curr.player.kills;
-            return acc;
-        }, {} as Record<string, number>);
+        const teamKills = players.reduce(
+            (acc, curr) => {
+                acc[curr.player.groupId] =
+                    (acc[curr.player.groupId] ?? 0) + curr.player.kills;
+                return acc;
+            },
+            {} as Record<string, number>,
+        );
 
         const values: SaveGameBody["matchData"] = players.map(({ player, rank }) => {
             return {
@@ -596,7 +600,9 @@ export class Game {
 
         if (!res || !res.ok) {
             const region = Config.gameServer.thisRegion.toUpperCase();
-            this.logger.error(`[${region}] Failed to save game data, saving locally instead`);
+            this.logger.error(
+                `[${region}] Failed to save game data, saving locally instead`,
+            );
             try {
                 // we dump the game  to a local db if we failed to save;
                 // avoid importing sqlite and creating the database at process startup

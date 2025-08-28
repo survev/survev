@@ -62,9 +62,7 @@ export const ModerationRouter = new Hono()
                 .where(eq(ipLogsTable.userId, user.id))
                 .groupBy(ipLogsTable.encodedIp, ipLogsTable.findGameEncodedIp);
 
-            const expiresIn = new Date(
-                Date.now() + daysToMs(ip_ban_duration),
-            );
+            const expiresIn = new Date(Date.now() + daysToMs(ip_ban_duration));
 
             const bans = [
                 ...new Set(

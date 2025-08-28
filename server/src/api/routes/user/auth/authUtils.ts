@@ -137,7 +137,7 @@ export async function createNewUser(payload: UsersTableInsert) {
 
         const unlockType = "unlock_new_account";
         const itemsToUnlock = UnlockDefs[unlockType].unlocks || [];
-        
+
         if (!itemsToUnlock.length) return;
 
         const items = itemsToUnlock.map((outfit) => {
