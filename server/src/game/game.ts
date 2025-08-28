@@ -595,27 +595,32 @@ export class Game {
         }
 
         if (!res || !res.ok) {
-            this.logger.warn(`Failed to save game data, saving locally instead`);
-            // we dump the game  to a local db if we failed to save;
-            // avoid importing sqlite and creating the database at process startup
-            // since this code should rarely run anyway
-            const sqliteDb = (await import("better-sqlite3")).default(
-                "lost_game_data.db",
-            );
+            const region = Config.gameServer.thisRegion.toUpperCase();
+            this.logger.error(`[${region}] Failed to save game data, saving locally instead`);
+            try {
+                // we dump the game  to a local db if we failed to save;
+                // avoid importing sqlite and creating the database at process startup
+                // since this code should rarely run anyway
+                const sqliteDb = (await import("better-sqlite3")).default(
+                    "lost_game_data.db",
+                );
 
-            sqliteDb
-                .prepare(`
-                    CREATE TABLE IF NOT EXISTS lost_game_data (
-                        id INTEGER PRIMARY KEY AUTOINCREMENT,
-                        data TEXT NOT NULL,
-                        timestamp DATETIME DEFAULT CURRENT_TIMESTAMP
-                    )
-                `)
-                .run();
+                sqliteDb
+                    .prepare(`
+                        CREATE TABLE IF NOT EXISTS lost_game_data (
+                            id INTEGER PRIMARY KEY AUTOINCREMENT,
+                            data TEXT NOT NULL,
+                            timestamp DATETIME DEFAULT CURRENT_TIMESTAMP
+                        )
+                    `)
+                    .run();
 
-            sqliteDb
-                .prepare("INSERT INTO lost_game_data (data) VALUES (?)")
-                .run(JSON.stringify(values));
+                sqliteDb
+                    .prepare("INSERT INTO lost_game_data (data) VALUES (?)")
+                    .run(JSON.stringify(values));
+            } catch (err) {
+                this.logger.error(`[${region}] Failed to save game data locally`, err);
+            }
         }
     }
 }
