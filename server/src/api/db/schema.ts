@@ -82,6 +82,7 @@ export const matchDataTable = pgTable(
         rank: integer("rank").notNull(),
         died: boolean("died").notNull(),
         kills: integer("kills").notNull(),
+        team_kills: integer("team_kills").notNull().default(0),
         damageDealt: integer("damage_dealt").notNull(),
         damageTaken: integer("damage_taken").notNull(),
         killerId: integer("killer_id").notNull(),

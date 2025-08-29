@@ -543,6 +543,15 @@ export class Game {
          */
         const teamTotal = new Set(players.map(({ player }) => player.teamId)).size;
 
+        const teamKills = players.reduce(
+            (acc, curr) => {
+                acc[curr.player.groupId] =
+                    (acc[curr.player.groupId] ?? 0) + curr.player.kills;
+                return acc;
+            },
+            {} as Record<string, number>,
+        );
+
         const values: SaveGameBody["matchData"] = players.map(({ player, rank }) => {
             return {
                 // *NOTE: userId is optional; we save the game stats for non logged users too
@@ -557,6 +566,7 @@ export class Game {
                 timeAlive: Math.round(player.timeAlive),
                 died: player.dead,
                 kills: player.kills,
+                team_kills: teamKills[player.groupId] ?? 0,
                 damageDealt: Math.round(player.damageDealt),
                 damageTaken: Math.round(player.damageTaken),
                 killerId: player.killedBy?.matchDataId || 0,
@@ -589,27 +599,34 @@ export class Game {
         }
 
         if (!res || !res.ok) {
-            this.logger.warn(`Failed to save game data, saving locally instead`);
-            // we dump the game  to a local db if we failed to save;
-            // avoid importing sqlite and creating the database at process startup
-            // since this code should rarely run anyway
-            const sqliteDb = (await import("better-sqlite3")).default(
-                "lost_game_data.db",
+            const region = Config.gameServer.thisRegion.toUpperCase();
+            this.logger.error(
+                `[${region}] Failed to save game data, saving locally instead`,
             );
+            try {
+                // we dump the game  to a local db if we failed to save;
+                // avoid importing sqlite and creating the database at process startup
+                // since this code should rarely run anyway
+                const sqliteDb = (await import("better-sqlite3")).default(
+                    "lost_game_data.db",
+                );
 
-            sqliteDb
-                .prepare(`
-                    CREATE TABLE IF NOT EXISTS lost_game_data (
-                        id INTEGER PRIMARY KEY AUTOINCREMENT,
-                        data TEXT NOT NULL,
-                        timestamp DATETIME DEFAULT CURRENT_TIMESTAMP
-                    )
-                `)
-                .run();
+                sqliteDb
+                    .prepare(`
+                        CREATE TABLE IF NOT EXISTS lost_game_data (
+                            id INTEGER PRIMARY KEY AUTOINCREMENT,
+                            data TEXT NOT NULL,
+                            timestamp DATETIME DEFAULT CURRENT_TIMESTAMP
+                        )
+                    `)
+                    .run();
 
-            sqliteDb
-                .prepare("INSERT INTO lost_game_data (data) VALUES (?)")
-                .run(JSON.stringify(values));
+                sqliteDb
+                    .prepare("INSERT INTO lost_game_data (data) VALUES (?)")
+                    .run(JSON.stringify(values));
+            } catch (err) {
+                this.logger.error(`[${region}] Failed to save game data locally`, err);
+            }
         }
     }
 

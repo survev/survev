@@ -14,6 +14,7 @@ import {
 } from "../../auth/middleware";
 import { db } from "../../db";
 import { matchDataTable, usersTable } from "../../db/schema";
+import { daysToMs } from "../user/auth/authUtils";
 
 export const matchHistoryRouter = new Hono<Context>();
 
@@ -86,10 +87,7 @@ matchHistoryRouter.post(
                     eq(matchDataTable.teamMode, teamModeFilter as TeamMode).if(
                         teamModeFilter != ALL_TEAM_MODES,
                     ),
-                    gt(
-                        matchDataTable.createdAt,
-                        new Date(Date.now() - 7 * 24 * 60 * 60 * 1000),
-                    ),
+                    gt(matchDataTable.createdAt, new Date(Date.now() - daysToMs(7))),
                 ),
             )
             .orderBy(desc(matchDataTable.createdAt))
