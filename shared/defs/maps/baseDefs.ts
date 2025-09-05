@@ -769,6 +769,28 @@ export const Main: MapDef = {
         ],
         spawnReplacements: [{}],
         importantSpawns: ["club_complex_01"],
+        paddingRules: [
+            {
+                mansion_structure_01: {
+                    scaleStart: 3,
+                    distStart: 20,
+                },
+                warehouse_01: {},
+                house_red_01: {},
+                house_red_02: {},
+                barn_01: {},
+                barn_02: {},
+                greenhouse_01: {},
+                bunker_structure_01: {},
+                bunker_structure_02: {},
+                bunker_structure_03: {},
+                bunker_structure_04: {},
+                bunker_structure_05: {},
+                warehouse_complex_01: {},
+                teahouse_complex_01su: {},
+                club_complex_01: {},
+            },
+        ],
     },
     /* STRIP_FROM_PROD_CLIENT:END */
 };

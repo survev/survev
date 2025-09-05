@@ -270,6 +270,49 @@ export const math = {
         return Math.sqrt(closestDistSq);
     },
 
+    /**
+     * Returns the distance from a point to a box. If the point is inside the
+     * box, the distance is considered to be 0
+     */
+    distToAabb(pos: Vec2, min: Vec2, max: Vec2) {
+        const intersectsX = min.x <= pos.x && pos.x <= max.x;
+        const intersectsY = min.y <= pos.y && pos.y <= max.y;
+
+        if (intersectsX && intersectsY) {
+            return 0;
+        }
+
+        if (intersectsX && !intersectsY) {
+            if (pos.y < min.y) {
+                return min.y - pos.y;
+            }
+            return pos.y - max.y;
+        }
+
+        if (intersectsY) {
+            if (pos.x < min.x) {
+                return min.x - pos.x;
+            }
+            return pos.x - max.x;
+        }
+
+        return v2.distance(
+            pos,
+            v2.create(math.clamp(pos.x, min.x, max.x), math.clamp(pos.y, min.y, max.y)),
+        );
+    },
+
+    /**
+     * Returns the distance from a point to a circle. If the point is inside the
+     * circle, the distance is considered to be 0
+     */
+    distToCircle(pos: Vec2, center: Vec2, rad: number) {
+        const distSq = v2.lengthSqr(v2.sub(pos, center));
+
+        if (distSq <= rad ** 2) return 0;
+        return Math.sqrt(distSq) - rad;
+    },
+
     polygonArea(poly: Vec2[]) {
         // Convert polygon to triangles
         const verts: number[] = [];
