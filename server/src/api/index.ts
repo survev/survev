@@ -191,31 +191,40 @@ app.post("/api/find_game", validateParams(zFindGameBody), async (c) => {
     });
 });
 
-app.get("/api/get_recording/:recordingId", async (c) => {
-    const gameId = c.req.param("recordingId");
+app.get(
+    "/api/get_recording/:recordingId",
+    async (c) => {
+        const param = c.req.param("recordingId");
 
-    const res = await db.query.reportsTable.findFirst({
-        where: eq(reportsTable.gameId, gameId),
-        columns: {
-            recording: true,
-        },
-    });
+        const {success, data: recordingId } = z.string().safeParse(param);
 
-    if (!res) {
-        return c.json({ error: "No recording found" }, 404);
-    }
+        if ( !success ) {
+            return c.json({ error: "Invalid recording ID" }, 400);
+        }
 
-    const binaryData = Buffer.from(res.recording, "base64");
+        const res = await db.query.reportsTable.findFirst({
+            where: eq(reportsTable.id, recordingId),
+            columns: {
+                recording: true,
+            },
+        });
 
-    c.header("Content-Type", "application/octet-stream");
-    c.header("Content-Length", binaryData.length.toString());
-    c.header(
-        "Content-Disposition",
-        `attachment; filename="recording-${Math.random()}.surv"`,
-    );
+        if (!res) {
+            return c.json({ error: "No recording found" }, 404);
+        }
 
-    return c.body(binaryData);
-});
+        const binaryData = Buffer.from(res.recording, "base64");
+
+        c.header("Content-Type", "application/octet-stream");
+        c.header("Content-Length", binaryData.length.toString());
+        c.header(
+            "Content-Disposition",
+            `attachment; filename="recording-${Math.random()}.surv"`,
+        );
+
+        return c.body(binaryData);
+    },
+);
 
 app.post(
     "/api/report_error",
