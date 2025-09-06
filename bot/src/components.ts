@@ -12,7 +12,6 @@ import {
 import { BUTTON_PREFIXES } from "./commands/search-player";
 import { createCollector, formatDate, honoClient } from "./utils";
 
-
 export type DropdownPlayer = {
     teamMode: string;
     mapId: string;
@@ -26,7 +25,7 @@ export type DropdownPlayer = {
     createdAt: Date | string;
 };
 
-export  function createSelectUI(matchingPlayers: DropdownPlayer[], searchName: string) {
+export function createSelectUI(matchingPlayers: DropdownPlayer[], searchName: string) {
     const options = matchingPlayers.map((player, index) => {
         const slug = player.slug ? ` (slug: ${player.slug})` : "";
 
@@ -52,7 +51,7 @@ export  function createSelectUI(matchingPlayers: DropdownPlayer[], searchName: s
         )
         .setTimestamp();
 
-    return { embed, row }
+    return { embed, row };
 }
 
 export async function createDiscordDropdownUI(

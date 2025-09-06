@@ -378,7 +378,7 @@ export { MapMsg } from "./mapMsg";
 export { PerkModeRoleSelectMsg } from "./perkModeRoleSelectMsg";
 export { PickupMsg } from "./pickupMsg";
 export { PlayerStatsMsg } from "./playerStatsMsg";
+export { ReportMsg } from "./reportMsg";
 export { RoleAnnouncementMsg } from "./roleAnnouncementMsg";
 export { SpectateMsg } from "./spectateMsg";
-export { ReportMsg } from "./reportMsg";
 export { getPlayerStatusUpdateRate, UpdateMsg } from "./updateMsg";

@@ -3,14 +3,10 @@ import { Hono } from "hono";
 import { z } from "zod";
 import { MapId, TeamModeToString } from "../../../../../shared/defs/types/misc";
 import { Config } from "../../../config";
+import { server } from "../../apiServer";
 import { databaseEnabledMiddleware, validateParams } from "../../auth/middleware";
 import { db } from "../../db";
-import {
-    ipLogsTable,
-    reportsTable,
-    usersTable
-} from "../../db/schema";
-import { server } from "../../apiServer";
+import { ipLogsTable, reportsTable, usersTable } from "../../db/schema";
 
 export const ReportsRouter = new Hono()
     .use(databaseEnabledMiddleware)
@@ -41,14 +37,17 @@ export const ReportsRouter = new Hono()
             }
 
             // insert the report and get the id
-            const [{ id: reportId } ]= await db.insert(reportsTable).values({
-                gameId,
-                recording,
-                reportedBy: reportedBy, 
-                sepectatedPlayerNames,
-            }).returning({
-                id: reportsTable.id,
-            });
+            const [{ id: reportId }] = await db
+                .insert(reportsTable)
+                .values({
+                    gameId,
+                    recording,
+                    reportedBy: reportedBy,
+                    sepectatedPlayerNames,
+                })
+                .returning({
+                    id: reportsTable.id,
+                });
 
             if (!Config.recordingReportWebhook)
                 return c.json({ message: "report saved" }, 200);

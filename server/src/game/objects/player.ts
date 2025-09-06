@@ -342,7 +342,7 @@ export class PlayerBarn {
 
         player.obstacleOutfit?.destroy();
 
-        if ( player.recorder?.recording ) {
+        if (player.recorder?.recording) {
             player.recorder.stopRecording();
         }
 
@@ -740,7 +740,7 @@ export class Player extends BaseGameObject {
         if (player) {
             player.spectatorCount++;
             player.spectators.add(this);
-            if ( this.recorder?.recording ) {
+            if (this.recorder?.recording) {
                 this.spectatedWhenRecording.add(player.name);
             }
         }
@@ -4819,22 +4819,22 @@ export class Player extends BaseGameObject {
 
         const playerToReport = this.spectating;
 
-        if ( this.reportedAPlayer && false) {
-            console.log("Already reported a player this game.");   
+        if (this.reportedAPlayer && false) {
+            console.log("Already reported a player this game.");
             return;
         }
 
-        if ( !playerToReport ) {
+        if (!playerToReport) {
             console.log("No player to report");
             return;
         }
 
-        if ( this.game.reportedPlayersIds.has(playerToReport.__id) ) {
+        if (this.game.reportedPlayersIds.has(playerToReport.__id)) {
             console.log("This player was already reported by another player this game.");
             return;
         }
 
-        if ( !this.userId ) {
+        if (!this.userId) {
             console.log("Log in honey.");
             return;
         }
@@ -4930,7 +4930,7 @@ export class Player extends BaseGameObject {
 
         const buff = this.recorder!.getData();
         this.recorder = undefined;
-        
+
         return {
             userId: this.userId!,
             gameId: this.game.id,

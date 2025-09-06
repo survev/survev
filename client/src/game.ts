@@ -825,7 +825,7 @@ export class Game {
             specMsg.specForce = specForce;
             this.m_sendMessage(net.MsgType.Spectate, specMsg, 128);
         }
-        if ( this.m_spectating && this.m_uiManager.recording ) {
+        if (this.m_spectating && this.m_uiManager.recording) {
             const reportMsg = new net.ReportMsg();
             reportMsg.startRecording = true;
             this.m_sendMessage(net.MsgType.Report, reportMsg, 128);

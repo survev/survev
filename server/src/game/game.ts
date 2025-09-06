@@ -451,7 +451,7 @@ export class Game {
                 break;
             }
             case net.MsgType.Report: {
-                if ( player.recorder?.recording ) {
+                if (player.recorder?.recording) {
                     player.recorder.stopRecording();
                     break;
                 }
@@ -631,12 +631,12 @@ export class Game {
         // this needs to be done after the game is saved to the db
         const allPlayers = this.playerBarn.players;
         for await (const player of allPlayers) {
-            if ( !player.recorder ) continue;
+            if (!player.recorder) continue;
 
             const data = player.getRecorderDBData();
 
-            if ( !data ) continue;
-            
+            if (!data) continue;
+
             const res = await apiPrivateRouter.reports.save_game_recording.$post({
                 json: {
                     gameId: this.id,
@@ -646,7 +646,7 @@ export class Game {
                 },
             });
 
-            if ( !res.ok ) {
+            if (!res.ok) {
                 this.logger.error(`Failed to save recording by ${data.userId}`);
                 return;
             }

@@ -1,3 +1,4 @@
+import { randomUUID } from "crypto";
 import {
     bigint,
     boolean,
@@ -13,7 +14,6 @@ import {
 } from "drizzle-orm/pg-core";
 import { TeamMode } from "../../../../shared/gameConfig";
 import { ItemStatus, type Loadout, loadout } from "../../../../shared/utils/loadout";
-import { randomUUID } from "crypto";
 
 export const sessionTable = pgTable("session", {
     id: text("id").primaryKey(),
@@ -151,7 +151,7 @@ export const bannedIpsTable = pgTable("banned_ips", {
     bannedBy: text("banned_by").notNull().default("admin"),
 });
 
-export const statusEnum = pgEnum("status", ["unreviewed", "ignored", "reviewed"]);  
+export const statusEnum = pgEnum("status", ["unreviewed", "ignored", "reviewed"]);
 
 export const reportsTable = pgTable("reports", {
     id: uuid("id").primaryKey().defaultRandom(),
@@ -166,7 +166,5 @@ export const reportsTable = pgTable("reports", {
     createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
     // discordId of the game mod, or the user who reported the game
     reviewdBy: text("reviewed_by").notNull().default(""),
-    status: statusEnum()
-    .notNull()
-    .default("unreviewed"),
+    status: statusEnum().notNull().default("unreviewed"),
 });

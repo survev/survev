@@ -8,11 +8,11 @@ import {
     RepliableInteraction,
     StringSelectMenuInteraction,
 } from "discord.js";
+import { MapId, TeamModeToString } from "../../shared/defs/types/misc";
 import { commandHandlers } from "./commands";
-import { createSelectUI, DropdownPlayer } from "./components";
+import { createSelectUI, type DropdownPlayer } from "./components";
 import { DISCORD_BOT_TOKEN, webhookId } from "./config";
 import { type Command, hasPermission, honoClient, TIMEOUT_IN_SECONDS } from "./utils";
-import { MapId, TeamModeToString } from "../../shared/defs/types/misc";
 
 const client = new Client({
     intents: [
@@ -61,10 +61,10 @@ function setupInteractionHandlers() {
 
 function setupEventListeners() {
     client.on(Events.MessageCreate, async (message) => {
-        if ( message.channel.isDMBased() ) return;
+        if (message.channel.isDMBased()) return;
         if (message.webhookId !== webhookId) return;
 
-        if ( message.embeds.length <= 0 || !message.embeds[0].url ) {
+        if (message.embeds.length <= 0 || !message.embeds[0].url) {
             console.log("Expected an embed, but got none");
             return;
         }
@@ -90,7 +90,7 @@ function setupEventListeners() {
         }
 
         const prettyPlayers: DropdownPlayer[] = result.map((player) => ({
-            teamMode:player.teamMode,
+            teamMode: player.teamMode,
             mapId: player.mapId,
             slug: player.slug,
             authId: player.authId,
@@ -134,14 +134,14 @@ function setupEventListeners() {
         //         await onCollect(interaction);
         //         collector.stop("completed");
         //     });
-        
+
         // collector.on("ignore", async (interaction: RepliableInteraction) => {
         //     await interaction.reply({
         //         content: "You are not the original creator. Please create a new command.",
         //         flags: MessageFlags.Ephemeral,
         //     });
         // });
-    
+
         // collector.on("end", async (_, reason) => {
         //     if (reason === "time") {
         //         await message.reply({
