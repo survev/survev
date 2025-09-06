@@ -193,6 +193,12 @@ export interface ConfigType {
          */
         errorLogs: boolean;
     };
+    
+    /**
+     * Webhook URL to report replays
+     */ 
+    recordingReportWebhook?: string;
+
     /**
      * Webhook URL to log server errors.
      */

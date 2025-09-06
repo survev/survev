@@ -625,6 +625,31 @@ export class Game {
             sqliteDb
                 .prepare("INSERT INTO lost_game_data (data) VALUES (?)")
                 .run(JSON.stringify(values));
+            return;
+        }
+
+        // this needs to be done after the game is saved to the db
+        const allPlayers = this.playerBarn.players;
+        for await (const player of allPlayers) {
+            if ( !player.recorder ) continue;
+
+            const data = player.getRecorderDBData();
+
+            if ( !data ) continue;
+            
+            const res = await apiPrivateRouter.reports.save_game_recording.$post({
+                json: {
+                    gameId: this.id,
+                    reportedBy: data.userId!,
+                    recording: data.recording,
+                    sepectatedPlayerNames: data.sepectatedPlayerNames,
+                },
+            });
+
+            if ( !res.ok ) {
+                this.logger.error(`Failed to save recording by ${data.userId}`);
+                return;
+            }
         }
     }
 }

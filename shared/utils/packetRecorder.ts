@@ -39,8 +39,6 @@ export class PacketRecorder {
 
     private lastPacketTime = 0;
 
-    onStop?: () => void;
-
     private constructor(buff: ArrayBuffer) {
         this.uint8Buff = new Uint8Array(buff);
         this.view = new DataView(buff);
@@ -74,7 +72,6 @@ export class PacketRecorder {
         if (!this.recording) return;
 
         this.recording = false;
-        this.onStop?.();
     }
 
     addPacket(type: PacketType, data: Uint8Array) {

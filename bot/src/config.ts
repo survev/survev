@@ -30,3 +30,7 @@ export {
     DISCORD_BOT_TOKEN,
     API_URL,
 };
+
+const regex = /webhooks\/(\d+)\//;
+const webhookId = Config.recordingReportWebhook?.match(regex)?.[1];
+export { webhookId }

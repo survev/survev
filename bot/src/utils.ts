@@ -45,7 +45,7 @@ export function hasPermission(interaction: Interaction): boolean {
     return false;
 }
 
-const TIMEOUT_IN_SECONDS = 60;
+export const TIMEOUT_IN_SECONDS = 60;
 
 /**
  * generic collector that handles timeouts and only allows interactions buy the original user
@@ -95,7 +95,7 @@ export function createCollector<
     });
 }
 
-export function formatDate(date?: string) {
+export function formatDate(date?: string | Date) {
     return date
         ? new Date(date).toLocaleDateString("en-US", {
               year: "numeric",

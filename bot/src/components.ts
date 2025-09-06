@@ -9,15 +9,24 @@ import {
     StringSelectMenuBuilder,
     type StringSelectMenuInteraction,
 } from "discord.js";
-import { BUTTON_PREFIXES, type SelectedPlayer } from "./commands/search-player";
+import { BUTTON_PREFIXES } from "./commands/search-player";
 import { createCollector, formatDate, honoClient } from "./utils";
 
-export async function createDiscordDropdownUI(
-    interaction: RepliableInteraction,
-    matchingPlayers: SelectedPlayer[],
-    searchName: string,
-) {
-    const originalUserId = interaction.user.id;
+
+export type DropdownPlayer = {
+    teamMode: string;
+    mapId: string;
+    slug: string | null;
+    authId: string | null;
+    linkedDiscord: boolean | null;
+    ip: string;
+    findGameIp: string;
+    username: string;
+    region: string;
+    createdAt: Date | string;
+};
+
+export  function createSelectUI(matchingPlayers: DropdownPlayer[], searchName: string) {
     const options = matchingPlayers.map((player, index) => {
         const slug = player.slug ? ` (slug: ${player.slug})` : "";
 
@@ -42,6 +51,18 @@ export async function createDiscordDropdownUI(
             `Found ${matchingPlayers.length} players matching "${searchName}". Please select one to ban:`,
         )
         .setTimestamp();
+
+    return { embed, row }
+}
+
+export async function createDiscordDropdownUI(
+    interaction: RepliableInteraction,
+    matchingPlayers: DropdownPlayer[],
+    searchName: string,
+) {
+    const originalUserId = interaction.user.id;
+
+    const { embed, row } = createSelectUI(matchingPlayers, searchName);
 
     const response = await interaction.editReply({
         embeds: [embed],
@@ -82,10 +103,10 @@ export async function createDiscordPlayerInfoCardUI({
     matchingPlayers,
 }: {
     interaction: RepliableInteraction;
-    selectedPlayer: SelectedPlayer;
+    selectedPlayer: DropdownPlayer;
     playerIdx: number;
     originalUserId: string;
-    matchingPlayers: SelectedPlayer[];
+    matchingPlayers: DropdownPlayer[];
 }) {
     const fields = getEmbedFields(selectedPlayer);
 
@@ -192,7 +213,7 @@ export async function clearEmbedWithMessage(
     });
 }
 
-function getEmbedFields(selectedPlayer: SelectedPlayer) {
+function getEmbedFields(selectedPlayer: DropdownPlayer) {
     const fields = [
         { name: "Player Name", value: selectedPlayer.username, inline: true },
         { name: "Team Mode", value: selectedPlayer.teamMode, inline: true },

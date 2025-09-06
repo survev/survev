@@ -1,13 +1,13 @@
 import { and, eq } from "drizzle-orm";
 import { Hono } from "hono";
 import { z } from "zod";
+import type { Context } from "../..";
 import { saveConfig } from "../../../../../config";
 import { GameObjectDefs } from "../../../../../shared/defs/gameObjectDefs";
 import { MapDefs } from "../../../../../shared/defs/mapDefs";
 import { TeamMode } from "../../../../../shared/gameConfig";
 import { serverConfigPath } from "../../../config";
 import { type SaveGameBody, zUpdateRegionBody } from "../../../utils/types";
-import type { Context } from "../..";
 import { server } from "../../apiServer";
 import {
     databaseEnabledMiddleware,
@@ -21,14 +21,15 @@ import {
     itemsTable,
     type MatchDataTable,
     matchDataTable,
-    reportsTable,
     usersTable,
 } from "../../db/schema";
 import { MOCK_USER_ID } from "../user/auth/mock";
 import { logPlayerIPs, ModerationRouter } from "./ModerationRouter";
+import { ReportsRouter } from "./ReportsRouter";
 
 export const PrivateRouter = new Hono<Context>()
     .use(privateMiddleware)
+    .route("/reports", ReportsRouter)
     .route("/moderation", ModerationRouter)
     .post("/update_region", validateParams(zUpdateRegionBody), (c) => {
         const { regionId, data } = c.req.valid("json");
@@ -191,27 +192,6 @@ export const PrivateRouter = new Hono<Context>()
         await client.flushAll();
         return c.json({ success: true }, 200);
     })
-    .post(
-        "/save_game_recording",
-        validateParams(
-            z.object({
-                gameId: z.string(),
-                userId: z.string(),
-                recording: z.string(),
-            }),
-        ),
-        async (c) => {
-            const { gameId, recording, userId } = c.req.valid("json");
-
-            await db.insert(reportsTable).values({
-                gameId,
-                recording,
-                reportedBy: userId,
-            });
-
-            return c.json({ success: true }, 200);
-        },
-    )
     .post(
         "/test/insert_game",
         databaseEnabledMiddleware,

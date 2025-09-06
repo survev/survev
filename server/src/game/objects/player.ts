@@ -740,6 +740,9 @@ export class Player extends BaseGameObject {
         if (player) {
             player.spectatorCount++;
             player.spectators.add(this);
+            if ( this.recorder?.recording ) {
+                this.spectatedWhenRecording.add(player.name);
+            }
         }
 
         this._spectating = player;
@@ -4804,7 +4807,8 @@ export class Player extends BaseGameObject {
 
     // we limit it one report per player per game
     reportedAPlayer = false;
-    
+    spectatedWhenRecording = new Set<string>();
+
     /**
      * Initializes the recording by saving initial data
      * Like the map msg, joinedMsg and an updateMsg with everything set to dirty
@@ -4815,7 +4819,7 @@ export class Player extends BaseGameObject {
 
         const playerToReport = this.spectating;
 
-        if ( this.reportedAPlayer ) {
+        if ( this.reportedAPlayer && false) {
             console.log("Already reported a player this game.");   
             return;
         }
@@ -4850,31 +4854,6 @@ export class Player extends BaseGameObject {
         msgStream.serializeMsg(net.MsgType.Joined, joinedMsg);
 
         this.recorder = PacketRecorder.create();
-
-        this.recorder.onStop = async () => {
-            if ( !this.userId) {
-                console.log("No user id");
-                return;
-            };
-            
-            this.reportedAPlayer = true;
-
-            const buff = this.recorder!.getData();
-            this.recorder = undefined;
-
-            const res = await apiPrivateRouter.save_game_recording.$post({
-                json: {
-                    userId: this.userId,
-                    gameId: this.game.id,
-                    recording: Buffer.from(buff).toString("base64"),
-                },
-            });
-
-            if ( res.ok) {
-                // this.game.reportedPlayers.add();
-                console.log(`Saved recording`);
-            }
-        };
 
         this.recorder.startRecording();
 
@@ -4944,4 +4923,19 @@ export class Player extends BaseGameObject {
 
         msgStream.stream.index = 0;
     }
+
+    // TODO: move this to the packet recorder class
+    getRecorderDBData = () => {
+        this.reportedAPlayer = true;
+
+        const buff = this.recorder!.getData();
+        this.recorder = undefined;
+        
+        return {
+            userId: this.userId!,
+            gameId: this.game.id,
+            recording: Buffer.from(buff).toString("base64"),
+            sepectatedPlayerNames: [...this.spectatedWhenRecording],
+        };
+    };
 }
