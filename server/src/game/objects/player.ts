@@ -4857,6 +4857,10 @@ export class Player extends BaseGameObject {
 
         this.recorder.startRecording();
 
+        if ( this.spectating ) {
+            this.spectatedWhenRecording.add(this.spectating?.name);
+        }
+
         this.recorder.addPacket(PacketType.Server, msgStream.getBuffer());
 
         msgStream.stream.index = 0;
