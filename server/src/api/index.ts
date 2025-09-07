@@ -37,6 +37,7 @@ import { PrivateRouter } from "./routes/private/private";
 import { StatsRouter } from "./routes/stats/StatsRouter";
 import { AuthRouter } from "./routes/user/AuthRouter";
 import { UserRouter } from "./routes/user/UserRouter";
+import { deleteOldReports } from "./routes/private/ReportsRouter";
 
 export type Context = {
     Variables: {
@@ -276,7 +277,8 @@ new Cron("0 0 * * *", async () => {
     try {
         await cleanupOldLogs();
         await deleteExpiredSessions();
-        server.logger.info("Deleted old logs and expired sessions");
+        await deleteOldReports();
+        server.logger.info("Cleanup script ran successfully");
     } catch (err) {
         server.logger.error("Failed to run cleanup script", err);
     }

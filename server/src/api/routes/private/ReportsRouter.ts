@@ -1,4 +1,4 @@
-import { and, count, desc, eq, inArray, sql } from "drizzle-orm";
+import { and, count, desc, eq, inArray, lt, sql } from "drizzle-orm";
 import { Hono } from "hono";
 import { z } from "zod";
 import { MapId, TeamModeToString } from "../../../../../shared/defs/types/misc";
@@ -179,3 +179,11 @@ export const ReportsRouter = new Hono()
             return c.json(prettyResult, 200);
         },
     );
+
+export async function deleteOldReports() {
+    const aWeekAgo = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000);
+    await db
+        .update(reportsTable)
+        .set({ recording: "" })
+        .where(lt(reportsTable.createdAt, aWeekAgo));
+}
