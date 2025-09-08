@@ -5,12 +5,12 @@ import {
     ButtonStyle,
     ComponentType,
     EmbedBuilder,
+    type Message,
     type RepliableInteraction,
     StringSelectMenuBuilder,
     type StringSelectMenuInteraction,
 } from "discord.js";
-import { BUTTON_PREFIXES } from "./commands/search-player";
-import { createCollector, formatDate, honoClient } from "./utils";
+import { BUTTON_PREFIXES, createCollector, formatDate, honoClient } from "./utils";
 
 export type DropdownPlayer = {
     teamMode: string;
@@ -79,14 +79,11 @@ export async function createDiscordDropdownUI(
             await interaction.deferUpdate();
             const selectedValue = interaction.values[0];
             // fomrat: ban_<index>
-            const playerIndex = parseInt(selectedValue.split("_")[1]);
-
-            const selectedPlayer = matchingPlayers[playerIndex];
+            const playerIdx = parseInt(selectedValue.split("_")[1]);
 
             await createDiscordPlayerInfoCardUI({
                 interaction,
-                selectedPlayer,
-                playerIdx: playerIndex,
+                playerIdx,
                 originalUserId,
                 matchingPlayers,
             });
@@ -94,19 +91,7 @@ export async function createDiscordDropdownUI(
     });
 }
 
-export async function createDiscordPlayerInfoCardUI({
-    interaction,
-    selectedPlayer,
-    playerIdx,
-    originalUserId,
-    matchingPlayers,
-}: {
-    interaction: RepliableInteraction;
-    selectedPlayer: DropdownPlayer;
-    playerIdx: number;
-    originalUserId: string;
-    matchingPlayers: DropdownPlayer[];
-}) {
+export function discordCardUI(selectedPlayer: DropdownPlayer, playerIdx: number) {
     const fields = getEmbedFields(selectedPlayer);
 
     const embed = new EmbedBuilder()
@@ -130,6 +115,23 @@ export async function createDiscordPlayerInfoCardUI({
     const row = new ActionRowBuilder<ButtonBuilder>()
         .addComponents(banPlayerForCheating)
         .addComponents(banPlayerForBadName);
+
+    return { embed, row };
+}
+
+export async function createDiscordPlayerInfoCardUI({
+    interaction,
+    playerIdx,
+    originalUserId,
+    matchingPlayers,
+}: {
+    interaction: RepliableInteraction;
+    playerIdx: number;
+    originalUserId: string;
+    matchingPlayers: DropdownPlayer[];
+}) {
+    const selectedPlayer = matchingPlayers[playerIdx];
+    const { embed, row } = discordCardUI(selectedPlayer, playerIdx);
 
     const response = await interaction.editReply({
         embeds: [embed],
@@ -202,14 +204,15 @@ export async function createDiscordPlayerInfoCardUI({
 }
 
 export async function clearEmbedWithMessage(
-    interaction: RepliableInteraction,
+    interaction: RepliableInteraction | Message,
     content: string,
 ) {
-    await interaction.editReply({
-        content,
-        components: [],
-        embeds: [],
-    });
+    const payload = { content, components: [], embeds: [] };
+    if ("editReply" in interaction) {
+        await interaction.editReply(payload);
+        return;
+    }
+    await interaction.edit(payload);
 }
 
 function getEmbedFields(selectedPlayer: DropdownPlayer) {

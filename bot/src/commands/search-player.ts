@@ -8,11 +8,6 @@ export type SelectedPlayer = Extract<
     any[]
 >[number];
 
-export const BUTTON_PREFIXES = {
-    BAN_FOR_CHEATING: `search_player_ban_for_cheating_`,
-    BAN_FOR_BAD_NAME: `search_player_ban_for_name_`,
-} as const;
-
 export const searchPlayersHandler = {
     command: new SlashCommandBuilder()
         .setName(Command.SearchPlayer)

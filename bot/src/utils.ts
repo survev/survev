@@ -10,6 +10,7 @@ import { MessageFlags, PermissionFlagsBits } from "discord.js";
 import { hc } from "hono/client";
 import type { PrivateRouteApp } from "../../server/src/api/routes/private/private";
 import { API_URL, Config, DISCORD_GUILD_ID, DISCORD_ROLE_ID } from "./config";
+import { clearEmbedWithMessage } from "./components";
 
 // we love enums
 export const enum Command {
@@ -22,6 +23,11 @@ export const enum Command {
     SetMatchDataName = "set_match_data_name",
     SetAccountName = "set_account_name",
 }
+
+export const BUTTON_PREFIXES = {
+    BAN_FOR_CHEATING: `search_player_ban_for_cheating_`,
+    BAN_FOR_BAD_NAME: `search_player_ban_for_name_`,
+} as const;
 
 export const honoClient = hc<PrivateRouteApp>(API_URL, {
     headers: {
@@ -45,10 +51,11 @@ export function hasPermission(interaction: Interaction): boolean {
     return false;
 }
 
-export const TIMEOUT_IN_SECONDS = 60;
+// 60 seconds
+export const BOT_COLLECTOR_TIMEOUT = 60 * 1000;
 
 /**
- * generic collector that handles timeouts and only allows interactions buy the original user
+ * generic collector that handles timeouts and only allows interactions by the original user
  */
 export function createCollector<
     T extends ButtonInteraction | StringSelectMenuInteraction,
@@ -68,7 +75,7 @@ export function createCollector<
     const collector = response.createMessageComponentCollector({
         filter: (i) => i.user.id === options.originalUserId,
         componentType: options.componentType,
-        time: TIMEOUT_IN_SECONDS * 1000,
+        time: BOT_COLLECTOR_TIMEOUT,
     });
 
     collector.on("collect", async (interaction: T) => {
@@ -84,14 +91,8 @@ export function createCollector<
     });
 
     collector.on("end", async (_, reason) => {
-        if (reason === "time") {
-            await options.interaction.editReply({
-                content: "Timed out, please try again.",
-                components: [],
-                embeds: [],
-            });
-            return;
-        }
+        if (reason != "time") return;
+        await clearEmbedWithMessage(options.interaction, "Timed out, please try again.");
     });
 }
 

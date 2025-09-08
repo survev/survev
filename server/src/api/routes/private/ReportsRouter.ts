@@ -11,6 +11,38 @@ import { ipLogsTable, reportsTable, usersTable } from "../../db/schema";
 export const ReportsRouter = new Hono()
     .use(databaseEnabledMiddleware)
     .post(
+        "/ignore_report",
+        validateParams(z.object({ reportId: z.string() })),
+        async (c) => {
+            const { reportId } = c.req.valid("json");
+
+            const [{ reportedBy }] = await db.update(reportsTable).set({
+                status: "ignored",
+            }).where(eq(reportsTable.id, reportId))
+            .returning({ reportedBy: reportsTable.reportedBy });
+
+            if (!reportedBy) {
+                return c.json({ message: "Report not found" }, 200);
+            }
+
+            const [{ count }] = await db
+                .select({
+                    count: sql<number>`sum(case when ${reportsTable.status} = 'ignored' then 1 else 0 end)`,
+                })
+                .from(reportsTable)
+                .where(eq(reportsTable.reportedBy, reportedBy))
+                .limit(1);
+
+            const MAX_IGNORED_REPORTS = 3;
+            if (count <= MAX_IGNORED_REPORTS)
+                return c.json({ message: `Ignored report with id: ${reportId}` }, 200);
+
+            await db.update(usersTable).set({ canReportPlayers: false }).where(eq(usersTable.id, reportedBy));
+
+            return c.json({ message: `User would no longer be able to make reports` }, 200); 
+        },
+    )
+    .post(
         "/save_game_recording",
         validateParams(
             z.object({
@@ -112,12 +144,12 @@ export const ReportsRouter = new Hono()
         "get_data_by_recording_id",
         validateParams(
             z.object({
-                recordingId: z.string(),
+                reportId: z.string(),
             }),
         ),
         async (c) => {
-            const { recordingId } = c.req.valid("json");
-
+            const { reportId: recordingId } = c.req.valid("json");
+            
             const recordingData = await db.query.reportsTable.findFirst({
                 where: eq(reportsTable.id, recordingId),
                 columns: {
@@ -125,7 +157,7 @@ export const ReportsRouter = new Hono()
                     sepectatedPlayerNames: true,
                 },
             });
-
+            
             if (!recordingData) {
                 return c.json(
                     {
@@ -134,8 +166,17 @@ export const ReportsRouter = new Hono()
                     200,
                 );
             }
-
+            
             const { gameId, sepectatedPlayerNames } = recordingData;
+            
+            if ( sepectatedPlayerNames.length == 0 ) {
+                return c.json({ message: "No players to show, this shouldn't happen" }, 200);
+            }
+            
+            const MAX_PLAYERS_TO_SHOW = 15;
+            if ( sepectatedPlayerNames.length > MAX_PLAYERS_TO_SHOW ) {
+                return c.json({ message: `Spectate more than ${MAX_PLAYERS_TO_SHOW} playes, they should seek help` }, 200);
+            }
 
             const result = await db
                 .select({
@@ -159,12 +200,12 @@ export const ReportsRouter = new Hono()
                 )
                 .leftJoin(usersTable, eq(ipLogsTable.userId, usersTable.id))
                 .orderBy(desc(ipLogsTable.createdAt))
-                .limit(10);
+                .limit(MAX_PLAYERS_TO_SHOW);
 
             if (result.length === 0) {
                 return c.json(
                     {
-                        message: `No IP found for ${sepectatedPlayerNames.join(", ")}. Make sure the names match the ones in game.`,
+                        message: `No IP found for ${sepectatedPlayerNames.join(", ")}. Weird.`,
                     },
                     200,
                 );
