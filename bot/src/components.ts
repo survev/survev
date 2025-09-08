@@ -124,11 +124,13 @@ export async function createDiscordPlayerInfoCardUI({
     playerIdx,
     originalUserId,
     matchingPlayers,
+    reportId
 }: {
     interaction: RepliableInteraction;
     playerIdx: number;
     originalUserId: string;
     matchingPlayers: DropdownPlayer[];
+    reportId?: string;
 }) {
     const selectedPlayer = matchingPlayers[playerIdx];
     const { embed, row } = discordCardUI(selectedPlayer, playerIdx);
@@ -197,6 +199,14 @@ export async function createDiscordPlayerInfoCardUI({
                 },
             });
 
+            if ( reportId ) {
+                await honoClient.reports.mark_as_reviewed.$post({
+                    json: {
+                        reportId
+                    },
+                });
+            }
+            
             const { message } = await res.json();
             await clearEmbedWithMessage(interaction, message);
         },

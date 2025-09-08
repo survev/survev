@@ -160,6 +160,7 @@ function setupEventListeners() {
                     playerIdx,
                     originalUserId: interaction.user.id,
                     matchingPlayers,
+                    reportId
                 });
                 collector.stop("completed")
             })

@@ -10,6 +10,15 @@ import { ipLogsTable, reportsTable, usersTable } from "../../db/schema";
 
 export const ReportsRouter = new Hono()
     .use(databaseEnabledMiddleware)
+    .post("/mark_as_reviewed", validateParams(z.object({ reportId: z.string() })), async (c) => {
+        const { reportId } = c.req.valid("json");
+
+        await db.update(reportsTable).set({
+            status: "reviewed",
+        }).where(eq(reportsTable.id, reportId));
+
+        return c.json({ message: "Report marked as reviewed" }, 200);
+    })
     .post(
         "/ignore_report",
         validateParams(z.object({ reportId: z.string() })),
