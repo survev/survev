@@ -30,6 +30,7 @@ import type { Localization } from "./localization";
 import { PieTimer } from "./pieTimer";
 import type { Touch } from "./touch";
 import type { UiManager2 } from "./ui2";
+import type * as net from "../../../shared/net/net";
 
 function humanizeTime(time: number) {
     const hours = Math.floor(time / 3600);
@@ -610,6 +611,10 @@ export class UiManager {
         $(".ui-team-member-health")
             .find(".ui-bar-inner")
             .css("width", this.teamMemberHealthBarWidth);
+
+        // reset recording button
+        $("#btn-report-cheater").text("Report Cheater");
+        $("#btn-report-cheater").prop("disabled", false);
 
         $("#ui-center").off("mouseenter mouseleave");
         this.inputBinds.menuHovered = false;
@@ -2188,6 +2193,15 @@ export class UiManager {
             "ui-team-member-status-downed ui-team-member-status-dead ui-team-member-status-disconnected icon-pulse",
         );
         this.teamSelectors = [];
+    }
+
+    updateRecording(msg: net.ReportMsg) {
+        this.recording = !msg.end;
+
+        if ( this.recording ) {
+            $("#btn-report-cheater").text("Reported!");
+            $("#btn-report-cheater").prop("disabled", true);
+        }
     }
 
     resize(map: Map, camera: Camera) {

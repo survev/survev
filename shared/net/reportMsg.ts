@@ -1,13 +1,16 @@
 import type { AbstractMsg, BitStream } from "./net";
 
 export class ReportMsg implements AbstractMsg {
-    startRecording = false;
+    start = false;
+    end = false;
 
     serialize(s: BitStream) {
-        s.writeBoolean(this.startRecording);
+        s.writeBoolean(this.start);
+        s.writeBoolean(this.end);
     }
 
     deserialize(s: BitStream) {
-        this.startRecording = s.readBoolean();
+        this.start = s.readBoolean();
+        this.end = s.readBoolean();
     }
 }

@@ -5,29 +5,8 @@
     {
       "idx": 0,
       "version": "7",
-      "when": 1745172979186,
-      "tag": "0000_same_falcon",
-      "breakpoints": true
-    },
-    {
-      "idx": 1,
-      "version": "7",
-      "when": 1750964146027,
-      "tag": "0001_lovely_skrulls",
-      "breakpoints": true
-    },
-    {
-      "idx": 2,
-      "version": "7",
-      "when": 1751241098146,
-      "tag": "0002_brown_lizard",
-      "breakpoints": true
-    },
-    {
-      "idx": 3,
-      "version": "7",
-      "when": 1755009124214,
-      "tag": "0003_slim_valkyrie",
+      "when": 1757188512095,
+      "tag": "0000_broad_menace",
       "breakpoints": true
     }
   ]

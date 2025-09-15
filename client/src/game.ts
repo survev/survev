@@ -42,6 +42,7 @@ import type { Localization } from "./ui/localization";
 import { Touch } from "./ui/touch";
 import { UiManager } from "./ui/ui";
 import { UiManager2 } from "./ui/ui2";
+import $ from "jquery";
 
 export interface Ctx {
     audioManager: AudioManager;
@@ -827,8 +828,9 @@ export class Game {
         }
         if (this.m_spectating && this.m_uiManager.recording) {
             const reportMsg = new net.ReportMsg();
-            reportMsg.startRecording = true;
+            reportMsg.start = true;
             this.m_sendMessage(net.MsgType.Report, reportMsg, 128);
+            $("#btn-report-cheater").text("Stop recording.")
         }
         this.m_uiManager.specBegin = false;
         this.m_uiManager.specNext = false;
@@ -1611,6 +1613,13 @@ export class Game {
             }
             case net.MsgType.Stats: {
                 stream.readString();
+                break;
+            }
+            case net.MsgType.Report: {
+                const msg = new net.ReportMsg();
+                msg.deserialize(stream);
+                this.m_uiManager.recording = msg.start;
+                $("#btn-report-cheater").text(msg.start ? "Stop recording." : "Start recording.");
                 break;
             }
             case net.MsgType.GameOver: {

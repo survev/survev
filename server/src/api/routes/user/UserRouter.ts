@@ -51,6 +51,7 @@ UserRouter.post("/profile", async (c) => {
         lastUsernameChangeTime,
         banned,
         banReason,
+        canReportPlayers,
     } = user;
 
     if (banned) {
@@ -91,6 +92,7 @@ UserRouter.post("/profile", async (c) => {
                 username,
                 usernameSet,
                 usernameChangeTime: timeUntilNextChange,
+                canReportPlayers,
             },
             loadout,
             items: items,
