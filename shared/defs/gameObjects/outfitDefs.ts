@@ -235,7 +235,7 @@ const SkinDefs: Record<string, OutfitDef> = {
             tint: 0xffffff,
         },
         rarity: Rarity.Epic,
-        lore: "For those who knows.",
+        lore: "We all agreed on this already.",
     }),
     outfitMod: defineOutfitSkin("outfitBase", {
         name: "Game Moderatr",
