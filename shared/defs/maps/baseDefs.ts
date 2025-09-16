@@ -548,7 +548,7 @@ export const Main: MapDef = {
             { name: "model94", count: 1, weight: 1 },
             { name: "colt45", count: 1, weight: 1 },
             { name: "outfitVerde", count: 1, weight: 0.1 },
-            { name: "outfitDesertCamo", count: 1, weight: 0.3 },
+            { name: "outfitDesertCamo", count: 1, weight: 0.4 },
         ],
         // seems to be unused? so adding this to suppress the warning
         tier_pumpkin_candy: [{ name: "", weight: 1, count: 1 }],
