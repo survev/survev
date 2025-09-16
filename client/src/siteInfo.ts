@@ -34,11 +34,17 @@ export class SiteInfo {
             teamSelector.append(elm);
         }
 
-        $.ajax(siteInfoUrl).done((data: SiteInfoRes) => {
-            this.info = data || {};
-            this.loaded = true;
-            this.updatePageFromInfo();
-        });
+        const fetchSiteInfo = () => {
+            $.ajax(siteInfoUrl).done((data: SiteInfoRes) => {
+                this.info = data || {};
+                this.loaded = true;
+                this.updatePageFromInfo();
+            });
+        };
+
+        fetchSiteInfo();
+        setInterval(fetchSiteInfo, 300000);
+
     }
 
     getGameModeStyles() {
@@ -142,13 +148,15 @@ export class SiteInfo {
             );
 
             const featuredYoutuberElem = $("#featured-youtuber");
-            const displayYoutuber = this.info.youtube;
-            if (displayYoutuber) {
+            if (this.info.youtube && this.info.youtube.length > 0) {
+                const yt = this.info.youtube[Math.floor(Math.random() * this.info.youtube.length)];
                 $(".btn-youtuber")
-                    .attr("href", this.info.youtube.link)
-                    .html(this.info.youtube.name);
+                    .attr("href", yt.link)
+                    .html(yt.name);
+                featuredYoutuberElem.css("display", "block");
+            } else {
+                featuredYoutuberElem.css("display", "none");
             }
-            featuredYoutuberElem.css("display", displayYoutuber ? "block" : "none");
 
             const mapDef = MapDefs[this.info.clientTheme] as MapDef;
             if (mapDef) {
