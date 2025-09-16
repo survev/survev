@@ -117,7 +117,7 @@ export class ApiServer {
     }
 
     private startFeaturedRefresh() {
-        setInterval(async () => {
+        const refresh = async () => {
             this.youtubeCache = [...Config.featured.youtubers];
             const streamers: typeof this.twitchCache = [];
             for (const s of Config.featured.twitch) {
@@ -125,7 +125,9 @@ export class ApiServer {
                 if (twitchData) streamers.push(twitchData);
             }
             this.twitchCache = streamers;
-        }, 300000);
+        };
+        refresh();
+        setInterval(refresh, 300000);
     }
 
     private async fetchTwitchData(name: string) {
