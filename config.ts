@@ -34,6 +34,21 @@ export function getConfig(isProduction: boolean, dir: string) {
             { mapName: "main", teamMode: TeamMode.Squad, enabled: true },
         ],
         clientTheme: "main",
+        featured: {
+            youtubers: [
+                { name: "Awm-S Gaming", link: "https://www.youtube.com/@Awm-SGaming" },
+                { name: "GAMERIO", link: "https://www.youtube.com/@GAMERIO1" },
+                { name: "NAMERIO", link: "https://www.youtube.com/@namerio1" },
+                { name: "RazerTiduu", link: "https://www.youtube.com/@razertiduu1876" },
+                { name: "squiggle", link: "https://www.youtube.com/@squiggle" },
+                { name: "this.is.gls_", link: "https://www.youtube.com/@this.is.gls_" },
+                { name: "Whosty", link: "https://www.youtube.com/@WhostyIO" },
+            ],
+            twitch: [
+                { name: "awmsgaming" },
+                { name: "surviv_skiper" },
+            ],
+        },
         gameTps: 100,
         netSyncTps: 33,
         processMode: isDev ? "single" : "multi",
