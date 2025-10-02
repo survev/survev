@@ -307,8 +307,11 @@ export const Main: MapDef = {
             { name: "outfitAqua", count: 1, weight: 1 },
             { name: "outfitCoral", count: 1, weight: 1 },
         ],
-        tier_noir_outfit: [{ name: "outfitNoir", count: 1, weight: 1 }],
-        tier_khaki_outfit: [{ name: "outfitKhaki", count: 1, weight: 1 }],
+        tier_noir_outfit: [{ name: "outfitNoir", count: 1, weight: 1 },],
+        tier_khaki_outfit: [
+            { name: "outfitKhaki", count: 1, weight: 20 },
+            { name: "outfitParmaPrestige", count: 1, weight: 1 },
+        ],
         tier_pirate_melee: [{ name: "hook", count: 1, weight: 1 }],
         tier_hatchet: [
             { name: "vector", count: 1, weight: 0.4 },
@@ -348,8 +351,12 @@ export const Main: MapDef = {
         tier_forest_helmet: [{ name: "helmet03_forest", count: 1, weight: 1 }],
         tier_outfits: [
             { name: "outfitCobaltShell", count: 1, weight: 0.2 }, // ?
+            { name: "outfitRed", count: 1, weight: 0.2}, // ?
+            { name: "outfitWhite", count: 1, weight: 0.2}, // ?
             { name: "outfitKeyLime", count: 1, weight: 0.15 }, // ?
             { name: "outfitWoodland", count: 1, weight: 0.1 }, // ?
+            { name: "outfitCarbonFiber", count: 1, weight: 0.1}, // ?
+            { name: "outfitDarkGloves", count: 1, weight: 0.1}, // ?
             { name: "outfitCamo", count: 1, weight: 0.1 }, // ?
             { name: "outfitGhillie", count: 1, weight: 0.01 }, // ?
         ],
@@ -602,6 +609,9 @@ export const Main: MapDef = {
             { name: "outfitVerde", count: 1, weight: 1 },
             { name: "outfitWoodland", count: 1, weight: 1 },
             { name: "outfitKeyLime", count: 1, weight: 1 },
+            { name: "outfitWhite", count: 1, weight: 1},
+            { name: "outfitCarbonFiber", count: 1, weight: 1},
+            { name: "outfitDarkGloves", count: 1, weight: 1},
             { name: "outfitCamo", count: 1, weight: 1 },
         ],
         tier_airdrop_faction_outfits: [{ name: "outfitGhillie", count: 1, weight: 1 }],

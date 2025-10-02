@@ -9977,7 +9977,7 @@ export const MapObjectDefs: Record<string, MapObjectDef> = {
     }),
     locker_03: createLocker({
         img: { sprite: "map-locker-03.img" },
-        loot: [autoLoot("ak47", 1), autoLoot("backpack02", 1)],
+        loot: [autoLoot("ak47", 1), autoLoot("backpack02", 1), tierLoot("tier_khaki_outfit", 1, 1)],
     }),
     oven_01: createOven({}),
     piano_01: {
