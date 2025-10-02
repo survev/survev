@@ -307,7 +307,7 @@ export const Main: MapDef = {
             { name: "outfitAqua", count: 1, weight: 1 },
             { name: "outfitCoral", count: 1, weight: 1 },
         ],
-        tier_noir_outfit: [{ name: "outfitNoir", count: 1, weight: 1 },],
+        tier_noir_outfit: [{ name: "outfitNoir", count: 1, weight: 1 }],
         tier_khaki_outfit: [
             { name: "outfitKhaki", count: 1, weight: 20 },
             { name: "outfitParmaPrestige", count: 1, weight: 1 },
