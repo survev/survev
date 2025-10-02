@@ -359,6 +359,12 @@ export const UnlockDefs: Record<UnlockDefKey, UnlockDef> = {
             "emote_flaguae",
             "emote_flagdominicanrepublic",
             "emote_flagpalestine",
+            "emote_flagtransgender",
+            "emote_flagpride",
+            "emote_flaglesbian",
+            "emote_flaggay",
+            "emote_flagasexual",
+            "emote_flagnonbinary",
             "emote_logocloud",
             "emote_logotwins",
 
