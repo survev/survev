@@ -1095,7 +1095,6 @@ export class UiManager {
         playerId: number,
         activePlayerId: number,
         playerBarn: PlayerBarn,
-        _factionMode: unknown,
     ) {
         const pingDef = PingDefs[pingType];
         if (pingDef) {
