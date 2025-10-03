@@ -8638,11 +8638,19 @@ export const MapObjectDefs: Record<string, MapObjectDef> = {
     } as unknown as Partial<ObstacleDef>),
     bush_06: createBush({
         collision: collider.createCircle(v2.create(0, 0), 1.75),
+        map: { display: true, color: 0xfb9c01, scale: 1.5 },
         img: {
             sprite: "map-bush-06.img",
             residue: "map-bush-res-06.img",
         },
-        map: { display: true, color: 0x6a623d, scale: 1.5 },
+    }),
+    bush_06tr: createBush({
+        collision: collider.createCircle(v2.create(0, 0), 1.75),
+        map: { display: true, color: 0xe2a51a, scale: 1.6 },
+        img: {
+            sprite: "map-bush-06tr.img",
+            residue: "map-bush-res-06.img",
+        },
     }),
     bush_06b: createBush({
         scale: { createMin: 1, createMax: 1 },
@@ -8763,6 +8771,10 @@ export const MapObjectDefs: Record<string, MapObjectDef> = {
     }),
     chest_03x: createRiverChest({
         img: { sprite: "map-chest-03x.img" },
+        loot: [tierLoot("tier_chest", 3, 5), autoLoot("outfitWaterElem", 1)],
+    }),
+    chest_03tr: createRiverChest({
+        img: { sprite: "map-chest-03tr.img" },
         loot: [tierLoot("tier_chest", 3, 5), autoLoot("outfitWaterElem", 1)],
     }),
     chest_04: createChest({
@@ -8965,7 +8977,7 @@ export const MapObjectDefs: Record<string, MapObjectDef> = {
     crate_03: createCrate({
         health: 100,
         collision: collider.createAabbExtents(v2.create(0, 0), v2.create(1.575, 1.575)),
-        loot: [tierLoot("tier_throwables", 2, 4)],
+        loot: [tierLoot("tier_throwables", 2, 4), tierLoot("tier_fragtastic", 1, 1)],
         map: { color: 0x4d4d1e, scale: 0.875 },
         terrain: { grass: true, beach: false },
         img: { sprite: "map-crate-03.img", scale: 0.35 },
@@ -10114,14 +10126,14 @@ export const MapObjectDefs: Record<string, MapObjectDef> = {
     }),
     squash_01: createPumpkin({
         collision: collider.createCircle(v2.create(0, 0), 1.25),
-        map: { display: false },
+        map: { display: true, color: 0x8dad49, scale: 1.25 },
         img: {
             sprite: "map-squash-01.img",
             residue: "map-squash-res-01.img",
         },
         hitParticle: "squashChip",
         explodeParticle: "squashBreak",
-        loot: [autoLoot("turkey_shoot", 1), tierLoot("tier_fruit_xp", 1, 1)],
+        loot: [autoLoot("turkey_shoot", 1), tierLoot("tier_turkey_ff", 1, 1)], // tierLoot("tier_fruit_xp", 1, 1)], i replaced it with fowl facade %
     }),
     refrigerator_01: createRefrigerator({}),
     refrigerator_01b: createRefrigerator({
@@ -10376,6 +10388,12 @@ export const MapObjectDefs: Record<string, MapObjectDef> = {
     stone_03x: createRiverStone({
         img: {
             sprite: "map-stone-03x.img",
+            residue: "map-stone-res-02x.img",
+        },
+    }),
+    stone_03tr: createRiverStone({
+        img: {
+            sprite: "map-stone-03tr.img",
             residue: "map-stone-res-02x.img",
         },
     }),
@@ -11116,6 +11134,7 @@ export const MapObjectDefs: Record<string, MapObjectDef> = {
         collision: collider.createAabbExtents(v2.create(0, 0), v2.create(6, 3)),
         health: 400,
         destructible: true,
+        map: { display: true, color: 0x663300, scale: 0.8 },
         img: {
             sprite: "map-woodpile-02.img",
             residue: "map-woodpile-res-02.img",
@@ -13156,6 +13175,24 @@ export const MapObjectDefs: Record<string, MapObjectDef> = {
             },
             {
                 type: "loot_tier_leaf_pile",
+                pos: v2.create(0, 0),
+                scale: 1,
+                ori: 0,
+                inheritOri: false,
+            },
+        ],
+        map: { displayType: "bush_06" },
+    }),
+    cache_03tr: createCache({
+        mapObjects: [
+            {
+                type: "bush_06tr",
+                pos: v2.create(0, 0),
+                scale: 1,
+                ori: 0,
+            },
+            {
+                type: randomObstacleType({ "": 2, loot_tier_leaf_pile: 1 }),
                 pos: v2.create(0, 0),
                 scale: 1,
                 ori: 0,
@@ -16169,6 +16206,7 @@ export const MapObjectDefs: Record<string, MapObjectDef> = {
         },
     } as unknown as Partial<BuildingDef>),
     outhouse_02: createOutHouse({
+        map: { display: true, color: 0x9e4116, scale: 1 },
         ceiling: {
             zoomRegions: [
                 {
