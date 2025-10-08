@@ -1,5 +1,6 @@
 import type { Vec2 } from "../utils/v2";
 import { Main } from "./maps/baseDefs";
+import { Birthday } from "./maps/birthdayDefs";
 import { Cobalt } from "./maps/cobaltDefs";
 import { Desert } from "./maps/desertDefs";
 import { Faction } from "./maps/factionDefs";
@@ -49,6 +50,7 @@ export const MapDefs = {
     savannah: Savannah,
     cobalt: Cobalt,
     turkey: Turkey,
+    birthday: Birthday,
 
     /* STRIP_FROM_PROD_CLIENT:START */
     test_normal: testNormal,

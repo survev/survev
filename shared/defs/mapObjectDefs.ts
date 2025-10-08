@@ -8468,6 +8468,9 @@ export const MapObjectDefs: Record<string, MapObjectDef> = {
             autoLoot("mirv", 1),
         ],
     }),
+    barrel_01bd: createBarrel({
+        explosion: "",
+    }),
     barrel_02: createWoodBarrel({ health: 60 }),
     barrel_03: createWoodBarrel({
         collision: collider.createAabbExtents(v2.create(0, 0), v2.create(1.25, 0.5)),
