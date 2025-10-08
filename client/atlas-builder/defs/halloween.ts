@@ -11,22 +11,9 @@ export const HalloweenAtlas: AtlasDef = {
         "particles/part-airdrop-01h.svg",
         "particles/part-airdrop-02h.svg",
 
-        "map/map-bush-06.svg",
         "map/map-bush-07sp.svg",
-        "map/map-bush-res-06.svg",
 
         "map/map-crate-11h.svg",
-
-        "map/map-pumpkin-01.svg",
-        "map/map-pumpkin-02.svg",
-        "map/map-pumpkin-04.svg",
-        "map/map-pumpkin-res-01.svg",
-        "map/map-pumpkin-res-03.svg",
-
-        "map/map-tree-04h.svg",
-        "map/map-tree-05.svg",
-        "map/map-tree-07.svg",
-        "map/map-tree-08.svg",
 
         "map/map-web-01.svg",
     ],
