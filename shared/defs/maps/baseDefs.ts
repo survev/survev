@@ -351,12 +351,12 @@ export const Main: MapDef = {
         tier_forest_helmet: [{ name: "helmet03_forest", count: 1, weight: 1 }],
         tier_outfits: [
             { name: "outfitCobaltShell", count: 1, weight: 0.2 }, // ?
-            { name: "outfitRed", count: 1, weight: 0.2}, // ?
-            { name: "outfitWhite", count: 1, weight: 0.2}, // ?
+            { name: "outfitRed", count: 1, weight: 0.2 }, // ?
+            { name: "outfitWhite", count: 1, weight: 0.2 }, // ?
             { name: "outfitKeyLime", count: 1, weight: 0.15 }, // ?
             { name: "outfitWoodland", count: 1, weight: 0.1 }, // ?
-            { name: "outfitCarbonFiber", count: 1, weight: 0.1}, // ?
-            { name: "outfitDarkGloves", count: 1, weight: 0.1}, // ?
+            { name: "outfitCarbonFiber", count: 1, weight: 0.1 }, // ?
+            { name: "outfitDarkGloves", count: 1, weight: 0.1 }, // ?
             { name: "outfitCamo", count: 1, weight: 0.1 }, // ?
             { name: "outfitGhillie", count: 1, weight: 0.01 }, // ?
         ],
@@ -609,9 +609,9 @@ export const Main: MapDef = {
             { name: "outfitVerde", count: 1, weight: 1 },
             { name: "outfitWoodland", count: 1, weight: 1 },
             { name: "outfitKeyLime", count: 1, weight: 1 },
-            { name: "outfitWhite", count: 1, weight: 1},
-            { name: "outfitCarbonFiber", count: 1, weight: 1},
-            { name: "outfitDarkGloves", count: 1, weight: 1},
+            { name: "outfitWhite", count: 1, weight: 1 },
+            { name: "outfitCarbonFiber", count: 1, weight: 1 },
+            { name: "outfitDarkGloves", count: 1, weight: 1 },
             { name: "outfitCamo", count: 1, weight: 1 },
         ],
         tier_airdrop_faction_outfits: [{ name: "outfitGhillie", count: 1, weight: 1 }],
