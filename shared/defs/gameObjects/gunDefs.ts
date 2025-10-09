@@ -1408,7 +1408,7 @@ export const GunDefs: Record<string, GunDef> = {
         worldImg: {
             sprite: "gun-blr-01.img",
             scale: { x: 0.5, y: 0.5 },
-            tint: 16777215,
+            tint: 0xFFFFFF,
             leftHandOffset: { x: 6.5, y: 0 },
             recoil: 2.75,
         },
