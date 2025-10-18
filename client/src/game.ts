@@ -1,3 +1,4 @@
+import $ from "jquery";
 import * as PIXI from "pixi.js-legacy";
 import { GameObjectDefs } from "../../shared/defs/gameObjectDefs";
 import { RoleDefs } from "../../shared/defs/gameObjects/roleDefs";
@@ -42,7 +43,6 @@ import type { Localization } from "./ui/localization";
 import { Touch } from "./ui/touch";
 import { UiManager } from "./ui/ui";
 import { UiManager2 } from "./ui/ui2";
-import $ from "jquery";
 
 export interface Ctx {
     audioManager: AudioManager;
@@ -830,7 +830,7 @@ export class Game {
             const reportMsg = new net.ReportMsg();
             reportMsg.start = true;
             this.m_sendMessage(net.MsgType.Report, reportMsg, 128);
-            $("#btn-report-cheater").text("Stop recording.")
+            $("#btn-report-cheater").text("Stop recording.");
         }
         this.m_uiManager.specBegin = false;
         this.m_uiManager.specNext = false;
@@ -1619,7 +1619,9 @@ export class Game {
                 const msg = new net.ReportMsg();
                 msg.deserialize(stream);
                 this.m_uiManager.recording = msg.start;
-                $("#btn-report-cheater").text(msg.start ? "Stop recording." : "Start recording.");
+                $("#btn-report-cheater").text(
+                    msg.start ? "Stop recording." : "Start recording.",
+                );
                 break;
             }
             case net.MsgType.GameOver: {

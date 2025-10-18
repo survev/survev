@@ -10,25 +10,35 @@ import { ipLogsTable, reportsTable, usersTable } from "../../db/schema";
 
 export const ReportsRouter = new Hono()
     .use(databaseEnabledMiddleware)
-    .post("/mark_as_reviewed", validateParams(z.object({ reportId: z.string() })), async (c) => {
-        const { reportId } = c.req.valid("json");
+    .post(
+        "/mark_as_reviewed",
+        validateParams(z.object({ reportId: z.string() })),
+        async (c) => {
+            const { reportId } = c.req.valid("json");
 
-        await db.update(reportsTable).set({
-            status: "reviewed",
-        }).where(eq(reportsTable.id, reportId));
+            await db
+                .update(reportsTable)
+                .set({
+                    status: "reviewed",
+                })
+                .where(eq(reportsTable.id, reportId));
 
-        return c.json({ message: "Report marked as reviewed" }, 200);
-    })
+            return c.json({ message: "Report marked as reviewed" }, 200);
+        },
+    )
     .post(
         "/ignore_report",
         validateParams(z.object({ reportId: z.string() })),
         async (c) => {
             const { reportId } = c.req.valid("json");
 
-            const [{ reportedBy }] = await db.update(reportsTable).set({
-                status: "ignored",
-            }).where(eq(reportsTable.id, reportId))
-            .returning({ reportedBy: reportsTable.reportedBy });
+            const [{ reportedBy }] = await db
+                .update(reportsTable)
+                .set({
+                    status: "ignored",
+                })
+                .where(eq(reportsTable.id, reportId))
+                .returning({ reportedBy: reportsTable.reportedBy });
 
             if (!reportedBy) {
                 return c.json({ message: "Report not found" }, 200);
@@ -46,9 +56,15 @@ export const ReportsRouter = new Hono()
             if (count <= MAX_IGNORED_REPORTS)
                 return c.json({ message: `Ignored report with id: ${reportId}` }, 200);
 
-            await db.update(usersTable).set({ canReportPlayers: false }).where(eq(usersTable.id, reportedBy));
+            await db
+                .update(usersTable)
+                .set({ canReportPlayers: false })
+                .where(eq(usersTable.id, reportedBy));
 
-            return c.json({ message: `User would no longer be able to make reports` }, 200); 
+            return c.json(
+                { message: `User would no longer be able to make reports` },
+                200,
+            );
         },
     )
     .post(
@@ -158,7 +174,7 @@ export const ReportsRouter = new Hono()
         ),
         async (c) => {
             const { reportId: recordingId } = c.req.valid("json");
-            
+
             const recordingData = await db.query.reportsTable.findFirst({
                 where: eq(reportsTable.id, recordingId),
                 columns: {
@@ -166,7 +182,7 @@ export const ReportsRouter = new Hono()
                     sepectatedPlayerNames: true,
                 },
             });
-            
+
             if (!recordingData) {
                 return c.json(
                     {
@@ -175,16 +191,24 @@ export const ReportsRouter = new Hono()
                     200,
                 );
             }
-            
+
             const { gameId, sepectatedPlayerNames } = recordingData;
-            
-            if ( sepectatedPlayerNames.length == 0 ) {
-                return c.json({ message: "No players to show, this shouldn't happen" }, 200);
+
+            if (sepectatedPlayerNames.length == 0) {
+                return c.json(
+                    { message: "No players to show, this shouldn't happen" },
+                    200,
+                );
             }
-            
+
             const MAX_PLAYERS_TO_SHOW = 15;
-            if ( sepectatedPlayerNames.length > MAX_PLAYERS_TO_SHOW ) {
-                return c.json({ message: `Spectate more than ${MAX_PLAYERS_TO_SHOW} playes, they should seek help` }, 200);
+            if (sepectatedPlayerNames.length > MAX_PLAYERS_TO_SHOW) {
+                return c.json(
+                    {
+                        message: `Spectate more than ${MAX_PLAYERS_TO_SHOW} playes, they should seek help`,
+                    },
+                    200,
+                );
             }
 
             const result = await db

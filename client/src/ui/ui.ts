@@ -5,6 +5,7 @@ import { PingDefs } from "../../../shared/defs/gameObjects/pingDefs";
 import { type RoleDef, RoleDefs } from "../../../shared/defs/gameObjects/roleDefs";
 import type { MapDef } from "../../../shared/defs/mapDefs";
 import { Action, GameConfig, GasMode, TeamMode } from "../../../shared/gameConfig";
+import type * as net from "../../../shared/net/net";
 import type { PlayerStatsMsg } from "../../../shared/net/playerStatsMsg";
 import type { MapIndicator, PlayerStatus } from "../../../shared/net/updateMsg";
 import { coldet } from "../../../shared/utils/coldet";
@@ -30,7 +31,6 @@ import type { Localization } from "./localization";
 import { PieTimer } from "./pieTimer";
 import type { Touch } from "./touch";
 import type { UiManager2 } from "./ui2";
-import type * as net from "../../../shared/net/net";
 
 function humanizeTime(time: number) {
     const hours = Math.floor(time / 3600);
@@ -2198,7 +2198,7 @@ export class UiManager {
     updateRecording(msg: net.ReportMsg) {
         this.recording = !msg.end;
 
-        if ( this.recording ) {
+        if (this.recording) {
             $("#btn-report-cheater").text("Reported!");
             $("#btn-report-cheater").prop("disabled", true);
         }

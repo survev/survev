@@ -262,9 +262,9 @@ export class Account {
                 profile.slug = data.profile.slug;
                 this.config.set("profile", profile);
 
-                if ( data.profile.canReportPlayers ) {
+                if (data.profile.canReportPlayers) {
                     $("#btn-report-cheater").css("display", "block");
-                } 
+                }
             }
             if (!this.loggedIn) {
                 this.config.set("sessionCookie", null);

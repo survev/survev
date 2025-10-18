@@ -124,7 +124,7 @@ export async function createDiscordPlayerInfoCardUI({
     playerIdx,
     originalUserId,
     matchingPlayers,
-    reportId
+    reportId,
 }: {
     interaction: RepliableInteraction;
     playerIdx: number;
@@ -199,14 +199,14 @@ export async function createDiscordPlayerInfoCardUI({
                 },
             });
 
-            if ( reportId ) {
+            if (reportId) {
                 await honoClient.reports.mark_as_reviewed.$post({
                     json: {
-                        reportId
+                        reportId,
                     },
                 });
             }
-            
+
             const { message } = await res.json();
             await clearEmbedWithMessage(interaction, message);
         },

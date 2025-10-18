@@ -13,9 +13,15 @@ import {
 } from "discord.js";
 import { MapId, TeamModeToString } from "../../shared/defs/types/misc";
 import { commandHandlers } from "./commands";
-import { clearEmbedWithMessage, createDiscordPlayerInfoCardUI, createSelectUI, discordCardUI, type DropdownPlayer } from "./components";
+import {
+    clearEmbedWithMessage,
+    createDiscordPlayerInfoCardUI,
+    createSelectUI,
+    type DropdownPlayer,
+    discordCardUI,
+} from "./components";
 import { DISCORD_BOT_TOKEN, webhookId } from "./config";
-import { type Command, hasPermission, honoClient, BOT_COLLECTOR_TIMEOUT } from "./utils";
+import { BOT_COLLECTOR_TIMEOUT, type Command, hasPermission, honoClient } from "./utils";
 
 const client = new Client({
     intents: [
@@ -120,35 +126,37 @@ function setupEventListeners() {
             embeds: [],
             components: [
                 row,
-                new ActionRowBuilder<ButtonBuilder>()
-                .addComponents(banPlayerForCheating)
+                new ActionRowBuilder<ButtonBuilder>().addComponents(banPlayerForCheating),
             ],
         });
 
-        const collector = selectDropdownReply
-            .createMessageComponentCollector({
-                time: BOT_COLLECTOR_TIMEOUT,
-            })
-        
-        collector.on("collect", async (interaction) => {
-                if ( interaction.componentType === ComponentType.Button) {
+        const collector = selectDropdownReply.createMessageComponentCollector({
+            time: BOT_COLLECTOR_TIMEOUT,
+        });
+
+        collector
+            .on("collect", async (interaction) => {
+                if (interaction.componentType === ComponentType.Button) {
                     const res = await honoClient.reports.ignore_report.$post({
                         json: {
-                            reportId
+                            reportId,
                         },
                     });
                     const { message } = await res.json();
                     await clearEmbedWithMessage(selectDropdownReply, message);
-                    collector.stop("completed")
+                    collector.stop("completed");
                     return;
                 }
-                if ( interaction.componentType !== ComponentType.StringSelect ) return;
+                if (interaction.componentType !== ComponentType.StringSelect) return;
 
                 await interaction.deferUpdate();
                 const selectedValue = interaction.values[0];
                 const playerIdx = parseInt(selectedValue.split("_")[1]);
-                
-                const { embed, row } = discordCardUI(matchingPlayers[playerIdx], playerIdx);
+
+                const { embed, row } = discordCardUI(
+                    matchingPlayers[playerIdx],
+                    playerIdx,
+                );
 
                 await interaction.editReply({
                     embeds: [embed],
@@ -160,13 +168,16 @@ function setupEventListeners() {
                     playerIdx,
                     originalUserId: interaction.user.id,
                     matchingPlayers,
-                    reportId
+                    reportId,
                 });
-                collector.stop("completed")
+                collector.stop("completed");
             })
             .on("end", async (_, reason) => {
                 if (reason != "time") return;
-                await clearEmbedWithMessage(selectDropdownReply, "Timed out, please try again.");
+                await clearEmbedWithMessage(
+                    selectDropdownReply,
+                    "Timed out, please try again.",
+                );
             });
     });
 }

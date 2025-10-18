@@ -34,10 +34,10 @@ import {
 } from "./db/schema";
 import { cleanupOldLogs, isBanned } from "./routes/private/ModerationRouter";
 import { PrivateRouter } from "./routes/private/private";
+import { deleteOldReports } from "./routes/private/ReportsRouter";
 import { StatsRouter } from "./routes/stats/StatsRouter";
 import { AuthRouter } from "./routes/user/AuthRouter";
 import { UserRouter } from "./routes/user/UserRouter";
-import { deleteOldReports } from "./routes/private/ReportsRouter";
 
 export type Context = {
     Variables: {

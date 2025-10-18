@@ -9,8 +9,8 @@ import type {
 import { MessageFlags, PermissionFlagsBits } from "discord.js";
 import { hc } from "hono/client";
 import type { PrivateRouteApp } from "../../server/src/api/routes/private/private";
-import { API_URL, Config, DISCORD_GUILD_ID, DISCORD_ROLE_ID } from "./config";
 import { clearEmbedWithMessage } from "./components";
+import { API_URL, Config, DISCORD_GUILD_ID, DISCORD_ROLE_ID } from "./config";
 
 // we love enums
 export const enum Command {

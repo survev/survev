@@ -4857,7 +4857,7 @@ export class Player extends BaseGameObject {
 
         this.recorder.startRecording();
 
-        if ( this.spectating ) {
+        if (this.spectating) {
             this.spectatedWhenRecording.add(this.spectating?.name);
         }
 
