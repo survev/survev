@@ -10,6 +10,7 @@ import { Potato } from "./maps/potatoDefs";
 import { PotatoSpring } from "./maps/potatoSpringDefs";
 import { Savannah } from "./maps/savannahDefs";
 import { Snow } from "./maps/snowDefs";
+import { testFaction, testNormal } from "./maps/testDefs";
 import { Turkey } from "./maps/turkeyDefs";
 import { Woods } from "./maps/woodsDefs";
 import { WoodsSnow } from "./maps/woodsSnowDefs";
@@ -48,6 +49,11 @@ export const MapDefs = {
     savannah: Savannah,
     cobalt: Cobalt,
     turkey: Turkey,
+
+    /* STRIP_FROM_PROD_CLIENT:START */
+    test_normal: testNormal,
+    test_faction: testFaction,
+    /* STRIP_FROM_PROD_CLIENT:END */
 } satisfies Record<string, MapDef>;
 
 export interface MapDef {
@@ -57,6 +63,7 @@ export interface MapDef {
         icon: string;
         buttonCss: string;
         buttonText?: string;
+        backgroundImg: string;
     };
     assets: {
         audio: Array<{
@@ -193,6 +200,7 @@ export interface MapDef {
         places: Array<{
             name: string;
             pos: Vec2;
+            dontSpawnObjects?: boolean;
         }>;
         bridgeTypes: {
             medium: string;
@@ -208,15 +216,15 @@ export interface MapDef {
             }>;
             placeSpawns: string[];
         };
-        densitySpawns: Array<Record<string, number>>;
-        fixedSpawns: Array<
-            Record<string, number | { odds: number } | { small: number; large: number }>
-        >;
+        densitySpawns: [Record<string, number>];
+        fixedSpawns: [
+            Record<string, number | { odds: number } | { small: number; large: number }>,
+        ];
         randomSpawns: Array<{
             spawns: string[];
             choose: number;
         }>;
-        spawnReplacements: Array<Record<string, string>>;
+        spawnReplacements: [Record<string, string>];
         importantSpawns: string[];
     };
 }

@@ -1,4 +1,4 @@
-import type { AABBWithHeight } from "../../utils/coldet";
+import type { AABB } from "../../utils/coldet";
 import type { Vec2 } from "../../utils/v2";
 import type { TerrainSpawnDef } from "../mapObjectsTyping";
 
@@ -6,7 +6,7 @@ export interface StructureDef {
     readonly type: "structure";
     terrain: TerrainSpawnDef;
     ori?: number;
-    mapObstacleBounds?: AABBWithHeight[];
+    mapObstacleBounds?: AABB[];
     layers: Array<{
         type: string;
         pos: Vec2;
@@ -15,12 +15,12 @@ export interface StructureDef {
         inheritOri?: number;
     }>;
     stairs: Array<{
-        collision: AABBWithHeight;
+        collision: AABB;
         downDir: Vec2;
         noCeilingReveal?: boolean;
         lootOnly?: boolean;
     }>;
-    mask: AABBWithHeight[];
+    mask: AABB[];
     bunkerType?: string;
     structureType?: string;
     interiorSound?: {
@@ -34,7 +34,7 @@ export interface StructureDef {
         undergroundVolume?: number;
         puzzle: string;
     };
-    bridgeLandBounds?: AABBWithHeight[];
-    bridgeWaterBounds?: AABBWithHeight[];
+    bridgeLandBounds?: AABB[];
+    bridgeWaterBounds?: AABB[];
     teamId?: number;
 }

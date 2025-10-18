@@ -112,14 +112,13 @@ export class Pass {
         this.account.addEventListener("request", this.onRequest.bind(this));
         this.account.addEventListener("pass", this.onPass.bind(this));
         this.loadPlaceholders();
-        $("#pass-progress-unlock-wrapper").hover(
-            () => {
+        $("#pass-progress-unlock-wrapper")
+            .on("mouseenter", () => {
                 $("#pass-unlock-tooltip").fadeIn(50);
-            },
-            () => {
+            })
+            .on("mouseleave", () => {
                 $("#pass-unlock-tooltip").fadeOut(50);
-            },
-        );
+            });
     }
 
     onPass(pass: any, quests: any[], resetRefresh: boolean) {

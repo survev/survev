@@ -18,11 +18,16 @@ const mapDef: PartialMapDef = {
         icon: "img/gui/star.svg",
         buttonCss: "btn-mode-faction",
         buttonText: "50v50",
+        backgroundImg: "img/main_splash_0_7_0.png",
     },
     assets: {
         audio: [
             {
                 name: "lt_assigned_01",
+                channel: "ui",
+            },
+            {
+                name: "captain_assigned_01",
                 channel: "ui",
             },
             {

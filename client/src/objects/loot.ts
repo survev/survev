@@ -11,8 +11,8 @@ import { util } from "../../../shared/utils/util";
 import { type Vec2, v2 } from "../../../shared/utils/v2";
 import type { AudioManager } from "../audioManager";
 import type { Camera } from "../camera";
-import type { DebugOptions } from "../config";
-import { debugLines } from "../debugLines";
+import type { DebugRenderOpts } from "../config";
+import { debugLines } from "../debug/debugLines";
 import { device } from "../device";
 import type { Map } from "../map";
 import type { Renderer } from "../renderer";
@@ -170,7 +170,7 @@ export class LootBarn {
         map: Map,
         audioManager: AudioManager,
         camera: Camera,
-        debug: DebugOptions,
+        debug: DebugRenderOpts,
     ) {
         this.closestLoot = null;
         let closestDist = Number.MAX_VALUE;
@@ -235,7 +235,7 @@ export class LootBarn {
                 loot.container.position.set(screenPos.x, screenPos.y);
                 loot.container.scale.set(screenScale, screenScale);
 
-                if (IS_DEV && debug.render.loot && activePlayer.layer === loot.layer) {
+                if (IS_DEV && debug.loot && activePlayer.layer === loot.layer) {
                     debugLines.addCircle(loot.pos, loot.rad, 0xff0000, 0);
                 }
             }

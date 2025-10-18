@@ -662,7 +662,6 @@ export class UiManager {
         player: Player,
         map: Map,
         gas: Gas,
-        _i: unknown,
         playerBarn: PlayerBarn,
         camera: Camera,
         teamMode: TeamMode,
@@ -828,8 +827,6 @@ export class UiManager {
                         role: playerStatus.role,
                     },
                     playerInfo.playerId,
-                    playerInfo.teamId,
-                    playerBarn,
                 );
 
                 // Team indicators
@@ -943,7 +940,7 @@ export class UiManager {
                 top: 12,
             });
         }
-        this.updatePlayerMapSprites(dt, player, playerBarn, map);
+        this.updatePlayerMapSprites(player, playerBarn, map);
         this.mapSpriteBarn.update(dt, this, map);
         this.m_pieTimer.update(dt, camera);
 
@@ -972,12 +969,7 @@ export class UiManager {
         }
     }
 
-    updatePlayerMapSprites(
-        _dt: unknown,
-        activePlayer: Player,
-        playerBarn: PlayerBarn,
-        map: Map,
-    ) {
+    updatePlayerMapSprites(activePlayer: Player, playerBarn: PlayerBarn, map: Map) {
         const activePlayerInfo = playerBarn.getPlayerInfo(activePlayer.__id);
 
         let spriteIdx = 0;
@@ -2037,14 +2029,7 @@ export class UiManager {
         this.waitingText.css("display", waiting ? "block" : "none");
     }
 
-    m_render(
-        playerPos: Vec2,
-        gas: Gas,
-        _camera: unknown,
-        map: Map,
-        planeBarn: PlaneBarn,
-        debug: unknown,
-    ) {
+    m_render(playerPos: Vec2, gas: Gas, map: Map, planeBarn: PlaneBarn) {
         // Gas
         const circle = gas.getCircle(1);
         const gasPos = this.getMapPosFromWorldPos(circle.pos, map);
@@ -2074,7 +2059,7 @@ export class UiManager {
             drawLine,
         );
 
-        planeBarn.renderAirstrikeZones(this, map, debug);
+        planeBarn.renderAirstrikeZones(this, map);
     }
 
     updateHealthBar(
@@ -2136,8 +2121,6 @@ export class UiManager {
         health: number,
         status: PrevStatus,
         playerId: number,
-        _o: unknown,
-        _s: unknown,
     ) {
         const groupId = this.teamSelectors[slotIdx].groupId;
         const teamName = this.teamSelectors[slotIdx].teamName;
@@ -2360,14 +2343,13 @@ export class UiManager {
                 }
                 this.escMenuDisplayed = true;
                 this.escMenuElem.css("display", "block");
-                $("#ui-center").hover(
-                    () => {
+                $("#ui-center")
+                    .on("mouseenter", () => {
                         this.inputBinds.menuHovered = true;
-                    },
-                    () => {
+                    })
+                    .on("mouseleave", () => {
                         this.inputBinds.menuHovered = false;
-                    },
-                );
+                    });
                 this.inputBinds.menuHovered = false;
                 if (this.roleMenuActive) {
                     this.hideRoleMenu();

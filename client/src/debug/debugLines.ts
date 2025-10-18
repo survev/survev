@@ -1,8 +1,8 @@
 import type { Graphics } from "pixi.js-legacy";
-import type { Collider } from "../../shared/utils/coldet";
-import { collider } from "../../shared/utils/collider";
-import { type Vec2, v2 } from "../../shared/utils/v2";
-import type { Camera } from "./camera";
+import type { Collider } from "../../../shared/utils/coldet";
+import { collider } from "../../../shared/utils/collider";
+import { type Vec2, v2 } from "../../../shared/utils/v2";
+import type { Camera } from "../camera";
 
 enum kShapes {
     Line,

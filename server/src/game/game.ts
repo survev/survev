@@ -169,13 +169,13 @@ export class Game {
         this.updateData();
     }
 
-    update(): void {
+    update(dt?: number): void {
         if (!this.allowJoin) return;
         this.profiler.flush();
 
         const now = performance.now();
         if (!this.now) this.now = now;
-        const dt = math.clamp((now - this.now) / 1000, 0.001, 1 / 8);
+        dt ??= math.clamp((now - this.now) / 1000, 0.001, 1 / 8);
 
         this.now = now;
 
@@ -476,7 +476,7 @@ export class Game {
         player.disconnected = true;
         player.group?.checkPlayers();
         player.spectating = undefined;
-        player.dir = v2.create(1, 0);
+        player.dirNew = v2.create(1, 0);
         player.setPartDirty();
         if (player.canDespawn()) {
             player.game.playerBarn.removePlayer(player);
@@ -558,6 +558,15 @@ export class Game {
          */
         const teamTotal = new Set(players.map(({ player }) => player.teamId)).size;
 
+        const teamKills = players.reduce(
+            (acc, curr) => {
+                acc[curr.player.teamId] =
+                    (acc[curr.player.teamId] ?? 0) + curr.player.kills;
+                return acc;
+            },
+            {} as Record<string, number>,
+        );
+
         const values: SaveGameBody["matchData"] = players.map(({ player, rank }) => {
             return {
                 // *NOTE: userId is optional; we save the game stats for non logged users too
@@ -566,12 +575,13 @@ export class Game {
                 username: player.name,
                 playerId: player.matchDataId,
                 teamMode: this.teamMode,
-                teamCount: player.group?.totalCount ?? 1,
+                teamCount: player.group?.players.length ?? 1,
                 teamTotal: teamTotal,
                 teamId: player.teamId,
                 timeAlive: Math.round(player.timeAlive),
                 died: player.dead,
                 kills: player.kills,
+                team_kills: teamKills[player.groupId] ?? 0,
                 damageDealt: Math.round(player.damageDealt),
                 damageTaken: Math.round(player.damageTaken),
                 killerId: player.killedBy?.matchDataId || 0,
@@ -604,51 +614,70 @@ export class Game {
         }
 
         if (!res || !res.ok) {
-            this.logger.warn(`Failed to save game data, saving locally instead`);
-            // we dump the game  to a local db if we failed to save;
-            // avoid importing sqlite and creating the database at process startup
-            // since this code should rarely run anyway
-            const sqliteDb = (await import("better-sqlite3")).default(
-                "lost_game_data.db",
+            const region = Config.gameServer.thisRegion.toUpperCase();
+            this.logger.error(
+                `[${region}] Failed to save game data, saving locally instead`,
             );
+            try {
+                // we dump the game  to a local db if we failed to save;
+                // avoid importing sqlite and creating the database at process startup
+                // since this code should rarely run anyway
+                const sqliteDb = (await import("better-sqlite3")).default(
+                    "lost_game_data.db",
+                );
 
-            sqliteDb
-                .prepare(`
-                    CREATE TABLE IF NOT EXISTS lost_game_data (
-                        id INTEGER PRIMARY KEY AUTOINCREMENT,
-                        data TEXT NOT NULL,
-                        timestamp DATETIME DEFAULT CURRENT_TIMESTAMP
-                    )
-                `)
-                .run();
+                sqliteDb
+                    .prepare(`
+                        CREATE TABLE IF NOT EXISTS lost_game_data (
+                            id INTEGER PRIMARY KEY AUTOINCREMENT,
+                            data TEXT NOT NULL,
+                            timestamp DATETIME DEFAULT CURRENT_TIMESTAMP
+                        )
+                    `)
+                    .run();
 
-            sqliteDb
-                .prepare("INSERT INTO lost_game_data (data) VALUES (?)")
-                .run(JSON.stringify(values));
-            return;
+                sqliteDb
+                    .prepare("INSERT INTO lost_game_data (data) VALUES (?)")
+                    .run(JSON.stringify(values));
+            } catch (err) {
+                this.logger.error(`[${region}] Failed to save game data locally`, err);
+            }
+
+            // this needs to be done after the game is saved to the db
+            const allPlayers = this.playerBarn.players;
+            for await (const player of allPlayers) {
+                if (!player.recorder) continue;
+
+                const data = player.getRecorderDBData();
+
+                if (!data) continue;
+
+                const res = await apiPrivateRouter.reports.save_game_recording.$post({
+                    json: {
+                        gameId: this.id,
+                        reportedBy: data.userId!,
+                        recording: data.recording,
+                        sepectatedPlayerNames: data.sepectatedPlayerNames,
+                    },
+                });
+
+                if (!res.ok) {
+                    this.logger.error(`Failed to save recording by ${data.userId}`);
+                    return;
+                }
+            }
         }
-
-        // this needs to be done after the game is saved to the db
-        const allPlayers = this.playerBarn.players;
-        for await (const player of allPlayers) {
-            if (!player.recorder) continue;
-
-            const data = player.getRecorderDBData();
-
-            if (!data) continue;
-
-            const res = await apiPrivateRouter.reports.save_game_recording.$post({
-                json: {
-                    gameId: this.id,
-                    reportedBy: data.userId!,
-                    recording: data.recording,
-                    sepectatedPlayerNames: data.sepectatedPlayerNames,
-                },
-            });
-
-            if (!res.ok) {
-                this.logger.error(`Failed to save recording by ${data.userId}`);
-                return;
+    }
+        /**
+         * Steps the game X seconds in the future
+         * This is done in smaller steps of 0.1 seconds
+         * To make sure everything updates properly
+         *
+         * Used for unit tests, don't call this on actual game code :p
+         */
+        step(seconds: number) {
+            for (let i = 0, steps = seconds * 10; i < steps; i++) {
+                this.update(0.1);
             }
         }
     }

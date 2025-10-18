@@ -1,0 +1,1 @@
+ALTER TABLE "match_data" ADD COLUMN "team_kills" integer DEFAULT 0 NOT NULL;

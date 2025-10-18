@@ -4,6 +4,9 @@ import type { MapDef } from "../mapDefs";
 import { Main, type PartialMapDef } from "./baseDefs";
 
 const mapDef: PartialMapDef = {
+    desc: {
+        backgroundImg: "img/main_splash_0_6_10.png",
+    },
     assets: {
         audio: [
             { name: "snowball_01", channel: "sfx" },

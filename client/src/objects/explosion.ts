@@ -9,8 +9,8 @@ import { util } from "../../../shared/utils/util";
 import { type Vec2, v2 } from "../../../shared/utils/v2";
 import type { AudioManager } from "../audioManager";
 import type { Camera } from "../camera";
-import type { DebugOptions } from "../config";
-import { debugLines } from "../debugLines";
+import type { DebugRenderOpts } from "../config";
+import { debugLines } from "../debug/debugLines";
 import type { SoundHandle } from "../lib/createJS";
 import type { Map } from "../map";
 import type { Particle, ParticleBarn } from "./particles";
@@ -67,7 +67,7 @@ class PhysicsParticle {
                 !player.dead &&
                 util.sameLayer(this.layer, player.layer)
             ) {
-                colliders.push(collider.createCircle(player.m_pos, player.m_rad, 0));
+                colliders.push(collider.createCircle(player.m_pos, player.m_rad));
             }
         }
 
@@ -122,7 +122,7 @@ class Explosion {
     soundInstance!: SoundHandle | null;
     soundUpdateThrottle!: number;
 
-    constructor(_e: unknown) {
+    constructor() {
         this.active = false;
     }
 
@@ -279,7 +279,7 @@ export class ExplosionBarn {
             }
         }
         if (!explosion) {
-            explosion = new Explosion(this);
+            explosion = new Explosion();
             this.explosions.push(explosion);
         }
         explosion.init(type, pos, layer);
@@ -308,7 +308,7 @@ export class ExplosionBarn {
         camera: Camera,
         particleBarn: ParticleBarn,
         audioManager: AudioManager,
-        debug: DebugOptions,
+        debug: DebugRenderOpts,
     ) {
         for (let i = 0; i < this.explosions.length; i++) {
             const e = this.explosions[i];
@@ -318,7 +318,7 @@ export class ExplosionBarn {
                     e.free();
                 }
 
-                if (IS_DEV && debug.render.explosions) {
+                if (IS_DEV && debug.explosions) {
                     const def = GameObjectDefs[e.type] as ExplosionDef;
                     debugLines.addCircle(e.pos, def.rad.min, 0xff0000, 0);
                     debugLines.addCircle(e.pos, def.rad.max, 0xff9900, 0);

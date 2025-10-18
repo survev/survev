@@ -134,6 +134,12 @@ const app = Config.gameServer.ssl
       })
     : App();
 
+app.get("/health", (res) => {
+    res.writeStatus("200 OK");
+    res.write("OK");
+    res.end();
+});
+
 app.options("/api/find_game", (res) => {
     cors(res);
     res.end();
@@ -214,10 +220,25 @@ app.ws<GameSocketData>("/play", {
         const searchParams = new URLSearchParams(req.getQuery());
         const gameId = searchParams.get("gameId");
 
-        if (!gameId || !server.manager.getById(gameId)) {
+        if (!gameId) {
+            server.logger.warn("game_id_missing");
             forbidden(res);
             return;
         }
+        const gameData = server.manager.getById(gameId);
+
+        if (!gameData) {
+            server.logger.warn("invalid_game_id");
+            forbidden(res);
+            return;
+        }
+
+        if (!gameData.canJoin) {
+            server.logger.warn("game_started");
+            forbidden(res);
+            return;
+        }
+
         gameWsRateLimit.ipConnected(ip);
 
         const socketId = randomUUID();

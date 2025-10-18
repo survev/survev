@@ -33,8 +33,8 @@ class Ads {
         survevio_300x250_playerprofile_top: "survevio_300x250_playerprofile",
         survevio_300x250_playerprofile_bottom: "survevio_300x250_playerprofile",
     };
-    showFreestarAds(_slotIds: unknown) {}
-    getFreestarSlotPlacement(_slotId: unknown) {}
+    showFreestarAds(_slotIds: string) {}
+    getFreestarSlotPlacement(_slotId: string) {}
 }
 
 export class App {

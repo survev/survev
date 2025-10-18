@@ -8,6 +8,13 @@
       "when": 1757188512095,
       "tag": "0000_broad_menace",
       "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "7",
+      "when": 1756778270320,
+      "tag": "0003_cool_skrulls",
+      "breakpoints": true
     }
   ]
 }

@@ -1,4 +1,5 @@
 import { GameConfig } from "../../gameConfig";
+import type { DeepPartial } from "../../utils/util";
 import { v2 } from "../../utils/v2";
 import type { MapDef } from "../mapDefs";
 import { MapId } from "../types/misc";
@@ -12,7 +13,12 @@ import { MapId } from "../types/misc";
 
 export const Main: MapDef = {
     mapId: MapId.Main,
-    desc: { name: "Normal", icon: "", buttonCss: "" },
+    desc: {
+        name: "Normal",
+        icon: "",
+        buttonCss: "",
+        backgroundImg: "img/main_splash.png",
+    },
     assets: {
         audio: [
             { name: "club_music_01", channel: "ambient" },
@@ -542,7 +548,7 @@ export const Main: MapDef = {
             { name: "model94", count: 1, weight: 1 },
             { name: "colt45", count: 1, weight: 1 },
             { name: "outfitVerde", count: 1, weight: 0.1 },
-            { name: "outfitDesertCamo", count: 1, weight: 0.1 },
+            { name: "outfitDesertCamo", count: 1, weight: 0.3 },
         ],
         // seems to be unused? so adding this to suppress the warning
         tier_pumpkin_candy: [{ name: "", weight: 1, count: 1 }],
@@ -771,11 +777,5 @@ export const Main: MapDef = {
     },
     /* STRIP_FROM_PROD_CLIENT:END */
 };
-
-type DeepPartial<T> = T extends object
-    ? {
-          [P in keyof T]?: DeepPartial<T[P]>;
-      }
-    : T;
 
 export type PartialMapDef = DeepPartial<MapDef>;

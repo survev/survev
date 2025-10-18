@@ -87,21 +87,21 @@ export class TeamMenu {
         public leaveCb: (err: string) => void,
     ) {
         // Listen for ui modifications
-        this.serverSelect.change(() => {
+        this.serverSelect.on("change", () => {
             const e = this.serverSelect.find(":selected").val() as string;
             this.pingTest.start([e]);
             this.setRoomProperty("region", e);
         });
-        this.queueMode1.click(() => {
+        this.queueMode1.on("click", () => {
             this.setRoomProperty("gameModeIdx", 1);
         });
-        this.queueMode2.click(() => {
+        this.queueMode2.on("click", () => {
             this.setRoomProperty("gameModeIdx", 2);
         });
-        this.fillAuto.click(() => {
+        this.fillAuto.on("click", () => {
             this.setRoomProperty("autoFill", true);
         });
-        this.fillNone.click(() => {
+        this.fillNone.on("click", () => {
             this.setRoomProperty("autoFill", false);
         });
         this.playBtn.on("click", () => {
@@ -109,7 +109,7 @@ export class TeamMenu {
                 this.tryStartGame();
             });
         });
-        $("#team-copy-url, #team-desc-text").click((e) => {
+        $("#team-copy-url, #team-desc-text").on("click", (e) => {
             const t = $("<div/>", {
                 class: "copy-toast",
                 html: "Copied!",
@@ -149,7 +149,7 @@ export class TeamMenu {
         if (!device.mobile) {
             // Hide invite link
             this.hideUrl = false;
-            $("#team-hide-url").click((e) => {
+            $("#team-hide-url").on("click", (e) => {
                 const el = e.currentTarget;
                 this.hideUrl = !this.hideUrl;
                 $("#team-desc-text, #team-code-text").css({
@@ -618,7 +618,7 @@ export class TeamMenu {
                         this.editingName = false;
                         this.refreshUi();
                     };
-                    n.keypress((e) => {
+                    n.on("keydown", (e) => {
                         if (e.which === 13) {
                             m();
                             return false;
@@ -666,10 +666,10 @@ export class TeamMenu {
                     );
                 }
                 teamMembers.append(member);
-                n?.focus();
+                n?.trigger("focus");
             }
 
-            $(".icon-kick", teamMembers).click((e) => {
+            $(".icon-kick", teamMembers).on("click", (e) => {
                 const playerId = Number($(e.currentTarget).attr("data-playerid"));
                 this.sendMessage("kick", {
                     playerId,

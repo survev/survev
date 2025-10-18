@@ -1,9 +1,9 @@
-import type { ColliderWithHeight } from "../../utils/coldet";
+import type { Collider } from "../../utils/coldet";
 import type { TerrainSpawnDef } from "../mapObjectsTyping";
 
 export interface DecalDef {
     readonly type: "decal";
-    collision: ColliderWithHeight;
+    collision: Collider;
     // ! terrain doesn't exist
     terrain?: TerrainSpawnDef;
     height: number;

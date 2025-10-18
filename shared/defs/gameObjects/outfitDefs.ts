@@ -1,5 +1,5 @@
 import { Rarity } from "../../gameConfig";
-import { defineSkin } from "../../utils/util";
+import { type DeepPartial, util } from "../../utils/util";
 
 export interface OutfitDef {
     readonly type: "outfit";
@@ -34,8 +34,8 @@ export interface OutfitDef {
     ghillie?: boolean;
 }
 
-function defineOutfitSkin(baseType: string, params: any) {
-    return defineSkin<OutfitDef>(BaseDefs, baseType, params);
+function defineOutfitSkin(baseType: string, params: DeepPartial<OutfitDef>): OutfitDef {
+    return util.mergeDeep({}, BaseDefs[baseType], params);
 }
 const BaseDefs: Record<string, OutfitDef> = {
     outfitBase: {

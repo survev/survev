@@ -1,6 +1,6 @@
 import type { Hono } from "hono";
 import type { UpgradeWebSocket } from "hono/ws";
-import type { Info } from "../../../shared/types/api";
+import type { SiteInfoRes } from "../../../shared/types/api";
 import { Config } from "../config";
 import { TeamMenu } from "../teamMenu";
 import { GIT_VERSION } from "../utils/gitRevision";
@@ -60,6 +60,7 @@ export class ApiServer {
     regions: Record<string, Region> = {};
 
     modes = [...Config.modes];
+    clientTheme = Config.clientTheme;
 
     captchaEnabled = Config.captchaEnabled;
 
@@ -73,8 +74,8 @@ export class ApiServer {
         this.teamMenu.init(app, upgradeWebSocket);
     }
 
-    getSiteInfo(): Info {
-        const data: Info = {
+    getSiteInfo(): SiteInfoRes {
+        const data: SiteInfoRes = {
             modes: this.modes,
             pops: {},
             youtube: { name: "", link: "" },
@@ -82,6 +83,7 @@ export class ApiServer {
             country: "US",
             gitRevision: GIT_VERSION,
             captchaEnabled: this.captchaEnabled,
+            clientTheme: this.clientTheme,
         };
 
         for (const region in this.regions) {

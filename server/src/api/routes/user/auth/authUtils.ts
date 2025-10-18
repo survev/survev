@@ -4,6 +4,7 @@ import type { Context } from "hono";
 import { deleteCookie, setCookie } from "hono/cookie";
 import slugify from "slugify";
 import { UnlockDefs } from "../../../../../../shared/defs/gameObjects/unlockDefs";
+import { util } from "../../../../../../shared/utils/util";
 import { Config } from "../../../../config";
 import { checkForBadWords } from "../../../../utils/serverHelpers";
 import { createSession, invalidateSession } from "../../../auth";
@@ -132,21 +133,25 @@ export async function handleAuthUser(c: Context, provider: Provider, authId: str
 }
 
 export async function createNewUser(payload: UsersTableInsert) {
-    await db.insert(usersTable).values(payload);
+    await db.transaction(async (tx) => {
+        await tx.insert(usersTable).values(payload);
 
-    const unlockType = "unlock_new_account";
-    const itemsToUnlock = UnlockDefs[unlockType].unlocks || [];
+        const unlockType = "unlock_new_account";
+        const itemsToUnlock = UnlockDefs[unlockType].unlocks || [];
 
-    const items = itemsToUnlock.map((outfit) => {
-        return {
-            userId: payload.id,
-            source: unlockType,
-            type: outfit,
-            timeAcquired: Date.now(),
-        };
+        if (!itemsToUnlock.length) return;
+
+        const items = itemsToUnlock.map((outfit) => {
+            return {
+                userId: payload.id,
+                source: unlockType,
+                type: outfit,
+                timeAcquired: Date.now(),
+            };
+        });
+
+        await tx.insert(itemsTable).values(items);
     });
-
-    await db.insert(itemsTable).values(items);
 }
 
 export function getRedirectUri(method: Provider) {
@@ -159,8 +164,7 @@ export function getRedirectUri(method: Provider) {
     return `${Config.oauthRedirectURI}/api/auth/${method}/callback`;
 }
 
-export const dayInMs = 24 * 60 * 60 * 1000;
-export const cooldownPeriod = 10 * dayInMs;
+const cooldownPeriod = util.daysToMs(10);
 
 export function getTimeUntilNextUsernameChange(lastChangeTime: Date | null) {
     if (!(lastChangeTime instanceof Date)) return 0;

@@ -27,7 +27,7 @@ export function createBullet(
     renderer: Renderer,
 ) {
     if (BulletDefs[bullet.bulletType].addFlare) {
-        flareBarn.addFlare(bullet, playerBarn, renderer);
+        flareBarn.addFlare(bullet, playerBarn);
     } else {
         bulletBarn.addBullet(bullet, playerBarn, renderer);
     }
@@ -519,8 +519,7 @@ export class BulletBarn {
         }
     }
 
-    m_render(camera: Camera, _debug: unknown) {
-        camera.m_pixels(1);
+    m_render(camera: Camera) {
         for (let i = 0; i < this.bullets.length; i++) {
             const b = this.bullets[i];
             if (b.alive || b.collided) {

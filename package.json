@@ -1,6 +1,6 @@
 {
   "name": "survev",
-  "version": "0.1.21",
+  "version": "0.1.23",
   "type": "module",
   "description": "Open Source Surviv.io Server",
   "scripts": {
@@ -23,9 +23,9 @@
   "devDependencies": {
     "@biomejs/biome": "2.0.5",
     "@types/hjson": "^2.4.6",
-    "@types/node": "^22.16.5",
-    "concurrently": "^9.2.0",
-    "typescript": "^5.8.3"
+    "@types/node": "^22.18.6",
+    "concurrently": "^9.2.1",
+    "typescript": "^5.9.2"
   },
   "workspaces": [
     "client",
@@ -36,6 +36,6 @@
   "dependencies": {
     "enquirer": "^2.4.1",
     "hjson": "^3.2.2",
-    "tsx": "^4.20.3"
+    "tsx": "^4.20.6"
   }
 }

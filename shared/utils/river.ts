@@ -204,7 +204,7 @@ export class River {
             aabbMin = v2.minElems(aabbMin, this.shorePoly[i]);
             aabbMax = v2.maxElems(aabbMax, this.shorePoly[i]);
         }
-        this.aabb = collider.createAabb(aabbMin, aabbMax, 0.0);
+        this.aabb = collider.createAabb(aabbMin, aabbMax);
     }
 
     distanceToShore(pos: Vec2) {

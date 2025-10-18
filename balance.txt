@@ -43,9 +43,11 @@ Added more mode specific variations of mosin tree and ak rock
 
 Loot tables:
 Added bar to normal loot tables
+Increased desert camo drop rate from cattle crate 0.1 -> 0.3
 
 Other:
 - Certain roles receive healing when promoted: Commander recieves 5 bandages and 1 medkit, Lieutenant receives 10 bandages and 3 sodas; Bugler receives 5 bandages and 2 sodas; Grenadier, Marksman, and Recon all receive 5 bandages.
-- Lone Survivr no longer has Splinter Rounds, and instead have an additional perk: AP Rounds.
-- Lone Survivr third perk odds have been adjusted.
+- Lone Survivr's splinter rounds can now also be AP Rounds
+- Lone Survivr now gets 4 perks (splinter/ap, windwalk/combat medic, takedown, cast ironskin)
+- Lone Survivr split perk odds have been adjusted.
 - Last Breath adjusted (overall buff).

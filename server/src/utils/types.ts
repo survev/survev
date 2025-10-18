@@ -1,6 +1,6 @@
 import { z } from "zod";
 import type { MapDefs } from "../../../shared/defs/mapDefs";
-import type { TeamMode } from "../../../shared/gameConfig";
+import { TeamMode } from "../../../shared/gameConfig";
 import type { FindGameError } from "../../../shared/types/api";
 import { loadoutSchema } from "../../../shared/utils/loadout";
 import type { MatchDataTable } from "../api/db/schema";
@@ -20,8 +20,18 @@ export const zUpdateRegionBody = z.object({
         playerCount: z.number(),
     }),
 });
-
 export type UpdateRegionBody = z.infer<typeof zUpdateRegionBody>;
+
+export const zSetGameModeBody = z.object({
+    index: z.number(),
+    team_mode: z.nativeEnum(TeamMode).optional(),
+    map_name: z.string().optional(),
+    enabled: z.boolean().optional(),
+});
+
+export const zSetClientThemeBody = z.object({
+    theme: z.string(),
+});
 
 export interface SaveGameBody {
     matchData: (MatchDataTable & { ip: string; findGameIp: string })[];

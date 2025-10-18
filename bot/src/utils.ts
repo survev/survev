@@ -22,6 +22,10 @@ export const enum Command {
     UnbanIp = "unban_ip",
     SetMatchDataName = "set_match_data_name",
     SetAccountName = "set_account_name",
+    GiveItem = "give_item",
+    RemoveItem = "remove_item",
+    SetGameMode = "set_game_mode",
+    SetClientTheme = "set_client_theme",
 }
 
 export const BUTTON_PREFIXES = {
@@ -35,7 +39,19 @@ export const honoClient = hc<PrivateRouteApp>(API_URL, {
     },
 });
 
-export function hasPermission(interaction: Interaction): boolean {
+export function isAdmin(interaction: Interaction) {
+    if (interaction.guild?.id !== DISCORD_GUILD_ID) {
+        return false;
+    }
+
+    if (interaction.inCachedGuild()) {
+        return interaction.member.permissions.has(PermissionFlagsBits.Administrator);
+    }
+
+    return false;
+}
+
+export function hasBotPermission(interaction: Interaction): boolean {
     if (interaction.guild?.id !== DISCORD_GUILD_ID) {
         return false;
     }
@@ -96,6 +112,7 @@ export function createCollector<
     });
 }
 
+export const botLogger = new Logger(Config.logging, "Bot");
 export function formatDate(date?: string | Date) {
     return date
         ? new Date(date).toLocaleDateString("en-US", {

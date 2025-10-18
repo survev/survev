@@ -231,8 +231,7 @@ export const math = {
     pointInsidePolygon(point: Vec2, poly: Vec2[]) {
         // ray-casting algorithm based on
         // http://www.ecse.rpi.edu/Homepages/wrf/Research/Short_Notes/pnpoly.html
-        const { x } = point;
-        const { y } = point;
+        const { x, y } = point;
         let inside = false;
         const count = poly.length;
         for (let i = 0, j = count - 1; i < count; j = i++) {

@@ -48,6 +48,7 @@ export function forbidden(res: HttpResponse): void {
 }
 
 export function returnJson(res: HttpResponse, data: Record<string, unknown>): void {
+    if (res.aborted) return;
     res.cork(() => {
         if (res.aborted) return;
         res.writeHeader("Content-Type", "application/json").end(JSON.stringify(data));

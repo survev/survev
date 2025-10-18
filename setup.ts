@@ -135,6 +135,7 @@ async function setupAccounts(config: PartialConfig) {
             "Enter the full base URL of the website for oauth2 redirects (eg: https://survev.io)",
         name: "value",
         type: "text",
+        initial: `http://${config.apiServer?.host ?? "127.0.0.1"}:${config.apiServer?.port ?? 8000}`,
         required: true,
     });
 

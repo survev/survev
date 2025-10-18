@@ -151,8 +151,7 @@ class Application {
             this.localization.localizeIndex();
             this.account.init();
 
-            (this.nameInput as unknown as HTMLInputElement).maxLength =
-                net.Constants.PlayerNameMaxLen;
+            this.nameInput.attr("maxLength", net.Constants.PlayerNameMaxLen);
 
             this.playMode0Btn.on("click", () => {
                 SDK.requestMidGameAd(() => {
@@ -170,7 +169,7 @@ class Application {
                 });
             });
 
-            this.serverSelect.change(() => {
+            this.serverSelect.on("change", () => {
                 const t = this.serverSelect.find(":selected").val();
                 this.config.set("region", t as string);
             });
@@ -213,7 +212,7 @@ class Application {
                     const a = $(r);
                     a.prop("checked", this.config.get(a.prop("id")));
                 });
-            $(".modal-settings-item > input:checkbox").change((t) => {
+            $(".modal-settings-item > input:checkbox").on("change", (t) => {
                 const r = $(t.target);
                 this.config.set(r.prop("id"), r.is(":checked"));
             });
@@ -553,6 +552,10 @@ class Application {
 
         if (key == "highResTex") {
             location.reload();
+        }
+
+        if (key === "debugHUD") {
+            this.game?.debugHUD?.onConfigModified();
         }
     }
 
