@@ -13,8 +13,8 @@ import {
     type DropdownPlayer,
     discordCardUI,
 } from "../components";
-import { BOT_COLLECTOR_TIMEOUT, honoClient } from "../utils";
 import { webhookId } from "../config";
+import { BOT_COLLECTOR_TIMEOUT, honoClient } from "../utils";
 
 export async function setupEventListeners(client: Client) {
     client.on(Events.MessageCreate, async (message) => {
