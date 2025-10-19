@@ -232,8 +232,8 @@ export const ReportsRouter = new Hono()
                     ),
                 )
                 .leftJoin(usersTable, eq(ipLogsTable.userId, usersTable.id))
-                .orderBy(desc(ipLogsTable.createdAt))
-                // .limit(MAX_PLAYERS_TO_SHOW);
+                .orderBy(desc(ipLogsTable.createdAt));
+            // .limit(MAX_PLAYERS_TO_SHOW);
 
             if (result.length === 0) {
                 return c.json(

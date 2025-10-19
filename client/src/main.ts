@@ -286,7 +286,7 @@ class Application {
                 this.game?.startPacketPlayBack(await res.arrayBuffer());
             };
 
-            const replayUrl = getParameterByName("replay");
+            const replayUrl = getParameterByName("replayUrl");
 
             if (replayUrl) {
                 fetchGame(replayUrl);

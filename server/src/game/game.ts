@@ -613,7 +613,6 @@ export class Game {
             this.logger.error(`Failed to fetch API save game:`, err);
         }
 
-
         // this needs to be done after the game is saved to the db
         const allPlayers = this.playerBarn.players;
         for await (const player of allPlayers) {

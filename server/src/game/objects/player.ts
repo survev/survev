@@ -4767,7 +4767,9 @@ export class Player extends BaseGameObject {
         }
 
         if (this.game.reportedPlayersIds.has(playerToReport.__id)) {
-            this.game.logger.info("This player was already reported by another player this game.");
+            this.game.logger.info(
+                "This player was already reported by another player this game.",
+            );
             return;
         }
 

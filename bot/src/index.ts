@@ -1,14 +1,8 @@
-import {
-    Client,
-    Events,
-    GatewayIntentBits
-} from "discord.js";
-import { DISCORD_BOT_TOKEN } from "./config";
-import {
-    botLogger
-} from "./utils";
+import { Client, Events, GatewayIntentBits } from "discord.js";
 import { setupInteractionHandlers } from "./commands";
+import { DISCORD_BOT_TOKEN } from "./config";
 import { setupEventListeners } from "./listeners";
+import { botLogger } from "./utils";
 
 const client = new Client({
     intents: [

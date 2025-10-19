@@ -1,10 +1,10 @@
 import {
     ApplicationCommandOptionType,
+    type ChatInputCommandInteraction,
     MessageFlags,
     SlashCommandBuilder,
-    type ChatInputCommandInteraction
 } from "discord.js";
-import { z } from "zod";
+import type { z } from "zod";
 import { zSetClientThemeBody, zSetGameModeBody } from "../../../server/src/utils/types";
 import {
     zBanAccountParams,
@@ -17,8 +17,14 @@ import {
     zUnbanAccountParams,
     zUnbanIpParams,
 } from "../../../shared/types/moderation";
-import { botLogger,  Command,  honoClient, isAdmin, safeBotReply } from "../utils";
-import { sendNoPermissionMessage } from "../utils";
+import {
+    botLogger,
+    Command,
+    honoClient,
+    isAdmin,
+    safeBotReply,
+    sendNoPermissionMessage,
+} from "../utils";
 
 /**
  * for generic commands that only makes an api call and return it's meessage
@@ -290,7 +296,6 @@ export function createCommand<T extends z.ZodSchema>(config: {
     return config;
 }
 
-
 export function createSlashCommand(config: ReturnType<typeof createCommand>) {
     const builder = new SlashCommandBuilder()
         .setName(config.name)
@@ -324,7 +329,6 @@ export function createSlashCommand(config: ReturnType<typeof createCommand>) {
     return builder;
 }
 
-
 export async function genericExecute<N extends Exclude<Command, "search_player">>(
     name: N,
     interaction: ChatInputCommandInteraction,
@@ -332,54 +336,53 @@ export async function genericExecute<N extends Exclude<Command, "search_player">
     isPrivateRoute = false,
 ) {
     try {
+        await interaction.deferReply();
 
-    await interaction.deferReply();
+        const options = interaction.options.data.reduce(
+            (obj, { name, value }) => {
+                obj[name] = value;
+                return obj;
+            },
+            {} as Record<string, unknown>,
+        );
 
-    const options = interaction.options.data.reduce(
-        (obj, { name, value }) => {
-            obj[name] = value;
-            return obj;
-        },
-        {} as Record<string, unknown>,
-    );
-
-    const args = validator.safeParse({
-        ...options,
-        executor_id: interaction.user.id,
-    });
-
-    if (!args.success) {
-        botLogger.error("Failed to parse arguments", options, args.error);
-        await interaction.reply({
-            content: "Invalid arguments",
-            flags: MessageFlags.Ephemeral,
+        const args = validator.safeParse({
+            ...options,
+            executor_id: interaction.user.id,
         });
-        return;
-    }
 
-    if (isPrivateRoute && !isAdmin(interaction)) {
-        await sendNoPermissionMessage(interaction);
-        return;
-    }
+        if (!args.success) {
+            botLogger.error("Failed to parse arguments", options, args.error);
+            await interaction.reply({
+                content: "Invalid arguments",
+                flags: MessageFlags.Ephemeral,
+            });
+            return;
+        }
 
-    const client = isPrivateRoute ? honoClient : honoClient.moderation;
-    // @ts-expect-error - we don't care at this point
-    const res = await client[name].$post({
-        json: args.data as any,
-    });
-    if ( !res.ok) {
-        safeBotReply(interaction, {
-            content: `API Error: ${res.status === 500 ? 'Server is down' : `Request failed (${res.status})`}`,
-        })
-        return;
-    }
-    const { message } = await res.json();
-    await interaction.editReply(message);
+        if (isPrivateRoute && !isAdmin(interaction)) {
+            sendNoPermissionMessage(interaction);
+            return;
+        }
+
+        const client = isPrivateRoute ? honoClient : honoClient.moderation;
+        // @ts-expect-error - we don't care at this point
+        const res = await client[name].$post({
+            json: args.data as any,
+        });
+        if (!res.ok) {
+            safeBotReply(interaction, {
+                content: `API Error: ${res.status === 500 ? "Server is down" : `Request failed (${res.status})`}`,
+            });
+            return;
+        }
+        const { message } = await res.json();
+        await interaction.editReply(message);
     } catch (error) {
         botLogger.error(`Failed to execute command: ${interaction.commandName}`, error);
         safeBotReply(interaction, {
             content: "Failed to execute command",
-        })
+        });
         return;
     }
 }

@@ -1,8 +1,13 @@
 import { type ChatInputCommandInteraction, SlashCommandBuilder } from "discord.js";
 import type { InferResponseType } from "hono";
 import { createDiscordDropdownUI } from "../components";
-import { botLogger,  Command,  hasBotPermission, honoClient } from "../utils";
-import { sendNoPermissionMessage } from "../utils";
+import {
+    botLogger,
+    Command,
+    hasBotPermission,
+    honoClient,
+    sendNoPermissionMessage,
+} from "../utils";
 
 export type SelectedPlayer = Extract<
     InferResponseType<typeof honoClient.moderation.get_player_ip.$post, 200>,
@@ -42,7 +47,7 @@ export const searchPlayersHandler = {
         await interaction.deferReply();
 
         if (!hasBotPermission(interaction)) {
-            await sendNoPermissionMessage(interaction);
+            sendNoPermissionMessage(interaction);
             return;
         }
 

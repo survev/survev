@@ -1,6 +1,5 @@
 import { GameConfig } from "../gameConfig";
 import { assert } from "../utils/util";
-import { Logger } from "./logger";
 
 /**
  * The recording data uses the following format:

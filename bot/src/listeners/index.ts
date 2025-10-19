@@ -2,36 +2,32 @@ import {
     ActionRowBuilder,
     ButtonBuilder,
     ButtonStyle,
-    Client,
+    type Client,
     ComponentType,
-    Events
+    Events,
 } from "discord.js";
 import {
     clearEmbedWithMessage,
     createDiscordPlayerInfoCardUI,
     createSelectUI,
-    discordCardUI,
     type DropdownPlayer,
+    discordCardUI,
 } from "../components";
+import { BOT_COLLECTOR_TIMEOUT, honoClient } from "../utils";
 import { webhookId } from "../config";
-import {
-    BOT_COLLECTOR_TIMEOUT,
-    honoClient
-} from "../utils";
 
 export async function setupEventListeners(client: Client) {
     client.on(Events.MessageCreate, async (message) => {
-        // if (message.channel.isDMBased()) return;
-        // if (message.webhookId !== webhookId) return;
+        if (message.channel.isDMBased()) return;
+        if (message.webhookId !== webhookId) return;
 
-        // if (message.embeds.length <= 0 || !message.embeds[0].url) {
-        //     console.log("Expected an embed, but got none");
-        //     return;
-        // }
+        if (message.embeds.length <= 0 || !message.embeds[0].url) {
+            console.log("Expected an embed, but got none");
+            return;
+        }
 
-        // const reportId = message.embeds[0].url.split("/").at(-1);
+        const reportId = message.embeds[0].url.split("/").at(-1);
 
-        const reportId = ""
         if (!reportId) {
             await message.reply("Malformatted url.");
             return;
@@ -120,5 +116,5 @@ export async function setupEventListeners(client: Client) {
                     "Timed out, please try again.",
                 );
             });
-    })
+    });
 }

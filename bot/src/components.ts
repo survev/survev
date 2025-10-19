@@ -55,7 +55,6 @@ export function createSelectUI(matchingPlayers: DropdownPlayer[], searchName: st
     return { embed, row };
 }
 
-
 export const BUTTON_PREFIXES = {
     BAN_FOR_CHEATING: `search_player_ban_for_cheating_`,
     BAN_FOR_BAD_NAME: `search_player_ban_for_name_`,

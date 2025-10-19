@@ -5,16 +5,15 @@ import type {
     Interaction,
     InteractionReplyOptions,
     Message,
-    MessagePayload,
     RepliableInteraction,
     StringSelectMenuInteraction,
 } from "discord.js";
 import { MessageFlags, PermissionFlagsBits } from "discord.js";
 import { hc } from "hono/client";
 import type { PrivateRouteApp } from "../../server/src/api/routes/private/private";
+import { Logger } from "../../shared/utils/logger";
 import { clearEmbedWithMessage } from "./components";
 import { API_URL, Config, DISCORD_GUILD_ID, DISCORD_ROLE_ID } from "./config";
-import { Logger } from "../../shared/utils/logger";
 
 export const enum Command {
     BanIp = "ban_ip",
@@ -110,7 +109,7 @@ export function createCollector<
     });
 }
 
-export async function sendNoPermissionMessage(interaction: ChatInputCommandInteraction) {
+export function sendNoPermissionMessage(interaction: ChatInputCommandInteraction) {
     if (!interaction.isRepliable()) return;
     const errorMessage = {
         content: "You do not have permission to use this action.",
@@ -119,7 +118,10 @@ export async function sendNoPermissionMessage(interaction: ChatInputCommandInter
     safeBotReply(interaction, errorMessage);
 }
 
-export function safeBotReply(interaction: RepliableInteraction, message: InteractionReplyOptions) {
+export function safeBotReply(
+    interaction: RepliableInteraction,
+    message: InteractionReplyOptions,
+) {
     if (interaction.replied || interaction.deferred) {
         interaction.followUp(message);
     } else {
