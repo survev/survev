@@ -1,5 +1,3 @@
-import { writeFile } from "node:fs/promises";
-import { resolve } from "node:path";
 import { randomUUID } from "node:crypto";
 import {
     GameObjectDefs,
@@ -44,7 +42,7 @@ import { assert, util } from "../../../../shared/utils/util";
 import { type Vec2, v2 } from "../../../../shared/utils/v2";
 import { Config } from "../../config";
 import { IDAllocator } from "../../utils/IDAllocator";
-import { apiPrivateRouter, validateUserName } from "../../utils/serverHelpers";
+import { validateUserName } from "../../utils/serverHelpers";
 import type { Game, JoinTokenData } from "../game";
 import { Group, Team } from "../group";
 import { InventoryManager } from "../inventoryManager";

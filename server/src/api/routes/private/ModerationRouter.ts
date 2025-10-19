@@ -20,13 +20,7 @@ import type { SaveGameBody } from "../../../utils/types";
 import { server } from "../../apiServer";
 import { databaseEnabledMiddleware, validateParams } from "../../auth/middleware";
 import { db } from "../../db";
-import {
-    bannedIpsTable,
-    ipLogsTable,
-    matchDataTable,
-    reportsTable,
-    usersTable,
-} from "../../db/schema";
+import { bannedIpsTable, ipLogsTable, matchDataTable, usersTable } from "../../db/schema";
 import { sanitizeSlug } from "../user/auth/authUtils";
 
 export const ModerationRouter = new Hono()

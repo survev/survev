@@ -8,10 +8,7 @@ import {
     GatewayIntentBits,
     type InteractionReplyOptions,
     MessageFlags,
-    RepliableInteraction,
-    StringSelectMenuInteraction,
 } from "discord.js";
-import { MapId, TeamModeToString } from "../../shared/defs/types/misc";
 import { commandHandlers } from "./commands";
 import { sendNoPermissionMessage } from "./commands/helpers";
 import {
@@ -22,7 +19,13 @@ import {
     discordCardUI,
 } from "./components";
 import { DISCORD_BOT_TOKEN, webhookId } from "./config";
-import { BOT_COLLECTOR_TIMEOUT, botLogger, type Command, hasBotPermission, honoClient } from "./utils";
+import {
+    BOT_COLLECTOR_TIMEOUT,
+    botLogger,
+    type Command,
+    hasBotPermission,
+    honoClient,
+} from "./utils";
 
 const client = new Client({
     intents: [
