@@ -1,8 +1,8 @@
 import { type ChatInputCommandInteraction, SlashCommandBuilder } from "discord.js";
 import type { InferResponseType } from "hono";
 import { createDiscordDropdownUI } from "../components";
-import { botLogger, Command, hasBotPermission, honoClient } from "../utils";
-import { sendNoPermissionMessage } from "./helpers";
+import { botLogger,  Command,  hasBotPermission, honoClient } from "../utils";
+import { sendNoPermissionMessage } from "../utils";
 
 export type SelectedPlayer = Extract<
     InferResponseType<typeof honoClient.moderation.get_player_ip.$post, 200>,
@@ -76,7 +76,7 @@ export const searchPlayersHandler = {
 
             await createDiscordDropdownUI(interaction, matchingPlayers, searchName);
         } catch (error) {
-            botLogger.error("Error in banplayer command:", error);
+            botLogger.error("Error in search_player command:", error);
             await interaction.editReply({
                 content: "An error occurred while searching for players.",
             });

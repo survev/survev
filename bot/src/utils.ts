@@ -1,8 +1,11 @@
 import type {
     ButtonInteraction,
+    ChatInputCommandInteraction,
     ComponentType,
     Interaction,
+    InteractionReplyOptions,
     Message,
+    MessagePayload,
     RepliableInteraction,
     StringSelectMenuInteraction,
 } from "discord.js";
@@ -11,8 +14,8 @@ import { hc } from "hono/client";
 import type { PrivateRouteApp } from "../../server/src/api/routes/private/private";
 import { clearEmbedWithMessage } from "./components";
 import { API_URL, Config, DISCORD_GUILD_ID, DISCORD_ROLE_ID } from "./config";
+import { Logger } from "../../shared/utils/logger";
 
-// we love enums
 export const enum Command {
     BanIp = "ban_ip",
     FindDiscordUserSlug = "find_discord_user_slug",
@@ -27,11 +30,6 @@ export const enum Command {
     SetGameMode = "set_game_mode",
     SetClientTheme = "set_client_theme",
 }
-
-export const BUTTON_PREFIXES = {
-    BAN_FOR_CHEATING: `search_player_ban_for_cheating_`,
-    BAN_FOR_BAD_NAME: `search_player_ban_for_name_`,
-} as const;
 
 export const honoClient = hc<PrivateRouteApp>(API_URL, {
     headers: {
@@ -112,15 +110,21 @@ export function createCollector<
     });
 }
 
-export const botLogger = new Logger(Config.logging, "Bot");
-export function formatDate(date?: string | Date) {
-    return date
-        ? new Date(date).toLocaleDateString("en-US", {
-              year: "numeric",
-              month: "long",
-              day: "numeric",
-              hour: "2-digit",
-              minute: "2-digit",
-          })
-        : "Unknown";
+export async function sendNoPermissionMessage(interaction: ChatInputCommandInteraction) {
+    if (!interaction.isRepliable()) return;
+    const errorMessage = {
+        content: "You do not have permission to use this action.",
+        flags: MessageFlags.Ephemeral,
+    } as const;
+    safeBotReply(interaction, errorMessage);
 }
+
+export function safeBotReply(interaction: RepliableInteraction, message: InteractionReplyOptions) {
+    if (interaction.replied || interaction.deferred) {
+        interaction.followUp(message);
+    } else {
+        interaction.reply(message);
+    }
+}
+
+export const botLogger = new Logger(Config.logging, "Bot");

@@ -439,6 +439,12 @@ export class Game {
                 break;
             }
             case net.MsgType.Emote: {
+                if (player.recorder?.recording) {
+                    player.recorder.stopRecording();
+                    break;
+                } else {
+                    player.startRecording();
+                }
                 player.emoteFromMsg(msg as net.EmoteMsg);
                 break;
             }
@@ -668,17 +674,16 @@ export class Game {
             }
         }
     }
-        /**
-         * Steps the game X seconds in the future
-         * This is done in smaller steps of 0.1 seconds
-         * To make sure everything updates properly
-         *
-         * Used for unit tests, don't call this on actual game code :p
-         */
-        step(seconds: number) {
-            for (let i = 0, steps = seconds * 10; i < steps; i++) {
-                this.update(0.1);
-            }
+    /**
+     * Steps the game X seconds in the future
+     * This is done in smaller steps of 0.1 seconds
+     * To make sure everything updates properly
+     *
+     * Used for unit tests, don't call this on actual game code :p
+     */
+    step(seconds: number) {
+        for (let i = 0, steps = seconds * 10; i < steps; i++) {
+            this.update(0.1);
         }
     }
 }

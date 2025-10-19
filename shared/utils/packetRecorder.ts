@@ -1,5 +1,6 @@
 import { GameConfig } from "../gameConfig";
 import { assert } from "../utils/util";
+import { Logger } from "./logger";
 
 /**
  * The recording data uses the following format:
@@ -72,6 +73,7 @@ export class PacketRecorder {
         if (!this.recording) return;
 
         this.recording = false;
+        console.log("Stopped recording.");
     }
 
     addPacket(type: PacketType, data: Uint8Array) {

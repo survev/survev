@@ -4754,27 +4754,28 @@ export class Player extends BaseGameObject {
     startRecording() {
         if (this.recorder?.recording) return;
 
-        const playerToReport = this.spectating;
+        const playerToReport = this;
+        // const playerToReport = this.spectating;
 
-        if (this.reportedAPlayer && false) {
-            console.log("Already reported a player this game.");
-            return;
-        }
+        // if (this.reportedAPlayer && false) {
+        //     this.game.logger.info("Already reported a player this game.");
+        //     return;
+        // }
 
-        if (!playerToReport) {
-            console.log("No player to report");
-            return;
-        }
+        // if (!playerToReport) {
+        //     this.game.logger.info("No player to report");
+        //     return;
+        // }
 
-        if (this.game.reportedPlayersIds.has(playerToReport.__id)) {
-            console.log("This player was already reported by another player this game.");
-            return;
-        }
+        // if (this.game.reportedPlayersIds.has(playerToReport.__id)) {
+        //     this.game.logger.info("This player was already reported by another player this game.");
+        //     return;
+        // }
 
-        if (!this.userId) {
-            console.log("Log in honey.");
-            return;
-        }
+        // if (!this.userId) {
+        //     this.game.logger.info("Log in honey.");
+        //     return;
+        // }
 
         const game = this.game;
         const msgStream = this.msgStream;
