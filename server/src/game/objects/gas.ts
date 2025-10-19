@@ -114,7 +114,7 @@ const GasStages: StageData[] = [
         rad: 0,
         damage: 22,
     },
-].map((t) => ({ ...t, duration: t.duration / 15, damage: t.damage * 5 }));
+];
 
 export class Gas {
     /**

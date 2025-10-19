@@ -439,12 +439,6 @@ export class Game {
                 break;
             }
             case net.MsgType.Emote: {
-                if (player.recorder?.recording) {
-                    player.recorder.stopRecording();
-                    break;
-                } else {
-                    player.startRecording();
-                }
                 player.emoteFromMsg(msg as net.EmoteMsg);
                 break;
             }
@@ -619,6 +613,31 @@ export class Game {
             this.logger.error(`Failed to fetch API save game:`, err);
         }
 
+
+        // this needs to be done after the game is saved to the db
+        const allPlayers = this.playerBarn.players;
+        for await (const player of allPlayers) {
+            if (!player.recorder) continue;
+
+            const data = player.getRecorderDBData();
+
+            if (!data) continue;
+
+            const res = await apiPrivateRouter.reports.save_game_recording.$post({
+                json: {
+                    gameId: this.id,
+                    reportedBy: data.userId!,
+                    recording: data.recording,
+                    sepectatedPlayerNames: data.sepectatedPlayerNames,
+                },
+            });
+
+            if (!res.ok) {
+                this.logger.error(`Failed to save recording by ${data.userId}`);
+                return;
+            }
+        }
+
         if (!res || !res.ok) {
             const region = Config.gameServer.thisRegion.toUpperCase();
             this.logger.error(
@@ -647,30 +666,6 @@ export class Game {
                     .run(JSON.stringify(values));
             } catch (err) {
                 this.logger.error(`[${region}] Failed to save game data locally`, err);
-            }
-
-            // this needs to be done after the game is saved to the db
-            const allPlayers = this.playerBarn.players;
-            for await (const player of allPlayers) {
-                if (!player.recorder) continue;
-
-                const data = player.getRecorderDBData();
-
-                if (!data) continue;
-
-                const res = await apiPrivateRouter.reports.save_game_recording.$post({
-                    json: {
-                        gameId: this.id,
-                        reportedBy: data.userId!,
-                        recording: data.recording,
-                        sepectatedPlayerNames: data.sepectatedPlayerNames,
-                    },
-                });
-
-                if (!res.ok) {
-                    this.logger.error(`Failed to save recording by ${data.userId}`);
-                    return;
-                }
             }
         }
     }

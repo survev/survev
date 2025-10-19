@@ -201,15 +201,15 @@ export const ReportsRouter = new Hono()
                 );
             }
 
-            const MAX_PLAYERS_TO_SHOW = 15;
-            if (sepectatedPlayerNames.length > MAX_PLAYERS_TO_SHOW) {
-                return c.json(
-                    {
-                        message: `Spectate more than ${MAX_PLAYERS_TO_SHOW} playes, they should seek help`,
-                    },
-                    200,
-                );
-            }
+            // const MAX_PLAYERS_TO_SHOW = 15;
+            // if (sepectatedPlayerNames.length > MAX_PLAYERS_TO_SHOW) {
+            //     return c.json(
+            //         {
+            //             message: `Spectated more than ${MAX_PLAYERS_TO_SHOW} playes, they should seek help`,
+            //         },
+            //         200,
+            //     );
+            // }
 
             const result = await db
                 .select({
@@ -233,7 +233,7 @@ export const ReportsRouter = new Hono()
                 )
                 .leftJoin(usersTable, eq(ipLogsTable.userId, usersTable.id))
                 .orderBy(desc(ipLogsTable.createdAt))
-                .limit(MAX_PLAYERS_TO_SHOW);
+                // .limit(MAX_PLAYERS_TO_SHOW);
 
             if (result.length === 0) {
                 return c.json(

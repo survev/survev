@@ -1,5 +1,5 @@
 {
-  "id": "c4c125d3-d563-4bf8-afc0-67ee14cd8d22",
+  "id": "d1970b00-1a11-4b7b-93ac-ae700af70a80",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "version": "7",
   "dialect": "postgresql",
@@ -334,6 +334,13 @@
           "type": "integer",
           "primaryKey": false,
           "notNull": true
+        },
+        "team_kills": {
+          "name": "team_kills",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "default": 0
         },
         "damage_dealt": {
           "name": "damage_dealt",

@@ -49,6 +49,7 @@ CREATE TABLE "match_data" (
 	"rank" integer NOT NULL,
 	"died" boolean NOT NULL,
 	"kills" integer NOT NULL,
+	"team_kills" integer DEFAULT 0 NOT NULL,
 	"damage_dealt" integer NOT NULL,
 	"damage_taken" integer NOT NULL,
 	"killer_id" integer NOT NULL,
