@@ -1526,7 +1526,25 @@ a:active {
   z-index: 9999999;
 }
 
-.ui-modal-keybind {
+#ui-modal-recorder-body {
+  width: 512px;
+  height: 320px;
+}
+
+#ui-modal-recorder-url {
+  display: flex;
+}
+
+#ui-modal-recorder-url input {
+  margin: 5px 5px 0px 0px;
+}
+
+#btn-recorder-load-url {
+  width: 30%;
+}
+
+.ui-modal-keybind,
+.ui-modal-recorder {
   display: none;
   position: absolute;
   left: 0;
@@ -1540,7 +1558,8 @@ a:active {
   background-color: rgba(0, 0, 0, 0.4);
 }
 
-.ui-modal-keybind-content {
+.ui-modal-keybind-content,
+.ui-modal-recorder-content {
   top: 50%;
   left: 50%;
   transform: translateY(-50%) translateX(-50%);
@@ -1548,11 +1567,13 @@ a:active {
   width: unset !important;
 }
 
-#ui-modal-keybind-header {
+#ui-modal-keybind-header,
+#ui-modal-recorder-header {
   background-color: #547033;
 }
 
-#ui-modal-keybind-header > h2 {
+#ui-modal-keybind-header > h2,
+#ui-modal-recorder-header > h2 {
   font-weight: 700;
 }
 
@@ -4443,6 +4464,12 @@ input [type="image"]:focus {
 
 .btn-keybind {
   background-image: url(/img/gui/keyboard.svg);
+  background-size: 44px;
+  background-position: 2px -3px;
+}
+
+.btn-recorder {
+  background-image: url(/img/gui/eye.svg);
   background-size: 44px;
   background-position: 2px -3px;
 }

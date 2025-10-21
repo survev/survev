@@ -37,6 +37,7 @@ import { type Circle, coldet } from "../../../../shared/utils/coldet";
 import { collider } from "../../../../shared/utils/collider";
 import type { Loadout } from "../../../../shared/utils/loadout";
 import { math } from "../../../../shared/utils/math";
+import { PacketRecorder, PacketType } from "../../../../shared/utils/packetRecorder";
 import { assert, util } from "../../../../shared/utils/util";
 import { type Vec2, v2 } from "../../../../shared/utils/v2";
 import { Config } from "../../config";
@@ -381,6 +382,10 @@ export class PlayerBarn {
         }
 
         player.obstacleOutfit?.destroy();
+
+        if (player.recorder?.recording) {
+            player.recorder.stopRecording();
+        }
 
         this.game.checkGameOver();
         this.game.updateData();
@@ -777,6 +782,9 @@ export class Player extends BaseGameObject {
         if (player) {
             player.spectatorCount++;
             player.spectators.add(this);
+            if (this.recorder?.recording) {
+                this.spectatedWhenRecording.add(player.name);
+            }
         }
 
         this._spectating = player;
@@ -2259,7 +2267,10 @@ export class Player extends BaseGameObject {
     visibleObjects = new Set<GameObject>();
     visibleMapIndicators = new Set<MapIndicator>();
 
-    msgStream = new net.MsgStream(new ArrayBuffer(65536));
+    msgStream = new net.MsgStream(new ArrayBuffer(1 << 16));
+
+    recorder?: PacketRecorder;
+
     sendMsgs(): void {
         const msgStream = this.msgStream;
         const game = this.game;
@@ -2528,7 +2539,11 @@ export class Player extends BaseGameObject {
         const globalMsgStream = this.game.msgsToSend.stream;
         msgStream.stream.writeBytes(globalMsgStream, 0, globalMsgStream.byteIndex);
 
-        this.sendData(msgStream.getBuffer());
+        const buff = msgStream.getBuffer();
+
+        if (this.recorder?.recording) this.recorder?.addPacket(PacketType.Server, buff);
+        this.sendData(buff);
+
         this._firstUpdate = false;
     }
 
@@ -4349,6 +4364,14 @@ export class Player extends BaseGameObject {
             }
         }
 
+        // if (!this.bot) {
+        //     if (!this.recorder?.recording) {
+        //         this.startRecording();
+        //     } else {
+        //         this.recorder.stopRecording();
+        //     }
+        // }
+
         this.emoteCounter++;
         if (this.emoteCounter >= GameConfig.player.emoteThreshold) {
             this.emoteHardTicker =
@@ -4718,4 +4741,144 @@ export class Player extends BaseGameObject {
     sendData(buffer: Uint8Array): void {
         this.game.sendSocketMsg(this.socketId, buffer);
     }
+
+    // we limit it one report per player per game
+    reportedAPlayer = false;
+    spectatedWhenRecording = new Set<string>();
+
+    /**
+     * Initializes the recording by saving initial data
+     * Like the map msg, joinedMsg and an updateMsg with everything set to dirty
+     * So the incremental updates on the next updateMsgs work
+     */
+    startRecording() {
+        if (this.recorder?.recording) return;
+
+        const playerToReport = this.spectating;
+
+        if (this.reportedAPlayer && false) {
+            this.game.logger.info("Already reported a player this game.");
+            return;
+        }
+
+        if (!playerToReport) {
+            this.game.logger.info("No player to report");
+            return;
+        }
+
+        if (this.game.reportedPlayersIds.has(playerToReport.__id)) {
+            this.game.logger.info(
+                "This player was already reported by another player this game.",
+            );
+            return;
+        }
+
+        if (!this.userId) {
+            this.game.logger.info("Log in honey.");
+            return;
+        }
+
+        const game = this.game;
+        const msgStream = this.msgStream;
+        msgStream.stream.index = 0;
+
+        console.log(`Started recording`);
+
+        const joinedMsg = new net.JoinedMsg();
+        joinedMsg.teamMode = game.teamMode;
+        joinedMsg.playerId = playerToReport.__id;
+        joinedMsg.started = game.started;
+        joinedMsg.teamMode = game.teamMode;
+        joinedMsg.emotes = playerToReport.loadout.emotes;
+        msgStream.serializeMsg(net.MsgType.Joined, joinedMsg);
+
+        this.recorder = PacketRecorder.create();
+
+        this.recorder.startRecording();
+
+        if (this.spectating) {
+            this.spectatedWhenRecording.add(this.spectating?.name);
+        }
+
+        this.recorder.addPacket(PacketType.Server, msgStream.getBuffer());
+
+        msgStream.stream.index = 0;
+
+        this.recorder.addPacket(PacketType.Server, game.map.mapStream.getBuffer());
+
+        const updateMsg = new net.UpdateMsg();
+
+        updateMsg.activePlayerData = {
+            healthDirty: true,
+            boostDirty: true,
+            zoomDirty: true,
+            actionDirty: true,
+            inventoryDirty: true,
+            weapsDirty: true,
+            spectatorCountDirty: true,
+
+            action: playerToReport.action,
+            health: playerToReport.health,
+            zoom: playerToReport.zoom,
+            boost: playerToReport.boost,
+            scope: playerToReport.scope,
+            curWeapIdx: playerToReport.curWeapIdx,
+            inventory: playerToReport.inventory,
+            weapons: playerToReport.weapons,
+            spectatorCount: playerToReport.spectatorCount,
+        };
+
+        updateMsg.activePlayerIdDirty = true;
+        updateMsg.activePlayerId = playerToReport.__id;
+
+        updateMsg.playerInfos = game.playerBarn.players;
+
+        updateMsg.fullObjects.push(...playerToReport.visibleObjects);
+
+        if (playerToReport.group) {
+            updateMsg.groupStatusDirty = true;
+            updateMsg.groupStatus = playerToReport.group.players;
+        }
+
+        updateMsg.playerStatus = playerToReport.getPlayerStatus();
+        updateMsg.playerStatusDirty = true;
+
+        updateMsg.gasDirty = true;
+        updateMsg.gasData = game.gas;
+        updateMsg.gasTDirty = true;
+        updateMsg.gasT = game.gas.gasT;
+
+        if (game.playerBarn.killLeader) {
+            updateMsg.killLeaderDirty = true;
+            updateMsg.killLeaderId = game.playerBarn.killLeader.__id;
+            updateMsg.killLeaderKills = game.playerBarn.killLeader.kills;
+        }
+
+        updateMsg.mapIndicators = game.mapIndicatorBarn.mapIndicators;
+
+        msgStream.serializeMsg(net.MsgType.Update, updateMsg);
+
+        const aliveMsg = new net.AliveCountsMsg();
+        this.game.modeManager.updateAliveCounts(aliveMsg.teamAliveCounts);
+        msgStream.serializeMsg(net.MsgType.AliveCounts, aliveMsg);
+
+        this.recorder.addPacket(PacketType.Server, msgStream.getBuffer());
+
+        msgStream.stream.index = 0;
+    }
+
+    // TODO: move this to the packet recorder class
+    getRecorderDBData = () => {
+        this.reportedAPlayer = true;
+
+        const buff = this.recorder!.getData();
+        this.recorder = undefined;
+
+        return {
+            userId: this.userId!,
+            gameId: this.game.id,
+            recording: Buffer.from(buff).toString("base64"),
+            sepectatedPlayerNames: [...this.spectatedWhenRecording],
+        };
+    };
 }

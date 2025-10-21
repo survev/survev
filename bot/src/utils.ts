@@ -1,7 +1,9 @@
 import type {
     ButtonInteraction,
+    ChatInputCommandInteraction,
     ComponentType,
     Interaction,
+    InteractionReplyOptions,
     Message,
     RepliableInteraction,
     StringSelectMenuInteraction,
@@ -10,9 +12,9 @@ import { MessageFlags, PermissionFlagsBits } from "discord.js";
 import { hc } from "hono/client";
 import type { PrivateRouteApp } from "../../server/src/api/routes/private/private";
 import { Logger } from "../../shared/utils/logger";
+import { clearEmbedWithMessage } from "./components";
 import { API_URL, Config, DISCORD_GUILD_ID, DISCORD_ROLE_ID } from "./config";
 
-// we love enums
 export const enum Command {
     BanIp = "ban_ip",
     FindDiscordUserSlug = "find_discord_user_slug",
@@ -62,10 +64,11 @@ export function hasBotPermission(interaction: Interaction): boolean {
     return false;
 }
 
-const TIMEOUT_IN_SECONDS = 60;
+// 60 seconds
+export const BOT_COLLECTOR_TIMEOUT = 60 * 1000;
 
 /**
- * generic collector that handles timeouts and only allows interactions buy the original user
+ * generic collector that handles timeouts and only allows interactions by the original user
  */
 export function createCollector<
     T extends ButtonInteraction | StringSelectMenuInteraction,
@@ -85,7 +88,7 @@ export function createCollector<
     const collector = response.createMessageComponentCollector({
         filter: (i) => i.user.id === options.originalUserId,
         componentType: options.componentType,
-        time: TIMEOUT_IN_SECONDS * 1000,
+        time: BOT_COLLECTOR_TIMEOUT,
     });
 
     collector.on("collect", async (interaction: T) => {
@@ -101,15 +104,29 @@ export function createCollector<
     });
 
     collector.on("end", async (_, reason) => {
-        if (reason === "time") {
-            await options.interaction.editReply({
-                content: "Timed out, please try again.",
-                components: [],
-                embeds: [],
-            });
-            return;
-        }
+        if (reason != "time") return;
+        await clearEmbedWithMessage(options.interaction, "Timed out, please try again.");
     });
+}
+
+export function sendNoPermissionMessage(interaction: ChatInputCommandInteraction) {
+    if (!interaction.isRepliable()) return;
+    const errorMessage = {
+        content: "You do not have permission to use this action.",
+        flags: MessageFlags.Ephemeral,
+    } as const;
+    safeBotReply(interaction, errorMessage);
+}
+
+export function safeBotReply(
+    interaction: RepliableInteraction,
+    message: InteractionReplyOptions,
+) {
+    if (interaction.replied || interaction.deferred) {
+        interaction.followUp(message);
+    } else {
+        interaction.reply(message);
+    }
 }
 
 export const botLogger = new Logger(Config.logging, "Bot");

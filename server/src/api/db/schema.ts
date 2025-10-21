@@ -4,6 +4,7 @@ import {
     index,
     integer,
     json,
+    pgEnum,
     pgTable,
     serial,
     text,
@@ -44,6 +45,7 @@ export const usersTable = pgTable("users", {
         .notNull()
         .default(loadout.validate({} as Loadout))
         .$type<Loadout>(),
+    canReportPlayers: boolean("can_report_players").notNull().default(true),
 });
 
 export type UsersTableInsert = typeof usersTable.$inferInsert;
@@ -147,4 +149,22 @@ export const bannedIpsTable = pgTable("banned_ips", {
     permanent: boolean("permanent").notNull().default(false),
     reason: text("reason").notNull().default(""),
     bannedBy: text("banned_by").notNull().default("admin"),
+});
+
+export const statusEnum = pgEnum("status", ["unreviewed", "ignored", "reviewed"]);
+
+export const reportsTable = pgTable("reports", {
+    id: uuid("id").primaryKey().defaultRandom(),
+    sepectatedPlayerNames: text("sepectated_player_ids").array().notNull().default([]),
+    reportedBy: text("reported_by")
+        .notNull()
+        .references(() => usersTable.id, {
+            onUpdate: "cascade",
+        }),
+    recording: text("recording").notNull(),
+    gameId: uuid("game_id").notNull(),
+    createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+    // discordId of the game mod, or the user who reported the game
+    reviewdBy: text("reviewed_by").notNull().default(""),
+    status: statusEnum().notNull().default("unreviewed"),
 });

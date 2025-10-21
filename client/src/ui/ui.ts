@@ -5,6 +5,7 @@ import { PingDefs } from "../../../shared/defs/gameObjects/pingDefs";
 import { type RoleDef, RoleDefs } from "../../../shared/defs/gameObjects/roleDefs";
 import type { MapDef } from "../../../shared/defs/mapDefs";
 import { Action, GameConfig, GasMode, TeamMode } from "../../../shared/gameConfig";
+import type * as net from "../../../shared/net/net";
 import type { PlayerStatsMsg } from "../../../shared/net/playerStatsMsg";
 import type { MapIndicator, PlayerStatus } from "../../../shared/net/updateMsg";
 import { coldet } from "../../../shared/utils/coldet";
@@ -168,6 +169,7 @@ export class UiManager {
     specPrev = false;
     specNextButton = $("#btn-spectate-next-player");
     specPrevButton = $("#btn-spectate-prev-player");
+    reportPlayeButton = $("#btn-report-cheater");
 
     // Touch specific buttons
     interactionElems = $("#ui-interaction-press, #ui-interaction");
@@ -392,7 +394,9 @@ export class UiManager {
         this.specPrevButton.on("click", () => {
             this.specPrev = true;
         });
-
+        this.reportPlayeButton.on("click", () => {
+            this.recording = true;
+        });
         // Touch specific buttons
         this.interactionElems.css("pointer-events", "auto");
         this.interactionElems.on("touchstart", (e) => {
@@ -607,6 +611,10 @@ export class UiManager {
         $(".ui-team-member-health")
             .find(".ui-bar-inner")
             .css("width", this.teamMemberHealthBarWidth);
+
+        // reset recording button
+        $("#btn-report-cheater").text("Report Cheater");
+        $("#btn-report-cheater").prop("disabled", false);
 
         $("#ui-center").off("mouseenter mouseleave");
         this.inputBinds.menuHovered = false;
@@ -1321,6 +1329,8 @@ export class UiManager {
     beginSpectating() {
         this.specBegin = true;
     }
+
+    recording = false;
 
     hideStats() {
         this.displayingStats = false;
@@ -2166,6 +2176,15 @@ export class UiManager {
             "ui-team-member-status-downed ui-team-member-status-dead ui-team-member-status-disconnected icon-pulse",
         );
         this.teamSelectors = [];
+    }
+
+    updateRecording(msg: net.ReportMsg) {
+        this.recording = !msg.end;
+
+        if (this.recording) {
+            $("#btn-report-cheater").text("Reported!");
+            $("#btn-report-cheater").prop("disabled", true);
+        }
     }
 
     resize(map: Map, camera: Camera) {

@@ -12,7 +12,7 @@ export type ProfileResponse =
           readonly success: true;
           profile: Pick<
               UsersTableSelect,
-              "slug" | "username" | "usernameSet" | "linked"
+              "slug" | "username" | "usernameSet" | "linked" | "canReportPlayers"
           > & {
               usernameChangeTime: number;
           };

@@ -5,20 +5,28 @@ import {
     ButtonStyle,
     ComponentType,
     EmbedBuilder,
+    type Message,
     type RepliableInteraction,
     StringSelectMenuBuilder,
     type StringSelectMenuInteraction,
 } from "discord.js";
 import { util } from "../../shared/utils/util";
-import { BUTTON_PREFIXES, type SelectedPlayer } from "./commands/search-player";
 import { createCollector, honoClient } from "./utils";
 
-export async function createDiscordDropdownUI(
-    interaction: RepliableInteraction,
-    matchingPlayers: SelectedPlayer[],
-    searchName: string,
-) {
-    const originalUserId = interaction.user.id;
+export type DropdownPlayer = {
+    teamMode: string;
+    mapId: string;
+    slug: string | null;
+    authId: string | null;
+    linkedDiscord: boolean | null;
+    ip: string;
+    findGameIp: string;
+    username: string;
+    region: string;
+    createdAt: Date | string;
+};
+
+export function createSelectUI(matchingPlayers: DropdownPlayer[], searchName: string) {
     const options = matchingPlayers.map((player, index) => {
         const slug = player.slug ? ` (slug: ${player.slug})` : "";
 
@@ -44,6 +52,23 @@ export async function createDiscordDropdownUI(
         )
         .setTimestamp();
 
+    return { embed, row };
+}
+
+export const BUTTON_PREFIXES = {
+    BAN_FOR_CHEATING: `search_player_ban_for_cheating_`,
+    BAN_FOR_BAD_NAME: `search_player_ban_for_name_`,
+} as const;
+
+export async function createDiscordDropdownUI(
+    interaction: RepliableInteraction,
+    matchingPlayers: DropdownPlayer[],
+    searchName: string,
+) {
+    const originalUserId = interaction.user.id;
+
+    const { embed, row } = createSelectUI(matchingPlayers, searchName);
+
     const response = await interaction.editReply({
         embeds: [embed],
         components: [row],
@@ -60,14 +85,11 @@ export async function createDiscordDropdownUI(
             await interaction.deferUpdate();
             const selectedValue = interaction.values[0];
             // fomrat: ban_<index>
-            const playerIndex = parseInt(selectedValue.split("_")[1]);
-
-            const selectedPlayer = matchingPlayers[playerIndex];
+            const playerIdx = parseInt(selectedValue.split("_")[1]);
 
             await createDiscordPlayerInfoCardUI({
                 interaction,
-                selectedPlayer,
-                playerIdx: playerIndex,
+                playerIdx,
                 originalUserId,
                 matchingPlayers,
             });
@@ -75,19 +97,7 @@ export async function createDiscordDropdownUI(
     });
 }
 
-export async function createDiscordPlayerInfoCardUI({
-    interaction,
-    selectedPlayer,
-    playerIdx,
-    originalUserId,
-    matchingPlayers,
-}: {
-    interaction: RepliableInteraction;
-    selectedPlayer: SelectedPlayer;
-    playerIdx: number;
-    originalUserId: string;
-    matchingPlayers: SelectedPlayer[];
-}) {
+export function discordCardUI(selectedPlayer: DropdownPlayer, playerIdx: number) {
     const fields = getEmbedFields(selectedPlayer);
 
     const embed = new EmbedBuilder()
@@ -111,6 +121,25 @@ export async function createDiscordPlayerInfoCardUI({
     const row = new ActionRowBuilder<ButtonBuilder>()
         .addComponents(banPlayerForCheating)
         .addComponents(banPlayerForBadName);
+
+    return { embed, row };
+}
+
+export async function createDiscordPlayerInfoCardUI({
+    interaction,
+    playerIdx,
+    originalUserId,
+    matchingPlayers,
+    reportId,
+}: {
+    interaction: RepliableInteraction;
+    playerIdx: number;
+    originalUserId: string;
+    matchingPlayers: DropdownPlayer[];
+    reportId?: string;
+}) {
+    const selectedPlayer = matchingPlayers[playerIdx];
+    const { embed, row } = discordCardUI(selectedPlayer, playerIdx);
 
     const response = await interaction.editReply({
         embeds: [embed],
@@ -175,6 +204,14 @@ export async function createDiscordPlayerInfoCardUI({
                 },
             });
 
+            if (reportId) {
+                await honoClient.reports.mark_as_reviewed.$post({
+                    json: {
+                        reportId,
+                    },
+                });
+            }
+
             const { message } = await res.json();
             await clearEmbedWithMessage(interaction, message);
         },
@@ -182,17 +219,18 @@ export async function createDiscordPlayerInfoCardUI({
 }
 
 export async function clearEmbedWithMessage(
-    interaction: RepliableInteraction,
+    interaction: RepliableInteraction | Message,
     content: string,
 ) {
-    await interaction.editReply({
-        content,
-        components: [],
-        embeds: [],
-    });
+    const payload = { content, components: [], embeds: [] };
+    if ("editReply" in interaction) {
+        await interaction.editReply(payload);
+        return;
+    }
+    await interaction.edit(payload);
 }
 
-function getEmbedFields(selectedPlayer: SelectedPlayer) {
+function getEmbedFields(selectedPlayer: DropdownPlayer) {
     const fields = [
         { name: "Player Name", value: selectedPlayer.username, inline: true },
         { name: "Team Mode", value: selectedPlayer.teamMode, inline: true },

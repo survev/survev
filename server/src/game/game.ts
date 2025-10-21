@@ -69,6 +69,7 @@ export class Game {
     objectRegister: ObjectRegister;
 
     joinTokens = new Map<string, JoinTokenData>();
+    reportedPlayersIds = new Set<number>();
 
     get aliveCount(): number {
         return this.playerBarn.livingPlayers.length;
@@ -354,6 +355,7 @@ export class Game {
             | net.EmoteMsg
             | net.DropItemMsg
             | net.SpectateMsg
+            | net.ReportMsg
             | net.PerkModeRoleSelectMsg
             | net.EditMsg
             | undefined = undefined;
@@ -383,6 +385,10 @@ export class Game {
                 break;
             case net.MsgType.PerkModeRoleSelect:
                 msg = new net.PerkModeRoleSelectMsg();
+                msg.deserialize(stream);
+                break;
+            case net.MsgType.Report:
+                msg = new net.ReportMsg();
                 msg.deserialize(stream);
                 break;
             case net.MsgType.Edit:
@@ -442,6 +448,14 @@ export class Game {
             }
             case net.MsgType.Spectate: {
                 player.spectate(msg as net.SpectateMsg);
+                break;
+            }
+            case net.MsgType.Report: {
+                if (player.recorder?.recording) {
+                    player.recorder.stopRecording();
+                    break;
+                }
+                player.startRecording();
                 break;
             }
             case net.MsgType.PerkModeRoleSelect: {
@@ -528,6 +542,7 @@ export class Game {
             if (!player.disconnected) {
                 this.closeSocket(player.socketId);
             }
+            player.recorder?.stopRecording();
         }
         this.logger.info("Game Ended");
         this.updateData();
@@ -598,6 +613,30 @@ export class Game {
             this.logger.error(`Failed to fetch API save game:`, err);
         }
 
+        // this needs to be done after the game is saved to the db
+        const allPlayers = this.playerBarn.players;
+        for await (const player of allPlayers) {
+            if (!player.recorder) continue;
+
+            const data = player.getRecorderDBData();
+
+            if (!data) continue;
+
+            const res = await apiPrivateRouter.reports.save_game_recording.$post({
+                json: {
+                    gameId: this.id,
+                    reportedBy: data.userId!,
+                    recording: data.recording,
+                    sepectatedPlayerNames: data.sepectatedPlayerNames,
+                },
+            });
+
+            if (!res.ok) {
+                this.logger.error(`Failed to save recording by ${data.userId}`);
+                return;
+            }
+        }
+
         if (!res || !res.ok) {
             const region = Config.gameServer.thisRegion.toUpperCase();
             this.logger.error(
@@ -629,7 +668,6 @@ export class Game {
             }
         }
     }
-
     /**
      * Steps the game X seconds in the future
      * This is done in smaller steps of 0.1 seconds

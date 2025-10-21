@@ -97,6 +97,7 @@ const defaultConfig = {
     binds: "",
     cachedBgImg: "img/main_splash.png",
     version: 1,
+    recordGame: false,
     /* STRIP_FROM_PROD_CLIENT:START */
     debugTools: debugToolsConfig,
     debugRenderer: debugRenderConfig,

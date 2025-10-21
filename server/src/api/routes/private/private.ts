@@ -34,9 +34,11 @@ import {
 } from "../../db/schema";
 import { MOCK_USER_ID } from "../user/auth/mock";
 import { logPlayerIPs, ModerationRouter } from "./ModerationRouter";
+import { ReportsRouter } from "./ReportsRouter";
 
 export const PrivateRouter = new Hono<Context>()
     .use(privateMiddleware)
+    .route("/reports", ReportsRouter)
     .route("/moderation", ModerationRouter)
     .post("/update_region", validateParams(zUpdateRegionBody), (c) => {
         const { regionId, data } = c.req.valid("json");

@@ -17,7 +17,7 @@ import { ConfigManager, type ConfigType } from "./config";
 import { device } from "./device";
 import { errorLogManager } from "./errorLogs";
 import { Game } from "./game";
-import { helpers } from "./helpers";
+import { getParameterByName, helpers } from "./helpers";
 import { InputHandler } from "./input";
 import { InputBinds, InputBindUi } from "./inputBinds";
 import { PingTest } from "./pingTest";
@@ -55,6 +55,7 @@ class Application {
     errorModal = new MenuModal($("#modal-notification"));
     refreshModal = new MenuModal($("#modal-refresh"));
     ipBanModal = new MenuModal($("#modal-ip-banned"));
+    modalRecorder = new MenuModal($("#ui-modal-recorder"));
     config = new ConfigManager();
     localization = new Localization();
 
@@ -267,6 +268,48 @@ class Application {
             if (a > i) {
                 $(".news-toggle").find(".account-alert").css("display", "block");
             }
+
+            $<HTMLInputElement>("#recorder-play-local-file").on("change", async (e) => {
+                const file = e.target.files![0];
+                if (!file) return;
+
+                const buff = await file.arrayBuffer();
+                this.game?.startPacketPlayBack(buff);
+            });
+
+            this.modalRecorder.onShow(() => {});
+
+            this.modalRecorder.onHide(() => {});
+
+            const fetchGame = async (url: string) => {
+                const res = await fetch(url);
+                this.game?.startPacketPlayBack(await res.arrayBuffer());
+            };
+
+            const replayUrl = getParameterByName("replayUrl");
+
+            if (replayUrl) {
+                fetchGame(replayUrl);
+            }
+
+            $(".btn-recorder").on("click", () => {
+                this.modalRecorder.show();
+                return false;
+            });
+
+            $("#btn-recorder-load-url").on("click", (_e) => {
+                const url = $("#recording-url-input").val() as string;
+                this.quickPlayPendingModeIdx = 0;
+                this.refreshUi();
+                this.modalRecorder.hide();
+                try {
+                    fetchGame(url);
+                } catch {
+                    this.quickPlayPendingModeIdx = -1;
+                    this.refreshUi();
+                }
+            });
+
             this.setDOMFromConfig();
             this.setAppActive(true);
             const domCanvas = document.querySelector<HTMLCanvasElement>("#cvs")!;

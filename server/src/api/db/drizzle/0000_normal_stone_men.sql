@@ -1,9 +1,11 @@
+CREATE TYPE "public"."status" AS ENUM('unreviewed', 'ignored', 'reviewed');--> statement-breakpoint
 CREATE TABLE "banned_ips" (
 	"created_at" timestamp with time zone DEFAULT now() NOT NULL,
 	"expries_in" timestamp NOT NULL,
 	"encoded_ip" text PRIMARY KEY NOT NULL,
 	"permanent" boolean DEFAULT false NOT NULL,
-	"reason" text DEFAULT '' NOT NULL
+	"reason" text DEFAULT '' NOT NULL,
+	"banned_by" text DEFAULT 'admin' NOT NULL
 );
 --> statement-breakpoint
 CREATE TABLE "ip_logs" (
@@ -15,6 +17,7 @@ CREATE TABLE "ip_logs" (
 	"username" text NOT NULL,
 	"user_id" text DEFAULT '',
 	"encoded_ip" text NOT NULL,
+	"team_mode" integer DEFAULT 1 NOT NULL,
 	"ip" text NOT NULL,
 	"find_game_ip" text NOT NULL,
 	"find_game_encoded_ip" text NOT NULL
@@ -46,10 +49,22 @@ CREATE TABLE "match_data" (
 	"rank" integer NOT NULL,
 	"died" boolean NOT NULL,
 	"kills" integer NOT NULL,
+	"team_kills" integer DEFAULT 0 NOT NULL,
 	"damage_dealt" integer NOT NULL,
 	"damage_taken" integer NOT NULL,
 	"killer_id" integer NOT NULL,
 	"killed_ids" integer[] NOT NULL
+);
+--> statement-breakpoint
+CREATE TABLE "reports" (
+	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
+	"sepectated_player_ids" text[] DEFAULT '{}' NOT NULL,
+	"reported_by" text NOT NULL,
+	"recording" text NOT NULL,
+	"game_id" uuid NOT NULL,
+	"created_at" timestamp with time zone DEFAULT now() NOT NULL,
+	"reviewed_by" text DEFAULT '' NOT NULL,
+	"status" "status" DEFAULT 'unreviewed' NOT NULL
 );
 --> statement-breakpoint
 CREATE TABLE "session" (
@@ -64,6 +79,7 @@ CREATE TABLE "users" (
 	"slug" text NOT NULL,
 	"banned" boolean DEFAULT false NOT NULL,
 	"ban_reason" text DEFAULT '' NOT NULL,
+	"banned_by" text DEFAULT '' NOT NULL,
 	"username" text DEFAULT '' NOT NULL,
 	"username_set" boolean DEFAULT false NOT NULL,
 	"user_created" timestamp with time zone DEFAULT now() NOT NULL,
@@ -72,10 +88,12 @@ CREATE TABLE "users" (
 	"linked_google" boolean DEFAULT false NOT NULL,
 	"linked_discord" boolean DEFAULT false NOT NULL,
 	"loadout" json DEFAULT '{"outfit":"outfitBase","melee":"fists","heal":"heal_basic","boost":"boost_basic","player_icon":"","crosshair":{"type":"crosshair_default","color":16777215,"size":"1.00","stroke":"0.00"},"emotes":["emote_happyface","emote_thumbsup","emote_surviv","emote_sadface","",""]}'::json NOT NULL,
+	"can_report_players" boolean DEFAULT true NOT NULL,
 	CONSTRAINT "users_slug_unique" UNIQUE("slug")
 );
 --> statement-breakpoint
 ALTER TABLE "items" ADD CONSTRAINT "items_user_id_users_id_fk" FOREIGN KEY ("user_id") REFERENCES "public"."users"("id") ON DELETE cascade ON UPDATE cascade;--> statement-breakpoint
+ALTER TABLE "reports" ADD CONSTRAINT "reports_reported_by_users_id_fk" FOREIGN KEY ("reported_by") REFERENCES "public"."users"("id") ON DELETE no action ON UPDATE cascade;--> statement-breakpoint
 ALTER TABLE "session" ADD CONSTRAINT "session_user_id_users_id_fk" FOREIGN KEY ("user_id") REFERENCES "public"."users"("id") ON DELETE cascade ON UPDATE cascade;--> statement-breakpoint
 CREATE INDEX "name_created_at_idx" ON "ip_logs" USING btree ("username","created_at");--> statement-breakpoint
 CREATE INDEX "idx_match_data_user_stats" ON "match_data" USING btree ("user_id","team_mode","rank","kills","damage_dealt","time_alive");--> statement-breakpoint

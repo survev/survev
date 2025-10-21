@@ -394,6 +394,14 @@ async function setupBotConfig(config: PartialConfig) {
         type: "text",
     });
     config.discordRoleId = discordRoleId.value;
+
+    const recordingReportWebhook = await prompt<{ value: string }>({
+        message: "Enter the recording report webhook URL",
+        name: "value",
+        type: "text",
+    });
+
+    config.recordingReportWebhook = recordingReportWebhook.value;
 }
 
 const configPath = path.join(import.meta.dirname, configFileName);

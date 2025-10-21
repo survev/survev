@@ -2,6 +2,7 @@ import { serve } from "@hono/node-server";
 import { createNodeWebSocket } from "@hono/node-ws";
 import { Cron } from "croner";
 import { randomUUID } from "crypto";
+import { eq } from "drizzle-orm";
 import { Hono } from "hono";
 import { getCookie } from "hono/cookie";
 import { cors } from "hono/cors";
@@ -25,9 +26,15 @@ import {
 import { server } from "./apiServer";
 import { deleteExpiredSessions, validateSessionToken } from "./auth";
 import { rateLimitMiddleware, validateParams } from "./auth/middleware";
-import type { SessionTableSelect, UsersTableSelect } from "./db/schema";
+import { db } from "./db";
+import {
+    reportsTable,
+    type SessionTableSelect,
+    type UsersTableSelect,
+} from "./db/schema";
 import { cleanupOldLogs, isBanned } from "./routes/private/ModerationRouter";
 import { PrivateRouter } from "./routes/private/private";
+import { deleteOldReports } from "./routes/private/ReportsRouter";
 import { StatsRouter } from "./routes/stats/StatsRouter";
 import { AuthRouter } from "./routes/user/AuthRouter";
 import { UserRouter } from "./routes/user/UserRouter";
@@ -185,6 +192,38 @@ app.post("/api/find_game", validateParams(zFindGameBody), async (c) => {
     });
 });
 
+app.get("/api/get_recording/:recordingId", async (c) => {
+    const param = c.req.param("recordingId");
+
+    const { success, data: recordingId } = z.string().safeParse(param);
+
+    if (!success) {
+        return c.json({ error: "Invalid recording ID" }, 400);
+    }
+
+    const res = await db.query.reportsTable.findFirst({
+        where: eq(reportsTable.id, recordingId),
+        columns: {
+            recording: true,
+        },
+    });
+
+    if (!res) {
+        return c.json({ error: "No recording found" }, 404);
+    }
+
+    const binaryData = Buffer.from(res.recording, "base64");
+
+    c.header("Content-Type", "application/octet-stream");
+    c.header("Content-Length", binaryData.length.toString());
+    c.header(
+        "Content-Disposition",
+        `attachment; filename="recording-${Math.random()}.surv"`,
+    );
+
+    return c.body(binaryData);
+});
+
 app.post(
     "/api/report_error",
     rateLimitMiddleware(5, 60 * 1000),
@@ -238,7 +277,8 @@ new Cron("0 0 * * *", async () => {
     try {
         await cleanupOldLogs();
         await deleteExpiredSessions();
-        server.logger.info("Deleted old logs and expired sessions");
+        await deleteOldReports();
+        server.logger.info("Cleanup script ran successfully");
     } catch (err) {
         server.logger.error("Failed to run cleanup script", err);
     }
