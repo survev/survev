@@ -46,6 +46,7 @@ import type { Localization } from "./ui/localization";
 import { Touch } from "./ui/touch";
 import { UiManager } from "./ui/ui";
 import { UiManager2 } from "./ui/ui2";
+import { type AmmoDef } from "../../shared/defs/gameObjects/gearDefs";
 
 export interface Ctx {
     audioManager: AudioManager;
@@ -1300,6 +1301,9 @@ export class Game {
                     this.editor.toolParams.mapSeed = msg.seed;
                     this.editor.pane.refresh();
                 }
+
+                //OG
+                (GameObjectDefs["556mm"] as AmmoDef).special=this.m_map.mapDef.gameMode.ogMode===true;
                 break;
             }
             case net.MsgType.Update: {

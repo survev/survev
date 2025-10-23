@@ -60,6 +60,14 @@ import { createCasingParticle } from "./shot";
 
 const submergeMaskScaleFactor = 0.1;
 
+
+const backpackTints=[
+    0xffffff,
+    0x663300,
+    0x006600,
+    0x666633
+]
+
 function perksEqual(a: Array<{ type: string }>, b: Array<{ type: string }>) {
     if (a.length != b.length) {
         return false;
@@ -1610,12 +1618,13 @@ export class Player implements AbstractObject {
             this.backpackSprite.texture = PIXI.Texture.from("player-circle-base-01.img");
             this.backpackSprite.position.set(-bagOffset, 0);
             this.backpackSprite.scale.set(scale, scale);
-            this.backpackSprite.tint = outfitImg.backpackTint;
+            const btint=map.mapDef.gameMode.ogMode?backpackTints[bagLevel]:outfitImg.backpackTint;
+            this.backpackSprite.tint = btint;
             this.backpackSprite.visible = true;
             (function (sprite, img, tint) {
                 sprite.texture = PIXI.Texture.from(img);
                 sprite.tint = tint;
-            })(this.backpackSprite, outfitImg.backpackSprite, outfitImg.backpackTint);
+            })(this.backpackSprite, outfitImg.backpackSprite, btint);
         } else {
             this.backpackSprite.visible = false;
         }

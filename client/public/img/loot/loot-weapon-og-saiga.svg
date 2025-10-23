@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <svg
-   width="112.07401"
-   height="122.138"
+   width="128"
+   height="128"
    version="1.1"
    id="svg63"
    sodipodi:docname="loot-weapon-og-saiga.svg"
@@ -31,7 +31,7 @@
      showgrid="true"
      inkscape:zoom="1.3409091"
      inkscape:cx="-152.50847"
-     inkscape:cy="36.169491"
+     inkscape:cy="35.423729"
      inkscape:window-x="-8"
      inkscape:window-y="-8"
      inkscape:window-maximized="1"
@@ -48,8 +48,8 @@
        empspacing="4"
        spacingy="2"
        spacingx="2"
-       originx="-3.7950776e-07"
-       originy="-7.3778791e-07"
+       originx="-3.7950775e-07"
+       originy="-7.377879e-07"
        units="px" /></sodipodi:namedview><defs
      id="defs37"><linearGradient
        id="linearGradient987"><stop
@@ -62,7 +62,7 @@
          offset="1"
          style="stop-color:#d38600;stop-opacity:1" /></linearGradient></defs><g
      id="g39"
-     transform="matrix(0.20901744,0,0,0.21119553,98.930445,33.050531)"><g
+     transform="matrix(0.20901744,0,0,0.21119553,106.89344,35.981532)"><g
        id="g38"
        transform="translate(-7.9631252,-2.9312215)"><path
          style="fill:#ffffff;fill-opacity:1"

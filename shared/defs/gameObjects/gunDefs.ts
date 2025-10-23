@@ -101,10 +101,10 @@ export interface GunDef {
     burstSounds?: number;
 }
 function OG_Gun(original:string):GunDef{
-    const clone=util.cloneDeep(GunDefs[original]) as GunDef
-    clone.lootImg.sprite=`loot-weapon-og-${original}.img`
-    GunDefs[`og_${original}`]=clone
-    return clone
+    const clone=util.cloneDeep(GunDefs[original]) as GunDef;
+    clone.lootImg.sprite=`loot-weapon-og-${original}.img`;
+    GunDefs[`og_${original}`]=clone;
+    return clone;
 }
 export const GunDefs: Record<string, GunDef> = {
     mp5: {
@@ -2176,6 +2176,55 @@ export const GunDefs: Record<string, GunDef> = {
             deploy: "m9_switch_01",
         },
     },
+    og_m9: {
+        name: "M9",
+        type: "gun",
+        quality: 1,
+        fireMode: "single",
+        caseTiming: "shoot",
+        ammo: "9mm",
+        ammoSpawnCount: 45,
+        pistol: true,
+        maxClip: 15,
+        maxReload: 15,
+        extendedClip: 30,
+        extendedReload: 30,
+        reloadTime: 1.6,
+        fireDelay: 0.12,
+        switchDelay: 0.25,
+        barrelLength: 2.2,
+        barrelOffset: 0,
+        recoilTime: 1e10,
+        moveSpread: 3,
+        shotSpread: 3,
+        bulletCount: 1,
+        bulletType: "bullet_m9",
+        bulletTypeBonus: "bullet_m9_bonus",
+        headshotMult: 2,
+        speed: { equip: 0, attack: 0 },
+        lootImg: {
+            sprite: "loot-weapon-og-m9.img",
+            tint: 0xff00,
+            border: "loot-circle-outer-01.img",
+            borderTint: 0,
+            scale: 0.3,
+        },
+        worldImg: {
+            sprite: "gun-short-01.img",
+            scale: { x: 0.5, y: 0.505 },
+            tint: 0x1e1e1e,
+            leftHandOffset: { x: 0, y: 0 },
+            recoil: 1,
+        },
+        particle: { shellScale: 1, shellOffset: 0.25 },
+        sound: {
+            shoot: "m9_01",
+            reload: "m9_reload_01",
+            pickup: "gun_pickup_01",
+            empty: "empty_fire_01",
+            deploy: "m9_switch_01",
+        },
+    },
     m9_cursed: {
         name: "M9 Cursed",
         type: "gun",
@@ -3359,8 +3408,8 @@ export const GunDefs: Record<string, GunDef> = {
         },
     },
 };
-OG_Gun("mosin")
-OG_Gun("saiga")
-OG_Gun("ak47")
-OG_Gun("m870")
-OG_Gun("m39")
+OG_Gun("mosin");
+OG_Gun("saiga");
+OG_Gun("ak47");
+OG_Gun("m870");
+OG_Gun("m39");

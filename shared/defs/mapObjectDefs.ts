@@ -10657,6 +10657,12 @@ export const MapObjectDefs: Record<string, MapObjectDef> = {
         explodeParticle: ["woodPlank", "clothBreak"],
     }),
     tree_01: createTree({}),
+    tree_og:createTree({
+        collision: collider.createCircle(v2.create(0, 0), 2),
+        img:{
+            sprite:"map-tree-og.img"
+        }
+    }),
     tree_01cb: createTree({
         scale: {
             createMin: 1.1,

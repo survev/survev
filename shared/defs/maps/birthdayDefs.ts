@@ -13,7 +13,7 @@ const mapDef: PartialMapDef = {
     },
     assets: {
         audio: [],
-        atlases: ["gradient", "loadout", "shared", "main"],
+        atlases: ["gradient", "loadout", "shared", "main","og"],
     },
     biome: {
         colors: {
@@ -40,6 +40,7 @@ const mapDef: PartialMapDef = {
     gameMode: {
         maxPlayers: 80,
         killLeaderEnabled: true,
+        ogMode:true
     },
     gameConfig: {
         planes: {
@@ -86,7 +87,7 @@ const mapDef: PartialMapDef = {
         ],
         tier_guns: [
             { name: "mp5", count: 1, weight: 10 },
-            { name: "m9", count: 1, weight: 10 },
+            { name: "og_m9", count: 1, weight: 10 },
             { name: "og_m870", count: 1, weight: 9 },
             { name: "og_ak47", count: 1, weight: 8 },
             { name: "og_mosin", count: 1, weight: 1 },
@@ -163,7 +164,7 @@ const mapDef: PartialMapDef = {
                 barrel_01bd: 70,
                 silo_01: 16,
                 crate_01: 120,
-                tree_01: 300,
+                tree_og: 300,
                 loot_tier_1: 100,
             },
         ],

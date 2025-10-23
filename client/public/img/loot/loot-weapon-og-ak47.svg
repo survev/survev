@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <svg
-   width="101.204"
-   height="118.969"
+   width="128"
+   height="128"
    version="1.1"
    id="svg5"
    sodipodi:docname="loot-weapon-og-ak47.svg"
@@ -20,9 +20,9 @@
      inkscape:pageopacity="0.0"
      inkscape:pagecheckerboard="0"
      inkscape:deskcolor="#d1d1d1"
-     inkscape:zoom="0.78808594"
-     inkscape:cx="295.01859"
-     inkscape:cy="268.37175"
+     inkscape:zoom="1.5761719"
+     inkscape:cx="66.299876"
+     inkscape:cy="111.34572"
      inkscape:window-width="1920"
      inkscape:window-height="1009"
      inkscape:window-x="-8"
@@ -30,7 +30,7 @@
      inkscape:window-maximized="1"
      inkscape:current-layer="svg5" /><g
      id="g5"
-     transform="matrix(0.19645,0,0,0.2025799,1.7188788,24.441356)"><path
+     transform="matrix(0.19645,0,0,0.2025799,15.116879,28.956856)"><path
        style="fill:#ffffff;fill-opacity:1"
        d="M 304.53531,124.35192 376.228,39.335811 338.79554,-1.268897 263.29616,80.574969 Z"
        id="path10" /><path
