@@ -85,13 +85,13 @@ const mapDef: PartialMapDef = {
             { name: "painkiller", count: 1, weight: 5 },
         ],
         tier_guns: [
-            { name: "ak47", count: 1, weight: 8 },
-            { name: "mosin", count: 1, weight: 1 },
-            { name: "m39", count: 1, weight: 0.5 },
-            { name: "saiga", count: 1, weight: 0.5 },
             { name: "mp5", count: 1, weight: 10 },
-            { name: "m870", count: 1, weight: 9 },
             { name: "m9", count: 1, weight: 10 },
+            { name: "og_m870", count: 1, weight: 9 },
+            { name: "og_ak47", count: 1, weight: 8 },
+            { name: "og_mosin", count: 1, weight: 1 },
+            { name: "og_m39", count: 1, weight: 0.5 },
+            { name: "og_saiga", count: 1, weight: 0.5 },
         ],
         tier_outfits: [
             // CHECK IF THERE ARE ANY OTHER SKINS

@@ -1,3 +1,4 @@
+import { util } from "../../utils/util";
 import type { Vec2 } from "../../utils/v2";
 
 export interface GunDef {
@@ -99,7 +100,12 @@ export interface GunDef {
     toMouseHit?: boolean;
     burstSounds?: number;
 }
-
+function OG_Gun(original:string):GunDef{
+    const clone=util.cloneDeep(GunDefs[original]) as GunDef
+    clone.lootImg.sprite=`loot-weapon-og-${original}.img`
+    GunDefs[`og_${original}`]=clone
+    return clone
+}
 export const GunDefs: Record<string, GunDef> = {
     mp5: {
         name: "MP5",
@@ -3353,3 +3359,8 @@ export const GunDefs: Record<string, GunDef> = {
         },
     },
 };
+OG_Gun("mosin")
+OG_Gun("saiga")
+OG_Gun("ak47")
+OG_Gun("m870")
+OG_Gun("m39")
