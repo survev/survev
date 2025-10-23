@@ -408,7 +408,7 @@ export const Main: MapDef = {
         tier_guns_common_healer: [
             { name: "mk12", count: 1, weight: 1 },
             { name: "m39", count: 1, weight: 1 },
-            { name: "vss", count: 1, weight: 1},
+            { name: "vss", count: 1, weight: 1 },
         ],
         tier_guns_common_demo: [
             { name: "m870", count: 1, weight: 1 },
@@ -439,7 +439,7 @@ export const Main: MapDef = {
         tier_guns_rare_demo: [
             { name: "saiga", count: 1, weight: 1 },
             { name: "usas", count: 1, weight: 0.1 },
-            { name: "m1014", count: 1, weight: 0.1 },            
+            { name: "m1014", count: 1, weight: 0.1 },
         ],
         tier_guns_rare_healer: [
             { name: "svd", count: 1, weight: 1 },
