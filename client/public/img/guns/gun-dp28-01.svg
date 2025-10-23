@@ -5,7 +5,7 @@
    version="1.1"
    id="svg854"
    sodipodi:docname="gun-dp28-01.svg"
-   inkscape:version="1.3 (0e150ed6c4, 2023-07-21)"
+   inkscape:version="1.4 (e7c3feb1, 2024-10-09)"
    xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
    xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
    xmlns="http://www.w3.org/2000/svg"
@@ -33,8 +33,8 @@
      guidetolerance="10"
      inkscape:pageopacity="0"
      inkscape:pageshadow="2"
-     inkscape:window-width="2560"
-     inkscape:window-height="1560"
+     inkscape:window-width="1104"
+     inkscape:window-height="245"
      id="namedview856"
      showgrid="true"
      fit-margin-top="1"
@@ -42,11 +42,11 @@
      fit-margin-bottom="1"
      fit-margin-right="1"
      inkscape:zoom="2.8284271"
-     inkscape:cx="-18.031223"
-     inkscape:cy="174.65537"
-     inkscape:window-x="-12"
-     inkscape:window-y="-12"
-     inkscape:window-maximized="1"
+     inkscape:cx="-18.208"
+     inkscape:cy="174.65538"
+     inkscape:window-x="51"
+     inkscape:window-y="34"
+     inkscape:window-maximized="0"
      inkscape:current-layer="svg854"
      inkscape:showpageshadow="false"
      inkscape:object-paths="true"
@@ -69,89 +69,6 @@
   </sodipodi:namedview>
   <defs
      id="defs850">
-    <clipPath
-       clipPathUnits="userSpaceOnUse"
-       id="clipPath854">
-      <path
-         sodipodi:nodetypes="ccccccccccccc"
-         inkscape:connector-curvature="0"
-         id="path856"
-         d="m 34,40 v 56 l 2,4 v 68 l -6,4 v 22 H 18 v -22 l -6,-4 v -68 l 2,-4 V 40 Z"
-         style="fill:#515151;stroke-width:10.00078678;stroke-miterlimit:10;stroke-opacity:0.49000005" />
-    </clipPath>
-    <clipPath
-       clipPathUnits="userSpaceOnUse"
-       id="clipPath917">
-      <path
-         inkscape:connector-curvature="0"
-         id="path919"
-         d="m 24,9.9999981 c 7.479,0 13.5,12.9323089 13.5,28.9961399 V 165.00386 C 37.5,181.06769 31.479,194 24,194 16.521,194 10.5,181.06769 10.5,165.00386 V 38.996138 C 10.5,22.932307 16.521,9.9999981 24,9.9999981 Z"
-         clip-path="none"
-         style="fill:#7b673c;fill-opacity:1;stroke:none;stroke-width:7.8558445;stroke-miterlimit:10;stroke-dasharray:none;stroke-opacity:1" />
-    </clipPath>
-    <clipPath
-       clipPathUnits="userSpaceOnUse"
-       id="clipPath1007">
-      <path
-         sodipodi:nodetypes="ccccccccc"
-         inkscape:connector-curvature="0"
-         id="path1009"
-         d="m 12,134 h 24 l 4,4 v 46 l -4,4 H 12 l -4,-4 v -46 z"
-         style="fill:#353535;fill-opacity:1;stroke:none;stroke-width:18.05043411;stroke-linecap:round;stroke-linejoin:miter;stroke-miterlimit:10;stroke-dasharray:none;stroke-opacity:1" />
-    </clipPath>
-    <clipPath
-       clipPathUnits="userSpaceOnUse"
-       id="clipPath978">
-      <path
-         style="fill:#515151;stroke-width:10.00078678;stroke-miterlimit:10;stroke-opacity:0.49000005"
-         clip-path="none"
-         d="M 234.11719,84 232,120 v 32 h 28 v -32 l -2.11719,-36 z"
-         id="path980"
-         inkscape:connector-curvature="0" />
-    </clipPath>
-    <clipPath
-       clipPathUnits="userSpaceOnUse"
-       id="clipPath960">
-      <path
-         clip-path="none"
-         style="fill:#515151;stroke-width:10.00078678;stroke-miterlimit:10;stroke-opacity:0.49000005"
-         d="m 30,48 4,4 4,68 v 68 l -4,12 v 14 l 2,10 v 32 H 12 v -32 l 2,-10 v -14 l -4,-12 v -68 l 4,-68 4,-4 z"
-         id="path962"
-         inkscape:connector-curvature="0"
-         sodipodi:nodetypes="ccccccccccccccccc" />
-    </clipPath>
-    <clipPath
-       clipPathUnits="userSpaceOnUse"
-       id="clipPath969">
-      <path
-         style="fill:#515151;stroke-width:11.47149086;stroke-miterlimit:10;stroke-opacity:0.49000005"
-         d="m 38,76 4,4 v 36 l -4,4 H 10 L 6,116 V 80 l 4,-4 z"
-         id="path971"
-         inkscape:connector-curvature="0"
-         sodipodi:nodetypes="ccccccccc"
-         clip-path="none" />
-    </clipPath>
-    <clipPath
-       clipPathUnits="userSpaceOnUse"
-       id="clipPath975">
-      <path
-         sodipodi:nodetypes="ccccccccccccccc"
-         style="fill:#515151;stroke-width:10.00078678;stroke-miterlimit:10;stroke-opacity:0.49000005"
-         clip-path="none"
-         d="M 14,56 10.11719,62 10,120 h 2 v 72 l 2,2 v 62 h 20 v -62 l 2,-2 v -72 h 2 L 38.11719,62 34,56 Z"
-         id="path977"
-         inkscape:connector-curvature="0" />
-    </clipPath>
-    <clipPath
-       clipPathUnits="userSpaceOnUse"
-       id="clipPath1040">
-      <path
-         sodipodi:nodetypes="ccccccccc"
-         inkscape:connector-curvature="0"
-         id="path1042"
-         d="m 36,128 4,4 v 54 l -4,4 H 12 l -4,-4 v -54 l 4,-4 z"
-         style="fill:#515151;stroke-width:11.47149086;stroke-miterlimit:10;stroke-opacity:0.49000005" />
-    </clipPath>
     <clipPath
        clipPathUnits="userSpaceOnUse"
        id="clipPath5">

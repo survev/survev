@@ -5,7 +5,7 @@
    version="1.1"
    id="svg854"
    sodipodi:docname="gun-bar-01.svg"
-   inkscape:version="1.3 (0e150ed6c4, 2023-07-21)"
+   inkscape:version="1.4 (e7c3feb1, 2024-10-09)"
    xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
    xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
    xmlns="http://www.w3.org/2000/svg"
@@ -33,8 +33,8 @@
      guidetolerance="10"
      inkscape:pageopacity="0"
      inkscape:pageshadow="2"
-     inkscape:window-width="2560"
-     inkscape:window-height="1560"
+     inkscape:window-width="1104"
+     inkscape:window-height="245"
      id="namedview856"
      showgrid="true"
      fit-margin-top="1"
@@ -42,11 +42,11 @@
      fit-margin-bottom="1"
      fit-margin-right="1"
      inkscape:zoom="3.3027142"
-     inkscape:cx="57.831223"
+     inkscape:cx="57.679832"
      inkscape:cy="35.425409"
-     inkscape:window-x="-12"
-     inkscape:window-y="-12"
-     inkscape:window-maximized="1"
+     inkscape:window-x="51"
+     inkscape:window-y="34"
+     inkscape:window-maximized="0"
      inkscape:current-layer="svg854"
      inkscape:showpageshadow="false"
      inkscape:object-paths="true"
@@ -69,233 +69,6 @@
   </sodipodi:namedview>
   <defs
      id="defs850">
-    <clipPath
-       id="a-1">
-      <path
-         style="fill-opacity:0.506;stroke:#ffffff;stroke-width:2.1170001;stroke-opacity:0.50199998"
-         inkscape:connector-curvature="0"
-         d="m -45.534,209.35 29.33,16.933 v 33.867 l -29.33,16.933 -29.33,-16.933 v -33.867 z"
-         id="path2-0-6" />
-    </clipPath>
-    <clipPath
-       clipPathUnits="userSpaceOnUse"
-       id="clipPath1204">
-      <path
-         sodipodi:nodetypes="ccccccccc"
-         style="fill:#515151;stroke-width:5.94354391;stroke-miterlimit:10;stroke-opacity:0.49000005"
-         clip-path="none"
-         d="m 76,48 v 20 h 24 V 48 L 96,44 V 38 H 80 v 6 z"
-         id="path1207"
-         inkscape:connector-curvature="0" />
-    </clipPath>
-    <clipPath
-       clipPathUnits="userSpaceOnUse"
-       id="clipPath1211">
-      <path
-         inkscape:connector-curvature="0"
-         id="path1213"
-         d="M 76,68 72,72 71.93306,136 78,144 v 8 h 20 v -8 l 5.93306,-8 L 104,72 100,68 V 54 H 76 Z"
-         clip-path="none"
-         style="fill:#515151;stroke-width:12.55464077;stroke-miterlimit:10;stroke-opacity:0.49000005"
-         sodipodi:nodetypes="ccccccccccccc" />
-    </clipPath>
-    <clipPath
-       clipPathUnits="userSpaceOnUse"
-       id="clipPath1221">
-      <path
-         inkscape:connector-curvature="0"
-         id="path1223"
-         d="m 76,48 v 10 h 24 V 48 L 96,44 V 38 H 80 v 6 z"
-         clip-path="none"
-         style="fill:#515151;stroke-width:5.94354391;stroke-miterlimit:10;stroke-opacity:0.49000005"
-         sodipodi:nodetypes="ccccccccc" />
-    </clipPath>
-    <clipPath
-       clipPathUnits="userSpaceOnUse"
-       id="clipPath1271">
-      <path
-         sodipodi:nodetypes="ccccc"
-         style="fill:#515151;stroke-width:10.41214085;stroke-miterlimit:10;stroke-opacity:0.49000005"
-         clip-path="none"
-         d="M 30,191.95395 C 56,192 74,174 74,174 v 21.95395 C 74,195.95395 56,212 30,212 Z"
-         id="path1273"
-         inkscape:connector-curvature="0" />
-    </clipPath>
-    <clipPath
-       clipPathUnits="userSpaceOnUse"
-       id="clipPath1301">
-      <rect
-         style="fill:#5b1616;fill-opacity:1;stroke:none;stroke-width:6.72946072;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:10;stroke-dasharray:none;stroke-opacity:1"
-         id="rect1303"
-         width="12.00001"
-         height="13.999999"
-         x="-118"
-         y="-88" />
-    </clipPath>
-    <clipPath
-       clipPathUnits="userSpaceOnUse"
-       id="clipPath1334">
-      <path
-         clip-path="none"
-         sodipodi:nodetypes="ccccccccccccccccc"
-         inkscape:connector-curvature="0"
-         id="path1336"
-         d="m 104,136 -6,8 v 24 l 6,-6 v 10 l -6,6 v 60 H 78 v -46 l -4,3.95395 V 174 l 4,-4 v -26 l -6,-8 v -10 h 32 z"
-         style="fill:#5b1616;fill-opacity:1;stroke-width:15.17535591;stroke-miterlimit:10;stroke-opacity:0.49000005" />
-    </clipPath>
-    <inkscape:path-effect
-       effect="fillet_chamfer"
-       id="path-effect91-22-095-0"
-       is_visible="true"
-       lpeversion="1"
-       nodesatellites_param="C,0,0,1,0,8,0,1 @ C,0,0,1,0,8,0,1 @ C,0,0,1,0,8,0,1 @ C,0,0,1,0,8,0,1"
-       radius="0"
-       unit="px"
-       method="auto"
-       mode="F"
-       chamfer_steps="1"
-       flexible="false"
-       use_knot_distance="true"
-       apply_no_radius="true"
-       apply_with_radius="true"
-       only_selected="false"
-       hide_knots="false" />
-    <inkscape:path-effect
-       effect="fillet_chamfer"
-       id="path-effect62"
-       is_visible="true"
-       lpeversion="1"
-       nodesatellites_param="C,0,0,1,0,2,0,1 @ C,0,0,1,0,2,0,1 @ F,0,0,1,0,0,0,1 @ F,0,0,1,0,0,0,1"
-       radius="0"
-       unit="px"
-       method="auto"
-       mode="F"
-       chamfer_steps="1"
-       flexible="false"
-       use_knot_distance="true"
-       apply_no_radius="true"
-       apply_with_radius="true"
-       only_selected="false"
-       hide_knots="false" />
-    <inkscape:path-effect
-       effect="fillet_chamfer"
-       id="path-effect60"
-       is_visible="true"
-       lpeversion="1"
-       nodesatellites_param="F,0,0,1,0,0,0,1 @ F,0,0,1,0,0,0,1 @ C,0,0,1,0,3,0,1 @ C,0,0,1,0,3,0,1"
-       radius="0"
-       unit="px"
-       method="auto"
-       mode="F"
-       chamfer_steps="1"
-       flexible="false"
-       use_knot_distance="true"
-       apply_no_radius="true"
-       apply_with_radius="true"
-       only_selected="false"
-       hide_knots="false" />
-    <inkscape:path-effect
-       effect="fillet_chamfer"
-       id="path-effect24"
-       is_visible="true"
-       lpeversion="1"
-       nodesatellites_param="F,0,0,1,0,0,0,1 @ F,0,0,1,0,0,0,1 @ F,0,0,1,0,0,0,1 @ C,0,0,1,0,8,0,1"
-       radius="0"
-       unit="px"
-       method="auto"
-       mode="F"
-       chamfer_steps="1"
-       flexible="false"
-       use_knot_distance="true"
-       apply_no_radius="true"
-       apply_with_radius="true"
-       only_selected="false"
-       hide_knots="false" />
-    <inkscape:path-effect
-       effect="fillet_chamfer"
-       id="path-effect35"
-       is_visible="true"
-       lpeversion="1"
-       nodesatellites_param="IC,0,0,1,0,8,0,1 @ F,0,0,1,0,0,0,1 @ F,0,0,1,0,0,0,1 @ F,0,0,1,0,0,0,1"
-       radius="0"
-       unit="px"
-       method="auto"
-       mode="F"
-       chamfer_steps="1"
-       flexible="false"
-       use_knot_distance="true"
-       apply_no_radius="true"
-       apply_with_radius="true"
-       only_selected="false"
-       hide_knots="false" />
-    <inkscape:path-effect
-       effect="fillet_chamfer"
-       id="path-effect91-22-095-0-7"
-       is_visible="true"
-       lpeversion="1"
-       nodesatellites_param="C,0,0,1,0,12,0,1 @ C,0,0,1,0,12,0,1 @ C,0,0,1,0,12,0,1 @ C,0,0,1,0,12,0,1"
-       radius="0"
-       unit="px"
-       method="auto"
-       mode="F"
-       chamfer_steps="1"
-       flexible="false"
-       use_knot_distance="true"
-       apply_no_radius="true"
-       apply_with_radius="true"
-       only_selected="false"
-       hide_knots="false" />
-    <inkscape:path-effect
-       effect="fillet_chamfer"
-       id="path-effect25"
-       is_visible="true"
-       lpeversion="1"
-       nodesatellites_param="F,0,0,1,0,0,0,1 @ F,0,0,1,0,0,0,1 @ F,0,0,1,0,0,0,1 @ F,0,0,1,0,0,0,1"
-       radius="0"
-       unit="px"
-       method="auto"
-       mode="F"
-       chamfer_steps="1"
-       flexible="false"
-       use_knot_distance="true"
-       apply_no_radius="true"
-       apply_with_radius="true"
-       only_selected="false"
-       hide_knots="false" />
-    <inkscape:path-effect
-       effect="fillet_chamfer"
-       id="path-effect91-22-095-0-3"
-       is_visible="true"
-       lpeversion="1"
-       nodesatellites_param="C,0,0,1,0,8,0,1 @ C,0,0,1,0,8,0,1 @ C,0,0,1,0,8,0,1 @ C,0,0,1,0,8,0,1"
-       radius="0"
-       unit="px"
-       method="auto"
-       mode="F"
-       chamfer_steps="1"
-       flexible="false"
-       use_knot_distance="true"
-       apply_no_radius="true"
-       apply_with_radius="true"
-       only_selected="false"
-       hide_knots="false" />
-    <inkscape:path-effect
-       effect="fillet_chamfer"
-       id="path-effect91-22-095-0-8"
-       is_visible="true"
-       lpeversion="1"
-       nodesatellites_param="C,0,0,1,0,8,0,1 @ C,0,0,1,0,8,0,1 @ C,0,0,1,0,8,0,1 @ C,0,0,1,0,8,0,1"
-       radius="0"
-       unit="px"
-       method="auto"
-       mode="F"
-       chamfer_steps="1"
-       flexible="false"
-       use_knot_distance="true"
-       apply_no_radius="true"
-       apply_with_radius="true"
-       only_selected="false"
-       hide_knots="false" />
     <clipPath
        clipPathUnits="userSpaceOnUse"
        id="clipPath6">
@@ -325,28 +98,11 @@
     </clipPath>
     <clipPath
        clipPathUnits="userSpaceOnUse"
-       id="clipPath18">
-      <path
-         style="fill:none;stroke:#000000;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
-         d="m 80,161 -6,6 v 16 l 6,6 h 16 l 6,-6 v -16 l -6,-6 z"
-         id="path19" />
-    </clipPath>
-    <clipPath
-       clipPathUnits="userSpaceOnUse"
        id="clipPath27">
       <path
          style="fill:none;stroke:#000000;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
          d="m 76,228 v 44 h 24 v -44 z"
          id="path28"
-         sodipodi:nodetypes="ccccc" />
-    </clipPath>
-    <clipPath
-       clipPathUnits="userSpaceOnUse"
-       id="clipPath33">
-      <path
-         style="fill:#000000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
-         d="m 75,194 h -8 v 6 h 8 z"
-         id="path34"
          sodipodi:nodetypes="ccccc" />
     </clipPath>
     <clipPath
