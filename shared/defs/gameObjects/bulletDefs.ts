@@ -320,7 +320,7 @@ export const BaseDefs: Record<string, BulletDef> = {
         distance: 100,
         variance: 0,
         shrapnel: false,
-        tracerColor: "9mm_cursed",
+        tracerColor: "cursed_ammo",
         tracerWidth: 0.1,
         tracerLength: 0.7,
     },

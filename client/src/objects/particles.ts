@@ -1697,8 +1697,8 @@ const ParticleDefs: Record<string, ParticleDef> = {
             return util.rgbToInt(util.hsvToRgb(0, 0, util.random(0.9, 0.95)));
         },
     },
-    "9mm_cursed": {
-        image: ["part-shell-01.img"],
+    "cursed_ammo": {
+        image: ["part-shell-04.img"],
         life: new Range(0.5, 0.75),
         drag: new Range(3, 4),
         rotVel: new Range(Math.PI * 3, Math.PI * 3),

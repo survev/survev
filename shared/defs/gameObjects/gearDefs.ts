@@ -586,6 +586,22 @@ const AmmoDefs: Record<string, AmmoDef> = {
             pickup: "ammo_pickup_01",
         },
     },
+    cursed_ammo: {
+        name: "Cursed Ammo",
+        type: "ammo",
+        special: true,
+        hideUi: true,
+        minStackSize: 10,
+        lootImg: {
+            sprite: "loot-ammo-box.img",
+            scale: 0.2,
+            tint: 0x440000,
+            tintDark: 0x440000,
+        },
+        sound: {
+            pickup: "ammo_pickup_01",
+        },
+    },
 };
 
 const BaseDefs = {
