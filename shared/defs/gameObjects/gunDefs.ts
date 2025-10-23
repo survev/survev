@@ -1,3 +1,4 @@
+import { type DeepPartial, util } from "../../utils/util";
 import type { Vec2 } from "../../utils/v2";
 
 export interface GunDef {
@@ -99,7 +100,9 @@ export interface GunDef {
     toMouseHit?: boolean;
     burstSounds?: number;
 }
-
+function extendedGunDef(baseType: string, params: DeepPartial<GunDef>): GunDef {
+    return util.mergeDeep({}, GunDefs[baseType], params);
+}
 export const GunDefs: Record<string, GunDef> = {
     mp5: {
         name: "MP5",
@@ -3353,3 +3356,79 @@ export const GunDefs: Record<string, GunDef> = {
         },
     },
 };
+GunDefs["og_m9"] = extendedGunDef("m9", {
+    lootImg: {
+        sprite: "loot-weapon-og-m9.img",
+    },
+    worldImg: {
+        recoil: 0,
+    },
+    dualWieldType: "og_m9_dual",
+});
+GunDefs["og_m9_dual"] = extendedGunDef("m9_dual", {
+    lootImg: {
+        sprite: "loot-weapon-og-m9-dual.img",
+    },
+    worldImg: {
+        recoil: 0,
+    },
+});
+GunDefs["og_ak47"] = extendedGunDef("ak47", {
+    lootImg: {
+        sprite: "loot-weapon-og-ak47.img",
+    },
+    worldImg: {
+        sprite: "gun-long-01.img",
+        scale: { x: 0.5, y: 0.52 },
+        leftHandOffset: { x: 2.8, y: 0 },
+        recoil: 0,
+    },
+});
+GunDefs["og_m870"] = extendedGunDef("m870", {
+    lootImg: {
+        sprite: "loot-weapon-og-m870.img",
+    },
+    worldImg: {
+        sprite: "gun-long-01.img",
+        scale: { x: 0.5, y: 0.52 },
+        tint: 0x331a00,
+        leftHandOffset: { x: 2.8, y: 0 },
+        recoil: 0,
+    },
+});
+GunDefs["og_saiga"] = extendedGunDef("saiga", {
+    lootImg: {
+        sprite: "loot-weapon-og-saiga.img",
+    },
+    worldImg: {
+        sprite: "gun-long-01.img",
+        scale: { x: 0.5, y: 0.52 },
+        tint: 0x331a00,
+        leftHandOffset: { x: 2.8, y: 0 },
+        recoil: 0,
+    },
+});
+GunDefs["og_mosin"] = extendedGunDef("mosin", {
+    lootImg: {
+        sprite: "loot-weapon-og-mosin.img",
+    },
+    worldImg: {
+        sprite: "gun-long-01.img",
+        scale: { x: 0.5, y: 0.52 },
+        tint: 0x331a00,
+        leftHandOffset: { x: 2.8, y: 0 },
+        recoil: 0,
+    },
+});
+GunDefs["og_m39"] = extendedGunDef("m39", {
+    lootImg: {
+        sprite: "loot-weapon-og-m39.img",
+    },
+    worldImg: {
+        sprite: "gun-long-01.img",
+        scale: { x: 0.5, y: 0.52 },
+        tint: 0x333333,
+        leftHandOffset: { x: 2.8, y: 0 },
+        recoil: 0,
+    },
+});

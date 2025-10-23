@@ -6,6 +6,7 @@ import { GradientAtlas } from "./defs/gradient";
 import { HalloweenAtlas } from "./defs/halloween";
 import { LoadoutAtlas } from "./defs/loadout";
 import { MainAtlas } from "./defs/main";
+import { OgAtlas } from "./defs/og";
 import { PotatoAtlas } from "./defs/potato";
 import { SavannahAtlas } from "./defs/savannah";
 import { SharedAtlas } from "./defs/shared";
@@ -40,6 +41,7 @@ export const Atlases: Record<Atlas, AtlasDef> = {
     woods: WoodsAtlas,
     cobalt: CobaltAtlas,
     savannah: SavannahAtlas,
+    og: OgAtlas,
 };
 export type AtlasRes = "high" | "low";
 

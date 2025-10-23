@@ -15,8 +15,10 @@ import { debugLines } from "./debug/debugLines";
 
 /* STRIP_FROM_PROD_CLIENT:START */
 import { Editor } from "./debug/editor";
+
 /* STRIP_FROM_PROD_CLIENT:END */
 
+import type { AmmoDef } from "../../shared/defs/gameObjects/gearDefs";
 import { device } from "./device";
 import { EmoteBarn } from "./emote";
 import { Gas } from "./gas";
@@ -1300,6 +1302,10 @@ export class Game {
                     this.editor.toolParams.mapSeed = msg.seed;
                     this.editor.pane.refresh();
                 }
+
+                //OG
+                (GameObjectDefs["556mm"] as AmmoDef).special =
+                    this.m_map.mapDef.gameMode.ogMode === true;
                 break;
             }
             case net.MsgType.Update: {
