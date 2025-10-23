@@ -397,7 +397,7 @@ export const Main: MapDef = {
         tier_guns_common_scout: [
             { name: "glock_dual", count: 1, weight: 1 },
             { name: "ot38_dual", count: 1, weight: 1 },
-            { name: "m39r_dual", count: 1, weight: 1 },
+            { name: "m93r_dual", count: 1, weight: 1 },
             { name: "deagle", count: 1, weight: 0.2 },
         ],
         tier_guns_common_sniper: [
@@ -413,7 +413,7 @@ export const Main: MapDef = {
         tier_guns_common_demo: [
             { name: "m870", count: 1, weight: 1 },
             { name: "spas12", count: 1, weight: 0.5 },
-            { name: "spas12", count: 1, weight: 1 },
+            { name: "mp220", count: 1, weight: 1 },
         ],
         tier_guns_common_assault: [
             { name: "hk416", count: 1, weight: 1 },
