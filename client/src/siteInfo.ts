@@ -39,7 +39,6 @@ export class SiteInfo {
             this.loaded = true;
             this.updatePageFromInfo();
         });
-
     }
 
     getGameModeStyles() {
@@ -148,8 +147,8 @@ export class SiteInfo {
                 $(".btn-youtuber")
                     .attr("href", this.info.youtube.link)
                     .html(this.info.youtube.name);
-            }        
-            featuredYoutuberElem.css("display", displayYoutuber ? "block" : "none");       
+            }
+            featuredYoutuberElem.css("display", displayYoutuber ? "block" : "none");
             const mapDef = MapDefs[this.info.clientTheme] as MapDef;
             if (mapDef) {
                 this.config.set("cachedBgImg", mapDef.desc.backgroundImg);

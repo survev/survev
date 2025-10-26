@@ -313,7 +313,7 @@ export interface ConfigType {
          */
         AIP_PLACEMENT_ID?: string;
         GAMEMONETIZE_ID?: string;
-        
+
         /**
          * Twitch API client ID.
          *

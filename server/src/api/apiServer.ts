@@ -1,12 +1,12 @@
 import type { Hono } from "hono";
 import type { UpgradeWebSocket } from "hono/ws";
 import type { SiteInfoRes } from "../../../shared/types/api";
+import { util } from "../../../shared/utils/util";
 import { Config } from "../config";
 import { TeamMenu } from "../teamMenu";
 import { GIT_VERSION } from "../utils/gitRevision";
 import { defaultLogger, ServerLogger } from "../utils/logger";
 import type { FindGamePrivateBody, FindGamePrivateRes } from "../utils/types";
-import { util } from "../../../shared/utils/util";
 
 class Region {
     data: (typeof Config)["regions"][string];
@@ -84,12 +84,12 @@ export class ApiServer {
     }
 
     getSiteInfo(): SiteInfoRes {
-    const featuredYt = util.randomItem(this.youtubeCache) ?? {name: "", link: ""}
+        const featuredYt = util.randomItem(this.youtubeCache) ?? { name: "", link: "" };
         const data: SiteInfoRes = {
             modes: this.modes,
             pops: {},
             youtube: featuredYt,
-            twitch: this.twitchCache ??[],
+            twitch: this.twitchCache ?? [],
             country: "US",
             gitRevision: GIT_VERSION,
             captchaEnabled: this.captchaEnabled,
@@ -137,9 +137,9 @@ export class ApiServer {
     }
 
     private async fetchTwitchData(name: string) {
-            if (!Config.secrets.TWITCH_CLIENT_ID || !Config.secrets.TWITCH_OAUTH) {
-                return;
-            }
+        if (!Config.secrets.TWITCH_CLIENT_ID || !Config.secrets.TWITCH_OAUTH) {
+            return;
+        }
         try {
             const res = await fetch(
                 `https://api.twitch.tv/helix/streams?user_login=${name}`,
@@ -148,7 +148,7 @@ export class ApiServer {
                         "Client-ID": Config.secrets.TWITCH_CLIENT_ID,
                         Authorization: `Bearer ${Config.secrets.TWITCH_OAUTH}`,
                     },
-                }
+                },
             );
             const data = await res.json();
             const stream = data.data?.[0];
