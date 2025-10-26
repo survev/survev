@@ -77,10 +77,10 @@ export interface SiteInfoRes {
             l10n: string;
         }
     >;
-    youtube: Array<{
+    youtube: {
         name: string;
         link: string;
-    }>;
+    };
     twitch: Array<{
         name: string;
         viewers: number;

@@ -34,16 +34,11 @@ export class SiteInfo {
             teamSelector.append(elm);
         }
 
-        const fetchSiteInfo = () => {
-            $.ajax(siteInfoUrl).done((data: SiteInfoRes) => {
-                this.info = data || {};
-                this.loaded = true;
-                this.updatePageFromInfo();
-            });
-        };
-
-        fetchSiteInfo();
-        setInterval(fetchSiteInfo, 300000);
+        $.ajax(siteInfoUrl).done((data: SiteInfoRes) => {
+            this.info = data || {};
+            this.loaded = true;
+            this.updatePageFromInfo();
+        });
 
     }
 
@@ -148,16 +143,13 @@ export class SiteInfo {
             );
 
             const featuredYoutuberElem = $("#featured-youtuber");
-            if (this.info.youtube && this.info.youtube.length > 0) {
-                const yt = this.info.youtube[Math.floor(Math.random() * this.info.youtube.length)];
+            const displayYoutuber = this.info.youtube;
+            if (displayYoutuber) {
                 $(".btn-youtuber")
-                    .attr("href", yt.link)
-                    .html(yt.name);
-                featuredYoutuberElem.css("display", "block");
-            } else {
-                featuredYoutuberElem.css("display", "none");
-            }
-
+                    .attr("href", this.info.youtube.link)
+                    .html(this.info.youtube.name);
+            }        
+            featuredYoutuberElem.css("display", displayYoutuber ? "block" : "none");       
             const mapDef = MapDefs[this.info.clientTheme] as MapDef;
             if (mapDef) {
                 this.config.set("cachedBgImg", mapDef.desc.backgroundImg);
