@@ -6,6 +6,7 @@ import { TeamMenu } from "../teamMenu";
 import { GIT_VERSION } from "../utils/gitRevision";
 import { defaultLogger, ServerLogger } from "../utils/logger";
 import type { FindGamePrivateBody, FindGamePrivateRes } from "../utils/types";
+import { util } from "../../../shared/utils/util";
 
 class Region {
     data: (typeof Config)["regions"][string];
@@ -63,8 +64,13 @@ export class ApiServer {
     clientTheme = Config.clientTheme;
 
     captchaEnabled = Config.captchaEnabled;
-    twitchCache: SiteInfoRes["twitch"] = [];
-    youtubeCache: SiteInfoRes["youtube"] = [];
+    youtubeCache: { name: string; link: string }[] = [];
+    twitchCache: {
+        name: string;
+        viewers: number;
+        url: string;
+        img: string;
+    }[] = [];
 
     constructor() {
         for (const region in Config.regions) {
@@ -78,11 +84,12 @@ export class ApiServer {
     }
 
     getSiteInfo(): SiteInfoRes {
+    const featuredYt = util.randomItem(this.youtubeCache) ?? {name: "", link: ""}
         const data: SiteInfoRes = {
             modes: this.modes,
             pops: {},
-            youtube: this.youtubeCache,
-            twitch: this.twitchCache,
+            youtube: featuredYt,
+            twitch: this.twitchCache ??[],
             country: "US",
             gitRevision: GIT_VERSION,
             captchaEnabled: this.captchaEnabled,
@@ -130,13 +137,16 @@ export class ApiServer {
     }
 
     private async fetchTwitchData(name: string) {
+            if (!Config.secrets.TWITCH_CLIENT_ID || !Config.secrets.TWITCH_OAUTH) {
+                return;
+            }
         try {
             const res = await fetch(
                 `https://api.twitch.tv/helix/streams?user_login=${name}`,
                 {
                     headers: {
-                        "Client-ID": Config.secrets.TWITCH_CLIENT_ID ?? "",
-                        Authorization: `Bearer ${Config.secrets.TWITCH_OAUTH ?? ""}`,
+                        "Client-ID": Config.secrets.TWITCH_CLIENT_ID,
+                        Authorization: `Bearer ${Config.secrets.TWITCH_OAUTH}`,
                     },
                 }
             );
