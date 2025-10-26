@@ -6,7 +6,6 @@ import { TeamMenu } from "../teamMenu";
 import { GIT_VERSION } from "../utils/gitRevision";
 import { defaultLogger, ServerLogger } from "../utils/logger";
 import type { FindGamePrivateBody, FindGamePrivateRes } from "../utils/types";
-import fetch from "node-fetch";
 
 class Region {
     data: (typeof Config)["regions"][string];
