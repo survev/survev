@@ -397,18 +397,23 @@ export const Main: MapDef = {
         tier_guns_common_scout: [
             { name: "glock_dual", count: 1, weight: 1 },
             { name: "ot38_dual", count: 1, weight: 1 },
+            { name: "m93r_dual", count: 1, weight: 1 },
+            { name: "deagle", count: 1, weight: 0.2 },
         ],
         tier_guns_common_sniper: [
             { name: "blr", count: 1, weight: 1 },
-            { name: "mosin", count: 1, weight: 0.1 },
+            { name: "mosin", count: 1, weight: 0.2 },
+            { name: "scout_elite", count: 1, weight: 1 },
         ],
         tier_guns_common_healer: [
             { name: "mk12", count: 1, weight: 1 },
             { name: "m39", count: 1, weight: 1 },
+            { name: "vss", count: 1, weight: 1 },
         ],
         tier_guns_common_demo: [
             { name: "m870", count: 1, weight: 1 },
             { name: "spas12", count: 1, weight: 0.5 },
+            { name: "mp220", count: 1, weight: 1 },
         ],
         tier_guns_common_assault: [
             { name: "hk416", count: 1, weight: 1 },
@@ -418,7 +423,8 @@ export const Main: MapDef = {
         ],
         tier_guns_common_tank: [
             { name: "dp28", count: 1, weight: 1 },
-            { name: "qbb97", count: 1, weight: 0.1 },
+            { name: "qbb97", count: 1, weight: 0.2 },
+            { name: "bar", count: 1, weight: 0.5 },
         ],
         tier_guns_rare_scout: [
             { name: "ots38_dual", count: 1, weight: 1 },
@@ -431,14 +437,15 @@ export const Main: MapDef = {
             { name: "awc", count: 1, weight: 0.05 },
         ],
         tier_guns_rare_demo: [
-            { name: "mp220", count: 1, weight: 1 },
-            { name: "saiga", count: 1, weight: 0.5 },
+            { name: "saiga", count: 1, weight: 1 },
             { name: "usas", count: 1, weight: 0.1 },
+            { name: "m1014", count: 1, weight: 0.1 },
         ],
         tier_guns_rare_healer: [
             { name: "svd", count: 1, weight: 1 },
             { name: "l86", count: 1, weight: 1 },
             { name: "garand", count: 1, weight: 0.5 },
+            { name: "scarssr", count: 1, weight: 0.05 },
         ],
         tier_guns_rare_assault: [
             { name: "scar", count: 1, weight: 1 },
@@ -447,9 +454,9 @@ export const Main: MapDef = {
             { name: "an94", count: 1, weight: 0.5 },
         ],
         tier_guns_rare_tank: [
-            { name: "qbb97", count: 1, weight: 1 },
+            { name: "qbb97", count: 1, weight: 1.3 },
             { name: "pkp", count: 1, weight: 0.1 },
-            { name: "m249", count: 1, weight: 0.05 },
+            { name: "m249", count: 1, weight: 0.2 },
         ],
         tier_class_crate_mythic: [
             { name: "scavenger_adv", count: 1, weight: 1 },
