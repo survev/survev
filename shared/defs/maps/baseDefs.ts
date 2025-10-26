@@ -652,10 +652,23 @@ export const Main: MapDef = {
             { name: "tier_perks", count: 1, weight: 1 },
         ],
 
-        // TODO: Savannah loot tables
+        // TODO:
         tier_knives: [],
-        tier_snipers: [],
-        tier_cloud_02: [],
+
+        tier_snipers: [
+            { name: "model94", count: 1, weight: 1 },
+            { name: "blr", count: 1, weight: 1 },
+            { name: "scout_elite", count: 1, weight: 0.2 },
+            { name: "mosin", count: 1, weight: 0.2 },
+            { name: "vss", count: 1, weight: 0.2 },
+            { name: "mk12", count: 1, weight: 0.2 },
+            { name: "l86", count: 1, weight: 0.1 },
+            { name: "sv98", count: 1, weight: 0.1 },
+            { name: "svd", count: 1, weight: 0.1 },
+            { name: "m1100", count: 1, weight: 0.1 },
+            { name: "awc", count: 1, weight: 0.02 },
+        ],
+        tier_cloud_02: [{ name: "outfitWheat", count: 1, weight: 1,}],
     },
     mapGen: {
         map: {
