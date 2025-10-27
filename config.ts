@@ -3,6 +3,7 @@ import fs from "node:fs";
 import path from "node:path";
 import hjson from "hjson";
 import type { ConfigType, PartialConfig } from "./configType";
+import { version } from "./package.json";
 import { TeamMode } from "./shared/gameConfig";
 import { util } from "./shared/utils/util";
 
@@ -12,6 +13,7 @@ export function getConfig(isProduction: boolean, dir: string) {
     const isDev = !isProduction;
 
     const config: ConfigType = {
+        version,
         apiServer: {
             host: "0.0.0.0",
             port: 8000,

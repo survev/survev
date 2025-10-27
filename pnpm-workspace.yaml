@@ -3,6 +3,7 @@ packages:
   - shared/
   - client/
   - bot/
+  - api/
   - tests/
   - '!**dist/**'
 

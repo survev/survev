@@ -1,23 +1,23 @@
-import assert from "assert";
-import { EmotesDefs } from "../../shared/defs/gameObjects/emoteDefs";
-import { MeleeDefs } from "../../shared/defs/gameObjects/meleeDefs";
-import { OutfitDefs } from "../../shared/defs/gameObjects/outfitDefs";
-import { UnlockDefs } from "../../shared/defs/gameObjects/unlockDefs";
-import { GameConfig, type Input } from "../../shared/gameConfig";
-import * as net from "../../shared/net/net";
+import { EmotesDefs } from "@survev/shared/defs/gameObjects/emoteDefs";
+import { MeleeDefs } from "@survev/shared/defs/gameObjects/meleeDefs";
+import { OutfitDefs } from "@survev/shared/defs/gameObjects/outfitDefs";
+import { UnlockDefs } from "@survev/shared/defs/gameObjects/unlockDefs";
+import { GameConfig, type Input } from "@survev/shared/gameConfig";
+import * as net from "@survev/shared/net/net";
 import {
     type ObjectData,
     type ObjectsPartialData,
     ObjectType,
-} from "../../shared/net/objectSerializeFns";
-import type { LocalData } from "../../shared/net/updateMsg";
+} from "@survev/shared/net/objectSerializeFns";
+import type { LocalData } from "@survev/shared/net/updateMsg";
 import type {
     FindGameBody,
     FindGameMatchData,
     FindGameResponse,
-} from "../../shared/types/api";
-import { util } from "../../shared/utils/util";
-import { v2 } from "../../shared/utils/v2";
+} from "@survev/shared/types/api";
+import { util } from "@survev/shared/utils/util";
+import { v2 } from "@survev/shared/utils/v2";
+import assert from "assert";
 import { Config } from "./config";
 
 const config = {

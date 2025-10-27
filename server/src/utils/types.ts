@@ -1,9 +1,9 @@
+import type { MapDefs } from "@survev/shared/defs/mapDefs";
+import { TeamMode } from "@survev/shared/gameConfig";
+import type { FindGameError } from "@survev/shared/types/api";
+import { loadoutSchema } from "@survev/shared/utils/loadout";
 import { z } from "zod";
-import type { MapDefs } from "../../../shared/defs/mapDefs";
-import { TeamMode } from "../../../shared/gameConfig";
-import type { FindGameError } from "../../../shared/types/api";
-import { loadoutSchema } from "../../../shared/utils/loadout";
-import type { MatchDataTable } from "../api/db/schema";
+import type { MatchDataTable } from "../../../api/src/db/schema";
 
 export interface GameSocketData {
     gameId: string;

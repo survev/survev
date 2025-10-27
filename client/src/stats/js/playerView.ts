@@ -1,7 +1,6 @@
-import $ from "jquery";
-import { EmotesDefs } from "../../../../shared/defs/gameObjects/emoteDefs";
-import { TeamModeToString } from "../../../../shared/defs/types/misc";
-import type { TeamMode } from "../../../../shared/gameConfig";
+import { EmotesDefs } from "@survev/shared/defs/gameObjects/emoteDefs";
+import { TeamModeToString } from "@survev/shared/defs/types/misc";
+import type { TeamMode } from "@survev/shared/gameConfig";
 import {
     ALL_MAPS,
     ALL_TEAM_MODES,
@@ -14,7 +13,8 @@ import {
     type MatchHistoryResponse,
     type UserStatsRequest,
     type UserStatsResponse,
-} from "../../../../shared/types/stats";
+} from "@survev/shared/types/stats";
+import $ from "jquery";
 import { api } from "../../api";
 import { device } from "../../device";
 import { helpers } from "../../helpers";

@@ -1,4 +1,4 @@
-import { GameObjectDefs, type LootDef } from "../../../shared/defs/gameObjectDefs";
+import { GameObjectDefs, type LootDef } from "@survev/shared/defs/gameObjectDefs";
 import {
     type AmmoDef,
     type BoostDef,
@@ -6,24 +6,24 @@ import {
     GEAR_TYPES,
     type HealDef,
     SCOPE_LEVELS,
-} from "../../../shared/defs/gameObjects/gearDefs";
-import type { GunDef } from "../../../shared/defs/gameObjects/gunDefs";
-import type { MeleeDef } from "../../../shared/defs/gameObjects/meleeDefs";
-import type { RoleDef } from "../../../shared/defs/gameObjects/roleDefs";
-import { MapObjectDefs } from "../../../shared/defs/mapObjectDefs";
-import type { ObstacleDef } from "../../../shared/defs/mapObjectsTyping";
+} from "@survev/shared/defs/gameObjects/gearDefs";
+import type { GunDef } from "@survev/shared/defs/gameObjects/gunDefs";
+import type { MeleeDef } from "@survev/shared/defs/gameObjects/meleeDefs";
+import type { RoleDef } from "@survev/shared/defs/gameObjects/roleDefs";
+import { MapObjectDefs } from "@survev/shared/defs/mapObjectDefs";
+import type { ObstacleDef } from "@survev/shared/defs/mapObjectsTyping";
 import {
     Action,
     DamageType,
     GameConfig,
     Input,
     type InventoryItem,
-} from "../../../shared/gameConfig";
-import { PickupMsgType } from "../../../shared/net/net";
-import { collider } from "../../../shared/utils/collider";
-import { math } from "../../../shared/utils/math";
-import { util } from "../../../shared/utils/util";
-import { v2 } from "../../../shared/utils/v2";
+} from "@survev/shared/gameConfig";
+import { PickupMsgType } from "@survev/shared/net/net";
+import { collider } from "@survev/shared/utils/collider";
+import { math } from "@survev/shared/utils/math";
+import { util } from "@survev/shared/utils/util";
+import { v2 } from "@survev/shared/utils/v2";
 import { device } from "../device";
 import { helpers } from "../helpers";
 import type { InputBinds } from "../inputBinds";

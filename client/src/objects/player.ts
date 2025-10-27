@@ -1,19 +1,11 @@
-import * as PIXI from "pixi.js-legacy";
-import { GameObjectDefs, type LootDef } from "../../../shared/defs/gameObjectDefs";
-import type {
-    BackpackDef,
-    BoostDef,
-    ChestDef,
-    HealDef,
-    HelmetDef,
-} from "./../../../shared/defs/gameObjects/gearDefs";
-import type { GunDef } from "../../../shared/defs/gameObjects/gunDefs";
-import type { MeleeDef } from "../../../shared/defs/gameObjects/meleeDefs";
-import type { OutfitDef } from "../../../shared/defs/gameObjects/outfitDefs";
-import type { RoleDef } from "../../../shared/defs/gameObjects/roleDefs";
-import type { ThrowableDef } from "../../../shared/defs/gameObjects/throwableDefs";
-import { MapObjectDefs } from "../../../shared/defs/mapObjectDefs";
-import type { ObstacleDef } from "../../../shared/defs/mapObjectsTyping";
+import { GameObjectDefs, type LootDef } from "@survev/shared/defs/gameObjectDefs";
+import type { GunDef } from "@survev/shared/defs/gameObjects/gunDefs";
+import type { MeleeDef } from "@survev/shared/defs/gameObjects/meleeDefs";
+import type { OutfitDef } from "@survev/shared/defs/gameObjects/outfitDefs";
+import type { RoleDef } from "@survev/shared/defs/gameObjects/roleDefs";
+import type { ThrowableDef } from "@survev/shared/defs/gameObjects/throwableDefs";
+import { MapObjectDefs } from "@survev/shared/defs/mapObjectDefs";
+import type { ObstacleDef } from "@survev/shared/defs/mapObjectsTyping";
 import {
     Action,
     Anim,
@@ -21,22 +13,23 @@ import {
     HasteType,
     Input,
     type WeaponSlot,
-} from "../../../shared/gameConfig";
-import type { ObjectData, ObjectType } from "../../../shared/net/objectSerializeFns";
+} from "@survev/shared/gameConfig";
+import type { ObjectData, ObjectType } from "@survev/shared/net/objectSerializeFns";
 import {
     type GroupStatus,
     getPlayerStatusUpdateRate,
     type LocalDataWithDirty,
     type PlayerInfo,
     type PlayerStatus,
-} from "../../../shared/net/updateMsg";
-import { coldet } from "../../../shared/utils/coldet";
-import { collider } from "../../../shared/utils/collider";
-import { collisionHelpers } from "../../../shared/utils/collisionHelpers";
-import { math } from "../../../shared/utils/math";
-import type { River } from "../../../shared/utils/river";
-import { util } from "../../../shared/utils/util";
-import { type Vec2, v2 } from "../../../shared/utils/v2";
+} from "@survev/shared/net/updateMsg";
+import { coldet } from "@survev/shared/utils/coldet";
+import { collider } from "@survev/shared/utils/collider";
+import { collisionHelpers } from "@survev/shared/utils/collisionHelpers";
+import { math } from "@survev/shared/utils/math";
+import type { River } from "@survev/shared/utils/river";
+import { util } from "@survev/shared/utils/util";
+import { type Vec2, v2 } from "@survev/shared/utils/v2";
+import * as PIXI from "pixi.js-legacy";
 import { Animations, Bones, IdlePoses, Pose } from "../animData";
 import type { AudioManager } from "../audioManager";
 import type { Camera } from "../camera";
@@ -52,6 +45,13 @@ import type { SoundHandle } from "../lib/createJS";
 import type { Map } from "../map";
 import type { Renderer } from "../renderer";
 import type { UiManager2 } from "../ui/ui2";
+import type {
+    BackpackDef,
+    BoostDef,
+    ChestDef,
+    HealDef,
+    HelmetDef,
+} from "./@survev/shared/defs/gameObjects/gearDefs";
 import { Pool } from "./objectPool";
 import type { Obstacle } from "./obstacle";
 import type { Emitter, ParticleBarn } from "./particles";

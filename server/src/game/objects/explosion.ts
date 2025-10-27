@@ -1,10 +1,10 @@
-import { GameObjectDefs } from "../../../../shared/defs/gameObjectDefs";
-import type { ExplosionDef } from "../../../../shared/defs/gameObjects/explosionsDefs";
-import { ObjectType } from "../../../../shared/net/objectSerializeFns";
-import { collider } from "../../../../shared/utils/collider";
-import { math } from "../../../../shared/utils/math";
-import { assert, util } from "../../../../shared/utils/util";
-import { type Vec2, v2 } from "../../../../shared/utils/v2";
+import { GameObjectDefs } from "@survev/shared/defs/gameObjectDefs";
+import type { ExplosionDef } from "@survev/shared/defs/gameObjects/explosionsDefs";
+import { ObjectType } from "@survev/shared/net/objectSerializeFns";
+import { collider } from "@survev/shared/utils/collider";
+import { math } from "@survev/shared/utils/math";
+import { assert, util } from "@survev/shared/utils/util";
+import { type Vec2, v2 } from "@survev/shared/utils/v2";
 import type { Game } from "../game";
 import type { DamageParams, GameObject } from "./gameObject";
 import { EXPLOSION_LOOT_PUSH_FORCE } from "./loot";

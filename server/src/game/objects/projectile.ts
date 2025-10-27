@@ -1,12 +1,12 @@
-import { GameObjectDefs } from "../../../../shared/defs/gameObjectDefs";
-import type { ThrowableDef } from "../../../../shared/defs/gameObjects/throwableDefs";
-import { DamageType, GameConfig } from "../../../../shared/gameConfig";
-import { ObjectType } from "../../../../shared/net/objectSerializeFns";
-import { type AABB, coldet } from "../../../../shared/utils/coldet";
-import { collider } from "../../../../shared/utils/collider";
-import { math } from "../../../../shared/utils/math";
-import { util } from "../../../../shared/utils/util";
-import { type Vec2, v2 } from "../../../../shared/utils/v2";
+import { GameObjectDefs } from "@survev/shared/defs/gameObjectDefs";
+import type { ThrowableDef } from "@survev/shared/defs/gameObjects/throwableDefs";
+import { DamageType, GameConfig } from "@survev/shared/gameConfig";
+import { ObjectType } from "@survev/shared/net/objectSerializeFns";
+import { type AABB, coldet } from "@survev/shared/utils/coldet";
+import { collider } from "@survev/shared/utils/collider";
+import { math } from "@survev/shared/utils/math";
+import { util } from "@survev/shared/utils/util";
+import { type Vec2, v2 } from "@survev/shared/utils/v2";
 import type { Game } from "../game";
 import { BaseGameObject } from "./gameObject";
 

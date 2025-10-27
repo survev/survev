@@ -24,11 +24,7 @@ const esbuildConfig: BuildOptions = {
 
 esbuild.buildSync({
     ...esbuildConfig,
-    entryPoints: [
-        "./src/gameServer.ts",
-        "./src/game/gameProcess.ts",
-        "./src/api/index.ts",
-    ],
+    entryPoints: ["./src/gameServer.ts", "./src/game/gameProcess.ts"],
 });
 
 if (fs.existsSync(pluginDir)) {

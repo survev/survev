@@ -1,5 +1,5 @@
 import { z } from "zod";
-import type { UsersTableSelect } from "../../server/src/api/db/schema";
+import type { UsersTableSelect } from "../../api/src/db/schema";
 import { Constants } from "../../shared/net/net";
 import { type Item, ItemStatus, type Loadout, loadoutSchema } from "../utils/loadout";
 

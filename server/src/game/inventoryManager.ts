@@ -1,7 +1,7 @@
-import { GameObjectDefs } from "../../../shared/defs/gameObjectDefs";
-import { SCOPE_LEVELS, type ScopeDef } from "../../../shared/defs/gameObjects/gearDefs";
-import { GameConfig, type InventoryItem } from "../../../shared/gameConfig";
-import { math } from "../../../shared/utils/math";
+import { GameObjectDefs } from "@survev/shared/defs/gameObjectDefs";
+import { SCOPE_LEVELS, type ScopeDef } from "@survev/shared/defs/gameObjects/gearDefs";
+import { GameConfig, type InventoryItem } from "@survev/shared/gameConfig";
+import { math } from "@survev/shared/utils/math";
 import type { Player } from "./objects/player";
 import { throwableList } from "./weaponManager";
 

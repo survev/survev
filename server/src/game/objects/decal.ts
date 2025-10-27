@@ -1,12 +1,12 @@
-import { MapObjectDefs } from "../../../../shared/defs/mapObjectDefs";
-import type { DecalDef } from "../../../../shared/defs/mapObjectsTyping";
-import { ObjectType } from "../../../../shared/net/objectSerializeFns";
-import type { AABB, Circle } from "../../../../shared/utils/coldet";
-import { collider } from "../../../../shared/utils/collider";
-import { mapHelpers } from "../../../../shared/utils/mapHelpers";
-import { math } from "../../../../shared/utils/math";
-import { util } from "../../../../shared/utils/util";
-import { type Vec2, v2 } from "../../../../shared/utils/v2";
+import { MapObjectDefs } from "@survev/shared/defs/mapObjectDefs";
+import type { DecalDef } from "@survev/shared/defs/mapObjectsTyping";
+import { ObjectType } from "@survev/shared/net/objectSerializeFns";
+import type { AABB, Circle } from "@survev/shared/utils/coldet";
+import { collider } from "@survev/shared/utils/collider";
+import { mapHelpers } from "@survev/shared/utils/mapHelpers";
+import { math } from "@survev/shared/utils/math";
+import { util } from "@survev/shared/utils/util";
+import { type Vec2, v2 } from "@survev/shared/utils/v2";
 import type { Game } from "../game";
 import { BaseGameObject } from "./gameObject";
 

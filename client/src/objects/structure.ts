@@ -1,11 +1,10 @@
-import { MapObjectDefs } from "../../../shared/defs/mapObjectDefs";
-import type { StructureDef } from "../../../shared/defs/mapObjectsTyping";
-import type { ObjectData, ObjectType } from "./../../../shared/net/objectSerializeFns";
-import { type AABB, type Collider, coldet } from "../../../shared/utils/coldet";
-import { collider } from "../../../shared/utils/collider";
-import { mapHelpers } from "../../../shared/utils/mapHelpers";
-import { math } from "../../../shared/utils/math";
-import { type Vec2, v2 } from "../../../shared/utils/v2";
+import { MapObjectDefs } from "@survev/shared/defs/mapObjectDefs";
+import type { StructureDef } from "@survev/shared/defs/mapObjectsTyping";
+import { type AABB, type Collider, coldet } from "@survev/shared/utils/coldet";
+import { collider } from "@survev/shared/utils/collider";
+import { mapHelpers } from "@survev/shared/utils/mapHelpers";
+import { math } from "@survev/shared/utils/math";
+import { type Vec2, v2 } from "@survev/shared/utils/v2";
 import type { Ambiance } from "../ambiance";
 import type Camera from "../camera";
 import type { DebugRenderOpts } from "../config";
@@ -18,6 +17,7 @@ import {
 import { debugLines } from "../debug/debugLines";
 import type { Ctx } from "../game";
 import type { Map } from "../map";
+import type { ObjectData, ObjectType } from "./@survev/shared/net/objectSerializeFns";
 import type { AbstractObject, Player } from "./player";
 
 interface Stair {

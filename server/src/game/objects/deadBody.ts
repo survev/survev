@@ -1,6 +1,6 @@
-import { ObjectType } from "../../../../shared/net/objectSerializeFns";
-import { collider } from "../../../../shared/utils/collider";
-import { type Vec2, v2 } from "../../../../shared/utils/v2";
+import { ObjectType } from "@survev/shared/net/objectSerializeFns";
+import { collider } from "@survev/shared/utils/collider";
+import { type Vec2, v2 } from "@survev/shared/utils/v2";
 import type { Game } from "../game";
 import { BaseGameObject } from "./gameObject";
 

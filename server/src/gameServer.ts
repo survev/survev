@@ -1,11 +1,11 @@
 import { App, SSLApp, type WebSocket } from "uWebSockets.js";
 import fs from "node:fs/promises";
 import path from "node:path";
+import { GameConfig } from "@survev/shared/gameConfig";
+import * as net from "@survev/shared/net/net";
+import { WebSocketRateLimit } from "@survev/shared/utils/ratelimit";
 import { Cron } from "croner";
 import { randomUUID } from "crypto";
-import { version } from "../../package.json";
-import { GameConfig } from "../../shared/gameConfig";
-import * as net from "../../shared/net/net";
 import { Config } from "./config";
 import { SingleThreadGameManager } from "./game/gameManager";
 import { GameProcessManager } from "./game/gameProcessManager";
@@ -20,7 +20,6 @@ import {
     logErrorToWebhook,
     readPostedJSON,
     returnJson,
-    WebSocketRateLimit,
 } from "./utils/serverHelpers";
 import {
     type FindGamePrivateBody,
@@ -409,7 +408,7 @@ setInterval(() => {
 }, 20 * 1000);
 
 app.listen(Config.gameServer.host, Config.gameServer.port, () => {
-    server.logger.info(`Survev Game Server v${version} - GIT ${GIT_VERSION}`);
+    server.logger.info(`Survev Game Server v${Config.version} - GIT ${GIT_VERSION}`);
     server.logger.info(
         `Listening on ${Config.gameServer.host}:${Config.gameServer.port}`,
     );

@@ -3,8 +3,8 @@ import {
     GameObjectDefs,
     type LootDef,
     WeaponTypeToDefs,
-} from "../../../../shared/defs/gameObjectDefs";
-import { type EmoteDef, EmotesDefs } from "../../../../shared/defs/gameObjects/emoteDefs";
+} from "@survev/shared/defs/gameObjectDefs";
+import { type EmoteDef, EmotesDefs } from "@survev/shared/defs/gameObjects/emoteDefs";
 import {
     type BackpackDef,
     type BoostDef,
@@ -14,14 +14,14 @@ import {
     type HelmetDef,
     SCOPE_LEVELS,
     type ScopeDef,
-} from "../../../../shared/defs/gameObjects/gearDefs";
-import type { GunDef } from "../../../../shared/defs/gameObjects/gunDefs";
-import type { MeleeDef } from "../../../../shared/defs/gameObjects/meleeDefs";
-import type { OutfitDef } from "../../../../shared/defs/gameObjects/outfitDefs";
-import { PerkProperties } from "../../../../shared/defs/gameObjects/perkDefs";
-import type { RoleDef } from "../../../../shared/defs/gameObjects/roleDefs";
-import type { ThrowableDef } from "../../../../shared/defs/gameObjects/throwableDefs";
-import { UnlockDefs } from "../../../../shared/defs/gameObjects/unlockDefs";
+} from "@survev/shared/defs/gameObjects/gearDefs";
+import type { GunDef } from "@survev/shared/defs/gameObjects/gunDefs";
+import type { MeleeDef } from "@survev/shared/defs/gameObjects/meleeDefs";
+import type { OutfitDef } from "@survev/shared/defs/gameObjects/outfitDefs";
+import { PerkProperties } from "@survev/shared/defs/gameObjects/perkDefs";
+import type { RoleDef } from "@survev/shared/defs/gameObjects/roleDefs";
+import type { ThrowableDef } from "@survev/shared/defs/gameObjects/throwableDefs";
+import { UnlockDefs } from "@survev/shared/defs/gameObjects/unlockDefs";
 import {
     type Action,
     type Anim,
@@ -29,16 +29,16 @@ import {
     GameConfig,
     type HasteType,
     type InventoryItem,
-} from "../../../../shared/gameConfig";
-import * as net from "../../../../shared/net/net";
-import { ObjectType } from "../../../../shared/net/objectSerializeFns";
-import type { GroupStatus } from "../../../../shared/net/updateMsg";
-import { type Circle, coldet } from "../../../../shared/utils/coldet";
-import { collider } from "../../../../shared/utils/collider";
-import type { Loadout } from "../../../../shared/utils/loadout";
-import { math } from "../../../../shared/utils/math";
-import { assert, util } from "../../../../shared/utils/util";
-import { type Vec2, v2 } from "../../../../shared/utils/v2";
+} from "@survev/shared/gameConfig";
+import * as net from "@survev/shared/net/net";
+import { ObjectType } from "@survev/shared/net/objectSerializeFns";
+import type { GroupStatus } from "@survev/shared/net/updateMsg";
+import { type Circle, coldet } from "@survev/shared/utils/coldet";
+import { collider } from "@survev/shared/utils/collider";
+import type { Loadout } from "@survev/shared/utils/loadout";
+import { math } from "@survev/shared/utils/math";
+import { assert, util } from "@survev/shared/utils/util";
+import { type Vec2, v2 } from "@survev/shared/utils/v2";
 import { Config } from "../../config";
 import { IDAllocator } from "../../utils/IDAllocator";
 import { validateUserName } from "../../utils/serverHelpers";

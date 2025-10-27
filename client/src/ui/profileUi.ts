@@ -1,5 +1,5 @@
+import loadout from "@survev/shared/utils/loadout";
 import $ from "jquery";
-import loadout from "../../../shared/utils/loadout";
 import type { Account } from "../account";
 import { api } from "../api";
 import { device } from "../device";

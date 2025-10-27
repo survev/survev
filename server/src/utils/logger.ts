@@ -1,4 +1,4 @@
-import { Logger } from "../../../shared/utils/logger";
+import { Logger } from "@survev/shared/utils/logger";
 import { Config } from "../config";
 import { logErrorToWebhook } from "./serverHelpers";
 

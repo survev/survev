@@ -1,14 +1,14 @@
-import { MapObjectDefs } from "../../../shared/defs/mapObjectDefs";
+import { MapObjectDefs } from "@survev/shared/defs/mapObjectDefs";
 import type {
     BuildingDef,
     ObstacleDef,
     StructureDef,
-} from "../../../shared/defs/mapObjectsTyping";
-import type { AABB } from "../../../shared/utils/coldet";
-import { collider } from "../../../shared/utils/collider";
-import { mapHelpers } from "../../../shared/utils/mapHelpers";
-import type { River } from "../../../shared/utils/river";
-import { type Vec2, v2 } from "../../../shared/utils/v2";
+} from "@survev/shared/defs/mapObjectsTyping";
+import type { AABB } from "@survev/shared/utils/coldet";
+import { collider } from "@survev/shared/utils/collider";
+import { mapHelpers } from "@survev/shared/utils/mapHelpers";
+import type { River } from "@survev/shared/utils/river";
+import { type Vec2, v2 } from "@survev/shared/utils/v2";
 import type { Building } from "../objects/building";
 import type { Obstacle } from "../objects/obstacle";
 import type { Structure } from "../objects/structure";

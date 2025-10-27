@@ -1,5 +1,5 @@
-import { Constants } from "../../../../shared/net/net";
-import { type Vec2, v2 } from "../../../../shared/utils/v2";
+import { Constants } from "@survev/shared/net/net";
+import { type Vec2, v2 } from "@survev/shared/utils/v2";
 
 export class MapIndicator {
     oldPosition = v2.create(0, 0);

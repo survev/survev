@@ -1,9 +1,9 @@
 import type { WebSocket } from "uWebSockets.js";
+import { type MapDef, MapDefs } from "@survev/shared/defs/mapDefs";
+import type { TeamMode } from "@survev/shared/gameConfig";
+import * as net from "@survev/shared/net/net";
 import { type ChildProcess, fork } from "child_process";
 import { randomUUID } from "crypto";
-import { type MapDef, MapDefs } from "../../../shared/defs/mapDefs";
-import type { TeamMode } from "../../../shared/gameConfig";
-import * as net from "../../../shared/net/net";
 import { ServerLogger } from "../utils/logger";
 import {
     type FindGamePrivateBody,

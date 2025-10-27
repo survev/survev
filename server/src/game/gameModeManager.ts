@@ -1,9 +1,9 @@
-import { TeamColor } from "../../../shared/defs/maps/factionDefs";
-import { GameConfig, TeamMode } from "../../../shared/gameConfig";
-import { ObjectType } from "../../../shared/net/objectSerializeFns";
-import { collider } from "../../../shared/utils/collider";
-import { util } from "../../../shared/utils/util";
-import { v2 } from "../../../shared/utils/v2";
+import { TeamColor } from "@survev/shared/defs/maps/factionDefs";
+import { GameConfig, TeamMode } from "@survev/shared/gameConfig";
+import { ObjectType } from "@survev/shared/net/objectSerializeFns";
+import { collider } from "@survev/shared/utils/collider";
+import { util } from "@survev/shared/utils/util";
+import { v2 } from "@survev/shared/utils/v2";
 import type { Game } from "./game";
 import type { DamageParams } from "./objects/gameObject";
 import type { Player } from "./objects/player";

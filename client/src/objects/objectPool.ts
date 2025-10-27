@@ -1,10 +1,10 @@
-import type { BitStream } from "../../../shared/net/net";
+import type { BitStream } from "@survev/shared/net/net";
 import {
     type ObjectData,
     type ObjectsPartialData,
     ObjectType,
-} from "../../../shared/net/objectSerializeFns";
-import { assert } from "../../../shared/utils/util";
+} from "@survev/shared/net/objectSerializeFns";
+import { assert } from "@survev/shared/utils/util";
 import { errorLogManager } from "../errorLogs";
 import type { Ctx } from "../game";
 

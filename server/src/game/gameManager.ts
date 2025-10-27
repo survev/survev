@@ -1,9 +1,9 @@
 import type { WebSocket } from "uWebSockets.js";
+import type { MapDefs } from "@survev/shared/defs/mapDefs";
+import * as net from "@survev/shared/net/net";
 import { randomUUID } from "crypto";
 import NanoTimer from "nanotimer";
 import { platform } from "os";
-import type { MapDefs } from "../../../shared/defs/mapDefs";
-import * as net from "../../../shared/net/net";
 import { Config } from "../config";
 import type {
     FindGamePrivateBody,

@@ -1,7 +1,7 @@
-import type { AABB, Collider } from "../../../shared/utils/coldet";
-import { collider } from "../../../shared/utils/collider";
-import { math } from "../../../shared/utils/math";
-import { type Vec2, v2 } from "../../../shared/utils/v2";
+import type { AABB, Collider } from "@survev/shared/utils/coldet";
+import { collider } from "@survev/shared/utils/collider";
+import { math } from "@survev/shared/utils/math";
+import { type Vec2, v2 } from "@survev/shared/utils/v2";
 import type { Loot } from "./objects/loot";
 
 interface GameObject {

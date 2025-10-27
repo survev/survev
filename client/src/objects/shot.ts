@@ -1,8 +1,8 @@
-import { GameObjectDefs } from "../../../shared/defs/gameObjectDefs";
-import type { GunDef } from "../../../shared/defs/gameObjects/gunDefs";
-import { GameConfig } from "../../../shared/gameConfig";
-import type { Bullet } from "../../../shared/net/updateMsg";
-import { type Vec2, v2 } from "../../../shared/utils/v2";
+import { GameObjectDefs } from "@survev/shared/defs/gameObjectDefs";
+import type { GunDef } from "@survev/shared/defs/gameObjects/gunDefs";
+import { GameConfig } from "@survev/shared/gameConfig";
+import type { Bullet } from "@survev/shared/net/updateMsg";
+import { type Vec2, v2 } from "@survev/shared/utils/v2";
 import type { AudioManager } from "../audioManager";
 import type { ParticleBarn } from "./particles";
 import type { PlayerBarn } from "./player";

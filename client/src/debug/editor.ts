@@ -1,10 +1,10 @@
+import { GameObjectDefs } from "@survev/shared/defs/gameObjectDefs";
+import { RoleDefs } from "@survev/shared/defs/gameObjects/roleDefs";
+import { EditMsg } from "@survev/shared/net/editMsg";
+import { math } from "@survev/shared/utils/math";
+import { util } from "@survev/shared/utils/util";
 import $ from "jquery";
 import { type FolderApi, Pane, type TabPageApi } from "tweakpane";
-import { GameObjectDefs } from "../../../shared/defs/gameObjectDefs";
-import { RoleDefs } from "../../../shared/defs/gameObjects/roleDefs";
-import { EditMsg } from "../../../shared/net/editMsg";
-import { math } from "../../../shared/utils/math";
-import { util } from "../../../shared/utils/util";
 import {
     type ConfigKey,
     type ConfigManager,

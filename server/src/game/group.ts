@@ -1,6 +1,6 @@
-import { GameConfig } from "../../../shared/gameConfig";
-import { util } from "../../../shared/utils/util";
-import type { Vec2 } from "../../../shared/utils/v2";
+import { GameConfig } from "@survev/shared/gameConfig";
+import { util } from "@survev/shared/utils/util";
+import type { Vec2 } from "@survev/shared/utils/v2";
 import type { Game } from "./game";
 import type { Player } from "./objects/player";
 

@@ -1,11 +1,8 @@
-import { BitStream } from "../../../../shared/net/net";
-import {
-    ObjectSerializeFns,
-    ObjectType,
-} from "../../../../shared/net/objectSerializeFns";
-import { type AABB, coldet } from "../../../../shared/utils/coldet";
-import { assert } from "../../../../shared/utils/util";
-import { type Vec2, v2 } from "../../../../shared/utils/v2";
+import { BitStream } from "@survev/shared/net/net";
+import { ObjectSerializeFns, ObjectType } from "@survev/shared/net/objectSerializeFns";
+import { type AABB, coldet } from "@survev/shared/utils/coldet";
+import { assert } from "@survev/shared/utils/util";
+import { type Vec2, v2 } from "@survev/shared/utils/v2";
 import type { Game } from "../game";
 import type { Grid } from "../grid";
 import type { Airdrop } from "./airdrop";

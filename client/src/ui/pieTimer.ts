@@ -1,5 +1,5 @@
+import { math } from "@survev/shared/utils/math";
 import * as PIXI from "pixi.js-legacy";
-import { math } from "../../../shared/utils/math";
 import type { Camera } from "../camera";
 import { device } from "../device";
 import type { Touch } from "./touch";

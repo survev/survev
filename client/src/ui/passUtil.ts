@@ -1,4 +1,4 @@
-import { PassDefs } from "../../../shared/defs/gameObjects/passDefs";
+import { PassDefs } from "@survev/shared/defs/gameObjects/passDefs";
 
 const passMaxLevel = 99;
 

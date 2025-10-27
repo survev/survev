@@ -1,14 +1,14 @@
-import $ from "jquery";
-import { GameConfig } from "../../../shared/gameConfig";
-import * as net from "../../../shared/net/net";
-import type { FindGameMatchData } from "../../../shared/types/api";
+import { GameConfig } from "@survev/shared/gameConfig";
+import * as net from "@survev/shared/net/net";
+import type { FindGameMatchData } from "@survev/shared/types/api";
 import type {
     RoomData,
     ServerToClientTeamMsg,
     TeamMenuErrorType,
     TeamPlayGameMsg,
     TeamStateMsg,
-} from "../../../shared/types/team";
+} from "@survev/shared/types/team";
+import $ from "jquery";
 import { api } from "../api";
 import type { AudioManager } from "../audioManager";
 import type { ConfigManager } from "../config";

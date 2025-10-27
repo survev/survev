@@ -1,10 +1,10 @@
 import fs from "node:fs";
 import path from "node:path";
-import { TeamMode } from "../../../shared/gameConfig";
-import * as net from "../../../shared/net/net";
-import type { Loadout } from "../../../shared/utils/loadout";
-import { math } from "../../../shared/utils/math";
-import { v2 } from "../../../shared/utils/v2";
+import { TeamMode } from "@survev/shared/gameConfig";
+import * as net from "@survev/shared/net/net";
+import type { Loadout } from "@survev/shared/utils/loadout";
+import { math } from "@survev/shared/utils/math";
+import { v2 } from "@survev/shared/utils/v2";
 import { Config } from "../config";
 import { ServerLogger } from "../utils/logger";
 import { apiPrivateRouter } from "../utils/serverHelpers";

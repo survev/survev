@@ -1,12 +1,12 @@
-import { GameObjectDefs } from "../../../shared/defs/gameObjectDefs";
+import { GameObjectDefs } from "@survev/shared/defs/gameObjectDefs";
 import {
     type ExplosionDef,
     ExplosionDefs,
-} from "../../../shared/defs/gameObjects/explosionsDefs";
-import { collider } from "../../../shared/utils/collider";
-import { math } from "../../../shared/utils/math";
-import { util } from "../../../shared/utils/util";
-import { type Vec2, v2 } from "../../../shared/utils/v2";
+} from "@survev/shared/defs/gameObjects/explosionsDefs";
+import { collider } from "@survev/shared/utils/collider";
+import { math } from "@survev/shared/utils/math";
+import { util } from "@survev/shared/utils/util";
+import { type Vec2, v2 } from "@survev/shared/utils/v2";
 import type { AudioManager } from "../audioManager";
 import type { Camera } from "../camera";
 import type { DebugRenderOpts } from "../config";

@@ -9,6 +9,7 @@
     "register-commands": "tsx src/register-commands.ts"
   },
   "dependencies": {
+    "@survev/shared": "workspace:*",
     "discord.js": "^14.23.2",
     "hono": "^4.10.2",
     "tsx": "^4.20.6",

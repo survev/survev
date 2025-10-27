@@ -1,8 +1,8 @@
+import type { ObjectData, ObjectType } from "@survev/shared/net/objectSerializeFns";
+import { collider } from "@survev/shared/utils/collider";
+import { util } from "@survev/shared/utils/util";
+import { v2 } from "@survev/shared/utils/v2";
 import * as PIXI from "pixi.js-legacy";
-import type { ObjectData, ObjectType } from "../../../shared/net/objectSerializeFns";
-import { collider } from "../../../shared/utils/collider";
-import { util } from "../../../shared/utils/util";
-import { v2 } from "../../../shared/utils/v2";
 import type { Camera } from "../camera";
 import { device } from "../device";
 import type { Ctx } from "../game";

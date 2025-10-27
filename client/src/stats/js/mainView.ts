@@ -1,6 +1,6 @@
+import { MinGames } from "@survev/shared/constants";
+import type { LeaderboardRequest } from "@survev/shared/types/stats";
 import $ from "jquery";
-import { MinGames } from "../../../../shared/constants";
-import type { LeaderboardRequest } from "../../../../shared/types/stats";
 import { api } from "../../api";
 import { device } from "../../device";
 import { helpers } from "../../helpers";

@@ -1,20 +1,20 @@
-import { GameObjectDefs } from "../../../shared/defs/gameObjectDefs";
-import type { GunDef } from "../../../shared/defs/gameObjects/gunDefs";
-import type { MeleeDef } from "../../../shared/defs/gameObjects/meleeDefs";
-import { PerkProperties } from "../../../shared/defs/gameObjects/perkDefs";
+import { GameObjectDefs } from "@survev/shared/defs/gameObjectDefs";
+import type { GunDef } from "@survev/shared/defs/gameObjects/gunDefs";
+import type { MeleeDef } from "@survev/shared/defs/gameObjects/meleeDefs";
+import { PerkProperties } from "@survev/shared/defs/gameObjects/perkDefs";
 import {
     type ThrowableDef,
     ThrowableDefs,
-} from "../../../shared/defs/gameObjects/throwableDefs";
-import { GameConfig, type InventoryItem, WeaponSlot } from "../../../shared/gameConfig";
-import * as net from "../../../shared/net/net";
-import { ObjectType } from "../../../shared/net/objectSerializeFns";
-import { coldet } from "../../../shared/utils/coldet";
-import { collider } from "../../../shared/utils/collider";
-import { collisionHelpers } from "../../../shared/utils/collisionHelpers";
-import { math } from "../../../shared/utils/math";
-import { assert, util } from "../../../shared/utils/util";
-import { type Vec2, v2 } from "../../../shared/utils/v2";
+} from "@survev/shared/defs/gameObjects/throwableDefs";
+import { GameConfig, type InventoryItem, WeaponSlot } from "@survev/shared/gameConfig";
+import * as net from "@survev/shared/net/net";
+import { ObjectType } from "@survev/shared/net/objectSerializeFns";
+import { coldet } from "@survev/shared/utils/coldet";
+import { collider } from "@survev/shared/utils/collider";
+import { collisionHelpers } from "@survev/shared/utils/collisionHelpers";
+import { math } from "@survev/shared/utils/math";
+import { assert, util } from "@survev/shared/utils/util";
+import { type Vec2, v2 } from "@survev/shared/utils/v2";
 import type { BulletParams } from "../game/objects/bullet";
 import type { GameObject } from "../game/objects/gameObject";
 import type { Player } from "../game/objects/player";

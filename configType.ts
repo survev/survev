@@ -32,6 +32,11 @@ interface ServerConfig {
 
 export interface ConfigType {
     /**
+     * version duh
+     */
+    version: string;
+
+    /**
      * API server configuration.
      * Not needed if only deploying a game server.
      */

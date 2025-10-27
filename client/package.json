@@ -10,6 +10,7 @@
     "lint": "cd .. && pnpm lint"
   },
   "dependencies": {
+    "@survev/shared": "workspace:*",
     "@taufik-nurrohman/color-picker": "1.4.2",
     "base64-js": "^1.5.1",
     "bit-buffer": "^0.2.5",

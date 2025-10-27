@@ -1,17 +1,17 @@
+import { GameConfig } from "@survev/shared/gameConfig";
+import type { Plane as PlaneData, UpdateMsg } from "@survev/shared/net/updateMsg";
+import { collider } from "@survev/shared/utils/collider";
+import { math } from "@survev/shared/utils/math";
+import { util } from "@survev/shared/utils/util";
+import { v2 } from "@survev/shared/utils/v2";
 import * as PIXI from "pixi.js-legacy";
-import { GameConfig } from "../../../shared/gameConfig";
-import type { Plane as PlaneData, UpdateMsg } from "../../../shared/net/updateMsg";
-import { collider } from "../../../shared/utils/collider";
-import { math } from "../../../shared/utils/math";
-import { util } from "../../../shared/utils/util";
-import type { Vec2 } from "./../../../shared/utils/v2";
-import { v2 } from "../../../shared/utils/v2";
 import type { AudioManager } from "../audioManager";
 import type { Camera } from "../camera";
 import type { SoundHandle } from "../lib/createJS";
 import type { Map } from "../map";
 import type { Renderer } from "../renderer";
 import type { UiManager } from "../ui/ui";
+import type { Vec2 } from "./@survev/shared/utils/v2";
 import type { Player } from "./player";
 
 const planeElevateMult = 1.25;

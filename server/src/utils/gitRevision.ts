@@ -1,8 +1,4 @@
-import { execSync } from "child_process";
+import { GIT_VERSION } from "@survev/shared/utils/gitRevision";
 
-export let GIT_VERSION = "Unknown";
-try {
-    GIT_VERSION = execSync("git rev-parse HEAD").toString().trim();
-} catch (error) {
-    console.error(`Failed to parse git revision: `, error);
-}
+// !! TODO:
+export { GIT_VERSION };
