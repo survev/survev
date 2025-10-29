@@ -4,8 +4,8 @@ import path from "node:path";
 import hjson from "hjson";
 import type { ConfigType, PartialConfig } from "./configType";
 import { version } from "./package.json";
-import { TeamMode } from "./shared/gameConfig";
-import { util } from "./shared/utils/util";
+import { TeamMode } from "./packages/shared/src/gameConfig";
+import { util } from "./packages/shared/src/utils/util";
 
 export const configFileName = "survev-config.hjson";
 

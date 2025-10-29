@@ -1,0 +1,22 @@
+{
+  "name": "@survev/bot",
+  "main": "src/index.js",
+  "type": "module",
+  "scripts": {
+    "typecheck": "tsc --noEmit",
+    "start": "bun --conditions=@survev/source run src/index.ts",
+    "dev": "bun --watch --conditions=@survev/source src/index.ts --watch ../../survev-config.hjson",
+    "register-commands": "tsx src/register-commands.ts",
+    "lint": "cd ../.. && bun run lint"
+  },
+  "dependencies": {
+    "@survev/types": "workspace:*",
+    "@survev/shared": "workspace:*",
+    "discord.js": "^14.23.2",
+    "hono": "^4.10.2",
+    "zod": "^3.25.76"
+  },
+  "devDependencies": {
+    "tsx": "^4.20.6"
+  }
+}

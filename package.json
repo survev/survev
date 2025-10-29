@@ -10,7 +10,8 @@
     "dev:api": "cd server && pnpm dev:api",
     "dev:game": "cd server && pnpm dev:game",
     "dev:client": "cd client && pnpm dev",
-    "build": "cd server && pnpm build && cd ../client && pnpm build",
+    "_build": "cd server && pnpm build && cd ../client && pnpm build",
+    "build": "bun bunup",
     "stressTest": "cd server && pnpm stressTest",
     "lint": "biome check --write",
     "lint:ci": "biome check"
@@ -22,17 +23,18 @@
   "license": "GPL-3.0-or-later",
   "devDependencies": {
     "@biomejs/biome": "2.0.5",
+    "@types/bun": "^1.3.1",
     "@types/hjson": "^2.4.6",
     "@types/node": "^22.18.12",
+    "bunup": "^0.15.11",
     "concurrently": "^9.2.1",
-    "typescript": "^5.9.3"
+    "typescript": "^5.9.3",
+    "esbuild": "^0.25.11"
   },
   "workspaces": [
-    "client",
-    "server",
-    "shared"
+    "packages/*",
+    "apps/*"
   ],
-  "packageManager": "pnpm@10.13.1",
   "dependencies": {
     "enquirer": "^2.4.1",
     "hjson": "^3.2.2",

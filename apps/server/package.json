@@ -1,0 +1,33 @@
+{
+  "name": "@survev/server",
+  "private": true,
+  "type": "module",
+  
+  "scripts": {
+    "typecheck": "tsc --noEmit",
+    "start": "node --enable-source-maps dist/gameServer.js",
+    "dev": "tsx watch --conditions=@survev/source  --clear-screen=false --include ../../survev-config.hjson src/gameServer.ts",
+    "build": "cd .. && bun run build",
+    "stresstest": "bun  --conditions=@survev/source run src/stressTest.ts",
+    "lint": "cd ../.. && bun run lint"
+  },
+  "dependencies": {
+    "@survev/lib": "workspace:*",
+    "@survev/types": "workspace:*",
+    "@survev/shared": "workspace:*",
+    "croner": "^9.1.0",
+    "hono": "^4.10.2",
+    "nanotimer": "^0.3.15",
+    "typescript": "^5.9.3",
+    "uWebSockets.js": "github:uNetworking/uWebSockets.js#v20.52.0",
+    "zod": "^3.25.76"
+  },
+  "devDependencies": {
+    "@types/nanotimer": "^0.3.2",
+    "@types/node": "^22.18.12",
+    "bunup": "^0.15.11",
+    "esbuild": "^0.25.11",
+    "tsx": "^4.20.6",
+    "vitest": "^3.2.4"
+  }
+}

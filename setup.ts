@@ -5,7 +5,7 @@ import enquirer from "enquirer";
 import hjson from "hjson";
 import { configFileName } from "./config";
 import type { PartialConfig } from "./configType";
-import { util } from "./shared/utils/util";
+import { util } from "./packages/shared/utils/util";
 
 const prompt = enquirer.prompt;
 

@@ -2,7 +2,7 @@
   "compilerOptions": {
     "target": "ES2022",
     "module": "ES2022",
-    "moduleResolution": "node",
+    "moduleResolution": "bundler",
     "esModuleInterop": true,
     "allowSyntheticDefaultImports": true,
     "resolveJsonModule": true,
@@ -11,8 +11,9 @@
     "allowJs": true,
     "strict": true,
     "skipLibCheck": true,
-    "noEmit": true
+    "noEmit": true,
+    "customConditions": ["@survev/source"]
   },
   "exclude": ["node_modules", "dist"],
-  "include": ["shared", "./*.ts"]
+  "include": ["packages/shared", "./*.ts"]
 }

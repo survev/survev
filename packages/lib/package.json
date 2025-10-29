@@ -1,0 +1,36 @@
+{
+  "name": "@survev/lib",
+  "private": true,
+  "type": "module",
+  "main": "./src/index.ts",
+  "exports": {
+    "./bitbuffer": {
+      "import": {
+        "@survev/source": "./src/bitbuffer/index.ts",
+        "default": "./dist/index.js"
+      }
+    },
+    "./net": {
+      "import": {
+        "@survev/source": "./src/net/index.ts",
+        "default": "./dist/index.js"
+      }
+    },
+    "./*": {
+      "import": {
+        "@survev/source": "./src/*.ts",
+        "default": "./dist/*.js"
+      }
+    }
+  },
+  "scripts": {
+    "typecheck": "tsc --noEmit"
+  },
+  "devDependencies": {
+    "@types/bun": "latest"
+  },
+  "dependencies": {
+    "@survev/shared": "workspace:*",
+    "zod": "^3.25.76"
+  }
+}

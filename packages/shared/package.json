@@ -1,0 +1,31 @@
+{
+    "name": "@survev/shared",
+    "private": true,
+    "type": "module",
+    "main": "./src/index.ts",
+    "exports": {
+        ".": {
+            "@survev/source": "./src/index.ts",
+            "default": "./dist/index.js"
+        },
+        "./*": {
+            "@survev/source": "./src/*.ts",
+            "default": "./dist/*.js"
+        }
+    },
+    "scripts": {
+        "test": "vitest",
+        "typecheck": "tsc --noEmit"
+    },
+    "dependencies": {
+        "@survev/lib": "workspace:*",
+        "@survev/types": "workspace:*",
+        "obscenity": "^0.4.5",
+        "zod": "^3.25.76"
+    },
+    "devDependencies": {
+        "@types/svg-parser": "^2.0.6",
+        "svg-parser": "^2.0.4",
+        "vitest": "^3.2.4"
+    }
+}
