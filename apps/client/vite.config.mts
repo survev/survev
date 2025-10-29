@@ -2,7 +2,7 @@ import { resolve } from "node:path";
 import { defineConfig, type Plugin, type ServerOptions } from "vite";
 import stripBlockPlugin from "vite-plugin-strip-block";
 import { getConfig } from "../../config";
-// import { GIT_VERSION } from "../server/src/utils/gitRevision";
+import { GIT_VERSION } from "../server/src/utils/gitRevision";
 import { atlasBuilderPlugin } from "./atlas-builder/vitePlugin";
 import { codefendPlugin } from "./vite-plugins/codefendPlugin";
 import { ejsPlugin } from "./vite-plugins/ejsPlugin";
@@ -126,7 +126,7 @@ export default defineConfig(({ mode }) => {
         },
         define: {
             GAME_REGIONS: Config.regions,
-            GIT_VERSION: { unkown: "Unknown" }, //JSON.stringify(GIT_VERSION),
+            GIT_VERSION: JSON.stringify(GIT_VERSION),
             PING_TEST_URLS: Object.entries(Config.regions).map(([key, data]) => {
                 return {
                     region: key,
