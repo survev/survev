@@ -1943,6 +1943,9 @@ export class Player extends BaseGameObject {
                     }
                     case "perk": {
                         if (!this.perks.find((perk) => perk.droppable)) {
+                            if(this.perks.find((perk) => perk.replaceOnDeath === "halloween_mystery",)?.type) {
+                                break;
+                            }
                             this.pickupLoot(closestLoot);
                         }
                         break;
