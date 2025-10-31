@@ -219,7 +219,7 @@ export class PlayerView {
     getUrlParams() {
         const params = new URLSearchParams(window.location.search);
         const slug = params.get("slug") || "";
-        const interval = params.get("t") || "alltime";
+        const interval = params.get("time") || "alltime";
         const mapId = params.get("mapId") || ALL_MAPS;
         const gameId = params.get("gameId") || "";
 
