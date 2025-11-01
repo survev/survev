@@ -1942,12 +1942,9 @@ export class Player extends BaseGameObject {
                         break;
                     }
                     case "perk": {
-                        if (!this.perks.find((perk) => perk.droppable)) {
-                            if(this.perks.find(
-                                (perk) => perk.replaceOnDeath === "halloween_mystery",
-                            )?.type) {
-                                break;
-                            }
+                        // Prevent mobile players from picking up potentially negative perks.
+                        // This includes non-droppable perks and halloween perks.
+                        if (!this.perks.find((perk) => perk.droppable && perk.replaceOnDeath !== "halloween_mystery")) {
                             this.pickupLoot(closestLoot);
                         }
                         break;
