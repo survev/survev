@@ -61,3 +61,8 @@ Cobalt Loot Changes 10/22:
 - Medic Rare: Added SCAR SSR (weight 0.05).
 - Demo Rare: Removed MP220, Saiga weight 0.5 -> 1, M1014 added (weight 0.1).
 - Tank Rare: QBB weight 1 -> 1.3, M249 weight 0.05 -> 0.2.
+
+Turkey Cache Changes 11/1: 
++ 50 Leafpile Loot Caches
+- 12 Berry Bush Caches (cache removed from mode)
+- 30 Turkey Leafpiles (non-cache piles)
