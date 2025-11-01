@@ -31,7 +31,8 @@ export type Atlas =
     | "snow"
     | "woods"
     | "cobalt"
-    | "savannah";
+    | "savannah"
+    | "turkey";
 
 export const MapDefs = {
     main: Main,

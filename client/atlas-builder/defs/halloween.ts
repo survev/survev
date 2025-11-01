@@ -25,8 +25,6 @@ export const HalloweenAtlas: AtlasDef = {
 
         "map/map-tree-04h.svg",
         "map/map-tree-05.svg",
-        "map/map-tree-07.svg",
-        "map/map-tree-08.svg",
 
         "map/map-web-01.svg",
     ],

@@ -10,6 +10,7 @@ import { PotatoAtlas } from "./defs/potato";
 import { SavannahAtlas } from "./defs/savannah";
 import { SharedAtlas } from "./defs/shared";
 import { SnowAtlas } from "./defs/snow";
+import { TurkeyAtlas } from "./defs/turkey";
 import { WoodsAtlas } from "./defs/woods";
 
 export interface AtlasDef {
@@ -40,6 +41,7 @@ export const Atlases: Record<Atlas, AtlasDef> = {
     woods: WoodsAtlas,
     cobalt: CobaltAtlas,
     savannah: SavannahAtlas,
+    turkey: TurkeyAtlas,
 };
 export type AtlasRes = "high" | "low";
 
