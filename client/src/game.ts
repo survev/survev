@@ -9,10 +9,15 @@ import { v2 } from "../../shared/utils/v2";
 import type { Ambiance } from "./ambiance";
 import type { AudioManager } from "./audioManager";
 import { Camera } from "./camera";
-import type { ConfigManager, DebugOptions } from "./config";
-import { debugLines } from "./debugLines";
+import type { ConfigManager, DebugRenderOpts } from "./config";
+import { DebugHUD } from "./debug/debugHUD";
+import { debugLines } from "./debug/debugLines";
+
+/* STRIP_FROM_PROD_CLIENT:START */
+import { Editor } from "./debug/editor";
+/* STRIP_FROM_PROD_CLIENT:END */
+
 import { device } from "./device";
-import { Editor } from "./editor";
 import { EmoteBarn } from "./emote";
 import { Gas } from "./gas";
 import { helpers } from "./helpers";
@@ -105,6 +110,7 @@ export class Game {
     m_useDebugZoom!: boolean;
 
     editor!: Editor;
+    debugHUD!: DebugHUD;
 
     seq!: number;
     seqInFlight!: boolean;
@@ -136,6 +142,10 @@ export class Game {
         this.m_inputBinds = m_inputBinds;
         this.m_inputBindUi = m_inputBindUi;
         this.m_resourceManager = m_resourceManager;
+
+        if (IS_DEV) {
+            this.editor = new Editor(this.m_config);
+        }
     }
 
     tryJoinGame(
@@ -186,6 +196,9 @@ export class Game {
                         this.m_onMsg(type, msgStream.getStream());
                         msgStream.stream.readAlignToNextByte();
                     }
+                    this.debugHUD?.netInGraph.addEntry(
+                        msgStream.stream.buffer.byteLength,
+                    );
                 };
                 this.m_ws.onclose = () => {
                     const displayingStats = this.m_uiManager?.displayingStats;
@@ -250,13 +263,11 @@ export class Game {
             this.m_map,
         );
         this.m_shotBarn = new ShotBarn();
+        this.debugHUD = new DebugHUD(this.m_config);
+
         // this.particleBarn,
         // this.audioManager,
         // this.uiManager
-
-        if (IS_DEV) {
-            this.editor = new Editor(this.m_config);
-        }
 
         // Register types
         const TypeToPool = {
@@ -297,6 +308,7 @@ export class Game {
             this.m_uiManager.container,
             this.m_uiManager.m_pieTimer.container,
             this.m_emoteBarn.indContainer,
+            this.debugHUD.container,
         ];
         for (let i = 0; i < pixiContainers.length; i++) {
             const container = pixiContainers[i];
@@ -365,6 +377,7 @@ export class Game {
             this.m_renderer.m_free();
             this.m_input.m_free();
             this.m_audioManager.stopAll();
+
             while (this.m_pixi.stage.children.length > 0) {
                 const c = this.m_pixi.stage.children[0];
                 this.m_pixi.stage.removeChild(c);
@@ -386,22 +399,22 @@ export class Game {
     }
 
     update(dt: number) {
+        this.debugHUD.m_update(dt, this);
+
         if (IS_DEV) {
             if (this.m_input.keyPressed(Key.Tilde)) {
                 this.editor.setEnabled(!this.editor.enabled);
             }
             if (this.editor.enabled) {
-                this.editor.m_update(dt, this.m_input, this.m_activePlayer, this.m_map);
+                this.editor.m_update(this.m_input);
             }
         }
 
-        let debug: DebugOptions;
+        let debug: DebugRenderOpts;
         if (IS_DEV) {
-            debug = this.m_config.get("debug")!;
+            debug = this.m_config.get("debugRenderer")!;
         } else {
-            debug = {
-                render: {},
-            } as DebugOptions;
+            debug = {} as DebugRenderOpts;
         }
 
         const smokeParticles = this.m_smokeBarn.m_particles;
@@ -412,7 +425,6 @@ export class Game {
         this.m_playerBarn.m_update(
             dt,
             this.m_activeId,
-            this.teamMode,
             this.m_renderer,
             this.m_particleBarn,
             this.m_camera,
@@ -651,9 +663,7 @@ export class Game {
                             [WeaponSlot.Throwable]: Input.EquipThrowable,
                         };
                         const input =
-                            weapIdxToInput[
-                                e.data as unknown as keyof typeof weapIdxToInput
-                            ];
+                            weapIdxToInput[e.data as keyof typeof weapIdxToInput];
                         if (input) {
                             inputMsg.addInput(input);
                         }
@@ -679,12 +689,12 @@ export class Game {
                 if (uiEvent.action == "drop") {
                     const dropMsg = new net.DropItemMsg();
                     if (uiEvent.type == "weapon") {
-                        const eventData = uiEvent.data as unknown as number;
+                        const eventData = uiEvent.data as number;
                         const Y = this.m_activePlayer.m_localData.m_weapons;
                         dropMsg.item = Y[eventData].type;
                         dropMsg.weapIdx = eventData;
                     } else if (uiEvent.type == "perk") {
-                        const eventData = uiEvent.data as unknown as number;
+                        const eventData = uiEvent.data as number;
                         const J = this.m_activePlayer.m_netData.m_perks;
                         const Q = J.length > eventData ? J[eventData] : null;
                         if (Q?.droppable) {
@@ -829,16 +839,7 @@ export class Game {
             this.m_particleBarn,
             this.m_audioManager,
         );
-        this.m_flareBarn.m_update(
-            dt,
-            this.m_playerBarn,
-            this.m_map,
-            this.m_camera,
-            this.m_activePlayer,
-            this.m_renderer,
-            this.m_particleBarn,
-            this.m_audioManager,
-        );
+        this.m_flareBarn.m_update(dt, this.m_map, this.m_activePlayer, this.m_renderer);
         this.m_projectileBarn.m_update(
             dt,
             this.m_particleBarn,
@@ -887,7 +888,7 @@ export class Game {
             this.m_particleBarn,
             this.m_audioManager,
         );
-        this.m_particleBarn.m_update(dt, this.m_camera, debug);
+        this.m_particleBarn.m_update(dt, this.m_camera);
         this.m_deadBodyBarn.m_update(
             dt,
             this.m_playerBarn,
@@ -896,13 +897,12 @@ export class Game {
             this.m_camera,
             this.m_renderer,
         );
-        this.m_decalBarn.m_update(dt, this.m_camera, this.m_renderer, debug);
+        this.m_decalBarn.m_update(dt, this.m_camera, this.m_renderer);
         this.m_uiManager.m_update(
             dt,
             this.m_activePlayer,
             this.m_map,
             this.m_gas,
-            this.m_lootBarn,
             this.m_playerBarn,
             this.m_camera,
             this.teamMode,
@@ -936,7 +936,7 @@ export class Game {
             this.m_camera,
             this.m_renderer,
         );
-        this.m_renderer.m_update(dt, this.m_camera, this.m_map, debug);
+        this.m_renderer.m_update(dt, this.m_camera, this.m_map);
 
         for (let i = 0; i < this.m_emoteBarn.newPings.length; i++) {
             const ping = this.m_emoteBarn.newPings[i];
@@ -1009,14 +1009,14 @@ export class Game {
         this.m_render(dt, debug);
     }
 
-    m_render(dt: number, debug: DebugOptions) {
+    m_render(dt: number, debug: DebugRenderOpts) {
         const grassColor = this.m_map.mapLoaded
             ? this.m_map.getMapDef().biome.colors.grass
             : 8433481;
         this.m_pixi.renderer.background.color = grassColor;
         // Module rendering
         this.m_playerBarn.m_render(this.m_camera, debug);
-        this.m_bulletBarn.m_render(this.m_camera, debug);
+        this.m_bulletBarn.m_render(this.m_camera);
         this.m_flareBarn.m_render(this.m_camera);
         this.m_decalBarn.m_render(this.m_camera, debug, this.m_activePlayer.layer);
         this.m_map.m_render(this.m_camera);
@@ -1024,15 +1024,13 @@ export class Game {
         this.m_uiManager.m_render(
             this.m_activePlayer.m_pos,
             this.m_gas,
-            this.m_camera,
             this.m_map,
             this.m_planeBarn,
-            debug,
         );
         this.m_emoteBarn.m_render(this.m_camera);
         if (IS_DEV) {
             this.m_debugDisplay.clear();
-            if (debug.render.enabled) {
+            if (debug.enabled) {
                 debugLines.m_render(this.m_camera, this.m_debugDisplay);
             }
             debugLines.flush();
@@ -1145,7 +1143,7 @@ export class Game {
         }
         this.m_spectating = this.m_activeId != this.m_localId;
         this.m_activePlayer = this.m_playerBarn.getPlayerById(this.m_activeId)!;
-        this.m_activePlayer.m_setLocalData(msg.activePlayerData, this.m_playerBarn);
+        this.m_activePlayer.m_setLocalData(msg.activePlayerData);
         if (msg.activePlayerData.weapsDirty) {
             this.m_uiManager.weapsDirty = true;
         }
@@ -1167,7 +1165,7 @@ export class Game {
 
         // Gas data
         if (msg.gasDirty) {
-            this.m_gas.setFullState(msg.gasT, msg.gasData, this.m_map, this.m_uiManager);
+            this.m_gas.setFullState(msg.gasT, msg.gasData, this.m_uiManager);
         }
         if (msg.gasTDirty) {
             this.m_gas.setProgress(msg.gasT);
@@ -1233,6 +1231,7 @@ export class Game {
         if (msg.ack == this.seq && this.seqInFlight) {
             this.seqInFlight = false;
             const ping = now - this.seqSendTime;
+            this.debugHUD.pingGraph.addEntry(ping);
             this.pings.push(ping);
         }
         if (this.lastUpdateTime > 0) {
@@ -1283,7 +1282,6 @@ export class Game {
                 );
                 this.m_resourceManager.loadMapAssets(this.m_map.mapName);
                 this.m_map.renderMap(this.m_pixi.renderer, this.m_canvasMode);
-                this.m_playerBarn.onMapLoad(this.m_map);
                 this.m_bulletBarn.onMapLoad(this.m_map);
                 this.m_particleBarn.onMapLoad(this.m_map);
                 this.m_uiManager.onMapLoad(this.m_map, this.m_camera);
@@ -1296,6 +1294,11 @@ export class Game {
                     this.m_uiManager.setRoleMenuActive(true);
                 } else {
                     this.m_uiManager.setRoleMenuActive(false);
+                }
+
+                if (IS_DEV) {
+                    this.editor.toolParams.mapSeed = msg.seed;
+                    this.editor.pane.refresh();
                 }
                 break;
             }
@@ -1397,7 +1400,6 @@ export class Game {
                     this.m_playerBarn.addDeathEffect(
                         msg.targetId,
                         msg.killerId,
-                        sourceType,
                         this.m_audioManager,
                         this.m_particleBarn,
                     );

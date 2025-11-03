@@ -191,8 +191,7 @@ export class InputHandler {
     }
 
     onMouseDown(event: MouseEvent) {
-        let button = 0;
-        button = "which" in event ? event.which - 1 : (event as MouseEvent).button;
+        const button = event.button;
         if (this.checkCaptureInput(event, InputType.MouseButton, button)) {
             return;
         }
@@ -200,8 +199,7 @@ export class InputHandler {
     }
 
     onMouseUp(event: MouseEvent) {
-        let button = 0;
-        button = "which" in event ? event.which - 1 : (event as MouseEvent).button;
+        const button = event.button;
 
         this.mouseButtons[button] = false;
 

@@ -1,7 +1,7 @@
-import { defineSkin } from "../../utils/util";
+import { type DeepPartial, util } from "../../utils/util";
 
-function defineXpSkin(baseType: string, params: any) {
-    return defineSkin<XPDef>(BaseDefs, baseType, params);
+function defineXpSkin(baseType: string, params: DeepPartial<XPDef>): XPDef {
+    return util.mergeDeep({}, BaseDefs[baseType], params);
 }
 
 export interface XPDef {

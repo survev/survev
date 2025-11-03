@@ -19,35 +19,33 @@
     "lint": "cd .. && pnpm lint"
   },
   "dependencies": {
-    "@hono/node-server": "^1.17.1",
+    "@hono/node-server": "^1.19.6",
     "@hono/node-ws": "^1.2.0",
     "@hono/zod-validator": "^0.5.0",
     "@oslojs/crypto": "^1.0.1",
     "arctic": "^3.7.0",
-    "better-sqlite3": "^11.10.0",
     "croner": "^9.1.0",
     "dotenv": "^16.6.1",
     "drizzle-orm": "^0.43.1",
-    "hono": "^4.8.5",
+    "hono": "^4.10.4",
     "nanotimer": "^0.3.15",
-    "obscenity": "^0.4.4",
+    "obscenity": "^0.4.5",
     "pg": "^8.16.3",
     "proxycheck-ts": "^0.0.11",
     "redis": "^4.7.1",
     "slugify": "^1.6.6",
-    "typescript": "^5.8.3",
+    "typescript": "^5.9.3",
     "uWebSockets.js": "github:uNetworking/uWebSockets.js#v20.52.0",
     "zod": "^3.25.76"
   },
   "devDependencies": {
-    "@types/better-sqlite3": "^7.6.13",
     "@types/nanotimer": "^0.3.2",
-    "@types/node": "^22.16.5",
-    "@types/pg": "^8.15.4",
-    "concurrently": "^9.2.0",
-    "drizzle-kit": "^0.31.4",
-    "esbuild": "^0.25.8",
-    "tsx": "^4.20.3",
-    "unique-username-generator": "^1.4.0"
+    "@types/node": "^22.18.13",
+    "@types/pg": "^8.15.6",
+    "concurrently": "^9.2.1",
+    "drizzle-kit": "^0.31.6",
+    "esbuild": "^0.25.11",
+    "tsx": "^4.20.6",
+    "unique-username-generator": "^1.5.1"
   }
 }

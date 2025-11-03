@@ -1,12 +1,22 @@
-import { and, eq } from "drizzle-orm";
+import { and, eq, inArray } from "drizzle-orm";
 import { Hono } from "hono";
 import { z } from "zod";
 import { saveConfig } from "../../../../../config";
 import { GameObjectDefs } from "../../../../../shared/defs/gameObjectDefs";
 import { MapDefs } from "../../../../../shared/defs/mapDefs";
 import { TeamMode } from "../../../../../shared/gameConfig";
+import {
+    zGiveItemParams,
+    zRemoveItemParams,
+} from "../../../../../shared/types/moderation";
 import { serverConfigPath } from "../../../config";
-import { type SaveGameBody, zUpdateRegionBody } from "../../../utils/types";
+import { isBehindProxy } from "../../../utils/serverHelpers";
+import {
+    type SaveGameBody,
+    zSetClientThemeBody,
+    zSetGameModeBody,
+    zUpdateRegionBody,
+} from "../../../utils/types";
 import type { Context } from "../..";
 import { server } from "../../apiServer";
 import {
@@ -24,7 +34,7 @@ import {
     usersTable,
 } from "../../db/schema";
 import { MOCK_USER_ID } from "../user/auth/mock";
-import { logPlayerIPs, ModerationRouter } from "./ModerationRouter";
+import { isBanned, logPlayerIPs, ModerationRouter } from "./ModerationRouter";
 
 export const PrivateRouter = new Hono<Context>()
     .use(privateMiddleware)
@@ -35,40 +45,52 @@ export const PrivateRouter = new Hono<Context>()
         server.updateRegion(regionId, data);
         return c.json({}, 200);
     })
-    .post(
-        "/set_game_mode",
-        validateParams(
-            z.object({
-                index: z.number(),
-                teamMode: z.nativeEnum(TeamMode).optional(),
-                mapName: z.string().optional(),
-                enabled: z.boolean().optional(),
-            }),
-        ),
-        (c) => {
-            const { index, mapName, teamMode, enabled } = c.req.valid("json");
+    .post("/set_game_mode", validateParams(zSetGameModeBody), (c) => {
+        const {
+            index,
+            map_name: mapName,
+            team_mode: teamMode,
+            enabled,
+        } = c.req.valid("json");
 
-            if (!MapDefs[mapName as keyof typeof MapDefs]) {
-                return c.json({ error: "Invalid map name" }, 400);
-            }
+        if (!MapDefs[mapName as keyof typeof MapDefs]) {
+            return c.json({ error: "Invalid map name" }, 400);
+        }
 
-            if (!server.modes[index]) {
-                return c.json({ error: "Invalid mode index" }, 400);
-            }
+        if (!server.modes[index]) {
+            return c.json({ error: "Invalid mode index" }, 400);
+        }
 
-            server.modes[index] = {
-                mapName: (mapName ?? server.modes[index].mapName) as keyof typeof MapDefs,
-                teamMode: teamMode ?? server.modes[index].teamMode,
-                enabled: enabled ?? server.modes[index].enabled,
-            };
+        server.modes[index] = {
+            mapName: (mapName ?? server.modes[index].mapName) as keyof typeof MapDefs,
+            teamMode: teamMode ?? server.modes[index].teamMode,
+            enabled: enabled ?? server.modes[index].enabled,
+        };
 
-            saveConfig(serverConfigPath, {
-                modes: server.modes,
-            });
+        saveConfig(serverConfigPath, {
+            modes: server.modes,
+        });
 
-            return c.json({}, 200);
-        },
-    )
+        return c.json(
+            { message: `Set mode ${index} to ${JSON.stringify(server.modes[index])}` },
+            200,
+        );
+    })
+    .post("/set_client_theme", validateParams(zSetClientThemeBody), (c) => {
+        const { theme } = c.req.valid("json");
+
+        if (!MapDefs[theme as keyof typeof MapDefs]) {
+            return c.json({ error: "Invalid map name" }, 400);
+        }
+
+        server.clientTheme = theme as keyof typeof MapDefs;
+
+        saveConfig(serverConfigPath, {
+            clientTheme: server.clientTheme,
+        });
+
+        return c.json({ message: `Set client theme to ${theme}` }, 200);
+    })
     .post(
         "/toggle_captcha",
         validateParams(
@@ -97,6 +119,26 @@ export const PrivateRouter = new Hono<Context>()
             return c.json({ error: "Empty match data" }, 400);
         }
 
+        const gameIds = [...new Set(data.matchData.map((d) => d.gameId))];
+
+        // i really don't want the game server to insert duplicated games by accident
+        // when saving lost game data...
+        const exists = await db
+            .selectDistinct({
+                gameId: matchDataTable.gameId,
+            })
+            .from(matchDataTable)
+            .where(inArray(matchDataTable.gameId, gameIds));
+
+        if (exists.length) {
+            return c.json(
+                {
+                    error: `Games [${exists.map((d) => d.gameId).join(",")}] are already inserted`,
+                },
+                400,
+            );
+        }
+
         await leaderboardCache.invalidateCache(matchData);
 
         await db.insert(matchDataTable).values(matchData);
@@ -107,20 +149,14 @@ export const PrivateRouter = new Hono<Context>()
     .post(
         "/give_item",
         databaseEnabledMiddleware,
-        validateParams(
-            z.object({
-                item: z.string(),
-                slug: z.string(),
-                source: z.string().default("daddy-has-privileges"),
-            }),
-        ),
+        validateParams(zGiveItemParams),
         async (c) => {
             const { item, slug, source } = c.req.valid("json");
 
             const def = GameObjectDefs[item];
 
             if (!def) {
-                return c.json({ error: "Invalid item type" }, 400);
+                return c.json({ message: "Invalid item type" }, 200);
             }
 
             const userId = await db.query.usersTable.findFirst({
@@ -131,7 +167,7 @@ export const PrivateRouter = new Hono<Context>()
             });
 
             if (!userId) {
-                return c.json({ error: "User not found" }, 404);
+                return c.json({ message: "User not found" }, 200);
             }
 
             const existing = await db.query.itemsTable.findFirst({
@@ -142,7 +178,7 @@ export const PrivateRouter = new Hono<Context>()
             });
 
             if (existing) {
-                return c.json({ error: "User already has item" }, 400);
+                return c.json({ message: "User already has item" }, 200);
             }
 
             await db.insert(itemsTable).values({
@@ -152,18 +188,13 @@ export const PrivateRouter = new Hono<Context>()
                 timeAcquired: Date.now(),
             });
 
-            return c.json({ success: true }, 200);
+            return c.json({ message: `Item "${item}" given to ${slug}` }, 200);
         },
     )
     .post(
         "/remove_item",
         databaseEnabledMiddleware,
-        validateParams(
-            z.object({
-                item: z.string(),
-                slug: z.string(),
-            }),
-        ),
+        validateParams(zRemoveItemParams),
         async (c) => {
             const { item, slug } = c.req.valid("json");
 
@@ -175,14 +206,14 @@ export const PrivateRouter = new Hono<Context>()
             });
 
             if (!user) {
-                return c.json({ error: "User not found" }, 404);
+                return c.json({ message: "User not found" }, 200);
             }
 
             await db
                 .delete(itemsTable)
                 .where(and(eq(itemsTable.userId, user.id), eq(itemsTable.type, item)));
 
-            return c.json({ success: true }, 200);
+            return c.json({ message: `Item "${item}" removed from ${slug}` }, 200);
         },
     )
     .post("/clear_cache", async (c) => {
@@ -190,6 +221,29 @@ export const PrivateRouter = new Hono<Context>()
         await client.flushAll();
         return c.json({ success: true }, 200);
     })
+    .post(
+        "/check_ip",
+        validateParams(
+            z.object({
+                ip: z.string(),
+            }),
+        ),
+        async (c) => {
+            const { ip } = c.req.valid("json");
+
+            const banData = await isBanned(ip, false);
+            if (banData) {
+                return c.json({ banned: true, banData: banData, behindProxy: false });
+            }
+
+            const isProxied = await isBehindProxy(ip, 0);
+            if (isProxied) {
+                return c.json({ banned: false, banData: undefined, behindProxy: true });
+            }
+
+            return c.json({ banned: false, banData: undefined, behindProxy: false });
+        },
+    )
     .post(
         "/test/insert_game",
         databaseEnabledMiddleware,

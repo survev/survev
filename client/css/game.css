@@ -3192,6 +3192,38 @@ span.ui-stats-header-value {
   font-size: 16px;
   top: 12px;
   right: 12px;
+
+  /* Tweakpane theme */
+  --tp-base-background-color: hsla(0, 0%, 0%, 0.4);
+  --tp-base-shadow-color: hsla(0, 0%, 0%, 0.2);
+  --tp-button-background-color: hsl(177.47, 37.25%, 50%);
+  --tp-button-background-color-active: hsl(177.47, 37.25%, 60%);
+  --tp-button-background-color-focus: hsl(177.47, 37.25%, 60%);
+  --tp-button-background-color-hover: hsl(177.47, 37.25%, 40%);
+  --tp-button-foreground-color: hsla(0, 0%, 100%, 1);
+  --tp-container-background-color: hsla(0, 0%, 10%, 0.5);
+  --tp-container-background-color-active: hsla(0, 0%, 25%, 0.5);
+  --tp-container-background-color-focus: hsla(0, 0%, 20%, 0.5);
+  --tp-container-background-color-hover: hsla(0, 0%, 15%, 0.5);
+  --tp-container-foreground-color: hsla(0, 0%, 100%, 1);
+  --tp-groove-foreground-color: hsla(0, 0%, 10%, 1);
+  --tp-input-background-color: hsla(0, 0%, 90%, 1);
+  --tp-input-background-color-active: hsla(0, 0%, 85%, 1);
+  --tp-input-background-color-focus: hsla(0, 0%, 80%, 1);
+  --tp-input-background-color-hover: hsla(0, 0%, 75%, 1);
+  --tp-input-foreground-color: hsla(0, 0%, 0%, 1);
+  --tp-label-foreground-color: hsla(0, 0%, 100%, 1);
+  --tp-monitor-background-color: hsla(0, 0%, 8%, 1);
+  --tp-monitor-foreground-color: hsla(0, 3%, 90%, 1);
+}
+
+/* Invert the tweak panel slider background */
+.tp-sldv_t::before {
+  background-color: var(--in-fg) !important;
+}
+
+.tp-sldv_k::before {
+  background-color: var(--in-bg) !important;
 }
 
 .ui-editor-header {
@@ -3199,31 +3231,6 @@ span.ui-stats-header-value {
   font-weight: bold;
   font-size: 16px;
   padding: 8px;
-}
-
-.ui-editor-info {
-  background: rgba(0, 0, 0, 0.4);
-  border-radius: 5px;
-  font-size: 36px;
-  margin-bottom: 8px;
-  padding: 8px;
-  max-height: 500px;
-  overflow: auto;
-  scrollbar-width: thin;
-  scrollbar-color: white transparent;
-}
-
-.ui-editor-list {
-  margin: 0px;
-  list-style: none;
-}
-
-.ui-editor-list ul {
-  padding-inline-start: 15px;
-}
-
-#ui-editor-info-list {
-  padding: 0px;
 }
 
 /*

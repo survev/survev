@@ -19,13 +19,6 @@ declare global {
     }
 
     interface Window {
-        login: () => void;
-        deleteAccount: () => void;
-        deleteItems: () => void;
-        unlock: (item: string) => void;
-        setQuest: (questType: string, idx: number) => void;
-        refreshQuest: (idx: number) => void;
-        setPassUnlock: (questType: string) => void;
         mobile?: boolean;
         webkitAudioContext?: AudioContext;
         CP: any;

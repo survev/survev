@@ -37,7 +37,7 @@ interface FlareBullet extends BulletDef {
 export class FlareBarn {
     bullets: FlareBullet[] = [];
 
-    addFlare(bullet: Bullet, playerBarn: PlayerBarn, _renderer: unknown) {
+    addFlare(bullet: Bullet, playerBarn: PlayerBarn) {
         let b: FlareBullet | null = null;
         for (let i = 0; i < this.bullets.length; i++) {
             if (!this.bullets[i].alive && !this.bullets[i].collided) {
@@ -114,16 +114,7 @@ export class FlareBarn {
         b.trailContainer.visible = true;
     }
 
-    m_update(
-        dt: number,
-        _playerBarn: unknown,
-        map: Map,
-        _camera: unknown,
-        activePlayer: Player,
-        renderer: Renderer,
-        _particleBarn: unknown,
-        _audioManager: unknown,
-    ) {
+    m_update(dt: number, map: Map, activePlayer: Player, renderer: Renderer) {
         for (let h = 0; h < this.bullets.length; h++) {
             const d = this.bullets[h];
             if (d.collided) {

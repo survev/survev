@@ -8,43 +8,10 @@ import { atlasBuilderPlugin } from "./atlas-builder/vitePlugin";
 import { codefendPlugin } from "./vite-plugins/codefendPlugin";
 import { ejsPlugin } from "./vite-plugins/ejsPlugin";
 
-export const SplashThemes = {
-    main: {
-        menuMusic: "audio/ambient/menu_music_01.mp3",
-        splashBg: "/img/main_splash.png",
-    },
-    easter: {
-        menuMusic: "audio/ambient/menu_music_01.mp3",
-        splashBg: "/img/main_splash_easter.png",
-    },
-    halloween: {
-        menuMusic: "audio/ambient/menu_music_02.mp3",
-        splashBg: "/img/main_splash_halloween.png",
-    },
-    faction: {
-        menuMusic: "audio/ambient/menu_music_01.mp3",
-        splashBg: "/img/main_splash_0_7_0.png",
-    },
-    cobalt: {
-        menuMusic: "audio/ambient/menu_music_01.mp3",
-        splashBg: "/img/main_splash_cobalt.png",
-    },
-    snow: {
-        menuMusic: "audio/ambient/menu_music_01.mp3",
-        splashBg: "/img/main_splash_0_6_10.png",
-    },
-    spring: {
-        menuMusic: "audio/ambient/menu_music_01.mp3",
-        splashBg: "/img/main_splash_7_3.png",
-    },
-};
-
 export default defineConfig(({ mode }) => {
     const isDev = mode === "development";
 
     const Config = getConfig(!isDev, "");
-
-    const selectedTheme = SplashThemes[Config.clientTheme];
 
     process.env.VITE_ADIN_PLAY_SCRIPT = "";
     process.env.VITE_AIP_PLACEMENT_ID = "";
@@ -92,7 +59,6 @@ export default defineConfig(({ mode }) => {
     }
 
     process.env.VITE_GAME_VERSION = version;
-    process.env.VITE_BACKGROUND_IMG = selectedTheme.splashBg;
 
     const plugins: Plugin[] = [ejsPlugin(), ...atlasBuilderPlugin()];
 
@@ -170,7 +136,6 @@ export default defineConfig(({ mode }) => {
                     https: data.https,
                 };
             }),
-            MENU_MUSIC: JSON.stringify(selectedTheme.menuMusic),
             AIP_PLACEMENT_ID: JSON.stringify(Config.secrets.AIP_PLACEMENT_ID),
             VITE_GAMEMONETIZE_ID: JSON.stringify(Config.secrets.GAMEMONETIZE_ID),
             IS_DEV: isDev,

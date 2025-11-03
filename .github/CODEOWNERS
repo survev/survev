@@ -1,0 +1,11 @@
+# This file manages code responsibility in this project.
+# For reference, each line consists of a glob match pattern followed by a user selector.
+
+# Users that match the given selection pattern will be automatically requested for a review
+# when a pull request is made which modifies any of the specified files.
+
+# Global owners.
+* @leia-uwu
+
+# API
+/server/src/api/ @leia-uwu @lmssiehdev

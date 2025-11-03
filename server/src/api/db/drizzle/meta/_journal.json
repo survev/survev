@@ -22,6 +22,20 @@
       "when": 1751241098146,
       "tag": "0002_brown_lizard",
       "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "7",
+      "when": 1756778270320,
+      "tag": "0003_cool_skrulls",
+      "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "7",
+      "when": 1760380431165,
+      "tag": "0004_famous_mulholland_black",
+      "breakpoints": true
     }
   ]
 }

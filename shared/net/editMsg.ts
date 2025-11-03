@@ -1,52 +1,81 @@
 import type { AbstractMsg, BitStream } from "./net";
 
 export class EditMsg implements AbstractMsg {
-    overrideZoom = false;
+    zoomEnabled = false;
     zoom = 1;
-    speed = -1;
-    layer = 0;
-    cull = false;
+
+    speedEnabled = false;
+    speed = 0;
+
     loadNewMap = false;
     newMapSeed = 0;
-    printLootStats = false;
+
     spawnLootType = "";
+    promoteToRole = false;
     promoteToRoleType = "";
-    spectatorMode = false;
+
+    toggleLayer = false;
+
+    noClip = false;
+    teleportToPings = false;
     godMode = false;
+    moveObjs = false;
 
     serialize(s: BitStream) {
-        s.writeBoolean(this.overrideZoom);
-        s.writeBoolean(this.cull);
-        s.writeFloat32(this.zoom);
-        s.writeFloat32(this.speed);
-        s.writeBits(this.layer, 2);
+        s.writeBoolean(this.zoomEnabled);
+        if (this.zoomEnabled) {
+            s.writeUint8(this.zoom);
+        }
 
-        s.writeBoolean(this.printLootStats);
+        s.writeBoolean(this.speedEnabled);
+        if (this.speedEnabled) {
+            s.writeFloat32(this.speed);
+        }
 
         s.writeBoolean(this.loadNewMap);
-        s.writeUint32(this.newMapSeed);
+        if (this.loadNewMap) {
+            s.writeUint32(this.newMapSeed);
+        }
 
         s.writeGameType(this.spawnLootType);
-        s.writeGameType(this.promoteToRoleType);
-        s.writeBoolean(this.spectatorMode);
+        s.writeBoolean(this.promoteToRole);
+        if (this.promoteToRole) {
+            s.writeGameType(this.promoteToRoleType);
+        }
+        s.writeBoolean(this.toggleLayer);
+
+        s.writeBoolean(this.noClip);
+        s.writeBoolean(this.teleportToPings);
         s.writeBoolean(this.godMode);
+        s.writeBoolean(this.moveObjs);
     }
 
     deserialize(s: BitStream) {
-        this.overrideZoom = s.readBoolean();
-        this.cull = s.readBoolean();
-        this.zoom = s.readFloat32();
-        this.speed = s.readFloat32();
-        this.layer = s.readBits(2);
+        this.zoomEnabled = s.readBoolean();
+        if (this.zoomEnabled) {
+            this.zoom = s.readUint8();
+        }
 
-        this.printLootStats = s.readBoolean();
+        this.speedEnabled = s.readBoolean();
+        if (this.speedEnabled) {
+            this.speed = s.readFloat32();
+        }
 
         this.loadNewMap = s.readBoolean();
-        this.newMapSeed = s.readUint32();
+        if (this.loadNewMap) {
+            this.newMapSeed = s.readUint32();
+        }
 
         this.spawnLootType = s.readGameType();
-        this.promoteToRoleType = s.readGameType();
-        this.spectatorMode = s.readBoolean();
+        this.promoteToRole = s.readBoolean();
+        if (this.promoteToRole) {
+            this.promoteToRoleType = s.readGameType();
+        }
+        this.toggleLayer = s.readBoolean();
+
+        this.noClip = s.readBoolean();
+        this.teleportToPings = s.readBoolean();
         this.godMode = s.readBoolean();
+        this.moveObjs = s.readBoolean();
     }
 }

@@ -9,6 +9,7 @@ const mapDef: PartialMapDef = {
         name: "Cobalt",
         icon: "img/gui/cobalt.svg",
         buttonCss: "btn-mode-cobalt",
+        backgroundImg: "img/main_splash_cobalt.png",
     },
     assets: {
         audio: [

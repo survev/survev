@@ -1,39 +1,71 @@
+import { GameConfig } from "../../shared/gameConfig";
 import loadout from "../../shared/utils/loadout";
 import { util } from "../../shared/utils/util";
 import type { Locale } from "./ui/localization";
 
-const defaultDebugConfig = {
-    /** drag and drop loot, obstacles, and buildings */
+export const debugToolsConfig = {
+    enabled: false,
+
+    zoomEnabled: false,
+    zoom: GameConfig.scopeZoomRadius.desktop["1xscope"],
+
+    speedEnabled: false,
+    speed: GameConfig.player.moveSpeed,
+
+    mapSeed: 0,
+
+    loot: "",
+    role: "",
+
+    noClip: false,
     godMode: false,
-    spectatorMode: false,
-    overrideZoom: false,
-    cull: false,
-    render: {
-        enabled: false,
-        players: false,
-        obstacles: false,
-        loot: false,
-        explosions: false,
-        rivers: false,
-        buildings: {
-            buildingBounds: false,
-            obstacleBounds: false,
-            bridge: false,
-            waterEdge: false,
-            ceiling: false,
-            floors: false,
-        },
-        structures: {
-            buildingBounds: false,
-            obstacleBounds: false,
-            bridge: false,
-            waterEdge: false,
-            stairs: false,
-        },
+    teleportToPings: false,
+    moveObjs: false,
+};
+
+export const debugRenderConfig = {
+    enabled: false,
+    players: false,
+    obstacles: false,
+    loot: false,
+    explosions: false,
+    rivers: false,
+    buildings: {
+        buildingBounds: false,
+        obstacleBounds: false,
+        bridge: false,
+        waterEdge: false,
+        ceiling: false,
+        floors: false,
+    },
+    structures: {
+        buildingBounds: false,
+        obstacleBounds: false,
+        bridge: false,
+        waterEdge: false,
+        stairs: false,
     },
 };
 
-export type DebugOptions = typeof defaultDebugConfig;
+export const debugHUDConfig = {
+    enabled: false,
+    position: false,
+    objectPools: false,
+    fps: {
+        show: false,
+        showGraph: false,
+    },
+    ping: {
+        show: false,
+        showGraph: false,
+    },
+    netIn: {
+        show: false,
+        showGraph: false,
+    },
+};
+
+export type DebugRenderOpts = typeof debugRenderConfig;
 
 const defaultConfig = {
     muteAudio: false,
@@ -63,10 +95,13 @@ const defaultConfig = {
     loadout: loadout.defaultLoadout(),
     sessionCookie: "" as string | null,
     binds: "",
+    cachedBgImg: "img/main_splash.png",
     version: 1,
     /* STRIP_FROM_PROD_CLIENT:START */
-    debug: defaultDebugConfig,
+    debugTools: debugToolsConfig,
+    debugRenderer: debugRenderConfig,
     /* STRIP_FROM_PROD_CLIENT:END */
+    debugHUD: debugHUDConfig,
 };
 
 export type ConfigType = typeof defaultConfig;
@@ -153,6 +188,9 @@ export class ConfigManager {
     }
 
     checkUpgradeConfig() {
+        // validation logic
+        this.config.loadout = loadout.validate(this.config.loadout);
+
         // seem not to be implemeted yet
         // this.get("version");
         // // @TODO: Put upgrade code here

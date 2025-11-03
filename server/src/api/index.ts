@@ -10,7 +10,7 @@ import { z } from "zod";
 import { version } from "../../../package.json";
 import {
     type FindGameResponse,
-    type Info,
+    type SiteInfoRes,
     zFindGameBody,
 } from "../../../shared/types/api";
 import { Config } from "../config";
@@ -80,7 +80,7 @@ app.route("/private/", PrivateRouter);
 server.init(app, upgradeWebSocket);
 
 app.get("/api/site_info", (c) => {
-    return c.json<Info>(server.getSiteInfo(), 200);
+    return c.json<SiteInfoRes>(server.getSiteInfo(), 200);
 });
 
 // not using the middleware here to not add extra indentation... smh

@@ -48,6 +48,7 @@ export function forbidden(res: HttpResponse): void {
 }
 
 export function returnJson(res: HttpResponse, data: Record<string, unknown>): void {
+    if (res.aborted) return;
     res.cork(() => {
         if (res.aborted) return;
         res.writeHeader("Content-Type", "application/json").end(JSON.stringify(data));
@@ -427,9 +428,34 @@ export async function verifyTurnsStile(token: string, ip: string): Promise<boole
     return true;
 }
 
+function fetchWithRetry(input: RequestInfo | URL, init?: RequestInit): Promise<Response> {
+    return new Promise((resolve, reject) => {
+        const tryFetch = (attempts: number) => {
+            fetch(input, init)
+                .then(resolve)
+                .catch((err) => {
+                    if (attempts < 3) {
+                        defaultLogger.warn(`Failed to fetch ${input}, retrying`);
+                        setTimeout(
+                            () => {
+                                tryFetch(++attempts);
+                            },
+                            (attempts + 1) * 1000,
+                        );
+                    } else {
+                        reject(err);
+                    }
+                });
+        };
+
+        tryFetch(0);
+    });
+}
+
 export const apiPrivateRouter = hc<PrivateRouteApp>(
     `${Config.gameServer.apiServerUrl}/private`,
     {
+        fetch: fetchWithRetry,
         headers: {
             "survev-api-key": Config.secrets.SURVEV_API_KEY,
         },

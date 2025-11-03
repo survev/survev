@@ -16,7 +16,7 @@ export class PingTest {
             ping: 9999,
             active: false,
             complete: false,
-            ws: null as unknown as WebSocket | null,
+            ws: null as WebSocket | null,
             sendDelay: 0,
             sendTime: 0,
             sendCount: 0,

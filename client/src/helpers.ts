@@ -46,7 +46,7 @@ export const helpers = {
         const mapKeys = Object.keys(MapDefs);
         for (let i = 0; i < mapKeys.length; i++) {
             const mapKey = mapKeys[i];
-            const mapDef = MapDefs[mapKey as unknown as keyof typeof MapDefs];
+            const mapDef = MapDefs[mapKey as keyof typeof MapDefs];
             if (
                 !gameModes.find((x) => {
                     return x.mapId == mapDef.mapId;
@@ -150,7 +150,7 @@ export const helpers = {
                 el.contentEditable = editable;
                 el.readOnly = readOnly;
             } else {
-                $temp.select();
+                $temp.trigger("select");
             }
             document.execCommand("copy");
             $temp.remove();

@@ -9,6 +9,7 @@ if (fs.existsSync("./dist")) {
 const esbuildConfig: BuildOptions = {
     bundle: true,
     minify: false,
+    minifySyntax: true,
     outdir: "./dist",
     platform: "node",
     packages: "external",

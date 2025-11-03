@@ -11,6 +11,7 @@ const mapDef: PartialMapDef = {
         name: "Halloween",
         icon: "img/gui/pumpkin-play.svg",
         buttonCss: "btn-mode-halloween",
+        backgroundImg: "img/main_splash_halloween.png",
     },
     assets: {
         audio: [

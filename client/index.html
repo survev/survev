@@ -30,12 +30,6 @@
 
     <link href="css/app.css" rel="stylesheet">
     <link href="css/game.css" rel="stylesheet">
-
-    <style type="text/css">
-      #background {
-        background-image: url(%VITE_BACKGROUND_IMG%);
-      }
-    </style>
   </head>
   <body>
     <div id="preroll-wrapper">
@@ -631,9 +625,6 @@
           <div class="ui-editor-header">EDIT MODE</div>
         </div>
         <div id="ui-editor-top-right">
-          <div class="ui-editor-info">
-            <ul id="ui-editor-info-list" class="ui-editor-list"></ul>
-          </div>
         </div>
       </div>
     </div>
@@ -794,7 +785,7 @@
               <div class="login-options-content"></div>
             </div>
           </div>
-        </div> 
+        </div>
 
         <div id="start-main-center">
           <div id="start-row-header">
@@ -1048,7 +1039,23 @@
                 <div id="news-block" class="menu-block">
                   <div id="news">
                     <h3 class="news-header">What's New!</h3>
-                    <div id="news-current" data-date="2025-07-23">
+                    <div id="news-current" data-date="2025-10-XX">
+                      <small class="news-date">October Xth, 2025</small>
+                      <p class="news-paragraph"><strong>Anniversary Harvest</strong></p>
+                      <p class="news-paragraph">A strange irregularity emanating from the center of the island has led to the temporal displacement of survevrs back to <span class="highlight">October 2017</span> … perfectly coinciding with <span class="highlight">surviv’s birthday!</span></p>
+                      <p class="news-paragraph">Celebrate eight years of chicken dinners with a new limited-time gamemode simulating the Early Access version of the game, featuring <span class="highlight">silos, boxes, trees...</span> and the key to victory: <span class="highlight">weapons</span>! Note that our lack of research funds back then also means that the <span class="highlight">barrels don't explode.</span></p>
+                      <p class="news-paragraph">On top of that, a new and improved <span class="highlight">fall map</span> has returned, with additional obstacles and a <span class="highlight">new type of squash</span>, providing even more loot for you.</p>
+                      <p class="news-paragraph">Thanks to everyone for being a part of this community, and go hunting for the chicken dinner! Beware of the approaching gloom...</p>
+                    </div>
+                    <div id="news-current" data-date="2025-09-09">
+                      <small class="news-date">September 9th, 2025</small>
+                      <p class="news-paragraph"><strong>Remnants</strong></p>
+                      <p class="news-paragraph">The war goes quiet once more after both sides exhausted their weaponry (and scheduled fighter flights).</p>
+                      <p class="news-paragraph">Luckily, there's still tons of reserve airdrops, so go get rid of them in the <span class="highlight">Desert</span>!</p>
+                      <p class="news-paragraph">The <span class="highlight">Mk45G</span> and <span class="highlight">Desert Camo</span> have also been made more common.</p>
+                      <p class="news-paragraph">Stay tuned for new content, with the return of our <span class="highlight">arboreal</span> and <span class="highlight">veld</span> landscapes...<p>
+                    </div>
+                    <div data-date="2025-07-23">
                       <small class="news-date">July 23, 2025</small>
                       <p class="news-paragraph"><strong>New Leadership</strong></p>
                       <p class="news-paragraph">50v50 is back for another round, and getting straight to fighting is easier than ever: select guns are now <span class="highlight">bundled with ammo</span>.</p>
@@ -1439,6 +1446,16 @@
         </div>
       </div>
     </div>
+    <script>
+      // load a cached background image as earlier as possible
+      // so we dont have to wait for API to reply to show a background
+      const config = JSON.parse(localStorage.getItem("surviv_config") || "{}");
+      const bgImg = config.cachedBgImg || "img/main_splash.png";
+      const bg = document.getElementById("background");
+      if (bg) {
+          bg.style.backgroundImage = `url(${bgImg})`;
+      }
+    </script>
     <script type="module" src="src/main.ts"></script>
   </body>
 </html>

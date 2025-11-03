@@ -40,8 +40,8 @@ import { type Vec2, v2 } from "../../../shared/utils/v2";
 import { Animations, Bones, IdlePoses, Pose } from "../animData";
 import type { AudioManager } from "../audioManager";
 import type { Camera } from "../camera";
-import type { DebugOptions } from "../config";
-import { debugLines } from "../debugLines";
+import type { DebugRenderOpts } from "../config";
+import { debugLines } from "../debug/debugLines";
 import { device } from "../device";
 import { errorLogManager } from "../errorLogs";
 import type { Ctx } from "../game";
@@ -592,7 +592,7 @@ export class Player implements AbstractObject {
         }
     }
 
-    m_setLocalData(data: LocalDataWithDirty, _playerBarn: unknown) {
+    m_setLocalData(data: LocalDataWithDirty) {
         const scopeOld = this.m_localData.m_scope;
 
         if (data.healthDirty) {
@@ -692,7 +692,7 @@ export class Player implements AbstractObject {
         );
         const pos = v2.add(this.m_pos, v2.rotate(off, ang));
         const rad = meleeDef.attack.rad;
-        return collider.createCircle(pos, rad, 0);
+        return collider.createCircle(pos, rad);
     }
 
     m_hasActivePan() {
@@ -1285,7 +1285,13 @@ export class Player implements AbstractObject {
 
         this.updateAura(dt, isActivePlayer, activePlayer);
 
-        this.Zr(inputBinds.input, camera, isActivePlayer, isSpectating, displayingStats);
+        this.updateRotation(
+            inputBinds.input,
+            camera,
+            isActivePlayer,
+            isSpectating,
+            displayingStats,
+        );
 
         // @NOTE: There's an off-by-one frame issue for effects spawned earlier
         // in this frame that reference renderLayer / zOrd / zIdx. This issue is
@@ -1319,7 +1325,7 @@ export class Player implements AbstractObject {
         this.isNew = false;
     }
 
-    render(camera: Camera, debug: DebugOptions) {
+    render(camera: Camera, debug: DebugRenderOpts) {
         const screenPos = camera.m_pointToScreen(this.m_visualPos);
         const screenScale = camera.m_pixels(1);
         this.container.position.set(screenPos.x, screenPos.y);
@@ -1328,7 +1334,7 @@ export class Player implements AbstractObject {
         this.auraContainer.position.set(screenPos.x, screenPos.y);
         this.auraContainer.scale.set(screenScale, screenScale);
 
-        if (IS_DEV && debug.render.players) {
+        if (IS_DEV && debug.players) {
             debugLines.addCircle(this.m_pos, this.m_rad, 0xff0000, 0);
 
             const weapDef = GameObjectDefs[this.m_netData.m_activeWeapon];
@@ -1826,7 +1832,7 @@ export class Player implements AbstractObject {
         }
     }
 
-    Zr(
+    updateRotation(
         inputManager: InputHandler,
         camera: Camera,
         isActivePlayer: boolean,
@@ -2208,7 +2214,7 @@ export class Player implements AbstractObject {
         }
     }
 
-    animSetThrowableState(_animCtx: unknown, args: { state: string }) {
+    animSetThrowableState(_animCtx: Partial<AnimCtx>, args: { state: string }) {
         this.throwableState = args.state;
     }
 
@@ -2549,12 +2555,9 @@ export class PlayerBarn {
     playerStatus: Record<number, PlayerStatus> = {};
     anonPlayerNames = false;
 
-    onMapLoad(_e: unknown) {}
-
     m_update(
         dt: number,
         activeId: number,
-        _r: unknown,
         renderer: Renderer,
         particleBarn: ParticleBarn,
         camera: Camera,
@@ -2662,7 +2665,7 @@ export class PlayerBarn {
         }
     }
 
-    m_render(camera: Camera, debug: DebugOptions) {
+    m_render(camera: Camera, debug: DebugRenderOpts) {
         const players = this.playerPool.m_getPool();
         for (let i = 0; i < players.length; i++) {
             const p = players[i];
@@ -2913,7 +2916,6 @@ export class PlayerBarn {
     addDeathEffect(
         targetId: number,
         killerId: number,
-        _sourceType: unknown,
         audioManager: AudioManager,
         particleBarn: ParticleBarn,
     ) {

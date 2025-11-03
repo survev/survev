@@ -2,12 +2,13 @@ import * as PIXI from "pixi.js-legacy";
 import { MapObjectDefs } from "../../../shared/defs/mapObjectDefs";
 import type { DecalDef } from "../../../shared/defs/mapObjectsTyping";
 import type { ObjectData, ObjectType } from "../../../shared/net/objectSerializeFns";
-import type { ColliderWithHeight } from "../../../shared/utils/coldet";
+import type { Collider } from "../../../shared/utils/coldet";
 import { collider } from "../../../shared/utils/collider";
 import { math } from "../../../shared/utils/math";
 import { util } from "../../../shared/utils/util";
 import { type Vec2, v2 } from "../../../shared/utils/v2";
 import type { Camera } from "../camera";
+import type { DebugRenderOpts } from "../config";
 import type { Ctx } from "../game";
 import type { Map } from "../map";
 import type { Renderer } from "../renderer";
@@ -36,7 +37,7 @@ class Decal implements AbstractObject {
     scale!: number;
     layer!: number;
     goreKills!: number;
-    collider!: ColliderWithHeight;
+    collider!: Collider;
     surface!: DecalDef["surface"] | null;
 
     m_init() {
@@ -82,12 +83,12 @@ class Decal implements AbstractObject {
             this.isNew = isNew;
             if (this.isNew) {
                 this.decalRender = ctx.decalBarn.allocDecalRender();
-                this.decalRender.init(this, ctx.map, ctx.renderer);
+                this.decalRender.init(this, ctx.map);
             }
         }
     }
 
-    update(dt: number, _map?: unknown) {
+    update(dt: number) {
         if (this.hasGore) {
             const def = MapObjectDefs[this.type] as DecalDef;
             let goreTarget = math.delerp(
@@ -163,7 +164,7 @@ class DecalRender {
         this.sprite.visible = false;
     }
 
-    init(decal: Decal, map: Map, _renderer: unknown) {
+    init(decal: Decal, map: Map) {
         const def = MapObjectDefs[decal.type] as DecalDef;
 
         this.pos = v2.copy(decal.pos);
@@ -270,7 +271,7 @@ export class DecalBarn {
         return decalRender;
     }
 
-    m_update(dt: number, camera: Camera, renderer: Renderer, _debug: unknown) {
+    m_update(dt: number, camera: Camera, renderer: Renderer) {
         const decals = this.decalPool.m_getPool();
         for (let i = 0; i < decals.length; i++) {
             const decal = decals[i];
@@ -286,5 +287,5 @@ export class DecalBarn {
         }
     }
 
-    m_render(_camera: unknown, _debug: unknown, _layer: number) {}
+    m_render(_camera: Camera, _debug: DebugRenderOpts, _layer: number) {}
 }

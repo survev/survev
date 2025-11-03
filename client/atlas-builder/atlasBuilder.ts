@@ -8,6 +8,7 @@ import { loadImage } from "canvas";
 import type { ISpritesheetData } from "pixi.js-legacy";
 import type { Atlas } from "../../shared/defs/mapDefs";
 import { Logger } from "../../shared/utils/logger";
+import { util } from "../../shared/utils/util";
 import { Atlases, type AtlasRes, scaledSprites } from "./atlasDefs";
 import type { MainToWorkerMsg, WorkerToMainMsg } from "./atlasWorker";
 import type { Edges } from "./detectEdges";
@@ -164,7 +165,7 @@ export class ImageManager {
             const date = Date.now() - stat.atimeMs;
 
             // remove files that are over 7 days old and are invalid cache
-            if (date > 7 * 24 * 60 * 60 * 1000) {
+            if (date > util.daysToMs(7)) {
                 const hashKey = file.replace(".png", "");
                 const existsInCache = validCachedImages.has(hashKey);
 
@@ -226,6 +227,10 @@ export class AtlasManager {
         let atlasHash = "";
         for (const file of atlasDef.images) {
             const imagePath = Path.join(imageFolder, file);
+            if (!fs.existsSync(imagePath)) {
+                atlasLogger.error(`File ${imagePath} doesn't exist`);
+                continue;
+            }
             const data = fs.readFileSync(imagePath);
 
             const scale = scaledSprites[file] ?? 1;
@@ -352,7 +357,7 @@ export class AtlasManager {
             const date = Date.now() - stat.atimeMs;
 
             // remove atlases that are over 7 days old and are invalid cache
-            if (date > 7 * 24 * 60 * 60 * 1000) {
+            if (date > util.daysToMs(7)) {
                 const existsInCache = validCachedImages.has(folder);
 
                 if (!existsInCache) {

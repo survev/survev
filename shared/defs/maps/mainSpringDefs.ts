@@ -3,6 +3,9 @@ import type { MapDef } from "../mapDefs";
 import { Main, type PartialMapDef } from "./baseDefs";
 
 const mapDef: PartialMapDef = {
+    desc: {
+        backgroundImg: "img/main_splash_7_3.png",
+    },
     assets: {
         audio: [],
         atlases: ["gradient", "loadout", "shared", "main"],

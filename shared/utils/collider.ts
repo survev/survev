@@ -1,4 +1,4 @@
-import { type AABB, type Collider, type ColliderWithHeight, coldet } from "./coldet";
+import { type AABB, type Collider, coldet } from "./coldet";
 import { math } from "./math";
 import { type Vec2, v2 } from "./v2";
 
@@ -12,60 +12,57 @@ export const collider = {
         Aabb: 1 as const,
     },
 
-    createCircle(pos: Vec2, rad: number, height = 0) {
+    createCircle(pos: Vec2, rad: number) {
         return {
             type: collider.Type.Circle,
             pos: v2.copy(pos),
             rad,
-            height,
         };
     },
 
-    createAabb(min: Vec2, max: Vec2, height = 0) {
+    createAabb(min: Vec2, max: Vec2) {
+        // console.log(min, max)
         return {
             type: collider.Type.Aabb,
             min: v2.copy(min),
             max: v2.copy(max),
-            height,
         };
     },
 
-    createAabbExtents(pos: Vec2, extent: Vec2, height?: number) {
+    createAabbExtents(pos: Vec2, extent: Vec2) {
         const min = v2.sub(pos, extent);
         const max = v2.add(pos, extent);
-        return collider.createAabb(min, max, height);
+        return collider.createAabb(min, max);
     },
 
-    createBounding(colliders: ColliderWithHeight[]) {
+    createBounding(colliders: Collider[]) {
         if (colliders.length === 1) {
             return collider.copy(colliders[0]);
         }
         const aabbs: AABB[] = [];
-        let maxHeight = 0.0;
         for (let i = 0; i < colliders.length; i++) {
             const col = colliders[i];
             aabbs.push(collider.toAabb(col));
-            maxHeight = math.max(maxHeight, col.height!);
         }
         const bound = coldet.boundingAabb(aabbs);
-        return collider.createAabb(bound.min, bound.max, maxHeight);
+        return collider.createAabb(bound.min, bound.max);
     },
 
-    toAabb(c: ColliderWithHeight) {
+    toAabb(c: Collider) {
         if (c.type === collider.Type.Aabb) {
-            return collider.createAabb(c.min, c.max, c.height);
+            return collider.createAabb(c.min, c.max);
         }
         const aabb = coldet.circleToAabb(c.pos, c.rad);
-        return collider.createAabb(aabb.min, aabb.max, c.height);
+        return collider.createAabb(aabb.min, aabb.max);
     },
 
-    copy(c: ColliderWithHeight) {
+    copy(c: Collider) {
         return c.type === collider.Type.Circle
-            ? collider.createCircle(c.pos, c.rad, c.height)
-            : collider.createAabb(c.min, c.max, c.height);
+            ? collider.createCircle(c.pos, c.rad)
+            : collider.createAabb(c.min, c.max);
     },
 
-    transform(col: ColliderWithHeight, pos: Vec2, rot: number, scale: number) {
+    transform(col: Collider, pos: Vec2, rot: number, scale: number) {
         if (col.type === collider.Type.Aabb) {
             const e = v2.mul(v2.sub(col.max, col.min), 0.5);
             const c = v2.add(col.min, e);
@@ -85,12 +82,11 @@ export const collider = {
                 max.y = math.max(max.y, p.y);
             }
 
-            return collider.createAabb(min, max, col.height);
+            return collider.createAabb(min, max);
         }
         return collider.createCircle(
             v2.add(v2.rotate(v2.mul(col.pos, scale), rot), pos),
             col.rad * scale,
-            col.height,
         );
     },
 

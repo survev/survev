@@ -3,7 +3,7 @@ import { MapObjectDefs } from "../../../shared/defs/mapObjectDefs";
 import type { BuildingDef } from "../../../shared/defs/mapObjectsTyping";
 import type { FloorImage } from "../../../shared/defs/types/building";
 import type { ObjectData, ObjectType } from "../../../shared/net/objectSerializeFns";
-import type { Collider, ColliderWithHeight } from "../../../shared/utils/coldet";
+import type { Collider } from "../../../shared/utils/coldet";
 import { collider } from "../../../shared/utils/collider";
 import { collisionHelpers } from "../../../shared/utils/collisionHelpers";
 import { mapHelpers } from "../../../shared/utils/mapHelpers";
@@ -12,14 +12,14 @@ import { util } from "../../../shared/utils/util";
 import { type Vec2, v2 } from "../../../shared/utils/v2";
 import type { AudioManager } from "../audioManager";
 import type { Camera } from "../camera";
-import type { DebugOptions } from "../config";
+import type { DebugRenderOpts } from "../config";
 import {
     renderBridge,
     renderMapBuildingBounds,
     renderMapObstacleBounds,
     renderWaterEdge,
-} from "../debugHelpers";
-import { debugLines } from "../debugLines";
+} from "../debug/debugHelpers";
+import { debugLines } from "../debug/debugLines";
 import type { Ctx } from "../game";
 import type { SoundHandle } from "../lib/createJS";
 import type { Map } from "../map";
@@ -110,7 +110,7 @@ export class Building implements AbstractObject {
     surfaces!: Array<{
         type: string;
         data: Record<string, unknown>;
-        colliders: ColliderWithHeight[];
+        colliders: Collider[];
     }>;
 
     m_init() {
@@ -377,11 +377,10 @@ export class Building implements AbstractObject {
         map: Map,
         particleBarn: ParticleBarn,
         audioManager: AudioManager,
-        _ambience: unknown,
         activePlayer: Player,
         renderer: Renderer,
         camera: Camera,
-        debug: DebugOptions,
+        debug: DebugRenderOpts,
     ) {
         // Puzzle effects
         if (this.hasPuzzle) {
@@ -475,7 +474,7 @@ export class Building implements AbstractObject {
                     vision.width! * 2,
                     vision.dist!,
                     5,
-                    debug.render.buildings?.ceiling,
+                    debug.buildings?.ceiling,
                     debugLines,
                 )
             ) {
@@ -660,21 +659,21 @@ export class Building implements AbstractObject {
         sprite.alpha = sprite.imgAlpha * alpha;
     }
 
-    render(_camera: Camera, debug: DebugOptions, layer: number) {
+    render(_camera: Camera, debug: DebugRenderOpts, layer: number) {
         if (IS_DEV && layer === this.layer) {
-            if (debug.render.buildings?.buildingBounds) {
+            if (debug.buildings?.buildingBounds) {
                 renderMapBuildingBounds(this);
             }
-            if (debug.render.buildings?.obstacleBounds) {
+            if (debug.buildings?.obstacleBounds) {
                 renderMapObstacleBounds(this);
             }
-            if (debug.render.buildings?.bridge) {
+            if (debug.buildings?.bridge) {
                 renderBridge(this);
             }
-            if (debug.render.buildings.waterEdge) {
+            if (debug.buildings.waterEdge) {
                 renderWaterEdge(this);
             }
-            if (debug.render.buildings?.ceiling) {
+            if (debug.buildings?.ceiling) {
                 for (let i = 0; i < this.ceiling.zoomRegions.length; i++) {
                     const region = this.ceiling.zoomRegions[i];
                     if (region.zoomIn) {
@@ -686,7 +685,7 @@ export class Building implements AbstractObject {
                 }
             }
 
-            if (debug.render.buildings?.floors) {
+            if (debug.buildings?.floors) {
                 for (let i = 0; i < this.surfaces.length; i++) {
                     const colliders = this.surfaces[i].colliders;
                     for (let j = 0; j < colliders.length; j++) {

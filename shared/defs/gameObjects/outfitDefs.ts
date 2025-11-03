@@ -1,5 +1,5 @@
 import { Rarity } from "../../gameConfig";
-import { defineSkin } from "../../utils/util";
+import { type DeepPartial, util } from "../../utils/util";
 
 export interface OutfitDef {
     readonly type: "outfit";
@@ -34,8 +34,8 @@ export interface OutfitDef {
     ghillie?: boolean;
 }
 
-function defineOutfitSkin(baseType: string, params: any) {
-    return defineSkin<OutfitDef>(BaseDefs, baseType, params);
+function defineOutfitSkin(baseType: string, params: DeepPartial<OutfitDef>): OutfitDef {
+    return util.mergeDeep({}, BaseDefs[baseType], params);
 }
 const BaseDefs: Record<string, OutfitDef> = {
     outfitBase: {
@@ -781,6 +781,25 @@ const SkinDefs: Record<string, OutfitDef> = {
         lootImg: {
             sprite: "loot-shirt-outfitCobaltShell.img",
             tint: 0xffffff,
+        },
+    }),
+    outfitFragtastic: defineOutfitSkin("outfitBase", {
+        name: "Fragtastic",
+        rarity: Rarity.Common,
+        lore: "Pin not included. Maybe.",
+        skinImg: {
+            baseTint: 0x62591f,
+            baseSprite: "player-base-01.img",
+            handTint: 0x7f742a,
+            handSprite: "player-hands-01.img",
+            footTint: 0x7f742a,
+            footSprite: "player-feet-01.img",
+            backpackTint: 0x999999,
+            backpackSprite: "player-circle-base-01.img",
+        },
+        lootImg: {
+            sprite: "loot-shirt-01.img",
+            tint: 0x938632,
         },
     }),
     outfitCarbonFiber: defineOutfitSkin("outfitBase", {

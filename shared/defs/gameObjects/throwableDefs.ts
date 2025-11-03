@@ -367,7 +367,7 @@ export const ThrowableDefs: Record<string, ThrowableDef> = {
         explodeOnImpact: false,
         playerCollision: false,
         fuseTime: 13.5,
-        strikeDelay: 2.5,
+        strikeDelay: 3, // Changed this from 2.5 to 3, but it might have been used somewhere else
         aimDistance: 0,
         rad: 1,
         throwPhysics: {
@@ -757,6 +757,8 @@ export const ThrowableDefs: Record<string, ThrowableDef> = {
         inventoryOrder: 1,
         cookable: true,
         noPotatoSwap: true,
+        // HACK: force constant velocity until we figure out how surviv's airstrike bomb velocity really worked
+        forceMaxThrowDistance: true,
         explodeOnImpact: true,
         playerCollision: false,
         fuseTime: 4,

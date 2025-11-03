@@ -40,7 +40,7 @@ export class ProjectileBarn {
         fuseTime: number,
         damageType: number,
         throwDir?: Vec2,
-        gameSourceType?: string,
+        weaponSourceType?: string,
     ): Projectile {
         const proj = new Projectile(
             this.game,
@@ -53,7 +53,7 @@ export class ProjectileBarn {
             fuseTime,
             damageType,
             throwDir,
-            gameSourceType,
+            weaponSourceType,
         );
 
         this.projectiles.push(proj);
@@ -75,7 +75,7 @@ export class Projectile extends BaseGameObject {
     type: string;
     // used for "heavy" potatos and snowballs
     // so the kill source is still the regular potato
-    gameSourceType: string;
+    weaponSourceType: string;
 
     rad: number;
 
@@ -90,9 +90,13 @@ export class Projectile extends BaseGameObject {
     obstacleBellowId = 0;
 
     strobe?: {
-        strobeTicker: number;
+        timeToPing: number;
+        airstrikesTotal: number;
         airstrikesLeft: number;
         airstrikeTicker: number;
+        airstrikeDelay: number;
+        airstrikeOffset: number;
+        rotAngle: number;
     };
 
     constructor(
@@ -106,7 +110,7 @@ export class Projectile extends BaseGameObject {
         fuseTime: number,
         damageType: DamageType,
         throwDir?: Vec2,
-        gameSourceType?: string,
+        weaponSourceType?: string,
     ) {
         super(game, pos);
         this.layer = layer;
@@ -118,7 +122,7 @@ export class Projectile extends BaseGameObject {
         this.damageType = damageType;
         this.dir = v2.normalizeSafe(vel);
         this.throwDir = throwDir ?? v2.copy(this.dir);
-        this.gameSourceType = gameSourceType || this.type;
+        this.weaponSourceType = weaponSourceType || this.type;
 
         const def = GameObjectDefs[type] as ThrowableDef;
         this.velZ = def.throwPhysics.velZ;
@@ -132,36 +136,37 @@ export class Projectile extends BaseGameObject {
     updateStrobe(dt: number): void {
         if (!this.strobe) return;
 
-        if (this.strobe.strobeTicker > 0) {
-            this.strobe.strobeTicker -= dt;
+        if (this.strobe.timeToPing > 0) {
+            this.strobe.timeToPing -= dt;
 
-            if (this.strobe.strobeTicker <= 0) {
+            if (this.strobe.timeToPing <= 0) {
                 this.game.playerBarn.addMapPing("ping_airstrike", this.pos);
-                this.game.planeBarn.addAirStrike(this.pos, this.throwDir, this.playerId);
-                this.strobe.airstrikesLeft--;
-                this.strobe.airstrikeTicker = 0.85;
+                this.strobe.airstrikeTicker = 1;
             }
         }
 
         if (this.strobe.airstrikesLeft == 0) return;
 
         // airstrikes cannot drop until the strobe ticker is finished
-        if (this.strobe.strobeTicker >= 0) return;
+        if (this.strobe.timeToPing >= 0) return;
 
         if (this.strobe.airstrikeTicker > 0) {
             this.strobe.airstrikeTicker -= dt;
 
             if (this.strobe.airstrikeTicker <= 0) {
-                // the position can only be "past" the strobe
-                // meaning that the random direction can be a MAX of 90 degrees offset from the regular direction so it doesnt go backwards
-                const randomDir = v2.rotate(
-                    this.throwDir,
-                    util.random(-Math.PI / 2, Math.PI / 2),
-                );
-                const pos = v2.add(this.pos, v2.mul(randomDir, 7));
+                let rotAngle = this.strobe.rotAngle;
+                if (this.strobe.airstrikesLeft % 2) {
+                    rotAngle *= -1;
+                }
+                const nextDir = v2.rotate(this.throwDir, rotAngle);
+                const newOffset =
+                    Math.ceil(
+                        (this.strobe.airstrikesTotal - this.strobe.airstrikesLeft) / 2,
+                    ) * this.strobe.airstrikeOffset;
+                const pos = v2.add(this.pos, v2.mul(nextDir, newOffset));
                 this.game.planeBarn.addAirStrike(pos, this.throwDir, this.playerId);
                 this.strobe.airstrikesLeft--;
-                this.strobe.airstrikeTicker = 0.85;
+                this.strobe.airstrikeTicker = this.strobe.airstrikeDelay;
             }
         }
     }
@@ -225,7 +230,8 @@ export class Projectile extends BaseGameObject {
                         obj.damage({
                             amount: damage,
                             damageType: this.damageType,
-                            gameSourceType: this.gameSourceType,
+                            gameSourceType: this.type,
+                            weaponSourceType: this.weaponSourceType,
                             source: this.game.objectRegister.getById(this.playerId),
                             mapSourceType: "",
                             dir: this.vel,
@@ -354,7 +360,7 @@ export class Projectile extends BaseGameObject {
                     splitDef.fuseTime,
                     DamageType.Player,
                     undefined,
-                    this.gameSourceType,
+                    this.weaponSourceType,
                 );
             }
         }
@@ -372,7 +378,8 @@ export class Projectile extends BaseGameObject {
                 this.pos,
                 this.layer,
                 {
-                    gameSourceType: this.gameSourceType,
+                    gameSourceType: this.type,
+                    weaponSourceType: this.weaponSourceType,
                     damageType: this.damageType,
                     source,
                 },

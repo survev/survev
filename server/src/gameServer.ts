@@ -1,4 +1,7 @@
 import { App, SSLApp, type WebSocket } from "uWebSockets.js";
+import fs from "node:fs/promises";
+import path from "node:path";
+import { Cron } from "croner";
 import { randomUUID } from "crypto";
 import { version } from "../../package.json";
 import { GameConfig } from "../../shared/gameConfig";
@@ -14,7 +17,6 @@ import {
     forbidden,
     getIp,
     HTTPRateLimit,
-    isBehindProxy,
     logErrorToWebhook,
     readPostedJSON,
     returnJson,
@@ -24,6 +26,7 @@ import {
     type FindGamePrivateBody,
     type FindGamePrivateRes,
     type GameSocketData,
+    type SaveGameBody,
     zFindGamePrivateBody,
 } from "./utils/types";
 
@@ -101,9 +104,9 @@ class GameServer {
         }
     }
 
-    async isIpBanned(ip: string) {
+    async checkIp(ip: string) {
         try {
-            const apiRes = await apiPrivateRouter.moderation.is_ip_banned.$post({
+            const apiRes = await apiPrivateRouter.check_ip.$post({
                 json: {
                     ip,
                 },
@@ -111,13 +114,50 @@ class GameServer {
 
             if (apiRes.ok) {
                 const body = await apiRes.json();
-                return body.banned;
+                return body;
             }
         } catch (err) {
-            this.logger.error(`Failed check if IP is banned: `, err);
+            this.logger.error(`Failed request API fetch_ip: `, err);
         }
 
-        return false;
+        return undefined;
+    }
+
+    async tryToSaveLostGames() {
+        const games: SaveGameBody["matchData"] = [];
+
+        const dir = path.resolve("lost_game_data");
+        const files = await fs.readdir(dir);
+
+        for (const fileName of files) {
+            const filePath = path.resolve(dir, fileName);
+            const data = JSON.parse(await fs.readFile(filePath, "utf8"));
+            games.push(...data);
+        }
+
+        if (games.length < 2) return;
+
+        this.logger.info(`${games.length} lost games found, trying to save...`);
+
+        let res: Response | undefined = undefined;
+        try {
+            res = await apiPrivateRouter.save_game.$post({
+                json: {
+                    matchData: games,
+                },
+            });
+        } catch (err) {
+            this.logger.error(`Failed to fetch API save game:`, err);
+        }
+
+        if (res?.ok) {
+            this.logger.info(`successfully saved lost games!`);
+            // if we successfully saved the games we can remove them
+            for (const fileName of files) {
+                const filePath = path.resolve(dir, fileName);
+                await fs.rm(filePath);
+            }
+        }
     }
 }
 
@@ -133,6 +173,12 @@ const app = Config.gameServer.ssl
           cert_file_name: Config.gameServer.ssl.certFile,
       })
     : App();
+
+app.get("/health", (res) => {
+    res.writeStatus("200 OK");
+    res.write("OK");
+    res.end();
+});
 
 app.options("/api/find_game", (res) => {
     cors(res);
@@ -214,19 +260,36 @@ app.ws<GameSocketData>("/play", {
         const searchParams = new URLSearchParams(req.getQuery());
         const gameId = searchParams.get("gameId");
 
-        if (!gameId || !server.manager.getById(gameId)) {
+        if (!gameId) {
+            server.logger.warn("game_id_missing");
             forbidden(res);
             return;
         }
+        const gameData = server.manager.getById(gameId);
+
+        if (!gameData) {
+            server.logger.warn("invalid_game_id");
+            forbidden(res);
+            return;
+        }
+
+        if (!gameData.canJoin) {
+            server.logger.warn("game_started");
+            forbidden(res);
+            return;
+        }
+
         gameWsRateLimit.ipConnected(ip);
 
         const socketId = randomUUID();
         let disconnectReason = "";
 
-        if (await isBehindProxy(ip, 0)) {
-            disconnectReason = "behind_proxy";
-        } else if (await server.isIpBanned(ip)) {
+        const ipData = await server.checkIp(ip);
+
+        if (ipData?.banned) {
             disconnectReason = "ip_banned";
+        } else if (ipData?.behindProxy) {
+            disconnectReason = "behind_proxy";
         }
 
         if (res.aborted) return;
@@ -351,4 +414,13 @@ app.listen(Config.gameServer.host, Config.gameServer.port, () => {
         `Listening on ${Config.gameServer.host}:${Config.gameServer.port}`,
     );
     server.logger.info("Press Ctrl+C to exit.");
+});
+
+// try to save lost games every hour
+new Cron("0 * * * *", async () => {
+    try {
+        await server.tryToSaveLostGames();
+    } catch (err) {
+        server.logger.error("Failed to save lost games", err);
+    }
 });

@@ -1,6 +1,7 @@
 import type { MapDefs } from "./shared/defs/mapDefs";
 import type { TeamMode } from "./shared/gameConfig";
 import type { ProxyDef } from "./shared/types/api";
+import type { DeepPartial } from "./shared/utils/util";
 import type { Vec2 } from "./shared/utils/v2";
 
 /**
@@ -130,14 +131,7 @@ export interface ConfigType {
      *
      * NOTE: Required at build time, unlike modes it wont update by fetching from the server!
      */
-    clientTheme:
-        | "main"
-        | "easter"
-        | "halloween"
-        | "faction"
-        | "cobalt"
-        | "snow"
-        | "spring";
+    clientTheme: keyof typeof MapDefs;
 
     /**
      * Game tick rate.
@@ -412,9 +406,4 @@ export interface ConfigType {
     };
 }
 
-type DeepPartial<T> = T extends object
-    ? {
-          [P in keyof T]?: DeepPartial<T[P]>;
-      }
-    : T;
 export type PartialConfig = DeepPartial<ConfigType>;

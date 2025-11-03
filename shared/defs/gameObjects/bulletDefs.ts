@@ -1,4 +1,4 @@
-import { defineSkin } from "../../utils/util";
+import { util } from "../../utils/util";
 
 export interface BulletDef {
     readonly type: "bullet";
@@ -22,8 +22,8 @@ export interface BulletDef {
     useExplosiveRoundsAlt?: boolean;
 }
 
-function defineBulletSkin(baseType: string, params: Partial<BulletDef>) {
-    return defineSkin<BulletDef>(BaseDefs, baseType, params);
+function defineBulletSkin(baseType: string, params: Partial<BulletDef>): BulletDef {
+    return util.mergeDeep({}, BaseDefs[baseType], params);
 }
 
 export const BaseDefs: Record<string, BulletDef> = {

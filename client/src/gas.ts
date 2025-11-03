@@ -217,7 +217,7 @@ export class Gas {
         this.interpolationT = 0;
     }
 
-    setFullState(circleT: number, data: GasData, _map: unknown, ui: UiManager) {
+    setFullState(circleT: number, data: GasData, ui: UiManager) {
         // Update Ui
         if (data.mode != this.mode) {
             const timeLeft = Math.ceil(data.duration * (1 - circleT));

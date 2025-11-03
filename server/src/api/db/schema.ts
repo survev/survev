@@ -82,6 +82,7 @@ export const matchDataTable = pgTable(
         rank: integer("rank").notNull(),
         died: boolean("died").notNull(),
         kills: integer("kills").notNull(),
+        teamKills: integer("team_kills").notNull().default(0),
         damageDealt: integer("damage_dealt").notNull(),
         damageTaken: integer("damage_taken").notNull(),
         killerId: integer("killer_id").notNull(),
@@ -141,7 +142,7 @@ export type IpLogsTable = typeof ipLogsTable.$inferSelect;
 
 export const bannedIpsTable = pgTable("banned_ips", {
     createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
-    expiresIn: timestamp("expries_in").notNull(),
+    expiresIn: timestamp("expires_in").notNull(),
     encodedIp: text("encoded_ip").notNull().primaryKey(),
     permanent: boolean("permanent").notNull().default(false),
     reason: text("reason").notNull().default(""),

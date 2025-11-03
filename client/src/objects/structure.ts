@@ -1,27 +1,21 @@
 import { MapObjectDefs } from "../../../shared/defs/mapObjectDefs";
 import type { StructureDef } from "../../../shared/defs/mapObjectsTyping";
 import type { ObjectData, ObjectType } from "./../../../shared/net/objectSerializeFns";
-import {
-    type AABB,
-    type AABBWithHeight,
-    type Collider,
-    type ColliderWithHeight,
-    coldet,
-} from "../../../shared/utils/coldet";
+import { type AABB, type Collider, coldet } from "../../../shared/utils/coldet";
 import { collider } from "../../../shared/utils/collider";
 import { mapHelpers } from "../../../shared/utils/mapHelpers";
 import { math } from "../../../shared/utils/math";
 import { type Vec2, v2 } from "../../../shared/utils/v2";
 import type { Ambiance } from "../ambiance";
 import type Camera from "../camera";
-import type { DebugOptions } from "../config";
+import type { DebugRenderOpts } from "../config";
 import {
     renderBridge,
     renderMapBuildingBounds,
     renderMapObstacleBounds,
     renderWaterEdge,
-} from "../debugHelpers";
-import { debugLines } from "../debugLines";
+} from "../debug/debugHelpers";
+import { debugLines } from "../debug/debugLines";
 import type { Ctx } from "../game";
 import type { Map } from "../map";
 import type { AbstractObject, Player } from "./player";
@@ -52,17 +46,17 @@ export class Structure implements AbstractObject {
     interiorSoundAlt!: boolean;
     interiorSoundEnabled!: boolean;
 
-    aabb!: Collider & { height: number };
+    aabb!: Collider;
 
     layers!: Array<{
         objId: number;
-        collision: ColliderWithHeight;
+        collision: Collider;
         underground: boolean;
     }>;
 
     stairs!: Stair[];
 
-    mask!: AABBWithHeight[];
+    mask!: AABB[];
 
     m_init() {
         this.soundTransitionT = 0;
@@ -125,7 +119,7 @@ export class Structure implements AbstractObject {
                     this.pos,
                     this.rot,
                     this.scale,
-                ) as AABBWithHeight;
+                ) as AABB;
                 const downDir = v2.rotate(stairsDef.downDir, this.rot);
                 const childAabbs = coldet.splitAabb(stairsCol, downDir);
 
@@ -245,22 +239,22 @@ export class Structure implements AbstractObject {
         track1.weight = sound ? weight1 * transitionWeight * this.soundEnabledT : 0;
     }
 
-    render(_camera: Camera, debug: DebugOptions, _layer: number) {
+    render(_camera: Camera, debug: DebugRenderOpts, _layer: number) {
         if (!IS_DEV) return; // only debug rendering code here
 
-        if (debug.render.structures.buildingBounds) {
+        if (debug.structures.buildingBounds) {
             renderMapBuildingBounds(this);
         }
-        if (debug.render.structures.obstacleBounds) {
+        if (debug.structures.obstacleBounds) {
             renderMapObstacleBounds(this);
         }
-        if (debug.render.structures.bridge) {
+        if (debug.structures.bridge) {
             renderBridge(this);
         }
-        if (debug.render.structures.waterEdge) {
+        if (debug.structures.waterEdge) {
             renderWaterEdge(this);
         }
-        if (debug.render.structures.stairs) {
+        if (debug.structures.stairs) {
             for (let i = 0; i < this.stairs.length; i++) {
                 debugLines.addCollider(this.stairs[i].downAabb, 0x0000ff, 0);
                 debugLines.addCollider(this.stairs[i].upAabb, 0x00ff00, 0);

@@ -195,7 +195,7 @@ export class ProjectileBarn {
         for (let i = 0; i < projectiles.length; i++) {
             const p = projectiles[i];
             if (p.active) {
-                const itemDef = GameObjectDefs[p.type] as unknown as ThrowableDef;
+                const itemDef = GameObjectDefs[p.type] as ThrowableDef;
                 let rotDrag = p.rotDrag;
                 if (p.inWater) {
                     rotDrag *= 3;

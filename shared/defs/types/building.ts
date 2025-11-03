@@ -1,4 +1,4 @@
-import type { AABBWithHeight, ColliderWithHeight } from "../../utils/coldet";
+import type { AABB, Collider } from "../../utils/coldet";
 import type { Vec2 } from "../../utils/v2";
 import type { TerrainSpawnDef } from "../mapObjectsTyping";
 
@@ -9,18 +9,18 @@ export interface BuildingDef {
         color?: number;
         scale?: number;
         shapes?: Array<{
-            collider: ColliderWithHeight;
+            collider: Collider;
             color: number;
         }>;
         displayType?: string;
     };
     terrain: TerrainSpawnDef;
-    mapObstacleBounds?: ColliderWithHeight[];
+    mapObstacleBounds?: Collider[];
     zIdx?: number;
     floor: {
         surfaces: Array<{
             type: string;
-            collision: AABBWithHeight[];
+            collision: AABB[];
             data?: {
                 isBright: boolean;
             };
@@ -29,8 +29,8 @@ export interface BuildingDef {
     };
     ceiling: {
         zoomRegions: Array<{
-            zoomIn?: AABBWithHeight;
-            zoomOut?: AABBWithHeight;
+            zoomIn?: AABB;
+            zoomOut?: AABB;
             zoom?: number;
         }>;
         vision?: {
@@ -50,7 +50,7 @@ export interface BuildingDef {
             residue: string;
             sound?: string;
         };
-        collision?: AABBWithHeight[];
+        collision?: AABB[];
     };
     mapObjects: Array<{
         type?: string | Record<string, number>;
@@ -97,20 +97,20 @@ export interface BuildingDef {
     botRightObs?: string;
     ignoreMapSpawnReplacement?: boolean;
     mapGroundPatches?: Array<{
-        bound: AABBWithHeight;
+        bound: AABB;
         color: number;
         order?: number;
         roughness?: number;
         offsetDist?: number;
         useAsMapShape?: boolean;
     }>;
-    bridgeLandBounds?: AABBWithHeight[];
+    bridgeLandBounds?: AABB[];
     groundTintLt?: number;
     groundTintDk?: number;
-    bridgeWaterBounds?: AABBWithHeight[];
+    bridgeWaterBounds?: AABB[];
     bonus_room?: string;
     bonus_door?: string;
-    goreRegion?: AABBWithHeight;
+    goreRegion?: AABB;
     tree_08c?: string;
     crate?: string;
     oris?: number[];
@@ -136,7 +136,7 @@ export interface BuildingDef {
         volume: number;
     }>;
     healRegions?: Array<{
-        collision: AABBWithHeight;
+        collision: AABB;
         healRate: number;
     }>;
     center_loot?: string;

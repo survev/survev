@@ -13,6 +13,7 @@ import {
     zUnbanAccountParams,
     zUnbanIpParams,
 } from "../../../../../shared/types/moderation";
+import { util } from "../../../../../shared/utils/util";
 import { Config } from "../../../config";
 import { validateUserName } from "../../../utils/serverHelpers";
 import type { SaveGameBody } from "../../../utils/types";
@@ -62,9 +63,7 @@ export const ModerationRouter = new Hono()
                 .where(eq(ipLogsTable.userId, user.id))
                 .groupBy(ipLogsTable.encodedIp, ipLogsTable.findGameEncodedIp);
 
-            const expiresIn = new Date(
-                Date.now() + ip_ban_duration * 24 * 60 * 60 * 1000,
-            );
+            const expiresIn = new Date(Date.now() + util.daysToMs(ip_ban_duration));
 
             const bans = [
                 ...new Set(
@@ -153,7 +152,7 @@ export const ModerationRouter = new Hono()
             executor_id,
         } = c.req.valid("json");
 
-        const expiresIn = new Date(Date.now() + ip_ban_duration * 24 * 60 * 60 * 1000);
+        const expiresIn = new Date(Date.now() + util.daysToMs(ip_ban_duration));
         const encodedIps = is_encoded ? ips : ips.map(hashIp);
         const values = encodedIps.map((encodedIp) => ({
             encodedIp,
@@ -219,6 +218,9 @@ export const ModerationRouter = new Hono()
             .execute();
         return c.json({ message: `IP ${encodedIp} has been unbanned.` }, 200);
     })
+    /**
+     * @deprecated
+     */
     .post(
         "/is_ip_banned",
         validateParams(
@@ -343,7 +345,7 @@ export const ModerationRouter = new Hono()
 
         if (res.rowCount) {
             return c.json(
-                { message: `updated player's name to ${sanitized.validName}` },
+                { message: `updated ${current_slug}'s name to ${sanitized.validName}` },
                 200,
             );
         }
@@ -416,7 +418,7 @@ async function banAccount(userId: string, banReason: string, executorId: string)
 
 export async function cleanupOldLogs() {
     try {
-        const thirtyDaysAgo = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000);
+        const thirtyDaysAgo = new Date(Date.now() - util.daysToMs(30));
         await db.delete(ipLogsTable).where(lt(ipLogsTable.createdAt, thirtyDaysAgo));
     } catch (err) {
         server.logger.error("Failed to cleanup old logs", err);

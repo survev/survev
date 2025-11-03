@@ -6,34 +6,30 @@ import {
     MessageFlags,
 } from "discord.js";
 import { commandHandlers } from "./commands";
+import { sendNoPermissionMessage } from "./commands/helpers";
 import { DISCORD_BOT_TOKEN } from "./config";
-import { type Command, hasPermission } from "./utils";
+import { botLogger, type Command, hasBotPermission } from "./utils";
 
 const client = new Client({ intents: [GatewayIntentBits.Guilds] });
 
 function setupInteractionHandlers() {
     client.on(Events.InteractionCreate, async (interaction) => {
-        if (!hasPermission(interaction)) {
-            if (interaction.isRepliable()) {
-                await interaction.reply({
-                    content: "You do not have permission to use this action.",
-                    flags: MessageFlags.Ephemeral,
-                });
-            }
+        if (!interaction.isChatInputCommand()) return;
+
+        if (!hasBotPermission(interaction)) {
+            await sendNoPermissionMessage(interaction);
             return;
         }
 
-        if (!interaction.isChatInputCommand()) return;
-
         const commandName = interaction.commandName as Command;
         if (!commandHandlers[commandName]) {
-            console.warn(`Unknown command: ${commandName}`);
+            botLogger.warn(`Unknown command: ${commandName}`);
             return;
         }
         try {
             await commandHandlers[commandName](interaction);
         } catch (error) {
-            console.error(`Error executing command "${commandName}":`, error);
+            botLogger.error(`Error executing command "${commandName}":`, error);
             const errorMessage: InteractionReplyOptions = {
                 content: "There was an error while executing this command!",
                 flags: MessageFlags.Ephemeral,
@@ -50,11 +46,11 @@ function setupInteractionHandlers() {
 
 try {
     client.once(Events.ClientReady, (readyClient) => {
-        console.log(`Logged in as ${readyClient.user.tag}!`);
+        botLogger.info(`Logged in as ${readyClient.user.tag}!`);
     });
     setupInteractionHandlers();
     await client.login(DISCORD_BOT_TOKEN);
 } catch (error) {
-    console.error("Failed to start the bot:", error);
+    botLogger.error("Failed to start the bot:", error);
     process.exit(1);
 }

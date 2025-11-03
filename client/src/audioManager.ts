@@ -52,7 +52,7 @@ export class AudioManager {
         type: string;
     }> = [];
 
-    constructor(_options?: unknown) {
+    constructor() {
         CreateJS.Sound.volume = 0.5;
         CreateJS.Sound.on("fileload", this.loadHandler, this);
     }

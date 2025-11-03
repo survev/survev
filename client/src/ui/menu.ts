@@ -37,7 +37,7 @@ function createToast(
 }
 function setupModals(inputBinds: InputBinds, inputBindUi: InputBindUi) {
     const startMenuWrapper = $("#start-menu");
-    $("#btn-help").click(() => {
+    $("#btn-help").on("click", () => {
         const e = $("#start-help");
         startMenuWrapper.addClass("display-help");
         const height = startMenuWrapper.css("height");
@@ -58,7 +58,7 @@ function setupModals(inputBinds: InputBinds, inputBindUi: InputBindUi) {
     const newsBlock = $("#news-block");
 
     // Team mobile link
-    $("#btn-join-team").click(() => {
+    $("#btn-join-team").on("click", () => {
         $("#server-warning").css("display", "none");
         teamMobileLinkInput.val("");
         teamMobileLink.css("display", "block");
@@ -70,7 +70,7 @@ function setupModals(inputBinds: InputBinds, inputBindUi: InputBindUi) {
         $("#right-column").css("display", "none");
         return false;
     });
-    $("#btn-team-mobile-link-leave").click(() => {
+    $("#btn-team-mobile-link-leave").on("click", () => {
         teamMobileLink.css("display", "none");
         teamMobileLinkInput.val("");
         startMenuWrapper.css("display", "block");
@@ -81,17 +81,17 @@ function setupModals(inputBinds: InputBinds, inputBindUi: InputBindUi) {
     });
 
     // Auto submit link or code on enter
-    $("#team-link-input").on("keypress", function (e) {
-        if ((e.which || e.keyCode) === 13) {
+    $("#team-link-input").on("keypress", (e) => {
+        if (e.key === "Enter") {
             $("#btn-team-mobile-link-join").trigger("click");
-            $(this).blur();
+            e.target.blur();
         }
     });
 
     // Blur name input on enter
-    $("#player-name-input-solo").on("keypress", function (e) {
-        if ((e.which || e.keyCode) === 13) {
-            $(this).blur();
+    $("#player-name-input-solo").on("keypress", (e) => {
+        if (e.key === "Enter") {
+            e.target.blur();
         }
     });
 
@@ -132,13 +132,13 @@ function setupModals(inputBinds: InputBinds, inputBindUi: InputBindUi) {
         startTopRight.fadeIn(200);
         inputBindUi.cancelBind();
     });
-    $(".btn-keybind").click(() => {
+    $(".btn-keybind").on("click", () => {
         modalKeybind.show();
         return false;
     });
 
     // Share button
-    $(".js-btn-keybind-share").click(() => {
+    $(".js-btn-keybind-share").on("click", () => {
         // Toggle the share screen
         if ($("#ui-modal-keybind-share").css("display") == "block") {
             $("#ui-modal-keybind-share").css("display", "none");
@@ -150,7 +150,7 @@ function setupModals(inputBinds: InputBinds, inputBindUi: InputBindUi) {
     });
 
     // Copy keybind code
-    $("#keybind-link, #keybind-copy").click((e) => {
+    $("#keybind-link, #keybind-copy").on("click", (e) => {
         createToast("Copied!", modalKeybind.selector, $("#keybind-link"), e);
         const t = $("#keybind-link").html();
         helpers.copyTextToClipboard(t);
@@ -179,11 +179,11 @@ function setupModals(inputBinds: InputBinds, inputBindUi: InputBindUi) {
         startBottomRight.fadeIn(200);
         startTopRight.fadeIn(200);
     });
-    $(".btn-settings").click(() => {
+    $(".btn-settings").on("click", () => {
         modalSettings.show();
         return false;
     });
-    $(".modal-settings-text").click(function (_e) {
+    $(".modal-settings-text").on("click", function (_e) {
         const checkbox = $(this).siblings("input:checkbox");
         checkbox.prop("checked", !checkbox.is(":checked"));
         checkbox.trigger("change");
@@ -197,16 +197,16 @@ function setupModals(inputBinds: InputBinds, inputBindUi: InputBindUi) {
     modalHamburger.onHide(() => {
         startTopLeft.fadeIn(200);
     });
-    $("#btn-hamburger").click(() => {
+    $("#btn-hamburger").on("click", () => {
         modalHamburger.show();
         return false;
     });
-    $(".modal-body-text").click(function () {
+    $(".modal-body-text").on("click", function () {
         const checkbox = $(this).siblings("input:checkbox");
         checkbox.prop("checked", !checkbox.is(":checked"));
         checkbox.trigger("change");
     });
-    $("#force-refresh").click(() => {
+    $("#force-refresh").on("click", () => {
         window.location.href = `/?t=${Date.now()}`;
     });
 }

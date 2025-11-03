@@ -160,7 +160,7 @@ export class InputBinds {
         }
     }
 
-    upgradeBinds(_version: unknown) {
+    upgradeBinds(_version: number) {
         const newBinds: GameInput[] = [];
 
         // Set default inputs for the new binds, as long as those

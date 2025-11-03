@@ -125,7 +125,6 @@ export class LootBarn {
         pushSpeed?: number,
         dir?: Vec2,
         preloadGun?: boolean,
-        preload?: boolean,
         source?: "player" | "obstacle" | "map",
     ) {
         const def = GameObjectDefs[type];
@@ -138,12 +137,13 @@ export class LootBarn {
         const loot = new Loot(this.game, type, pos, layer, count, pushSpeed, dir);
         this._addLoot(loot);
 
-        if (def && def.type === "gun") {
-            const doPreload = preload || preloadGun;
-
-            if (doPreload && !def.ammoInfinite && source !== "player") {
-                loot.isPreloadedGun = true;
-            }
+        if (
+            def.type === "gun" &&
+            preloadGun &&
+            !def.ammoInfinite &&
+            source !== "player"
+        ) {
+            loot.isPreloadedGun = true;
         }
 
         if (def.type === "gun" && GameObjectDefs[def.ammo] && !loot.isPreloadedGun) {
