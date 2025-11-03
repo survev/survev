@@ -1,4 +1,3 @@
-import { GameConfig } from "../../gameConfig";
 import { util } from "../../utils/util";
 import { v2 } from "../../utils/v2";
 import { MapId } from "../types/misc";
@@ -6,7 +5,6 @@ import { Main, type PartialMapDef } from "./baseDefs";
 
 const mapDef: PartialMapDef = {
     mapId: MapId.Savannah,
-
     desc: {
         name: "Savannah",
         icon: "img/gui/player-the-hunted.svg",
@@ -31,26 +29,6 @@ const mapDef: PartialMapDef = {
         particles: {},
     },
     gameMode: { maxPlayers: 80, sniperMode: true },
-    gameConfig: {
-        planes: {
-            timings: [
-                {
-                    circleIdx: 1,
-                    wait: 10,
-                    options: { type: GameConfig.Plane.Airdrop },
-                },
-                {
-                    circleIdx: 3,
-                    wait: 2,
-                    options: { type: GameConfig.Plane.Airdrop },
-                },
-            ],
-            crates: [
-                { name: "airdrop_crate_01sv", weight: 10 },
-                { name: "airdrop_crate_02sv", weight: 1 },
-            ],
-        },
-    },
     lootTable: {
         tier_scopes: [
             { name: "4xscope", count: 1, weight: 5 },
@@ -160,10 +138,6 @@ const mapDef: PartialMapDef = {
     },
     mapGen: {
         map: {
-            baseWidth: 512,
-            baseHeight: 512,
-            scale: { small: 1.1875, large: 1.28125 },
-            extension: 112,
             shoreInset: 24,
             grassInset: 12,
             rivers: {
@@ -202,40 +176,6 @@ const mapDef: PartialMapDef = {
                 masks: [],
             },
         },
-        places: [
-            {
-                name: "The Killpit",
-                pos: v2.create(0.53, 0.64),
-            },
-            {
-                name: "Sweatbath",
-                pos: v2.create(0.84, 0.18),
-            },
-            {
-                name: "Tarkhany",
-                pos: v2.create(0.15, 0.11),
-            },
-            {
-                name: "Ytyk-Kyuyol",
-                pos: v2.create(0.25, 0.42),
-            },
-            {
-                name: "Todesfelde",
-                pos: v2.create(0.81, 0.85),
-            },
-            {
-                name: "Pineapple",
-                pos: v2.create(0.21, 0.79),
-            },
-            {
-                name: "Fowl Forest",
-                pos: v2.create(0.73, 0.47),
-            },
-            {
-                name: "Ranchito Pollo",
-                pos: v2.create(0.53, 0.25),
-            },
-        ],
         customSpawnRules: {
             locationSpawns: [],
             placeSpawns: [],
