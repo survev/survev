@@ -845,16 +845,16 @@ const SkinDefs: Record<string, OutfitDef> = {
     outfitThePro: defineOutfitSkin("outfitBase", {
         name: "The Pro",
         noDropOnDeath: true,
-        rarity: Rarity.Common,
-        lore: "The Pros can wear bright colors, they have no need to hide. You Do.",
+        rarity: Rarity.Rare,
+        lore: "For those who wear their wins",
         skinImg: {
-            baseTint: 16303476,
+            baseTint: 0xedc078,
             baseSprite: "player-base-01.img",
-            handTint: 3300450,
+            handTint: 0x325c62,
             handSprite: "player-hands-01.img",
-            footTint: 3300450,
+            footTint: 0x325c62,
             footSprite: "player-feet-01.img",
-            backpackTint: 2508377,
+            backpackTint: 0x274659,
             backpackSprite: "player-circle-base-01.img",
         },
         lootImg: {

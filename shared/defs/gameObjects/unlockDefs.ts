@@ -391,7 +391,7 @@ export const UnlockDefs: Record<UnlockDefKey, UnlockDef> = {
     },
     unlock_500_wins: {
         type: "unlock",
-        name: "Champion Skin",
+        name: "500+ Wins",
         free: true,
         unlocks: ["outfitThePro"]
     }

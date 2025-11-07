@@ -35,6 +35,7 @@ import {
 } from "../../db/schema";
 import { MOCK_USER_ID } from "../user/auth/mock";
 import { isBanned, logPlayerIPs, ModerationRouter } from "./ModerationRouter";
+import { UnlockDefs } from "../../../../../shared/defs/gameObjects/unlockDefs";
 
 export const PrivateRouter = new Hono<Context>()
     .use(privateMiddleware)
@@ -143,7 +144,14 @@ export const PrivateRouter = new Hono<Context>()
 
         await db.insert(matchDataTable).values(matchData);
         await logPlayerIPs(matchData);
-        const playerIds = matchData.map(d => d.userId).filter(d => d != null);
+        const playerIds: string[] = [
+            ...new Set(
+                matchData
+                .filter(d => d.rank === 1 && !!d.userId)
+                .map(d => d.userId as string)
+            ),
+        ];
+
         const playerWins = await db
 
             .select({
@@ -152,20 +160,37 @@ export const PrivateRouter = new Hono<Context>()
             })
             .from(matchDataTable)
             .where(inArray(matchDataTable.userId, playerIds))
-            .groupBy(matchDataTable.userId);
+            .groupBy(matchDataTable.userId)
+            .having(sql`SUM(CASE WHEN ${matchDataTable.rank} = 1 THEN 1 ELSE 0 END) >= 500`);
 
-        const items = playerWins.filter(({wins}) => wins >= 500)
-            .map(u => ({
-                    userId: u.userId as string,
-                    source: "unlock_500_wins",
-                    type: "outfitThePro",
-                    timeAcquired: Date.now(),
-                }));
+        const existing = await db
+            .select({ userId: itemsTable.userId })
+            .from(itemsTable)
+            .where(
+                and(
+                inArray(itemsTable.userId, playerIds),
+                eq(itemsTable.type, "outfitThePro")
+                )
+            );
 
-        await db
-            .insert(itemsTable)
-            .values(items)
-            .onConflictDoNothing()
+        const existingSet = new Set(existing.map(e => e.userId));
+
+        const unlock = UnlockDefs["unlock_500_wins"];
+
+        const items = playerWins
+            .filter(({ wins, userId }) => wins >= 500 && userId && !existingSet.has(userId))
+            .flatMap(({ userId }) =>
+                unlock.unlocks.map(type => ({
+                userId: userId!,
+                source: "unlock_500_wins",
+                type,
+                timeAcquired: Date.now(),
+                }))
+            );
+
+        if (items.length > 0) {
+            await db.insert(itemsTable).values(items);
+        }
         server.logger.info(`Saved game data for ${matchData[0].gameId}`);
         return c.json({}, 200);
     })
