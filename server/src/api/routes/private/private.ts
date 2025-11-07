@@ -155,18 +155,14 @@ export const PrivateRouter = new Hono<Context>()
         ];
 
         const playerWins = await db
-            .selectDistinct({
+            .select({
                 userId: matchDataTable.userId,
+                wins: sql<number>`SUM(CASE WHEN ${matchDataTable.rank} = 1 THEN 1 ELSE 0 END)`.as("wins"),
             })
             .from(matchDataTable)
-            .where(
-                and(
-                    inArray(matchDataTable.userId, playerIds),
-                    sql`SUM(CASE WHEN ${matchDataTable.rank} = 1 THEN 1 ELSE 0 END) >= 500`,
-                    notInArray(itemsTable.type, unlockItems)
-                ),
-            )
-            .groupBy(matchDataTable.userId);
+            .where(inArray(matchDataTable.userId, playerIds))
+            .groupBy(matchDataTable.userId)
+            .having(sql`SUM(CASE WHEN ${matchDataTable.rank} = 1 THEN 1 ELSE 0 END) >= 500`);
 
         const items = playerWins.flatMap(({ userId }) =>
             unlockItems.map((type) => ({
