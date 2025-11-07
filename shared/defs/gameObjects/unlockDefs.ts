@@ -393,6 +393,6 @@ export const UnlockDefs: Record<UnlockDefKey, UnlockDef> = {
         type: "unlock",
         name: "500+ Wins",
         free: true,
-        unlocks: ["outfitThePro"]
-    }
+        unlocks: ["outfitThePro"],
+    },
 };

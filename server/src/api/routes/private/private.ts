@@ -3,6 +3,7 @@ import { Hono } from "hono";
 import { z } from "zod";
 import { saveConfig } from "../../../../../config";
 import { GameObjectDefs } from "../../../../../shared/defs/gameObjectDefs";
+import { UnlockDefs } from "../../../../../shared/defs/gameObjects/unlockDefs";
 import { MapDefs } from "../../../../../shared/defs/mapDefs";
 import { TeamMode } from "../../../../../shared/gameConfig";
 import {
@@ -35,7 +36,6 @@ import {
 } from "../../db/schema";
 import { MOCK_USER_ID } from "../user/auth/mock";
 import { isBanned, logPlayerIPs, ModerationRouter } from "./ModerationRouter";
-import { UnlockDefs } from "../../../../../shared/defs/gameObjects/unlockDefs";
 
 export const PrivateRouter = new Hono<Context>()
     .use(privateMiddleware)
@@ -147,8 +147,8 @@ export const PrivateRouter = new Hono<Context>()
         const playerIds: string[] = [
             ...new Set(
                 matchData
-                .filter(d => d.rank === 1 && !!d.userId)
-                .map(d => d.userId as string)
+                    .filter((d) => d.rank === 1 && !!d.userId)
+                    .map((d) => d.userId as string),
             ),
         ];
 
@@ -156,36 +156,42 @@ export const PrivateRouter = new Hono<Context>()
 
             .select({
                 userId: matchDataTable.userId,
-                wins: sql<number>`SUM(CASE WHEN ${matchDataTable.rank} = 1 THEN 1 ELSE 0 END)`.as("wins"),
+                wins: sql<number>`SUM(CASE WHEN ${matchDataTable.rank} = 1 THEN 1 ELSE 0 END)`.as(
+                    "wins",
+                ),
             })
             .from(matchDataTable)
             .where(inArray(matchDataTable.userId, playerIds))
             .groupBy(matchDataTable.userId)
-            .having(sql`SUM(CASE WHEN ${matchDataTable.rank} = 1 THEN 1 ELSE 0 END) >= 500`);
+            .having(
+                sql`SUM(CASE WHEN ${matchDataTable.rank} = 1 THEN 1 ELSE 0 END) >= 500`,
+            );
 
         const existing = await db
             .select({ userId: itemsTable.userId })
             .from(itemsTable)
             .where(
                 and(
-                inArray(itemsTable.userId, playerIds),
-                eq(itemsTable.type, "outfitThePro")
-                )
+                    inArray(itemsTable.userId, playerIds),
+                    eq(itemsTable.type, "outfitThePro"),
+                ),
             );
 
-        const existingSet = new Set(existing.map(e => e.userId));
+        const existingSet = new Set(existing.map((e) => e.userId));
 
         const unlock = UnlockDefs["unlock_500_wins"];
 
         const items = playerWins
-            .filter(({ wins, userId }) => wins >= 500 && userId && !existingSet.has(userId))
+            .filter(
+                ({ wins, userId }) => wins >= 500 && userId && !existingSet.has(userId),
+            )
             .flatMap(({ userId }) =>
-                unlock.unlocks.map(type => ({
-                userId: userId!,
-                source: "unlock_500_wins",
-                type,
-                timeAcquired: Date.now(),
-                }))
+                unlock.unlocks.map((type) => ({
+                    userId: userId!,
+                    source: "unlock_500_wins",
+                    type,
+                    timeAcquired: Date.now(),
+                })),
             );
 
         if (items.length > 0) {
