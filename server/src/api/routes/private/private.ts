@@ -144,6 +144,8 @@ export const PrivateRouter = new Hono<Context>()
 
         await db.insert(matchDataTable).values(matchData);
         await logPlayerIPs(matchData);
+        const unlock = UnlockDefs["unlock_500_wins"];
+        const unlockItems = unlock.unlocks;
         const playerIds: string[] = [
             ...new Set(
                 matchData
@@ -173,13 +175,11 @@ export const PrivateRouter = new Hono<Context>()
             .where(
                 and(
                     inArray(itemsTable.userId, playerIds),
-                    eq(itemsTable.type, "outfitThePro"),
+                    inArray(itemsTable.type, unlockItems),
                 ),
             );
 
         const existingSet = new Set(existing.map((e) => e.userId));
-
-        const unlock = UnlockDefs["unlock_500_wins"];
 
         const items = playerWins
             .filter(
