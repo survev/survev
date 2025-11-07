@@ -55,6 +55,7 @@ const _allowedOutfits = [
     "outfitCamo",
     "outfitRed",
     "outfitWhite",
+    "outfitThePro",
 ];
 const _allowedEmotes = [
     "emote_thumbsup",
@@ -202,7 +203,7 @@ export interface UnlockDef {
     free?: boolean;
 }
 
-type UnlockDefKey = "unlock_default" | "unlock_new_account";
+type UnlockDefKey = "unlock_default" | "unlock_new_account" | "unlock_500_wins";
 export const UnlockDefs: Record<UnlockDefKey, UnlockDef> = {
     unlock_default: {
         type: "unlock",
@@ -388,4 +389,10 @@ export const UnlockDefs: Record<UnlockDefKey, UnlockDef> = {
         free: true,
         unlocks: ["outfitDarkShirt"],
     },
+    unlock_500_wins: {
+        type: "unlock",
+        name: "Champion Skin",
+        free: true,
+        unlocks: ["outfitThePro"]
+    }
 };

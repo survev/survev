@@ -1,4 +1,4 @@
-import { and, eq, inArray } from "drizzle-orm";
+import { and, eq, inArray, sql } from "drizzle-orm";
 import { Hono } from "hono";
 import { z } from "zod";
 import { saveConfig } from "../../../../../config";
@@ -143,6 +143,29 @@ export const PrivateRouter = new Hono<Context>()
 
         await db.insert(matchDataTable).values(matchData);
         await logPlayerIPs(matchData);
+        const playerIds = matchData.map(d => d.userId).filter(d => d != null);
+        const playerWins = await db
+
+            .select({
+                userId: matchDataTable.userId,
+                wins: sql<number>`SUM(CASE WHEN ${matchDataTable.rank} = 1 THEN 1 ELSE 0 END)`.as("wins"),
+            })
+            .from(matchDataTable)
+            .where(inArray(matchDataTable.userId, playerIds))
+            .groupBy(matchDataTable.userId);
+
+        const items = playerWins.filter(({wins}) => wins >= 500)
+            .map(u => ({
+                    userId: u.userId as string,
+                    source: "unlock_500_wins",
+                    type: "outfitThePro",
+                    timeAcquired: Date.now(),
+                }));
+
+        await db
+            .insert(itemsTable)
+            .values(items)
+            .onConflictDoNothing()
         server.logger.info(`Saved game data for ${matchData[0].gameId}`);
         return c.json({}, 200);
     })
