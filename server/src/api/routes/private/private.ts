@@ -1,4 +1,4 @@
-import { and, eq, inArray, notInArray, sql } from "drizzle-orm";
+import { and, eq, inArray, sql } from "drizzle-orm";
 import { Hono } from "hono";
 import { z } from "zod";
 import { saveConfig } from "../../../../../config";
@@ -157,12 +157,16 @@ export const PrivateRouter = new Hono<Context>()
         const playerWins = await db
             .select({
                 userId: matchDataTable.userId,
-                wins: sql<number>`SUM(CASE WHEN ${matchDataTable.rank} = 1 THEN 1 ELSE 0 END)`.as("wins"),
+                wins: sql<number>`SUM(CASE WHEN ${matchDataTable.rank} = 1 THEN 1 ELSE 0 END)`.as(
+                    "wins",
+                ),
             })
             .from(matchDataTable)
             .where(inArray(matchDataTable.userId, playerIds))
             .groupBy(matchDataTable.userId)
-            .having(sql`SUM(CASE WHEN ${matchDataTable.rank} = 1 THEN 1 ELSE 0 END) >= 500`);
+            .having(
+                sql`SUM(CASE WHEN ${matchDataTable.rank} = 1 THEN 1 ELSE 0 END) >= 500`,
+            );
 
         const items = playerWins.flatMap(({ userId }) =>
             unlockItems.map((type) => ({

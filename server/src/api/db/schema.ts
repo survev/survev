@@ -5,11 +5,11 @@ import {
     integer,
     json,
     pgTable,
+    primaryKey,
     serial,
     text,
     timestamp,
     uuid,
-    primaryKey,
 } from "drizzle-orm/pg-core";
 import { TeamMode } from "../../../../shared/gameConfig";
 import { ItemStatus, type Loadout, loadout } from "../../../../shared/utils/loadout";
@@ -50,20 +50,22 @@ export const usersTable = pgTable("users", {
 export type UsersTableInsert = typeof usersTable.$inferInsert;
 export type UsersTableSelect = typeof usersTable.$inferSelect;
 
-export const itemsTable = pgTable("items", {
-    userId: text("user_id")
-        .notNull()
-        .references(() => usersTable.id, {
-            onDelete: "cascade",
-            onUpdate: "cascade",
-        }),
-    type: text("type").notNull(),
-    timeAcquired: bigint("time_acquired", { mode: "number" }).notNull(),
-    source: text("source").notNull().default("unlock_new_account"),
-    status: integer("status").notNull().default(ItemStatus.New),
-}, (table) => [
-    primaryKey({ columns: [table.userId, table.source] }),
-]);
+export const itemsTable = pgTable(
+    "items",
+    {
+        userId: text("user_id")
+            .notNull()
+            .references(() => usersTable.id, {
+                onDelete: "cascade",
+                onUpdate: "cascade",
+            }),
+        type: text("type").notNull(),
+        timeAcquired: bigint("time_acquired", { mode: "number" }).notNull(),
+        source: text("source").notNull().default("unlock_new_account"),
+        status: integer("status").notNull().default(ItemStatus.New),
+    },
+    (table) => [primaryKey({ columns: [table.userId, table.source] })],
+);
 
 export const matchDataTable = pgTable(
     "match_data",
