@@ -9,6 +9,7 @@ import {
     text,
     timestamp,
     uuid,
+    primaryKey,
 } from "drizzle-orm/pg-core";
 import { TeamMode } from "../../../../shared/gameConfig";
 import { ItemStatus, type Loadout, loadout } from "../../../../shared/utils/loadout";
@@ -60,7 +61,9 @@ export const itemsTable = pgTable("items", {
     timeAcquired: bigint("time_acquired", { mode: "number" }).notNull(),
     source: text("source").notNull().default("unlock_new_account"),
     status: integer("status").notNull().default(ItemStatus.New),
-});
+}, (table) => [
+    primaryKey({ columns: [table.userId, table.source] }),
+]);
 
 export const matchDataTable = pgTable(
     "match_data",

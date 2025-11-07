@@ -195,7 +195,7 @@ export const PrivateRouter = new Hono<Context>()
             );
 
         if (items.length > 0) {
-            await db.insert(itemsTable).values(items);
+            await db.insert(itemsTable).values(items).onConflictDoNothing();
         }
         server.logger.info(`Saved game data for ${matchData[0].gameId}`);
         return c.json({}, 200);
