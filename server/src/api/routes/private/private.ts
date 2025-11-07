@@ -1,4 +1,4 @@
-import { and, eq, inArray, sql } from "drizzle-orm";
+import { and, eq, inArray, notInArray, sql } from "drizzle-orm";
 import { Hono } from "hono";
 import { z } from "zod";
 import { saveConfig } from "../../../../../config";
@@ -155,44 +155,27 @@ export const PrivateRouter = new Hono<Context>()
         ];
 
         const playerWins = await db
-
-            .select({
+            .selectDistinct({
                 userId: matchDataTable.userId,
-                wins: sql<number>`SUM(CASE WHEN ${matchDataTable.rank} = 1 THEN 1 ELSE 0 END)`.as(
-                    "wins",
-                ),
             })
             .from(matchDataTable)
-            .where(inArray(matchDataTable.userId, playerIds))
-            .groupBy(matchDataTable.userId)
-            .having(
-                sql`SUM(CASE WHEN ${matchDataTable.rank} = 1 THEN 1 ELSE 0 END) >= 500`,
-            );
-
-        const existing = await db
-            .select({ userId: itemsTable.userId })
-            .from(itemsTable)
             .where(
                 and(
-                    inArray(itemsTable.userId, playerIds),
-                    inArray(itemsTable.type, unlockItems),
+                    inArray(matchDataTable.userId, playerIds),
+                    sql`SUM(CASE WHEN ${matchDataTable.rank} = 1 THEN 1 ELSE 0 END) >= 500`,
+                    notInArray(itemsTable.type, unlockItems)
                 ),
-            );
-
-        const existingSet = new Set(existing.map((e) => e.userId));
-
-        const items = playerWins
-            .filter(
-                ({ wins, userId }) => wins >= 500 && userId && !existingSet.has(userId),
             )
-            .flatMap(({ userId }) =>
-                unlock.unlocks.map((type) => ({
-                    userId: userId!,
-                    source: "unlock_500_wins",
-                    type,
-                    timeAcquired: Date.now(),
-                })),
-            );
+            .groupBy(matchDataTable.userId);
+
+        const items = playerWins.flatMap(({ userId }) =>
+            unlockItems.map((type) => ({
+                userId: userId!,
+                source: "unlock_500_wins",
+                type,
+                timeAcquired: Date.now(),
+            })),
+        );
 
         if (items.length > 0) {
             await db.insert(itemsTable).values(items).onConflictDoNothing();
