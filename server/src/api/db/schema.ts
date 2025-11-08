@@ -64,7 +64,7 @@ export const itemsTable = pgTable(
         source: text("source").notNull().default("unlock_new_account"),
         status: integer("status").notNull().default(ItemStatus.New),
     },
-    (table) => [primaryKey({ columns: [table.userId, table.source] })],
+    (table) => [primaryKey({ columns: [table.userId, table.type] })],
 );
 
 export const matchDataTable = pgTable(
