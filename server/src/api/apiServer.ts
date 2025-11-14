@@ -64,13 +64,12 @@ export class ApiServer {
     clientTheme = Config.clientTheme;
 
     captchaEnabled = Config.captchaEnabled;
-    youtubeCache: { name: string; link: string }[] = [];
-    twitchCache: {
+    twitchCache: Array<{
         name: string;
         viewers: number;
         url: string;
         img: string;
-    }[] = [];
+    }> = [];
 
     constructor() {
         for (const region in Config.regions) {
@@ -84,7 +83,7 @@ export class ApiServer {
     }
 
     getSiteInfo(): SiteInfoRes {
-        const featuredYt = util.randomItem(this.youtubeCache) ?? { name: "", link: "" };
+        const featuredYt = util.randomItem(Config.featured.youtubers);
         const data: SiteInfoRes = {
             modes: this.modes,
             pops: {},
