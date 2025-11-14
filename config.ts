@@ -36,7 +36,7 @@ export function getConfig(isProduction: boolean, dir: string) {
         clientTheme: "main",
         featured: {
             youtubers: [],
-            twitch: [],
+            streamers: [],
         },
         gameTps: 100,
         netSyncTps: 33,

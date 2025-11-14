@@ -431,9 +431,7 @@ export interface ConfigType {
             name: string;
             link: string;
         }>;
-        twitch: Array<{
-            name: string;
-        }>;
+        streamers: string[];
     };
 }
 

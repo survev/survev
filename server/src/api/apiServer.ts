@@ -1,6 +1,7 @@
 import type { Hono } from "hono";
 import type { UpgradeWebSocket } from "hono/ws";
-import type { SiteInfoRes } from "../../../shared/types/api";
+import z from "zod";
+import { type SiteInfoRes, twitchSchema } from "../../../shared/types/api";
 import { util } from "../../../shared/utils/util";
 import { Config } from "../config";
 import { TeamMenu } from "../teamMenu";
@@ -64,12 +65,7 @@ export class ApiServer {
     clientTheme = Config.clientTheme;
 
     captchaEnabled = Config.captchaEnabled;
-    twitchCache: Array<{
-        name: string;
-        viewers: number;
-        url: string;
-        img: string;
-    }> = [];
+    twitchCache: SiteInfoRes["twitch"] = [];
 
     constructor() {
         for (const region in Config.regions) {
@@ -88,7 +84,7 @@ export class ApiServer {
             modes: this.modes,
             pops: {},
             youtube: featuredYt,
-            twitch: this.twitchCache ?? [],
+            twitch: this.twitchCache,
             country: "US",
             gitRevision: GIT_VERSION,
             captchaEnabled: this.captchaEnabled,
@@ -123,25 +119,23 @@ export class ApiServer {
 
     private startFeaturedRefresh() {
         const refresh = async () => {
-            this.youtubeCache = [...Config.featured.youtubers];
-            const streamers: typeof this.twitchCache = [];
-            for (const s of Config.featured.twitch) {
-                const twitchData = await this.fetchTwitchData(s.name);
-                if (twitchData) streamers.push(twitchData);
-            }
-            this.twitchCache = streamers;
+            this.twitchCache = await this.fetchTwitchData();
         };
         refresh();
         setInterval(refresh, 300000);
     }
 
-    private async fetchTwitchData(name: string) {
+    private async fetchTwitchData() {
         if (!Config.secrets.TWITCH_CLIENT_ID || !Config.secrets.TWITCH_OAUTH) {
-            return;
+            return [];
         }
+        const streamers = Config.featured.streamers.slice(0, 3);
+
+        const params = new URLSearchParams();
+        streamers.forEach((name) => params.append("user_login", name));
         try {
             const res = await fetch(
-                `https://api.twitch.tv/helix/streams?user_login=${name}`,
+                `https://api.twitch.tv/helix/streams?user_login=${params.toString()}`,
                 {
                     headers: {
                         "Client-ID": Config.secrets.TWITCH_CLIENT_ID,
@@ -149,20 +143,20 @@ export class ApiServer {
                     },
                 },
             );
-            const data = await res.json();
-            const stream = data.data?.[0];
-            if (!stream) return null;
-            return {
-                name,
-                viewers: stream.viewer_count,
-                url: `https://twitch.tv/${name}`,
-                img: stream.thumbnail_url
-                    .replace("{width}", "320")
-                    .replace("{height}", "180"),
-            };
+            const { data: stream } = await res.json();
+            if (!stream.length) return [];
+
+            const { data, success } = z.array(twitchSchema).safeParse(stream);
+
+            if (!success) {
+                defaultLogger.error("Failed to parse twitch data", stream);
+                return [];
+            }
+
+            return data;
         } catch (err) {
             defaultLogger.error("Twitch fetch failed", err);
-            return null;
+            return [];
         }
     }
 }
