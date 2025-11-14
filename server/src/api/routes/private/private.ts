@@ -1,4 +1,4 @@
-import { and, eq } from "drizzle-orm";
+import { and, eq, inArray } from "drizzle-orm";
 import { Hono } from "hono";
 import { z } from "zod";
 import { saveConfig } from "../../../../../config";
@@ -10,6 +10,7 @@ import {
     zRemoveItemParams,
 } from "../../../../../shared/types/moderation";
 import { serverConfigPath } from "../../../config";
+import { isBehindProxy } from "../../../utils/serverHelpers";
 import {
     type SaveGameBody,
     zSetClientThemeBody,
@@ -33,7 +34,7 @@ import {
     usersTable,
 } from "../../db/schema";
 import { MOCK_USER_ID } from "../user/auth/mock";
-import { logPlayerIPs, ModerationRouter } from "./ModerationRouter";
+import { isBanned, logPlayerIPs, ModerationRouter } from "./ModerationRouter";
 
 export const PrivateRouter = new Hono<Context>()
     .use(privateMiddleware)
@@ -118,6 +119,26 @@ export const PrivateRouter = new Hono<Context>()
             return c.json({ error: "Empty match data" }, 400);
         }
 
+        const gameIds = [...new Set(data.matchData.map((d) => d.gameId))];
+
+        // i really don't want the game server to insert duplicated games by accident
+        // when saving lost game data...
+        const exists = await db
+            .selectDistinct({
+                gameId: matchDataTable.gameId,
+            })
+            .from(matchDataTable)
+            .where(inArray(matchDataTable.gameId, gameIds));
+
+        if (exists.length) {
+            return c.json(
+                {
+                    error: `Games [${exists.map((d) => d.gameId).join(",")}] are already inserted`,
+                },
+                400,
+            );
+        }
+
         await leaderboardCache.invalidateCache(matchData);
 
         await db.insert(matchDataTable).values(matchData);
@@ -200,6 +221,29 @@ export const PrivateRouter = new Hono<Context>()
         await client.flushAll();
         return c.json({ success: true }, 200);
     })
+    .post(
+        "/check_ip",
+        validateParams(
+            z.object({
+                ip: z.string(),
+            }),
+        ),
+        async (c) => {
+            const { ip } = c.req.valid("json");
+
+            const banData = await isBanned(ip, false);
+            if (banData) {
+                return c.json({ banned: true, banData: banData, behindProxy: false });
+            }
+
+            const isProxied = await isBehindProxy(ip, 0);
+            if (isProxied) {
+                return c.json({ banned: false, banData: undefined, behindProxy: true });
+            }
+
+            return c.json({ banned: false, banData: undefined, behindProxy: false });
+        },
+    )
     .post(
         "/test/insert_game",
         databaseEnabledMiddleware,

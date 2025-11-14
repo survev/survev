@@ -282,7 +282,7 @@ export class UiManager2 {
                 domElemById("ui-boost-counter-1").firstElementChild,
                 domElemById("ui-boost-counter-2").firstElementChild,
                 domElemById("ui-boost-counter-3").firstElementChild,
-            ] as unknown as HTMLElement[],
+            ] as HTMLElement[],
         },
         scopes: [] as Array<{
             scopeType: string;

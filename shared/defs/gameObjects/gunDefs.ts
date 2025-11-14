@@ -393,7 +393,7 @@ export const GunDefs: Record<string, GunDef> = {
     vss: {
         name: "VSS",
         type: "gun",
-        quality: 1,
+        quality: 0,
         fireMode: "single",
         caseTiming: "shoot",
         ammo: "9mm",

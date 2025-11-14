@@ -43,7 +43,7 @@ export class Renderer {
 
     ground = new PIXI.Graphics();
     layerMask = createLayerMask();
-    debugLayerMask = null;
+    debugLayerMask = null as null | PIXI.Graphics;
     layerMaskDirty = true;
     layerMaskActive = false;
 
@@ -191,7 +191,7 @@ export class Renderer {
     }
 
     redrawDebugLayerMask(camera: Camera, map: Map) {
-        const mask = this.debugLayerMask as unknown as PIXI.Graphics;
+        const mask = this.debugLayerMask as PIXI.Graphics;
         mask.clear();
         mask.beginFill(16711935, 1);
         const structures = map.m_structurePool.m_getPool();
@@ -217,7 +217,7 @@ export class Renderer {
         mask.scale.set(s, -s);
     }
 
-    m_update(dt: number, camera: Camera, map: Map, _debug: unknown) {
+    m_update(dt: number, camera: Camera, map: Map) {
         // Adjust layer alpha
         const alphaTarget = this.layer > 0 ? 1.0 : 0.0;
         this.layerAlpha += step(this.layerAlpha, alphaTarget, dt * 12.0);

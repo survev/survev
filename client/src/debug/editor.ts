@@ -68,8 +68,6 @@ export class Editor {
         this.config = config;
         this.config.addModifiedListener(this.onConfigModified.bind(this));
 
-        this.setEnabled(false);
-
         this.toolParams = this.config.get("debugTools")!;
         this.toolParams.role = "";
 
@@ -240,6 +238,9 @@ export class Editor {
             folder.addBinding(this.toolParams, "noClip", {
                 label: "No Clip",
             });
+            folder.addBinding(this.toolParams, "teleportToPings", {
+                label: "Teleport To Pings",
+            });
             folder.addBinding(this.toolParams, "godMode", {
                 label: "God Mode",
             });
@@ -340,6 +341,8 @@ export class Editor {
                 e.stopPropagation();
             });
         }
+
+        this.setEnabled(this.toolParams.enabled);
     }
 
     onConfigModified(_key?: string) {
@@ -350,6 +353,9 @@ export class Editor {
         this.enabled = e;
         this.refreshUi();
         if (e) this.sendMsg = true;
+
+        this.toolParams.enabled = e;
+        this.config.set("debugTools", this.toolParams);
     }
 
     refreshUi() {
@@ -406,6 +412,7 @@ export class Editor {
         msg.toggleLayer = this.toggleLayer;
 
         msg.noClip = this.toolParams.noClip;
+        msg.teleportToPings = this.toolParams.teleportToPings;
         msg.godMode = this.toolParams.godMode;
         msg.moveObjs = this.toolParams.moveObjs;
 

@@ -136,7 +136,7 @@ class AirstrikeZone {
         }
     }
 
-    render(uiManager: UiManager, map: Map, _debug: unknown) {
+    render(uiManager: UiManager, map: Map) {
         // uiManager.getMapPosFromWorldPos is only valid after
         // uiManager.update() is run, so this logic must be run
         // afterward; render() is a reasonable place to do it.
@@ -374,11 +374,11 @@ export class PlaneBarn {
         }
     }
 
-    renderAirstrikeZones(uiManager: UiManager, map: Map, debug: unknown) {
+    renderAirstrikeZones(uiManager: UiManager, map: Map) {
         for (let i = 0; i < this.airstrikeZones.length; i++) {
             const zone = this.airstrikeZones[i];
             if (zone.active) {
-                zone.render(uiManager, map, debug);
+                zone.render(uiManager, map);
             }
         }
     }

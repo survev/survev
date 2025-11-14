@@ -17,6 +17,7 @@ export class EditMsg implements AbstractMsg {
     toggleLayer = false;
 
     noClip = false;
+    teleportToPings = false;
     godMode = false;
     moveObjs = false;
 
@@ -44,6 +45,7 @@ export class EditMsg implements AbstractMsg {
         s.writeBoolean(this.toggleLayer);
 
         s.writeBoolean(this.noClip);
+        s.writeBoolean(this.teleportToPings);
         s.writeBoolean(this.godMode);
         s.writeBoolean(this.moveObjs);
     }
@@ -72,6 +74,7 @@ export class EditMsg implements AbstractMsg {
         this.toggleLayer = s.readBoolean();
 
         this.noClip = s.readBoolean();
+        this.teleportToPings = s.readBoolean();
         this.godMode = s.readBoolean();
         this.moveObjs = s.readBoolean();
     }

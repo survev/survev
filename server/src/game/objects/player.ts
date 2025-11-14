@@ -1291,6 +1291,7 @@ export class Player extends BaseGameObject {
         speed: 1,
 
         noClip: false,
+        teleportToPings: false,
         godMode: false,
 
         /** drag and drop loot, obstacles, and buildings */
@@ -1941,7 +1942,18 @@ export class Player extends BaseGameObject {
                         break;
                     }
                     case "perk": {
-                        if (!this.perks.find((perk) => perk.droppable)) {
+                        /**
+                         * Prevents mobile players from automatically picking up
+                         * halloween perks. Additionally prevents them from auto-picking
+                         * up perks if they already have a droppable perk.
+                         *
+                         * NOTE: This is a poor solution (idString checking) and should
+                         * not be used as a precedent to allow more idString checking.
+                         */
+                        if (
+                            closestLoot.type !== "halloween_mystery" &&
+                            !this.perks.find((perk) => perk.droppable)
+                        ) {
                             this.pickupLoot(closestLoot);
                         }
                         break;
@@ -4319,6 +4331,11 @@ export class Player extends BaseGameObject {
         const emoteDef = GameObjectDefs[emoteMsg.type];
 
         if (emoteMsg.isPing) {
+            if (this.debug.teleportToPings) {
+                v2.set(this.pos, msg.pos);
+                this.setPartDirty();
+            }
+
             if (emoteDef.type !== "ping") {
                 return;
             }
@@ -4373,6 +4390,7 @@ export class Player extends BaseGameObject {
         }
 
         this.debug.noClip = msg.noClip;
+        this.debug.teleportToPings = msg.teleportToPings;
         this.debug.godMode = msg.godMode;
 
         this.debug.moveObjMode.enabled = msg.moveObjs;

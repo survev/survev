@@ -187,6 +187,14 @@ export const Main: MapDef = {
         tier_mansion_floor: [{ name: "outfitCasanova", count: 1, weight: 1 }],
         tier_vault_floor: [{ name: "outfitJester", count: 1, weight: 1 }],
         tier_police_floor: [{ name: "outfitPrisoner", count: 1, weight: 1 }],
+        tier_fragtastic: [
+            { name: "", count: 1, weight: 1 },
+            { name: "outfitFragtastic", count: 1, weight: 0.15 },
+        ],
+        tier_turkey_outfit: [
+            { name: "", count: 1, weight: 1 },
+            { name: "outfitTurkey", count: 1, weight: 0.05 },
+        ],
         tier_chrys_01: [{ name: "outfitImperial", count: 1, weight: 1 }],
         tier_chrys_02: [{ name: "katana", count: 1, weight: 1 }],
         tier_chrys_03: [
@@ -308,7 +316,10 @@ export const Main: MapDef = {
             { name: "outfitCoral", count: 1, weight: 1 },
         ],
         tier_noir_outfit: [{ name: "outfitNoir", count: 1, weight: 1 }],
-        tier_khaki_outfit: [{ name: "outfitKhaki", count: 1, weight: 1 }],
+        tier_khaki_outfit: [
+            { name: "outfitKhaki", count: 1, weight: 20 },
+            { name: "outfitParmaPrestige", count: 1, weight: 1 },
+        ],
         tier_pirate_melee: [{ name: "hook", count: 1, weight: 1 }],
         tier_hatchet: [
             { name: "vector", count: 1, weight: 0.4 },
@@ -348,8 +359,12 @@ export const Main: MapDef = {
         tier_forest_helmet: [{ name: "helmet03_forest", count: 1, weight: 1 }],
         tier_outfits: [
             { name: "outfitCobaltShell", count: 1, weight: 0.2 }, // ?
+            { name: "outfitRed", count: 1, weight: 0.2 }, // ?
+            { name: "outfitWhite", count: 1, weight: 0.2 }, // ?
             { name: "outfitKeyLime", count: 1, weight: 0.15 }, // ?
             { name: "outfitWoodland", count: 1, weight: 0.1 }, // ?
+            { name: "outfitCarbonFiber", count: 1, weight: 0.1 }, // ?
+            { name: "outfitDarkGloves", count: 1, weight: 0.1 }, // ?
             { name: "outfitCamo", count: 1, weight: 0.1 }, // ?
             { name: "outfitGhillie", count: 1, weight: 0.01 }, // ?
         ],
@@ -382,18 +397,23 @@ export const Main: MapDef = {
         tier_guns_common_scout: [
             { name: "glock_dual", count: 1, weight: 1 },
             { name: "ot38_dual", count: 1, weight: 1 },
+            { name: "m93r_dual", count: 1, weight: 1 },
+            { name: "deagle", count: 1, weight: 0.2 },
         ],
         tier_guns_common_sniper: [
             { name: "blr", count: 1, weight: 1 },
-            { name: "mosin", count: 1, weight: 0.1 },
+            { name: "mosin", count: 1, weight: 0.2 },
+            { name: "scout_elite", count: 1, weight: 1 },
         ],
         tier_guns_common_healer: [
             { name: "mk12", count: 1, weight: 1 },
             { name: "m39", count: 1, weight: 1 },
+            { name: "vss", count: 1, weight: 1 },
         ],
         tier_guns_common_demo: [
             { name: "m870", count: 1, weight: 1 },
             { name: "spas12", count: 1, weight: 0.5 },
+            { name: "mp220", count: 1, weight: 1 },
         ],
         tier_guns_common_assault: [
             { name: "hk416", count: 1, weight: 1 },
@@ -403,7 +423,8 @@ export const Main: MapDef = {
         ],
         tier_guns_common_tank: [
             { name: "dp28", count: 1, weight: 1 },
-            { name: "qbb97", count: 1, weight: 0.1 },
+            { name: "qbb97", count: 1, weight: 0.2 },
+            { name: "bar", count: 1, weight: 0.5 },
         ],
         tier_guns_rare_scout: [
             { name: "ots38_dual", count: 1, weight: 1 },
@@ -416,14 +437,15 @@ export const Main: MapDef = {
             { name: "awc", count: 1, weight: 0.05 },
         ],
         tier_guns_rare_demo: [
-            { name: "mp220", count: 1, weight: 1 },
-            { name: "saiga", count: 1, weight: 0.5 },
+            { name: "saiga", count: 1, weight: 1 },
             { name: "usas", count: 1, weight: 0.1 },
+            { name: "m1014", count: 1, weight: 0.1 },
         ],
         tier_guns_rare_healer: [
             { name: "svd", count: 1, weight: 1 },
             { name: "l86", count: 1, weight: 1 },
             { name: "garand", count: 1, weight: 0.5 },
+            { name: "scarssr", count: 1, weight: 0.05 },
         ],
         tier_guns_rare_assault: [
             { name: "scar", count: 1, weight: 1 },
@@ -432,9 +454,9 @@ export const Main: MapDef = {
             { name: "an94", count: 1, weight: 0.5 },
         ],
         tier_guns_rare_tank: [
-            { name: "qbb97", count: 1, weight: 1 },
+            { name: "qbb97", count: 1, weight: 1.3 },
             { name: "pkp", count: 1, weight: 0.1 },
-            { name: "m249", count: 1, weight: 0.05 },
+            { name: "m249", count: 1, weight: 0.2 },
         ],
         tier_class_crate_mythic: [
             { name: "scavenger_adv", count: 1, weight: 1 },
@@ -602,6 +624,9 @@ export const Main: MapDef = {
             { name: "outfitVerde", count: 1, weight: 1 },
             { name: "outfitWoodland", count: 1, weight: 1 },
             { name: "outfitKeyLime", count: 1, weight: 1 },
+            { name: "outfitWhite", count: 1, weight: 1 },
+            { name: "outfitCarbonFiber", count: 1, weight: 1 },
+            { name: "outfitDarkGloves", count: 1, weight: 1 },
             { name: "outfitCamo", count: 1, weight: 1 },
         ],
         tier_airdrop_faction_outfits: [{ name: "outfitGhillie", count: 1, weight: 1 }],

@@ -592,7 +592,7 @@ export class Player implements AbstractObject {
         }
     }
 
-    m_setLocalData(data: LocalDataWithDirty, _playerBarn: unknown) {
+    m_setLocalData(data: LocalDataWithDirty) {
         const scopeOld = this.m_localData.m_scope;
 
         if (data.healthDirty) {
@@ -692,7 +692,7 @@ export class Player implements AbstractObject {
         );
         const pos = v2.add(this.m_pos, v2.rotate(off, ang));
         const rad = meleeDef.attack.rad;
-        return collider.createCircle(pos, rad, 0);
+        return collider.createCircle(pos, rad);
     }
 
     m_hasActivePan() {
@@ -1285,7 +1285,13 @@ export class Player implements AbstractObject {
 
         this.updateAura(dt, isActivePlayer, activePlayer);
 
-        this.Zr(inputBinds.input, camera, isActivePlayer, isSpectating, displayingStats);
+        this.updateRotation(
+            inputBinds.input,
+            camera,
+            isActivePlayer,
+            isSpectating,
+            displayingStats,
+        );
 
         // @NOTE: There's an off-by-one frame issue for effects spawned earlier
         // in this frame that reference renderLayer / zOrd / zIdx. This issue is
@@ -1826,7 +1832,7 @@ export class Player implements AbstractObject {
         }
     }
 
-    Zr(
+    updateRotation(
         inputManager: InputHandler,
         camera: Camera,
         isActivePlayer: boolean,
@@ -2208,7 +2214,7 @@ export class Player implements AbstractObject {
         }
     }
 
-    animSetThrowableState(_animCtx: unknown, args: { state: string }) {
+    animSetThrowableState(_animCtx: Partial<AnimCtx>, args: { state: string }) {
         this.throwableState = args.state;
     }
 
@@ -2549,12 +2555,9 @@ export class PlayerBarn {
     playerStatus: Record<number, PlayerStatus> = {};
     anonPlayerNames = false;
 
-    onMapLoad(_e: unknown) {}
-
     m_update(
         dt: number,
         activeId: number,
-        _r: unknown,
         renderer: Renderer,
         particleBarn: ParticleBarn,
         camera: Camera,
@@ -2913,7 +2916,6 @@ export class PlayerBarn {
     addDeathEffect(
         targetId: number,
         killerId: number,
-        _sourceType: unknown,
         audioManager: AudioManager,
         particleBarn: ParticleBarn,
     ) {

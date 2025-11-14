@@ -4,7 +4,7 @@ import type {
     ObstacleDef,
     StructureDef,
 } from "../../../shared/defs/mapObjectsTyping";
-import type { AABBWithHeight } from "../../../shared/utils/coldet";
+import type { AABB } from "../../../shared/utils/coldet";
 import { collider } from "../../../shared/utils/collider";
 import { mapHelpers } from "../../../shared/utils/mapHelpers";
 import type { River } from "../../../shared/utils/river";
@@ -80,7 +80,7 @@ export function renderWaterEdge(mapObj: Structure | Building) {
             mapObj.pos,
             mapObj.rot,
             mapObj.scale * 1.15,
-        ) as AABBWithHeight;
+        ) as AABB;
         const center = v2.add(bounds.min, v2.mul(v2.sub(bounds.max, bounds.min), 0.5));
         const dir = v2.rotate(waterEdge.dir, mapObj.rot);
 

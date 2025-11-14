@@ -27,6 +27,10 @@ const mapDef: PartialMapDef = {
                 channel: "ui",
             },
             {
+                name: "captain_assigned_01",
+                channel: "ui",
+            },
+            {
                 name: "medic_assigned_01",
                 channel: "ui",
             },

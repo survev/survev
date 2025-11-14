@@ -218,6 +218,9 @@ export const ModerationRouter = new Hono()
             .execute();
         return c.json({ message: `IP ${encodedIp} has been unbanned.` }, 200);
     })
+    /**
+     * @deprecated
+     */
     .post(
         "/is_ip_banned",
         validateParams(

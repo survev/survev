@@ -11,6 +11,7 @@
     "useDefineForClassFields": true,
     "resolveJsonModule": true,
     "isolatedModules": true,
+    "noEmit": true,
     "allowImportingTsExtensions": true,
     "allowJs": true,
     "strict": true,

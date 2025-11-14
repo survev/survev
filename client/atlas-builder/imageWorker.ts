@@ -1,9 +1,14 @@
 import fs from "node:fs";
 import Path from "node:path";
 import { createCanvas, loadImage } from "canvas";
-import { type ImgCache, imageFolder, imagesCacheFolder } from "./atlasBuilder";
+import {
+    atlasLogger,
+    type ImgCache,
+    imageFolder,
+    imagesCacheFolder,
+} from "./atlasBuilder";
 import { scaledSprites } from "./atlasDefs";
-import { detectEdges } from "./detectEdges";
+import { detectEdges, type Edges } from "./detectEdges";
 
 const tmpCanvas = createCanvas(0, 0);
 const tmpCtx = tmpCanvas.getContext("2d");
@@ -19,9 +24,21 @@ async function renderImage(path: string, hash: string) {
 
     tmpCtx.drawImage(image, 0, 0, tmpCanvas.width, tmpCanvas.height);
 
-    const edges = detectEdges(tmpCanvas, {
-        tolerance: 0,
-    });
+    let edges: Edges;
+
+    try {
+        edges = detectEdges(tmpCanvas, {
+            tolerance: 0,
+        });
+    } catch (error) {
+        atlasLogger.error(`Failed to detect edges for ${path}`, error);
+        edges = {
+            top: 0,
+            bottom: 0,
+            left: 0,
+            right: 0,
+        };
+    }
 
     const buff = tmpCanvas.toBuffer("image/png");
     fs.writeFileSync(pngFileName, buff);

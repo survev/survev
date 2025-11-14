@@ -67,7 +67,7 @@ class PhysicsParticle {
                 !player.dead &&
                 util.sameLayer(this.layer, player.layer)
             ) {
-                colliders.push(collider.createCircle(player.m_pos, player.m_rad, 0));
+                colliders.push(collider.createCircle(player.m_pos, player.m_rad));
             }
         }
 
@@ -122,7 +122,7 @@ class Explosion {
     soundInstance!: SoundHandle | null;
     soundUpdateThrottle!: number;
 
-    constructor(_e: unknown) {
+    constructor() {
         this.active = false;
     }
 
@@ -279,7 +279,7 @@ export class ExplosionBarn {
             }
         }
         if (!explosion) {
-            explosion = new Explosion(this);
+            explosion = new Explosion();
             this.explosions.push(explosion);
         }
         explosion.init(type, pos, layer);

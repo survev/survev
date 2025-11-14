@@ -1,4 +1,4 @@
-import type { AABBWithHeight, ColliderWithHeight } from "../../utils/coldet";
+import type { AABB, Collider } from "../../utils/coldet";
 import type { Vec2 } from "../../utils/v2";
 import type { LootSpawnDef, TerrainSpawnDef } from "../mapObjectsTyping";
 
@@ -10,7 +10,7 @@ export interface ObstacleDef {
         createMax: number;
         destroy: number;
     };
-    collision: ColliderWithHeight;
+    collision: Collider;
     height: number;
     collidable: boolean;
     destructible: boolean;
@@ -45,7 +45,7 @@ export interface ObstacleDef {
     isWall?: boolean;
     material?: string;
     extents?: Vec2;
-    mapObstacleBounds?: AABBWithHeight[];
+    mapObstacleBounds?: AABB[];
     door?: {
         interactionRad: number;
         canUse: boolean;
@@ -78,7 +78,7 @@ export interface ObstacleDef {
     isWindow?: boolean;
     destroyType?: string;
     stonePlated?: boolean;
-    aabb?: AABBWithHeight;
+    aabb?: AABB;
     isTree?: boolean;
     button?: {
         interactionRad: number;
@@ -102,7 +102,7 @@ export interface ObstacleDef {
         offset: Vec2;
         speedMult: number;
     };
-    dropCollision?: AABBWithHeight;
+    dropCollision?: AABB;
     airdropCrate?: boolean;
     isBush?: boolean;
     isDecalAnchor?: boolean;

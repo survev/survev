@@ -356,9 +356,7 @@ export class GameMap {
 
         this.riverMasks = [];
 
-        this.timerStart();
         this.generateRiverMasks();
-        this.timerEnd("Generating river masks");
 
         if (this.factionMode) {
             this.factionModeSplitOri = util.randomInt(0, 1) as 0 | 1;
@@ -583,6 +581,10 @@ export class GameMap {
     }
 
     generateRiverMasks() {
+        if (!this.mapDef.mapGen.map.rivers.masks.length) return;
+
+        this.timerStart();
+
         const rand = util.seededRand(this.seed);
 
         for (const mask of this.mapDef.mapGen.map.rivers.masks) {
@@ -627,6 +629,7 @@ export class GameMap {
                 });
             }
         }
+        this.timerEnd("Generating river masks");
     }
 
     generateTerrain(): void {
@@ -779,8 +782,7 @@ export class GameMap {
         const fixedSpawns = { ...mapDef.mapGen.fixedSpawns[0] };
         const importantSpawns = mapDef.mapGen.importantSpawns;
 
-        const randomSpawns = mapDef.mapGen.randomSpawns[0];
-        if (randomSpawns) {
+        for (const randomSpawns of mapDef.mapGen.randomSpawns) {
             const spawns = [...randomSpawns.spawns];
             for (let i = 0; i < randomSpawns.choose; i++) {
                 const idx = util.randomInt(0, spawns.length - 1);

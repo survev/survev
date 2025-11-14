@@ -227,6 +227,10 @@ export class AtlasManager {
         let atlasHash = "";
         for (const file of atlasDef.images) {
             const imagePath = Path.join(imageFolder, file);
+            if (!fs.existsSync(imagePath)) {
+                atlasLogger.error(`File ${imagePath} doesn't exist`);
+                continue;
+            }
             const data = fs.readFileSync(imagePath);
 
             const scale = scaledSprites[file] ?? 1;

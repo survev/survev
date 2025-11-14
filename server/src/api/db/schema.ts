@@ -142,7 +142,7 @@ export type IpLogsTable = typeof ipLogsTable.$inferSelect;
 
 export const bannedIpsTable = pgTable("banned_ips", {
     createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
-    expiresIn: timestamp("expries_in").notNull(),
+    expiresIn: timestamp("expires_in").notNull(),
     encodedIp: text("encoded_ip").notNull().primaryKey(),
     permanent: boolean("permanent").notNull().default(false),
     reason: text("reason").notNull().default(""),

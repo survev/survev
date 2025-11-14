@@ -1,3 +1,5 @@
+import fs from "node:fs";
+import path from "node:path";
 import { TeamMode } from "../../../shared/gameConfig";
 import * as net from "../../../shared/net/net";
 import type { Loadout } from "../../../shared/utils/loadout";
@@ -603,30 +605,16 @@ export class Game {
             this.logger.error(
                 `[${region}] Failed to save game data, saving locally instead`,
             );
-            try {
-                // we dump the game  to a local db if we failed to save;
-                // avoid importing sqlite and creating the database at process startup
-                // since this code should rarely run anyway
-                const sqliteDb = (await import("better-sqlite3")).default(
-                    "lost_game_data.db",
-                );
 
-                sqliteDb
-                    .prepare(`
-                        CREATE TABLE IF NOT EXISTS lost_game_data (
-                            id INTEGER PRIMARY KEY AUTOINCREMENT,
-                            data TEXT NOT NULL,
-                            timestamp DATETIME DEFAULT CURRENT_TIMESTAMP
-                        )
-                    `)
-                    .run();
-
-                sqliteDb
-                    .prepare("INSERT INTO lost_game_data (data) VALUES (?)")
-                    .run(JSON.stringify(values));
-            } catch (err) {
-                this.logger.error(`[${region}] Failed to save game data locally`, err);
+            const dir = path.resolve("lost_game_data");
+            if (!fs.existsSync(dir)) {
+                fs.mkdirSync(dir);
             }
+            fs.writeFileSync(
+                path.join(dir, `${this.id}.json`),
+                JSON.stringify(values),
+                "utf8",
+            );
         }
     }
 

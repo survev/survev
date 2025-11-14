@@ -693,9 +693,9 @@ export class LoadoutMenu {
             this.loadout.crosshair = {
                 type: this.selectedItem.type,
                 color: util.hexToInt(color),
-                size: Number(size.toFixed(2)),
-                stroke: Number(stroke.toFixed(2)),
-            } as unknown as Crosshair;
+                size: size.toFixed(2),
+                stroke: stroke.toFixed(2),
+            };
         } else {
             this.loadout[loadoutType as keyof Loadout] = this.selectedItem.type as any;
         }

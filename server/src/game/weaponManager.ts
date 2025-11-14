@@ -605,7 +605,9 @@ export class WeaponManager {
 
             weap.ammo -= diff;
             this.player.weapsDirty = true;
-            this.player.invManager.giveAndDrop(ammoType as InventoryItem, diff);
+            if (this.player.invManager.isValid(ammoType)) {
+                this.player.invManager.giveAndDrop(ammoType, diff);
+            }
         }
     }
 
@@ -928,7 +930,7 @@ export class WeaponManager {
         );
         const rotated = v2.add(this.player.pos, v2.rotate(pos, rot));
         const rad = meleeDef.attack.rad;
-        return collider.createCircle(rotated, rad, 0);
+        return collider.createCircle(rotated, rad);
     }
 
     meleeDamage(): void {
@@ -1142,13 +1144,45 @@ export class WeaponManager {
         const throwStr = multiplier * throwableDef.throwPhysics.speed;
 
         // position of throwing hand
-        const pos = v2.add(
+        let pos = v2.add(
             this.player.pos,
             v2.rotate(
                 v2.create(0.5, -1.0),
                 Math.atan2(this.player.dir.y, this.player.dir.x),
             ),
         );
+        let closestDist = Number.MAX_VALUE;
+        let spawnPos = v2.copy(pos);
+        const spawnHeight = 0.5;
+
+        // clip it to obstacles, similar to bullets
+        // so it doesn't spawn inside walls
+        const objs = this.player.game.grid.intersectLineSegment(this.player.pos, pos);
+
+        for (let i = 0; i < objs.length; i++) {
+            const obj = objs[i];
+            if (obj.__type !== ObjectType.Obstacle) continue;
+
+            if (
+                obj.dead ||
+                !obj.collidable ||
+                !util.sameLayer(obj.layer, this.player.layer) ||
+                obj.height < spawnHeight
+            ) {
+                continue;
+            }
+
+            const res = collider.intersectSegment(obj.collider, this.player.pos, pos);
+            if (res) {
+                const colPos = v2.add(res.point, v2.mul(res.normal, 0.01));
+
+                const dist = v2.length(v2.sub(colPos, pos));
+                if (dist < closestDist) {
+                    closestDist = dist;
+                    spawnPos = colPos;
+                }
+            }
+        }
 
         let dir = v2.copy(this.player.dir);
         // Aim toward a point some distance infront of the player
@@ -1157,7 +1191,7 @@ export class WeaponManager {
                 this.player.pos,
                 v2.mul(this.player.dir, throwableDef.aimDistance),
             );
-            dir = v2.normalizeSafe(v2.sub(aimTarget, pos), v2.create(1.0, 0.0));
+            dir = v2.normalizeSafe(v2.sub(aimTarget, spawnPos), v2.create(1.0, 0.0));
         }
 
         // Incorporate some of the player motion into projectile velocity
@@ -1174,8 +1208,8 @@ export class WeaponManager {
         const projectile = this.player.game.projectileBarn.addProjectile(
             this.player.__id,
             throwableType,
-            pos,
-            0.5,
+            spawnPos,
+            spawnHeight,
             this.player.layer,
             vel,
             fuseTime,

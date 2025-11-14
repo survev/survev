@@ -1725,6 +1725,7 @@ const Sounds: Record<string, Record<string, SoundDef>> = {
         captain_assigned_01: {
             path: "audio/ui/captain_assigned_01.mp3",
             volume: 2,
+            preload: false,
             maxInstances: 1,
         },
         lt_assigned_01: {

@@ -26,11 +26,11 @@
     "canvas": "^3.2.0",
     "codefend": "^3.2.0",
     "maxrects-packer": "^2.7.3",
-    "sharp": "^0.33.5",
-    "tsx": "^4.20.5",
+    "sharp": "^0.34.4",
+    "tsx": "^4.20.6",
     "turnstile-types": "^1.2.3",
     "tweakpane": "^4.0.5",
-    "vite": "^6.3.6",
+    "vite": "^7.1.12",
     "vite-plugin-strip-block": "^1.0.1"
   }
 }

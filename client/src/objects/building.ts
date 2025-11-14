@@ -3,7 +3,7 @@ import { MapObjectDefs } from "../../../shared/defs/mapObjectDefs";
 import type { BuildingDef } from "../../../shared/defs/mapObjectsTyping";
 import type { FloorImage } from "../../../shared/defs/types/building";
 import type { ObjectData, ObjectType } from "../../../shared/net/objectSerializeFns";
-import type { Collider, ColliderWithHeight } from "../../../shared/utils/coldet";
+import type { Collider } from "../../../shared/utils/coldet";
 import { collider } from "../../../shared/utils/collider";
 import { collisionHelpers } from "../../../shared/utils/collisionHelpers";
 import { mapHelpers } from "../../../shared/utils/mapHelpers";
@@ -110,7 +110,7 @@ export class Building implements AbstractObject {
     surfaces!: Array<{
         type: string;
         data: Record<string, unknown>;
-        colliders: ColliderWithHeight[];
+        colliders: Collider[];
     }>;
 
     m_init() {
@@ -377,7 +377,6 @@ export class Building implements AbstractObject {
         map: Map,
         particleBarn: ParticleBarn,
         audioManager: AudioManager,
-        _ambience: unknown,
         activePlayer: Player,
         renderer: Renderer,
         camera: Camera,

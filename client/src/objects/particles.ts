@@ -305,7 +305,7 @@ export class ParticleBarn {
         return emitter;
     }
 
-    m_update(dt: number, camera: Camera, _debug: unknown) {
+    m_update(dt: number, camera: Camera) {
         // Update emitters
         for (let i = 0; i < this.emitters.length; i++) {
             const e = this.emitters[i];

@@ -217,13 +217,17 @@ export class PlayerView {
     );
     constructor(readonly app: App) {}
     getUrlParams() {
-        const slug = helpers.getParameterByName("slug") || "";
-        const interval = helpers.getParameterByName("t") || "alltime";
-        const mapId = helpers.getParameterByName("mapId") || ALL_MAPS;
+        const params = new URLSearchParams(window.location.search);
+        const slug = params.get("slug") || "";
+        const interval = params.get("time") || "alltime";
+        const mapId = params.get("mapId") || ALL_MAPS;
+        const gameId = params.get("gameId") || "";
+
         return {
-            slug: slug,
-            interval: interval,
-            mapId: mapId,
+            slug,
+            interval,
+            mapId,
+            gameId,
         };
     }
     getGameByGameId(gameId: string) {
@@ -310,6 +314,18 @@ export class PlayerView {
                     this.matchHistoryCache[teamModeFilter] = this.games;
                 }
                 this.moreGamesAvailable = games.length >= count;
+
+                const gameId = this.getUrlParams().gameId;
+                if (gameId) {
+                    for (const game of this.games) {
+                        if (!game.expanded && game.summary.guid === gameId) {
+                            game.expanded = true;
+                            this.loadMatchData(gameId);
+                            break;
+                        }
+                    }
+                }
+
                 this.render();
             },
         );
@@ -349,12 +365,29 @@ export class PlayerView {
         }
 
         this.render();
+        this.updateSearchParams();
     }
-    onChangedParams() {
+
+    updateSearchParams() {
+        const slug = this.getUrlParams().slug;
         const time = $("#player-time").val();
         const mapId = $("#player-map-id").val();
-        const slug = this.getUrlParams().slug;
-        window.history.pushState("", "", `?slug=${slug}&t=${time}&mapId=${mapId}`);
+
+        let searchP = new URLSearchParams();
+        searchP.set("slug", slug);
+        searchP.set("time", time as string);
+        searchP.set("mapId", mapId as string);
+
+        const selectedGame = this.games.find((g) => g.expanded);
+        if (selectedGame) {
+            searchP.set("gameId", selectedGame.summary.guid);
+        }
+
+        window.history.pushState("", "", `?${searchP.toString()}`);
+    }
+
+    onChangedParams() {
+        this.updateSearchParams();
 
         const params = this.getUrlParams();
         this.loadUserStats(
@@ -444,17 +477,18 @@ export class PlayerView {
                 }
             });
 
+            const params = this.getUrlParams();
+
             // Match data
             let matchDataContent = "";
             const expandedGame = this.games.find((x) => x.expanded);
             if (expandedGame) {
-                const _params2 = this.getUrlParams();
                 let localId = 0;
                 // Get this player's player_id in this match
                 if (expandedGame.data) {
                     for (let i = 0; i < expandedGame.data.length; i++) {
                         const d = expandedGame.data[i];
-                        if (_params2.slug == d.slug) {
+                        if (params.slug == d.slug) {
                             localId = d.player_id || 0;
                             break;
                         }
@@ -471,6 +505,15 @@ export class PlayerView {
             }
 
             $("#match-data").html(matchDataContent);
+
+            if (expandedGame && expandedGame.summary.guid === params.gameId) {
+                const elm = document.querySelector(
+                    `div[data-game-id="${params.gameId}"]`,
+                );
+                if (elm) {
+                    elm.scrollIntoView();
+                }
+            }
         }
 
         this.app.localization.localizeIndex();
