@@ -1,5 +1,6 @@
 import type { Vec2 } from "../utils/v2";
 import { Main } from "./maps/baseDefs";
+import {Chaos} from "./maps/chaosDefs";
 import { Birthday } from "./maps/birthdayDefs";
 import { Cobalt } from "./maps/cobaltDefs";
 import { Desert } from "./maps/desertDefs";
@@ -51,6 +52,7 @@ export const MapDefs = {
     cobalt: Cobalt,
     turkey: Turkey,
     birthday: Birthday,
+    chaos: Chaos,
 
     /* STRIP_FROM_PROD_CLIENT:START */
     test_normal: testNormal,
