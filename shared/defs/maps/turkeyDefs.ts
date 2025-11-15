@@ -51,8 +51,8 @@ const mapDef: PartialMapDef = {
                 crate_01: 45,
                 crate_02: 3,
                 crate_03: 7,
-                bush_06tr: 100, // leaf pile turkey
-                cache_06: 12, // cherry bush
+                bush_06tr: 70, // leaf pile turkey (without loot)
+                cache_03: 50, // leaf pile with loot
                 tree_07: 20,
                 tree_08: 170,
                 tree_08b: 4,
@@ -84,7 +84,7 @@ const mapDef: PartialMapDef = {
                 shack_03b: { small: 2, large: 3 },
                 greenhouse_01: 1,
                 cache_01: 1,
-                cache_02: 1, // mosin tree
+                cache_02w: 1, // mosin tree
                 cache_07: 1,
                 bunker_structure_01: { odds: 0.05 },
                 bunker_structure_02: 1,
