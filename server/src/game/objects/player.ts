@@ -248,6 +248,9 @@ export class PlayerBarn {
              */
             player.roleMenuTicker = GameConfig.player.perkModeRoleSelectDuration + 5;
         }
+        for (const perk of player.game.map.autoPerks) {
+            player.addPerk(perk)
+        }
 
         this.game.logger.info(`Player ${player.name} joined`);
 

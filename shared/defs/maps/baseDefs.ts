@@ -54,6 +54,8 @@ export const Main: MapDef = {
     gameMode: {
         maxPlayers: 80,
         killLeaderEnabled: true,
+        autoPerkCount: 0,
+        autoPerkTable: [],
     },
     gameConfig: {
         planes: {

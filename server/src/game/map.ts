@@ -203,6 +203,9 @@ export class GameMap {
     potatoMode: boolean;
     sniperMode: boolean;
 
+    // gives these perks to every player that joins.
+    autoPerks: string[] = [];
+
     mapStream = new MsgStream(new ArrayBuffer(1 << 16));
 
     grassBounds: AABB;
@@ -353,6 +356,31 @@ export class GameMap {
                     Math.abs(place.pos.y - 1) * this.height,
                 );
             });
+
+
+        let totalWeight = 0.0;
+        let perkTable = this.mapDef.gameMode.autoPerkTable
+        for (let i = 0; i < perkTable.length; i++) {
+            totalWeight += perkTable[i].weight;
+        }
+        for (let i = 0; i < <number>this.mapDef.gameMode.autoPerkCount; i++) {
+            if (perkTable.length == 0) {
+                break;
+            }
+            // TODO: Seed this random because idk how
+            let rng = util.random(0, totalWeight);
+            let idx = 0;
+            while (rng > perkTable[idx].weight) {
+                rng -= perkTable[idx].weight;
+                idx++;
+            }
+            this.autoPerks.push(perkTable[idx].name);
+            totalWeight -= perkTable[idx].weight;
+            perkTable.splice(idx, 1);
+            if (perkTable.length < 1) {
+                break;
+            }
+        }
 
         this.riverMasks = [];
 

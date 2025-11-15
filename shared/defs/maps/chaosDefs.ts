@@ -5,6 +5,9 @@ import { MapId } from "../types/misc";
 import { Main, type PartialMapDef } from "./baseDefs";
 
 const mapDef: PartialMapDef = {
+    /*
+    Chaos Perk Mode. Core Idea: Give players a set of random perks.
+     */
     mapId: MapId.Chaos,
     desc: {
         name: "Chaos",
@@ -18,10 +21,10 @@ const mapDef: PartialMapDef = {
             waterRipple: 0xb3f0ff,
             beach: 0xd9c5cf,
             riverbank: 0xa6929c,
-            grass: 0x679e87,
+            grass: 0x53a382,
             underground: 0x1b0d03,
             playerSubmerge: 0x4293a1,
-            playerGhillie: 0xb85dc2,
+            playerGhillie: 0x52a180,
         },
         valueAdjust: 1,
         sound: { riverShore: "sand" },
@@ -32,6 +35,42 @@ const mapDef: PartialMapDef = {
             planeSound: "plane_01",
             airdropImg: "map-chute-01.img",
         },
+    },
+    mapGen: {
+        map: {
+            rivers: {
+                lakes: [
+                    {odds: 1, innerRad: 22, outerRad: 64, spawnBound: {pos: v2.create(0.5, 0.5), rad: 200,},},
+                    {odds: 1, innerRad: 22, outerRad: 64, spawnBound: {pos: v2.create(0.5, 0.5), rad: 200,},},
+                    {odds: 1, innerRad: 22, outerRad: 64, spawnBound: {pos: v2.create(0.5, 0.5), rad: 200,},},
+                ]
+            }
+        },
+        spawnReplacements: [
+            {
+                bush_01: "bush_07sp",
+                tree_01: "tree_07sp"
+            },
+        ]
+    },
+    gameMode: {
+        autoPerkCount: 3,
+        autoPerkTable: [
+            { name: "firepower", count: 1, weight: 1 },
+            { name: "windwalk", count: 1, weight: 1 },
+            { name: "endless_ammo", count: 1, weight: 1 },
+            { name: "steelskin", count: 1, weight: 1 },
+            { name: "splinter", count: 1, weight: 1 },
+            { name: "small_arms", count: 1, weight: 1 },
+            { name: "takedown", count: 1, weight: 1 },
+            { name: "field_medic", count: 1, weight: 1 },
+            { name: "tree_climbing", count: 1, weight: 1 },
+            { name: "scavenger", count: 1, weight: 1 },
+            { name: "chambered", count: 1, weight: 1 },
+            { name: "martyrdom", count: 1, weight: 1 },
+            { name: "self_revive", count: 1, weight: 1 },
+            { name: "bonus_9mm", count: 1, weight: 1 }
+        ]
     }
 };
 

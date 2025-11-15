@@ -115,6 +115,10 @@ export interface MapDef {
         perkMode?: boolean;
         perkModeRoles?: string[];
         turkeyMode?: number;
+        autoPerkCount: number;
+        autoPerkTable: Array<{
+            name: string; count: number; weight: number;
+        }>;
         spookyKillSounds?: boolean;
     };
     gameConfig: {
