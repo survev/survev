@@ -30,7 +30,8 @@
   "dependencies": {
     "enquirer": "^2.4.1",
     "hjson": "^3.2.2",
-    "tsx": "^4.20.6"
+    "tsx": "^4.20.6",
+    "vite": "^7.2.2"
   },
   "workspaces": [
     "client",
