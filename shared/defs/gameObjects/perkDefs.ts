@@ -53,15 +53,24 @@ export const PerkProperties = {
     bonus_9mm: {
         spreadMul: 1.1,
     },
+    bonus_762: {
+        spreadMul: 1.1,
+    },
+    bonus_556: {
+        spreadMul: 1.1,
+    },
+    bonus_12g: {
+        spreadMul: 1.1,
+    },
     rare_potato: {
         quality: 1,
     },
     // map of ammo type to perk that boosts that ammo
     ammoBonuses: {
         "9mm": ["treat_9mm", "bonus_9mm"],
-        "762mm": ["treat_762"],
-        "556mm": ["treat_556"],
-        "12gauge": ["treat_12g"],
+        "762mm": ["treat_762", "bonus_762"],
+        "556mm": ["treat_556", "bonus_556"],
+        "12gauge": ["treat_12g", "bonus_12g"],
         "45acp": ["bonus_45"],
     } as Record<string, string[]>,
     ammoBonusDamageMult: 1.08,
@@ -378,20 +387,6 @@ export const PerkDefs: Record<string, PerkDef> = {
             pickup: "perk_pickup_01",
         },
     },
-    bonus_45: {
-        name: ".45 In The Chamber",
-        type: "perk",
-        lootImg: {
-            sprite: "loot-perk-bonus-45.img",
-            tint: 0xffffff,
-            border: "loot-circle-outer-03.img",
-            borderTint: 0xffffff,
-            scale: 0.275,
-        },
-        sound: {
-            pickup: "perk_pickup_01",
-        },
-    },
     broken_arrow: {
         name: "Broken Arrow",
         type: "perk",
@@ -448,6 +443,76 @@ export const PerkDefs: Record<string, PerkDef> = {
             pickup: "perk_pickup_01",
         },
     },
+    bonus_762: {
+        name: "762 Overpressure",
+        type: "perk",
+        lootImg: {
+            sprite: "loot-perk-bonus-762.img",
+            tint: 0xffffff,
+            border: "loot-circle-outer-03.img",
+            borderTint: 0xffffff,
+            scale: 0.275,
+        },
+        sound: {
+            pickup: "perk_pickup_01",
+        },
+    },
+    bonus_556: {
+        name: "556 Overpressure",
+        type: "perk",
+        lootImg: {
+            sprite: "loot-perk-bonus-556.img",
+            tint: 0xffffff,
+            border: "loot-circle-outer-03.img",
+            borderTint: 0xffffff,
+            scale: 0.275,
+        },
+        sound: {
+            pickup: "perk_pickup_01",
+        },
+    },
+    bonus_12g: {
+        name: "12g Overpressure",
+        type: "perk",
+        lootImg: {
+            sprite: "loot-perk-bonus-12g.img",
+            tint: 0xffffff,
+            border: "loot-circle-outer-03.img",
+            borderTint: 0xffffff,
+            scale: 0.275,
+        },
+        sound: {
+            pickup: "perk_pickup_01",
+        },
+    },
+    bonus_45: {
+        name: ".45 In The Chamber",
+        type: "perk",
+        lootImg: {
+            sprite: "loot-perk-bonus-45.img",
+            tint: 0xffffff,
+            border: "loot-circle-outer-03.img",
+            borderTint: 0xffffff,
+            scale: 0.275,
+        },
+        sound: {
+            pickup: "perk_pickup_01",
+        },
+    },
+    bonus_assault: {
+        name: "Hollow-points",
+        type: "perk",
+        lootImg: {
+            sprite: "loot-perk-bonus-assault.img",
+            tint: 0xffffff,
+            border: "loot-circle-outer-03.img",
+            borderTint: 0xffffff,
+            scale: 0.275,
+        },
+        sound: {
+            pickup: "perk_pickup_01",
+        },
+    },
     flak_jacket: {
         name: "Flak Jacket",
         type: "perk",
@@ -467,20 +532,6 @@ export const PerkDefs: Record<string, PerkDef> = {
         type: "perk",
         lootImg: {
             sprite: "loot-perk-explosive.img",
-            tint: 0xffffff,
-            border: "loot-circle-outer-03.img",
-            borderTint: 0xffffff,
-            scale: 0.275,
-        },
-        sound: {
-            pickup: "perk_pickup_01",
-        },
-    },
-    bonus_assault: {
-        name: "Hollow-points",
-        type: "perk",
-        lootImg: {
-            sprite: "loot-perk-bonus-assault.img",
             tint: 0xffffff,
             border: "loot-circle-outer-03.img",
             borderTint: 0xffffff,

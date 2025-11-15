@@ -771,6 +771,18 @@ export class WeaponManager {
             bulletType = itemDef.bulletTypeBonus ?? bulletType;
             spread *= PerkProperties.bonus_9mm.spreadMul;
         }
+        if (itemDef.ammo == "762" && this.player.hasPerk("bonus_762")) {
+            bulletType = itemDef.bulletTypeBonus ?? bulletType;
+            spread *= PerkProperties.bonus_762.spreadMul;
+        }
+        if (itemDef.ammo == "556" && this.player.hasPerk("bonus_556")) {
+            bulletType = itemDef.bulletTypeBonus ?? bulletType;
+            spread *= PerkProperties.bonus_556.spreadMul;
+        }
+        if (itemDef.ammo == "12g" && this.player.hasPerk("bonus_12g")) {
+            bulletType = itemDef.bulletTypeBonus ?? bulletType;
+            spread *= PerkProperties.bonus_12g.spreadMul;
+        }
 
         const bulletCount = itemDef.bulletCount;
         const jitter = itemDef.jitter ?? 0.25;
