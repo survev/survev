@@ -43,7 +43,10 @@ const mapDef: PartialMapDef = {
                     {odds: 1, innerRad: 22, outerRad: 64, spawnBound: {pos: v2.create(0.5, 0.5), rad: 200,},},
                     {odds: 1, innerRad: 22, outerRad: 64, spawnBound: {pos: v2.create(0.5, 0.5), rad: 200,},},
                     {odds: 1, innerRad: 22, outerRad: 64, spawnBound: {pos: v2.create(0.5, 0.5), rad: 200,},},
-                ]
+                ],
+                weights: [
+                    { weight: 1, widths: [12, 8, 8, 8, 4] },
+                ],
             }
         },
         spawnReplacements: [
@@ -54,13 +57,12 @@ const mapDef: PartialMapDef = {
         ]
     },
     gameMode: {
-        autoPerkCount: 3,
+        autoPerkCount: 4,
         autoPerkTable: [
             { name: "firepower", count: 1, weight: 1 },
             { name: "windwalk", count: 1, weight: 1 },
             { name: "endless_ammo", count: 1, weight: 1 },
             { name: "steelskin", count: 1, weight: 1 },
-            { name: "splinter", count: 1, weight: 1 },
             { name: "small_arms", count: 1, weight: 1 },
             { name: "takedown", count: 1, weight: 1 },
             { name: "field_medic", count: 1, weight: 1 },
@@ -69,7 +71,16 @@ const mapDef: PartialMapDef = {
             { name: "chambered", count: 1, weight: 1 },
             { name: "martyrdom", count: 1, weight: 1 },
             { name: "self_revive", count: 1, weight: 1 },
-            { name: "bonus_9mm", count: 1, weight: 1 }
+            { name: "flak_jacket", count: 1, weight: 1 },
+            { name: "bonus_9mm", count: 1, weight: 0.5 },
+            { name: "bonus_762", count: 1, weight: 0.5 },
+            { name: "bonus_556", count: 1, weight: 0.5 },
+            { name: "bonus_12g", count: 1, weight: 0.5 },
+            { name: "bonus_assault", count: 1, weight: 0.5 },
+            { name: "splinter", count: 1, weight: 0.5 },
+            { name: "explosive_rounds", count: 1, weight: 0.2 },
+            { name: "ap_rounds", count: 1, weight: 0.2 },
+            { name: "scavenger_adv", count: 1, weight: 0.2 }
         ]
     }
 };
