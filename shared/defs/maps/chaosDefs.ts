@@ -8,8 +8,8 @@ const mapDef: PartialMapDef = {
     mapId: MapId.Chaos,
     desc: {
         name: "Chaos",
-        icon: "img/gui/cobalt.svg",
-        buttonCss: "btn-mode-birthday",
+        icon: "img/gui/bullets.svg",
+        buttonCss: "btn-mode-chaos",
     },
     biome: {
         colors: {
@@ -25,7 +25,7 @@ const mapDef: PartialMapDef = {
         },
         valueAdjust: 1,
         sound: { riverShore: "sand" },
-        particles: { camera: "" },
+        particles: { camera: "falling_leaf_spring" },
         tracerColors: {},
         airdrop: {
             planeImg: "map-plane-01.img",

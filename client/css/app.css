@@ -3435,6 +3435,34 @@ a:active {
   }
 }
 
+@keyframes chaosPulse {
+    /* for pulse */
+    from {
+        background-color: #409974;
+        -webkit-box-shadow: 0 0 9px #409974;
+    }
+    50% {
+        background-color: #50cc98;
+        -webkit-box-shadow: 0 0 18px #50cc98;
+    }
+    to {
+        background-color: #409974;
+        -webkit-box-shadow: 0 0 9px #409974;
+    }
+}
+.btn-mode-chaos {
+    /* for desktop */
+    animation-name: chaosPulse;
+    border-bottom: 4px solid #27694d;
+}
+
+@media (max-width: 850px), (max-width: 900px) and (min-resolution: 3dppx) {
+    /* for phone */
+    .btn-mode-chaos {
+        border-bottom: 2px solid #27694d;
+    }
+}
+
 #btns-quick-start {
   display: flex;
 }
