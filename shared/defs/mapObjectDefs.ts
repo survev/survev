@@ -2424,6 +2424,155 @@ function createBarn<T extends BuildingDef>(e: Partial<T>): T {
                 },
             ],
         },
+        walls: [
+            {
+                type: "brick_wall_base",
+                bounds: [
+                    { 
+                        min: v2.create(-24, 7), max: v2.create(-25, 11),
+                        ori: 0
+                    },
+                    { 
+                        min: v2.create(-22, 9), max: v2.create(-23, 12),
+                        ori: 1
+                    },
+                    {
+                        min: v2.create(-24, -8), max: v2.create(-25, 4),
+                        ori: 0
+                    },
+                    {
+                        min: v2.create(-24, -11), max: v2.create(-25,-15),
+                        ori: 0
+                    },
+                    {
+                        min: v2.create(-22, -13), max: v2.create(-23, -16),
+                        ori: 1
+                    },
+                    {
+                        min: v2.create(-9.5, 2.5), max: v2.create(-10.5, 18.5),
+                        ori: 1
+                    },
+                    {
+                        min: v2.create(9.5, 2.5), max: v2.create(10.5, 18.5),
+                        ori: 1
+                    },
+                    {
+                        min: v2.create(-9.5, -22.5), max: v2.create(-10.5, -6.5),
+                        ori: 1
+                    },
+                    {
+                        min: v2.create(4.5, -17.5), max: v2.create(5.5, -11.5),
+                        ori: 1
+                    },
+                    {
+                        min: v2.create(-5, 11), max: v2.create(-6, 15),
+                        ori: 0
+                    },
+                    {
+                        min: v2.create(5, 11), max: v2.create(6, 15),
+                        ori: 0
+                    },
+                    {
+                        min: v2.create(-3, 13), max: v2.create(-4, 16),
+                        ori: 1
+                    },
+                    {
+                        min: v2.create(3, 13), max: v2.create(4, 16),
+                        ori: 1
+                    },
+                    {
+                        min: v2.create(24, 7), max: v2.create(25, 11),
+                        ori: 0
+                    },
+                    {
+                        min: v2.create(22, 9), max: v2.create(23, 12),
+                        ori: 1
+                    },
+                    {
+                        min: v2.create(17, -8), max: v2.create(18, -21),
+                        ori: 1
+                    },
+                    {
+                        min: v2.create(-22, -13), max: v2.create(-23, -16),
+                        ori: 1
+                    },
+                    {
+                        min: v2.create(24, 4), max: v2.create(25, -15),
+                        ori: 0
+                    },
+                    {
+                        min: v2.create(23, -1), max: v2.create(24, -2),
+                        ori: 0
+                    }
+
+                ]
+            },
+            {
+                type: "barn_int_base",
+                bounds: [
+                    {
+                        min: v2.create(-20.5, -2.5), max: v2.create(-21.5, 3.5),
+                        ori: 1,
+                        img: wallImg("map-wall-06-rounded.img", 0x6d7645)
+                    },
+                    {
+                        min: v2.create(-20.5, -7.5), max: v2.create(-21.5, -1.5),
+                        ori: 1,
+                        img: wallImg("map-wall-06-rounded.img", 0x6d7645)
+                    },
+                    {
+                        min: v2.create(-11, -2), max: v2.create(-12, 3),
+                        ori: 1,
+                        img: wallImg("map-wall-05-rounded.img", 0x6d7645)
+                    },
+                    {
+                        min: v2.create(-12.5, -3.5), max: v2.create(-13.5, -5.5),
+                        ori: 1,
+                        img: wallImg("map-wall-02-rounded.img", 0x6d7645)
+                    },
+                    {
+                        min: v2.create(-6, -1), max: v2.create(-7, -8),
+                        ori: 1,
+                        img: wallImg("map-wall-07-rounded.img", 0x6d7645)
+                    },
+                    {
+                        min: v2.create(-11, -6), max: v2.create(-12, -14),
+                        ori: 0,
+                        img: wallImg("map-wall-08-rounded.img", 0x6d7645)
+                    },
+                    {
+                        min: v2.create(-7, 2), max: v2.create(-8, 10),
+                        ori: 0,
+                        img: wallImg("map-wall-08-rounded.img", 0x6d7645)
+                    }, 
+                    {
+                        min: v2.create(-3, -9), max: v2.create(-4, -14),
+                        ori: 0,
+                        img: wallImg("map-wall-05-rounded.img", 0x6d7645)
+                    },
+                    {
+                        min: v2.create(10, -3), max: v2.create(11, 4),
+                        ori: 1,
+                        img: wallImg("map-wall-07-rounded.img", 0x6d7645)
+                    },
+                    {
+                        min: v2.create(14, 5), max: v2.create(15, 10),
+                        ori: 0,
+                        img: wallImg("map-wall-05-rounded.img", 0x6d7645)
+                    },
+                    {
+                        min: v2.create(14, -1), max: v2.create(15, -14),
+                        ori: 0,
+                        img: wallImg("map-wall-13-rounded.img", 0x6d7645)
+                    },
+                    {
+                        min: v2.create(16.5, 0.5), max: v2.create(17.5, -3.5),
+                        ori: 1,
+                        img: wallImg("map-wall-04-rounded.img", 0x6d7645)
+                    }
+                ]
+            }
+        ],
         ceiling: {
             zoomRegions: [
                 {
@@ -2468,36 +2617,6 @@ function createBarn<T extends BuildingDef>(e: Partial<T>): T {
         },
         mapObjects: [
             {
-                type: "brick_wall_ext_4",
-                pos: v2.create(-24.5, 9),
-                scale: 1,
-                ori: 0,
-            },
-            {
-                type: "brick_wall_ext_3",
-                pos: v2.create(-22.5, 10.5),
-                scale: 1,
-                ori: 1,
-            },
-            {
-                type: "brick_wall_ext_12",
-                pos: v2.create(-24.5, -2),
-                scale: 1,
-                ori: 0,
-            },
-            {
-                type: "brick_wall_ext_4",
-                pos: v2.create(-24.5, -13),
-                scale: 1,
-                ori: 0,
-            },
-            {
-                type: "brick_wall_ext_3",
-                pos: v2.create(-22.5, -14.5),
-                scale: 1,
-                ori: 1,
-            },
-            {
                 type: "house_window_01",
                 pos: v2.create(-24.75, 5.5),
                 scale: 1,
@@ -2522,54 +2641,6 @@ function createBarn<T extends BuildingDef>(e: Partial<T>): T {
                 ori: 1,
             },
             {
-                type: "brick_wall_ext_16",
-                pos: v2.create(-10, 10.5),
-                scale: 1,
-                ori: 1,
-            },
-            {
-                type: "brick_wall_ext_16",
-                pos: v2.create(10, 10.5),
-                scale: 1,
-                ori: 1,
-            },
-            {
-                type: "brick_wall_ext_16",
-                pos: v2.create(-10, -14.5),
-                scale: 1,
-                ori: 1,
-            },
-            {
-                type: "brick_wall_ext_6",
-                pos: v2.create(5, -14.5),
-                scale: 1,
-                ori: 1,
-            },
-            {
-                type: "brick_wall_ext_4",
-                pos: v2.create(-5.5, 13),
-                scale: 1,
-                ori: 0,
-            },
-            {
-                type: "brick_wall_ext_4",
-                pos: v2.create(5.5, 13),
-                scale: 1,
-                ori: 0,
-            },
-            {
-                type: "brick_wall_ext_3",
-                pos: v2.create(-3.5, 14.5),
-                scale: 1,
-                ori: 1,
-            },
-            {
-                type: "brick_wall_ext_3",
-                pos: v2.create(3.5, 14.5),
-                scale: 1,
-                ori: 1,
-            },
-            {
                 type: "house_window_01",
                 pos: v2.create(9.5, -14.75),
                 scale: 1,
@@ -2588,36 +2659,6 @@ function createBarn<T extends BuildingDef>(e: Partial<T>): T {
                 ori: 3,
             },
             {
-                type: "brick_wall_ext_4",
-                pos: v2.create(24.5, 9),
-                scale: 1,
-                ori: 0,
-            },
-            {
-                type: "brick_wall_ext_3",
-                pos: v2.create(22.5, 10.5),
-                scale: 1,
-                ori: 1,
-            },
-            {
-                type: "brick_wall_ext_13",
-                pos: v2.create(17.5, -14.5),
-                scale: 1,
-                ori: 1,
-            },
-            {
-                type: "brick_wall_ext_19",
-                pos: v2.create(24.5, -5.5),
-                scale: 1,
-                ori: 0,
-            },
-            {
-                type: "brick_wall_ext_1",
-                pos: v2.create(23.5, -1.5),
-                scale: 1,
-                ori: 0,
-            },
-            {
                 type: "house_window_01",
                 pos: v2.create(24.75, 5.5),
                 scale: 1,
@@ -2634,78 +2675,6 @@ function createBarn<T extends BuildingDef>(e: Partial<T>): T {
                 pos: v2.create(19.5, -8),
                 scale: 1,
                 ori: 0,
-            },
-            {
-                type: "barn_wall_int_6",
-                pos: v2.create(-21, 0.5),
-                scale: 1,
-                ori: 1,
-            },
-            {
-                type: "barn_wall_int_6",
-                pos: v2.create(-21, -4.5),
-                scale: 1,
-                ori: 1,
-            },
-            {
-                type: "barn_wall_int_5",
-                pos: v2.create(-11.5, 0.5),
-                scale: 1,
-                ori: 1,
-            },
-            {
-                type: "barn_wall_int_2",
-                pos: v2.create(-13, -4.5),
-                scale: 1,
-                ori: 1,
-            },
-            {
-                type: "barn_wall_int_7",
-                pos: v2.create(-6.5, -4.5),
-                scale: 1,
-                ori: 1,
-            },
-            {
-                type: "barn_wall_int_8",
-                pos: v2.create(-11.5, -10),
-                scale: 1,
-                ori: 0,
-            },
-            {
-                type: "barn_wall_int_8",
-                pos: v2.create(-7.5, 6),
-                scale: 1,
-                ori: 0,
-            },
-            {
-                type: "barn_wall_int_5",
-                pos: v2.create(-3.5, -11.5),
-                scale: 1,
-                ori: 0,
-            },
-            {
-                type: "barn_wall_int_7",
-                pos: v2.create(10.5, 0.5),
-                scale: 1,
-                ori: 1,
-            },
-            {
-                type: "barn_wall_int_5",
-                pos: v2.create(14.5, 7.5),
-                scale: 1,
-                ori: 0,
-            },
-            {
-                type: "barn_wall_int_13",
-                pos: v2.create(14.5, -7.5),
-                scale: 1,
-                ori: 0,
-            },
-            {
-                type: "barn_wall_int_4",
-                pos: v2.create(17, -1.5),
-                scale: 1,
-                ori: 1,
             },
             {
                 type: "house_door_01",
@@ -16380,6 +16349,15 @@ export const MapObjectDefs: Record<string, MapObjectDef> = {
         };
         return util.mergeDeep(t, e || {});
     })({}),
+    brick_wall_base: createWall({
+        material: "brick",
+        extents: v2.create(0.5, 0.5)
+    }),
+    barn_int_base: createWall({
+        material: "wood",
+        hitParticle: "ltgreenChip",
+        extents: v2.create(0.5, 0.5)
+    }),
     brick_wall_ext_1: createWall({
         material: "brick",
         extents: v2.create(0.5, 0.5),
