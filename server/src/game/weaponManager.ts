@@ -605,7 +605,9 @@ export class WeaponManager {
 
             weap.ammo -= diff;
             this.player.weapsDirty = true;
-            this.player.invManager.giveAndDrop(ammoType as InventoryItem, diff);
+            if (this.player.invManager.isValid(ammoType)) {
+                this.player.invManager.giveAndDrop(ammoType, diff);
+            }
         }
     }
 

@@ -31,6 +31,7 @@ M1 Garand:
 
 VSS:
 + made more common
++ changed potato quality from 1 (rare) to 0 (common)
 
 Flak Jacket:
 Size increase +0.2 -> +0.1
