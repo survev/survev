@@ -1688,7 +1688,13 @@ function createWall<T extends ObstacleDef>(e: Partial<T>): T {
         reflectBullets: false,
         loot: [],
         map: { display: false },
-        img: {},
+        img: {
+            sprite: "",
+            scale: 0.5,
+            alpha: 1,
+            tint: 0xffffff,
+            zIdx: 10,
+        },
         sound: {
             bullet: "wall_bullet",
             punch: "wall_bullet",

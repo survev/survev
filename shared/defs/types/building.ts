@@ -27,6 +27,18 @@ export interface BuildingDef {
         }>;
         imgs: FloorImage[];
     };
+    walls?: Array<{
+        type: string;
+        bounds: Array<{
+            min: Vec2;
+            max: Vec2;
+            ori?: number;
+            img?: {
+                sprite: string;
+                tint?: number;
+            };
+        }>;
+    }>;
     ceiling: {
         zoomRegions: Array<{
             zoomIn?: AABB;

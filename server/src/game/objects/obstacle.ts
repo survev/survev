@@ -103,6 +103,26 @@ export class Obstacle extends BaseGameObject {
 
     killTicker = 0;
     regrowTicker = 0;
+    definedWalls?: Collider;
+    imgSprite?: string;
+    imgTint?: number;
+
+    get hasWallDefinitions(): boolean {
+        return !!this.definedWalls;
+    }
+
+    get wallDefData():
+        | { type: 'aabb'; min: { x: number; y: number }; max: { x: number; y: number } }
+        | undefined {
+        if (!this.definedWalls || this.definedWalls.type !== collider.Type.Aabb) {
+            return undefined;
+        }
+        return {
+            type: 'aabb',
+            min: { x: this.definedWalls.min.x, y: this.definedWalls.min.y },
+            max: { x: this.definedWalls.max.x, y: this.definedWalls.max.y },
+        };
+    }
 
     constructor(
         game: Game,
@@ -249,12 +269,27 @@ export class Obstacle extends BaseGameObject {
         this.toggleDir = dir;
     }
 
+    setDefinedWall(customCollider: Collider) {
+        this.definedWalls = customCollider;
+        this.collider = collider.transform(customCollider, this.pos, this.rot, this.scale);
+        this.bounds = collider.toAabb(
+            collider.transform(customCollider, v2.create(0, 0), this.rot, this.scale),
+        );
+
+        const margin = v2.create(this.interactionRad, this.interactionRad);
+        v2.set(this.bounds.min, v2.sub(this.bounds.min, margin));
+        v2.set(this.bounds.max, v2.add(this.bounds.max, margin));
+        this.game.grid.updateObject(this);
+        this.setDirty();
+    }
+
     updateCollider() {
         const def = MapObjectDefs[this.type] as ObstacleDef;
-        this.collider = collider.transform(def.collision, this.pos, this.rot, this.scale);
+        const baseCollision = this.definedWalls ?? def.collision;
+        this.collider = collider.transform(baseCollision, this.pos, this.rot, this.scale);
 
         this.bounds = collider.toAabb(
-            collider.transform(def.collision, v2.create(0, 0), this.rot, this.scale),
+            collider.transform(baseCollision, v2.create(0, 0), this.rot, this.scale),
         );
 
         const margin = v2.create(this.interactionRad, this.interactionRad);
