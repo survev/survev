@@ -127,12 +127,12 @@ export interface ObjectsFullData {
         skinPlayerId?: number;
         hasWallDefinitions?: boolean;
         wallDefinitions?: {
-            type: 'aabb';
+            type: "aabb";
             min: { x: number; y: number };
             max: { x: number; y: number };
         };
         wallDefData?: {
-            type: 'aabb';
+            type: "aabb";
             min: { x: number; y: number };
             max: { x: number; y: number };
         };
@@ -419,7 +419,7 @@ export const ObjectSerializeFns: {
             data.hasWallDefinitions = s.readBoolean();
             if (data.hasWallDefinitions) {
                 data.wallDefinitions = {
-                    type: 'aabb',
+                    type: "aabb",
                     min: {
                         x: s.readFloat(-1024, 1024, 16),
                         y: s.readFloat(-1024, 1024, 16),

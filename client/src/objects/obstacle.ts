@@ -102,7 +102,7 @@ export class Obstacle implements AbstractObject {
     // Sprite override for walls system
     customImgSprite?: string;
     customImgTint?: number;
-    
+
     definedWall?: Collider;
 
     constructor() {
@@ -173,7 +173,12 @@ export class Obstacle implements AbstractObject {
             }
         }
         const obstacleCollision = this.definedWall ?? def.collision;
-        this.collider = collider.transform(obstacleCollision, this.pos, this.rot, this.scale);
+        this.collider = collider.transform(
+            obstacleCollision,
+            this.pos,
+            this.rot,
+            this.scale,
+        );
         if (isNew) {
             this.isNew = true;
             this.exploded = ctx.map.deadObstacleIds.includes(this.__id);
@@ -264,14 +269,14 @@ export class Obstacle implements AbstractObject {
             this.customImgSprite = data.imgSprite;
             this.customImgTint = data.imgTint;
         }
-        
+
         let w;
         if (this.customImgSprite) {
             w = this.dead ? "" : this.customImgSprite;
         } else {
             w = this.dead ? def.img.residue! : def.img.sprite!;
         }
-        
+
         if (this.isButton && this.button.onOff && !this.dead && def.button?.useImg) {
             w = def.button.useImg;
         } else if (this.isButton && !this.button.canUse && def.button?.offImg) {
@@ -290,8 +295,13 @@ export class Obstacle implements AbstractObject {
                 this.sprite.texture =
                     w == "none" || !w ? PIXI.Texture.EMPTY : PIXI.Texture.from(w);
                 this.sprite.anchor.set(f.x, f.y);
-                this.sprite.tint = this.customImgTint !== undefined ? this.customImgTint : def.img.tint!;
-                this.sprite.imgAlpha = this.dead ? 0.75 : (this.customImgSprite ? 1 : def.img.alpha!);
+                this.sprite.tint =
+                    this.customImgTint !== undefined ? this.customImgTint : def.img.tint!;
+                this.sprite.imgAlpha = this.dead
+                    ? 0.75
+                    : this.customImgSprite
+                      ? 1
+                      : def.img.alpha!;
                 this.sprite.zOrd = def.img.zIdx!;
                 this.sprite.zIdx = Math.floor(this.scale * 1000) * 65535 + this.__id;
                 this.sprite.alpha = this.sprite.imgAlpha;
