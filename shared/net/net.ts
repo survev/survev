@@ -347,6 +347,12 @@ export enum MsgType {
     UpdatePass,
     AliveCounts,
     PerkModeRoleSelect,
+    /* Bounty system messages */
+    BountyGameInfo,
+    BountyKill,
+    BountyStatus,
+    BountyLeaderboard,
+    BountyGameOver,
 }
 
 export enum PickupMsgType {
@@ -380,3 +386,10 @@ export { PlayerStatsMsg } from "./playerStatsMsg";
 export { RoleAnnouncementMsg } from "./roleAnnouncementMsg";
 export { SpectateMsg } from "./spectateMsg";
 export { getPlayerStatusUpdateRate, UpdateMsg } from "./updateMsg";
+export {
+    BountyKillMsg,
+    BountyGameInfoMsg,
+    BountyStatusMsg,
+    BountyGameOverMsg,
+    BountyLeaderboardMsg,
+} from "./bountyMsg";

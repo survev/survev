@@ -31,6 +31,7 @@ import { PrivateRouter } from "./routes/private/private";
 import { StatsRouter } from "./routes/stats/StatsRouter";
 import { AuthRouter } from "./routes/user/AuthRouter";
 import { UserRouter } from "./routes/user/UserRouter";
+import { BountyApiRouter } from "./routes/bountyRouter";
 
 export type Context = {
     Variables: {
@@ -75,6 +76,7 @@ app.use(
 app.route("/api/user/", UserRouter);
 app.route("/api/auth/", AuthRouter);
 app.route("/api/", StatsRouter);
+app.route("/api/", BountyApiRouter);
 app.route("/private/", PrivateRouter);
 
 server.init(app, upgradeWebSocket);

@@ -33,6 +33,7 @@ import { ProjectileBarn } from "./objects/projectile";
 import { SmokeBarn } from "./objects/smoke";
 import { PluginManager } from "./pluginManager";
 import { Profiler } from "./profiler";
+import { BountyManager } from "./bountyManager";
 
 export interface JoinTokenData {
     expiresAt: number;
@@ -113,6 +114,9 @@ export class Game {
 
     profiler = new Profiler();
 
+    // Bounty system manager
+    bountyManager: BountyManager;
+
     constructor(
         id: string,
         config: ServerGameConfig,
@@ -151,6 +155,9 @@ export class Game {
         this.gas = new Gas(this);
 
         this.modeManager = new GameModeManager(this);
+
+        // Initialize bounty manager
+        this.bountyManager = new BountyManager(this);
 
         if (this.map.factionMode) {
             for (let i = 1; i <= this.map.mapDef.gameMode.factions!; i++) {
@@ -192,6 +199,10 @@ export class Game {
             this.started = this.modeManager.isGameStarted();
             if (this.started) {
                 this.gas.advanceGasStage();
+                // Start bounty tracking when game starts
+                if (this.bountyManager.enabled) {
+                    this.bountyManager.startGame();
+                }
             }
         }
 
@@ -247,6 +258,13 @@ export class Game {
         this.profiler.addSample("planes");
         this.planeBarn.update(dt);
         this.profiler.endSample();
+
+        // Update bounty manager
+        if (this.bountyManager.enabled) {
+            this.profiler.addSample("bounty");
+            this.bountyManager.update(dt);
+            this.profiler.endSample();
+        }
 
         const tickTime = performance.now() - this.now;
 
@@ -466,6 +484,12 @@ export class Game {
         player.spectating = undefined;
         player.dirNew = v2.create(1, 0);
         player.setPartDirty();
+
+        // Handle bounty for disconnect
+        if (this.bountyManager.enabled && !player.dead) {
+            this.bountyManager.handleDisconnect(player);
+        }
+
         if (player.canDespawn()) {
             player.game.playerBarn.removePlayer(player);
         }
@@ -481,6 +505,12 @@ export class Game {
 
         if (didGameEnd) {
             this.over = true;
+
+            // Process bounty payouts if enabled
+            if (this.bountyManager.enabled) {
+                const rankings = this.modeManager.getPlayersSortedByRank();
+                this.bountyManager.endGame(rankings);
+            }
 
             // send win emoji after 1 second
             this.playerBarn.sendWinEmoteTicker = 1;

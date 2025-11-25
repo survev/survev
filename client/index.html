@@ -30,6 +30,7 @@
 
     <link href="css/app.css" rel="stylesheet">
     <link href="css/game.css" rel="stylesheet">
+    <link href="css/bounty.css" rel="stylesheet">
   </head>
   <body>
     <div id="preroll-wrapper">
@@ -384,6 +385,31 @@
             <div id="ui-kill-leader-count">0</div>
           </div>
         </div>
+        <!-- Bounty HUD -->
+        <div id="ui-bounty-hud" class="js-ui-map-hidden js-ui-hud-show">
+          <div class="bounty-hud-title">💰 BOUNTY MODE</div>
+          <div class="bounty-hud-row bounty-earned">
+            <span class="label">Earned</span>
+            <span class="value" id="ui-bounty-earned">$0.00</span>
+          </div>
+          <div class="bounty-hud-row head-bounty">
+            <span class="label">Your Head</span>
+            <span class="value" id="ui-bounty-head">$0.00</span>
+          </div>
+          <div class="bounty-hud-row">
+            <span class="label">Kills</span>
+            <span class="value" id="ui-bounty-kills">0</span>
+          </div>
+        </div>
+        <!-- Bounty Kill Popup -->
+        <div id="ui-bounty-popup" class="bounty-popup-hidden">
+          <div class="bounty-popup-header">💰 BOUNTY CLAIMED! 💰</div>
+          <div class="bounty-popup-amount">+$0.00</div>
+          <div class="bounty-popup-name">Killed: Player</div>
+          <div class="bounty-popup-total">Total: $0.00</div>
+        </div>
+        <!-- Bounty Leaderboard (shown on Tab) -->
+        <div id="ui-bounty-leaderboard" class="js-ui-map-show"></div>
         <div id="ui-killfeed-wrapper">
           <div id="ui-killfeed" class="js-ui-map-hidden js-ui-hud-show">
             <div id="ui-killfeed-contents"></div>

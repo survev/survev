@@ -46,6 +46,7 @@ import type { Localization } from "./ui/localization";
 import { Touch } from "./ui/touch";
 import { UiManager } from "./ui/ui";
 import { UiManager2 } from "./ui/ui2";
+import { BountyUiManager } from "./bounty/bountyUi";
 
 export interface Ctx {
     audioManager: AudioManager;
@@ -84,6 +85,7 @@ export class Game {
     m_gas!: Gas;
     m_uiManager!: UiManager;
     m_ui2Manager!: UiManager2;
+    m_bountyUi!: BountyUiManager;
     m_emoteBarn!: EmoteBarn;
     m_shotBarn!: ShotBarn;
     m_objectCreator!: Creator;
@@ -255,6 +257,7 @@ export class Game {
             this.m_inputBindUi,
         );
         this.m_ui2Manager = new UiManager2(this.m_localization, this.m_inputBinds);
+        this.m_bountyUi = new BountyUiManager();
         this.m_emoteBarn = new EmoteBarn(
             this.m_audioManager,
             this.m_uiManager,
@@ -1604,6 +1607,55 @@ export class Game {
                 const msg = new net.DisconnectMsg();
                 msg.deserialize(stream);
                 this.m_disconnectMsg = msg.reason;
+                break;
+            }
+            // Bounty system messages
+            case net.MsgType.BountyGameInfo: {
+                const msg = new net.BountyGameInfoMsg();
+                msg.deserialize(stream);
+                if (this.m_bountyUi) {
+                    this.m_bountyUi.handleGameInfo(msg);
+                }
+                break;
+            }
+            case net.MsgType.BountyKill: {
+                const msg = new net.BountyKillMsg();
+                msg.deserialize(stream);
+                if (this.m_bountyUi) {
+                    const isLocalKiller = msg.killerId === this.m_activeId;
+                    const victimInfo = this.m_playerBarn.getPlayerInfo(msg.victimId);
+                    const victimName = this.m_playerBarn.getPlayerName(
+                        victimInfo.playerId,
+                        this.m_activeId,
+                        true,
+                    );
+                    this.m_bountyUi.handleBountyKill(msg, isLocalKiller, victimName);
+                }
+                break;
+            }
+            case net.MsgType.BountyStatus: {
+                const msg = new net.BountyStatusMsg();
+                msg.deserialize(stream);
+                if (this.m_bountyUi) {
+                    this.m_bountyUi.handleBountyStatus(msg);
+                }
+                break;
+            }
+            case net.MsgType.BountyLeaderboard: {
+                const msg = new net.BountyLeaderboardMsg();
+                msg.deserialize(stream);
+                if (this.m_bountyUi) {
+                    this.m_bountyUi.handleLeaderboard(msg);
+                }
+                break;
+            }
+            case net.MsgType.BountyGameOver: {
+                const msg = new net.BountyGameOverMsg();
+                msg.deserialize(stream);
+                if (this.m_bountyUi) {
+                    this.m_bountyUi.handleGameOver(msg);
+                }
+                break;
             }
         }
     }

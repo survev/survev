@@ -3,6 +3,7 @@ import pg from "pg";
 import { Config } from "../../config";
 import { server } from "../apiServer";
 import * as schema from "./schema";
+import * as bountySchema from "./bountySchema";
 
 const poolConnection = new pg.Pool({
     ...Config.database,
@@ -19,5 +20,5 @@ poolConnection.on("error", (err) => {
 
 export const db = drizzle({
     client: poolConnection,
-    schema,
+    schema: { ...schema, ...bountySchema },
 });

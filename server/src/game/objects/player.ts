@@ -2849,6 +2849,16 @@ export class Player extends BaseGameObject {
                 if (killCreditSource.role === "woods_king") {
                     this.game.playerBarn.addMapPing("ping_woodsking", this.pos);
                 }
+
+                // Handle bounty kill
+                if (this.game.bountyManager.enabled) {
+                    this.game.bountyManager.handleKill(
+                        killCreditSource,
+                        this,
+                        params.damageType,
+                        params.gameSourceType ?? "",
+                    );
+                }
             }
             killMsg.killCreditId = killCreditSource.__id;
             killMsg.killerKills = killCreditSource.kills;
@@ -2856,6 +2866,28 @@ export class Player extends BaseGameObject {
 
         if (params.source?.__type === ObjectType.Player) {
             killMsg.killerId = params.source.__id;
+        }
+
+        // Handle bounty for environment deaths (gas, zone, disconnect, etc.)
+        // Give bounty to lastDamagedBy if there was no direct kill credit
+        if (
+            this.game.bountyManager.enabled &&
+            !killCreditSource &&
+            this.lastDamagedBy &&
+            this.lastDamagedBy !== this &&
+            !this.lastDamagedBy.dead
+        ) {
+            this.game.bountyManager.handleEnvironmentDeath(
+                this,
+                this.lastDamagedBy,
+            );
+        } else if (
+            this.game.bountyManager.enabled &&
+            !killCreditSource &&
+            !this.lastDamagedBy
+        ) {
+            // No killer and no last damager - bounty disappears
+            this.game.bountyManager.handleEnvironmentDeath(this);
         }
 
         if (this.hasPerk("final_bugle")) {
