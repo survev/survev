@@ -127,17 +127,9 @@ export interface ObjectsFullData {
         skinPlayerId?: number;
         hasWallDefinitions?: boolean;
         wallDefinitions?: {
-            type: 'aabb';
             min: { x: number; y: number };
             max: { x: number; y: number };
         };
-        wallDefData?: {
-            type: 'aabb';
-            min: { x: number; y: number };
-            max: { x: number; y: number };
-        };
-        imgSprite?: string;
-        imgTint?: number;
     };
     [ObjectType.Loot]: {
         type: string;
@@ -363,19 +355,24 @@ export const ObjectSerializeFns: {
             if (data.isSkin) s.writeUint16(data.skinPlayerId!);
 
             s.writeBoolean(data.hasWallDefinitions ?? false);
-            if (data.hasWallDefinitions && data.wallDefData) {
-                // Serialize AABB collision bounds
-                s.writeFloat(data.wallDefData.min.x, -1024, 1024, 16);
-                s.writeFloat(data.wallDefData.min.y, -1024, 1024, 16);
-                s.writeFloat(data.wallDefData.max.x, -1024, 1024, 16);
-                s.writeFloat(data.wallDefData.max.y, -1024, 1024, 16);
-            }
-
-            // Serialize sprite override if present
-            s.writeBoolean(!!data.imgSprite);
-            if (data.imgSprite) {
-                s.writeASCIIString(data.imgSprite, 48);
-                s.writeUint32(data.imgTint ?? 0xffffff);
+            if (data.hasWallDefinitions && data.wallDefinitions) {
+                // Serialize AABB collision bounds (local space)
+                s.writeVec(
+                    data.wallDefinitions.min,
+                    -Constants.MaxPosition,
+                    -Constants.MaxPosition,
+                    Constants.MaxPosition,
+                    Constants.MaxPosition,
+                    16,
+                );
+                s.writeVec(
+                    data.wallDefinitions.max,
+                    -Constants.MaxPosition,
+                    -Constants.MaxPosition,
+                    Constants.MaxPosition,
+                    Constants.MaxPosition,
+                    16,
+                );
             }
         },
         deserializePart: (s, data) => {
@@ -419,22 +416,21 @@ export const ObjectSerializeFns: {
             data.hasWallDefinitions = s.readBoolean();
             if (data.hasWallDefinitions) {
                 data.wallDefinitions = {
-                    type: 'aabb',
-                    min: {
-                        x: s.readFloat(-1024, 1024, 16),
-                        y: s.readFloat(-1024, 1024, 16),
-                    },
-                    max: {
-                        x: s.readFloat(-1024, 1024, 16),
-                        y: s.readFloat(-1024, 1024, 16),
-                    },
+                    min: s.readVec(
+                        -Constants.MaxPosition,
+                        -Constants.MaxPosition,
+                        Constants.MaxPosition,
+                        Constants.MaxPosition,
+                        16,
+                    ),
+                    max: s.readVec(
+                        -Constants.MaxPosition,
+                        -Constants.MaxPosition,
+                        Constants.MaxPosition,
+                        Constants.MaxPosition,
+                        16,
+                    ),
                 };
-            }
-
-            // Deserialize sprite override if present
-            if (s.readBoolean()) {
-                data.imgSprite = s.readASCIIString(48);
-                data.imgTint = s.readUint32();
             }
         },
     },

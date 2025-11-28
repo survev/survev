@@ -104,21 +104,18 @@ export class Obstacle extends BaseGameObject {
     killTicker = 0;
     regrowTicker = 0;
     definedWalls?: Collider;
-    imgSprite?: string;
-    imgTint?: number;
 
     get hasWallDefinitions(): boolean {
         return !!this.definedWalls;
     }
 
-    get wallDefData():
-        | { type: 'aabb'; min: { x: number; y: number }; max: { x: number; y: number } }
+    get wallDefinitions():
+        | { min: { x: number; y: number }; max: { x: number; y: number } }
         | undefined {
         if (!this.definedWalls || this.definedWalls.type !== collider.Type.Aabb) {
             return undefined;
         }
         return {
-            type: 'aabb',
             min: { x: this.definedWalls.min.x, y: this.definedWalls.min.y },
             max: { x: this.definedWalls.max.x, y: this.definedWalls.max.y },
         };

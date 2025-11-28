@@ -1883,41 +1883,24 @@ export class GameMap {
         }
         if (def.walls) {
             for (const wallDef of def.walls) {
-                for (const boundsDef of wallDef.bounds) {
-                    const wallOri = ((boundsDef.ori ?? 0) + ori) % 2;
+                for (const aabb of wallDef.collision) {
                     // Calculate wall position from AABB center
-                    const boundsCenter = v2.create(
-                        (boundsDef.min.x + boundsDef.max.x) / 2,
-                        (boundsDef.min.y + boundsDef.max.y) / 2
-                    );
-                    const wallPos = math.addAdjust(pos, boundsCenter, ori);
+                    const extent = v2.mul(v2.sub(aabb.max, aabb.min), 0.5);
+                    const center = v2.add(aabb.min, extent);
+                    const wallPos = math.addAdjust(pos, center, ori);
                     
                     const wall = this.genObstacle(
                         wallDef.type,
                         wallPos,
                         layer,
-                        wallOri,
+                        ori,
                         1, 
                         building.__id,
                     );
                     
-                    const halfExtents = v2.create(
-                        Math.abs(boundsDef.max.x - boundsDef.min.x) / 2,
-                        Math.abs(boundsDef.max.y - boundsDef.min.y) / 2
-                    );
-                    const customBounds = collider.createAabbExtents(
-                        v2.create(0, 0),
-                        halfExtents
-                    );
+                    // Create local-space collision from AABB extents
+                    const customBounds = collider.createAabbExtents(v2.create(0, 0), extent);
                     wall.setDefinedWall(customBounds);
-                    
-                    // Override the sprite if specified
-                    if (boundsDef.img) {
-                        wall.imgSprite = boundsDef.img.sprite;
-                        if (boundsDef.img.tint !== undefined) {
-                            wall.imgTint = boundsDef.img.tint;
-                        }
-                    }
                     
                     wall.setDirty();
                     building.childObjects.push(wall);

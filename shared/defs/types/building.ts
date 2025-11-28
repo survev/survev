@@ -29,15 +29,7 @@ export interface BuildingDef {
     };
     walls?: Array<{
         type: string;
-        bounds: Array<{
-            min: Vec2;
-            max: Vec2;
-            ori?: number;
-            img?: {
-                sprite: string;
-                tint?: number;
-            };
-        }>;
+        collision: AABB[];
     }>;
     ceiling: {
         zoomRegions: Array<{
