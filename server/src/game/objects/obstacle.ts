@@ -268,7 +268,12 @@ export class Obstacle extends BaseGameObject {
 
     setDefinedWall(customCollider: Collider) {
         this.definedWalls = customCollider;
-        this.collider = collider.transform(customCollider, this.pos, this.rot, this.scale);
+        this.collider = collider.transform(
+            customCollider,
+            this.pos,
+            this.rot,
+            this.scale,
+        );
         this.bounds = collider.toAabb(
             collider.transform(customCollider, v2.create(0, 0), this.rot, this.scale),
         );

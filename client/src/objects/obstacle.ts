@@ -169,7 +169,12 @@ export class Obstacle implements AbstractObject {
             }
         }
         const obstacleCollision = this.definedWall ?? def.collision;
-        this.collider = collider.transform(obstacleCollision, this.pos, this.rot, this.scale);
+        this.collider = collider.transform(
+            obstacleCollision,
+            this.pos,
+            this.rot,
+            this.scale,
+        );
         if (isNew) {
             this.isNew = true;
             this.exploded = ctx.map.deadObstacleIds.includes(this.__id);

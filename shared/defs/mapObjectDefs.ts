@@ -16210,12 +16210,12 @@ export const MapObjectDefs: Record<string, MapObjectDef> = {
     })({}),
     brick_wall_base: createWall({
         material: "brick",
-        extents: v2.create(0.5, 0.5)
+        extents: v2.create(0.5, 0.5),
     }),
     barn_int_base: createWall({
         material: "wood",
         hitParticle: "ltgreenChip",
-        extents: v2.create(0.5, 0.5)
+        extents: v2.create(0.5, 0.5),
     }),
     brick_wall_ext_1: createWall({
         material: "brick",
