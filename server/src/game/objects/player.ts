@@ -2737,6 +2737,21 @@ export class Player extends BaseGameObject {
             this.health = 50;
         }
 
+        if (
+            params.source?.__type === ObjectType.Player &&
+            params.source.hasPerk("rip_rounds") &&
+            params.weaponSourceType !== undefined
+        ) {
+            const weaponDef = GameObjectDefs[params.weaponSourceType] as
+                | GunDef
+                | MeleeDef
+                | ThrowableDef;
+
+            if (weaponDef.type === "gun") {
+                this.health = 40;
+            }
+        }
+
         this.animType = GameConfig.Anim.None;
         this.setDirty();
 

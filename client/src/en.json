@@ -636,6 +636,8 @@
   "game-ap_rounds-desc": "Bullets are more effective against armored enemies and obstacles.",
   "game-splinter": "Splinter Rounds",
   "game-splinter-desc": "Rounds fragment into three less powerful bullets.",
+  "game-rip-rounds": "RIP Rounds",
+  "game-rip-rounds-desc": "Instantly kill players that are knocked down.",
   "game-small_arms": "Small Arms",
   "game-small_arms-desc": "Move faster with weapons deployed.</br>Decreased size.",
   "game-takedown": "Takedown",
