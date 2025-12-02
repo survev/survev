@@ -1840,6 +1840,29 @@ function createBank<T extends BuildingDef>(e: Partial<T>): T {
                 },
             ],
         },
+        walls: [
+            {
+                type: "brick_wall_base",
+                collision: [
+                    collider.createAabb(v2.create(-25.5, 16.5), v2.create(-2.5, 17.5)),     // brick_wall_ext_23 at (-14, 17) ori:1
+                    collider.createAabb(v2.create(-26.4, -5.5), v2.create(-25.4, 17.5)),    // brick_wall_ext_23 at (-25.9, 6) ori:0
+                    collider.createAabb(v2.create(-25.5, -5.5), v2.create(-5.5, -4.5)),     // brick_wall_ext_20 at (-15.5, -5) ori:1
+                    collider.createAabb(v2.create(-5.5, -9.5), v2.create(-4.5, -4.5)),      // brick_wall_ext_5 at (-5, -7) ori:0
+                    collider.createAabb(v2.create(-5.5, -19.5), v2.create(-4.5, -13.5)),    // brick_wall_ext_6 at (-5, -16.5) ori:0
+                    collider.createAabb(v2.create(-4.5, -19.5), v2.create(-0.5, -18.5)),    // brick_wall_ext_4 at (-2.5, -19) ori:1
+                    collider.createAabb(v2.create(2.5, -19.5), v2.create(9.5, -18.5)),      // brick_wall_ext_7 at (6, -19) ori:1
+                    collider.createAabb(v2.create(12.5, -19.5), v2.create(16.5, -18.5)),    // brick_wall_ext_4 at (12.5, -19) ori:1
+                    collider.createAabb(v2.create(16.5, -19.5), v2.create(17.5, -13.5)),    // brick_wall_ext_6 at (17, -16.5) ori:0
+                    collider.createAabb(v2.create(16.5, -9.5), v2.create(17.5, -2.5)),      // brick_wall_ext_7 at (17, -6) ori:0
+                    collider.createAabb(v2.create(17.5, -2.5), v2.create(26.5, -3.5)),      // brick_wall_ext_9 at (22, -3) ori:1
+                    collider.createAabb(v2.create(25.5, -3.5), v2.create(26.5, 11.5)),      // brick_wall_ext_15 at (26, 4) ori:0
+                    collider.createAabb(v2.create(17.5, 10.5), v2.create(26.5, 11.5)),      // brick_wall_ext_9 at (22, 11) ori:1
+                    collider.createAabb(v2.create(16.5, 10.5), v2.create(17.5, 17.5)),      // brick_wall_ext_7 at (17, 14) ori:0
+                    collider.createAabb(v2.create(12.5, 16.5), v2.create(16.5, 17.5)),      // brick_wall_ext_4 at (12.5, 17) ori:1
+                    collider.createAabb(v2.create(0.5, 16.5), v2.create(8.5, 17.5)),        // brick_wall_ext_8 at (4.5, 17) ori:1
+                ]
+            }
+        ],
         ceiling: {
             zoomRegions: [
                 {
@@ -1897,66 +1920,6 @@ function createBank<T extends BuildingDef>(e: Partial<T>): T {
         },
         mapObjects: [
             {
-                type: "brick_wall_ext_23",
-                pos: v2.create(-14, 17),
-                scale: 1,
-                ori: 1,
-            },
-            {
-                type: "brick_wall_ext_23",
-                pos: v2.create(-25.9, 6),
-                scale: 1,
-                ori: 0,
-            },
-            {
-                type: "brick_wall_ext_20",
-                pos: v2.create(-15.5, -5),
-                scale: 1,
-                ori: 1,
-            },
-            {
-                type: "brick_wall_ext_5",
-                pos: v2.create(-5, -7),
-                scale: 1,
-                ori: 0,
-            },
-            {
-                type: "brick_wall_ext_6",
-                pos: v2.create(-5, -16.5),
-                scale: 1,
-                ori: 0,
-            },
-            {
-                type: "brick_wall_ext_4",
-                pos: v2.create(-2.5, -19),
-                scale: 1,
-                ori: 1,
-            },
-            {
-                type: "brick_wall_ext_7",
-                pos: v2.create(6, -19),
-                scale: 1,
-                ori: 1,
-            },
-            {
-                type: "brick_wall_ext_4",
-                pos: v2.create(14.5, -19),
-                scale: 1,
-                ori: 1,
-            },
-            {
-                type: "brick_wall_ext_6",
-                pos: v2.create(17, -16.5),
-                scale: 1,
-                ori: 0,
-            },
-            {
-                type: "brick_wall_ext_7",
-                pos: v2.create(17, -6),
-                scale: 1,
-                ori: 0,
-            },
-            {
                 type: "house_window_01",
                 pos: v2.create(1, -19.25),
                 scale: 1,
@@ -1979,42 +1942,6 @@ function createBank<T extends BuildingDef>(e: Partial<T>): T {
                 pos: v2.create(17.25, -13.5),
                 scale: 1,
                 ori: 0,
-            },
-            {
-                type: "brick_wall_ext_9",
-                pos: v2.create(22, -3),
-                scale: 1,
-                ori: 1,
-            },
-            {
-                type: "brick_wall_ext_15",
-                pos: v2.create(26, 4),
-                scale: 1,
-                ori: 0,
-            },
-            {
-                type: "brick_wall_ext_9",
-                pos: v2.create(22, 11),
-                scale: 1,
-                ori: 1,
-            },
-            {
-                type: "brick_wall_ext_7",
-                pos: v2.create(17, 14),
-                scale: 1,
-                ori: 0,
-            },
-            {
-                type: "brick_wall_ext_4",
-                pos: v2.create(14.5, 17),
-                scale: 1,
-                ori: 1,
-            },
-            {
-                type: "brick_wall_ext_8",
-                pos: v2.create(4.5, 17),
-                scale: 1,
-                ori: 1,
             },
             {
                 type: "house_window_01",
@@ -2236,6 +2163,18 @@ function createBankVault<T extends BuildingDef>(e: Partial<T>): T {
                 },
             ],
         },
+        walls: [
+            {
+                type: "metal_wall_base",
+                collision: [
+                    collider.createAabb(v2.create(-13.5, -10), v2.create(-11.5, 10)),     
+                    collider.createAabb(v2.create(-13.5, -10.5), v2.create(6.5, -8.5)),     
+                    collider.createAabb(v2.create(-13.5, 8.5), v2.create(6.5, 10.5)),       
+                    collider.createAabb(v2.create(4.5, -9.45), v2.create(6.5, -3.45)),      
+                    collider.createAabb(v2.create(4.5, 3.45), v2.create(6.5, 9.45)),        
+                ]
+            }
+        ],
         ceiling: {
             zoomRegions: [
                 {
@@ -2265,36 +2204,6 @@ function createBankVault<T extends BuildingDef>(e: Partial<T>): T {
             ],
         },
         mapObjects: [
-            {
-                type: "metal_wall_ext_thick_20",
-                pos: v2.create(-12.5, 0),
-                scale: 1,
-                ori: 0,
-            },
-            {
-                type: "metal_wall_ext_thick_20",
-                pos: v2.create(-3.5, -9.5),
-                scale: 1,
-                ori: 1,
-            },
-            {
-                type: "metal_wall_ext_thick_20",
-                pos: v2.create(-3.5, 9.5),
-                scale: 1,
-                ori: 1,
-            },
-            {
-                type: "metal_wall_ext_thick_6",
-                pos: v2.create(5.5, -6.45),
-                scale: 1,
-                ori: 0,
-            },
-            {
-                type: "metal_wall_ext_thick_6",
-                pos: v2.create(5.5, 6.45),
-                scale: 1,
-                ori: 0,
-            },
             {
                 type: "vault_door_main",
                 pos: v2.create(6.5, 3.5),
@@ -16212,9 +16121,12 @@ export const MapObjectDefs: Record<string, MapObjectDef> = {
         material: "brick",
         extents: v2.create(0.5, 0.5),
     }),
-    barn_int_base: createWall({
-        material: "wood",
-        hitParticle: "ltgreenChip",
+    metal_wall_base: createWall({
+        material: "metal",
+        extents: v2.create(0.5, 0.5),
+    }),
+    concrete_wall_base: createWall({
+        material: "concrete",
         extents: v2.create(0.5, 0.5),
     }),
     brick_wall_ext_1: createWall({
