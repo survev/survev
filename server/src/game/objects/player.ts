@@ -2669,6 +2669,7 @@ export class Player extends BaseGameObject {
         if (
             playerSource &&
             playerSource.hasPerk("rip_rounds") &&
+            this.downed &&
             params.weaponSourceType !== undefined
         ) {
             const weaponDef = GameObjectDefs[params.weaponSourceType] as
