@@ -106,7 +106,7 @@ class SDKManager {
             $("#btn-discord-top-right").show();
             $(".surviv-shirts")
                 .css("background-image", "url(./img/discord-promo.png)")
-                .html(`<a href="https://discord.gg/6uRdCdkTPt" target="_blank"></a>`);
+                .html(`<a href="https://discord.gg/75RAK3p3K2" target="_blank"></a>`);
         } else {
             $(".btn-kofi").show();
             $(".surviv-shirts")
