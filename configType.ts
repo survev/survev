@@ -313,6 +313,23 @@ export interface ConfigType {
          */
         AIP_PLACEMENT_ID?: string;
         GAMEMONETIZE_ID?: string;
+
+        /**
+         * Twitch API client ID.
+         *
+         * Identifies your application to the Twitch API.
+         * Must be set together with TWITCH_OAUTH in order to fetch live stream data
+         * (streamer name, viewers, thumbnails).
+         */
+        TWITCH_CLIENT_ID?: string;
+        /**
+         * Twitch OAuth token (App Access Token).
+         *
+         * Authorizes your server to call the Twitch API using the client ID above.
+         * Required to fetch live Twitch stream data like viewer counts and images.
+         * It automatically expires about every 60 days
+         */
+        TWITCH_OAUTH?: string;
     };
 
     /**
@@ -403,6 +420,18 @@ export interface ConfigType {
          * ammo, grenades, healing items and scopes
          */
         inventory?: Record<string, number>;
+    };
+
+    /**
+     * Featured streamers and youtubers to show on the main menu.
+     * These rotate randomly via the API.
+     */
+    featured: {
+        youtubers: Array<{
+            name: string;
+            link: string;
+        }>;
+        streamers: string[];
     };
 }
 
