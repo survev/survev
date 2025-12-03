@@ -27,6 +27,9 @@ export const PerkProperties = {
         armorPenetration: 0.8,
         obstacleMult: 1.5,
     },
+    rip_rounds: {
+        downedMult: 2.0,
+    },
     trick_size: {
         scale: 0.25,
     },
