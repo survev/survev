@@ -396,8 +396,8 @@ export const RoleDefs: Record<string, RoleDef> = {
                         },
                         teamcolor,
                     ),
-                { type: "", ammo: 0 },
-                { type: "mirv", ammo: 8 },
+                { type: "pan", ammo: 0 },
+                { type: "", ammo: 8 },
             ],
             backpack: "backpack03",
             helmet: (teamcolor: TeamColor) =>
@@ -411,6 +411,8 @@ export const RoleDefs: Record<string, RoleDef> = {
             chest: "chest04",
             inventory: {
                 mirv: 8,
+                frag: 12,
+                strobe: 3,
                 "8xscope": 1,
                 bandage: 10,
                 healthkit: 1,
