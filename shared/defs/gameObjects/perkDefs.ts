@@ -27,6 +27,9 @@ export const PerkProperties = {
         armorPenetration: 0.8,
         obstacleMult: 1.5,
     },
+    rip_rounds: {
+        downedMult: 2.0,
+    },
     trick_size: {
         scale: 0.25,
     },
@@ -229,6 +232,20 @@ export const PerkDefs: Record<string, PerkDef> = {
         type: "perk",
         lootImg: {
             sprite: "loot-perk-splinter.img",
+            tint: 0xffffff,
+            border: "loot-circle-outer-03.img",
+            borderTint: 0xffffff,
+            scale: 0.275,
+        },
+        sound: {
+            pickup: "perk_pickup_01",
+        },
+    },
+    rip_rounds: {
+        name: "RIP Rounds",
+        type: "perk",
+        lootImg: {
+            sprite: "loot-perk-rip-rounds.img",
             tint: 0xffffff,
             border: "loot-circle-outer-03.img",
             borderTint: 0xffffff,

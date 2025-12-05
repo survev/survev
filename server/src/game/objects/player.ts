@@ -2655,6 +2655,22 @@ export class Player extends BaseGameObject {
             }
         }
 
+        if (
+            playerSource &&
+            playerSource.hasPerk("rip_rounds") &&
+            this.downed &&
+            params.weaponSourceType !== undefined
+        ) {
+            const weaponDef = GameObjectDefs[params.weaponSourceType] as
+                | GunDef
+                | MeleeDef
+                | ThrowableDef;
+
+            if (weaponDef.type === "gun") {
+                finalDamage *= PerkProperties.rip_rounds.downedMult;
+            }
+        }
+
         if (this._health - finalDamage < 0) finalDamage = this.health;
 
         this.game.pluginManager.emit("playerDamage", { ...params, player: this });
