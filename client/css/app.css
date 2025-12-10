@@ -4153,7 +4153,7 @@ a:active {
 }
 
 #featured-youtuber {
-  display: none !important;
+  display: none;
   margin-top: 12px;
 }
 
