@@ -3675,7 +3675,10 @@ export class Player extends BaseGameObject {
         }
 
         // if none are found use active weapon if its a gun
-        if (GameConfig.WeaponType[this.curWeapIdx] === "gun") {
+        if (
+            GameConfig.WeaponType[this.curWeapIdx] === "gun" &&
+            this.activeWeapon !== "bugle"
+        ) {
             const newGunDef = GameObjectDefs[obj.type] as GunDef;
             return {
                 slot: this.curWeapIdx,
