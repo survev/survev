@@ -23,6 +23,7 @@
     "src/**/*.js",
     "../shared/",
     "atlas-builder/**/*.ts",
+    "building-editor/**/*.ts",
     "global.d.ts"
   ]
 }
