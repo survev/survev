@@ -13211,6 +13211,24 @@ export const MapObjectDefs: Record<string, MapObjectDef> = {
         ],
         map: { displayType: "bush_06" },
     }),
+    cache_03tr: createCache({
+        mapObjects: [
+            {
+                type: "bush_06tr",
+                pos: v2.create(0, 0),
+                scale: 1,
+                ori: 0,
+            },
+            {
+                type: "loot_tier_leaf_pile",
+                pos: v2.create(0, 0),
+                scale: 1,
+                ori: 0,
+                inheritOri: false,
+            },
+        ],
+        map: { displayType: "bush_06" },
+    }),
     cache_06: createCache({
         mapObjects: [
             {
