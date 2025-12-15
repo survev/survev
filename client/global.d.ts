@@ -23,14 +23,17 @@ declare global {
         webkitAudioContext?: AudioContext;
         CP: any;
 
-        aiptag?: {
-            cmd: {
-                display: Array<() => void>;
-            };
-        };
-        aipDisplayTag?: {
-            display(string: string): void;
-            destroy(string: string): void;
+        fusetag?: {
+            que: Array<() => any>;
+            initialised?: boolean;
+            fuseUUID?: string;
+            activateZone: (id: string) => void;
+            pageInit: (options?: PageInitOptions) => void;
+            registerAll: () => void;
+            registerZone: (id: string) => void;
+            setTargeting: (key: string, value: TargetingValue) => void;
+            setAllowRefreshCallback: (callback: (slotDivId: string) => boolean) => void;
+            destroySticky: () => void;
         };
     }
 
@@ -60,10 +63,11 @@ declare global {
 
     const GIT_VERSION: string | undefined;
 
-    const AIP_PLACEMENT_ID: string | undefined;
+    const AD_PREFIX: string | undefined;
     const GAMEMONETIZE_ID: string | undefined;
-
     const TURNSTILE_SITE_KEY: string | undefined;
+
+    window.fusetag = window.fusetag || (window.fusetag = { que: [] });
 }
 
 declare module "pixi.js-legacy" {
