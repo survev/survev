@@ -3721,6 +3721,10 @@ export class Player extends BaseGameObject {
             case "boost":
             case "throwable":
                 {
+                    if (this.role === "leader" && def.type === "boost") {
+                        return;
+                    }
+
                     const itemType = obj.type;
                     if (!this.invManager.isValid(itemType)) break;
 
