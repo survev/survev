@@ -239,6 +239,7 @@ const SkinDefs: Record<string, OutfitDef> = {
     }),
     outfitMod: defineOutfitSkin("outfitBase", {
         name: "Game Moderatr",
+        noDrop: true,
         noDropOnDeath: true,
         skinImg: {
             baseTint: 0x3393db,
