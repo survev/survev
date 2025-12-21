@@ -298,21 +298,18 @@ export interface ConfigType {
          * Turnstile captcha site key.
          */
         TURNSTILE_SITE_KEY?: string;
+        /**
+         * CrazyGames and GameMonetize ad IDs.
+         */
+        AD_PREFIX?: string;
+        GAMEMONETIZE_ID?: string;
 
         /**
-         * Adin play ID: API key used for Adin play ads.
-         * Setting both this and AIP_PLACEMENT_ID will enable ads on the client.
-         *
-         * NOTE: This is only used by the client so must be present at the build time!
+         * SpellSync project ID and public token.
+         * Used for the SpellSync integration.
          */
-        AIP_ID?: string;
-        /**
-         * Adin play placement ID (used to identify ad banners), can be just "survev-io".
-         *
-         * NOTE: This is only used by the client so must be present at the build time!
-         */
-        AIP_PLACEMENT_ID?: string;
-        GAMEMONETIZE_ID?: string;
+        SPELLSYNC_PROJECT_ID?: string;
+        SPELLSYNC_PUBLIC_TOKEN?: string;
     };
 
     /**

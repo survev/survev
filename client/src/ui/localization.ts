@@ -54,9 +54,9 @@ export class Localization {
 
     setLocale(locale: Locale) {
         const newLocale = this.acceptedLocales.includes(locale) ? locale : "en";
-        if (newLocale != this.locale) {
-            const downloadUrl = `/l10n/${this.isStats ? "stats/" : ""}${locale}.json`;
-            if (this.translations[locale] === undefined) {
+        if (newLocale !== this.locale) {
+            const downloadUrl = `./l10n/${this.isStats ? "stats/" : ""}${locale}.json`;
+            if (!this.translations[locale]) {
                 downloadFile(downloadUrl, (err, data) => {
                     if (err) {
                         console.error(
@@ -82,8 +82,8 @@ export class Localization {
         // Also try spaces as dashes
         const spacedKey = key.replace(" ", "-");
         return (
-            this.translations[this.locale][key] ||
-            this.translations[this.locale][spacedKey] ||
+            this.translations[this.locale]?.[key] ||
+            this.translations[this.locale]?.[spacedKey] ||
             this.translations["en"][key] ||
             ""
         );
@@ -100,7 +100,7 @@ export class Localization {
             }
             let localizedText = this.translate(datal10n);
             if (localizedText) {
-                if (el$.attr("data-caps") == "true") {
+                if (el$.attr("data-caps") === "true") {
                     localizedText = localizedText.toUpperCase();
                 }
                 if (el$.attr("label")) {
@@ -117,35 +117,34 @@ export class Localization {
                 }
             }
         });
+
+        $(".language-select").val(this.getLocale());
     }
 
     populateLanguageSelect() {
         if (this.isStats) return;
         const el = $(".language-select");
         el.empty();
-        for (let i = 0; i < this.acceptedLocales.length; i++) {
-            const locale = this.acceptedLocales[i];
+        this.acceptedLocales.forEach((locale) => {
             const name = Locales[locale];
-            el.append(
-                $("<option>", {
-                    value: locale,
-                    text: name,
-                }),
-            );
-        }
+            el.append($("<option>", { value: locale, text: name }));
+        });
     }
+
     detectLocale() {
-        let detectedLocale = (navigator.language || navigator.userLanguage).toLowerCase();
+        let detectedLocale = (
+            navigator.language || (navigator as any).userLanguage
+        ).toLowerCase();
         const languageWildcards = ["pt", "de", "es", "fr", "ko", "ru", "en"];
-        for (let i = 0; i < languageWildcards.length; i++) {
-            if (detectedLocale.includes(languageWildcards[i])) {
-                detectedLocale = languageWildcards[i];
+        for (const wildcard of languageWildcards) {
+            if (detectedLocale.includes(wildcard)) {
+                detectedLocale = wildcard;
                 break;
             }
         }
-        for (let i = 0; i < this.acceptedLocales.length; i++) {
-            if (detectedLocale.includes(this.acceptedLocales[i])) {
-                return this.acceptedLocales[i];
+        for (const loc of this.acceptedLocales) {
+            if (detectedLocale.includes(loc)) {
+                return loc;
             }
         }
         return "en";

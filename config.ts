@@ -241,13 +241,9 @@ function migrateConfig(localConfig: PartialConfig, legacyConfigPath: string) {
         }
         if (oldConfig.client.AIP_PLACEMENT_ID) {
             localConfig.secrets ??= {};
-            localConfig.secrets.AIP_PLACEMENT_ID = oldConfig.client.AIP_PLACEMENT_ID;
+            localConfig.secrets.AD_PREFIX = oldConfig.client.AIP_PLACEMENT_ID;
         }
 
-        if (oldConfig.client.AIP_ID) {
-            localConfig.secrets ??= {};
-            localConfig.secrets.AIP_ID = oldConfig.client.AIP_ID;
-        }
         delete oldConfig.client;
     }
 
