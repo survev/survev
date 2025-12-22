@@ -965,6 +965,11 @@ export class Player extends BaseGameObject {
                 }
                 this.setOutfit(newOutfit);
             }
+            else {
+                if (oldOutfit.noDrop) {
+                    this.setOutfit("outfitBase");
+                }
+            }
 
             const roleHelmet =
                 roleDef.defaultItems.helmet instanceof Function
