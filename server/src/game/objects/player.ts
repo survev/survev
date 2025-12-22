@@ -964,6 +964,10 @@ export class Player extends BaseGameObject {
                     this.dropLoot(this.outfit);
                 }
                 this.setOutfit(newOutfit);
+            } else {
+                if (oldOutfit.noDrop) {
+                    this.setOutfit("outfitBase");
+                }
             }
 
             const roleHelmet =
@@ -3721,6 +3725,10 @@ export class Player extends BaseGameObject {
             case "boost":
             case "throwable":
                 {
+                    if (this.role === "leader" && def.type === "boost") {
+                        return;
+                    }
+
                     const itemType = obj.type;
                     if (!this.invManager.isValid(itemType)) break;
 
