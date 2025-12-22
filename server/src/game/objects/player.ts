@@ -964,8 +964,7 @@ export class Player extends BaseGameObject {
                     this.dropLoot(this.outfit);
                 }
                 this.setOutfit(newOutfit);
-            }
-            else {
+            } else {
                 if (oldOutfit.noDrop) {
                     this.setOutfit("outfitBase");
                 }
