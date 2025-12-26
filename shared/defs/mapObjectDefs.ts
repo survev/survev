@@ -13656,7 +13656,7 @@ export const MapObjectDefs: Record<string, MapObjectDef> = {
         map: { displayType: "stone_01cb" },
     }),
     cache_01bh: createCache({
-                mapObjects: [
+        mapObjects: [
             {
                 type: "stone_02bh",
                 pos: v2.create(0, 0),

@@ -7,9 +7,9 @@ import { Main, type PartialMapDef } from "./baseDefs";
 const mapDef: PartialMapDef = {
     mapId: MapId.Beach,
     desc: {
-        name: "Beach", 
+        name: "Beach",
         icon: "img/loot/loot-throwable-coconut.svg",
-        buttonCss: "btn-mode-beach", 
+        buttonCss: "btn-mode-beach",
     },
     assets: {
         audio: [
