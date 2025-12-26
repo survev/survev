@@ -7,8 +7,6 @@ export const BeachAtlas: AtlasDef = {
         ...BuildingSprites.large_hut,
 
         "map/map-barrel-05.svg",
-        "map/map-bush-07x.svg",
-        "map/map-crate-09.svg",
         "map/map-gun-mount-06.svg",
         "map/map-stone-03bh.svg",
         "map/map-tree-01.svg",
