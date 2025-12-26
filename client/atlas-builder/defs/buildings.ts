@@ -109,6 +109,12 @@ export const BuildingSprites = {
         "map/map-building-hut-floor-02.svg",
     ],
 
+    large_hut: [
+        "map/map-building-hut-ceiling-04.svg",
+        "map/map-building-hut-floor-03.svg",
+        "map/map-hut-res-02.svg",
+    ],
+
     mansion: [
         "map/map-building-mansion-ceiling.svg",
         "map/map-building-mansion-cellar-01a.svg",

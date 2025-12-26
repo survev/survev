@@ -2651,6 +2651,25 @@ const ParticleDefs: Record<string, ParticleDef> = {
         },
         color: 16770437,
     },
+    coconut_impact: {
+        image: ["part-coconut-01.img", "part-coconut-02.img", "part-coconut-03.img"],
+        life: new Range(0.5, 1),
+        drag: new Range(0, 0),
+        rotVel: new Range(Math.PI * 0.25, Math.PI * 0.5),
+        scale: {
+            start: new Range(0.13, 0.23),
+            end: new Range(0.07, 0.14),
+            lerp: new Range(0, 1),
+        },
+        alpha: {
+            start: 1,
+            end: 0,
+            lerp: new Range(0.9, 1),
+        },
+        color: function () {
+            return util.rgbToInt(util.hsvToRgb(0, 0, util.random(0.9, 0.95)));
+        },
+    },
     heal_basic: {
         image: ["part-heal-basic.img"],
         life: new Range(0.75, 1),

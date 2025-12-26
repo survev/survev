@@ -384,6 +384,7 @@ export const Main: MapDef = {
             { name: "outfitBushRiver", count: 1, weight: 1 },
             { name: "outfitCrab", count: 1, weight: 1 },
         ],
+        tier_pirate_outfits: [{ name: "outfitRoyalFortune", count: 1, weight: 1 }],
         tier_islander_outfit: [{ name: "outfitIslander", count: 1, weight: 1 }],
         tier_imperial_outfit: [{ name: "outfitImperial", count: 1, weight: 1 }],
         tier_pineapple_outfit: [{ name: "outfitPineapple", count: 1, weight: 1 }],
@@ -391,6 +392,10 @@ export const Main: MapDef = {
         tier_spetsnaz_outfit: [{ name: "outfitSpetsnaz", count: 1, weight: 1 }],
         tier_lumber_outfit: [{ name: "outfitLumber", count: 1, weight: 1 }],
         tier_verde_outfit: [{ name: "outfitVerde", count: 1, weight: 1 }],
+        tier_coconut_outfit: [
+            { name: "", count: 1, weight: 19 },
+            { name: "outfitCoconut", count: 1, weight: 1 },
+        ],
         //
         // Cobalt class pods
         //
@@ -490,6 +495,29 @@ export const Main: MapDef = {
             { name: "helmet03", count: 1, weight: 1 },
             { name: "chest03", count: 1, weight: 1 },
             { name: "backpack03", count: 1, weight: 1 },
+        ],
+        tier_pirate: [
+            { name: "tier_ammo", count: 1, weight: 0.1 },
+            { name: "tier_scopes", count: 1, weight: 0.1 },
+            { name: "tier_armor", count: 1, weight: 0.05 },
+            { name: "tier_medical", count: 1, weight: 0.25 },
+            { name: "tier_throwables", count: 1, weight: 0.15 },
+            { name: "tier_packs", count: 1, weight: 0.05 },
+        ],
+        tier_pirate_rare: [
+            { name: "m9", count: 1, weight: 0.5 },
+            { name: "scar", count: 1, weight: 1 },
+            { name: "mosin", count: 1, weight: 1 },
+            { name: "saiga", count: 1, weight: 0.5 },
+            { name: "p30l_dual", count: 1, weight: 0.5 },
+            { name: "deagle", count: 1, weight: 1 },
+            { name: "deagle_dual", count: 1, weight: 0.5 },
+            { name: "sv98", count: 1, weight: 0.3 },
+            { name: "awc", count: 1, weight: 0.3 },
+            { name: "garand", count: 1, weight: 1 },
+            { name: "m249", count: 1, weight: 0.25 },
+            { name: "m4a1", count: 1, weight: 1 },
+            { name: "scorpion", count: 1, weight: 1 },
         ],
         tier_airdrop_uncommon: [
             { name: "mk12", count: 1, weight: 2.5 },

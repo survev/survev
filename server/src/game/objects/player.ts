@@ -850,7 +850,8 @@ export class Player extends BaseGameObject {
 
     wearingPan = false;
     healEffect = false;
-    // if hit by snowball or potato, slowed down for "x" seconds
+    healEffectTicker = 0;
+    // if hit by snowball, potato, or coconut: slowed down for "x" seconds
     frozenTicker = 0;
     frozen = false;
     frozenOri = 0;
@@ -1999,6 +2000,12 @@ export class Player extends BaseGameObject {
         const oldHealEffect = this.healEffect;
         this.healEffect = false;
 
+        // Special handling for short ticker for throwable healing
+        this.healEffectTicker -= dt;
+        if (this.healEffectTicker > 0) {
+            this.healEffect = true;
+        }
+
         let zoomRegionZoom = lowestZoom;
         let insideNoZoomRegion = true;
         let insideSmoke = false;
@@ -2833,6 +2840,43 @@ export class Player extends BaseGameObject {
                     killCreditSource.health += 25;
                     killCreditSource.boost += 25;
                     killCreditSource.giveHaste(GameConfig.HasteType.Takedown, 3);
+                }
+
+                // Pirate's Bounty (Cutlass-specific)
+                if (killCreditSource.hasPerk("pirate")) {
+                    if (params.gameSourceType) {
+                        const weaponDef = GameObjectDefs[params.gameSourceType];
+                        if (weaponDef?.type === "melee") {
+                            const count = util.randomInt(3, 4);
+                            for (let i = 0; i < count; i++) {
+                                const commonItems =
+                                    this.game.lootBarn.getLootTable("tier_pirate");
+                                const commonItem =
+                                    commonItems[
+                                        util.randomInt(0, commonItems.length - 1)
+                                    ];
+                                this.game.lootBarn.addLoot(
+                                    commonItem.name,
+                                    this.pos,
+                                    this.layer,
+                                    1,
+                                );
+                            }
+
+                            if (util.random(0, 1) < 0.12) {
+                                const rareGuns =
+                                    this.game.lootBarn.getLootTable("tier_pirate_rare");
+                                const rareGun =
+                                    rareGuns[util.randomInt(0, rareGuns.length - 1)];
+                                this.game.lootBarn.addLoot(
+                                    rareGun.name,
+                                    this.pos,
+                                    this.layer,
+                                    1,
+                                );
+                            }
+                        }
+                    }
                 }
 
                 if (killCreditSource.role === "woods_king") {
@@ -3740,6 +3784,19 @@ export class Player extends BaseGameObject {
             case "melee":
                 this.weaponManager.dropMelee();
                 this.weaponManager.setWeapon(GameConfig.WeaponSlot.Melee, obj.type, 0);
+                // Perks on melee weapons
+                {
+                    const thisType = this.weapons[GameConfig.WeaponSlot.Melee].type;
+                    const thisDef = GameObjectDefs[thisType];
+                    if (thisDef && thisDef.type == "melee" && thisDef.perk) {
+                        this.removePerk(thisDef.perk);
+                    }
+
+                    if (def.type == "melee" && def.perk) {
+                        this.addPerk(def.perk);
+                    }
+                    this.setDirty();
+                }
                 break;
             case "gun":
                 {
