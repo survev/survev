@@ -652,4 +652,26 @@ const ExplosionEffectDefs: Record<string, ExplotionDef> = {
         shakeDur: 0.4,
         lifetime: 2,
     },
+    coconut: {
+        burst: {
+            particle: "",
+            scale: 0.75,
+            sound: {
+                grass: "coconut_01",
+                water: "frag_water_01",
+            },
+        },
+        scatter: {
+            particle: "coconut_impact",
+            count: 6,
+            speed: {
+                min: 5,
+                max: 25,
+            },
+        },
+        rippleCount: 1,
+        shakeStr: 0,
+        shakeDur: 0,
+        lifetime: 1,
+    },
 };
