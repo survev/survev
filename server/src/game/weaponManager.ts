@@ -595,6 +595,11 @@ export class WeaponManager {
     dropMelee(): void {
         const slot = WeaponSlot.Melee;
         if (this.weapons[slot].type != "fists") {
+            const meleeDef = GameObjectDefs[this.weapons[slot].type];
+            // Remove perk from old melee
+            if (meleeDef && meleeDef.type === "melee" && meleeDef.perk) {
+                this.player.removePerk(meleeDef.perk);
+            }
             this.player.dropLoot(this.weapons[slot].type);
             this.setWeapon(slot, "fists", 0);
             if (slot === this.curWeapIdx) this.player.setDirty();

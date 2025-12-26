@@ -5,6 +5,7 @@ import type { Vec2 } from "../../utils/v2";
 export interface MeleeDef {
     readonly type: "melee";
     name: string;
+    perk?: string;
     quality: number;
     autoAttack: boolean;
     switchDelay: number;
@@ -1082,6 +1083,59 @@ const BaseDefs: Record<string, MeleeDef> = {
             tint: 0xffffff,
         },
     },
+    cutlass: {
+        name: "Cutlass",
+        type: "melee",
+        quality: 1,
+        cleave: true,
+        autoAttack: false,
+        switchDelay: 0.25,
+        damage: 30,
+        obstacleDamage: 1,
+        attack: {
+            offset: {
+                x: 2.25,
+                y: 0,
+            },
+            rad: 1.75,
+            damageTimes: [0.1],
+            cooldownTime: 0.225,
+        },
+        speed: {
+            equip: 1,
+        },
+        anim: {
+            idlePose: "cutlass",
+            attackAnims: ["cut", "cutReverse"],
+        },
+        sound: {
+            pickup: "frag_pickup_01",
+            swing: "knife_swing_01",
+            deploy: "knife_deploy_01",
+            playerHit: "knife_hit_01",
+        },
+        lootImg: {
+            sprite: "loot-melee-cutlass.img",
+            tint: 0xffffff,
+            border: "loot-circle-outer-02.img",
+            borderTint: 0xffffff,
+            scale: 0.3,
+            rot: 0.9,
+        },
+        worldImg: {
+            sprite: "loot-melee-cutlass.img",
+            pos: {
+                x: 2.5,
+                y: -75,
+            },
+            rot: 1.885,
+            scale: {
+                x: 0.325,
+                y: 0.325,
+            },
+            tint: 0xffffff,
+        },
+    },
 };
 
 const SkinDefs: Record<string, MeleeDef> = {
@@ -1330,6 +1384,14 @@ const SkinDefs: Record<string, MeleeDef> = {
             sprite: "loot-melee-warhammer-tank.img",
             pos: { x: -10.5, y: -3 },
         },
+    }),
+    cutlass_gold: defineMeleeSkin("cutlass", {
+        name: "Gold Cutlass",
+        noPotatoSwap: true,
+        damage: 35,
+        perk: "pirate",
+        lootImg: { sprite: "loot-melee-cutlass-gold.img" },
+        worldImg: { sprite: "loot-melee-cutlass-gold.img" },
     }),
 };
 
