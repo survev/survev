@@ -3462,6 +3462,58 @@ a:active {
   }
 }
 
+@keyframes beachPulse {
+  /* for pulse */
+  from {
+    background-color: #ffe7ba;
+    -webkit-box-shadow: 0 0 9px #f8d594;
+  }
+  50% {
+    background-color: #ffe0a7;
+    -webkit-box-shadow: 0 0 18px #fcd58b;
+  }
+  to {
+    background-color: #ffe7ba;
+    -webkit-box-shadow: 0 0 9px #f8d594;
+  }
+}
+
+.btn-mode-beach {
+  animation-name: beachPulse;
+  animation-duration: 5s;
+  animation-iteration-count: infinite;
+  background-repeat: no-repeat;
+  background-size: 35px;
+  background-image: url(/img/loot/loot-throwable-coconut.svg);
+  border-bottom: 4px solid #a08a62;
+  height: 41px;
+}
+
+@media (max-width: 850px), (max-width: 900px) and (min-resolution: 3dppx) {
+  .btn-mode-beach {
+    background-position: 0 2px;
+    background-size: 22px;
+    border-bottom: 2px solid #a08a62;
+    box-shadow: none;
+    height: 28px;
+  }
+}
+
+.btn-team-queue-mode-beach {
+  background-repeat: no-repeat;
+  background-size: 35px;
+  background-image: url(/img/loot/loot-throwable-coconut.svg);
+  text-indent: 18px;
+}
+
+@media (max-width: 850px), (max-width: 900px) and (min-resolution: 3dppx) {
+  .btn-team-queue-mode-beach {
+    background-position: 0 2px;
+    background-size: 22px;
+    text-indent: 14px;
+  }
+}
+
 #btns-quick-start {
   display: flex;
 }
