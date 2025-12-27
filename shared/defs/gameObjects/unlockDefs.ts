@@ -191,6 +191,8 @@ const _allowedEmotes = [
     "emote_flaglatvia",
     "emote_flaguae",
     "emote_flagdominicanrepublic",
+    "emote_flaglibya",
+    "emote_flagbosnia",
     "emote_logocloud",
     "emote_logotwins",
 ];
@@ -367,6 +369,8 @@ export const UnlockDefs: Record<UnlockDefKey, UnlockDef> = {
             "emote_flaggay",
             "emote_flagasexual",
             "emote_flagnonbinary",
+            "emote_flaglibya",
+            "emote_flagbosnia",
             "emote_logocloud",
             "emote_logotwins",
 

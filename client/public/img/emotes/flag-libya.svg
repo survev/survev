@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
+
+<svg
+   width="128"
+   height="128"
+   viewBox="0 0 33.866672 33.866666"
+   version="1.1"
+   id="svg1"
+   inkscape:version="1.4 (e7c3feb1, 2024-10-09)"
+   sodipodi:docname="flag-libya.svg"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg">
+  <sodipodi:namedview
+     id="namedview1"
+     pagecolor="#ffffff"
+     bordercolor="#000000"
+     borderopacity="0.25"
+     inkscape:showpageshadow="2"
+     inkscape:pageopacity="0.0"
+     inkscape:pagecheckerboard="0"
+     inkscape:deskcolor="#d1d1d1"
+     inkscape:document-units="mm"
+     inkscape:zoom="3.4271166"
+     inkscape:cx="114.52776"
+     inkscape:cy="69.154343"
+     inkscape:window-width="1920"
+     inkscape:window-height="1021"
+     inkscape:window-x="1512"
+     inkscape:window-y="31"
+     inkscape:window-maximized="1"
+     inkscape:current-layer="layer1" />
+  <defs
+     id="defs1" />
+  <g
+     inkscape:label="Layer 1"
+     inkscape:groupmode="layer"
+     id="layer1">
+    <circle
+       cx="16.933332"
+       cy="16.933332"
+       r="16.933332"
+       fill="#f0f0f0"
+       id="circle1-5"
+       style="fill:#000000;fill-opacity:1;stroke-width:0.264583" />
+    <path
+       d="M 16.933332,2e-6 C 10.220059,2e-6 4.419334,3.906839 1.680103,9.571039 H 32.186561 C 29.447065,3.906839 23.64634,2e-6 16.933332,2e-6 Z"
+       fill="#ff9811"
+       id="path1-5"
+       style="fill:#d80027;fill-opacity:1;stroke-width:0.264583" />
+    <path
+       d="m 16.933332,33.866667 c 6.713273,0 12.513998,-3.906837 15.253229,-9.571036 H 1.680103 c 2.739231,5.664199 8.539956,9.571036 15.253229,9.571036 z"
+       fill="#6da544"
+       id="path2-5"
+       style="fill:#6da544;fill-opacity:1;stroke-width:0.264583" />
+    <path
+       fill="#ffda44"
+       d="m 23.644535,19.111303 -2.494411,-0.810449 -1.541763,2.121881 2.1e-5,-2.622839 -2.494448,-0.810561 2.49447,-0.810503 2.1e-5,-2.62284 1.541719,2.122022 2.49447,-0.810503 -1.541687,2.121734 z"
+       id="path1-0"
+       style="fill:#f0f0f0;fill-opacity:1;stroke-width:0.264583"
+       inkscape:transform-center-x="0.817458"
+       inkscape:transform-center-y="-1.8466091" />
+    <path
+       d="m 16.553439,20.852935 c -2.164639,0 -3.919493,-1.754854 -3.919493,-3.919493 0,-2.164638 1.754854,-3.919493 3.919493,-3.919493 0.675027,0 1.309964,0.170545 1.864506,0.471111 a 4.8075389,4.8075389 0 0 0 -3.371887,-1.375626 c -2.664354,0 -4.824008,2.159654 -4.824008,4.823791 0,2.664354 2.159871,4.824009 4.823791,4.824009 a 4.8073219,4.8073219 0 0 0 3.372104,-1.375409 3.9004234,3.9004234 0 0 1 -1.864506,0.47111 z"
+       id="path4"
+       style="fill:#f0f0f0;stroke-width:0.264583" />
+  </g>
+</svg>
