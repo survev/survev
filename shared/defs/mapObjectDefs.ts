@@ -11569,47 +11569,17 @@ export const MapObjectDefs: Record<string, MapObjectDef> = {
             zIdx: 801,
         },
     } as unknown as Partial<ObstacleDef>),
-    // Palm Tree
     tree_13: createTree({
-        scale: { createMin: 1.15, createMax: 1.3, destroy: 0.75 },
-        collision: collider.createCircle(v2.create(0, 0), 1),
         img: {
             sprite: "map-tree-13.img",
-            scale: 0.35,
             tint: 0xffffff,
             zIdx: 801,
         },
-        terrain: { grass: true, beach: true },
-        randomRotation: true,
-    } as unknown as Partial<ObstacleDef>),
-    tree_13h: createTree({
-        scale: { createMin: 1.15, createMax: 1.3, destroy: 0.75 },
-        collision: collider.createCircle(v2.create(0, 0), 1),
-        img: {
-            sprite: "map-tree-13.img",
-            scale: 0.35,
-            tint: 0xffffff,
-            zIdx: 801,
-        },
-        map: { display: false },
-        randomRotation: true,
     }),
-    tree_13x: createTree({
-        scale: { createMin: 1.2, createMax: 1.4, destroy: 0.75 },
-        collision: collider.createCircle(v2.create(0, 0), 1),
-        img: {
-            sprite: "map-tree-13x.img",
-            scale: 0.35,
-            tint: 0xffffff,
-            zIdx: 801,
-        },
-        randomRotation: true,
-    } as unknown as Partial<ObstacleDef>),
-    // Coconut Palm
+    // Palm Tree
     tree_14: createTree({
-        scale: { createMin: 1.15, createMax: 1.3, destroy: 0.85 },
+        scale: { createMin: 1.15, createMax: 1.3, destroy: 0.75 },
         collision: collider.createCircle(v2.create(0, 0), 1),
-        loot: [tierLoot("tier_coconut_outfit", 1, 1), autoLoot("coconut", 2)],
         img: {
             sprite: "map-tree-14.img",
             scale: 0.35,
@@ -11617,20 +11587,52 @@ export const MapObjectDefs: Record<string, MapObjectDef> = {
             zIdx: 801,
         },
         terrain: { grass: true, beach: true },
-        randomRotation: true,
     } as unknown as Partial<ObstacleDef>),
-    // Christmas Coconut Palm
-    tree_14x: createTree({
-        scale: { createMin: 1.15, createMax: 1.3, destroy: 0.85 },
+    tree_14h: createTree({
+        scale: { createMin: 1.15, createMax: 1.3, destroy: 0.75 },
         collision: collider.createCircle(v2.create(0, 0), 1),
-        loot: [tierLoot("tier_coconut_outfit", 1, 3), autoLoot("coconut", 3)],
         img: {
-            sprite: "map-tree-14x.img",
+            sprite: "map-tree-14.img",
             scale: 0.35,
             tint: 0xffffff,
             zIdx: 801,
         },
-        randomRotation: true,
+        map: { display: false },
+    }),
+    tree_14ch: createTree({
+        scale: { createMin: 1.2, createMax: 1.4, destroy: 0.75 },
+        collision: collider.createCircle(v2.create(0, 0), 1),
+        img: {
+            sprite: "map-tree-14ch.img",
+            scale: 0.35,
+            tint: 0xffffff,
+            zIdx: 801,
+        },
+    } as unknown as Partial<ObstacleDef>),
+    // Coconut Palm
+    tree_14cn: createTree({
+        scale: { createMin: 1.15, createMax: 1.3, destroy: 0.85 },
+        collision: collider.createCircle(v2.create(0, 0), 1),
+        loot: [tierLoot("tier_coconut_outfit", 1, 1), autoLoot("coconut", 2)],
+        img: {
+            sprite: "map-tree-14cn.img",
+            scale: 0.35,
+            tint: 0xffffff,
+            zIdx: 801,
+        },
+        terrain: { grass: true, beach: true },
+    } as unknown as Partial<ObstacleDef>),
+    // Christmas Coconut Palm
+    tree_14cnch: createTree({
+        scale: { createMin: 1.15, createMax: 1.3, destroy: 0.85 },
+        collision: collider.createCircle(v2.create(0, 0), 1),
+        loot: [tierLoot("tier_coconut_outfit", 1, 3), autoLoot("coconut", 3)],
+        img: {
+            sprite: "map-tree-14cnch.img",
+            scale: 0.35,
+            tint: 0xffffff,
+            zIdx: 801,
+        },
     } as unknown as Partial<ObstacleDef>),
     tree_switch_01: createTreeSwitch({
         img: { sprite: "map-tree-switch-01.img" },
@@ -13867,7 +13869,7 @@ export const MapObjectDefs: Record<string, MapObjectDef> = {
                 inheritOri: false,
             },
         ],
-        map: { displayType: "tree_13" },
+        map: { displayType: "tree_14" },
     }),
     cache_03: createCache({
         mapObjects: [

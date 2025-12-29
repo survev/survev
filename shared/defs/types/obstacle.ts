@@ -113,5 +113,4 @@ export interface ObstacleDef {
     smartLoot?: boolean;
     createSmoke?: boolean;
     teamId?: number;
-    randomRotation?: boolean;
 }
