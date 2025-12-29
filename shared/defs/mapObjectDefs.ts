@@ -11187,15 +11187,14 @@ export const MapObjectDefs: Record<string, MapObjectDef> = {
     tree_interior_01: createTree({ img: { zIdx: 200 } }),
     tree_interior_01bh: createTree({
         img: {
-            sprite: "map-tree-14.img",
+            sprite: "map-tree-13.img",
             scale: 0.35,
             zIdx: 200,
         },
     }),
-    tree_01x: createTree({ img: { sprite: "map-tree-01x.img" } }),
-    tree_01ch: createTree({
+    tree_01x: createTree({
         img: {
-            sprite: "map-tree-01ch.img",
+            sprite: "map-tree-01x.img",
             scale: 0.35,
         },
     }),
@@ -11314,7 +11313,7 @@ export const MapObjectDefs: Record<string, MapObjectDef> = {
         scale: { createMin: 1.2, createMax: 1.25, destroy: 0.5 },
         collision: collider.createCircle(v2.create(0, 0), 1.1),
         map: { display: false },
-        img: { sprite: "map-tree-14.img", scale: 0.35, tint: 0xb1b1b1 },
+        img: { sprite: "map-tree-13.img", scale: 0.35, tint: 0xb1b1b1 },
         loot: [tierLoot("tier_surviv", 2, 3), autoLoot("scout_elite", 1)],
     } as unknown as Partial<ObstacleDef>),
     tree_05: createTree({
@@ -11569,70 +11568,68 @@ export const MapObjectDefs: Record<string, MapObjectDef> = {
             zIdx: 801,
         },
     } as unknown as Partial<ObstacleDef>),
-    tree_13: createTree({
-        img: {
-            sprite: "map-tree-13.img",
-            tint: 0xffffff,
-            zIdx: 801,
-        },
-    }),
     // Palm Tree
-    tree_14: createTree({
+    tree_13: createTree({
         scale: { createMin: 1.15, createMax: 1.3, destroy: 0.75 },
         collision: collider.createCircle(v2.create(0, 0), 1),
         img: {
-            sprite: "map-tree-14.img",
+            sprite: "map-tree-13.img",
+            scale: 0.35,
+            tint: 0xffffff,
+            zIdx: 801,
+        },
+        terrain: { grass: false, beach: true },
+        randomRotation: true,
+    } as unknown as Partial<ObstacleDef>),
+    tree_13bh: createTree({
+        scale: { createMin: 1.15, createMax: 1.3, destroy: 0.75 },
+        collision: collider.createCircle(v2.create(0, 0), 1),
+        img: {
+            sprite: "map-tree-13.img",
             scale: 0.35,
             tint: 0xffffff,
             zIdx: 801,
         },
         terrain: { grass: true, beach: true },
+        randomRotation: true,
     } as unknown as Partial<ObstacleDef>),
-    tree_14h: createTree({
-        scale: { createMin: 1.15, createMax: 1.3, destroy: 0.75 },
-        collision: collider.createCircle(v2.create(0, 0), 1),
-        img: {
-            sprite: "map-tree-14.img",
-            scale: 0.35,
-            tint: 0xffffff,
-            zIdx: 801,
-        },
-        map: { display: false },
-    }),
-    tree_14ch: createTree({
+    tree_13x: createTree({
         scale: { createMin: 1.2, createMax: 1.4, destroy: 0.75 },
         collision: collider.createCircle(v2.create(0, 0), 1),
         img: {
-            sprite: "map-tree-14ch.img",
+            sprite: "map-tree-13x.img",
             scale: 0.35,
             tint: 0xffffff,
             zIdx: 801,
         },
+        randomRotation: true,
     } as unknown as Partial<ObstacleDef>),
     // Coconut Palm
-    tree_14cn: createTree({
+    tree_14: createTree({
         scale: { createMin: 1.15, createMax: 1.3, destroy: 0.85 },
         collision: collider.createCircle(v2.create(0, 0), 1),
         loot: [tierLoot("tier_coconut_outfit", 1, 1), autoLoot("coconut", 2)],
         img: {
-            sprite: "map-tree-14cn.img",
+            sprite: "map-tree-14.img",
             scale: 0.35,
             tint: 0xffffff,
             zIdx: 801,
         },
         terrain: { grass: true, beach: true },
+        randomRotation: true,
     } as unknown as Partial<ObstacleDef>),
     // Christmas Coconut Palm
-    tree_14cnch: createTree({
+    tree_14x: createTree({
         scale: { createMin: 1.15, createMax: 1.3, destroy: 0.85 },
         collision: collider.createCircle(v2.create(0, 0), 1),
         loot: [tierLoot("tier_coconut_outfit", 1, 3), autoLoot("coconut", 3)],
         img: {
-            sprite: "map-tree-14cnch.img",
+            sprite: "map-tree-14x.img",
             scale: 0.35,
             tint: 0xffffff,
             zIdx: 801,
         },
+        randomRotation: true,
     } as unknown as Partial<ObstacleDef>),
     tree_switch_01: createTreeSwitch({
         img: { sprite: "map-tree-switch-01.img" },

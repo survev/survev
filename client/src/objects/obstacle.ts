@@ -44,6 +44,7 @@ export class Obstacle implements AbstractObject {
     isSkin!: boolean;
 
     rot!: number;
+    spriteRot: number = 0;
     scale!: number;
     pos!: Vec2;
     imgMirrorX!: boolean;
@@ -209,6 +210,11 @@ export class Obstacle implements AbstractObject {
             }
             this.isPuzzlePiece = data.isPuzzlePiece;
             this.parentBuildingId = this.isPuzzlePiece ? data.parentBuildingId! : 0;
+            if (def.randomRotation) {
+                this.spriteRot = Math.random() * Math.PI * 2;
+            } else {
+                this.spriteRot = 0;
+            }
         }
         if (this.isDoor && fullUpdate) {
             this.door.canUse = data.door?.canUse;
@@ -481,7 +487,7 @@ export class Obstacle implements AbstractObject {
         if (this.imgMirrorX) {
             this.sprite.scale.x *= -1;
         }
-        this.sprite.rotation = -rot;
+        this.sprite.rotation = -rot + this.spriteRot;
 
         if (this.isDoor && this.door?.casingSprite) {
             const casingPos = camera.m_pointToScreen(

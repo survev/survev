@@ -773,6 +773,7 @@ export const Main: MapDef = {
                 bush_01: 78,
                 cache_06: 12,
                 tree_01: 320,
+                tree_13: 30,
                 hedgehog_01: 24,
                 container_01: 5,
                 container_02: 5,

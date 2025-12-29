@@ -10,10 +10,9 @@ export const BeachAtlas: AtlasDef = {
         "map/map-gun-mount-06.svg",
         "map/map-stone-03bh.svg",
         "map/map-tree-01.svg",
-        "map/map-tree-01ch.svg",
+        "map/map-tree-01x.svg",
+        "map/map-tree-13x.svg",
         "map/map-tree-14.svg",
-        "map/map-tree-14ch.svg",
-        "map/map-tree-14cn.svg",
-        "map/map-tree-14cnch.svg",
+        "map/map-tree-14x.svg",
     ],
 };
