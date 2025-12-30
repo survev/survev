@@ -31,6 +31,7 @@ const mapDef: PartialMapDef = {
             grass: 0x8e832a,
             underground: 0x1b0d03,
             playerSubmerge: 0x2b8ca4,
+            playerGhillie: 0x91852c,
         },
         particles: { camera: "falling_leaf" },
     },
