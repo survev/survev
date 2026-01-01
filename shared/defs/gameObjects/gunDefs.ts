@@ -949,7 +949,7 @@ export const GunDefs: Record<string, GunDef> = {
         shotSpread: 1.5,
         bulletCount: 1,
         bulletType: "bullet_scarssr",
-        headshotMult: 1.5,
+        headshotMult: 1.25,
         speed: { equip: 0, attack: 0 },
         lootImg: {
             sprite: "loot-weapon-scarssr.img",
@@ -1027,7 +1027,7 @@ export const GunDefs: Record<string, GunDef> = {
     groza: {
         name: "Groza",
         type: "gun",
-        quality: 1,
+        quality: 0,
         fireMode: "auto",
         caseTiming: "shoot",
         isBullpup: true,
@@ -1450,7 +1450,7 @@ export const GunDefs: Record<string, GunDef> = {
         shotSpread: 1,
         bulletCount: 1,
         bulletType: "bullet_mosin",
-        headshotMult: 1.5,
+        headshotMult: 1.25,
         speed: { equip: 0, attack: 0 },
         lootImg: {
             sprite: "loot-weapon-mosin.img",
@@ -1502,7 +1502,7 @@ export const GunDefs: Record<string, GunDef> = {
         shotSpread: 1,
         bulletCount: 1,
         bulletType: "bullet_sv98",
-        headshotMult: 1.5,
+        headshotMult: 1.25,
         speed: { equip: 0, attack: 0 },
         lootImg: {
             sprite: "loot-weapon-sv98.img",
@@ -1694,7 +1694,7 @@ export const GunDefs: Record<string, GunDef> = {
         barrelOffset: 0,
         recoilTime: 0.36,
         moveSpread: 4,
-        shotSpread: 1,
+        shotSpread: 0.4,
         bulletCount: 1,
         bulletType: "bullet_garand",
         headshotMult: 2,
@@ -1994,7 +1994,7 @@ export const GunDefs: Record<string, GunDef> = {
         bulletCount: 1,
         jitter: 0.2,
         bulletType: "bullet_slug",
-        headshotMult: 1.5,
+        headshotMult: 1.25,
         speed: { equip: 0, attack: 0 },
         lootImg: {
             sprite: "loot-weapon-m1014.img",
@@ -2430,7 +2430,7 @@ export const GunDefs: Record<string, GunDef> = {
     p30l: {
         name: "P30L",
         type: "gun",
-        quality: 1,
+        quality: 0,
         fireMode: "single",
         caseTiming: "shoot",
         ammo: "9mm",
