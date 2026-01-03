@@ -12,6 +12,7 @@ import {
     MouseWheel,
 } from "./input";
 import { crc16 } from "./lib/crc";
+import type { Localization } from "./ui/localization";
 
 function def(name: string, defaultValue: InputValue | null) {
     return {
@@ -249,6 +250,7 @@ export class InputBindUi {
     constructor(
         public input: InputHandler,
         public inputBinds: InputBinds,
+        private localization: Localization,
     ) {
         this.input = input;
         this.inputBinds = inputBinds;
@@ -272,13 +274,22 @@ export class InputBindUi {
             const key = defKeys[i];
             const bindDef = BindDefs[key as unknown as keyof typeof BindDefs];
             const bind = binds[key as unknown as number];
+            const nameKey =
+                "bind-" +
+                bindDef.name
+                    .toLowerCase()
+                    .replace(/[^a-z0-9]+/g, "-")
+                    .replace(/-+/g, "-")
+                    .replace(/^-|-$/g, "");
             const btn = $("<a/>", {
                 class: "btn-game-menu btn-darken btn-keybind-desc",
-                text: bindDef.name,
+                text: this.localization.translate(nameKey) || bindDef.name,
             });
             const val = $("<div/>", {
                 class: "btn-keybind-display",
-                text: bind ? bind.toString() : "",
+                text: bind
+                    ? this.localization.translate(bind.toString()) || bind.toString()
+                    : "",
             });
             btn.on("click", (event) => {
                 const targetElem = $(event.target);
