@@ -18,6 +18,9 @@ export const SavannahAtlas: AtlasDef = {
         "map/map-propane-01.svg",
         "map/map-stone-07.svg",
         "map/map-stone-res-07.svg",
+        "map/map-stone-03sv.svg",
+        "map/map-chest-03sv.svg",
+        "map/map-stone-res-02sv.svg",
 
         "map/map-tree-03sv.svg",
         "map/map-tree-12.svg",
