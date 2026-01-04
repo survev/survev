@@ -1,5 +1,6 @@
 import type { Vec2 } from "../utils/v2";
 import { Main } from "./maps/baseDefs";
+import { Beach } from "./maps/beachDefs";
 import { Birthday } from "./maps/birthdayDefs";
 import { Cobalt } from "./maps/cobaltDefs";
 import { Desert } from "./maps/desertDefs";
@@ -32,7 +33,8 @@ export type Atlas =
     | "woods"
     | "cobalt"
     | "savannah"
-    | "turkey";
+    | "turkey"
+    | "beach";
 
 export const MapDefs = {
     main: Main,
@@ -52,6 +54,7 @@ export const MapDefs = {
     cobalt: Cobalt,
     turkey: Turkey,
     birthday: Birthday,
+    beach: Beach,
 
     /* STRIP_FROM_PROD_CLIENT:START */
     test_normal: testNormal,

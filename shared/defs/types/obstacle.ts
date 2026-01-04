@@ -35,6 +35,7 @@ export interface ObstacleDef {
         residue?: string;
         mirrorY?: boolean;
         mirrorX?: boolean;
+        randomRotation?: boolean;
     };
     sound: {
         bullet?: string;

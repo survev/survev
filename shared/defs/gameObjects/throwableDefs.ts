@@ -49,6 +49,8 @@ export interface ThrowableDef {
     };
     strikeDelay?: number;
     freezeOnImpact?: boolean;
+    healTeam?: boolean;
+    healValue?: number;
     heavyType?: string;
     changeTime?: number; // after changeTime has elapsed, throwable is changed to its "heavyType" variant
     forceMaxThrowDistance?: boolean;
@@ -791,6 +793,75 @@ export const ThrowableDefs: Record<string, ThrowableDef> = {
             pullPin: "frag_pin_01",
             throwing: "frag_throw_01",
             pickup: "frag_pickup_01",
+            deploy: "frag_deploy_01",
+        },
+    },
+    coconut: {
+        name: "Coconut",
+        type: "throwable",
+        quality: 0,
+        explosionType: "explosion_coconut",
+        freezeOnImpact: true,
+        changeTime: 1,
+        inventoryOrder: 0,
+        cookable: false,
+        noPotatoSwap: true,
+        forceMaxThrowDistance: true,
+        explodeOnImpact: true,
+        playerCollision: true,
+        healTeam: true,
+        healValue: 5,
+        fuseTime: 9999,
+        aimDistance: 32,
+        rad: 1,
+        throwPhysics: {
+            playerVelMult: 0,
+            velZ: 3.35,
+            speed: 50,
+            spinVel: 10 * Math.PI,
+            spinDrag: 1,
+            fixedCollisionHeight: 0.25,
+        },
+        speed: { equip: 0, attack: 0 },
+        lootImg: {
+            sprite: "loot-throwable-coconut.img",
+            tint: 0xff00,
+            border: "loot-circle-outer-01.img",
+            borderTint: 0,
+            scale: 0.2,
+        },
+        worldImg: {
+            sprite: "proj-coconut-01.img",
+            scale: 0.12,
+            tint: 0xffffff,
+        },
+        handImg: {
+            equip: {
+                right: {
+                    sprite: "proj-coconut-01.img",
+                    pos: { x: 3, y: 4.2 },
+                    scale: 0.14,
+                },
+                left: { sprite: "none" },
+            },
+            cook: {
+                right: {
+                    sprite: "proj-coconut-01.img",
+                    pos: { x: 3, y: 4.2 },
+                    scale: 0.14,
+                },
+                left: { sprite: "none" },
+            },
+            throwing: {
+                right: { sprite: "none" },
+                left: { sprite: "none" },
+            },
+        },
+        useThrowParticles: false,
+        sound: {
+            pullPin: "",
+            throwing: "frag_throw_01",
+            pickup: "potato_pickup_01",
             deploy: "frag_deploy_01",
         },
     },

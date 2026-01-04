@@ -67,6 +67,7 @@ export interface BuildingDef {
     tree_scale?: number;
     tree_loot?: string;
     bush_chance?: number;
+    bush?: string | Record<string, number>;
     decoration_01?: string;
     decoration_02?: string;
     mid_obs_01?: string;
@@ -145,7 +146,7 @@ export interface BuildingDef {
     entry_loot?: string;
     obs?: string;
     ceilingImg?: string;
-    specialLoot?: string;
+    specialLoot?: string | Record<string, number>;
     basement?: string;
     grass_color?: number;
     tree_small?: string;
