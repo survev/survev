@@ -250,7 +250,7 @@ export const Main: MapDef = {
             { name: "scar", count: 1, weight: 0.01 },
             { name: "dp28", count: 1, weight: 0.5 },
             { name: "bar", count: 1, weight: 0.05 },
-            { name: "mosin", count: 1, weight: 0.1 },
+            { name: "mosin", count: 1, weight: 0.05 },
             { name: "m39", count: 1, weight: 0.1 },
             { name: "mp5", count: 1, weight: 10 },
             { name: "mac10", count: 1, weight: 6 },
@@ -271,7 +271,7 @@ export const Main: MapDef = {
             { name: "flare_gun", count: 1, weight: 0.145 }, // !
             { name: "flare_gun_dual", count: 1, weight: 0.0025 }, // !
             { name: "groza", count: 1, weight: 0.8 },
-            { name: "scout_elite", count: 1, weight: 0.05 },
+            { name: "scout_elite", count: 1, weight: 0.1 },
             { name: "vss", count: 1, weight: 0.1 }, // !
         ],
         tier_police: [
@@ -495,7 +495,7 @@ export const Main: MapDef = {
             { name: "mk12", count: 1, weight: 2.5 },
             { name: "scar", count: 1, weight: 0.75 },
             { name: "bar", count: 1, weight: 1 },
-            { name: "mosin", count: 1, weight: 2.5 },
+            { name: "mosin", count: 1, weight: 1.5 },
             { name: "m39", count: 1, weight: 2.5 },
             { name: "saiga", count: 1, weight: 1 },
             { name: "deagle", count: 1, weight: 1 },
@@ -504,7 +504,7 @@ export const Main: MapDef = {
             { name: "qbb97", count: 1, weight: 1.5 },
             { name: "m9", count: 1, weight: 0.01 },
             { name: "flare_gun", count: 1, weight: 0.5 },
-            { name: "scout_elite", count: 1, weight: 1.5 },
+            { name: "scout_elite", count: 1, weight: 2.5 },
             { name: "vss", count: 1, weight: 2.5 }, // !
         ],
         tier_airdrop_rare: [
