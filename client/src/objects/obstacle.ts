@@ -44,9 +44,9 @@ export class Obstacle implements AbstractObject {
     isSkin!: boolean;
 
     rot!: number;
-    spriteRot: number = 0;
     scale!: number;
     pos!: Vec2;
+    imgRot!: number;
     imgMirrorX!: boolean;
     imgMirrorY!: boolean;
 
@@ -210,10 +210,15 @@ export class Obstacle implements AbstractObject {
             }
             this.isPuzzlePiece = data.isPuzzlePiece;
             this.parentBuildingId = this.isPuzzlePiece ? data.parentBuildingId! : 0;
-            if (def.randomRotation) {
-                this.spriteRot = Math.random() * Math.PI * 2;
+
+            if (def.img.randomRotation) {
+                // use the ID, while its not technically random, the obstacle positions are
+                // which makes the rotation of each obstacle on your screen effectively random
+                // and the id keeps it consistent so the obstacle doesn't rotate every time its re-added
+                // to your screen
+                this.imgRot = math.deg2rad(this.__id % 360);
             } else {
-                this.spriteRot = 0;
+                this.imgRot = 0;
             }
         }
         if (this.isDoor && fullUpdate) {
@@ -487,7 +492,7 @@ export class Obstacle implements AbstractObject {
         if (this.imgMirrorX) {
             this.sprite.scale.x *= -1;
         }
-        this.sprite.rotation = -rot + this.spriteRot;
+        this.sprite.rotation = -rot + this.imgRot;
 
         if (this.isDoor && this.door?.casingSprite) {
             const casingPos = camera.m_pointToScreen(

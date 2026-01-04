@@ -11577,9 +11577,9 @@ export const MapObjectDefs: Record<string, MapObjectDef> = {
             scale: 0.35,
             tint: 0xffffff,
             zIdx: 801,
+            randomRotation: true,
         },
         terrain: { grass: false, beach: true },
-        randomRotation: true,
     } as unknown as Partial<ObstacleDef>),
     tree_13bh: createTree({
         scale: { createMin: 1.15, createMax: 1.3, destroy: 0.75 },
@@ -11589,9 +11589,9 @@ export const MapObjectDefs: Record<string, MapObjectDef> = {
             scale: 0.35,
             tint: 0xffffff,
             zIdx: 801,
+            randomRotation: true,
         },
         terrain: { grass: true, beach: true },
-        randomRotation: true,
     } as unknown as Partial<ObstacleDef>),
     tree_13x: createTree({
         scale: { createMin: 1.2, createMax: 1.4, destroy: 0.75 },
@@ -11601,8 +11601,8 @@ export const MapObjectDefs: Record<string, MapObjectDef> = {
             scale: 0.35,
             tint: 0xffffff,
             zIdx: 801,
+            randomRotation: true,
         },
-        randomRotation: true,
     } as unknown as Partial<ObstacleDef>),
     // Coconut Palm
     tree_14: createTree({
@@ -11614,9 +11614,9 @@ export const MapObjectDefs: Record<string, MapObjectDef> = {
             scale: 0.35,
             tint: 0xffffff,
             zIdx: 801,
+            randomRotation: true,
         },
         terrain: { grass: true, beach: true },
-        randomRotation: true,
     } as unknown as Partial<ObstacleDef>),
     // Christmas Coconut Palm
     tree_14x: createTree({
@@ -11628,8 +11628,8 @@ export const MapObjectDefs: Record<string, MapObjectDef> = {
             scale: 0.35,
             tint: 0xffffff,
             zIdx: 801,
+            randomRotation: true,
         },
-        randomRotation: true,
     } as unknown as Partial<ObstacleDef>),
     tree_switch_01: createTreeSwitch({
         img: { sprite: "map-tree-switch-01.img" },

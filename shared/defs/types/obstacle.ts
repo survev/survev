@@ -35,6 +35,7 @@ export interface ObstacleDef {
         residue?: string;
         mirrorY?: boolean;
         mirrorX?: boolean;
+        randomRotation?: boolean;
     };
     sound: {
         bullet?: string;
@@ -113,5 +114,4 @@ export interface ObstacleDef {
     smartLoot?: boolean;
     createSmoke?: boolean;
     teamId?: number;
-    randomRotation?: boolean;
 }
