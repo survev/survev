@@ -21,6 +21,7 @@ export default defineConfig(({ mode }) => {
         process.env.VITE_TURNSTILE_SCRIPT = `<script src="https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit" defer></script>`;
     }
 
+    process.env.VITE_DEBUG_CSS_LINK = isDev ? `<link href='css/dev.css' rel="stylesheet" />` : "";
     process.env.VITE_GAME_VERSION = version;
 
     process.env.VITE_SPELLSYNC_PROJECT_ID = Config.secrets.SPELLSYNC_PROJECT_ID;
