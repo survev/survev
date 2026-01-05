@@ -1,5 +1,5 @@
 import $ from "jquery";
-import { Application } from "./main";
+import type { Application } from "./main";
 
 declare global {
     interface Window {
@@ -153,10 +153,13 @@ class SDKManager {
                 .css("background-image", "url(./img/survev-kofi.png)")
                 .html(`<a href="https://ko-fi.com/survev" target="_blank"></a>`);
 
-            const fuseScript = document.createElement("script");
-            fuseScript.async = true;
-            fuseScript.src = "https://cdn.fuseplatform.net/publift/tags/2/4018/fuse.js";
-            document.head.appendChild(fuseScript);
+            const fuseScriptContent = import.meta.env.VITE_FUSE_SCRIPT;
+            if (fuseScriptContent) {
+                const fuseScript = document.createElement("script");
+                fuseScript.async = true;
+                fuseScript.src = "https://cdn.fuseplatform.net/publift/tags/2/4018/fuse.js";
+                document.head.appendChild(fuseScript);
+            }
         }
 
         if (this.isPoki) {
