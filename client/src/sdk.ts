@@ -153,15 +153,18 @@ class SDKManager {
                 .css("background-image", "url(./img/survev-kofi.png)")
                 .html(`<a href="https://ko-fi.com/survev" target="_blank"></a>`);
 
-            const fuseScriptContent = import.meta.env.VITE_FUSE_SCRIPT;
-            if (fuseScriptContent) {
+            if (ADS_ENABLED) {
                 const fuseScript = document.createElement("script");
                 fuseScript.async = true;
-                fuseScript.src = "https://cdn.fuseplatform.net/publift/tags/2/4018/fuse.js";
+                fuseScript.src =
+                    "https://cdn.fuseplatform.net/publift/tags/2/4018/fuse.js";
                 document.head.appendChild(fuseScript);
             }
         }
 
+        if (!ADS_ENABLED) {
+            return;
+        }
         if (this.isPoki) {
             await this.initPoki();
         } else if (this.isGameMonetize) {
@@ -208,6 +211,10 @@ class SDKManager {
     }
 
     requestMidGameAd(callback: () => void): void {
+        if (!ADS_ENABLED) {
+            callback();
+            return;
+        }
         if (this.isPoki) {
             this.requestPokiMidGameAd(callback);
         } else if (this.isGameMonetize) {
@@ -220,6 +227,10 @@ class SDKManager {
     }
 
     requestFullscreenAd(callback: () => void): void {
+        if (!ADS_ENABLED) {
+            callback();
+            return;
+        }
         if (this.isSpellSync && window.spellSync.ads.isFullscreenAvailable) {
             window.spellSync.ads
                 .showFullscreen({ showCountdownOverlay: true })
@@ -283,6 +294,9 @@ class SDKManager {
     }
 
     async requestAd(ad: string): Promise<void> {
+        if (!ADS_ENABLED) {
+            return;
+        }
         if (this.isCrazyGames) {
             const dimensions = ad.split("x").map(Number);
             await this.requestCrazyGamesBanner(
@@ -302,6 +316,10 @@ class SDKManager {
     }
 
     private requestCrazyGamesMidGameAd(callback: () => void): void {
+        if (!ADS_ENABLED) {
+            callback();
+            return;
+        }
         const callbacks = {
             adFinished: callback,
             adError: callback,
@@ -312,6 +330,10 @@ class SDKManager {
     }
 
     private requestGameMonetizeMidgameAd(callback: () => void): void {
+        if (!ADS_ENABLED) {
+            callback();
+            return;
+        }
         if (window.sdk && window.sdk.showBanner) {
             window.sdk.showBanner();
             this.adCallback;
@@ -321,6 +343,10 @@ class SDKManager {
     }
 
     private requestPokiMidGameAd(callback: () => void): void {
+        if (!ADS_ENABLED) {
+            callback();
+            return;
+        }
         window.PokiSDK.commercialBreak(() => {
             // you can pause any background music or other audio here
         }).then(() => {
@@ -329,6 +355,9 @@ class SDKManager {
     }
 
     private initGameMonetize() {
+        if (!ADS_ENABLED) {
+            return;
+        }
         const gameMonetizeScript = document.createElement("script");
         gameMonetizeScript.src = "https://api.gamemonetize.com/sdk.js";
         gameMonetizeScript.id = "gamemonetize-sdk";
@@ -372,7 +401,10 @@ class SDKManager {
         });
     }
 
-    private initCrazyGames(): Promise<void> {
+    private initCrazyGames(): Promise<void> | undefined {
+        if (!ADS_ENABLED) {
+            return;
+        }
         return new Promise((resolve, reject) => {
             const crazyGamesScript = document.createElement("script");
             crazyGamesScript.src = "https://sdk.crazygames.com/crazygames-sdk-v3.js";
@@ -400,7 +432,10 @@ class SDKManager {
         });
     }
 
-    private initSpellSync(app: Application): Promise<void> {
+    private initSpellSync(app: Application): Promise<void> | undefined {
+        if (!ADS_ENABLED) {
+            return;
+        }
         return new Promise((resolve) => {
             window.SpellSyncConfig = {
                 projectId: Number(import.meta.env.VITE_SPELLSYNC_PROJECT_ID),
@@ -440,6 +475,9 @@ class SDKManager {
         width: number,
         height: number,
     ): Promise<void> {
+        if (!ADS_ENABLED) {
+            return;
+        }
         try {
             await window.CrazyGames.SDK.banner.requestBanner({
                 id: bannerId,

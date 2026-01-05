@@ -60,6 +60,7 @@ declare global {
     >;
 
     const IS_DEV: boolean;
+    const ADS_ENABLED: boolean;
 
     const GIT_VERSION: string | undefined;
 

@@ -13,15 +13,15 @@ export default defineConfig(({ mode }) => {
 
     const Config = getConfig(!isDev, "");
 
-    process.env.VITE_FUSE_SCRIPT = isDev ? "" : `<script async src="https://cdn.fuseplatform.net/publift/tags/2/4018/fuse.js"></script>`;
-
     process.env.VITE_TURNSTILE_SCRIPT = "";
     process.env.VITE_AD_PREFIX = Config.secrets.AD_PREFIX;
     if (Config.secrets.TURNSTILE_SITE_KEY) {
         process.env.VITE_TURNSTILE_SCRIPT = `<script src="https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit" defer></script>`;
     }
 
-    process.env.VITE_DEBUG_CSS_LINK = isDev ? `<link href='css/dev.css' rel="stylesheet" />` : "";
+    process.env.VITE_DEBUG_CSS_LINK = isDev
+        ? `<link href='css/dev.css' rel="stylesheet" />`
+        : "";
     process.env.VITE_GAME_VERSION = version;
 
     process.env.VITE_SPELLSYNC_PROJECT_ID = Config.secrets.SPELLSYNC_PROJECT_ID;
@@ -108,6 +108,7 @@ export default defineConfig(({ mode }) => {
             SPELLSYNC_PROJECT_ID: JSON.stringify(Config.secrets.SPELLSYNC_PROJECT_ID),
             SPELLSYNC_PUBLIC_TOKEN: JSON.stringify(Config.secrets.SPELLSYNC_PUBLIC_TOKEN),
             IS_DEV: isDev,
+            ADS_ENABLED: Config.adsEnabled,
             PROXY_DEFS: JSON.stringify(Config.proxies),
             TURNSTILE_SITE_KEY: JSON.stringify(Config.secrets.TURNSTILE_SITE_KEY),
         },
