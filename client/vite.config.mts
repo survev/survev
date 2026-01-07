@@ -1,5 +1,5 @@
 import { resolve } from "node:path";
-import { defineConfig, type Plugin, type ServerOptions } from "vite";
+import { defineConfig, loadEnv, type Plugin, type ServerOptions } from "vite";
 import stripBlockPlugin from "vite-plugin-strip-block";
 import { getConfig } from "../config";
 import { version } from "../package.json";
@@ -9,8 +9,10 @@ import { codefendPlugin } from "./vite-plugins/codefendPlugin";
 import { ejsPlugin } from "./vite-plugins/ejsPlugin";
 
 export default defineConfig(({ mode }) => {
+    const viteEnv = loadEnv(mode, process.cwd(), "VITE_");
     const isDev = mode === "development";
 
+    console.log({ viteEnv });
     const Config = getConfig(!isDev, "");
 
     process.env.VITE_TURNSTILE_SCRIPT = "";
@@ -91,6 +93,12 @@ export default defineConfig(({ mode }) => {
         },
         resolve: {
             extensions: [".ts", ".js"],
+            alias: {
+                "@/sdk":
+                    viteEnv?.VITE_ENABLE_SURVEV_ADS === "true"
+                        ? "./sdk-manager.prod"
+                        : "./sdk-manager",
+            },
         },
         define: {
             GAME_REGIONS: Config.regions,
@@ -108,7 +116,6 @@ export default defineConfig(({ mode }) => {
             SPELLSYNC_PROJECT_ID: JSON.stringify(Config.secrets.SPELLSYNC_PROJECT_ID),
             SPELLSYNC_PUBLIC_TOKEN: JSON.stringify(Config.secrets.SPELLSYNC_PUBLIC_TOKEN),
             IS_DEV: isDev,
-            ADS_ENABLED: Config.adsEnabled,
             PROXY_DEFS: JSON.stringify(Config.proxies),
             TURNSTILE_SITE_KEY: JSON.stringify(Config.secrets.TURNSTILE_SITE_KEY),
         },

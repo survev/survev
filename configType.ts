@@ -401,11 +401,6 @@ export interface ConfigType {
          */
         inventory?: Record<string, number>;
     };
-
-    /**
-     * Used to conditionally load the sdk scripts
-     */
-    adsEnabled: boolean;
 }
 
 export type PartialConfig = DeepPartial<ConfigType>;

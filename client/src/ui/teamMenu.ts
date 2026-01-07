@@ -15,7 +15,7 @@ import type { ConfigManager } from "../config";
 import { device } from "../device";
 import { helpers } from "../helpers";
 import type { PingTest } from "../pingTest";
-import { SDK } from "../sdk";
+import { SDK } from "../sdk/sdk";
 import type { SiteInfo } from "../siteInfo";
 import type { Localization } from "./localization";
 

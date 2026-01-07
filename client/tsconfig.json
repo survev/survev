@@ -16,6 +16,10 @@
     "allowJs": true,
     "strict": true,
     "skipLibCheck": true,
+    "baseUrl": ".",
+    "paths": {
+      "@/sdk": ["./src/sdk/sdk-manager.ts"]
+    },
     "types": ["vite/client", "turnstile-types"]
   },
   "include": [

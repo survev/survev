@@ -35,6 +35,15 @@ declare global {
             setAllowRefreshCallback: (callback: (slotDivId: string) => boolean) => void;
             destroySticky: () => void;
         };
+
+        // SDK
+        CrazyGames: any;
+        PokiSDK: any;
+        SDK_OPTIONS: any;
+        sdk: any;
+        SpellSyncConfig: any;
+        spellSync: any;
+        showAdFlag: boolean;
     }
 
     interface Document {
@@ -60,7 +69,7 @@ declare global {
     >;
 
     const IS_DEV: boolean;
-    const ADS_ENABLED: boolean;
+    const VITE_ENABLE_SURVEV_ADS: boolean;
 
     const GIT_VERSION: string | undefined;
 
