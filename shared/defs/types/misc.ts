@@ -12,6 +12,7 @@ export enum MapId {
     Birthday = 8,
 }
 
+export const teamModesStrings = ["solo", "duo", "squad"] as const;
 export const TeamModeToString = {
     [TeamMode.Solo]: "solo",
     [TeamMode.Duo]: "duo",
