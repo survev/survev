@@ -5,7 +5,7 @@ import { api } from "../api";
 import { device } from "../device";
 import { helpers } from "../helpers";
 import { proxy } from "../proxy";
-import { SDK } from "../sdk";
+import { SDK } from "../sdk/sdk";
 import type { LoadoutMenu } from "./loadoutMenu";
 import type { Localization } from "./localization";
 import { MenuModal } from "./menuModal";

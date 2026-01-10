@@ -5,7 +5,7 @@ import { type Vec2, v2 } from "../../../shared/utils/v2";
 import type { Camera } from "../camera";
 import type { Map } from "../map";
 import type { Renderer } from "../renderer";
-import { SDK } from "../sdk";
+import { SDK } from "../sdk/sdk";
 
 class Range {
     constructor(

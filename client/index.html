@@ -1,7 +1,6 @@
 <!doctype html>
 <html lang="en">
   <head>
-    %VITE_ADIN_PLAY_SCRIPT%
     %VITE_TURNSTILE_SCRIPT%
     <!-- Meta Properties -->
     <meta charset="UTF-8">
@@ -30,6 +29,7 @@
 
     <link href="css/app.css" rel="stylesheet">
     <link href="css/game.css" rel="stylesheet">
+    %VITE_DEBUG_CSS_LINK%
   </head>
   <body>
     <div id="preroll-wrapper">
@@ -613,11 +613,11 @@
             <div id="ui-stats-logo"></div>
           </div>
           <div id="ui-stats-ad-container-desktop" class="ui-stats-ad-container">
-            <div id="%VITE_AIP_PLACEMENT_ID%_300x250_2"></div>
+            <div data-fuse="died_mrec" style="min-height: 250px;"></div>
           </div>
-          <!-- <div id="ui-stats-ad-container-mobile" class="ui-stats-ad-container">
-            <div id="%VITE_AIP_PLACEMENT_ID%_300x250_mobile_2"></div>
-          </div> -->
+          <div id="ui-stats-ad-container-mobile" class="ui-stats-ad-container">
+            <div data-fuse="died_mrec_mobile" style="min-height: 200px;"></div>
+          </div>
         </div>
       </div>
       <div id="ui-editor" style="display: none">
@@ -655,6 +655,15 @@
               <a href="" target="_blank" class="btn-youtuber btn-darken"></a>
             </div>
           </div>
+        </div>
+        <div class="ad-block-header hide-on-mobile">
+          <div data-fuse="header" style="min-height: 90px;"></div>
+        </div>
+        <div class="ad-block-left-center hide-on-mobile">
+          <div data-fuse="home_vrec" style="min-height: 250px;"></div>
+        </div>
+        <div class="ad-block-right-center hide-on-mobile" style="min-height: 250px;">
+          <div data-fuse="home_mrec"></div>
         </div>
         <!-- Accounts Modals -->
         <div id="modal-account-name-change" class="modal modal-account">
@@ -794,21 +803,12 @@
           <div id="start-turnstile-container"></div>
           <div id="start-row-top">
             <div id="start-rotate-reminder" class="menu-column menu-block">
-              <span>Rotate to landscape for a better experience.</span>
+              <span data-l10n="index-rotate-reminder">Rotate to landscape for a better experience.</span>
             </div>
             <div id="left-column" class="menu-column">
               <div id="ad-block-left">
                 <div class="surviv-shirts">
                 </div>
-                <!--
-                <div class="adblock-plea">
-                  <span>Please consider supporting us by disabling your adblocker.</span>
-                </div>
-                -->
-                <!--
-                <div class="ad-block-med-rect" id="%VITE_AIP_PLACEMENT_ID%_300x250">
-                </div>
-                -->
               </div>
               <div id="social-share-block-wrapper">
                 <div id="social-share-block" class="menu-block">
@@ -835,7 +835,7 @@
               </div>
               <div class="play-button-container">
                 <div id="player-options">
-                  <input type="text" class="menu-option player-name-input" tabindex="0" placeholder="Enter your name here" id="player-name-input-solo" maxlength="16" />
+                  <input type="text" class="menu-option player-name-input" tabindex="0" placeholder="Enter your name here" data-l10n="index-enter-name-here" id="player-name-input-solo" maxlength="16" />
                   <a class="btn-darken menu-option player-options-btn" id="btn-customize"></a>
                 </div>
                 <select id="server-select-main" class="server-select menu-option btn-hollow btn-hollow-selected">
@@ -1106,7 +1106,7 @@
 
         </div>
 
-        <div class="ad-block-leaderboard-bottom" id="%VITE_AIP_PLACEMENT_ID%_728x90"></div>
+        <div class="ad-block-leaderboard-bottom" id="%VITE_AD_PREFIX%_728x90"></div>
         <div id="start-bottom-left">
           <div id="mobile-settings-front">
             <div class="btn-settings menu-option btn-darken btn-start-option"></div>
@@ -1171,7 +1171,6 @@
       </div>
       <!-- Loadouts -->
       <div id="modal-customize" class="modal">
-        <!-- <div class="ad-block-loadouts-left hide-on-mobile" id="%VITE_AIP_PLACEMENT_ID%_300x600"></div> -->
         <div id="modal-customize-wrapper" class="modal-close">
           <div id="modal-content-left" class="modal-content-shadow">
             <div id="modal-customize-cat-title"></div>

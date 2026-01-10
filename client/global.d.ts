@@ -23,15 +23,27 @@ declare global {
         webkitAudioContext?: AudioContext;
         CP: any;
 
-        aiptag?: {
-            cmd: {
-                display: Array<() => void>;
-            };
+        fusetag?: {
+            que: Array<() => any>;
+            initialised?: boolean;
+            fuseUUID?: string;
+            activateZone: (id: string) => void;
+            pageInit: (options?: PageInitOptions) => void;
+            registerAll: () => void;
+            registerZone: (id: string) => void;
+            setTargeting: (key: string, value: TargetingValue) => void;
+            setAllowRefreshCallback: (callback: (slotDivId: string) => boolean) => void;
+            destroySticky: () => void;
         };
-        aipDisplayTag?: {
-            display(string: string): void;
-            destroy(string: string): void;
-        };
+
+        // SDK
+        CrazyGames: any;
+        PokiSDK: any;
+        SDK_OPTIONS: any;
+        sdk: any;
+        SpellSyncConfig: any;
+        spellSync: any;
+        showAdFlag: boolean;
     }
 
     interface Document {
@@ -57,13 +69,15 @@ declare global {
     >;
 
     const IS_DEV: boolean;
+    const VITE_ENABLE_SURVEV_ADS: boolean;
 
     const GIT_VERSION: string | undefined;
 
-    const AIP_PLACEMENT_ID: string | undefined;
+    const AD_PREFIX: string | undefined;
     const GAMEMONETIZE_ID: string | undefined;
-
     const TURNSTILE_SITE_KEY: string | undefined;
+
+    window.fusetag = window.fusetag || (window.fusetag = { que: [] });
 }
 
 declare module "pixi.js-legacy" {
