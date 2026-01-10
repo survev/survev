@@ -5,6 +5,7 @@ import {
     integer,
     json,
     pgTable,
+    primaryKey,
     serial,
     text,
     timestamp,
@@ -45,6 +46,24 @@ export const usersTable = pgTable("users", {
         .default(loadout.validate({} as Loadout))
         .$type<Loadout>(),
 });
+
+export const weaponStats = pgTable(
+    "weapon_stats",
+    {
+        userId: text("user_id")
+            .notNull()
+            .references(() => usersTable.id, {
+                onDelete: "cascade",
+                onUpdate: "cascade",
+            }),
+        weaponId: text("weapon_id").notNull(),
+        kills: integer("kills").notNull().default(0),
+        deaths: integer("deaths").notNull().default(0),
+        damageDealt: integer("damage_dealt").notNull().default(0),
+        damageTaken: integer("damage_taken").notNull().default(0),
+    },
+    (table) => [primaryKey({ columns: [table.userId, table.weaponId] })],
+);
 
 export type UsersTableInsert = typeof usersTable.$inferInsert;
 export type UsersTableSelect = typeof usersTable.$inferSelect;

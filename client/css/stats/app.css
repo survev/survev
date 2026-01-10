@@ -691,6 +691,10 @@ table.player-stats-overview td {
   background-image: url("/img/ui/history.svg");
 }
 
+.extra-weapons {
+  background-image: url("/img/loot/loot-weapon-flare-gun.svg");
+}
+
 /*
 .extra-weapons {
   background-image: url("/img/ui/gun.svg");
@@ -703,15 +707,11 @@ table.player-stats-overview td {
 
 .header-extra {
   background-color: rgba(0, 0, 0, 0.75);
-  background-image: url("/img/ui/history.svg");
   background-position: 8px;
-  background-repeat: no-repeat;
-  background-size: 28px;
   color: white;
   font-size: 26px;
   font-weight: bold;
   height: 36px;
-  padding-left: 44px;
 }
 
 .extra-team-mode-filter {
