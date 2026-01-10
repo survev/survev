@@ -1,0 +1,42 @@
+name: Lint
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+on:
+  push:
+    branches:
+      - master
+    paths:
+      - "**.js"
+      - "**.ts"
+      - "**.json"
+      - "**.css"
+      - "**.yaml"
+      - ".github/workflows/biome.yml"
+
+  pull_request:
+    paths:
+      - "**.js"
+      - "**.ts"
+      - "**.json"
+      - "**.css"
+      - "**.yaml"
+      - ".github/workflows/biome.yml"
+
+jobs:
+  lint:
+    name: Lint
+    runs-on: ubuntu-latest
+    concurrency: ci-lint-${{ github.ref }}
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v6
+
+      - name: Setup Biome
+        uses: biomejs/setup-biome@v2
+
+      - name: Run Biome
+        run: biome ci .

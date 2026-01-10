@@ -1,0 +1,47 @@
+name: Server
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+on:
+  push:
+    branches:
+      - master
+    paths:
+      - "server/**"
+      - "shared/**"
+      - "*.json"
+      - "pnpm-lock.yaml"
+      - ".github/workflows/server.yml"
+
+  pull_request:
+    paths:
+      - "server/**"
+      - "shared/**"
+      - "*.json"
+      - "pnpm-lock.yaml"
+      - ".github/workflows/server.yml"
+
+jobs:
+  server:
+    name: Server
+    runs-on: ubuntu-latest
+    concurrency: ci-nodejs-${{ github.ref }}
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v6
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+
+      - name: Install Packages
+        run: pnpm install
+
+      - name: Typecheck server
+        run: pnpm run typecheck
+        working-directory: ./server
+
+      - name: Build Server
+        run: pnpm run build
+        working-directory: ./server
