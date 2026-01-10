@@ -139,7 +139,40 @@ export const MatchHistory: Component<MatchHistoryProps> = (props) => {
 
     return (
         <Show when={!isLoading()} fallback={<Loading type="match_history" />}>
-            <div class="header-extra">MATCH HISTORY</div>
+            <div
+                class="header-extra"
+                style={{
+                    padding: "2px 8px",
+                    display: "flex",
+                    "align-items": "center",
+                    gap: "8px",
+                }}
+            >
+                <div
+                    style={{
+                        display: "flex",
+                        "align-items": "center",
+                        "justify-content": "center",
+                    }}
+                >
+                    <img
+                        src="/img/ui/history.svg"
+                        draggable="false"
+                        style={{
+                            height: "28px",
+                            "line-height": "normal",
+                            "object-fit": "contain",
+                        }}
+                    />
+                </div>
+                <div
+                    style={{
+                        "line-height": "normal",
+                    }}
+                >
+                    MATCH HISTORY
+                </div>
+            </div>
 
             {matchHistoryResource?.error ? (
                 <div class="col-lg-10">

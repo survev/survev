@@ -152,3 +152,24 @@ export type LeaderboardResponse = {
 );
 
 export type LeaderboardRequest = z.input<typeof zLeaderboardsRequest>;
+
+//
+// Weapon Stats
+//
+export const zWeaponStatsRequest = z.object({
+    slug: z.string(),
+});
+
+export type WeaponStatsParams = z.infer<typeof zWeaponStatsRequest>;
+
+export type WeaponStat = {
+    type: string;
+    name: string;
+    img: string;
+    kills: number;
+    color: string;
+    deaths: number;
+    damageDealt: number;
+    damageTaken: number;
+};
+export type WeaponStatsResponse = WeaponStat[];
