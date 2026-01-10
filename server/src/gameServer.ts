@@ -29,6 +29,8 @@ import {
     type SaveGameBody,
     zFindGamePrivateBody,
 } from "./utils/types";
+import { existsSync } from "node:fs";
+
 
 process.on("uncaughtException", async (err) => {
     console.error(err);
@@ -127,6 +129,9 @@ class GameServer {
         const games: SaveGameBody["matchData"] = [];
 
         const dir = path.resolve("lost_game_data");
+
+        if (!existsSync(dir)) return;
+
         const files = await fs.readdir(dir);
 
         for (const fileName of files) {
