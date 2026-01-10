@@ -1,0 +1,45 @@
+name: Discord Bot
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+on:
+  push:
+    branches:
+      - master
+    paths:
+      - "bot/**"
+      - "server/**"
+      - "shared/**"
+      - "*.json"
+      - "pnpm-lock.yaml"
+      - ".github/workflows/bot.yml"
+
+  pull_request:
+    paths:
+      - "bot/**"
+      - "server/**"
+      - "shared/**"
+      - "*.json"
+      - "pnpm-lock.yaml"
+      - ".github/workflows/bot.yml"
+
+jobs:
+  bot:
+    name: Discord Bot
+    runs-on: ubuntu-latest
+    concurrency: ci-nodejs-${{ github.ref }}
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v6
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+
+      - name: Install Packages
+        run: pnpm install
+
+      - name: Typecheck Bot
+        run: pnpm run typecheck
+        working-directory: ./bot

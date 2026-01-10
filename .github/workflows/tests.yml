@@ -1,0 +1,45 @@
+name: Tests
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+on:
+  push:
+    branches:
+      - master
+    paths:
+      - "tests/**"
+      - "server/**"
+      - "shared/**"
+      - "*.json"
+      - "pnpm-lock.yaml"
+      - ".github/workflows/tests.yml"
+
+  pull_request:
+    paths:
+      - "tests/**"
+      - "server/**"
+      - "shared/**"
+      - "*.json"
+      - "pnpm-lock.yaml"
+      - ".github/workflows/tests.yml"
+jobs:
+  tests:
+    name: Tests
+    runs-on: ubuntu-latest
+    concurrency: ci-tests-${{ github.ref }}
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v6
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+
+      - name: Install Packages
+        run: pnpm install
+
+      - name: Run tests
+        run: pnpm run test
+        working-directory: ./tests
