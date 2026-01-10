@@ -1,12 +1,12 @@
 import { resolve } from "node:path";
 import { defineConfig, type Plugin, type ServerOptions } from "vite";
+import solid from "vite-plugin-solid";
 import stripBlockPlugin from "vite-plugin-strip-block";
 import { getConfig } from "../config";
 import { version } from "../package.json";
 import { GIT_VERSION } from "../server/src/utils/gitRevision";
 import { atlasBuilderPlugin } from "./atlas-builder/vitePlugin";
 import { codefendPlugin } from "./vite-plugins/codefendPlugin";
-import { ejsPlugin } from "./vite-plugins/ejsPlugin";
 
 export default defineConfig(({ mode }) => {
     const isDev = mode === "development";
@@ -60,7 +60,7 @@ export default defineConfig(({ mode }) => {
 
     process.env.VITE_GAME_VERSION = version;
 
-    const plugins: Plugin[] = [ejsPlugin(), ...atlasBuilderPlugin()];
+    const plugins: Plugin[] = [solid(), ...atlasBuilderPlugin()];
 
     if (!isDev) {
         plugins.push(codefendPlugin());
@@ -123,7 +123,7 @@ export default defineConfig(({ mode }) => {
             },
         },
         resolve: {
-            extensions: [".ts", ".js"],
+            extensions: [".ts", ".tsx", ".js"],
         },
         define: {
             GAME_REGIONS: Config.regions,

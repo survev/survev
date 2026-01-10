@@ -28,7 +28,7 @@ export type MatchHistory = {
     guid: string;
     region: string;
     map_id: number;
-    team_mode: number;
+    team_mode: TeamMode;
     team_count: number;
     team_total: number;
     end_time: string | Date;
@@ -118,7 +118,13 @@ const teamModeMap = {
 
 export const zLeaderboardsRequest = z.object({
     interval: z.enum(["daily", "weekly", "alltime"]),
-    mapId: z.enum(VALID_MAP_IDS).transform((v) => Number(v)),
+    mapId: z
+        .string()
+        .or(z.number())
+        .refine((mapId) => VALID_MAP_IDS.includes(mapId.toString()), {
+            message: "Invalid map ID",
+        })
+        .transform((mapId) => Number(mapId)),
     type: z.enum(["most_kills", "most_damage_dealt", "kpg", "kills", "wins"]),
     teamMode: z.enum(["solo", "duo", "squad"]).transform((mode) => teamModeMap[mode]),
 });
@@ -145,4 +151,4 @@ export type LeaderboardResponse = {
       }
 );
 
-export type LeaderboardRequest = z.infer<typeof zLeaderboardsRequest>;
+export type LeaderboardRequest = z.input<typeof zLeaderboardsRequest>;
