@@ -9239,6 +9239,10 @@ export const MapObjectDefs: Record<string, MapObjectDef> = {
         img: { sprite: "map-chest-03f.img" },
         loot: [tierLoot("tier_chest", 3, 5), autoLoot("outfitKhaki", 1)],
     }),
+    chest_03sv: createRiverChest({
+        img: { sprite: "map-chest-03sv.img" },
+        loot: [tierLoot("tier_chest", 3, 5), autoLoot("outfitWaterElem", 1)],
+    }),
     chest_03x: createRiverChest({
         img: { sprite: "map-chest-03x.img" },
         loot: [tierLoot("tier_chest", 3, 5), autoLoot("outfitWaterElem", 1)],
@@ -10903,6 +10907,12 @@ export const MapObjectDefs: Record<string, MapObjectDef> = {
         img: {
             sprite: "map-stone-03f.img",
             residue: "map-stone-res-02f.img",
+        },
+    }),
+    stone_03sv: createRiverStone({
+        img: {
+            sprite: "map-stone-03sv.img",
+            residue: "map-stone-res-02sv.img",
         },
     }),
     stone_03x: createRiverStone({

@@ -1800,9 +1800,12 @@ export class GameMap {
         );
     }
 
+    // todo make this choose a random lake out of available ones instead of filling all of them
     genOnLakeCenter(type: string) {
-        const lake = this.lakes[util.randomInt(0, this.lakes.length - 1)];
-        this.genAuto(type, lake.center, 0, 0);
+        for (let i = 0; i < this.lakes.length; i++) {
+            const lake = this.lakes[i];
+            this.genAuto(type, lake.center, 0, 0);
+        }
     }
 
     genObstacle(

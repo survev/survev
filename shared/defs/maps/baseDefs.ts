@@ -344,6 +344,22 @@ export const Main: MapDef = {
             { name: "saiga", count: 1, weight: 0.15 }, // ?
             { name: "usas", count: 1, weight: 0.01 }, // ?
         ],
+        tier_snipers: [
+            { name: "model94", count: 1, weight: 6 }, // ?
+            { name: "blr", count: 1, weight: 6 }, // ?
+            { name: "scout_elite", count: 1, weight: 3 }, // ?
+            { name: "mk12", count: 1, weight: 2 }, // ?
+            { name: "m39", count: 1, weight: 2 }, // ?
+            { name: "vss", count: 1, weight: 1.5 }, // ?
+            { name: "mosin", count: 1, weight: 0.75 }, // ?
+            { name: "mkg45", count: 1, weight: 0.75 }, // ?
+            { name: "l86", count: 1, weight: 0.75 }, // ?
+            { name: "svd", count: 1, weight: 0.75 }, // ?
+            { name: "garand", count: 1, weight: 0.45 }, // ?
+            { name: "scarssr", count: 1, weight: 0.15 }, // ?
+            { name: "awc", count: 1, weight: 0.15 }, // ?
+            { name: "sv98", count: 1, weight: 0.1 }, // ?
+        ],
         tier_hatchet_melee: [
             { name: "fireaxe", count: 1, weight: 5 }, // ?
             { name: "tier_katanas", count: 1, weight: 3 }, // ?
@@ -600,6 +616,10 @@ export const Main: MapDef = {
             { name: "outfitVerde", count: 1, weight: 0.1 },
             { name: "outfitDesertCamo", count: 1, weight: 0.3 },
         ],
+        tier_cloud_02: [
+            { name: "", count: 1, weight: 1 },
+            { name: "outfitWheat", count: 1, weight: 0.3 },
+        ],
         // seems to be unused? so adding this to suppress the warning
         tier_pumpkin_candy: [{ name: "", weight: 1, count: 1 }],
         tier_pumpkin_perks: [{ name: "halloween_mystery", count: 1, weight: 1 }],
@@ -679,11 +699,7 @@ export const Main: MapDef = {
             { name: "", count: 1, weight: 25 },
             { name: "tier_perks", count: 1, weight: 1 },
         ],
-
-        // TODO: Savannah loot tables
         tier_knives: [],
-        tier_snipers: [],
-        tier_cloud_02: [],
     },
     mapGen: {
         map: {

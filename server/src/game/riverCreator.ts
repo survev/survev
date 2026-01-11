@@ -179,18 +179,6 @@ export class RiverCreator {
         return riverPoints;
     }
 
-    pushNodes(center: Vec2, points: Vec2[], position: Vec2) {
-        for (let i = 0; i < points.length; i++) {
-            const point = points[i];
-            const dist = v2.distance(point, position);
-
-            if (dist > 32) continue;
-            const force = (32 - dist) * 0.8;
-            const dir = v2.normalize(v2.sub(position, center));
-            v2.set(point, v2.add(point, v2.mul(dir, force)));
-        }
-    }
-
     createLake(lake: MapDef["mapGen"]["map"]["rivers"]["lakes"][number]) {
         const points: Vec2[] = [];
 
@@ -199,28 +187,18 @@ export class RiverCreator {
             util.randomPointInCircle(lake.spawnBound.rad, this.randomGenerator),
         );
 
-        const variationPushDistance = 10;
         const width = (lake.outerRad - lake.innerRad) / 2;
 
-        const len = lake.innerRad + width - variationPushDistance * 2;
+        const len = lake.innerRad + width;
 
-        const step = (Math.PI * 2) / (width + 1);
+        const step = (Math.PI * 2) / 33;
         const max = Math.PI * 2 - step;
         for (let i = 0; i < max; i += step) {
             const dir = v2.create(Math.cos(i), Math.sin(i));
-            points.push(v2.add(center, v2.mul(dir, len)));
+            const newNode = v2.add(center, v2.mul(dir, len));
+            points.push(v2.add(newNode, util.randomPointInCircle((len * step) / 2)));
         }
 
-        const start = this.randomGenerator(0, Math.PI * 2);
-        const end = start + Math.PI * 2;
-        for (let i = start; i < end; i += this.randomGenerator(0.5, 1.1)) {
-            let pushDist = this.randomGenerator(0, variationPushDistance);
-            if (this.randomGenerator() < 0.5) pushDist *= -1;
-            pushDist += len;
-
-            const dir = v2.create(Math.cos(i) * pushDist, Math.sin(i) * pushDist);
-            this.pushNodes(center, points, v2.add(center, dir));
-        }
         points.push(v2.copy(points[0]));
 
         return {
