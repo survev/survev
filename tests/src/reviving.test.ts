@@ -59,6 +59,37 @@ test("Normal 2 players successful revive", async () => {
     expect(playerB.dead).toBeFalsy();
 });
 
+test("Two players reviving one player", async () => {
+    const game = await createGame(TeamMode.Squad, "test_normal");
+
+    const group = game.playerBarn.addGroup(false);
+    const playerA = game.playerBarn.addTestPlayer({ group });
+    const playerB = game.playerBarn.addTestPlayer({ group });
+    const playerC = game.playerBarn.addTestPlayer({ group });
+
+    playerC.damage({
+        amount: 999,
+        damageType: GameConfig.DamageType.Airdrop,
+        dir: v2.randomUnit(),
+    });
+    expect(playerC.downed).toBeTruthy();
+
+    const msg = new InputMsg();
+    msg.addInput(GameConfig.Input.Interact);
+    playerA.handleInput(msg);
+    expect(playerA.playerBeingRevived).toBe(playerC);
+
+    game.step(reviveDur / 2);
+
+    expect(playerC.downed).toBeTruthy();
+    playerB.handleInput(msg);
+    expect(playerB.playerBeingRevived).toBe(playerC);
+
+    game.step(reviveDur / 3.5);
+
+    expect(playerC.downed).toBeFalsy();
+});
+
 test("Normal player bleed out", async () => {
     const game = await createGame(TeamMode.Squad, "test_normal");
 
