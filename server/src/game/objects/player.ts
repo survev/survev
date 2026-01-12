@@ -1627,7 +1627,16 @@ export class Player extends BaseGameObject {
         // handle heal and boost actions
 
         if (this.actionType !== GameConfig.Action.None) {
-            this.action.time += dt;
+            if (
+                (this.downed && this.isBeingRevived()) ||
+                (!this.downed && this.isReviving())
+            ) {
+                let reviveMultiplier = this.getReviveMultiplier();
+                this.action.time += dt * reviveMultiplier;
+            } else {
+                this.action.time += dt;
+            }
+
             this.action.time = math.clamp(
                 this.action.time,
                 0,
@@ -3133,9 +3142,7 @@ export class Player extends BaseGameObject {
     isBeingRevived() {
         if (!this.downed) return false;
 
-        const normalRevive =
-            this.actionType == GameConfig.Action.Revive && this.action.targetId == 0;
-        if (normalRevive) return true;
+        if (this.getActiveRevivers().length > 0) return true;
 
         const numMedics = this.game.playerBarn.aoeHealPlayers.length;
         if (numMedics) {
@@ -3144,6 +3151,54 @@ export class Player extends BaseGameObject {
             });
         }
         return false;
+    }
+
+    isBeingTeamRevived() {
+        if (!this.downed) return false;
+
+        return this.game.playerBarn.players.some((player) => {
+            return (
+                player !== this &&
+                player.teamId === this.teamId &&
+                player.isReviving() &&
+                player.action.targetId === this.__id &&
+                util.sameLayer(player.layer, this.layer)
+            );
+        });
+    }
+
+    getActiveRevivers(): Player[] {
+        if (!this.downed && !this.isReviving()) return [];
+
+        if (!this.downed && this.isReviving()) {
+            return this.game.playerBarn.players.filter(
+                (p) =>
+                    p.teamId === this.teamId &&
+                    p.isReviving() &&
+                    p.action.targetId === this.action.targetId &&
+                    util.sameLayer(p.layer, this.layer),
+            );
+        }
+
+        if (this.downed) {
+            return this.game.playerBarn.players.filter(
+                (p) =>
+                    p !== this &&
+                    p.teamId === this.teamId &&
+                    p.isReviving() &&
+                    p.action.targetId === this.__id &&
+                    util.sameLayer(p.layer, this.layer),
+            );
+        }
+
+        return [];
+    }
+
+    getReviveMultiplier() {
+        const revivers = this.getActiveRevivers();
+        if (revivers.length === 0) return 1;
+
+        return 1 + 0.75 * (revivers.length - 1);
     }
 
     /** returns player to revive if can revive */
@@ -3163,9 +3218,7 @@ export class Player extends BaseGameObject {
                 (obj): obj is Player =>
                     obj.__type == ObjectType.Player &&
                     obj.teamId == this.teamId &&
-                    obj.downed &&
-                    // can't revive someone already being revived or self reviving (medic)
-                    obj.actionType != GameConfig.Action.Revive,
+                    obj.downed,
             );
 
         let playerToRevive: Player | undefined;
@@ -3184,6 +3237,21 @@ export class Player extends BaseGameObject {
         return playerToRevive;
     }
 
+    addReviver(playerToRevive: Player | undefined) {
+        if (!playerToRevive) return;
+
+        this.playerBeingRevived = playerToRevive;
+
+        this.doAction(
+            "",
+            GameConfig.Action.Revive,
+            GameConfig.player.reviveDuration,
+            this.playerBeingRevived.__id,
+        );
+
+        this.playAnim(GameConfig.Anim.Revive, GameConfig.player.reviveDuration);
+    }
+
     revive(playerToRevive: Player | undefined) {
         if (!playerToRevive) return;
 
@@ -3196,20 +3264,19 @@ export class Player extends BaseGameObject {
                 GameConfig.player.reviveDuration,
                 this.__id,
             );
-        } else {
+            return;
+        }
+
+        if (!playerToRevive.isBeingRevived()) {
             playerToRevive.doAction(
                 "",
                 GameConfig.Action.Revive,
                 GameConfig.player.reviveDuration,
             );
-            this.doAction(
-                "",
-                GameConfig.Action.Revive,
-                GameConfig.player.reviveDuration,
-                playerToRevive.__id,
-            );
             this.playAnim(GameConfig.Anim.Revive, GameConfig.player.reviveDuration);
         }
+
+        this.addReviver(playerToRevive);
     }
 
     isAffectedByAOE(medic: Player): boolean {
@@ -4474,7 +4541,7 @@ export class Player extends BaseGameObject {
         // If player is being revived and this is called, cancel the reviver's action
         if (this.revivedBy) {
             const revivingPlayer = this.revivedBy;
-            this.revivedBy = undefined;
+            this.revivedBy = this.revivedBy.getActiveRevivers()[0];
             if (revivingPlayer.playerBeingRevived) {
                 revivingPlayer.playerBeingRevived = undefined;
                 revivingPlayer.cancelAction();
