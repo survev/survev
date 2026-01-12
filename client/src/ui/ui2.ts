@@ -777,8 +777,7 @@ export class UiManager2 {
                             (p.__id != activePlayer.__id || canSelfRevive) &&
                             ourTeamId == theirTeamId &&
                             p.m_netData.m_downed &&
-                            !p.m_netData.m_dead &&
-                            p.m_action.type != Action.Revive
+                            !p.m_netData.m_dead
                         ) {
                             const dist = v2.length(
                                 v2.sub(p.m_netData.m_pos, activePlayer.m_netData.m_pos),

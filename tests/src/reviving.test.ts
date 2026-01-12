@@ -30,6 +30,37 @@ test("Solo self revive", async () => {
     expect(player.dead).toBeFalsy();
 });
 
+test("Dual self revive", async () => {
+    const game = await createGame(TeamMode.Duo, "test_normal");
+
+    const group = game.playerBarn.addGroup(false);
+    const playerA = game.playerBarn.addTestPlayer({ group });
+    const playerB = game.playerBarn.addTestPlayer({ group });
+
+    playerB.addPerk("self_revive");
+
+    playerB.damage({
+        amount: 999,
+        damageType: GameConfig.DamageType.Airdrop,
+        dir: v2.randomUnit(),
+    });
+    expect(playerB.downed).toBeTruthy();
+
+    const msg = new InputMsg();
+    msg.addInput(GameConfig.Input.Interact);
+    playerB.handleInput(msg);
+
+    game.step(reviveDur / 2);
+
+    playerA.handleInput(msg);
+    expect(playerA.playerBeingRevived).toBe(playerB);
+
+    game.step(reviveDur / 3.5);
+
+    expect(playerB.downed).toBeFalsy();
+    expect(playerB.dead).toBeFalsy();
+});
+
 //
 // Normal mode squad tests
 //
@@ -88,6 +119,7 @@ test("Two players reviving one player", async () => {
     game.step(reviveDur / 3.5);
 
     expect(playerC.downed).toBeFalsy();
+    expect(playerC.dead).toBeFalsy();
 });
 
 test("Normal player bleed out", async () => {

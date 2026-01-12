@@ -3153,20 +3153,7 @@ export class Player extends BaseGameObject {
         return false;
     }
 
-    isBeingTeamRevived() {
-        if (!this.downed) return false;
-
-        return this.game.playerBarn.players.some((player) => {
-            return (
-                player !== this &&
-                player.teamId === this.teamId &&
-                player.isReviving() &&
-                player.action.targetId === this.__id &&
-                util.sameLayer(player.layer, this.layer)
-            );
-        });
-    }
-
+    /** returns list of players reviving someone, including self-revive */
     getActiveRevivers(): Player[] {
         if (!this.downed && !this.isReviving()) return [];
 
@@ -3183,7 +3170,6 @@ export class Player extends BaseGameObject {
         if (this.downed) {
             return this.game.playerBarn.players.filter(
                 (p) =>
-                    p !== this &&
                     p.teamId === this.teamId &&
                     p.isReviving() &&
                     p.action.targetId === this.__id &&
@@ -3203,9 +3189,9 @@ export class Player extends BaseGameObject {
 
     /** returns player to revive if can revive */
     getPlayerToRevive(): Player | undefined {
-        if (this.actionType != GameConfig.Action.None) return undefined; // action in progress already
+        if (this.downed && this.hasPerk("self_revive") && !this.isReviving()) return this;
 
-        if (this.downed && this.hasPerk("self_revive")) return this;
+        if (this.actionType != GameConfig.Action.None) return undefined; // action in progress already
 
         if (!this.game.isTeamMode) return undefined; // no revives in solos
         if (this.downed) return undefined; // can't revive players while downed
@@ -3237,6 +3223,7 @@ export class Player extends BaseGameObject {
         return playerToRevive;
     }
 
+    /** starts revive action for the reviver */
     addReviver(playerToRevive: Player | undefined) {
         if (!playerToRevive) return;
 
@@ -3252,6 +3239,7 @@ export class Player extends BaseGameObject {
         this.playAnim(GameConfig.Anim.Revive, GameConfig.player.reviveDuration);
     }
 
+    /** starts revive action for the downed player */
     revive(playerToRevive: Player | undefined) {
         if (!playerToRevive) return;
 
@@ -4525,23 +4513,33 @@ export class Player extends BaseGameObject {
             return;
         }
 
-        // If player is reviving a player and this is called, cancel their action
-        if (this.playerBeingRevived) {
-            const revivedPlayer = this.playerBeingRevived;
+        const revivedPlayer = this.playerBeingRevived;
+        this.action.duration = 0;
+        this.action.targetId = 0;
+        this.action.time = 0;
+
+        this.actionItem = "";
+        this.actionType = GameConfig.Action.None;
+
+        const revivers = revivedPlayer ? revivedPlayer.getActiveRevivers() : [];
+        // If player is reviving a player and this is called, cancel the downed player's revive action ONLY if no revivers left
+        if (revivedPlayer) {
             this.playerBeingRevived = undefined;
             if (revivedPlayer == this.revivedBy) {
                 this.revivedBy = undefined;
             } else {
-                revivedPlayer.revivedBy = undefined;
-                revivedPlayer.cancelAction();
+                revivedPlayer.revivedBy = revivers[0] ?? undefined;
+                if (revivers.length === 0) {
+                    revivedPlayer.cancelAction();
+                }
                 this.cancelAnim();
             }
         }
 
-        // If player is being revived and this is called, cancel the reviver's action
+        // If player is being revived and this is called, cancel the reviver's revive action
         if (this.revivedBy) {
             const revivingPlayer = this.revivedBy;
-            this.revivedBy = this.revivedBy.getActiveRevivers()[0];
+            this.revivedBy = revivers[0] ?? undefined;
             if (revivingPlayer.playerBeingRevived) {
                 revivingPlayer.playerBeingRevived = undefined;
                 revivingPlayer.cancelAction();
@@ -4549,12 +4547,6 @@ export class Player extends BaseGameObject {
             }
         }
 
-        this.action.duration = 0;
-        this.action.targetId = 0;
-        this.action.time = 0;
-
-        this.actionItem = "";
-        this.actionType = GameConfig.Action.None;
         this.actionSeq++;
         this.actionDirty = false;
         this.setDirty();
