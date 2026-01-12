@@ -79,10 +79,13 @@ test("Two players reviving one player", async () => {
     playerA.handleInput(msg);
     expect(playerA.playerBeingRevived).toBe(playerC);
 
+    game.step(reviveDur / 2);
+
+    expect(playerC.downed).toBeTruthy();
     playerB.handleInput(msg);
     expect(playerB.playerBeingRevived).toBe(playerC);
 
-    game.step(reviveDur / 1.75);
+    game.step(reviveDur / 3.5);
 
     expect(playerC.downed).toBeFalsy();
 });
