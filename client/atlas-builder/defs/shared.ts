@@ -154,12 +154,6 @@ export const SharedAtlas: AtlasDef = {
 
         "map/map-grill-01.svg",
 
-        "map/map-gun-mount-01.svg",
-        "map/map-gun-mount-02.svg",
-        "map/map-gun-mount-03.svg",
-        "map/map-gun-mount-04.svg",
-        "map/map-gun-mount-05.svg",
-
         "map/map-hedgehog-01.svg",
         "map/map-hut-res-01.svg",
         "map/map-locker-01.svg",
