@@ -1,3 +1,5 @@
+@import url("./custom.css");
+
 html,
 body {
   background: #80af49;
@@ -193,10 +195,6 @@ a.nav-link-bright:hover {
   right: 0px;
   top: 0px;
   z-index: 0;
-}
-
-#my-profile {
-  display: none;
 }
 
 #leaderboard-bg {
@@ -457,35 +455,20 @@ table.player-stats-overview td {
 }
 
 .mode-image {
-  background-position: center;
   height: 100%;
-  position: absolute;
   width: 100%;
+  object-fit: contain;
 }
-
 .mode-image-solo {
   background-image: url("/img/ui/player.svg");
-  background-repeat: no-repeat;
-  background-size: 36px;
-  margin-left: 6px;
 }
 
 .mode-image-duo {
-  background-image: url("/img/ui/player.svg");
-  background-repeat: space;
-  background-size: 25px;
-  margin-left: 16px;
-  width: 50px;
+  background-image: url("/img/ui/duo-player.svg");
 }
 
 .mode-image-squad {
-  background-image: url("/img/ui/player.svg");
-  background-repeat: space;
-  background-size: 19px;
-  bottom: 0px;
-  height: 38px;
-  margin-left: 16px;
-  width: 38px;
+  background-image: url("/img/ui/squad-player.svg");
 }
 
 .mode-name {

@@ -16,10 +16,13 @@
     "allowJs": true,
     "strict": true,
     "skipLibCheck": true,
-    "types": ["vite/client", "turnstile-types"]
+    "types": ["vite/client", "turnstile-types"],
+    "jsx": "preserve",
+    "jsxImportSource": "solid-js"
   },
   "include": [
     "src/**/*.ts",
+    "src/**/*.tsx",
     "src/**/*.js",
     "../shared/",
     "atlas-builder/**/*.ts",
