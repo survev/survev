@@ -1,6 +1,8 @@
 import type { Hono } from "hono";
 import type { UpgradeWebSocket } from "hono/ws";
-import type { SiteInfoRes } from "../../../shared/types/api";
+import z from "zod";
+import { type SiteInfoRes, twitchSchema } from "../../../shared/types/api";
+import { util } from "../../../shared/utils/util";
 import { Config } from "../config";
 import { TeamMenu } from "../teamMenu";
 import { GIT_VERSION } from "../utils/gitRevision";
@@ -63,11 +65,13 @@ export class ApiServer {
     clientTheme = Config.clientTheme;
 
     captchaEnabled = Config.captchaEnabled;
+    twitchCache: SiteInfoRes["twitch"] = [];
 
     constructor() {
         for (const region in Config.regions) {
             this.regions[region] = new Region(region);
         }
+        this.startFeaturedRefresh();
     }
 
     init(app: Hono, upgradeWebSocket: UpgradeWebSocket) {
@@ -75,11 +79,12 @@ export class ApiServer {
     }
 
     getSiteInfo(): SiteInfoRes {
+        const featuredYt = util.randomItem(Config.featured.youtubers);
         const data: SiteInfoRes = {
             modes: this.modes,
             pops: {},
-            youtube: { name: "", link: "" },
-            twitch: [],
+            youtube: featuredYt,
+            twitch: this.twitchCache,
             country: "US",
             gitRevision: GIT_VERSION,
             captchaEnabled: this.captchaEnabled,
@@ -110,6 +115,49 @@ export class ApiServer {
             return await this.regions[body.region].findGame(body);
         }
         return { error: "find_game_failed" };
+    }
+
+    private startFeaturedRefresh() {
+        const refresh = async () => {
+            this.twitchCache = await this.fetchTwitchData();
+        };
+        refresh();
+        setInterval(refresh, 300000);
+    }
+
+    private async fetchTwitchData() {
+        if (!Config.secrets.TWITCH_CLIENT_ID || !Config.secrets.TWITCH_OAUTH) {
+            return [];
+        }
+        const streamers = Config.featured.streamers.slice(0, 3);
+
+        const params = new URLSearchParams();
+        streamers.forEach((name) => params.append("user_login", name));
+        try {
+            const res = await fetch(
+                `https://api.twitch.tv/helix/streams?user_login=${params.toString()}`,
+                {
+                    headers: {
+                        "Client-ID": Config.secrets.TWITCH_CLIENT_ID,
+                        Authorization: `Bearer ${Config.secrets.TWITCH_OAUTH}`,
+                    },
+                },
+            );
+            const { data: stream } = await res.json();
+            if (!stream.length) return [];
+
+            const { data, success } = z.array(twitchSchema).safeParse(stream);
+
+            if (!success) {
+                defaultLogger.error("Failed to parse twitch data", stream);
+                return [];
+            }
+
+            return data;
+        } catch (err) {
+            defaultLogger.error("Twitch fetch failed", err);
+            return [];
+        }
     }
 }
 

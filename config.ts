@@ -34,6 +34,10 @@ export function getConfig(isProduction: boolean, dir: string) {
             { mapName: "main", teamMode: TeamMode.Squad, enabled: true },
         ],
         clientTheme: "main",
+        featured: {
+            youtubers: [],
+            streamers: [],
+        },
         gameTps: 100,
         netSyncTps: 33,
         processMode: isDev ? "single" : "multi",

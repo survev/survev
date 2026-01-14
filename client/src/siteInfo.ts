@@ -145,11 +145,10 @@ export class SiteInfo {
             const displayYoutuber = this.info.youtube;
             if (displayYoutuber) {
                 $(".btn-youtuber")
-                    .attr("href", this.info.youtube.link)
-                    .html(this.info.youtube.name);
+                    .attr("href", displayYoutuber.link)
+                    .html(displayYoutuber.name);
             }
             featuredYoutuberElem.css("display", displayYoutuber ? "block" : "none");
-
             const mapDef = MapDefs[this.info.clientTheme] as MapDef;
             if (mapDef) {
                 this.config.set("cachedBgImg", mapDef.desc.backgroundImg);

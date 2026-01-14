@@ -77,17 +77,25 @@ export interface SiteInfoRes {
             l10n: string;
         }
     >;
-    youtube: {
+    youtube?: {
         name: string;
         link: string;
     };
-    twitch: Array<{
-        name: string;
-        viewers: number;
-        url: string;
-        img: string;
-    }>;
+    twitch: z.infer<typeof twitchSchema>[];
 }
+
+export const twitchSchema = z
+    .object({
+        user_name: z.string(),
+        viewer_count: z.number(),
+        thumbnail_url: z.string(),
+    })
+    .transform((data) => ({
+        name: data.user_name,
+        viewers: data.viewer_count,
+        url: `https://twitch.tv/${data.user_name}`,
+        img: data.thumbnail_url.replace("{width}", "320").replace("{height}", "180"),
+    }));
 
 export interface ProxyDef {
     apiUrl?: string;
