@@ -1,6 +1,8 @@
+import type { MapDefs } from "../../shared/defs/mapDefs";
 import { GameConfig } from "../../shared/gameConfig";
 import loadout from "../../shared/utils/loadout";
 import { util } from "../../shared/utils/util";
+import { v2 } from "../../shared/utils/v2";
 import type { Locale } from "./ui/localization";
 
 export const debugToolsConfig = {
@@ -67,6 +69,14 @@ export const debugHUDConfig = {
 
 export type DebugRenderOpts = typeof debugRenderConfig;
 
+export const BuildingEditorConfig = {
+    zoom: 1,
+    pos: v2.create(0, 0),
+    object: "house_red_01",
+    map: "main" as keyof typeof MapDefs,
+    grid: true,
+};
+
 const defaultConfig = {
     muteAudio: false,
     masterVolume: 1,
@@ -102,6 +112,7 @@ const defaultConfig = {
     debugRenderer: debugRenderConfig,
     /* STRIP_FROM_PROD_CLIENT:END */
     debugHUD: debugHUDConfig,
+    buildingEditor: BuildingEditorConfig,
 };
 
 export type ConfigType = typeof defaultConfig;
