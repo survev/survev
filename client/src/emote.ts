@@ -140,8 +140,8 @@ export class EmoteBarn {
     emoteMouseTriggered = false;
     emoteScreenPos = v2.create(0, 0);
 
-    triggerPing!: () => void;
-    triggerEmote!: () => void;
+    m_triggerPing!: () => void;
+    m_triggerEmote!: () => void;
 
     // Touch listeners
     emoteTouchedPos: Vec2 | null = null;
@@ -230,7 +230,7 @@ export class EmoteBarn {
         public camera: Camera,
         public map: Map,
     ) {
-        this.triggerPing = () => {
+        this.m_triggerPing = () => {
             if (this.activePlayer) {
                 let worldPos: Vec2;
                 // Determine if this is going to be a team ping or an emote
@@ -264,7 +264,7 @@ export class EmoteBarn {
             }
         };
 
-        this.triggerEmote = () => {
+        this.m_triggerEmote = () => {
             if (this.activePlayer) {
                 let worldPos;
                 if (this.emoteSelector.emote && !this.emoteWheelsGreyed) {
@@ -845,7 +845,7 @@ export class EmoteBarn {
             }
         }
         if (inputBinds.isBindReleased(Input.TeamPingSingle) && this.pingMouseTriggered) {
-            this.triggerPing();
+            this.m_triggerPing();
         }
         if (inputBinds.isBindPressed(Input.EmoteMenu)) {
             if (
@@ -863,10 +863,10 @@ export class EmoteBarn {
         }
         if (inputBinds.isBindReleased(Input.EmoteMenu)) {
             if (this.pingKeyTriggered && this.pingMouseTriggered) {
-                this.triggerPing();
+                this.m_triggerPing();
             }
             if (this.emoteMouseTriggered) {
-                this.triggerEmote();
+                this.m_triggerEmote();
             }
         }
 
@@ -1030,8 +1030,8 @@ export class EmoteBarn {
                         }
                         if (device.touch && this.emoteTouchedPos) {
                             this.pingMouseTriggered
-                                ? this.triggerPing()
-                                : this.triggerEmote();
+                                ? this.m_triggerPing()
+                                : this.m_triggerEmote();
                         }
                     }
                 }
