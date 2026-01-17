@@ -171,7 +171,7 @@ const mapDef: PartialMapDef = {
                 shack_03b: { small: 4, large: 6 },
                 cache_01bh: 1,
                 cache_02bh: 1,
-                cache_07: 1,
+                cache_07bh: 1,
                 bunker_structure_01: { odds: 0.25 },
                 bunker_structure_02: 1,
                 bunker_structure_03: 1,

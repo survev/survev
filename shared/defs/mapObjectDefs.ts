@@ -8922,6 +8922,16 @@ export const MapObjectDefs: Record<string, MapObjectDef> = {
             autoLoot("mirv", 1),
         ],
     }),
+    barrel_01bh: createBarrel({
+        img: { tint: 0xc9c9c9 },
+        loot: [
+            tierLoot("tier_surviv", 1, 2),
+            autoLoot("coconut", 4),
+            autoLoot("coconut", 4),
+            autoLoot("coconut", 4),
+            autoLoot("mirv", 1),
+        ]
+    }),
     barrel_01bd: createBarrel({
         explosion: "",
     }),
@@ -13970,6 +13980,22 @@ export const MapObjectDefs: Record<string, MapObjectDef> = {
             },
         ],
         map: { displayType: "barrel_01" },
+    }),
+    cache_07bh: createCache({
+        mapObjects: [
+            {
+                type: "barrel_01bh",
+                pos: v2.create(0, 0),
+                scale: 1,
+                ori: 0,
+            },
+            {
+                type: "decal_initiative_01",
+                pos: v2.create(0, 0),
+                scale: 1,
+                ori: 0,
+            },
+        ],
     }),
     cache_log_13: createCache({
         terrain: { grass: false, beach: true },
