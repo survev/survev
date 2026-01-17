@@ -8930,7 +8930,7 @@ export const MapObjectDefs: Record<string, MapObjectDef> = {
             autoLoot("coconut", 4),
             autoLoot("coconut", 4),
             autoLoot("mirv", 1),
-        ]
+        ],
     }),
     barrel_01bd: createBarrel({
         explosion: "",

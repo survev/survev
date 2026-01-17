@@ -103,3 +103,4 @@ Winter Changes 12/30/2025:
 + Tier Airdrop Melee (Snow): Added Ice Axe (weight of 1).
 + Tier Airdrop Melee (Snow): Adjusted no drop weight (19 --> 18).
 + Tier Throwables (Snow): Adjusted Snowball weight (0.5 --> 1).
++ Density Spawns: Added 30 Palm Trees
