@@ -131,7 +131,7 @@ export class Map {
     };
 
     mapLoaded = false;
-    mapTexture: PIXI.RenderTexture | null = null;
+    m_mapTexture: PIXI.RenderTexture | null = null;
     m_obstaclePool = new Pool(Obstacle);
     m_buildingPool = new Pool(Building);
     m_structurePool = new Pool(Structure);
@@ -158,7 +158,7 @@ export class Map {
         for (let i = 0; i < buildings.length; i++) {
             buildings[i].m_free();
         }
-        this.mapTexture?.destroy(true);
+        this.m_mapTexture?.destroy(true);
         this.display.ground.destroy({
             children: true,
         });
@@ -225,7 +225,7 @@ export class Map {
     }
 
     getMapTexture() {
-        return this.mapTexture;
+        return this.m_mapTexture;
     }
 
     m_update(
@@ -620,10 +620,10 @@ export class Map {
             txtRender.addChild(nameContainer);
 
             // Generate and/or update the texture
-            if (this.mapTexture) {
-                this.mapTexture.resize(screenScale, screenScale);
+            if (this.m_mapTexture) {
+                this.m_mapTexture.resize(screenScale, screenScale);
             } else {
-                this.mapTexture = PIXI.RenderTexture.create({
+                this.m_mapTexture = PIXI.RenderTexture.create({
                     width: screenScale,
                     height: screenScale,
                     scaleMode: PIXI.SCALE_MODES.LINEAR,
@@ -635,11 +635,11 @@ export class Map {
                 screenScale / this.height,
             );
             renderer.render(mapRender, {
-                renderTexture: this.mapTexture,
+                renderTexture: this.m_mapTexture,
                 clear: true,
             });
             renderer.render(txtRender, {
-                renderTexture: this.mapTexture,
+                renderTexture: this.m_mapTexture,
                 clear: false,
             });
             mapRender.destroy({
@@ -676,7 +676,7 @@ export class Map {
         };
 
         // Check decals
-        const decals = this.decalBarn.decalPool.m_getPool();
+        const decals = this.decalBarn.m_decalPool.m_getPool();
         for (let i = 0; i < decals.length; i++) {
             const decal = decals[i];
             if (
