@@ -199,7 +199,7 @@ export class BulletBarn {
         particleBarn: ParticleBarn,
         audioManager: AudioManager,
     ) {
-        const players = playerBarn.playerPool.m_getPool();
+        const players = playerBarn.m_playerPool.m_getPool();
         for (let i = 0; i < this.bullets.length; i++) {
             const b = this.bullets[i];
             if (b.collided) {

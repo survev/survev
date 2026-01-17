@@ -161,7 +161,7 @@ export class Loot implements AbstractObject {
 }
 
 export class LootBarn {
-    lootPool = new Pool(Loot);
+    m_lootPool = new Pool(Loot);
     closestLoot: Loot | null = null;
 
     m_update(
@@ -174,7 +174,7 @@ export class LootBarn {
     ) {
         this.closestLoot = null;
         let closestDist = Number.MAX_VALUE;
-        const loots = this.lootPool.m_getPool();
+        const loots = this.m_lootPool.m_getPool();
         for (let i = 0; i < loots.length; i++) {
             const loot = loots[i];
             if (loot.active) {

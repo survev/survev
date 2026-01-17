@@ -77,11 +77,11 @@ export class LoadoutDisplay {
 
         // Register types
         const TypeToPool = {
-            [ObjectType.Player]: this.playerBarn.playerPool,
+            [ObjectType.Player]: this.playerBarn.m_playerPool,
             [ObjectType.Obstacle]: this.map.m_obstaclePool,
             [ObjectType.Building]: this.map.m_buildingPool,
             [ObjectType.Structure]: this.map.m_structurePool,
-            [ObjectType.Decal]: this.decalBarn.decalPool,
+            [ObjectType.Decal]: this.decalBarn.m_decalPool,
             [ObjectType.Smoke]: this.smokeBarn.m_smokePool,
         };
 
