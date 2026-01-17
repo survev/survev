@@ -369,6 +369,9 @@ export class Application {
                 onJoin,
                 onQuit,
             );
+            if (!IS_DEV) {
+                Object.freeze(Object.getPrototypeOf(this.game));
+            }
             this.loadoutDisplay = new LoadoutDisplay(
                 this.pixi,
                 this.audioManager,
