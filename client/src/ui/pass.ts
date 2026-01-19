@@ -105,10 +105,6 @@ export class Pass {
         public loadoutMenu: LoadoutMenu,
         public localization: Localization,
     ) {
-        this.account = account;
-        this.loadoutMenu = loadoutMenu;
-        this.localization = localization;
-
         this.account.addEventListener("request", this.onRequest.bind(this));
         this.account.addEventListener("pass", this.onPass.bind(this));
         this.loadPlaceholders();

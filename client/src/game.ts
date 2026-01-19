@@ -134,16 +134,6 @@ export class Game {
         public onJoin: () => void,
         public onQuit: (err?: string) => void,
     ) {
-        this.m_pixi = m_pixi;
-        this.m_audioManager = m_audioManager;
-        this.m_ambience = m_ambience;
-        this.m_localization = m_localization;
-        this.m_config = m_config;
-        this.m_input = m_input;
-        this.m_inputBinds = m_inputBinds;
-        this.m_inputBindUi = m_inputBindUi;
-        this.m_resourceManager = m_resourceManager;
-
         if (IS_DEV) {
             this.editor = new Editor(this.m_config);
         }

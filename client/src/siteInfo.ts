@@ -14,10 +14,7 @@ export class SiteInfo {
     constructor(
         public config: ConfigManager,
         public localization: Localization,
-    ) {
-        this.config = config;
-        this.localization = localization;
-    }
+    ) {}
 
     load() {
         const locale = this.localization.getLocale();

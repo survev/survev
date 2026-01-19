@@ -32,6 +32,7 @@ export function sanitizeSlug(username: string) {
         username
             .toLowerCase()
             .trim()
+            // oxlint-disable-next-line no-useless-escape
             .replace(/[\.,\?""!@#\$%\^&\*\(\)_=\+;:<>\/\\\|\}\{\[\]`~]/g, "-"),
         {
             trim: true,

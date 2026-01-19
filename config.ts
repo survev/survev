@@ -142,13 +142,14 @@ export function getConfig(isProduction: boolean, dir: string) {
         config.secrets.GOOGLE_CLIENT_ID && config.secrets.GOOGLE_SECRET_ID
     );
     const discordLogin = !!(
-        config.secrets.DISCORD_CLIENT_ID && config.secrets.DISCORD_CLIENT_ID
+        config.secrets.DISCORD_SECRET_ID && config.secrets.DISCORD_CLIENT_ID
     );
 
     config.proxies[baseUrl.hostname] = {
         google: googleLogin,
         discord: discordLogin,
         mock: config.debug.allowMockAccount,
+        // oxlint-disable-next-line unicorn/no-useless-fallback-in-spread
         ...(config.proxies[baseUrl.hostname] ?? {}),
     };
 

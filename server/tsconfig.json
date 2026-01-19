@@ -1,5 +1,6 @@
 {
   "$schema": "https://www.schemastore.org/tsconfig.json",
   "extends": "../tsconfig.base.json",
+  "rootDir": "..",
   "include": ["src", "../shared", "../config.ts"]
 }

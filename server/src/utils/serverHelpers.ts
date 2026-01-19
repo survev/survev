@@ -170,6 +170,7 @@ export function checkForBadWords(name: string) {
 }
 
 const allowedCharsRegex =
+    // oxlint-disable-next-line no-useless-escape
     /[^A-Za-z 0-9 \.,\?""!@#\$%\^&\*\(\)-_=\+;:<>\/\\\|\}\{\[\]`~]*/g;
 
 export function validateUserName(name: string): {
@@ -434,8 +435,9 @@ function fetchWithRetry(input: RequestInfo | URL, init?: RequestInit): Promise<R
             fetch(input, init)
                 .then(resolve)
                 .catch((err) => {
+                    const url = input instanceof Request ? input.url : String(input);
                     if (attempts < 3) {
-                        defaultLogger.warn(`Failed to fetch ${input}, retrying`);
+                        defaultLogger.warn(`Failed to fetch ${url}, retrying`);
                         setTimeout(
                             () => {
                                 tryFetch(++attempts);

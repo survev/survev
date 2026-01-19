@@ -226,6 +226,7 @@ export const Animations: Record<
                 [Bones.HandR]: new Pose(v2.create(5, 12.25)).rotate(Math.PI * 0.1),
             }),
             frame(def.fists.attack.damageTimes[0] * 1.4, {
+                // oxlint-disable-next-line oxc/erasing-op
                 [Bones.HandR]: new Pose(v2.create(25, 6.25)).rotate(-Math.PI * 0),
             }),
             frame(def.fists.attack.cooldownTime, {

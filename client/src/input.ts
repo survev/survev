@@ -667,10 +667,7 @@ export class InputValue {
     constructor(
         public type: InputType,
         public code: number,
-    ) {
-        this.type = type;
-        this.code = code;
-    }
+    ) {}
 
     equals(inputValue: InputValue) {
         return this.type == inputValue.type && this.code == inputValue.code;

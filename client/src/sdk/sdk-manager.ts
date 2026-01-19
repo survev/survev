@@ -11,7 +11,7 @@ export class SDKManager {
 
     constructor() {}
 
-    async init(app: Application) {}
+    async init(_app: Application) {}
 
     disableBloodParticles() {
         return false;
@@ -38,7 +38,7 @@ export class SDKManager {
 
     hideInviteButton() {}
 
-    showInviteButton(roomID: string) {}
+    showInviteButton(_roomID: string) {}
 
     supportsInviteLink() {
         return false;
@@ -53,7 +53,7 @@ export class SDKManager {
         return undefined;
     }
 
-    async requestAd(ad: string): Promise<void> {}
+    async requestAd(_ad: string): Promise<void> {}
 
     removeAllAds() {}
 

@@ -255,6 +255,7 @@ export const PrivateRouter = new Hono<Context>()
         async (c) => {
             const data = c.req.valid("json");
             const matchData: MatchDataTable = {
+                // oxlint-disable-next-line unicorn/no-useless-spread
                 ...{
                     gameId: crypto.randomUUID(),
                     userId: MOCK_USER_ID,

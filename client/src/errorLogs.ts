@@ -2,7 +2,7 @@ import { api } from "./api";
 
 class ErrorLog {
     private requests = 0;
-    private enabled = true || import.meta.env.PROD;
+    private enabled = import.meta.env.PROD;
     private throttle = false;
     private throttleTimeout = 0;
     private errorLogCount = 0;

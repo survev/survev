@@ -55,6 +55,7 @@ export const loadout = {
             return val;
         };
         const mergedLoadout = {
+            // oxlint-disable-next-line unicorn/no-useless-spread
             ...{
                 crosshair: {
                     type: "",
@@ -109,6 +110,7 @@ export const loadout = {
             return "";
         };
         const newLoadout: Loadout = {
+            // oxlint-disable-next-line unicorn/no-useless-spread
             ...{
                 crosshair: {},
                 emotes: [],

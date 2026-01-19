@@ -30,7 +30,12 @@
     "tsx": "^4.21.0",
     "turnstile-types": "^1.2.3",
     "tweakpane": "^4.0.5",
-    "vite": "^7.3.1",
+    "vite": "npm:rolldown-vite@latest",
     "vite-plugin-strip-block": "^1.0.1"
+  },
+  "pnpm": {
+    "overrides": {
+      "vite": "npm:rolldown-vite@latest"
+    }
   }
 }

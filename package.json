@@ -13,7 +13,7 @@
     "build": "cd server && pnpm build && cd ../client && pnpm build",
     "stressTest": "cd server && pnpm stressTest",
     "lint": "biome check --write",
-    "lint:ci": "biome check"
+    "lint:ci": "oxlint"
   },
   "engines": {
     "node": ">=20.19.0"
@@ -24,8 +24,11 @@
     "@biomejs/biome": "2.0.5",
     "@types/hjson": "^2.4.6",
     "@types/node": "^22.19.7",
+    "@typescript/native-preview": "7.0.0-dev.20260117.1",
     "concurrently": "^9.2.1",
-    "typescript": "^5.9.3"
+    "oxfmt": "^0.26.0",
+    "oxlint": "^1.39.0",
+    "oxlint-tsgolint": "^0.11.1"
   },
   "dependencies": {
     "enquirer": "^2.4.1",

@@ -76,8 +76,6 @@ export class InputBinds {
         public input: InputHandler,
         public config: ConfigManager,
     ) {
-        this.input = input;
-        this.config = config;
         this.loadBinds();
     }
 
@@ -252,8 +250,6 @@ export class InputBindUi {
         public inputBinds: InputBinds,
         private localization: Localization,
     ) {
-        this.input = input;
-        this.inputBinds = inputBinds;
         $(".js-btn-keybind-restore").on("click", () => {
             this.inputBinds.loadDefaultBinds();
             this.inputBinds.saveBinds();

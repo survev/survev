@@ -1,0 +1,33 @@
+{
+  "$schema": "./node_modules/oxlint/configuration_schema.json",
+  "plugins": ["typescript"],
+  "categories": {
+    "correctness": "warn"
+  },
+  "rules": {
+    "typescript/no-floating-promises": ["off"],
+    "typescript/no-non-null-asserted-optional-chain": "off",
+    "typescript/restrict-template-expressions": "off",
+    "typescript/no-redundant-type-constituents": "off",
+    "typescript/no-duplicate-type-constituents": "off",
+    "typescript/unbound-method": "off",
+    "oxc/only-used-in-recursion": "off",
+    "unicorn/no-new-array": "off",
+    "no-unused-expressions": [
+      "error",
+      {
+        "allowTernary": true
+      }
+    ],
+    "typescript/no-this-alias": "off",
+    "eslint/no-unused-vars": [
+      "warn",
+      {
+        "varsIgnorePattern": "^_",
+        "argsIgnorePattern": "^_",
+        "caughtErrorsIgnorePattern": "^_"
+      }
+    ]
+  },
+  "ignorePatterns": ["**/dist/**/*", "**/drizzle/**/*", "**/client/atlas-builder/out/**/*.json"]
+}

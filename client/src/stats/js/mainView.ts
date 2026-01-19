@@ -41,8 +41,6 @@ export class MainView {
     );
 
     constructor(readonly app: App) {
-        this.app = app;
-
         this.el.find(".leaderboard-opt").change(() => {
             this.onChangedParams();
         });

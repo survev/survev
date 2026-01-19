@@ -1154,7 +1154,7 @@ export class LoadoutMenu {
                     ? that.selectedItem.img
                           .replace("url(", "")
                           .replace(")", "")
-                          .replace(/\'/gi, "")
+                          .replace(/'/gi, "")
                     : "";
                 e.originalEvent?.dataTransfer?.setDragImage(imgDiv, 64, 64);
             }
