@@ -34,6 +34,7 @@ import { Pass } from "./ui/pass";
 import { ProfileUi } from "./ui/profileUi";
 import { TeamMenu } from "./ui/teamMenu";
 import { loadStaticDomImages } from "./ui/ui2";
+import "./modding/Loader";
 
 export class Application {
     nameInput = $("#player-name-input-solo");

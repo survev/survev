@@ -1,3 +1,5 @@
+import type { ModAPI } from "./modding/ModAPI";
+
 /// <reference types="vite/client" />
 /// <reference types="turnstile-types" />
 
@@ -14,10 +16,10 @@ declare global {
                 | JQuery.htmlString
                 | JQuery.Node
                 | ((
-                      this: TElement,
-                      index: number,
-                      oldhtml: JQuery.htmlString,
-                  ) => JQuery.htmlString | JQuery.Node),
+                    this: TElement,
+                    index: number,
+                    oldhtml: JQuery.htmlString,
+                ) => JQuery.htmlString | JQuery.Node),
         ): this;
     }
 
@@ -81,6 +83,11 @@ declare global {
     const TURNSTILE_SITE_KEY: string | undefined;
 
     window.fusetag = window.fusetag || (window.fusetag = { que: [] });
+
+    interface Window {
+        __MYGAME_MOD_API__?: ModAPI;
+    }
+
 }
 
 declare module "pixi.js-legacy" {
@@ -90,4 +97,4 @@ declare module "pixi.js-legacy" {
         __layerIdx: number;
     }
 }
-export {};
+export { };
