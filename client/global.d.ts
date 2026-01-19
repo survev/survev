@@ -1,4 +1,4 @@
-import type { ModAPI } from "./modding/ModAPI";
+import type { ModAPI } from "./src/modding/Loader";
 
 /// <reference types="vite/client" />
 /// <reference types="turnstile-types" />
