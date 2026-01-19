@@ -1674,6 +1674,15 @@ export class Player extends BaseGameObject {
                         if (target.weapons[target.curWeapIdx].type === "pan") {
                             target.wearingPan = false;
                         }
+                        // stop all revivers from reviving if downed player is no longer downed
+                        const revivers = target.getActiveRevivers();
+                        for (const reviver of revivers) {
+                            reviver.playerBeingRevived = undefined;
+                            reviver.cancelAction();
+                            reviver.cancelAnim();
+                        }
+
+                        target.revivedBy = undefined;
 
                         target.setDirty();
                         target.setGroupStatuses();
@@ -1681,10 +1690,7 @@ export class Player extends BaseGameObject {
                     });
                 }
 
-                // Prevent cancelAction from being called by revived players at the end of revive
-                if (!this.revivedBy || this.playerBeingRevived == this.revivedBy) {
-                    this.cancelAction();
-                }
+                this.cancelAction();
 
                 if (
                     (this.curWeapIdx == GameConfig.WeaponSlot.Primary ||
