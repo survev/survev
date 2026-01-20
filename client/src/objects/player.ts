@@ -57,6 +57,7 @@ import type { Obstacle } from "./obstacle";
 import type { Emitter, ParticleBarn } from "./particles";
 import { halloweenSpriteMap } from "./projectile";
 import { createCasingParticle } from "./shot";
+import { modAPI } from "../modding/ModAPIInstance";
 
 const submergeMaskScaleFactor = 0.1;
 
@@ -2554,6 +2555,7 @@ export class PlayerBarn {
 
     playerStatus: Record<number, PlayerStatus> = {};
     anonPlayerNames = false;
+    private wasDead = false;
 
     m_update(
         dt: number,
@@ -2600,7 +2602,15 @@ export class PlayerBarn {
         // have not yet received an update for ourselves yet, but
         // we always expect the local data to be available.
         const activeInfo = this.getPlayerInfo(activeId);
-        const activePlayer = this.getPlayerById(activeId)!;
+        const activePlayer = this.getPlayerById(activeId)!;        
+
+        const isDead = activePlayer.m_netData.m_dead;
+
+        if (!this.wasDead && isDead) {
+            modAPI._emitPlayerDeath();
+        }
+
+        this.wasDead = isDead;
 
         this.setPlayerStatus(activeId, {
             pos: v2.copy(activePlayer.m_netData.m_pos),
