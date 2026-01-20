@@ -806,8 +806,12 @@
               <span data-l10n="index-rotate-reminder">Rotate to landscape for a better experience.</span>
             </div>
             <div id="left-column" class="menu-column">
-              <div id="ad-block-left">
-                <div class="surviv-shirts">
+              <div id="ad-block-left" style="overflow: auto;">
+                <div style="margin: 20px;">
+                  <h3 class="news-header">This is an offline demo version with bots</h3>
+                  <p>Report bugs on <a href="https://github.com/leia-uwu/survev/issues" target="_blank">Github</a></p>
+                  <label>Bot count: </label>
+                  <input id="offline-bot-count" type="number" max="79" min="0" value="79">
                 </div>
               </div>
               <div id="social-share-block-wrapper">
@@ -838,12 +842,12 @@
                   <input type="text" class="menu-option player-name-input" tabindex="0" placeholder="Enter your name here" data-l10n="index-enter-name-here" id="player-name-input-solo" maxlength="16" />
                   <a class="btn-darken menu-option player-options-btn" id="btn-customize"></a>
                 </div>
-                <select id="server-select-main" class="server-select menu-option btn-hollow btn-hollow-selected">
+                <select style="display: none;" id="server-select-main" class="server-select menu-option btn-hollow btn-hollow-selected">
                   <optgroup id="server-opts" label="Region" data-l10n="index-region">
                   </optgroup>
                 </select>
                 <a class="btn-green btn-darken menu-option" id="btn-start-mode-0" data-l10n="index-play-solo">Play Solo</a>
-                <div id="btns-quick-start">
+                <div style="display: none;" id="btns-quick-start">
                   <a class="btn-green btn-darken menu-option" id="btn-start-mode-1" data-l10n="index-play-duo">Play Duo</a>
                   <a class="btn-green btn-darken menu-option" id="btn-start-mode-2" data-l10n="index-play-squad">Play Squad</a>
                 </div>

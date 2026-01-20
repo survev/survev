@@ -1,4 +1,3 @@
-import { styleText } from "util";
 import { type MapDef, MapDefs } from "../../../shared/defs/mapDefs";
 import { MapObjectDefs } from "../../../shared/defs/mapObjectDefs";
 import type {
@@ -262,7 +261,7 @@ export class GameMap {
         const old = this.loggingTimes.pop();
 
         const time = `${Math.round(now - old!)}ms`.padEnd(6);
-        this.game.logger.debug(styleText(["green"], time), msg);
+        this.game.logger.debug(time, msg);
     }
 
     constructor(game: Game) {
