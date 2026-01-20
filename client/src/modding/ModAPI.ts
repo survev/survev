@@ -1,6 +1,8 @@
 type GameStartListener = () => void;
 type GameEndListener = () => void;
 type PlayerDeathListener = () => void;
+type PlayerShootListener = () => void;
+type PlayerLocalShootListener = () => void;
 
 export interface TextureOverrides {
   [key: string]: string; // key = texture ID, value = URL/path
@@ -10,6 +12,8 @@ export function createModAPI() {
   const gameStartListeners: GameStartListener[] = [];
   const gameEndListeners: GameEndListener[] = [];
   const playerDeathListeners: PlayerDeathListener[] = [];
+  const playerShootListeners: PlayerShootListener[] = [];
+  const playerLocalShootListeners: PlayerLocalShootListener[] = [];
   const textureOverrides: TextureOverrides = {};
 
   return Object.freeze({
@@ -24,6 +28,14 @@ export function createModAPI() {
 
     onPlayerDeath(fn: PlayerDeathListener) {
       playerDeathListeners.push(fn);
+    },
+
+    onPlayerShoot(fn: PlayerShootListener) {
+      playerShootListeners.push(fn);
+    },
+
+    onLocalPlayerShoot(fn: PlayerLocalShootListener) {
+      playerLocalShootListeners.push(fn);
     },
 
     /**
@@ -48,6 +60,14 @@ export function createModAPI() {
 
     _emitPlayerDeath() {
       for (const fn of playerDeathListeners) fn();
+    },
+
+    _emitPlayerShoot() {
+      for (const fn of playerShootListeners) fn();
+    },
+
+    _emitLocalPlayerShoot() {
+      for (const fn of playerLocalShootListeners) fn();
     },
 
     _getTextureOverrides() {
