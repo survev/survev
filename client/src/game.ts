@@ -46,6 +46,7 @@ import type { Localization } from "./ui/localization";
 import { Touch } from "./ui/touch";
 import { UiManager } from "./ui/ui";
 import { UiManager2 } from "./ui/ui2";
+import { modAPI } from "./modding/ModAPIInstance"
 
 export interface Ctx {
     audioManager: AudioManager;
@@ -354,6 +355,7 @@ export class Game {
         this.m_camera.m_setRotationEnabled(this.m_config.get("localRotation")!);
         this.m_playerBarn.anonPlayerNames = this.m_config.get("anonPlayerNames")!;
         this.initialized = true;
+        modAPI._emitGameStart();
     }
 
     free() {
