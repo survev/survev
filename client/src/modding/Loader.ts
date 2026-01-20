@@ -10,6 +10,10 @@ modAPI.setLocalPlayerTexture("playerSkin", "/textures/test-skin.png");
 
 // and then using that here when GameStart fires pretty simple right?
 modAPI.onGameStart(() => {
-  console.log("ModAPI hook fired! Current textures:", modAPI.getLocalPlayerTextures());
+  console.log("onGameStart ModAPI hook fired! Current textures:", modAPI.getLocalPlayerTextures());
 });
+
+modAPI.onGameEnd(() => {
+  console.log("onGameEnd ModAPI hook fired! Current textures:", modAPI.getLocalPlayerTextures());
+})
 // STRIP_FROM_PROD_CLIENT:END

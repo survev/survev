@@ -368,6 +368,7 @@ export class Game {
         this.connected = false;
         if (this.initialized) {
             this.initialized = false;
+            modAPI._emitGameEnd();
             this.m_updatePass = false;
             this.m_updatePassDelay = 0;
             this.m_emoteBarn.m_free();
