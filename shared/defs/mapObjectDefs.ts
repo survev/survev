@@ -26822,7 +26822,7 @@ export const MapObjectDefs: Record<string, MapObjectDef> = {
             },
             {
                 type: "metal_wall_ext_thicker_4",
-                pos: v2.create(28, 4.5),
+                pos: v2.create(27, 4.5),
                 scale: 1,
                 ori: 0,
             },

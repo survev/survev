@@ -1,6 +1,6 @@
 {
   "name": "survev",
-  "version": "0.1.4",
+  "version": "0.2.01",
   "type": "module",
   "description": "Open Source Surviv.io Server",
   "scripts": {
