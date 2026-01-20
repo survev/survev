@@ -16,4 +16,8 @@ modAPI.onGameStart(() => {
 modAPI.onGameEnd(() => {
   console.log("onGameEnd ModAPI hook fired! Current textures:", modAPI.getLocalPlayerTextures());
 })
+
+modAPI.onPlayerDeath(() => {
+  console.log("onPlayerDeath ModAPI hook fired! Current textures:", modAPI.getLocalPlayerTextures())
+})
 // STRIP_FROM_PROD_CLIENT:END
