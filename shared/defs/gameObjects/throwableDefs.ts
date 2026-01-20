@@ -809,11 +809,11 @@ export const ThrowableDefs: Record<string, ThrowableDef> = {
         playerCollision: true,
         fuseTime: 9999,
         aimDistance: 32,
-        rad: 1,
+        rad: 1.15,
         throwPhysics: {
             playerVelMult: 0,
             velZ: 3.35,
-            speed: 50,
+            speed: 45,
             spinVel: 10 * Math.PI,
             spinDrag: 1,
             fixedCollisionHeight: 0.25,
@@ -828,7 +828,7 @@ export const ThrowableDefs: Record<string, ThrowableDef> = {
         },
         worldImg: {
             sprite: "proj-coconut-01.img",
-            scale: 0.12,
+            scale: 0.15,
             tint: 0xffffff,
         },
         handImg: {
@@ -836,7 +836,7 @@ export const ThrowableDefs: Record<string, ThrowableDef> = {
                 right: {
                     sprite: "proj-coconut-01.img",
                     pos: { x: 3, y: 4.2 },
-                    scale: 0.14,
+                    scale: 0.15,
                 },
                 left: { sprite: "none" },
             },
@@ -844,7 +844,7 @@ export const ThrowableDefs: Record<string, ThrowableDef> = {
                 right: {
                     sprite: "proj-coconut-01.img",
                     pos: { x: 3, y: 4.2 },
-                    scale: 0.14,
+                    scale: 0.15,
                 },
                 left: { sprite: "none" },
             },

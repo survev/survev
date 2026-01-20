@@ -976,6 +976,8 @@ const SkinDefs: Record<string, OutfitDef> = {
     }),
     outfitCoconut: defineOutfitSkin("outfitBase", {
         name: "Coconut Frenzy",
+        rarity: Rarity.Common,
+        lore: "It's the coco fruit!",
         skinImg: {
             baseTint: 0x765836,
             baseSprite: "player-base-01.img",

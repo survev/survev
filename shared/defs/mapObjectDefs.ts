@@ -11631,7 +11631,7 @@ export const MapObjectDefs: Record<string, MapObjectDef> = {
     tree_14: createTree({
         scale: { createMin: 1.15, createMax: 1.3, destroy: 0.85 },
         collision: collider.createCircle(v2.create(0, 0), 1),
-        loot: [tierLoot("tier_coconut_outfit", 1, 1), autoLoot("coconut", 2)],
+        loot: [tierLoot("tier_coconut_outfit", 1, 1), autoLoot("coconut", 3)],
         img: {
             sprite: "map-tree-14.img",
             scale: 0.35,
