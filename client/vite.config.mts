@@ -1,12 +1,12 @@
 import { resolve } from "node:path";
 import { defineConfig, loadEnv, type ServerOptions } from "vite";
-import stripBlockPlugin from "vite-plugin-strip-block";
 import { getConfig } from "../config";
 import { version } from "../package.json";
 import { GIT_VERSION } from "../server/src/utils/gitRevision";
 import { atlasBuilderPlugin } from "./atlas-builder/vitePlugin";
 import { codefendPlugin } from "./vite-plugins/codefendPlugin";
 import { ejsPlugin } from "./vite-plugins/ejsPlugin";
+import { stripBlockPlugin } from "./vite-plugins/stripBlock";
 
 export default defineConfig(({ mode }) => {
     const viteEnv = loadEnv(mode, process.cwd(), "VITE_");
@@ -33,7 +33,7 @@ export default defineConfig(({ mode }) => {
     if (!isDev) {
         plugins.push(codefendPlugin());
 
-        plugins.push(
+        plugins.push( 
             stripBlockPlugin({
                 start: "STRIP_FROM_PROD_CLIENT:START",
                 end: "STRIP_FROM_PROD_CLIENT:END",
