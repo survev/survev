@@ -1,10 +1,10 @@
 {
-  "$schema": "./node_modules/oxfmt/configuration_schema.json",
+  "$schema": "../node_modules/oxfmt/configuration_schema.json",
   "indent_width": 4,
   "excludes": [
     "**/client/atlas-builder/out/**/*.json",
-    "**/package.json",
     "**/drizzle/**/*",
-    "**/dist/**/*"
+    "**/dist/**/*",
+    "*.min.js"
   ]
 }

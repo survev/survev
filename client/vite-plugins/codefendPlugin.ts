@@ -46,7 +46,7 @@ export function codefendPlugin(): Plugin {
       );
     },
     generateBundle() {
-      codefend.stats({ stats: true }, runtimeOptions);
+      codefend.stats({ stats: false }, runtimeOptions);
     },
   };
 }

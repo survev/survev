@@ -1,10 +1,12 @@
 {
-  "$schema": "./node_modules/oxlint/configuration_schema.json",
+  "$schema": "../node_modules/oxlint/configuration_schema.json",
   "plugins": ["typescript"],
+  "jsPlugins": ["./plugins/no-decimal-tint.js"],
   "categories": {
     "correctness": "warn"
   },
   "rules": {
+    "survev/no-decimal-tint": "error",
     "typescript/no-floating-promises": ["off"],
     "typescript/no-non-null-asserted-optional-chain": "off",
     "typescript/restrict-template-expressions": "off",
@@ -29,5 +31,10 @@
       }
     ]
   },
-  "ignorePatterns": ["**/dist/**/*", "**/drizzle/**/*", "**/client/atlas-builder/out/**/*.json"]
+  "ignorePatterns": [
+    "**/dist/**/*",
+    "**/drizzle/**/*",
+    "**/client/atlas-builder/out/**/*.json",
+    "*.min.js"
+  ]
 }

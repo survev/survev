@@ -12,8 +12,8 @@
     "dev:client": "cd client && pnpm dev",
     "build": "cd server && pnpm build && cd ../client && pnpm build",
     "stressTest": "cd server && pnpm stressTest",
-    "lint": "biome check --write",
-    "lint:ci": "oxlint"
+    "lint": "oxlint",
+    "lint:ci": "oxfmt --check -c oxc/.oxlintrc.json  && oxlint --type-aware -c oxc/.oxlintrc.json"
   },
   "engines": {
     "node": ">=20.19.0"
@@ -21,7 +21,7 @@
   "author": "Leia",
   "license": "GPL-3.0-or-later",
   "devDependencies": {
-    "@biomejs/biome": "2.0.5",
+    "@types/eslint": "^9.6.1",
     "@types/hjson": "^2.4.6",
     "@types/node": "^22.19.7",
     "@typescript/native-preview": "7.0.0-dev.20260117.1",
