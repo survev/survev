@@ -1,4 +1,4 @@
-import * as PIXI from "pixi.js-legacy";
+import * as PIXI from "pixi.js";
 import { GameObjectDefs, type LootDef } from "../../../shared/defs/gameObjectDefs";
 import type {
     BackpackDef,
@@ -78,15 +78,18 @@ function createPlayerNameText() {
         fontSize: device.pixelRatio > 1 ? 30 : 22,
         align: "center",
         fill: 65535,
-        stroke: 0,
-        strokeThickness: 0,
-        dropShadow: true,
-        dropShadowColor: "#000000",
-        dropShadowBlur: 1,
-        dropShadowAngle: Math.PI / 3,
-        dropShadowDistance: 1,
-    } satisfies Partial<PIXI.ITextStyle>;
-    const nameText = new PIXI.Text("", nameStyle);
+        stroke: {
+            width: 0,
+            color: 0,
+        },
+        dropShadow: {
+            color: "#000000",
+            blur: 1,
+            angle: Math.PI / 3,
+            distance: 1,
+        },
+    } satisfies Partial<PIXI.TextStyleOptions>;
+    const nameText = new PIXI.Text({ text: "", style: nameStyle });
     nameText.anchor.set(0.5, 0.5);
     nameText.scale.set(0.5, 0.5);
     nameText.position.set(0, 30);
@@ -2436,8 +2439,8 @@ export class Player implements AbstractObject {
         // by PIXI.Graphics; we scale it back up to the world size remains
         // the same
         const mask = new PIXI.Graphics();
-        mask.beginFill(0xff0000, 0.5);
-        mask.drawCircle(0, 0, 38.0 * 2.0 * submergeMaskScaleFactor);
+        mask.circle(0, 0, 38.0 * 2.0 * submergeMaskScaleFactor);
+        mask.fill({ color: 0xff0000, alpha: 0.5 });
         mask.position.set(0, 0);
         this.bodySubmergeSprite.addChild(mask);
         this.bodySubmergeSprite.mask = mask;

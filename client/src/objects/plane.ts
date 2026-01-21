@@ -1,4 +1,4 @@
-import * as PIXI from "pixi.js-legacy";
+import * as PIXI from "pixi.js";
 import { GameConfig, type Plane as PlaneType } from "../../../shared/gameConfig";
 import type { Plane as PlaneData, UpdateMsg } from "../../../shared/net/updateMsg";
 import { collider } from "../../../shared/utils/collider";
@@ -162,10 +162,15 @@ class AirstrikeZone {
 
         if (radChanged) {
             this.gfx.clear();
-            this.gfx.lineStyle(1.5, 0xeaff00);
-            this.gfx.beginFill(0xeaff00, 0.2);
-            this.gfx.drawCircle(0, 0, this.renderRad);
-            this.gfx.endFill();
+            this.gfx.circle(0, 0, this.renderRad);
+            this.gfx.fill({
+                color: 0xeaff00,
+                alpha: 0.2,
+            });
+            this.gfx.stroke({
+                color: 0xeaff00,
+                width: 1.5,
+            });
         }
 
         const alpha =

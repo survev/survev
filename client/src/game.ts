@@ -1,4 +1,4 @@
-import * as PIXI from "pixi.js-legacy";
+import * as PIXI from "pixi.js";
 import { GameObjectDefs } from "../../shared/defs/gameObjectDefs";
 import { RoleDefs } from "../../shared/defs/gameObjects/roleDefs";
 import { GameConfig, Input, TeamMode, WeaponSlot } from "../../shared/gameConfig";
@@ -39,6 +39,7 @@ import { type Player, PlayerBarn } from "./objects/player";
 import { ProjectileBarn } from "./objects/projectile";
 import { ShotBarn } from "./objects/shot";
 import { SmokeBarn } from "./objects/smoke";
+import type { OfflineServer, Socket } from "./offlineServer";
 import { Renderer } from "./renderer";
 import type { ResourceManager } from "./resources";
 import { SDK } from "./sdk/sdk";
@@ -61,7 +62,9 @@ export class Game {
     teamMode: TeamMode = TeamMode.Solo;
 
     victoryMusic: SoundHandle | null = null;
-    m_ws: WebSocket | null = null;
+
+    m_ws: Socket | null = null;
+
     connecting = false;
     connected = false;
 
@@ -89,7 +92,6 @@ export class Game {
     m_objectCreator!: Creator;
 
     m_debugDisplay!: PIXI.Graphics;
-    m_canvasMode!: boolean;
 
     m_updatePass!: boolean;
     m_updatePassDelay!: number;
@@ -133,6 +135,7 @@ export class Game {
         public m_resourceManager: ResourceManager,
         public onJoin: () => void,
         public onQuit: (err?: string) => void,
+        public offlineServer: OfflineServer,
     ) {
         this.m_pixi = m_pixi;
         this.m_audioManager = m_audioManager;
@@ -150,7 +153,7 @@ export class Game {
     }
 
     tryJoinGame(
-        url: string,
+        gameId: string,
         matchPriv: string,
         questPriv: string,
         onConnectFail: () => void,
@@ -167,7 +170,7 @@ export class Game {
             this.connecting = true;
             this.connected = false;
             try {
-                this.m_ws = new WebSocket(url);
+                this.m_ws = this.offlineServer.connect(gameId);
                 this.m_ws.binaryType = "arraybuffer";
                 this.m_ws.onerror = (_err) => {
                     this.m_ws?.close();
@@ -187,14 +190,14 @@ export class Game {
                     joinMessage.loadout = this.m_config.get("loadout")!;
                     this.m_sendMessage(net.MsgType.Join, joinMessage, 8192);
                 };
-                this.m_ws.onmessage = (e) => {
+                this.m_ws.onmessage = async (e) => {
                     const msgStream = new net.MsgStream(e.data);
                     while (true) {
                         const type = msgStream.deserializeMsgType();
                         if (type == net.MsgType.None) {
                             break;
                         }
-                        this.m_onMsg(type, msgStream.getStream());
+                        await this.m_onMsg(type, msgStream.getStream());
                         msgStream.stream.readAlignToNextByte();
                     }
                     this.debugHUD?.netInGraph.addEntry(
@@ -224,12 +227,10 @@ export class Game {
     }
 
     init() {
-        this.m_canvasMode = this.m_pixi.renderer.type == PIXI.RENDERER_TYPE.CANVAS;
-
         // Modules
         this.m_touch = new Touch(this.m_input, this.m_config);
         this.m_camera = new Camera();
-        this.m_renderer = new Renderer(this, this.m_canvasMode);
+        this.m_renderer = new Renderer(this);
         this.m_particleBarn = new ParticleBarn(this.m_renderer);
         this.m_decalBarn = new DecalBarn();
         this.m_map = new Map(this.m_decalBarn);
@@ -243,14 +244,13 @@ export class Game {
         this.m_smokeBarn = new SmokeBarn();
         this.m_deadBodyBarn = new DeadBodyBarn();
         this.m_lootBarn = new LootBarn();
-        this.m_gas = new Gas(this.m_canvasMode);
+        this.m_gas = new Gas();
         this.m_uiManager = new UiManager(
             this,
             this.m_audioManager,
             this.m_particleBarn,
             this.m_planeBarn,
             this.m_localization,
-            this.m_canvasMode,
             this.m_touch,
             this.m_inputBinds,
             this.m_inputBindUi,
@@ -1087,8 +1087,7 @@ export class Game {
     resize() {
         this.m_camera.m_screenWidth = device.screenWidth;
         this.m_camera.m_screenHeight = device.screenHeight;
-        this.m_map.resize(this.m_pixi.renderer, this.m_canvasMode);
-        this.m_gas.resize();
+        this.m_map.resize(this.m_pixi.renderer);
         this.m_uiManager.resize(this.m_map, this.m_camera);
         this.m_touch.resize();
         this.m_renderer.resize(this.m_map, this.m_camera);
@@ -1253,7 +1252,7 @@ export class Game {
     }
 
     // Socket functions
-    m_onMsg(type: net.MsgType, stream: net.BitStream) {
+    async m_onMsg(type: net.MsgType, stream: net.BitStream) {
         switch (type) {
             case net.MsgType.Joined: {
                 const msg = new net.JoinedMsg();
@@ -1289,14 +1288,12 @@ export class Game {
             case net.MsgType.Map: {
                 const msg = new net.MapMsg();
                 msg.deserialize(stream);
-                this.m_map.loadMap(
-                    msg,
-                    this.m_camera,
-                    this.m_canvasMode,
-                    this.m_particleBarn,
-                );
+                this.m_map.loadMap(msg, this.m_camera, this.m_particleBarn);
                 this.m_resourceManager.loadMapAssets(this.m_map.mapName);
-                this.m_map.renderMap(this.m_pixi.renderer, this.m_canvasMode);
+                this.m_map.renderMap(this.m_pixi.renderer);
+                this.m_map.loadMap(msg, this.m_camera, this.m_particleBarn);
+                await this.m_resourceManager.loadMapAssets(this.m_map.mapName);
+                this.m_map.renderMap(this.m_pixi.renderer);
                 this.m_bulletBarn.onMapLoad(this.m_map);
                 this.m_particleBarn.onMapLoad(this.m_map);
                 this.m_uiManager.onMapLoad(this.m_map, this.m_camera);

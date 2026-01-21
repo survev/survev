@@ -1,4 +1,3 @@
-import { randomUUID } from "node:crypto";
 import {
     GameObjectDefs,
     type LootDef,
@@ -282,7 +281,7 @@ export class PlayerBarn {
             team = this.getSmallestTeam();
         }
 
-        const socketId = randomUUID();
+        const socketId = Math.random().toString(16);
 
         const player = new Player(
             this.game,

@@ -1,4 +1,4 @@
-import { isMobile } from "pixi.js-legacy";
+import { isMobile } from "pixi.js";
 import { getParameterByName } from "./helpers";
 
 function detectMobile() {

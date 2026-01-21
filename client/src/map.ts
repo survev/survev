@@ -1,4 +1,4 @@
-import * as PIXI from "pixi.js-legacy";
+import * as PIXI from "pixi.js";
 import { type MapDef, MapDefs } from "../../shared/defs/mapDefs";
 import { MapObjectDefs } from "../../shared/defs/mapObjectDefs";
 import type { BuildingDef, ObstacleDef } from "../../shared/defs/mapObjectsTyping";
@@ -166,16 +166,11 @@ export class Map {
         this.cameraEmitter = null;
     }
 
-    resize(pixiRenderer: PIXI.IRenderer, canvasMode: boolean) {
-        this.renderMap(pixiRenderer, canvasMode);
+    resize(pixiRenderer: PIXI.Renderer) {
+        this.renderMap(pixiRenderer);
     }
 
-    loadMap(
-        mapMsg: MapMsg,
-        camera: Camera,
-        canvasMode: boolean,
-        particleBarn: ParticleBarn,
-    ) {
+    loadMap(mapMsg: MapMsg, camera: Camera, particleBarn: ParticleBarn) {
         this.mapName = mapMsg.mapName;
         // Clone the source mapDef
         const mapDef = MapDefs[this.mapName as keyof typeof MapDefs];
@@ -214,7 +209,7 @@ export class Map {
             });
         }
         this.display.ground.clear();
-        this.renderTerrain(this.display.ground, 2 / camera.m_ppu, canvasMode, false);
+        this.renderTerrain(this.display.ground, 2 / camera.m_ppu, false);
     }
 
     getMapDef() {
@@ -313,12 +308,7 @@ export class Map {
         }
     }
 
-    renderTerrain(
-        groundGfx: PIXI.Graphics,
-        gridThickness: number,
-        canvasMode: boolean,
-        mapRender: boolean,
-    ) {
+    renderTerrain(groundGfx: PIXI.Graphics, gridThickness: number, mapRender: boolean) {
         const width = this.width;
         const height = this.height;
         const terrain = this.terrain!;
@@ -340,72 +330,53 @@ export class Map {
         };
         const mapColors = this.mapDef.biome.colors;
         const groundPatches = this.mapData.groundPatches;
-        groundGfx.beginFill(mapColors.background);
-        groundGfx.drawRect(-120, -120, width + 240, 120);
-        groundGfx.drawRect(-120, height, width + 240, 120);
-        groundGfx.drawRect(-120, -120, 120, height + 240);
-        groundGfx.drawRect(width, -120, 120, height + 240);
-        groundGfx.endFill();
-        groundGfx.beginFill(mapColors.beach);
+        groundGfx.rect(-120, -120, width + 240, 120);
+        groundGfx.rect(-120, height, width + 240, 120);
+        groundGfx.rect(-120, -120, 120, height + 240);
+        groundGfx.rect(width, -120, 120, height + 240);
+        groundGfx.fill(mapColors.background);
         tracePath(groundGfx, terrain?.shore);
-        groundGfx.beginHole();
+        groundGfx.fill(mapColors.beach);
         tracePath(groundGfx, terrain?.grass);
-        // groundGfx.addHole();
-        groundGfx.endHole();
-        groundGfx.endFill();
+        groundGfx.cut();
 
         // As mentioned above, don't explicitly render a grass polygon;
         // there's a hole left where the grass should be, with the background
         // clear color set to the grass color.
-        //
-        // ... except we have to for canvas mode!
-        if (canvasMode) {
-            groundGfx.beginFill(mapColors.grass);
-            tracePath(groundGfx, terrain?.grass);
-            groundGfx.endFill();
-        }
 
         // Order 0 ground patches
         for (let i = 0; i < groundPatches.length; i++) {
             const patch = groundPatches[i];
             if (patch.order == 0 && (!mapRender || !!patch.useAsMapShape)) {
-                groundGfx.beginFill(patch.color);
                 traceGroundPatch(groundGfx, patch, this.seed);
-                groundGfx.endFill();
+                groundGfx.fill(patch.color);
             }
         }
 
         // River shore
-        groundGfx.beginFill(mapColors.riverbank);
-
-        // groundGfx.lineStyle(2, 0xff0000);
 
         for (let i = 0; i < terrain.rivers.length; i++) {
             tracePath(groundGfx, terrain.rivers[i].shorePoly);
         }
-        groundGfx.endFill();
-        groundGfx.beginFill(mapColors.water);
+        groundGfx.fill(mapColors.riverbank);
+
         for (let b = 0; b < terrain.rivers.length; b++) {
             tracePath(groundGfx, terrain.rivers[b].waterPoly);
         }
-        groundGfx.endFill();
+        groundGfx.fill(mapColors.water);
 
         // Water
-        groundGfx.beginFill(mapColors.water);
         groundGfx.moveTo(ul.x, ul.y);
         groundGfx.lineTo(ur.x, ur.y);
         groundGfx.lineTo(lr.x, lr.y);
         groundGfx.lineTo(ll.x, ll.y);
-        groundGfx.beginHole();
+        groundGfx.fill(mapColors.water);
         tracePath(groundGfx, terrain.shore);
-        // e.addHole();
-        groundGfx.endHole();
+        groundGfx.cut();
         groundGfx.closePath();
-        groundGfx.endFill();
 
         // Grid
         const gridGfx = groundGfx;
-        gridGfx.lineStyle(gridThickness, 0, 0.15);
         for (let x = 0; x <= width; x += GameConfig.map.gridSize) {
             drawLine(
                 gridGfx,
@@ -432,15 +403,18 @@ export class Map {
                 },
             );
         }
-        gridGfx.lineStyle(gridThickness, 0, 0);
+        gridGfx.stroke({
+            width: gridThickness,
+            color: 0,
+            alpha: 0.15,
+        });
 
         // Order 1 ground patches
         for (let i = 0; i < groundPatches.length; i++) {
             const patch = groundPatches[i];
             if (patch.order == 1 && (!mapRender || !!patch.useAsMapShape)) {
-                groundGfx.beginFill(patch.color);
                 traceGroundPatch(groundGfx, patch, this.seed);
-                groundGfx.endFill();
+                groundGfx.fill(patch.color);
             }
         }
     }
@@ -492,7 +466,7 @@ export class Map {
         };
     }
 
-    renderMap(renderer: PIXI.IRenderer, canvasMode: boolean) {
+    renderMap(renderer: PIXI.Renderer) {
         if (this.mapLoaded) {
             const mapRender = new PIXI.Container();
             const txtRender = new PIXI.Container();
@@ -510,10 +484,9 @@ export class Map {
 
             // Background
             const background = new PIXI.Graphics();
-            background.beginFill(mapColors.grass);
-            background.drawRect(0, 0, this.width, this.height);
-            background.endFill();
-            this.renderTerrain(background, scale, canvasMode, true);
+            background.rect(0, 0, this.width, this.height);
+            background.fill(mapColors.grass);
+            this.renderTerrain(background, scale, true);
 
             // Border for extra spiffiness
             const ll = {
@@ -532,11 +505,11 @@ export class Map {
                 x: this.width,
                 y: this.height,
             };
-            background.lineStyle(scale * 2, 0, 1);
             drawLine(background, ll, ul);
             drawLine(background, ul, ur);
             drawLine(background, ur, lr);
             drawLine(background, lr, ll);
+            background.stroke({ width: scale * 2, color: "#000000", alpha: 1 });
             background.position.y = this.height;
             background.scale.y = -1;
 
@@ -565,10 +538,9 @@ export class Map {
                         obj.scale,
                     );
                     const scale = shape.scale !== undefined ? shape.scale : 1;
-                    gfx.beginFill(shape.color, 1);
                     switch (col.type) {
                         case collider.Type.Circle:
-                            gfx.drawCircle(
+                            gfx.circle(
                                 col.pos.x,
                                 this.height - col.pos.y,
                                 col.rad * scale,
@@ -578,15 +550,15 @@ export class Map {
                             let A = v2.mul(v2.sub(col.max, col.min), 0.5);
                             const O = v2.add(col.min, A);
                             A = v2.mul(A, scale);
-                            gfx.drawRect(
+                            gfx.rect(
                                 O.x - A.x,
                                 this.height - O.y - A.y,
                                 A.x * 2,
                                 A.y * 2,
                             );
-                            gfx.endFill();
                         }
                     }
+                    gfx.fill(shape.color);
                 }
             }
             mapRender.addChild(gfx);
@@ -599,18 +571,23 @@ export class Map {
                     fontFamily: "Arial",
                     fontSize: device.mobile ? 20 : 22,
                     fontWeight: "bold",
-                    fill: ["#ffffff"],
-                    stroke: "#000000",
-                    strokeThickness: 1,
-                    dropShadow: true,
-                    dropShadowColor: "#000000",
-                    dropShadowBlur: 1,
-                    dropShadowAngle: Math.PI / 3,
-                    dropShadowDistance: 1,
+                    fill: {
+                        color: "#ffffff",
+                    },
+                    stroke: {
+                        color: "#000000",
+                        width: 1,
+                    },
+                    dropShadow: {
+                        color: "#000000",
+                        blur: 1,
+                        angle: Math.PI / 3,
+                        distance: 1,
+                    },
                     wordWrap: false,
                     align: "center",
                 });
-                const richText = new PIXI.Text(place.name, style);
+                const richText = new PIXI.Text({ text: place.name, style });
                 richText.anchor.set(0.5, 0.5);
                 richText.x = (place.pos.x * this.height) / scale;
                 richText.y = (place.pos.y * this.height) / scale;
@@ -621,37 +598,29 @@ export class Map {
 
             // Generate and/or update the texture
             if (this.mapTexture) {
-                this.mapTexture.resize(screenScale, screenScale);
+                this.mapTexture.resize(screenScale, screenScale, 1);
             } else {
                 this.mapTexture = PIXI.RenderTexture.create({
                     width: screenScale,
                     height: screenScale,
-                    scaleMode: PIXI.SCALE_MODES.LINEAR,
-                    resolution: 1,
+                    scaleMode: "linear",
                 });
+                this.mapTexture.dynamic = true;
             }
-            mapRender.scale = new PIXI.Point(
-                screenScale / this.height,
-                screenScale / this.height,
-            );
-            renderer.render(mapRender, {
-                renderTexture: this.mapTexture,
+
+            mapRender.scale.set(screenScale / this.height, screenScale / this.height);
+            renderer.render({
+                container: mapRender,
+                target: this.mapTexture,
                 clear: true,
             });
-            renderer.render(txtRender, {
-                renderTexture: this.mapTexture,
+            renderer.render({
+                container: txtRender,
+                target: this.mapTexture,
                 clear: false,
             });
-            mapRender.destroy({
-                children: true,
-                texture: true,
-                baseTexture: true,
-            });
-            txtRender.destroy({
-                children: true,
-                texture: true,
-                baseTexture: true,
-            });
+            mapRender.destroy(true);
+            txtRender.destroy(true);
         }
     }
 

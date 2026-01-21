@@ -1,4 +1,4 @@
-import * as PIXI from "pixi.js-legacy";
+import * as PIXI from "pixi.js";
 import { Constants } from "../../shared/net/net";
 import { v2 } from "../../shared/utils/v2";
 import type { Camera } from "./camera";
@@ -47,10 +47,7 @@ export class Renderer {
     layerMaskDirty = true;
     layerMaskActive = false;
 
-    constructor(
-        public game: Game,
-        public canvasMode: boolean,
-    ) {
+    constructor(public game: Game) {
         for (let i = 0; i < 4; i++) {
             this.layers.push(new RenderGroup(`layer_${i}`));
         }
@@ -63,7 +60,7 @@ export class Renderer {
     }
 
     addPIXIObj(obj: PIXI.Container, layer: number, zOrd: number, zIdx?: number) {
-        if (!obj.transform) {
+        if (obj.destroyed) {
             const err = new Error();
             const str = JSON.stringify({
                 type: "addChild",
@@ -122,78 +119,52 @@ export class Renderer {
             : 1772803;
 
         this.ground.clear();
-        this.ground.beginFill(undergroundColor);
-        this.ground.drawRect(0, 0, camera.m_screenWidth, camera.m_screenHeight);
-        this.ground.endFill();
+        this.ground.rect(0, 0, camera.m_screenWidth, camera.m_screenHeight);
+        this.ground.fill(undergroundColor);
 
         this.layerMaskDirty = true;
     }
 
     redrawLayerMask(camera: Camera, map: Map) {
         const mask = this.layerMask;
-        if (this.canvasMode) {
-            mask.clear();
-            if (this.layerMaskActive) {
-                mask.beginFill(0xffffff, 1.0);
-                mask.drawRect(0.0, 0.0, camera.m_screenWidth, camera.m_screenHeight);
-                const structures = map.m_structurePool.m_getPool();
-                for (let i = 0; i < structures.length; i++) {
-                    const structure = structures[i];
-                    if (!structure.active) {
-                        continue;
-                    }
-                    for (let j = 0; j < structure.mask.length; j++) {
-                        const m = structure.mask[j];
-                        const e = v2.mul(v2.sub(m.max, m.min), 0.5);
-                        const c = v2.add(m.min, e);
-                        const ll = camera.m_pointToScreen(v2.sub(c, e));
-                        const tr = camera.m_pointToScreen(v2.add(c, e));
-                        mask.drawRect(ll.x, ll.y, tr.x - ll.x, tr.y - ll.y);
-                    }
-                }
-                mask.endFill();
-            }
-        } else {
-            // Redraw mask
-            if (this.layerMaskDirty) {
-                this.layerMaskDirty = false;
-                mask.clear();
-                mask.beginFill(0xffffff, 1.0);
-                drawRect(mask, 0.0, 0.0, Constants.MaxPosition, Constants.MaxPosition);
-                const structures = map.m_structurePool.m_getPool();
-                for (let i = 0; i < structures.length; i++) {
-                    const structure = structures[i];
-                    if (!structure.active) {
-                        continue;
-                    }
-                    for (let j = 0; j < structure.mask.length; j++) {
-                        const m = structure.mask[j];
-                        const e = v2.mul(v2.sub(m.max, m.min), 0.5);
-                        const c = v2.add(m.min, e);
 
-                        const x = c.x - e.x;
-                        const y = c.y - e.y;
-                        const w = e.x * 2.0;
-                        const h = e.y * 2.0;
-                        mask.beginHole();
-                        drawRect(mask, x, y, w, h);
-                        mask.endHole();
-                    }
+        // Redraw mask
+        if (this.layerMaskDirty) {
+            this.layerMaskDirty = false;
+            mask.clear();
+            drawRect(mask, 0.0, 0.0, Constants.MaxPosition, Constants.MaxPosition);
+            mask.fill(0xffffff);
+            const structures = map.m_structurePool.m_getPool();
+            for (let i = 0; i < structures.length; i++) {
+                const structure = structures[i];
+                if (!structure.active) {
+                    continue;
                 }
-                mask.endFill();
+                for (let j = 0; j < structure.mask.length; j++) {
+                    const m = structure.mask[j];
+                    const e = v2.mul(v2.sub(m.max, m.min), 0.5);
+                    const c = v2.add(m.min, e);
+
+                    const x = c.x - e.x;
+                    const y = c.y - e.y;
+                    const w = e.x * 2.0;
+                    const h = e.y * 2.0;
+                    // mask.beginHole();
+                    drawRect(mask, x, y, w, h);
+                    mask.cut();
+                }
             }
-            // Position layer mask
-            const p0 = camera.m_pointToScreen(v2.create(0.0, 0.0));
-            const s = camera.m_scaleToScreen(1.0);
-            mask.position.set(p0.x, p0.y);
-            mask.scale.set(s, -s);
         }
+        // Position layer mask
+        const p0 = camera.m_pointToScreen(v2.create(0.0, 0.0));
+        const s = camera.m_scaleToScreen(1.0);
+        mask.position.set(p0.x, p0.y);
+        mask.scale.set(s, -s);
     }
 
     redrawDebugLayerMask(camera: Camera, map: Map) {
         const mask = this.debugLayerMask as PIXI.Graphics;
         mask.clear();
-        mask.beginFill(16711935, 1);
         const structures = map.m_structurePool.m_getPool();
         for (let i = 0; i < structures.length; i++) {
             const structure = structures[i];
@@ -210,7 +181,7 @@ export class Renderer {
                 }
             }
         }
-        mask.endFill();
+        mask.fill(0xff00ff);
         const p0 = camera.m_pointToScreen(v2.create(0, 0));
         const s = camera.m_scaleToScreen(1);
         mask.position.set(p0.x, p0.y);

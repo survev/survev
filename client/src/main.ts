@@ -1,5 +1,8 @@
+import * as PIXI from "pixi.js";
+import "pixi.js/prepare";
+
 import $ from "jquery";
-import * as PIXI from "pixi.js-legacy";
+import { MapDefs } from "../../shared/defs/mapDefs";
 import { GameConfig } from "../../shared/gameConfig";
 import * as net from "../../shared/net/net";
 import type {
@@ -20,6 +23,7 @@ import { Game } from "./game";
 import { helpers } from "./helpers";
 import { InputHandler } from "./input";
 import { InputBinds, InputBindUi } from "./inputBinds";
+import { OfflineServer } from "./offlineServer";
 import { PingTest } from "./pingTest";
 import { proxy } from "./proxy";
 import { ResourceManager } from "./resources";
@@ -70,7 +74,7 @@ export class Application {
     siteInfo!: SiteInfo;
     teamMenu!: TeamMenu;
 
-    pixi: PIXI.Application<PIXI.ICanvas> | null = null;
+    pixi: PIXI.Application | null = null;
     resourceManager: ResourceManager | null = null;
     input: InputHandler | null = null;
     inputBinds: InputBinds | null = null;
@@ -95,6 +99,8 @@ export class Application {
     checkedPingTest = false;
     hasFocus = true;
     newsDisplayed = true;
+
+    offlineServer = new OfflineServer();
 
     updateLogoBasedOnLanguage(lang: string) {
         const header = $("#start-row-header");
@@ -138,7 +144,7 @@ export class Application {
         onLoadCompleteCb();
     }
 
-    tryLoad() {
+    async tryLoad() {
         if (this.domContentLoaded && this.configLoaded && !this.initialized) {
             this.initialized = true;
             // this should be this.config.config.teamAutofill = true???
@@ -289,27 +295,17 @@ export class Application {
 
             const rendererRes = window.devicePixelRatio > 1 ? 2 : 1;
 
-            if (device.os == "ios") {
-                PIXI.settings.PRECISION_FRAGMENT = PIXI.PRECISION.HIGH;
-            }
+            const pixi = new PIXI.Application();
+            await pixi.init({
+                width: window.innerWidth,
+                height: window.innerHeight,
+                canvas: domCanvas,
+                antialias: true,
+                preference: "webgl",
+                resolution: rendererRes,
+                hello: true,
+            });
 
-            const createPixiApplication = (forceCanvas: boolean) => {
-                return new PIXI.Application({
-                    width: window.innerWidth,
-                    height: window.innerHeight,
-                    view: domCanvas,
-                    antialias: false,
-                    resolution: rendererRes,
-                    hello: true,
-                    forceCanvas,
-                });
-            };
-            let pixi = null;
-            try {
-                pixi = createPixiApplication(false);
-            } catch (_e) {
-                pixi = createPixiApplication(true);
-            }
             this.pixi = pixi;
             this.pixi.renderer.events.destroy();
             this.pixi.ticker.add(this.update, this);
@@ -319,7 +315,7 @@ export class Application {
                 this.audioManager,
                 this.config,
             );
-            this.resourceManager.loadMapAssets("main");
+            await this.resourceManager.loadMapAssets("main");
             this.input = new InputHandler(document.getElementById("game-touch-area")!);
             this.inputBinds = new InputBinds(this.input, this.config);
             this.inputBindUi = new InputBindUi(
@@ -368,6 +364,7 @@ export class Application {
                 this.resourceManager,
                 onJoin,
                 onQuit,
+                this.offlineServer,
             );
             this.loadoutDisplay = new LoadoutDisplay(
                 this.pixi,
@@ -385,6 +382,18 @@ export class Application {
             loadStaticDomImages();
 
             SDK.gameLoadComplete();
+
+            $(".btn-play").on("click", async (e) => {
+                const mapName = e.target.attributes.getNamedItem("data-mapName")!
+                    .value as keyof typeof MapDefs;
+
+                $(e.target).html('<div class="ui-spinner"></div>');
+
+                const res = await this.offlineServer.findGame(mapName);
+                if (res) {
+                    this.game?.tryJoinGame(res.gameId, res.data, "", () => {});
+                }
+            });
         }
     }
 
@@ -581,6 +590,19 @@ export class Application {
         updateButton(this.playMode0Btn, 0);
         updateButton(this.playMode1Btn, 1);
         updateButton(this.playMode2Btn, 2);
+
+        if (!this.game?.connecting) {
+            $(".btn-play").each((_i, ele) => {
+                const btn = $(ele);
+                const mapId = btn.attr("data-mapName") as keyof typeof MapDefs;
+                const def = MapDefs[mapId];
+                const name = def.desc.name;
+
+                btn.html(
+                    `Play ${name} ${name.toLowerCase() == mapId ? "" : `(${mapId})`}`,
+                );
+            });
+        }
     }
 
     waitOnAccount(cb: () => void) {
@@ -920,14 +942,16 @@ export class Application {
             this.pass?.update(dt);
         }
         this.input!.flush();
+
+        this.offlineServer.update();
     }
 }
 
 const App = new Application();
 
-function onPageLoad() {
+async function onPageLoad() {
     App.domContentLoaded = true;
-    App.tryLoad();
+    await App.tryLoad();
 }
 
 document.addEventListener("DOMContentLoaded", onPageLoad);

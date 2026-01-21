@@ -1,16 +1,17 @@
-import * as PIXI from "pixi.js-legacy";
+import * as PIXI from "pixi.js";
 import { util } from "../../../shared/utils/util";
 
-export const defaultLabelTextOptions: Partial<PIXI.ITextStyle> = {
+export const defaultLabelTextOptions: Partial<PIXI.TextStyleOptions> = {
     fontFamily: "monospace",
     fill: "white",
     fontSize: 13,
-    dropShadow: true,
-    dropShadowAlpha: 0.5,
-    dropShadowAngle: 0,
-    dropShadowBlur: 5,
-    dropShadowColor: "black",
-    dropShadowDistance: 0,
+    dropShadow: {
+        alpha: 0.5,
+        angle: 0,
+        blur: 5,
+        color: "black",
+        distance: 0,
+    },
 };
 
 export interface GraphOptions {
@@ -25,7 +26,7 @@ export interface GraphOptions {
         fill: string;
         stroke: string;
     };
-    titleTextStyle: Partial<PIXI.ITextStyle>;
+    titleTextStyle: Partial<PIXI.TextStyleOptions>;
 }
 
 export type GraphKey = "fps" | "ping" | "netIn";
@@ -208,7 +209,7 @@ export class Graph {
 
     addLabel(
         updateText: (graph: Graph) => string,
-        textOptions: Partial<PIXI.ITextStyle> = {},
+        textOptions: Partial<PIXI.TextStyleOptions> = {},
     ) {
         const text = new PIXI.Text();
         text.style = util.mergeDeep({}, defaultLabelTextOptions, textOptions);
@@ -233,7 +234,7 @@ export class Graph {
             label.text.text = label.updateText(this);
             label.text.x = x;
             label.text.y = this.gfx.visible ? this.gfx.height : 0;
-            x += label.text.width + parseInt(label.text.style.fontSize as string);
+            x += label.text.width + label.text.style.fontSize;
         }
     }
 
@@ -242,16 +243,10 @@ export class Graph {
 
         this.gfx
             .clear()
-            .beginFill(this.background.fill)
-            .lineStyle(2, this.background.stroke)
-            .drawRect(0, 0, this.width, this.height)
-            .endFill()
-            .beginFill(this.fill)
-            .lineStyle({
-                width: 2,
-                color: this.stroke,
-                join: PIXI.LINE_JOIN.ROUND,
-            })
+            .rect(0, 0, this.width, this.height)
+            .fill(this.background.fill)
+            .stroke(this.background.stroke)
+            .beginPath()
             .moveTo(0, this.height);
 
         const spaceBetween = this.width / (this.maxHistory - 1);
@@ -263,6 +258,6 @@ export class Graph {
             this.gfx.lineTo(x, this.height - height);
         }
 
-        this.gfx.lineTo(x, this.height).closePath().endFill();
+        this.gfx.lineTo(x, this.height).closePath().fill(this.fill).stroke(this.stroke);
     }
 }

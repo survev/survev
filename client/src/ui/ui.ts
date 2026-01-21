@@ -1,5 +1,5 @@
 import $ from "jquery";
-import * as PIXI from "pixi.js-legacy";
+import * as PIXI from "pixi.js";
 import { GameObjectDefs } from "../../../shared/defs/gameObjectDefs";
 import { PingDefs } from "../../../shared/defs/gameObjects/pingDefs";
 import { type RoleDef, RoleDefs } from "../../../shared/defs/gameObjects/roleDefs";
@@ -216,7 +216,7 @@ export class UiManager {
 
     resetWeapSlotStyling!: () => void;
     display: {
-        gas: PIXI.DisplayObject;
+        gas: PIXI.Container;
         gasSafeZone: PIXI.Container;
         airstrikeZones: PIXI.Container;
         mapSprites: PIXI.Container;
@@ -273,7 +273,6 @@ export class UiManager {
         public particleBarn: ParticleBarn,
         public planeBarn: PlaneBarn,
         public localization: Localization,
-        public canvasMode: boolean,
         public touch: Touch,
         public inputBinds: InputBinds,
         public inputBindUi: InputBindUi,
@@ -406,7 +405,7 @@ export class UiManager {
             this.reloadTouched = true;
         });
 
-        this.gasRenderer = new GasRenderer(canvasMode, 0x000000);
+        this.gasRenderer = new GasRenderer(0x000000);
 
         this.resetWeapSlotStyling = () => {
             if (this.weapDraggedDiv) {
@@ -2165,8 +2164,6 @@ export class UiManager {
                   );
         this.m_pieTimer.resize(this.touch, this.screenScaleFactor);
 
-        this.gasRenderer.resize();
-
         this.mapSprite.texture = map.getMapTexture()!;
 
         const roleMenuScale = math.min(
@@ -2213,14 +2210,13 @@ export class UiManager {
             this.mapSprite.x = screenWidth / 2;
             this.mapSprite.y = screenHeight / 2;
             this.mapSprite.alpha = 1;
-            this.container.mask.beginFill(0xffffff, 1);
-            this.container.mask.drawRect(
+            this.container.mask.rect(
                 this.mapSprite.x - this.mapSprite.width / 2,
                 this.mapSprite.y - this.mapSprite.height / 2,
                 this.mapSprite.width,
                 this.mapSprite.height,
             );
-            this.container.mask.endFill();
+            this.container.mask.fill(0xffffff);
             if (device.touch) {
                 this.bigmapCollision.css({
                     width: screenHeight,
@@ -2261,33 +2257,30 @@ export class UiManager {
             this.minimapPos.x =
                 thisMinimapMargin + minimapSize / 2 + thisMinimapMarginXAdjust;
             this.minimapPos.y = minimapPosY + thisMinimapMarginYAdjust;
-            this.display.border.lineStyle(thisMinimapBorderWidth, 0);
-            this.display.border.beginFill(0, 0);
             const u = layoutSm
                 ? thisMinimapMargin + thisMinimapBorderWidth / 2
                 : screenHeight -
                   minimapSize -
                   thisMinimapMargin +
                   thisMinimapBorderWidth / 2;
-            this.display.border.drawRect(
+            this.display.border.rect(
                 thisMinimapMargin + thisMinimapBorderWidth / 2 + thisMinimapMarginXAdjust,
                 u + thisMinimapMarginYAdjust,
                 minimapSize - thisMinimapBorderWidth,
                 minimapSize - thisMinimapBorderWidth,
             );
-            this.display.border.endFill();
+            this.display.border.stroke({ width: thisMinimapBorderWidth, color: 0 });
 
             const minimapMaskAnchorY = layoutSm
                 ? thisMinimapMargin
                 : screenHeight - minimapSize - thisMinimapMargin;
-            this.container.mask.beginFill(0xffffff, 1);
-            this.container.mask.drawRect(
+            this.container.mask.rect(
                 thisMinimapMargin + thisMinimapMarginXAdjust,
                 minimapMaskAnchorY - 0.5 + thisMinimapMarginYAdjust,
                 minimapSize,
                 minimapSize,
             );
-            this.container.mask.endFill();
+            this.container.mask.fill(0xffffff);
         }
     }
 
