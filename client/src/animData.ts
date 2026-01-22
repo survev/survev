@@ -192,6 +192,22 @@ export const Animations: Record<
             effect(def("fists").attack.damageTimes[0], "animMeleeCollision", {}),
         ],
     },
+    // Karambit-specific version of "fists"
+    stab: {
+        keyframes: [
+            frame(0, { [Bones.HandR]: new Pose(v2.create(6, 20.25)) }),
+            frame(def("fists").attack.damageTimes[0], {
+                [Bones.HandR]: new Pose(v2.create(29.75, 1.75)),
+            }),
+            frame(def("fists").attack.cooldownTime, {
+                [Bones.HandR]: new Pose(v2.create(6, 20.25)),
+            }),
+        ],
+        effects: [
+            effect(0, "animPlaySound", { sound: "swing" }),
+            effect(def("fists").attack.damageTimes[0], "animMeleeCollision", {}),
+        ],
+    },
     cut: {
         keyframes: [
             frame(0, { [Bones.HandR]: new Pose(v2.create(14, 12.25)) }),
@@ -560,5 +576,303 @@ export const Animations: Record<
             }),
         ],
         effects: [],
+    },
+
+    //
+    // Deploy Animations
+    //
+
+    // TODO: Bowie deploy & idle anim, 2nd deploy & idle anim for huntsman & bayonet
+
+    karambit_spin: {
+        keyframes: [
+            frame(0, {
+                [Bones.HandR]: new Pose(v2.create(6, 20.25)).rotate(Math.PI * 0.35),
+                [Bones.MeleeR]: new Pose(v2.create(0, 0)).rotate(Math.PI * 7).offset(v2.create(17.5, 5)),
+            }),
+            frame(0.575, {
+                [Bones.HandR]: new Pose(v2.create(6, 20.25)),
+                [Bones.MeleeR]: new Pose(v2.create(0, 0)).rotate(0).offset(v2.create(17.5, 5)),
+            }, math.easeOutSine),
+            frame(0.65, {
+                [Bones.HandR]: new Pose(v2.create(6, 20.25)),
+                [Bones.MeleeR]: new Pose(v2.create(0, 0)).rotate(0).offset(v2.create(0, 0)),
+            }),
+        ],
+        effects: [
+            effect(0, "animPlaySound", { sound: "deploy" }),
+            effect(0.1, "animPlaySound", { sound: "swing" }),
+            effect(0.2, "animPlaySound", { sound: "swing" }),
+            effect(0.3, "animPlaySound", { sound: "swing" }),
+        ],
+    },
+    karambit_rapidSpin: {
+        keyframes: [
+            frame(0, {
+                [Bones.HandR]: new Pose(v2.create(6, 20.25)).rotate(Math.PI * 0.35),
+                [Bones.MeleeR]: new Pose(v2.create(0, 0)).rotate(Math.PI * 3).offset(v2.create(17.5, 5)),
+            }),
+            frame(0.45, {
+                [Bones.HandR]: new Pose(v2.create(20, 10.25)),
+                [Bones.MeleeR]: new Pose(v2.create(0, 0)).rotate(Math.PI * -1.3).offset(v2.create(17.5, 5)),
+            }, math.easeOutSine),
+            frame(0.65, {
+                [Bones.HandR]: new Pose(v2.create(6, 20.25)),
+                [Bones.MeleeR]: new Pose(v2.create(0, 0)).rotate(0).offset(v2.create(0, 0)),
+            }, math.easeInSine),
+        ],
+        effects: [
+            effect(0, "animPlaySound", { sound: "deploy" }),
+            effect(0.125, "animPlaySound", { sound: "swing" }),
+            effect(0.25, "animPlaySound", { sound: "swing" }),
+        ],
+    },
+    bayonet_unsheathe: {
+        keyframes: [
+            frame(0, {
+                [Bones.HandL]: new Pose(v2.create(14, -12.25)).rotate(-Math.PI * 0.25),
+                [Bones.HandR]: new Pose(v2.create(1, 17.75)).rotate(-Math.PI),
+                [Bones.MeleeR]: new Pose(v2.create(0, 0)).rotate(0).offset(v2.create(0, 0)),
+            }),
+            frame(0.3, {
+                [Bones.HandL]: new Pose(v2.create(14, -12.25)),
+                [Bones.HandR]: new Pose(v2.create(1, 17.75)),
+                [Bones.MeleeR]: new Pose(v2.create(0, 0)).rotate(Math.PI * 0.05).offset(v2.create(0, 0)),
+            }, math.easeInSine),
+            frame(0.4, {
+                [Bones.HandL]: new Pose(v2.create(14, -12.25)),
+                [Bones.HandR]: new Pose(v2.create(1, 17.75)),
+                [Bones.MeleeR]: new Pose(v2.create(0, 0)).rotate(Math.PI * 0.35).offset(v2.create(0, 0)),
+            }, math.easeOutSine),
+            frame(0.65, {
+                [Bones.HandL]: new Pose(v2.create(14, -12.25)),
+                [Bones.HandR]: new Pose(v2.create(14, 12.25)),
+                [Bones.MeleeR]: new Pose(v2.create(0, 0)).rotate(0).offset(v2.create(0, 0)),
+            }, math.easeInSine),
+        ],
+        effects: [],
+    },
+    knuckles_slam: {
+        keyframes: [
+            frame(0, {
+                [Bones.HandL]: new Pose(v2.create(14, -12.25)),
+                [Bones.MeleeR]: new Pose(v2.create(-5, 24)).rotate(-Math.PI * 3).offset(v2.create(-20, 0)),
+            }),
+            frame(0.3, {
+                [Bones.HandL]: new Pose(v2.create(18, -6)),
+                [Bones.HandR]: new Pose(v2.create(14, 12.25)),
+                [Bones.MeleeR]: new Pose(v2.create(-10, 18)).rotate(-Math.PI * 0.4).offset(v2.create(-20, 0)),
+            }),
+            frame(0.35, {
+                [Bones.HandL]: new Pose(v2.create(18, -6)),
+                [Bones.HandR]: new Pose(v2.create(23, -6)),
+                [Bones.MeleeR]: new Pose(v2.create(0, 0)).rotate(-Math.PI * 0.4).offset(v2.create(0, 0)),
+            }),
+            frame(0.45, {
+                [Bones.HandL]: new Pose(v2.create(18, -6)),
+                [Bones.HandR]: new Pose(v2.create(27, -13)),
+                [Bones.MeleeR]: new Pose(v2.create(0, 0)).rotate(-Math.PI * 0.4).offset(v2.create(0, 0)),
+            }, math.easeOutQuart),
+            frame(0.65, {
+                [Bones.HandL]: new Pose(v2.create(14, -12.25)),
+                [Bones.HandR]: new Pose(v2.create(14, 12.25)),
+                [Bones.MeleeR]: new Pose(v2.create(0, 0)).rotate(0).offset(v2.create(0, 0)),
+            }, math.easeInSine),
+        ],
+        effects: [],
+    },
+    knuckles_spin: {
+        keyframes: [
+            frame(0, {
+                [Bones.HandL]: new Pose(v2.create(20, 6.25)).rotate(-Math.PI * 0.4),
+                [Bones.MeleeR]: new Pose(v2.create(0, 32)).rotate(-Math.PI * 3.5).offset(v2.create(20, 10)),
+            }),
+            frame(0.2, {
+                [Bones.HandL]: new Pose(v2.create(20, 6.25)).rotate(-Math.PI * 0.2),
+                [Bones.HandR]: new Pose(v2.create(14, 12.25)),
+                [Bones.MeleeR]: new Pose(v2.create(-14, 16)).rotate(-Math.PI * 1.75).offset(v2.create(20, 10)),
+            }),
+            frame(0.4, {
+                [Bones.HandL]: new Pose(v2.create(20, 6.25)),
+                [Bones.HandR]: new Pose(v2.create(19, 12.25)),
+                [Bones.MeleeR]: new Pose(v2.create(0, 0)).rotate(-Math.PI * 0.25).offset(v2.create(0, 0)),
+            }),
+            frame(0.525, {
+                [Bones.HandL]: new Pose(v2.create(17, -3.25)),
+                [Bones.HandR]: new Pose(v2.create(23, 12.25)),
+                [Bones.MeleeR]: new Pose(v2.create(0, 0)).rotate(-Math.PI * 0.3).offset(v2.create(0, 0)),
+            }),
+            frame(0.65, {
+                [Bones.HandL]: new Pose(v2.create(14, -12.25)),
+                [Bones.HandR]: new Pose(v2.create(14, 12.25)),
+                [Bones.MeleeR]: new Pose(v2.create(0, 0)).rotate(0).offset(v2.create(0, 0)),
+            }),
+        ],
+        effects: [],
+    },
+    huntsman_catch: {
+        keyframes: [
+            frame(0, {
+                [Bones.HandR]: new Pose(v2.create(14, 12.25)).rotate(Math.PI * 0.5),
+                [Bones.MeleeR]: new Pose(v2.create(0, 0)).rotate(Math.PI * 3).offset(v2.create(0, 0)),
+            }, math.easeInSine),
+            frame(0.25, {
+                [Bones.HandR]: new Pose(v2.create(14, 12.25)).rotate(Math.PI * 0.25),
+                [Bones.MeleeR]: new Pose(v2.create(-20, 0)).rotate(Math.PI * 1.5).offset(v2.create(0, 0)),
+            }),
+            frame(0.45, {
+                [Bones.HandR]: new Pose(v2.create(28, 12.25)),
+                [Bones.MeleeR]: new Pose(v2.create(0, 0)).rotate(Math.PI * 0.15).offset(v2.create(0, 0)),
+            }),
+            frame(0.475, {
+                [Bones.HandR]: new Pose(v2.create(31, 12.25)),
+                [Bones.MeleeR]: new Pose(v2.create(0, 0)).rotate(Math.PI * 0.15).offset(v2.create(0, 0)),
+            }, math.easeOutSine),
+            frame(0.675, {
+                [Bones.HandR]: new Pose(v2.create(14, 12.25)),
+                [Bones.MeleeR]: new Pose(v2.create(0, 0)).rotate(0).offset(v2.create(0, 0)),
+            }, math.easeInOutSine),
+        ],
+        effects: [
+            effect(0, "animPlaySound", { sound: "deploy" }),
+            effect(0.45, "animPlaySound", { sound: "swing" }),
+        ],
+    },
+
+    //
+    // Idle / Inspect Animations
+    //
+
+    karambit_frontSpin: {
+        keyframes: [
+            frame(0, {
+                [Bones.HandR]: new Pose(v2.create(6, 20.25)),
+                [Bones.MeleeR]: new Pose(v2.create(0, 0)).rotate(0).offset(v2.create(0, 0)),
+            }),
+            frame(0.2, {
+                [Bones.HandR]: new Pose(v2.create(6, 20.25)).rotate(Math.PI * 0.1),
+                [Bones.MeleeR]: new Pose(v2.create(0, 0)).rotate(Math.PI * 0.3).offset(v2.create(17.5, 5)),
+            }, math.easeOutSine),
+            frame(0.6, {
+                [Bones.HandR]: new Pose(v2.create(6, 20.25)).rotate(Math.PI * -0.1),
+                [Bones.MeleeR]: new Pose(v2.create(0, 0)).rotate(-Math.PI * 4).offset(v2.create(17.5, 5)),
+            }, math.easeInSine),
+            frame(0.7, {
+                [Bones.HandR]: new Pose(v2.create(6, 20.25)).rotate(Math.PI * -0.1),
+                [Bones.MeleeR]: new Pose(v2.create(0, 0)).rotate(-Math.PI * 4.5).offset(v2.create(17.5, 5)),
+            }, math.easeOutSine),
+            frame(0.85, {
+                [Bones.HandR]: new Pose(v2.create(6, 20.25)),
+                [Bones.MeleeR]: new Pose(v2.create(0, 0)).rotate(-Math.PI * 4).offset(v2.create(0, 0)),
+            }, math.easeInSine),
+        ],
+        effects: [
+            effect(0.325, "animPlaySound", { sound: "swing" }),
+            effect(0.475, "animPlaySound", { sound: "swing" }),
+        ],
+    },
+    karambit_backSpin: {
+        keyframes: [
+            frame(0, {
+                [Bones.HandR]: new Pose(v2.create(6, 20.25)),
+                [Bones.MeleeR]: new Pose(v2.create(0, 0)).rotate(0).offset(v2.create(0, 0)),
+            }),
+            frame(0.2, {
+                [Bones.HandR]: new Pose(v2.create(6, 20.25)).rotate(Math.PI * -0.1),
+                [Bones.MeleeR]: new Pose(v2.create(0, 0)).rotate(-Math.PI * 0.5).offset(v2.create(17.5, 5)),
+            }, math.easeOutSine),
+            frame(0.6, {
+                [Bones.HandR]: new Pose(v2.create(6, 20.25)).rotate(Math.PI * 0.1),
+                [Bones.MeleeR]: new Pose(v2.create(0, 0)).rotate(Math.PI * 4).offset(v2.create(17.5, 5)),
+            }, math.easeInSine),
+            frame(0.7, {
+                [Bones.HandR]: new Pose(v2.create(6, 20.25)).rotate(Math.PI * 0.1),
+                [Bones.MeleeR]: new Pose(v2.create(0, 0)).rotate(Math.PI * 4.3).offset(v2.create(17.5, 5)),
+            }, math.easeOutSine),
+            frame(0.85, {
+                [Bones.HandR]: new Pose(v2.create(6, 20.25)),
+                [Bones.MeleeR]: new Pose(v2.create(0, 0)).rotate(Math.PI * 4).offset(v2.create(0, 0)),
+            }, math.easeInSine),
+        ],
+        effects: [
+            effect(0.325, "animPlaySound", { sound: "swing" }),
+            effect(0.475, "animPlaySound", { sound: "swing" }),
+        ],
+    },
+    // Bayonet / Huntsman / Bowie
+    knife_inspect: {
+        keyframes: [
+            frame(0, {
+                [Bones.HandL]: new Pose(v2.create(14, -12.25)),
+                [Bones.HandR]: new Pose(v2.create(14, 12.25)),
+                [Bones.MeleeR]: new Pose(v2.create(0, 0)).rotate(0).offset(v2.create(0, 0)),
+            }, math.easeInOutSine),
+            frame(0.35, {
+                [Bones.HandL]: new Pose(v2.create(21, 8)),
+                [Bones.HandR]: new Pose(v2.create(21, 17.25)),
+                [Bones.MeleeR]: new Pose(v2.create(0, 0)).rotate(Math.PI * -0.2).offset(v2.create(0, 0)),
+            }, math.easeInOutSine),
+            frame(0.5, {
+                [Bones.HandL]: new Pose(v2.create(21, -10)),
+                [Bones.HandR]: new Pose(v2.create(21, 17.25)),
+                [Bones.MeleeR]: new Pose(v2.create(0, 0)).rotate(Math.PI * -0.25).offset(v2.create(0, 0)),
+            }, math.easeInOutSine),
+            frame(0.8, {
+                [Bones.HandL]: new Pose(v2.create(14, -12.25)).rotate(Math.PI * -0.05),
+                [Bones.HandR]: new Pose(v2.create(21, 17.25)).rotate(Math.PI * -0.35),
+                [Bones.MeleeR]: new Pose(v2.create(0, 0)).rotate(Math.PI * -0.925).offset(v2.create(0, 0)),
+            }, math.easeInOutSine),
+            frame(0.85, {
+                [Bones.HandL]: new Pose(v2.create(14, -12.25)).rotate(Math.PI * -0.05),
+                [Bones.HandR]: new Pose(v2.create(21, 17.25)).rotate(Math.PI * -0.35),
+                [Bones.MeleeR]: new Pose(v2.create(0, 0)).rotate(Math.PI * -0.925).offset(v2.create(0, 0)),
+            }),
+            frame(1.15, {
+                [Bones.HandL]: new Pose(v2.create(14, -12.25)),
+                [Bones.HandR]: new Pose(v2.create(14, 12.25)),
+                [Bones.MeleeR]: new Pose(v2.create(0, 0)).rotate(0).offset(v2.create(0, 0)),
+            }, math.easeInOutSine),
+        ],
+        effects: [
+            effect(0.35, "animPlaySound", { sound: "deploy" }),
+            effect(0.8, "animPlaySound", { sound: "deploy" }),
+        ],
+    },
+    knuckles_bash: {
+        keyframes: [
+            frame(0, {
+                [Bones.HandL]: new Pose(v2.create(14, -12.25)),
+                [Bones.HandR]: new Pose(v2.create(14, 12.25)),
+                [Bones.MeleeR]: new Pose(v2.create(0, 0)).rotate(0).offset(v2.create(0, 0)),
+            }),
+            frame(0.15, {
+                [Bones.HandL]: new Pose(v2.create(16, -18)),
+                [Bones.HandR]: new Pose(v2.create(16, 18)),
+                [Bones.MeleeR]: new Pose(v2.create(0, 0)).rotate(Math.PI * -0.25).offset(v2.create(0, 0)),
+            }, math.easeOutSine),
+            frame(0.2, {
+                [Bones.HandL]: new Pose(v2.create(16, -18)),
+                [Bones.HandR]: new Pose(v2.create(16, 18)),
+                [Bones.MeleeR]: new Pose(v2.create(0, 0)).rotate(Math.PI * -0.25).offset(v2.create(0, 0)),
+            }),
+            frame(0.35, {
+                [Bones.HandL]: new Pose(v2.create(16, -18)).rotate(Math.PI * 0.2),
+                [Bones.HandR]: new Pose(v2.create(16, 18)).rotate(Math.PI * -0.2),
+                [Bones.MeleeR]: new Pose(v2.create(0, 0)).rotate(Math.PI * -0.25).offset(v2.create(0, 0)),
+            }, math.easeOutBounce),
+            frame(0.45, {
+                [Bones.HandL]: new Pose(v2.create(16, -18)).rotate(Math.PI * 0.2),
+                [Bones.HandR]: new Pose(v2.create(16, 18)).rotate(Math.PI * -0.2),
+                [Bones.MeleeR]: new Pose(v2.create(0, 0)).rotate(Math.PI * -0.2).offset(v2.create(0, 0)),
+            }),
+            frame(0.7, {
+                [Bones.HandL]: new Pose(v2.create(14, -12.25)),
+                [Bones.HandR]: new Pose(v2.create(14, 12.25)),
+                [Bones.MeleeR]: new Pose(v2.create(0, 0)).rotate(0).offset(v2.create(0, 0)),
+            }, math.easeOutQuad),
+        ],
+        effects: [
+            effect(0.25, "animPlaySound", { sound: "idle" }),
+        ],
     },
 };

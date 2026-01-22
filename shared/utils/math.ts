@@ -75,8 +75,39 @@ export const math = {
         return Math.pow(2, (e - 1) * 10);
     },
 
+    easeInSine(x: number): number {
+        return 1 - Math.cos((x * Math.PI) / 2);
+    },
+
+    easeOutSine(x: number): number {
+        return Math.sin((x * Math.PI) / 2);
+    },
+
+    easeInOutSine(x: number): number {
+        return -(Math.cos(Math.PI * x) - 1) / 2;
+    },
+
+    easeOutQuad(x: number): number {
+        return 1 - (1 - x) * (1 - x);
+    },
+
     easeOutQuart(e: number) {
         return 1 - Math.pow(1 - e, 4);
+    },
+
+    easeOutBounce(x: number): number {
+        const n1 = 7.5625;
+        const d1 = 2.75;
+
+        if (x < 1 / d1) {
+            return n1 * x * x;
+        } else if (x < 2 / d1) {
+            return n1 * (x -= 1.5 / d1) * x + 0.75;
+        } else if (x < 2.5 / d1) {
+            return n1 * (x -= 2.25 / d1) * x + 0.9375;
+        } else {
+            return n1 * (x -= 2.625 / d1) * x + 0.984375;
+        }
     },
 
     remap(v: number, a: number, b: number, x: number, y: number) {

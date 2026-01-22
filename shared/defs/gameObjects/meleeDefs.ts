@@ -158,12 +158,17 @@ const BaseDefs: Record<string, MeleeDef> = {
         anim: {
             idlePose: "fists",
             attackAnims: ["fists", "fists"],
+            deployAnims: ["knuckles_spin", "knuckles_slam"],
+            deployAnimTime: 0.65,
+            idleAnims: ["knuckles_bash"],
+            idleAnimTime: 0.7,
         },
         sound: {
             pickup: "frag_pickup_01",
             swing: "punch_swing_01",
             deploy: "knuckles_deploy_01",
             playerHit: "punch_hit_01",
+            idle: "knuckles_bash_01",
         },
         lootImg: {
             sprite: "loot-melee-knuckles-rusted.img",
@@ -212,7 +217,11 @@ const BaseDefs: Record<string, MeleeDef> = {
         },
         anim: {
             idlePose: "slash",
-            attackAnims: ["slash", "fists"],
+            attackAnims: ["slash", "stab"],
+            deployAnims: ["karambit_spin", "karambit_rapidSpin"],
+            deployAnimTime: 0.65,
+            idleAnims: ["karambit_frontSpin", "karambit_backSpin"],
+            idleAnimTime: 0.85,
         },
         sound: {
             pickup: "frag_pickup_01",
@@ -268,6 +277,10 @@ const BaseDefs: Record<string, MeleeDef> = {
         anim: {
             idlePose: "fists",
             attackAnims: ["cut", "thrust"],
+            deployAnims: ["bayonet_unsheathe"],
+            deployAnimTime: 0.65,
+            idleAnims: ["knife_inspect"],
+            idleAnimTime: 1.15,
         },
         sound: {
             pickup: "frag_pickup_01",
@@ -322,6 +335,10 @@ const BaseDefs: Record<string, MeleeDef> = {
         anim: {
             idlePose: "fists",
             attackAnims: ["cut", "thrust"],
+            deployAnims: ["huntsman_catch"],
+            deployAnimTime: 0.675,
+            idleAnims: ["knife_inspect"],
+            idleAnimTime: 1.15,
         },
         sound: {
             pickup: "frag_pickup_01",
@@ -1186,10 +1203,6 @@ const SkinDefs: Record<string, MeleeDef> = {
         name: "Karambit Rugged",
         rarity: Rarity.Rare,
         noPotatoSwap: false,
-        anim: {
-            idlePose: "slash",
-            attackAnims: ["slash", "fists"],
-        },
         lootImg: {
             sprite: "loot-melee-karambit-rugged.img",
         },

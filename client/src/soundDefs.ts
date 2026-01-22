@@ -1285,6 +1285,10 @@ const Sounds: Record<string, Record<string, SoundDef>> = {
             path: "audio/sfx/footstep_carpet_01.mp3",
             volume: 1,
         },
+        knuckles_bash_01: {
+            path: "audio/sfx/knuckles_bash_01.mp3",
+            volume: 0.5,
+        },
         punch_swing_01: {
             path: "audio/sfx/punch_swing_01.mp3",
             volume: 1,
