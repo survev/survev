@@ -260,12 +260,12 @@ export const Animations: Record<
     spin: {
         keyframes: [
             frame(0, {
-                [Bones.HandR]: new Pose(v2.create(0, 0), 0, v2.create(-3, 20.25)),
+                [Bones.HandR]: new Pose(v2.create(0, 0), Math.PI, v2.create(-3, 20.25)),
             }),
             frame(1, {
                 [Bones.HandR]: new Pose(
                     v2.create(0, 0),
-                    -Math.PI * 6,
+                    -Math.PI * 7,
                     v2.create(6, 20.25),
                 ),
             }),
