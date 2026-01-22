@@ -50,6 +50,7 @@ import type { InputHandler } from "../input";
 import type { InputBinds } from "./../inputBinds";
 import type { SoundHandle } from "../lib/createJS";
 import type { Map } from "../map";
+import { modAPI } from "../modding/ModAPIInstance";
 import type { Renderer } from "../renderer";
 import type { UiManager2 } from "../ui/ui2";
 import { Pool } from "./objectPool";
@@ -57,7 +58,6 @@ import type { Obstacle } from "./obstacle";
 import type { Emitter, ParticleBarn } from "./particles";
 import { halloweenSpriteMap } from "./projectile";
 import { createCasingParticle } from "./shot";
-import { modAPI } from "../modding/ModAPIInstance";
 
 const submergeMaskScaleFactor = 0.1;
 
@@ -2602,7 +2602,7 @@ export class PlayerBarn {
         // have not yet received an update for ourselves yet, but
         // we always expect the local data to be available.
         const activeInfo = this.getPlayerInfo(activeId);
-        const activePlayer = this.getPlayerById(activeId)!;        
+        const activePlayer = this.getPlayerById(activeId)!;
 
         const isDead = activePlayer.m_netData.m_dead;
 

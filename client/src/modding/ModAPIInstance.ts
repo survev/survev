@@ -1,4 +1,4 @@
-import { createModAPI, ModAPI } from "./ModAPI";
+import { createModAPI, type ModAPI } from "./ModAPI";
 
 const modAPI: ModAPI = window.__MYGAME_MOD_API__ ?? createModAPI();
 

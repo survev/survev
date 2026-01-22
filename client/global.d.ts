@@ -16,10 +16,10 @@ declare global {
                 | JQuery.htmlString
                 | JQuery.Node
                 | ((
-                    this: TElement,
-                    index: number,
-                    oldhtml: JQuery.htmlString,
-                ) => JQuery.htmlString | JQuery.Node),
+                      this: TElement,
+                      index: number,
+                      oldhtml: JQuery.htmlString,
+                  ) => JQuery.htmlString | JQuery.Node),
         ): this;
     }
 
@@ -87,7 +87,6 @@ declare global {
     interface Window {
         __MYGAME_MOD_API__?: ModAPI;
     }
-
 }
 
 declare module "pixi.js-legacy" {
@@ -97,4 +96,4 @@ declare module "pixi.js-legacy" {
         __layerIdx: number;
     }
 }
-export { };
+export {};
