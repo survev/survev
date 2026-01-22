@@ -59,6 +59,8 @@ export class WeaponManager {
 
     meleeAttacks: number[] = [];
 
+    meleeAnimCooldown = 0;
+
     get cookingThrowable() {
         return this.player.animType === GameConfig.Anim.Cook;
     }
@@ -133,12 +135,12 @@ export class WeaponManager {
         const nextWeapon = this.weapons[idx];
         let effectiveSwitchDelay = 0;
 
+        const nextWeaponDef = GameObjectDefs.typeToDef(this.weapons[idx].type) as
+            | GunDef
+            | MeleeDef
+            | ThrowableDef;
         if (curWeapon.type && nextWeapon.type) {
             // ensure that player is still holding both weapons (didnt drop one)
-            const nextWeaponDef = GameObjectDefs.typeToDef(this.weapons[idx].type) as
-                | GunDef
-                | MeleeDef
-                | ThrowableDef;
 
             const swappingToGun = nextWeaponDef.type == "gun";
 
@@ -189,6 +191,10 @@ export class WeaponManager {
             this.offHand = false;
         }
 
+        if (nextWeaponDef.type === "melee") {
+            this.playMeleeDeployAnim();
+        }
+
         this.player.setDirty();
         this.player.weapsDirty = true;
     }
@@ -229,6 +235,13 @@ export class WeaponManager {
                     || weaponDef!.type === "melee"
                     || weaponDef!.type === "throwable",
             );
+        }
+        if (
+            isMelee
+            && (this.player.animType === GameConfig.Anim.DeployMelee
+                || this.player.animType === GameConfig.Anim.IdleMelee)
+        ) {
+            this.player.cancelAnim();
         }
 
         // can't wear pan if you're replacing it with another melee
@@ -292,6 +305,7 @@ export class WeaponManager {
 
         player.recoilTicker += dt;
 
+        this.meleeAnimCooldown -= dt;
         this.throwableCooldown -= dt;
 
         for (let i = 0; i < this.weapons.length; i++) {
@@ -415,6 +429,26 @@ export class WeaponManager {
                 i--;
             }
         }
+    }
+
+    playMeleeDeployAnim() {
+        if (this.player.animType !== GameConfig.Anim.None) return;
+        if (this.player.curWeapIdx !== GameConfig.WeaponSlot.Melee) return;
+        const def = GameObjectDefs.typeToDef(this.activeWeapon, "melee");
+        if (!def.anim.deployAnims?.length) return;
+
+        this.player.playAnim(GameConfig.Anim.DeployMelee, def.anim.deployAnimTime + 0.1);
+    }
+
+    playMeleeIdleAnim() {
+        if (this.player.animType !== GameConfig.Anim.None) return;
+        if (this.player.curWeapIdx !== GameConfig.WeaponSlot.Melee) return;
+        if (this.meleeAnimCooldown > 0) return;
+        const def = GameObjectDefs.typeToDef(this.activeWeapon, "melee");
+        if (!def.anim.idleAnims?.length) return;
+
+        this.player.playAnim(GameConfig.Anim.IdleMelee, def.anim.idleAnimTime + 0.1);
+        this.meleeAnimCooldown = def.anim.idleAnimTime + 1;
     }
 
     getAmmoStats(weaponDef: GunDef): {

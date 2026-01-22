@@ -22,10 +22,25 @@ export interface MeleeDef {
         equip: number;
         attack?: number;
     };
-    anim: {
-        idlePose: string;
-        attackAnims: string[];
-    };
+    anim:
+        & {
+            idlePose: string;
+            attackAnims: string[];
+        }
+        & ({
+            deployAnimTime: number;
+            deployAnims: string[];
+        } | {
+            deployAnimTime?: undefined;
+            deployAnims?: undefined;
+        })
+        & ({
+            idleAnimTime: number;
+            idleAnims: string[];
+        } | {
+            idleAnimTime?: undefined;
+            idleAnims?: undefined;
+        });
     sound: Record<string, string>;
     //  {
     //     swing: string

@@ -3276,6 +3276,7 @@ export class Player extends BaseGameObject {
             switch (input) {
                 case GameConfig.Input.StowWeapons:
                 case GameConfig.Input.EquipMelee:
+                    this.weaponManager.playMeleeIdleAnim();
                     this.weaponManager.setCurWeapIndex(GameConfig.WeaponSlot.Melee);
                     break;
                 case GameConfig.Input.EquipPrimary:

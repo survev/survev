@@ -5,10 +5,11 @@ import { assert } from "../../shared/utils/util.ts";
 import { v2, type Vec2 } from "../../shared/utils/v2.ts";
 import type { AnimCtx, Player } from "./objects/player.ts";
 
-function frame(time: number, bones: Partial<Record<Bones, Pose>>) {
+function frame(time: number, bones: Partial<Record<Bones, Pose>>, easing?: (t: number) => number) {
     return {
         time,
         bones,
+        easing,
     };
 }
 
@@ -34,13 +35,16 @@ function effect<K extends AnimKeys>(
 }
 
 export class Pose {
+    pivot: Vec2;
+    rot: number;
+    pos: Vec2;
     constructor(
-        public pivot = v2.create(0, 0),
-        public rot = 0,
-        public pos = v2.create(0, 0),
+        pivot = v2.create(0, 0),
+        rot = 0,
+        pos = v2.create(0, 0),
     ) {
         this.pivot = v2.copy(pivot);
-        this.rot = 0;
+        this.rot = rot;
         this.pos = v2.copy(pos);
     }
 
@@ -76,6 +80,8 @@ export enum Bones {
     HandR,
     FootL,
     FootR,
+    MeleeL, // unused for now
+    MeleeR,
 }
 assert(Object.keys(Bones).length % 2 == 0);
 
@@ -162,6 +168,7 @@ export const Animations: Record<
         keyframes: Array<{
             time: number;
             bones: Partial<Record<Bones, Pose>>;
+            easing?: (t: number) => number;
         }>;
         effects: Effect[];
     }
