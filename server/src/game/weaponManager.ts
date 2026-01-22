@@ -138,12 +138,12 @@ export class WeaponManager {
         const nextWeapon = this.weapons[idx];
         let effectiveSwitchDelay = 0;
 
+        const nextWeaponDef = GameObjectDefs[this.weapons[idx].type] as
+            | GunDef
+            | MeleeDef
+            | ThrowableDef;
         if (curWeapon.type && nextWeapon.type && changeCooldown) {
             // ensure that player is still holding both weapons (didnt drop one)
-            const nextWeaponDef = GameObjectDefs[this.weapons[idx].type] as
-                | GunDef
-                | MeleeDef
-                | ThrowableDef;
 
             const swappingToGun = nextWeaponDef.type == "gun";
 
@@ -193,6 +193,10 @@ export class WeaponManager {
 
         if (idx === this.curWeapIdx && WeaponSlot[idx] == "gun") {
             this.offHand = false;
+        }
+
+        if (nextWeaponDef.type === "melee" && nextWeaponDef.anim.deploy) {
+            this.player.playAnim(GameConfig.Anim.DeployMelee, 1);
         }
 
         this.player.setDirty();

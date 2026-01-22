@@ -62,6 +62,7 @@ export enum Anim {
     CrawlForward,
     CrawlBackward,
     Revive,
+    DeployMelee,
     Count,
 }
 
