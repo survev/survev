@@ -50,6 +50,7 @@ export class LoadoutDisplay {
     useDebugZoom = false;
 
     outfitOld!: string;
+    meleeOld!: string;
 
     animIdleTicker!: number;
     animSeq!: number;
@@ -122,6 +123,7 @@ export class LoadoutDisplay {
         this.viewOld = this.view;
 
         this.outfitOld = this.loadout.outfit;
+        this.meleeOld = this.loadout.melee;
 
         this.map.loadMap(
             {
@@ -224,15 +226,22 @@ export class LoadoutDisplay {
     }
 
     setLoadout(loadout: Loadout, skipEffects?: boolean) {
+        const meleeChanged = this.loadout.melee !== loadout.melee;
         this.loadout = loadouts.validate(loadout);
-        this.updateCharDisplay();
+        this.updateCharDisplay({
+            animType: meleeChanged ? GameConfig.Anim.None : this.activePlayer?.currentAnim(),
+            animSeq: meleeChanged ? -1 : this.activePlayer?.anim.seq,
+        });
         if (skipEffects) {
             this.outfitOld = this.loadout.outfit;
+            this.meleeOld = this.loadout.melee;
         }
         if (this.activePlayer) {
             this.activePlayer.playActionStartSfx = true;
         }
-        this.animIdleTicker = 0;
+        if (this.activePlayer?.currentAnim() === GameConfig.Anim.None) {
+            this.animIdleTicker = 0;
+        }
     }
 
     setView(view: string) {
@@ -388,41 +397,59 @@ export class LoadoutDisplay {
         // DebugLines.addAabb(modalAabb.min, modalAabb.max, 0xff0000, 0.0);
         // DebugLines.addCircle(this.m_activePlayer.pos, 1.5, 0xff0000, 0.0);
 
-        if (
-            hasFocus
-            && (this.view == this.viewOld
-                || (this.view != "heal" && this.view != "boost")
-                || (this.animIdleTicker = 0),
-                (this.viewOld = this.view),
-                (this.animIdleTicker -= dt),
-                this.animIdleTicker < 0)
-        ) {
-            if (this.view == "heal") {
-                this.actionSeq = (this.actionSeq + 1) % 8;
-                const options = {
-                    actionType: GameConfig.Action.UseItem,
-                    actionItem: "bandage",
-                    actionSeq: this.actionSeq,
-                };
-                this.updateCharDisplay(options);
-                this.animIdleTicker = 2 + Math.random();
-            } else if (this.view == "boost") {
-                this.actionSeq = (this.actionSeq + 1) % 8;
-                const options = {
-                    actionType: GameConfig.Action.UseItem,
-                    actionItem: "soda",
-                    actionSeq: this.actionSeq,
-                };
-                this.updateCharDisplay(options);
-                this.animIdleTicker = 2 + Math.random();
-            } else if (this.view != "emote" && this.view != "crosshair") {
-                this.animSeq = (this.animSeq + 1) % 8;
-                const options = {
-                    animType: GameConfig.Anim.Melee,
-                    animSeq: this.animSeq,
-                };
-                this.updateCharDisplay(options);
-                this.animIdleTicker = 1.5 + Math.random();
+        // Throw out an idle anim once in a while
+        if (hasFocus) {
+            if (
+                this.view != this.viewOld
+                && (this.view == "heal" || this.view == "boost")
+            ) {
+                this.animIdleTicker = 0.0;
+            }
+            this.viewOld = this.view;
+
+            if (this.activePlayer.currentAnim() === GameConfig.Anim.None) {
+                this.animIdleTicker -= dt;
+            }
+
+            if (this.animIdleTicker < 0.0) {
+                if (this.view == "heal") {
+                    this.actionSeq = (this.actionSeq + 1) % 8;
+                    const options = {
+                        actionType: GameConfig.Action.UseItem,
+                        actionItem: "bandage",
+                        actionSeq: this.actionSeq,
+                    };
+                    this.updateCharDisplay(options);
+                    this.animIdleTicker = 2 + Math.random();
+                } else if (this.view == "boost") {
+                    this.actionSeq = (this.actionSeq + 1) % 8;
+                    const options = {
+                        actionType: GameConfig.Action.UseItem,
+                        actionItem: "soda",
+                        actionSeq: this.actionSeq,
+                    };
+                    this.updateCharDisplay(options);
+                    this.animIdleTicker = 2 + Math.random();
+                } else if (this.view != "emote" && this.view != "crosshair") {
+                    let animType = GameConfig.Anim.Melee;
+                    const meleeDef = GameObjectDefs.typeToDef(this.loadout.melee, "melee");
+                    // force the deploy anim if we just switched to that melee
+                    // otherwise have a 50% chance of playing the idle anim instead of attack
+                    if (this.meleeOld !== this.loadout.melee && meleeDef.anim.deployAnims) {
+                        animType = GameConfig.Anim.DeployMelee;
+                    } else if (Math.random() < 0.5 && meleeDef.anim.idleAnims) {
+                        animType = GameConfig.Anim.IdleMelee;
+                    }
+                    this.meleeOld = this.loadout.melee;
+
+                    this.animSeq = (this.animSeq + 1) % 8;
+                    const options = {
+                        animType: animType,
+                        animSeq: this.animSeq,
+                    };
+                    this.updateCharDisplay(options);
+                    this.animIdleTicker = 1.5 + Math.random();
+                }
             }
         }
 
