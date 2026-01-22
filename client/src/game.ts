@@ -25,6 +25,7 @@ import { type InputHandler, Key } from "./input";
 import type { InputBinds, InputBindUi } from "./inputBinds";
 import type { SoundHandle } from "./lib/createJS";
 import { Map } from "./map";
+import { modAPI } from "./modding/ModAPIInstance";
 import { AirdropBarn } from "./objects/airdrop";
 import { BulletBarn, createBullet } from "./objects/bullet";
 import { DeadBodyBarn } from "./objects/deadBody";
@@ -46,7 +47,6 @@ import type { Localization } from "./ui/localization";
 import { Touch } from "./ui/touch";
 import { UiManager } from "./ui/ui";
 import { UiManager2 } from "./ui/ui2";
-import { modAPI } from "./modding/ModAPIInstance"
 
 export interface Ctx {
     audioManager: AudioManager;
@@ -1397,6 +1397,12 @@ export class Game {
                 // Update local kill counter
                 if (msg.killCreditId == this.m_localId && msg.killed) {
                     this.m_uiManager.setLocalKills(msg.killerKills);
+                    // I think thats the order they should be in... because if emit
+                    // is updated first and right after that someone calls
+                    // modAPI.getPlayerKills() then it might be undefined when emit fires I think...
+                    // either way cant hurt I guess
+                    modAPI._setPlayerKills(msg.killerKills);
+                    modAPI._emitPlayerKill();
                 }
 
                 // Add killfeed entry for this kill

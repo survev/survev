@@ -4,9 +4,9 @@ import { GameConfig } from "../../../shared/gameConfig";
 import type { Bullet } from "../../../shared/net/updateMsg";
 import { type Vec2, v2 } from "../../../shared/utils/v2";
 import type { AudioManager } from "../audioManager";
+import { modAPI } from "../modding/ModAPIInstance";
 import type { ParticleBarn } from "./particles";
 import type { PlayerBarn } from "./player";
-import { modAPI } from "../modding/ModAPIInstance";
 
 interface Shot {
     active: boolean;
@@ -120,7 +120,7 @@ export class ShotBarn {
                     }
                     if (shot.ticker == 0 && shot.playerId !== activePlayerId) {
                         modAPI._emitPlayerShoot();
-                    }                    
+                    }
                     const player = playerBarn.getPlayerById(shot.playerId);
 
                     // Play shot sound
