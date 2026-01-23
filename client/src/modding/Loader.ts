@@ -48,7 +48,27 @@ modAPI.onLocalPlayerShoot(() => {
 modAPI.onPlayerKill(() => {
     console.log("onPlayerKill ModAPI hook fired");
     const totalKills = modAPI.getPlayerKills();
-    console.log("getPlayerKills ModAPI hook reported:", totalKills, "as the kill amount");
+    console.log("getPlayerKills ModAPI hook reported:", totalKills.totalKills, "as the kill amount");
 });
 
+modAPI.onLocalPlayerHeal(() => {
+    console.log("onLocalPlayerHeal ModAPI hook fired!");
+    const newPlayerHealth = modAPI.getLocalPlayerHealth();
+    const playerHealAmount = modAPI.getLocalPlayerHeal();
+    // I should probably put this console.log behind a if statement checking
+    // if inferredSource !== "possiblyRegen" because as is it produces a lot of console spam...
+    // but eh I guess its fine it is just for testing after all :o
+    console.log("getLocalPlayerHealth ModAPI hook reported:", newPlayerHealth, "as the new health amount");
+    if (playerHealAmount.inferredSource !== "possiblyRegen") {
+        console.log("getLocalPlayerHeal ModAPI hook reported:", playerHealAmount.totalHeal, "as the amount of non regen health replenished");
+    }
+});
+
+modAPI.onLocalPlayerDamage(() => {
+    console.log("onLocalPlayerDamage ModAPI hook fired!");
+    const newPlayerHealth = modAPI.getLocalPlayerHealth();
+    const playerDamageTaken = modAPI.getLocalPlayerDamage();
+    console.log("getLocalPlayerHealth ModAPI hook reported:", newPlayerHealth, "as the new health amount");
+    console.log("getLocalPlayerDamage ModAPI hook reported:", playerDamageTaken.totalDamage, "as the damage taken");
+})
 // STRIP_FROM_PROD_CLIENT:END

@@ -4,14 +4,35 @@ type PlayerDeathListener = () => void;
 type PlayerShootListener = () => void;
 type PlayerLocalShootListener = () => void;
 type PlayerKillListener = () => void;
+type PlayerHealListener = () => void;
+type PlayerDamageListener = () => void;
 
 export interface TextureOverrides {
     [key: string]: string; // key = texture ID, value = URL/path
-}
+};
 
 export interface PlayerKills {
     totalKills: number;
-}
+};
+
+export interface PlayerHealth {
+    totalHealth: number;
+};
+
+export interface PlayerDamage {
+    totalDamage: number;
+};
+
+export type InferredHealSource = "possiblyRegen" | "likelyItem";
+
+export interface PlayerHeal {
+    totalHeal: number;
+    inferredSource?: InferredHealSource;
+};
+
+export interface PlayerHealRaw {
+    totalHealRaw: number;
+};
 
 export function createModAPI() {
     const gameStartListeners: GameStartListener[] = [];
@@ -24,6 +45,21 @@ export function createModAPI() {
     const playerKills: PlayerKills = {
         totalKills: 0,
     };
+    const playerHealListeners: PlayerHealListener[] = [];
+    const playerDamageListeners: PlayerDamageListener[] = [];
+    const playerHealth: PlayerHealth = {
+        totalHealth: 100,
+    };
+    const playerDamage: PlayerDamage = {
+        totalDamage: 0,
+    };
+    const playerHeal: PlayerHeal = {
+        totalHeal: 0,
+        inferredSource: undefined,
+    };
+    const playerHealRaw: PlayerHealRaw = {
+        totalHealRaw: 0
+    }
 
     return Object.freeze({
         // on* hooks start
@@ -51,6 +87,14 @@ export function createModAPI() {
             playerKillListeners.push(fn);
         },
 
+        onLocalPlayerHeal(fn: PlayerHealListener) {
+            playerHealListeners.push(fn);
+        },
+
+        onLocalPlayerDamage(fn: PlayerDamageListener) {
+            playerDamageListeners.push(fn);
+        },
+
         // on* hooks end
         /**
          * @param textureId string ID of the texture
@@ -66,6 +110,22 @@ export function createModAPI() {
 
         getPlayerKills(): Readonly<PlayerKills> {
             return { ...playerKills };
+        },
+
+        getLocalPlayerHealth(): Readonly<PlayerHealth> {
+            return { ...playerHealth };
+        },
+
+        getLocalPlayerDamage(): Readonly <PlayerDamage> {
+            return { ...playerDamage };
+        },
+
+        getLocalPlayerHeal(): Readonly<PlayerHeal> {
+            return { ...playerHeal };
+        },
+
+        getLocalPlayerHealRaw(): Readonly<PlayerHealRaw> {
+            return { ...playerHealRaw };
         },
 
         // _emit* internal hooks start
@@ -94,6 +154,14 @@ export function createModAPI() {
             for (const fn of playerKillListeners) fn();
         },
 
+        _emitLocalPlayerHeal() {
+            for (const fn of playerHealListeners) fn();
+        },
+
+        _emitLocalPlayerDamage() {
+            for (const fn of playerDamageListeners) fn();
+        },
+
         // _emit* internal hooks end
 
         // _get* internal hooks start
@@ -107,6 +175,26 @@ export function createModAPI() {
         // _set* internal hooks start
         _setPlayerKills(totalKills: number) {
             playerKills.totalKills = totalKills;
+        },
+
+        _setLocalPlayerHealth(totalHealth: number) {
+            playerHealth.totalHealth = totalHealth;
+        },
+
+        _setLocalPlayerDamageAmount(totalDamage: number) {
+            playerDamage.totalDamage = totalDamage;
+        },
+        // im probably going to forget this so heres a note for later doc writing
+        // the setLocalPlayerHealAmount is what people use when they want a semi-filtered
+        // heal readout meanwhile the raw one as the name implies is a raw readout
+        // (now that I think of it this is probably hard to forget due to the name but anything can happen I guess...)
+        _setLocalPlayerHealAmount(totalHeal: number, options?: { inferredSource?: InferredHealSource }) {
+            playerHeal.totalHeal = totalHeal;
+            playerHeal.inferredSource = options?.inferredSource;
+        },
+
+        _setLocalPlayerHealAmountRaw(totalHealRaw: number) {
+            playerHealRaw.totalHealRaw = totalHealRaw;
         },
 
         // _set* internal hooks end
