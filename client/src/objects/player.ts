@@ -595,13 +595,36 @@ export class Player implements AbstractObject {
 
     m_setLocalData(data: LocalDataWithDirty) {
         const scopeOld = this.m_localData.m_scope;
-
-        if (data.healthDirty) {
-            this.m_localData.m_health = data.health;
-        }
-
+        // I moved boostDirty above healthDirty (otherwise it wouldnt be here... lol)
+        // hopefully that doesnt cause issues but its needed here so the modAPI can infer
+        // whether or not the health healed is from boost regen
         if (data.boostDirty) {
             this.m_localData.m_boost = data.boost;
+        }
+
+        if (data.healthDirty) {
+            const oldHealth = this.m_localData.m_health;
+            const newHealth = data.health;
+            const healthDelta = newHealth - oldHealth;
+            
+            this.m_localData.m_health = newHealth;
+            modAPI._setLocalPlayerHealth(data.health);
+            
+            if (healthDelta < 0) {
+                modAPI._setLocalPlayerDamageAmount(-healthDelta);
+                modAPI._emitLocalPlayerDamage();
+            } else if (healthDelta > 0) {
+                const adrenActive = this.m_localData.m_boost > 0;
+                const smallishHeal = healthDelta <= 15;
+                const healMightBeRegen = adrenActive || smallishHeal;
+
+                modAPI._setLocalPlayerHealAmount(healthDelta, {
+                    inferredSource: healMightBeRegen ? "possiblyRegen" : "likelyItem",
+                });
+                
+                modAPI._setLocalPlayerHealAmountRaw(healthDelta);
+                modAPI._emitLocalPlayerHeal();
+            }
         }
 
         if (data.zoomDirty) {
