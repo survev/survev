@@ -52,13 +52,109 @@ The goal of this ModAPI project is to get rid of that brittleness, within reason
 
 # on* hooks
 
+This section contains everything needed to know about on* type hooks.
+
 ## Introduction to on* hooks
+
+on* hooks are quite simple once you get to know them, allow me to explain.
+
+These hooks follow quite simple rules first off practically all of these hooks are used like this. 
+
+    // onGameStart() hook used for example.
+    // As well modAPI will be the object that will equal window.__MYGAME_MOD_API__ just for simplicity of the example of course though, you can name this anything you want or just use the window object.
+
+    const modAPI = window.__MYGAME_MOD_API__
+
+    modAPI.onGameStart(() => {
+      // Your logic here to run upon game start.
+    })
+
+As you can see it is really quite simple of course there are a few things you should know.
+
+- First off, hooks are **synchronous**.
+
+- Secondly, execution order **between multiple hooks** must not be relied upon.
+
+Now what do those exactly mean? Lets start with hooks being synchronous.
+
+What this means is if you have an example like this 
+
+    const modAPI = window.__MYGAME_MOD_API__
+
+    modAPI.onGameStart(() => {
+      // perhaps you have logic here to play a sound
+    })
+
+    modAPI.onGameStart(() => {
+      // perhaps you have logic here to show an image
+    })
+
+These will *not* fire at the same time. Instead, each hook callback will execute only after the previous callback of the same type has finished executing.
+
+The callbacks are executed in the **order they were registered**. However, because mod load and registration order is not guaranteed, you should **not rely on a specific execution order between multiple hooks**.
+For this reason, it is generally recommended that you only use one on* hook of each type.
+
+**Note**: Execution order is only predictable within a single script. If a user installs additional mods that use the same hooks, the order in which each mods callbacks run may differ.
 
 ## Game state hooks
 
+This section contains every on* hook related to game state.
+
 ### onGameStart
 
+**When does this fire?**  
+Fires once at the start of a game round, after the game has initialized but before active gameplay begins.
+
+**How often does it fire?**  
+Once per game round.
+
+**Common use cases**
+- Initializing mod state
+- Setting up UI elements
+- Registering textures or assets
+- Playing intro sounds or animations
+
+**Example use**
+    
+    const modAPI = window.__MYGAME_MOD_API__
+
+    modAPI.onGameStart(() => {
+      // logic to run upon game start
+    })
+
+**Notes**
+- This hook is synchronous.
+- Execution order between multiple mods is not guaranteed.
+
+---
+
 ### onGameEnd
+
+**When does this fire?**  
+Fires once at the end of a game round, after active gameplay has ended.
+
+**How often does it fire?**  
+Once per game round.
+
+**Common use cases**
+- Preparing mod for menu interactions
+- Setting up UI elements
+- Registering textures or assets
+- Playing exit sounds or animations
+
+**Example use**
+    
+    const modAPI = window.__MYGAME_MOD_API__
+
+    modAPI.onGameEnd(() => {
+      // logic to run upon game end
+    })
+
+**Notes**
+- This hook is synchronous.
+- Execution order between multiple mods is not guaranteed.
+
+---
 
 ## Player state hooks
 
