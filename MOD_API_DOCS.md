@@ -757,19 +757,264 @@ This section contains every get* hook related to the player.
 
 ### getLocalPlayerKills
 
+**What does this return?**  
+Returns the current kill count of the local player.
+
+**When is this updated?**  
+Updates automatically whenever the local player is credited a kill.
+
+**Return value**
+- `object`
+  - `totalKills` (`number`) - The local player’s current kill count
+
+**Common use cases**
+- Rendering kill counters or overlays
+- kill-based logic or alerts
+- Debugging or analytics
+
+**Example use**
+
+    const modAPI = window.survevModAPI
+
+    const kills = modAPI.getLocalPlayerKills()
+    console.log(kills.totalKills)
+
+**Notes**
+- This hook is synchronous.
+- Returned values are read-only.
+
+---
+
 ### getLocalPlayerHealth
+
+**What does this return?**  
+Returns the current health of the local player.
+
+**When is this updated?**  
+Updates automatically whenever the local player's health changes.
+
+**Return value**
+- `object`
+  - `totalHealth` (`number`) - The local player’s current health
+
+**Common use cases**
+- Rendering health counters or overlays
+- health-based logic or alerts
+- Debugging or analytics
+
+**Example use**
+
+    const modAPI = window.survevModAPI
+
+    const health = modAPI.getLocalPlayerHealth()
+    console.log(health.totalHealth)
+
+**Notes**
+- This hook is synchronous.
+- Returned values are read-only.
+
+---
 
 ### getLocalPlayerDamage
 
+**What does this return?**  
+Returns the last damage amount the local player took.
+
+**When is this updated?**  
+Updates automatically whenever the local player takes damage.
+
+**Return value**
+- `object`
+  - `totalDamage` (`number`) - Amount of damage from the most recent damage event
+
+**Common use cases**
+- Rendering health counters or overlays
+- health-based logic or alerts
+- Debugging or analytics
+
+**Example use**
+
+    const modAPI = window.survevModAPI
+
+    const damageTaken = modAPI.getLocalPlayerDamage()
+    console.log(damageTaken.totalDamage)
+
+**Notes**
+- This hook is synchronous.
+- Returned values are read-only.
+
+---
+
 ### getLocalPlayerHeal
+
+**What does this return?**  
+Returns the last heal amount the local player took.
+
+**When is this updated?**  
+Updates automatically whenever the local player gains health.
+
+**Return value**
+- `object`
+  - `totalHeal` (`number`) - Amount of health gained from the most recent heal event
+  - `inferredSource`
+    - (`possiblyRegen`) or (`likelyItem`) - inferred healing source more info below
+
+**InferredHealSource**
+
+- `"possiblyRegen"` - healing likely came from regeneration (such as adrenaline)
+- `"likelyItem"` - healing likely came from an item (such as bandages)
+
+**Note**: inferred source should be treated as best guess not authoritative.
+
+**Common use cases**
+- Rendering health counters or overlays
+- health-based logic or alerts
+- Debugging or analytics
+
+**Example use**
+
+    const modAPI = window.survevModAPI
+
+    const heal = modAPI.getLocalPlayerHeal()
+    // example of filtering for item only heals
+    if (heal.inferredSource !== "possiblyRegen") {
+      console.log(heal.totalHeal)
+    }
+
+**Notes**
+- This hook is synchronous.
+- Returned values are read-only.
+- This hook uses inferred data sources. If you do not want those view the [getLocalPlayerHealRaw](#getlocalplayerhealraw) hook.
+
+---
 
 ### getLocalPlayerHealRaw
 
+**What does this return?**  
+Returns the *raw* heal amount the local player took.
+
+**When is this updated?**  
+Updates automatically whenever the local player regains health.
+
+**Return value**
+- `object`
+  - `totalHealRaw` (`number`) - Amount of health from the most recent heal event
+
+**Common use cases**
+- Rendering health counters or overlays
+- health-based logic or alerts
+- Debugging or analytics
+
+**Example use**
+
+    const modAPI = window.survevModAPI
+
+    const healthRaw = modAPI.getLocalPlayerHealRaw()
+    console.log(healthRaw.totalHealRaw)
+
+**Notes**
+- This hook is synchronous.
+- Returned values are read-only.
+
+---
+
 ### getLocalPlayerRemovedItem
+
+**What does this return?**  
+Returns the last removed item from the local player's inventory.
+
+**When is this updated?**  
+Updates automatically whenever the local player's inventory removes a item.
+
+**Return value**
+- `object`
+  - `removedItem` (`string`) - The name of the last removed item
+  - `removedItemAmount` (`number`) - The amount removed of the last item
+
+**Common use cases**
+- Rendering inventory counters or overlays
+- inventory-based logic or alerts
+- Debugging or analytics
+
+**Example use**
+
+    const modAPI = window.survevModAPI
+
+    const lastRemovedItem = modAPI.getLocalPlayerRemovedItem()
+    console.log(
+      lastRemovedItem.removedItem,
+      lastRemovedItem.removedItemAmount
+    )
+
+**Notes**
+- This hook is synchronous.
+- Returned values are read-only.
+
+---
 
 ### getLocalPlayerAddedItem
 
+**What does this return?**  
+Returns the last added item from the local player's inventory.
+
+**When is this updated?**  
+Updates automatically whenever the local player's inventory adds a item.
+
+**Return value**
+- `object`
+  - `addedItem` (`string`) - The name of the last added item
+  - `addedItemAmount` (`number`) - The amount added of the last item
+
+**Common use cases**
+- Rendering inventory counters or overlays
+- inventory-based logic or alerts
+- Debugging or analytics
+
+**Example use**
+
+    const modAPI = window.survevModAPI
+
+    const lastAddedItem = modAPI.getLocalPlayerAddedItem()
+    console.log(
+      lastAddedItem.addedItem,
+      lastAddedItem.addedItemAmount
+    )
+
+**Notes**
+- This hook is synchronous.
+- Returned values are read-only.
+
+---
+
 ### getLocalPlayerHelmet
+
+**What does this return?**  
+Returns the current local player helmet.
+
+**When is this updated?**  
+Updates automatically whenever the local player's helmet changes.
+
+**Return value**
+- `object`
+  - `newHelmet` (`string`) - The name of the current helmet
+
+**Common use cases**
+- Rendering gear counters or overlays
+- gear-based logic or alerts
+- Debugging or analytics
+
+**Example use**
+
+    const modAPI = window.survevModAPI
+
+    const helmet = modAPI.getLocalPlayerHelmet()
+    console.log(helmet.newHelmet)
+
+**Notes**
+- This hook is synchronous.
+- Returned values are read-only.
+
+---
 
 ### getLocalPlayerChest
 
