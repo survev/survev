@@ -21,26 +21,26 @@ type PlayerAddedItemListener = () => void;
 
 export interface PlayerKills {
     totalKills: number;
-};
+}
 
 export interface PlayerHealth {
     totalHealth: number;
-};
+}
 
 export interface PlayerDamage {
     totalDamage: number;
-};
+}
 
 export type InferredHealSource = "possiblyRegen" | "likelyItem";
 
 export interface PlayerHeal {
     totalHeal: number;
     inferredSource?: InferredHealSource;
-};
+}
 
 export interface PlayerHealRaw {
     totalHealRaw: number;
-};
+}
 
 export interface PlayerItemAdd {
     addedItem: string;
@@ -141,7 +141,7 @@ export function createModAPI() {
         inferredSource: undefined,
     };
     const playerHealRaw: PlayerHealRaw = {
-        totalHealRaw: 0
+        totalHealRaw: 0,
     };
     const playerItemAdd: PlayerItemAdd = {
         addedItem: "",
@@ -312,7 +312,7 @@ export function createModAPI() {
             return { ...playerHealth };
         },
 
-        getLocalPlayerDamage(): Readonly <PlayerDamage> {
+        getLocalPlayerDamage(): Readonly<PlayerDamage> {
             return { ...playerDamage };
         },
 
@@ -476,7 +476,10 @@ export function createModAPI() {
         // the setLocalPlayerHealAmount is what people use when they want a semi-filtered
         // heal readout meanwhile the raw one as the name implies is a raw readout
         // (now that I think of it this is probably hard to forget due to the name but anything can happen I guess...)
-        _setLocalPlayerHealAmount(totalHeal: number, options?: { inferredSource?: InferredHealSource }) {
+        _setLocalPlayerHealAmount(
+            totalHeal: number,
+            options?: { inferredSource?: InferredHealSource },
+        ) {
             playerHeal.totalHeal = totalHeal;
             playerHeal.inferredSource = options?.inferredSource;
         },
@@ -511,46 +514,82 @@ export function createModAPI() {
             playerOutfitChange.newOutfit = newOutfit;
         },
 
-        _setLocalPlayerLastChangedGear(gearSlot: string, oldGear: string, newGear: string) {
+        _setLocalPlayerLastChangedGear(
+            gearSlot: string,
+            oldGear: string,
+            newGear: string,
+        ) {
             playerLastGear.gearSlot = gearSlot;
             playerLastGear.oldGear = oldGear;
             playerLastGear.newGear = newGear;
         },
 
-        _setLocalPlayerGear(helmet: string, chest: string, backpack: string, outfit: string) {
+        _setLocalPlayerGear(
+            helmet: string,
+            chest: string,
+            backpack: string,
+            outfit: string,
+        ) {
             playerGearSet.helmet = helmet;
             playerGearSet.chest = chest;
             playerGearSet.backpack = backpack;
             playerGearSet.outfit = outfit;
         },
 
-        _setLocalPlayerCurrentEquippedWeapon(slot: number, weaponType: string, weaponAmmo: number) {
+        _setLocalPlayerCurrentEquippedWeapon(
+            slot: number,
+            weaponType: string,
+            weaponAmmo: number,
+        ) {
             playerActiveWeapon.slot = slot;
             playerActiveWeapon.weaponType = weaponType;
             playerActiveWeapon.weaponAmmo = weaponAmmo;
         },
 
-        _setLocalPlayerLastChangedWeapon(slot: number, oldWeapon: string, newWeapon: string) {
+        _setLocalPlayerLastChangedWeapon(
+            slot: number,
+            oldWeapon: string,
+            newWeapon: string,
+        ) {
             playerLastWeapon.slot = slot;
             playerLastWeapon.oldWeapon = oldWeapon;
             playerLastWeapon.newWeapon = newWeapon;
         },
 
-        _setLocalPlayerWeaponAmmoUsed(slot: number, weaponType: string, weaponAmmo: number, ammoUsed: number) {
+        _setLocalPlayerWeaponAmmoUsed(
+            slot: number,
+            weaponType: string,
+            weaponAmmo: number,
+            ammoUsed: number,
+        ) {
             playerWeaponAmmoRemove.slot = slot;
             playerWeaponAmmoRemove.weaponType = weaponType;
             playerWeaponAmmoRemove.weaponAmmo = weaponAmmo;
             playerWeaponAmmoRemove.ammoUsed = ammoUsed;
         },
 
-        _setLocalPlayerWeaponAmmoGained(slot: number, weaponType: string, weaponAmmo: number, ammoUsed: number) {
+        _setLocalPlayerWeaponAmmoGained(
+            slot: number,
+            weaponType: string,
+            weaponAmmo: number,
+            ammoUsed: number,
+        ) {
             playerWeaponAmmoAdd.slot = slot;
             playerWeaponAmmoAdd.weaponType = weaponType;
             playerWeaponAmmoAdd.weaponAmmo = weaponAmmo;
             playerWeaponAmmoAdd.ammoUsed = ammoUsed;
         },
 
-        _setLocalPlayerWeapons(primaryWeaponType: string, primaryWeaponAmmo: number, secondaryWeaponType: string, secondaryWeaponAmmo: number, meleeWeaponType: string, meleeWeaponAmmo: number, throwableWeaponType: string, throwableWeaponAmmo: number) {
+        _setLocalPlayerWeapons(
+            primaryWeaponType: string,
+            primaryWeaponAmmo: number,
+            secondaryWeaponType: string,
+            secondaryWeaponAmmo: number,
+            meleeWeaponType: string,
+            meleeWeaponAmmo: number,
+            throwableWeaponType: string,
+            throwableWeaponAmmo: number,
+        ) {
             playerWeapons.primaryWeaponType = primaryWeaponType;
             playerWeapons.primaryWeaponAmmo = primaryWeaponAmmo;
             playerWeapons.secondaryWeaponType = secondaryWeaponType;
@@ -559,7 +598,7 @@ export function createModAPI() {
             playerWeapons.meleeWeaponAmmo = meleeWeaponAmmo;
             playerWeapons.throwableWeaponType = throwableWeaponType;
             playerWeapons.throwableWeaponAmmo = throwableWeaponAmmo;
-        }
+        },
         // _set* internal hooks end
     });
 }
