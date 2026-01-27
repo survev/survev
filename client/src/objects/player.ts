@@ -2746,7 +2746,7 @@ export class PlayerBarn {
         const isDead = activePlayer.m_netData.m_dead;
 
         if (!this.wasDead && isDead) {
-            modAPI._emitPlayerDeath();
+            modAPI._emitLocalPlayerDeath();
         }
 
         this.wasDead = isDead;

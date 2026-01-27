@@ -85,7 +85,7 @@ declare global {
     window.fusetag = window.fusetag || (window.fusetag = { que: [] });
 
     interface Window {
-        __MYGAME_MOD_API__?: ModAPI;
+        survevModAPI?: ModAPI;
     }
 }
 
