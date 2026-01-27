@@ -1402,7 +1402,7 @@ export class Game {
                     // modAPI.getPlayerKills() then it might be undefined when emit fires I think...
                     // either way cant hurt I guess
                     modAPI._setPlayerKills(msg.killerKills);
-                    modAPI._emitPlayerKill();
+                    modAPI._emitLocalPlayerKill();
                 }
 
                 // Add killfeed entry for this kill

@@ -4,36 +4,27 @@ import { modAPI } from "./ModAPIInstance";
 // put like "fake mods" in here just to make sure the code works
 
 // STRIP_FROM_PROD_CLIENT:START
-
-// example of replacing a local player texture
-modAPI.setLocalPlayerTexture("playerSkin", "/textures/test-skin.png");
-
-// and then using that here when GameStart fires pretty simple right?
 modAPI.onGameStart(() => {
     console.log(
-        "onGameStart ModAPI hook fired! Current textures:",
-        modAPI.getLocalPlayerTextures(),
+        "onGameStart ModAPI hook fired!"
     );
 });
 
 modAPI.onGameEnd(() => {
     console.log(
-        "onGameEnd ModAPI hook fired! Current textures:",
-        modAPI.getLocalPlayerTextures(),
+        "onGameEnd ModAPI hook fired!"
     );
 });
 
-modAPI.onPlayerDeath(() => {
+modAPI.onLocalPlayerDeath(() => {
     console.log(
-        "onPlayerDeath ModAPI hook fired! Current textures:",
-        modAPI.getLocalPlayerTextures(),
+        "onLocalPlayerDeath ModAPI hook fired!"
     );
 });
 
 modAPI.onPlayerShoot(() => {
     console.log(
-        "onPlayerShoot ModAPI hook fired! Current textures:",
-        modAPI.getLocalPlayerTextures(),
+        "onPlayerShoot ModAPI hook fired!"
     );
 });
 
@@ -45,8 +36,8 @@ modAPI.onLocalPlayerShoot(() => {
 // also im gonna stop adding the modAPI.getLocalPlayerTextures because well too much typing...
 // but it will make a return once I actually hook it up
 
-modAPI.onPlayerKill(() => {
-    console.log("onPlayerKill ModAPI hook fired");
+modAPI.onLocalPlayerKill(() => {
+    console.log("onLocalPlayerKill ModAPI hook fired");
     const totalKills = modAPI.getPlayerKills();
     console.log("getPlayerKills ModAPI hook reported:", totalKills.totalKills, "as the kill amount");
 });

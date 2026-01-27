@@ -1,7 +1,7 @@
 import { createModAPI, type ModAPI } from "./ModAPI";
 
-const modAPI: ModAPI = window.__MYGAME_MOD_API__ ?? createModAPI();
+const modAPI: ModAPI = window.survevModAPI ?? createModAPI();
 
-window.__MYGAME_MOD_API__ = modAPI;
+window.survevModAPI = modAPI;
 
 export { modAPI };

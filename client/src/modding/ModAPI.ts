@@ -19,10 +19,6 @@ type PlayerWeaponGainedAmmoListener = () => void;
 type PlayerRemovedItemListener = () => void;
 type PlayerAddedItemListener = () => void;
 
-export interface TextureOverrides {
-    [key: string]: string; // key = texture ID, value = URL/path
-};
-
 export interface PlayerKills {
     totalKills: number;
 };
@@ -129,7 +125,6 @@ export function createModAPI() {
     const playerShootListeners: PlayerShootListener[] = [];
     const playerLocalShootListeners: PlayerLocalShootListener[] = [];
     const playerKillListeners: PlayerKillListener[] = [];
-    const textureOverrides: TextureOverrides = {};
     const playerKills: PlayerKills = {
         totalKills: 0,
     };
@@ -234,7 +229,7 @@ export function createModAPI() {
             gameEndListeners.push(fn);
         },
 
-        onPlayerDeath(fn: PlayerDeathListener) {
+        onLocalPlayerDeath(fn: PlayerDeathListener) {
             playerDeathListeners.push(fn);
         },
 
@@ -246,7 +241,7 @@ export function createModAPI() {
             playerLocalShootListeners.push(fn);
         },
 
-        onPlayerKill(fn: PlayerKillListener) {
+        onLocalPlayerKill(fn: PlayerKillListener) {
             playerKillListeners.push(fn);
         },
 
@@ -307,17 +302,7 @@ export function createModAPI() {
         },
 
         // on* hooks end
-        /**
-         * @param textureId string ID of the texture
-         * @param url path/URL to the texture
-         */
-        setLocalPlayerTexture(textureId: string, url: string) {
-            textureOverrides[textureId] = url;
-        },
-
-        getLocalPlayerTextures(): Readonly<TextureOverrides> {
-            return { ...textureOverrides };
-        },
+        // get* hooks start
 
         getPlayerKills(): Readonly<PlayerKills> {
             return { ...playerKills };
@@ -401,7 +386,7 @@ export function createModAPI() {
             for (const fn of gameEndListeners) fn();
         },
 
-        _emitPlayerDeath() {
+        _emitLocalPlayerDeath() {
             for (const fn of playerDeathListeners) fn();
         },
 
@@ -413,7 +398,7 @@ export function createModAPI() {
             for (const fn of playerLocalShootListeners) fn();
         },
 
-        _emitPlayerKill() {
+        _emitLocalPlayerKill() {
             for (const fn of playerKillListeners) fn();
         },
 
@@ -474,14 +459,6 @@ export function createModAPI() {
         },
 
         // _emit* internal hooks end
-
-        // _get* internal hooks start
-
-        _getTextureOverrides() {
-            return textureOverrides;
-        },
-
-        // _get* internal hooks end
 
         // _set* internal hooks start
         _setPlayerKills(totalKills: number) {
