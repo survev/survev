@@ -30,7 +30,7 @@ modAPI.onLocalPlayerShoot(() => {
 
 modAPI.onLocalPlayerKill(() => {
     console.log("onLocalPlayerKill ModAPI hook fired");
-    const totalKills = modAPI.getPlayerKills();
+    const totalKills = modAPI.getLocalPlayerKills();
     console.log(
         "getPlayerKills ModAPI hook reported:",
         totalKills.totalKills,
