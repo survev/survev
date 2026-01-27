@@ -304,7 +304,7 @@ export function createModAPI() {
         // on* hooks end
         // get* hooks start
 
-        getPlayerKills(): Readonly<PlayerKills> {
+        getLocalPlayerKills(): Readonly<PlayerKills> {
             return { ...playerKills };
         },
 
