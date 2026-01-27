@@ -104,7 +104,7 @@ export interface PlayerWeaponAmmoAdd {
     slot: number;
     weaponType: string;
     weaponAmmo: number;
-    ammoUsed: number;
+    ammoGained: number;
 }
 
 export interface PlayerWeapons {
@@ -203,7 +203,7 @@ export function createModAPI() {
         slot: 0,
         weaponType: "",
         weaponAmmo: 0,
-        ammoUsed: 0,
+        ammoGained: 0,
     };
     const playerWeaponGainedAmmoListeners: PlayerWeaponGainedAmmoListener[] = [];
     const playerWeapons: PlayerWeapons = {
@@ -572,12 +572,12 @@ export function createModAPI() {
             slot: number,
             weaponType: string,
             weaponAmmo: number,
-            ammoUsed: number,
+            ammoGained: number,
         ) {
             playerWeaponAmmoAdd.slot = slot;
             playerWeaponAmmoAdd.weaponType = weaponType;
             playerWeaponAmmoAdd.weaponAmmo = weaponAmmo;
-            playerWeaponAmmoAdd.ammoUsed = ammoUsed;
+            playerWeaponAmmoAdd.ammoGained = ammoGained;
         },
 
         _setLocalPlayerWeapons(
