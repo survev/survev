@@ -745,7 +745,7 @@ If you need timing, historical data collection, or event context, combine get* h
     const modAPI = window.survevModAPI
 
     modAPI.onLocalPlayerDamage(() => {
-      const newHealth = getLocalPlayerHealth();
+      const newHealth = modAPI.getLocalPlayerHealth();
       // now do whatever you like with that info
     })
 
