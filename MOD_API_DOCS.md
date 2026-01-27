@@ -34,20 +34,45 @@ The goal of this ModAPI project is to get rid of that brittleness, within reason
     - [onGameStart](#ongamestart)
     - [onGameEnd](#ongameend)
   - [Player state hooks](#player-state-hooks)
-    - [onPlayerDeath](#onplayerdeath)
+    - [onLocalPlayerDeath](#onLocalplayerdeath)
     - [onPlayerShoot](#onplayershoot)
     - [onLocalPlayerShoot](#onlocalplayershoot)
-    - [onPlayerKill](#onplayerkill)
+    - [onLocalPlayerKill](#onlocalplayerkill)
     - [onLocalPlayerHeal](#onlocalplayerheal)
     - [onLocalPlayerDamage](#onlocalplayerdamage)
+    - [onLocalPlayerInventoryItemChange](#onlocalplayerinventoryitemchange)
+    - [onLocalPlayerHelmetChange](#onlocalplayerhelmetchange)
+    - [onLocalPlayerChestChange](#onlocalplayerchestchange)
+    - [onLocalPlayerBackpackChange](#onlocalplayerbackpackchange)
+    - [onLocalPlayerOutfitChange](#onlocalplayeroutfitchange)
+    - [onLocalPlayerGearChange](#onlocalplayergearchange)
+    - [onLocalPlayerEquippedWeaponChange](#onlocalplayerequippedweaponchange)
+    - [onLocalPlayerWeaponChange](#onlocalplayerweaponchange)
+    - [onLocalPlayerWeaponAmmoUse](#onlocalplayerweaponammouse)
+    - [onLocalPlayerWeaponAmmoGained](#onlocalplayerweaponammogained)
+    - [onLocalPlayerRemovedItem](#onlocalplayerremoveditem)
+    - [onLocalPlayerAddedItem](#onlocalplayeraddeditem)
 - [get* hooks](#get-hooks)
   - [Introduction to get* hooks](#introduction-to-get-hooks)
   - [Player info hooks](#player-info-hooks)
-    - [getPlayerKills](#getplayerkills)
+    - [getLocalPlayerKills](#getlocalplayerkills)
     - [getLocalPlayerHealth](#getlocalplayerhealth)
     - [getLocalPlayerDamage](#getlocalplayerdamage)
     - [getLocalPlayerHeal](#getlocalplayerheal)
     - [getLocalPlayerHealRaw](#getlocalplayerhealraw)
+    - [getLocalPlayerRemovedItem](#getlocalplayerremoveditem)
+    - [getLocalPlayerAddedItem](#getlocalplayeraddeditem)
+    - [getLocalPlayerHelmet](#getlocalplayerhelmet)
+    - [getLocalPlayerChest](#getlocalplayerchest)
+    - [getLocalPlayerBackpack](#getlocalplayerbackpack)
+    - [getLocalPlayerOutfit](#getlocalplayeroutfit)
+    - [getLocalPlayerLastChangedGear](#getlocalplayerlastchangedgear)
+    - [getLocalPlayerGear](#getlocalplayergear)
+    - [getLocalPlayerCurrentEquippedWeapon](#getlocalplayercurrentequippedweapon)
+    - [getLocalPlayerLastChangedWeapon](#getlocalplayerlastchangedweapon)
+    - [getLocalPlayerWeaponAmmoUsed](#getlocalplayerweaponammoused)
+    - [getLocalPlayerWeaponAmmoGained](#getlocalplayerweaponammogained)
+    - [getLocalPlayerWeapons](#getlocalplayerweapons)
 
 
 # on* hooks
@@ -61,9 +86,9 @@ on* hooks are quite simple once you get to know them, allow me to explain.
 These hooks follow quite simple rules first off practically all of these hooks are used like this. 
 
     // onGameStart() hook used for example.
-    // As well modAPI will be the object that will equal window.__MYGAME_MOD_API__ just for simplicity of the example of course though, you can name this anything you want or just use the window object.
+    // As well modAPI will be the object that will equal window.survevModAPI just for simplicity of the example of course though, you can name this anything you want or just use the window object.
 
-    const modAPI = window.__MYGAME_MOD_API__
+    const modAPI = window.survevModAPI
 
     modAPI.onGameStart(() => {
       // Your logic here to run upon game start.
@@ -79,7 +104,7 @@ Now what do those exactly mean? Lets start with hooks being synchronous.
 
 What this means is if you have an example like this 
 
-    const modAPI = window.__MYGAME_MOD_API__
+    const modAPI = window.survevModAPI
 
     modAPI.onGameStart(() => {
       // perhaps you have logic here to play a sound
@@ -116,7 +141,7 @@ Once per game round.
 
 **Example use**
     
-    const modAPI = window.__MYGAME_MOD_API__
+    const modAPI = window.survevModAPI
 
     modAPI.onGameStart(() => {
       // logic to run upon game start
@@ -144,7 +169,7 @@ Once per game round.
 
 **Example use**
     
-    const modAPI = window.__MYGAME_MOD_API__
+    const modAPI = window.survevModAPI
 
     modAPI.onGameEnd(() => {
       // logic to run upon game end
@@ -158,17 +183,41 @@ Once per game round.
 
 ## Player state hooks
 
-### onPlayerDeath
+### onLocalPlayerDeath
 
 ### onPlayerShoot
 
 ### onLocalPlayerShoot
 
-### onPlayerKill
+### onLocalPlayerKill
 
 ### onLocalPlayerHeal
 
 ### onLocalPlayerDamage
+
+### onLocalPlayerInventoryItemChange
+
+### onLocalPlayerHelmetChange
+
+### onLocalPlayerChestChange
+
+### onLocalPlayerBackpackChange
+
+### onLocalPlayerOutfitChange
+
+### onLocalPlayerGearChange
+
+### onLocalPlayerEquippedWeaponChange
+
+### onLocalPlayerWeaponChange
+
+### onLocalPlayerWeaponAmmoUse
+
+### onLocalPlayerWeaponAmmoGained
+
+### onLocalPlayerRemovedItem
+
+### onLocalPlayerAddedItem
 
 # get* hooks
 
@@ -176,7 +225,7 @@ Once per game round.
 
 ## Player info hooks
 
-### getPlayerKills
+### getLocalPlayerKills
 
 ### getLocalPlayerHealth
 
@@ -185,3 +234,29 @@ Once per game round.
 ### getLocalPlayerHeal
 
 ### getLocalPlayerHealRaw
+
+### getLocalPlayerRemovedItem
+
+### getLocalPlayerAddedItem
+
+### getLocalPlayerHelmet
+
+### getLocalPlayerChest
+
+### getLocalPlayerBackpack
+
+### getLocalPlayerOutfit
+
+### getLocalPlayerLastChangedGear
+
+### getLocalPlayerGear
+
+### getLocalPlayerCurrentEquippedWeapon
+
+### getLocalPlayerLastChangedWeapon
+
+### getLocalPlayerWeaponAmmoUsed
+
+### getLocalPlayerWeaponAmmoGained
+
+### getLocalPlayerWeapons
