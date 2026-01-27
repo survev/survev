@@ -73,6 +73,9 @@ The goal of this ModAPI project is to get rid of that brittleness, within reason
     - [getLocalPlayerWeaponAmmoUsed](#getlocalplayerweaponammoused)
     - [getLocalPlayerWeaponAmmoGained](#getlocalplayerweaponammogained)
     - [getLocalPlayerWeapons](#getlocalplayerweapons)
+- [Future of the API](#future-of-the-api)
+- [Credits](#credits)
+- [Changelog](#changelog)
 
 
 # on* hooks
@@ -1018,20 +1021,428 @@ Updates automatically whenever the local player's helmet changes.
 
 ### getLocalPlayerChest
 
+**What does this return?**  
+Returns the current local player chest.
+
+**When is this updated?**  
+Updates automatically whenever the local player's chest changes.
+
+**Return value**
+- `object`
+  - `newChest` (`string`) - The name of the current chest
+
+**Common use cases**
+- Rendering gear counters or overlays
+- gear-based logic or alerts
+- Debugging or analytics
+
+**Example use**
+
+    const modAPI = window.survevModAPI
+
+    const chest = modAPI.getLocalPlayerChest()
+    console.log(chest.newChest)
+
+**Notes**
+- This hook is synchronous.
+- Returned values are read-only.
+
+---
+
 ### getLocalPlayerBackpack
+
+**What does this return?**  
+Returns the current local player backpack.
+
+**When is this updated?**  
+Updates automatically whenever the local player's backpack changes.
+
+**Return value**
+- `object`
+  - `newBackpack` (`string`) - The name of the current backpack
+
+**Common use cases**
+- Rendering gear counters or overlays
+- gear-based logic or alerts
+- Debugging or analytics
+
+**Example use**
+
+    const modAPI = window.survevModAPI
+
+    const backpack = modAPI.getLocalPlayerBackpack()
+    console.log(backpack.newBackpack)
+
+**Notes**
+- This hook is synchronous.
+- Returned values are read-only.
+
+---
 
 ### getLocalPlayerOutfit
 
+**What does this return?**  
+Returns the current local player outfit.
+
+**When is this updated?**  
+Updates automatically whenever the local player's outfit changes.
+
+**Return value**
+- `object`
+  - `newOutfit` (`string`) - The name of the current outfit
+
+**Common use cases**
+- Rendering gear counters or overlays
+- gear-based logic or alerts
+- Debugging or analytics
+
+**Example use**
+
+    const modAPI = window.survevModAPI
+
+    const outfit = modAPI.getLocalPlayerOutfit()
+    console.log(outfit.newOutfit)
+
+**Notes**
+- This hook is synchronous.
+- Returned values are read-only.
+
+---
+
 ### getLocalPlayerLastChangedGear
+
+**What does this return?**  
+Returns the current local player last changed gear.
+
+**When is this updated?**  
+Updates automatically whenever the local player's gear changes.
+
+**Return value**
+- `object`
+  - `gearSlot` (`string`) - The gear type
+  - `oldGear` (`string`) - The old gear
+  - `newGear` (`string`) - the current gear
+
+**Common use cases**
+- Rendering gear counters or overlays
+- gear-based logic or alerts
+- Debugging or analytics
+
+**Example use**
+
+    const modAPI = window.survevModAPI
+
+    const lastChangedGear = modAPI.getLocalPlayerLastChangedGear()
+    console.log(
+      lastChangedGear.gearSlot,
+      lastChangedGear.oldGear,
+      lastChangedGear.newGear
+    )
+
+**Notes**
+- This hook is synchronous.
+- Returned values are read-only.
+
+---
 
 ### getLocalPlayerGear
 
+**What does this return?**  
+Returns the current local player gear set.
+
+**When is this updated?**  
+Updates automatically whenever the local player's gear changes.
+
+**Return value**
+- `object`
+  - `helmet` (`string`) - The name of the current helmet
+  - `chest` (`string`) - The name of the current chest
+  - `backpack` (`string`) - The name of the current backpack
+  - `outfit` (`string`) - The name of the current outfit
+
+**Common use cases**
+- Rendering gear counters or overlays
+- gear-based logic or alerts
+- Debugging or analytics
+
+**Example use**
+
+    const modAPI = window.survevModAPI
+
+    const gearSet = modAPI.getLocalPlayerGear()
+    console.log(
+      gearSet.helmet,
+      gearSet.chest,
+      gearSet.backpack,
+      gearSet.outfit
+    )
+
+**Notes**
+- This hook is synchronous.
+- Returned values are read-only.
+
+---
+
 ### getLocalPlayerCurrentEquippedWeapon
+
+**What does this return?**  
+Returns the current local player equipped weapon.
+
+**When is this updated?**  
+Updates automatically whenever the local player's equipped weapon changes.
+
+**Return value**
+- `object`
+  - `slot` (`number`) - The slot the weapon is in
+  - `weaponType` (`string`) - The weapon name
+  - `weaponAmmo` (`number`) - The amount of ammo in the weapon
+
+**slot**
+
+The number that the `slot` object returns corresponds like this:
+
+0: Primary weapon slot
+1: Secondary weapon slot
+2: Melee weapon slot
+3: Throwables
+
+**Common use cases**
+- Rendering weapon counters or overlays
+- weapon-based logic or alerts
+- Debugging or analytics
+
+**Example use**
+
+    const modAPI = window.survevModAPI
+
+    const currentWeapon = modAPI.getLocalPlayerCurrentEquippedWeapon()
+    console.log(
+      currentWeapon.slot,
+      currentWeapon.weaponType,
+      currentWeapon.weaponAmmo
+    )
+
+**Notes**
+- This hook is synchronous.
+- Returned values are read-only.
+
+---
 
 ### getLocalPlayerLastChangedWeapon
 
+**What does this return?**  
+Returns the last changed local player weapon.
+
+**When is this updated?**  
+Updates automatically whenever the local player's weapon changes.
+
+**Return value**
+- `object`
+  - `slot` (`number`) - The slot the weapon is in
+  - `oldWeapon` (`string`) - The old weapon
+  - `newWeapon` (`number`) - The new replacement weapon
+
+**slot**
+
+The number that the `slot` object returns corresponds like this:
+
+0: Primary weapon slot
+1: Secondary weapon slot
+2: Melee weapon slot
+3: Throwables
+
+**Common use cases**
+- Rendering weapon counters or overlays
+- weapon-based logic or alerts
+- Debugging or analytics
+
+**Example use**
+
+    const modAPI = window.survevModAPI
+
+    const lastChangedWeapon = modAPI.getLocalPlayerLastChangedWeapon()
+    console.log(
+      lastChangedWeapon.slot,
+      lastChangedWeapon.oldWeapon,
+      lastChangedWeapon.newWeapon
+    )
+
+**Notes**
+- This hook is synchronous.
+- Returned values are read-only.
+
+---
+
 ### getLocalPlayerWeaponAmmoUsed
+
+**What does this return?**  
+Returns the last ammo used delta of the local player weapon.
+
+**When is this updated?**  
+Updates automatically whenever the local player's weapon ammo delta changes.
+
+**Return value**
+- `object`
+  - `slot` (`number`) - The slot the weapon is in
+  - `weaponType` (`string`) - The weapon name
+  - `weaponAmmo` (`number`) - The amount of ammo in the weapon
+  - `ammoUsed` (`number`) - The delta of the amount of used ammo
+
+**slot**
+
+The number that the `slot` object returns corresponds like this:
+
+0: Primary weapon slot
+1: Secondary weapon slot
+2: Melee weapon slot
+3: Throwables
+
+**Common use cases**
+- Rendering weapon counters or overlays
+- weapon-based logic or alerts
+- Debugging or analytics
+
+**Example use**
+
+    const modAPI = window.survevModAPI
+
+    const weaponAmmoUsed = modAPI.getLocalPlayerWeaponAmmoUsed()
+    console.log(
+      weaponAmmoUsed.slot,
+      weaponAmmoUsed.weaponType,
+      weaponAmmoUsed.weaponAmmo,
+      weaponAmmoUsed.ammoUsed
+    )
+
+**Notes**
+- This hook is synchronous.
+- Returned values are read-only.
+
+---
 
 ### getLocalPlayerWeaponAmmoGained
 
+**What does this return?**  
+Returns the last ammo gained delta of the local player weapon.
+
+**When is this updated?**  
+Updates automatically whenever the local player's equipped weapon ammo delta changes.
+
+**Return value**
+- `object`
+  - `slot` (`number`) - The slot the weapon is in
+  - `weaponType` (`string`) - The weapon name
+  - `weaponAmmo` (`number`) - The amount of ammo in the weapon
+  - `ammoGained` (`number`) - The delta of the amount of gained ammo
+
+**slot**
+
+The number that the `slot` object returns corresponds like this:
+
+0: Primary weapon slot
+1: Secondary weapon slot
+2: Melee weapon slot
+3: Throwables
+
+**Common use cases**
+- Rendering weapon counters or overlays
+- weapon-based logic or alerts
+- Debugging or analytics
+
+**Example use**
+
+    const modAPI = window.survevModAPI
+
+    const weaponAmmoGained = modAPI.getLocalPlayerWeaponAmmoGained()
+    console.log(
+      weaponAmmoGained.slot,
+      weaponAmmoGained.weaponType,
+      weaponAmmoGained.weaponAmmo,
+      weaponAmmoGained.ammoGained
+    )
+
+**Notes**
+- This hook is synchronous.
+- Returned values are read-only.
+
+---
+
 ### getLocalPlayerWeapons
+
+**What does this return?**  
+Returns the weapon set of the local player.
+
+**When is this updated?**  
+Updates automatically whenever the local player's weapons change.
+
+**Return value**
+- `object`
+  - `primaryWeaponType` (`string`) - The primary weapon name
+  - `primaryWeaponAmmo` (`string`) - The primary weapon ammo
+  - `secondaryWeaponType` (`string`) - The secondary weapon name
+  - `secondaryWeaponAmmo` (`string`) - The secondary weapon ammo
+  - `meleeWeaponType` (`string`) - The melee weapon name
+  - `meleeWeaponAmmo` (`string`) - The melee weapon ammo
+  - `throwableWeaponType` (`string`) - The throwable weapon name
+  - `throwableWeaponAmmo` (`string`) - The throwable weapon ammo
+
+**Common use cases**
+- Rendering weapon counters or overlays
+- weapon-based logic or alerts
+- Debugging or analytics
+
+**Example use**
+
+    const modAPI = window.survevModAPI
+
+    const weaponSet = modAPI.getLocalPlayerWeapons()
+    console.log(
+      weaponSet.primaryWeaponType,
+      weaponSet.primaryWeaponAmmo,
+      weaponSet.secondaryWeaponType,
+      weaponSet.secondaryWeaponAmmo,
+      weaponSet.meleeWeaponType,
+      weaponSet.meleeWeaponAmmo,
+      weaponSet.throwableWeaponType,
+      weaponSet.throwableWeaponAmmo,
+    )
+
+**Notes**
+- This hook is synchronous.
+- Returned values are read-only.
+
+---
+
+# Future of the API
+
+This API is not final. It is meant to be shaped by *you* yes, *you*, the modder.
+
+If you find yourself thinking things like:
+
+- "There should really be an on* hook for this"
+- "This get* hook works, but it's akward to use"
+
+or anything else reasonable, please speak up.
+
+This API is intentionally conservative, but it can’t evolve in the right direction without feedback from the people actually building mods with it.
+
+# Credits
+
+- [chickenPoo](https://github.com/chickenpoo351)
+  - Original API system implementation
+  - Original API documentation
+
+More contributors to be added as the API evolves.
+
+# Changelog
+
+## survevModAPI V1.0
+
+### Features
+
+- Initial on* and get* hooks added
+- Initial documentation
+
+### Contributors
+
+- [chickenPoo](https://github.com/chickenpoo351)
