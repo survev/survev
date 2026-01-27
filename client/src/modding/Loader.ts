@@ -70,5 +70,30 @@ modAPI.onLocalPlayerDamage(() => {
     const playerDamageTaken = modAPI.getLocalPlayerDamage();
     console.log("getLocalPlayerHealth ModAPI hook reported:", newPlayerHealth, "as the new health amount");
     console.log("getLocalPlayerDamage ModAPI hook reported:", playerDamageTaken.totalDamage, "as the damage taken");
-})
+});
+
+// lots of testing time...
+modAPI.onLocalPlayerRemovedItem(() => {
+    console.log("onLocalPlayerRemovedItem ModAPI hook fired!");
+    const removedItem = modAPI.getLocalPlayerRemovedItem();
+    console.log("getLocalPlayerRemovedItem ModAPI hooke reported:", removedItem, "as the removed item");
+});
+
+modAPI.onLocalPlayerAddedItem(() => {
+    console.log("onLocalPlayerAddedItem ModAPI hook fired!");
+    const addedItem = modAPI.getLocalPlayerAddedItem();
+    console.log("getLocalPlayerAddedItem ModAPI hook reported:", addedItem, "as the added item");
+});
+
+modAPI.onLocalPlayerGearChange(() => {
+    console.log("onLocalPlayerGearChange ModAPI hook fired!");
+    const playerGear = modAPI.getLocalPlayerGear();
+    console.log("getLocalPlayerGear ModAPi hook reported:", playerGear, "as the current player gear");
+});
+
+modAPI.onLocalPlayerWeaponChange(() => {
+    console.log("onLocalPlayerWeaponChange ModAPI hook fired!");
+    const equippedWeapons = modAPI.getLocalPlayerWeapons();
+    console.log("getLocalPlayerWeapons ModAPI hook reported:", equippedWeapons, "as the equipped weapons");
+});
 // STRIP_FROM_PROD_CLIENT:END
