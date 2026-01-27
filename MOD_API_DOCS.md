@@ -183,27 +183,322 @@ Once per game round.
 
 ## Player state hooks
 
+This section contains every on* hook related to the player.
+
 ### onLocalPlayerDeath
+
+**When does this fire?**  
+Fires once when the local player dies during a game round.
+
+**How often does it fire?**  
+Once per game round.
+
+**Common use cases**
+- Showing on screen effects
+- Setting up UI elements
+- Playing sound effects
+- Gathering data
+
+**Example use**
+    
+    const modAPI = window.survevModAPI
+
+    modAPI.onLocalPlayerDeath(() => {
+      // logic to run upon local player death
+    })
+
+**Notes**
+- This hook is synchronous.
+- Execution order between multiple mods is not guaranteed.
+
+---
 
 ### onPlayerShoot
 
+**When does this fire?**  
+Fires once when *any* player owned bullet is on screen.
+
+**How often does it fire?**  
+Once per bullet spawned on screen.
+
+**Common use cases**
+- Playing sound effects
+- Bullet specific effects
+- Data gathering
+
+**Example use**
+    
+    const modAPI = window.survevModAPI
+
+    modAPI.onPlayerShoot(() => {
+      // logic to run upon any bullet on screen
+    })
+
+**Notes**
+- This hook is synchronous.
+- Execution order between multiple mods is not guaranteed.
+- This hook is for any bullet on screen. View the [onLocalPlayerShoot](#onlocalplayershoot) hook if you want only local bullets.
+- This hook can fire frequently during active combat. Keep logic lightweight to avoid performance issues.
+
+---
+
 ### onLocalPlayerShoot
+
+**When does this fire?**  
+Fires once when any *local* player owned bullet is on screen.
+
+**How often does it fire?**  
+Once per local player owned bullet spawned on screen.
+
+**Common use cases**
+- Playing sound effects
+- Bullet specific effects
+- Data gathering
+
+**Example use**
+    
+    const modAPI = window.survevModAPI
+
+    modAPI.onLocalPlayerShoot(() => {
+      // logic to run upon any local player bullet on screen
+    })
+
+**Notes**
+- This hook is synchronous.
+- Execution order between multiple mods is not guaranteed.
+- This hook is for local player bullets on screen. View the [onPlayerShoot](#onplayershoot) hook if you want any bullets.
+- This hook can fire frequently during active combat. Keep logic lightweight to avoid performance issues.
+
+---
 
 ### onLocalPlayerKill
 
+**When does this fire?**  
+Fires once when the local player is credited a kill.
+
+**How often does it fire?**  
+Once per credited local player kill.
+
+**Common use cases**
+- Updating UI elements
+- Playing sound effects / animations
+- Data gathering
+- Kill streak tracking
+
+**Example use**
+    
+    const modAPI = window.survevModAPI
+
+    modAPI.onLocalPlayerKill(() => {
+      // logic to run upon local player kill
+    })
+
+**Notes**
+- This hook is synchronous.
+- Execution order between multiple mods is not guaranteed.
+
+---
+
 ### onLocalPlayerHeal
+
+**When does this fire?**  
+Fires once when the local player regains health, including healing items or regeneration.
+
+**How often does it fire?**  
+Once per tick of health regained.
+
+**Common use cases**
+- Updating UI elements
+- Playing sound effects / animations
+- Data gathering
+- Health tracking
+
+**Example use**
+    
+    const modAPI = window.survevModAPI
+
+    modAPI.onLocalPlayerHeal(() => {
+      // logic to run upon local player heal
+    })
+
+**Notes**
+- This hook is synchronous.
+- Execution order between multiple mods is not guaranteed.
+
+---
+
 
 ### onLocalPlayerDamage
 
+**When does this fire?**  
+Fires once when the local player takes damage.
+
+**How often does it fire?**  
+Once per tick of health lost.
+
+**Common use cases**
+- Updating UI elements
+- Playing sound effects / animations
+- Data gathering
+- Health tracking
+
+**Example use**
+    
+    const modAPI = window.survevModAPI
+
+    modAPI.onLocalPlayerDamage(() => {
+      // logic to run upon local player damage
+    })
+
+**Notes**
+- This hook is synchronous.
+- Execution order between multiple mods is not guaranteed.
+
+---
+
 ### onLocalPlayerInventoryItemChange
+
+**When does this fire?**  
+Fires once when an item in the inventory of the local player changes (added, removed, or updated).
+
+**How often does it fire?**  
+Once per inventory item changed.
+
+**Common use cases**
+- Updating UI elements
+- Playing sound effects / animations
+- Data gathering
+- Inventory tracking
+
+**Example use**
+    
+    const modAPI = window.survevModAPI
+
+    modAPI.onLocalPlayerInventoryItemChange(() => {
+      // logic to run upon local player inventory item change
+    })
+
+**Notes**
+- This hook is synchronous.
+- Execution order between multiple mods is not guaranteed.
+
+---
 
 ### onLocalPlayerHelmetChange
 
+**When does this fire?**  
+Fires once when the local player's helmet changes (equipped, removed, or replaced).
+
+**How often does it fire?**  
+Once per helmet change.
+
+**Common use cases**
+- Updating UI elements
+- Playing sound effects / animations
+- Data gathering
+- Gear tracking
+
+**Example use**
+    
+    const modAPI = window.survevModAPI
+
+    modAPI.onLocalPlayerHelmetChange(() => {
+      // logic to run upon local player helmet change
+    })
+
+**Notes**
+- This hook is synchronous.
+- Execution order between multiple mods is not guaranteed.
+- This hook is for a single gear change. View the [onLocalPlayerGearChange](#onlocalplayergearchange) hook if you want any gear change
+
+---
+
 ### onLocalPlayerChestChange
+
+**When does this fire?**  
+Fires once when the local player’s chest changes (equipped, removed, or replaced).
+
+**How often does it fire?**  
+Once per chest change.
+
+**Common use cases**
+- Updating UI elements
+- Playing sound effects or animations
+- Data gathering
+- Gear tracking
+
+**Example use**
+    
+    const modAPI = window.survevModAPI
+
+    modAPI.onLocalPlayerChestChange(() => {
+      // logic to run upon local player chest change
+    })
+
+**Notes**
+- This hook is synchronous.
+- Execution order between multiple mods is not guaranteed.
+- This hook is for a single gear change. View the [onLocalPlayerGearChange](#onlocalplayergearchange) hook if you want any gear change
+
+---
 
 ### onLocalPlayerBackpackChange
 
+**When does this fire?**  
+Fires once when the local player’s backpack changes (equipped, removed, or replaced).
+
+**How often does it fire?**  
+Once per backpack change.
+
+**Common use cases**
+- Updating UI elements
+- Playing sound effects or animations
+- Data gathering
+- Gear tracking
+
+**Example use**
+    
+    const modAPI = window.survevModAPI
+
+    modAPI.onLocalPlayerBackpackChange(() => {
+      // logic to run upon local player backpack change
+    })
+
+**Notes**
+- This hook is synchronous.
+- Execution order between multiple mods is not guaranteed.
+- This hook is for a single gear change. View the [onLocalPlayerGearChange](#onlocalplayergearchange) hook if you want any gear change
+
+---
+
 ### onLocalPlayerOutfitChange
+
+**When does this fire?**  
+Fires once when the local player’s outfit changes (equipped, removed, or replaced).
+
+**How often does it fire?**  
+Once per outfit change.
+
+**Common use cases**
+- Updating UI elements
+- Playing sound effects or animations
+- Data gathering
+- Gear tracking
+
+**Example use**
+    
+    const modAPI = window.survevModAPI
+
+    modAPI.onLocalPlayerOutfitChange(() => {
+      // logic to run upon local player outfit change
+    })
+
+**Notes**
+- This hook is synchronous.
+- Execution order between multiple mods is not guaranteed.
+- This hook is for a single gear change. View the [onLocalPlayerGearChange](#onlocalplayergearchange) hook if you want any gear change
+
+---
 
 ### onLocalPlayerGearChange
 
