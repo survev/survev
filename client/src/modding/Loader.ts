@@ -5,27 +5,19 @@ import { modAPI } from "./ModAPIInstance";
 
 // STRIP_FROM_PROD_CLIENT:START
 modAPI.onGameStart(() => {
-    console.log(
-        "onGameStart ModAPI hook fired!"
-    );
+    console.log("onGameStart ModAPI hook fired!");
 });
 
 modAPI.onGameEnd(() => {
-    console.log(
-        "onGameEnd ModAPI hook fired!"
-    );
+    console.log("onGameEnd ModAPI hook fired!");
 });
 
 modAPI.onLocalPlayerDeath(() => {
-    console.log(
-        "onLocalPlayerDeath ModAPI hook fired!"
-    );
+    console.log("onLocalPlayerDeath ModAPI hook fired!");
 });
 
 modAPI.onPlayerShoot(() => {
-    console.log(
-        "onPlayerShoot ModAPI hook fired!"
-    );
+    console.log("onPlayerShoot ModAPI hook fired!");
 });
 
 modAPI.onLocalPlayerShoot(() => {
@@ -39,7 +31,11 @@ modAPI.onLocalPlayerShoot(() => {
 modAPI.onLocalPlayerKill(() => {
     console.log("onLocalPlayerKill ModAPI hook fired");
     const totalKills = modAPI.getPlayerKills();
-    console.log("getPlayerKills ModAPI hook reported:", totalKills.totalKills, "as the kill amount");
+    console.log(
+        "getPlayerKills ModAPI hook reported:",
+        totalKills.totalKills,
+        "as the kill amount",
+    );
 });
 
 modAPI.onLocalPlayerHeal(() => {
@@ -49,9 +45,17 @@ modAPI.onLocalPlayerHeal(() => {
     // I should probably put this console.log behind a if statement checking
     // if inferredSource !== "possiblyRegen" because as is it produces a lot of console spam...
     // but eh I guess its fine it is just for testing after all :o
-    console.log("getLocalPlayerHealth ModAPI hook reported:", newPlayerHealth, "as the new health amount");
+    console.log(
+        "getLocalPlayerHealth ModAPI hook reported:",
+        newPlayerHealth,
+        "as the new health amount",
+    );
     if (playerHealAmount.inferredSource !== "possiblyRegen") {
-        console.log("getLocalPlayerHeal ModAPI hook reported:", playerHealAmount.totalHeal, "as the amount of non regen health replenished");
+        console.log(
+            "getLocalPlayerHeal ModAPI hook reported:",
+            playerHealAmount.totalHeal,
+            "as the amount of non regen health replenished",
+        );
     }
 });
 
@@ -59,32 +63,56 @@ modAPI.onLocalPlayerDamage(() => {
     console.log("onLocalPlayerDamage ModAPI hook fired!");
     const newPlayerHealth = modAPI.getLocalPlayerHealth();
     const playerDamageTaken = modAPI.getLocalPlayerDamage();
-    console.log("getLocalPlayerHealth ModAPI hook reported:", newPlayerHealth, "as the new health amount");
-    console.log("getLocalPlayerDamage ModAPI hook reported:", playerDamageTaken.totalDamage, "as the damage taken");
+    console.log(
+        "getLocalPlayerHealth ModAPI hook reported:",
+        newPlayerHealth,
+        "as the new health amount",
+    );
+    console.log(
+        "getLocalPlayerDamage ModAPI hook reported:",
+        playerDamageTaken.totalDamage,
+        "as the damage taken",
+    );
 });
 
 // lots of testing time...
 modAPI.onLocalPlayerRemovedItem(() => {
     console.log("onLocalPlayerRemovedItem ModAPI hook fired!");
     const removedItem = modAPI.getLocalPlayerRemovedItem();
-    console.log("getLocalPlayerRemovedItem ModAPI hooke reported:", removedItem, "as the removed item");
+    console.log(
+        "getLocalPlayerRemovedItem ModAPI hooke reported:",
+        removedItem,
+        "as the removed item",
+    );
 });
 
 modAPI.onLocalPlayerAddedItem(() => {
     console.log("onLocalPlayerAddedItem ModAPI hook fired!");
     const addedItem = modAPI.getLocalPlayerAddedItem();
-    console.log("getLocalPlayerAddedItem ModAPI hook reported:", addedItem, "as the added item");
+    console.log(
+        "getLocalPlayerAddedItem ModAPI hook reported:",
+        addedItem,
+        "as the added item",
+    );
 });
 
 modAPI.onLocalPlayerGearChange(() => {
     console.log("onLocalPlayerGearChange ModAPI hook fired!");
     const playerGear = modAPI.getLocalPlayerGear();
-    console.log("getLocalPlayerGear ModAPi hook reported:", playerGear, "as the current player gear");
+    console.log(
+        "getLocalPlayerGear ModAPi hook reported:",
+        playerGear,
+        "as the current player gear",
+    );
 });
 
 modAPI.onLocalPlayerWeaponChange(() => {
     console.log("onLocalPlayerWeaponChange ModAPI hook fired!");
     const equippedWeapons = modAPI.getLocalPlayerWeapons();
-    console.log("getLocalPlayerWeapons ModAPI hook reported:", equippedWeapons, "as the equipped weapons");
+    console.log(
+        "getLocalPlayerWeapons ModAPI hook reported:",
+        equippedWeapons,
+        "as the equipped weapons",
+    );
 });
 // STRIP_FROM_PROD_CLIENT:END

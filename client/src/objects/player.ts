@@ -619,36 +619,52 @@ export class Player implements AbstractObject {
             const newChest = this.m_netData.m_chest;
             const newBackpack = this.m_netData.m_backpack;
             const newOutfit = this.m_netData.m_outfit;
-            modAPI._setLocalPlayerGear(newHelmet, newChest, newBackpack, newOutfit,);
+            modAPI._setLocalPlayerGear(newHelmet, newChest, newBackpack, newOutfit);
 
             if (oldHelmet !== this.m_netData.m_helmet) {
                 modAPI._setLocalPlayerHelmet(this.m_netData.m_helmet);
-                modAPI._setLocalPlayerLastChangedGear("helmet", oldHelmet, this.m_netData.m_helmet);
+                modAPI._setLocalPlayerLastChangedGear(
+                    "helmet",
+                    oldHelmet,
+                    this.m_netData.m_helmet,
+                );
                 modAPI._emitLocalPlayerHelmetChange();
                 anyGearChanged = true;
             }
             if (oldChest !== this.m_netData.m_chest) {
                 modAPI._setLocalPlayerChest(this.m_netData.m_chest);
-                modAPI._setLocalPlayerLastChangedGear("chest", oldChest, this.m_netData.m_chest);
+                modAPI._setLocalPlayerLastChangedGear(
+                    "chest",
+                    oldChest,
+                    this.m_netData.m_chest,
+                );
                 modAPI._emitLocalPlayerChestChange();
                 anyGearChanged = true;
             }
             if (oldBackpack !== this.m_netData.m_backpack) {
                 modAPI._setLocalPlayerBackpack(this.m_netData.m_backpack);
-                modAPI._setLocalPlayerLastChangedGear("backpack", oldBackpack, this.m_netData.m_backpack);
+                modAPI._setLocalPlayerLastChangedGear(
+                    "backpack",
+                    oldBackpack,
+                    this.m_netData.m_backpack,
+                );
                 modAPI._emitLocalPlayerBackpackChange();
                 anyGearChanged = true;
             }
             if (oldOutfit !== this.m_netData.m_outfit) {
                 modAPI._setLocalPlayerOutfit(this.m_netData.m_outfit);
-                modAPI._setLocalPlayerLastChangedGear("outfit", oldOutfit, this.m_netData.m_outfit);
+                modAPI._setLocalPlayerLastChangedGear(
+                    "outfit",
+                    oldOutfit,
+                    this.m_netData.m_outfit,
+                );
                 modAPI._emitLocalPlayerOutfitChange();
                 anyGearChanged = true;
             }
             if (anyGearChanged) {
                 modAPI._emitLocalPlayerGearChange();
             }
-        }        
+        }
     }
 
     m_setLocalData(data: LocalDataWithDirty) {
@@ -664,10 +680,10 @@ export class Player implements AbstractObject {
             const oldHealth = this.m_localData.m_health;
             const newHealth = data.health;
             const healthDelta = newHealth - oldHealth;
-            
+
             this.m_localData.m_health = newHealth;
             modAPI._setLocalPlayerHealth(data.health);
-            
+
             if (healthDelta < 0) {
                 modAPI._setLocalPlayerDamageAmount(-healthDelta);
                 modAPI._emitLocalPlayerDamage();
@@ -679,7 +695,7 @@ export class Player implements AbstractObject {
                 modAPI._setLocalPlayerHealAmount(healthDelta, {
                     inferredSource: healMightBeRegen ? "possiblyRegen" : "likelyItem",
                 });
-                
+
                 modAPI._setLocalPlayerHealAmountRaw(healthDelta);
                 modAPI._emitLocalPlayerHeal();
             }
@@ -697,7 +713,7 @@ export class Player implements AbstractObject {
         }
 
         if (data.inventoryDirty) {
-            const oldInventory = {  ...this.m_localData.m_inventory  };
+            const oldInventory = { ...this.m_localData.m_inventory };
 
             this.m_localData.m_scope = data.scope;
             this.m_localData.m_inventory = {};
@@ -708,7 +724,7 @@ export class Player implements AbstractObject {
             }
 
             const newInventory = { ...this.m_localData.m_inventory };
-            
+
             for (const item in newInventory) {
                 const oldItem = oldInventory[item] ?? 0;
                 const newItem = newInventory[item] ?? 0;
@@ -725,7 +741,7 @@ export class Player implements AbstractObject {
             modAPI._emitLocalPlayerInventoryItemChange();
         }
         if (data.weapsDirty) {
-            const oldWeaponSlots = this.m_localData.m_weapons.map(w => ({
+            const oldWeaponSlots = this.m_localData.m_weapons.map((w) => ({
                 type: w.type,
                 ammo: w.ammo,
             }));
@@ -744,32 +760,59 @@ export class Player implements AbstractObject {
             }
             const newWeaponSlots = this.m_localData.m_weapons;
 
-            modAPI._setLocalPlayerWeapons(newWeaponSlots[0].type, newWeaponSlots[0].ammo, newWeaponSlots[1].type, newWeaponSlots[1].ammo, newWeaponSlots[2].type, newWeaponSlots[2].ammo, newWeaponSlots[3].type, newWeaponSlots[3].ammo);
+            modAPI._setLocalPlayerWeapons(
+                newWeaponSlots[0].type,
+                newWeaponSlots[0].ammo,
+                newWeaponSlots[1].type,
+                newWeaponSlots[1].ammo,
+                newWeaponSlots[2].type,
+                newWeaponSlots[2].ammo,
+                newWeaponSlots[3].type,
+                newWeaponSlots[3].ammo,
+            );
 
             if (currentIdxChange) {
                 const newWeapon = newWeaponSlots[newIdx];
 
-                modAPI._setLocalPlayerCurrentEquippedWeapon(newIdx, newWeapon.type, newWeapon.ammo);
+                modAPI._setLocalPlayerCurrentEquippedWeapon(
+                    newIdx,
+                    newWeapon.type,
+                    newWeapon.ammo,
+                );
                 modAPI._emitLocalPlayerEquippedWeaponChange();
             }
 
             for (let i = 0; i < newWeaponSlots.length; i++) {
                 const oldWeapon = oldWeaponSlots[i] ?? { type: "", ammo: 0 };
                 const newWeapon = newWeaponSlots[i];
-        
+
                 if (oldWeapon.type !== newWeapon.type) {
-                    modAPI._setLocalPlayerLastChangedWeapon(i, oldWeapon.type, newWeapon.type);
+                    modAPI._setLocalPlayerLastChangedWeapon(
+                        i,
+                        oldWeapon.type,
+                        newWeapon.type,
+                    );
                     modAPI._emitLocalPlayerWeaponChange();
                     continue;
                 }
-        
+
                 const ammoDelta = newWeapon.ammo - oldWeapon.ammo;
 
                 if (ammoDelta < 0) {
-                    modAPI._setLocalPlayerWeaponAmmoUsed(i, newWeapon.type, newWeapon.ammo, -ammoDelta);
+                    modAPI._setLocalPlayerWeaponAmmoUsed(
+                        i,
+                        newWeapon.type,
+                        newWeapon.ammo,
+                        -ammoDelta,
+                    );
                     modAPI._emitLocalPlayerWeaponAmmoUsed();
                 } else if (ammoDelta > 0) {
-                    modAPI._setLocalPlayerWeaponAmmoGained(i, newWeapon.type, newWeapon.ammo, ammoDelta);
+                    modAPI._setLocalPlayerWeaponAmmoGained(
+                        i,
+                        newWeapon.type,
+                        newWeapon.ammo,
+                        ammoDelta,
+                    );
                     modAPI._emitLocalPlayerWeaponAmmoGained();
                 }
             }
