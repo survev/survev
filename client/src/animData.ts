@@ -42,7 +42,7 @@ export class Pose {
         public pos = v2.create(0, 0),
     ) {
         this.pivot = v2.copy(pivot);
-        this.rot = 0;
+        this.rot = rot;
         this.pos = v2.copy(pos);
     }
 
@@ -256,6 +256,21 @@ export const Animations: Record<
             effect(0, "animPlaySound", { sound: "swing" }),
             effect(def.fists.attack.damageTimes[0], "animMeleeCollision", {}),
         ],
+    },
+    spin: {
+        keyframes: [
+            frame(0, {
+                [Bones.HandR]: new Pose(v2.create(0, 0), Math.PI, v2.create(-3, 20.25)),
+            }),
+            frame(1, {
+                [Bones.HandR]: new Pose(
+                    v2.create(0, 0),
+                    -Math.PI * 7,
+                    v2.create(6, 20.25),
+                ),
+            }),
+        ],
+        effects: [],
     },
     hook: {
         keyframes: [
