@@ -97,7 +97,7 @@ export class UiManager {
     roleMenuConfirm = $("#ui-role-footer-enter");
 
     roleMenuInst: SoundHandle | null = null;
-    topLeft = $("#ui-top-left");
+    m_topLeft = $("#ui-top-left");
     waitingForPlayers = true;
     waitingText = $("#ui-waiting-text");
     spectating = false;
@@ -521,7 +521,7 @@ export class UiManager {
         );
 
         for (let i = 0; i < 4; i++) {
-            const parent = this.topLeft;
+            const parent = this.m_topLeft;
             const slotIdx = i;
             this.teamSelectors.push({
                 teamNameHtml: "",

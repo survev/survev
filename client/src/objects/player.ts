@@ -228,7 +228,7 @@ export class Player implements AbstractObject {
     auraCircle = createSprite();
 
     // Anim
-    bones: Pose[] = [];
+    m_bones: Pose[] = [];
     anim = {
         type: Anim.None,
         data: {} as {
@@ -431,7 +431,7 @@ export class Player implements AbstractObject {
 
         const boneCount = Object.keys(Bones).length;
         for (let i = 0; i < boneCount; i++) {
-            this.bones.push(new Pose());
+            this.m_bones.push(new Pose());
             this.anim.bones.push({
                 weight: 0,
                 pose: new Pose(),
@@ -1259,16 +1259,16 @@ export class Player implements AbstractObject {
         // Compute blended bone positions
         const idlePose = this.selectIdlePose();
         const idlePoseData = IdlePoses[idlePose];
-        for (let boneIdx = 0; boneIdx < this.bones.length; boneIdx++) {
+        for (let boneIdx = 0; boneIdx < this.m_bones.length; boneIdx++) {
             const idleBonePose =
                 idlePoseData[boneIdx as keyof typeof idlePoseData] || Pose.identity;
             const animBone = this.anim.bones[boneIdx];
             if (animBone.weight > 0) {
-                this.bones[boneIdx].copy(
+                this.m_bones[boneIdx].copy(
                     Pose.lerp(animBone.weight, idleBonePose, animBone.pose),
                 );
             } else {
-                this.bones[boneIdx].copy(idleBonePose);
+                this.m_bones[boneIdx].copy(idleBonePose);
             }
         }
 
@@ -1844,10 +1844,10 @@ export class Player implements AbstractObject {
             e.pivot.set(-t.pivot.x, -t.pivot.y);
             e.rotation = t.rot;
         };
-        e(this.handLContainer, this.bones[Bones.HandL]);
-        e(this.handRContainer, this.bones[Bones.HandR]);
-        e(this.footLContainer, this.bones[Bones.FootL]);
-        e(this.footRContainer, this.bones[Bones.FootR]);
+        e(this.handLContainer, this.m_bones[Bones.HandL]);
+        e(this.handRContainer, this.m_bones[Bones.HandR]);
+        e(this.footLContainer, this.m_bones[Bones.FootL]);
+        e(this.footRContainer, this.m_bones[Bones.FootR]);
         const t = GameObjectDefs[this.m_netData.m_activeWeapon] as GunDef;
         if (!this.downed && this.currentAnim() != Anim.Revive && t.type == "gun") {
             if (t.worldImg.leftHandOffset) {
@@ -2127,10 +2127,10 @@ export class Player implements AbstractObject {
         this.anim.data = this.selectAnim(type);
         this.anim.seq = seq;
         this.anim.ticker = 0;
-        for (let i = 0; i < this.bones.length; i++) {
+        for (let i = 0; i < this.m_bones.length; i++) {
             const a = this.anim.bones[i];
             a.weight = 0;
-            a.pose.copy(this.bones[i]);
+            a.pose.copy(this.m_bones[i]);
         }
     }
 
@@ -2325,7 +2325,7 @@ export class Player implements AbstractObject {
                 }
             }
             const ourTeamId = animCtx.playerBarn?.getPlayerInfo(this.__id).teamId;
-            const players = animCtx.playerBarn?.playerPool.m_getPool()!;
+            const players = animCtx.playerBarn?.m_playerPool.m_getPool()!;
             for (let i = 0; i < players.length; i++) {
                 const playerCol = players[i];
                 if (
@@ -2531,7 +2531,7 @@ export class Player implements AbstractObject {
 }
 
 export class PlayerBarn {
-    playerPool = new Pool(Player);
+    m_playerPool = new Pool(Player);
     playerInfo: Record<number, PlayerInfo & { nameTruncated: string; anonName: string }> =
         {};
 
@@ -2570,7 +2570,7 @@ export class PlayerBarn {
         isSpectating?: boolean,
     ) {
         // Update players
-        const players = this.playerPool.m_getPool();
+        const players = this.m_playerPool.m_getPool();
         for (let i = 0; i < players.length; i++) {
             const p = players[i];
             if (p.active) {
@@ -2666,7 +2666,7 @@ export class PlayerBarn {
     }
 
     m_render(camera: Camera, debug: DebugRenderOpts) {
-        const players = this.playerPool.m_getPool();
+        const players = this.m_playerPool.m_getPool();
         for (let i = 0; i < players.length; i++) {
             const p = players[i];
             if (p.active) {
@@ -2676,7 +2676,7 @@ export class PlayerBarn {
     }
 
     getPlayerById(id: number) {
-        const pool = this.playerPool.m_getPool();
+        const pool = this.m_playerPool.m_getPool();
         for (let i = 0; i < pool.length; i++) {
             const p = pool[i];
             if (p.active && p.__id === id) {

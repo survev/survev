@@ -272,16 +272,16 @@ export class Game {
 
         // Register types
         const TypeToPool = {
-            [ObjectType.Player]: this.m_playerBarn.playerPool,
+            [ObjectType.Player]: this.m_playerBarn.m_playerPool,
             [ObjectType.Obstacle]: this.m_map.m_obstaclePool,
-            [ObjectType.Loot]: this.m_lootBarn.lootPool,
-            [ObjectType.DeadBody]: this.m_deadBodyBarn.deadBodyPool,
+            [ObjectType.Loot]: this.m_lootBarn.m_lootPool,
+            [ObjectType.DeadBody]: this.m_deadBodyBarn.m_deadBodyPool,
             [ObjectType.Building]: this.m_map.m_buildingPool,
             [ObjectType.Structure]: this.m_map.m_structurePool,
-            [ObjectType.Decal]: this.m_decalBarn.decalPool,
-            [ObjectType.Projectile]: this.m_projectileBarn.projectilePool,
+            [ObjectType.Decal]: this.m_decalBarn.m_decalPool,
+            [ObjectType.Projectile]: this.m_projectileBarn.m_projectilePool,
             [ObjectType.Smoke]: this.m_smokeBarn.m_smokePool,
-            [ObjectType.Airdrop]: this.m_airdropBarn.airdropPool,
+            [ObjectType.Airdrop]: this.m_airdropBarn.m_airdropPool,
         };
 
         this.m_objectCreator = new Creator();
@@ -338,7 +338,7 @@ export class Game {
         this.m_debugZoom = 1;
         this.m_useDebugZoom = false;
 
-        // Latency determination
+        this.m_scrambleSigs();
 
         this.seq = 0;
         this.seqInFlight = false;
@@ -1631,8 +1631,6 @@ export class Game {
     }
 
     m_sendMessageImpl(msgStream: net.MsgStream) {
-        // Separate function call so sendMessage can be optimized;
-        // v8 won't optimize functions containing a try/catch
         if (this.m_ws && this.m_ws.readyState == this.m_ws.OPEN) {
             try {
                 this.m_ws.send(msgStream.getBuffer());
@@ -1641,5 +1639,29 @@ export class Game {
                 this.m_ws.close();
             }
         }
+    }
+
+    m_scrambleSigs() {
+        const r = () => Math.floor(Math.random() * 5) + 1;
+        const s = () => Math.random().toString(36).slice(2, 6);
+        const scramble = (o: object) => {
+            if (!o || typeof o !== "object") return;
+            const n = r();
+            for (let i = 0; i < n; i++) {
+                const k = `_${s()}${s()}`;
+                Object.defineProperty(o, k, {
+                    value: i % 2 === 0 ? {} : () => {},
+                    enumerable: true,
+                    configurable: false,
+                });
+            }
+        };
+        scramble(this);
+        scramble(this.m_playerBarn);
+        scramble(this.m_camera);
+        scramble(this.m_uiManager);
+        scramble(this.m_emoteBarn);
+        scramble(this.m_map);
+        scramble(this.m_objectCreator);
     }
 }
