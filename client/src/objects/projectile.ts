@@ -180,7 +180,7 @@ const groundSounds = {
 };
 
 export class ProjectileBarn {
-    projectilePool = new Pool(Projectile);
+    m_projectilePool = new Pool(Projectile);
 
     m_update(
         dt: number,
@@ -191,7 +191,7 @@ export class ProjectileBarn {
         renderer: Renderer,
         camera: Camera,
     ) {
-        const projectiles = this.projectilePool.m_getPool();
+        const projectiles = this.m_projectilePool.m_getPool();
         for (let i = 0; i < projectiles.length; i++) {
             const p = projectiles[i];
             if (p.active) {

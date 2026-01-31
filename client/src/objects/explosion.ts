@@ -59,7 +59,7 @@ class PhysicsParticle {
             }
         }
 
-        const players = playerBarn.playerPool.m_getPool();
+        const players = playerBarn.m_playerPool.m_getPool();
         for (let i = 0; i < players.length; i++) {
             const player = players[i];
             if (

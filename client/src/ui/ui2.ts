@@ -767,7 +767,7 @@ export class UiManager2 {
                 (!activePlayer.m_netData.m_downed || canSelfRevive)
             ) {
                 const ourTeamId = playerBarn.getPlayerInfo(activePlayer.__id).teamId;
-                const players = playerBarn.playerPool.m_getPool();
+                const players = playerBarn.m_playerPool.m_getPool();
 
                 for (let i = 0; i < players.length; i++) {
                     const p = players[i];

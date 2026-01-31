@@ -82,7 +82,7 @@ class DeadBody implements AbstractObject {
 }
 
 export class DeadBodyBarn {
-    deadBodyPool = new Pool(DeadBody);
+    m_deadBodyPool = new Pool(DeadBody);
 
     m_update(
         _dt: number,
@@ -92,7 +92,7 @@ export class DeadBodyBarn {
         camera: Camera,
         renderer: Renderer,
     ) {
-        const deadBodies = this.deadBodyPool.m_getPool();
+        const deadBodies = this.m_deadBodyPool.m_getPool();
         for (let i = 0; i < deadBodies.length; i++) {
             const d = deadBodies[i];
             if (d.active) {
@@ -125,7 +125,7 @@ export class DeadBodyBarn {
     }
 
     getDeadBodyById(playerId: number) {
-        const deadBodies = this.deadBodyPool.m_getPool();
+        const deadBodies = this.m_deadBodyPool.m_getPool();
         for (let i = 0; i < deadBodies.length; i++) {
             const d = deadBodies[i];
             if (d.active && d.playerId == playerId) {

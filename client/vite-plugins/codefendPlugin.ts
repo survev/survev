@@ -40,6 +40,10 @@ export function codefendPlugin(): Rollup.Plugin {
                             name: "main",
                             regex: /(?<![a-zA-Z0-9])m((_[a-zA-Z0-9]+)+)/g,
                         },
+                        {
+                            name: "pools",
+                            regex: /(?<![a-zA-Z0-9])([a-z]+Pool)\b/g,
+                        },
                     ],
                 },
                 runtimeOptions,

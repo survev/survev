@@ -252,7 +252,7 @@ class DecalRender {
     }
 }
 export class DecalBarn {
-    decalPool = new Pool(Decal);
+    m_decalPool = new Pool(Decal);
     decalRenders: DecalRender[] = [];
 
     allocDecalRender() {
@@ -272,7 +272,7 @@ export class DecalBarn {
     }
 
     m_update(dt: number, camera: Camera, renderer: Renderer) {
-        const decals = this.decalPool.m_getPool();
+        const decals = this.m_decalPool.m_getPool();
         for (let i = 0; i < decals.length; i++) {
             const decal = decals[i];
             if (decal.active) {
