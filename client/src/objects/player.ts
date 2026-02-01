@@ -1633,14 +1633,14 @@ export class Player implements AbstractObject {
             this.hipSprite.visible = false;
         }
 
-        const R = GameObjectDefs[this.m_netData.m_activeWeapon] as
+        const weapDef = GameObjectDefs[this.m_netData.m_activeWeapon] as
             | GunDef
             | MeleeDef
             | ThrowableDef;
-        if (R.type == "gun") {
+        if (weapDef.type == "gun") {
             this.gunRSprites.setType(this.m_netData.m_activeWeapon, bodyScale);
             this.gunRSprites.setVisible(true);
-            if (R.isDual) {
+            if (weapDef.isDual) {
                 this.gunLSprites.setType(this.m_netData.m_activeWeapon, bodyScale);
                 this.gunLSprites.setVisible(true);
             } else {
@@ -1649,7 +1649,7 @@ export class Player implements AbstractObject {
             const L = this.bodyContainer.getChildIndex(this.handRContainer);
             const q = this.bodyContainer.getChildIndex(this.handRContainer);
             let F = L + 1;
-            if (this.gunRSprites.magTop || R.worldImg.handsBelow) {
+            if (this.gunRSprites.magTop || weapDef.worldImg.handsBelow) {
                 F = L - 1;
             }
             F = math.max(F, 0);
@@ -1657,7 +1657,9 @@ export class Player implements AbstractObject {
                 this.bodyContainer.addChildAt(this.handLContainer, F);
             }
             const j = this.handRContainer.getChildIndex(this.gunRSprites.container);
-            const N = R.worldImg.handsBelow ? this.handRContainer.children.length : 0;
+            const N = weapDef.worldImg.handsBelow
+                ? this.handRContainer.children.length
+                : 0;
             if (j != N) {
                 this.handRContainer.addChildAt(this.gunRSprites.container, N);
             }
@@ -1676,28 +1678,42 @@ export class Player implements AbstractObject {
                 this.bodyContainer.addChild(this.handRContainer);
             }
         }
-        if (R.type == "melee" && this.m_netData.m_activeWeapon != "fists") {
-            const V = R.worldImg!;
-            this.meleeSprite.texture = PIXI.Texture.from(V.sprite);
-            this.meleeSprite.pivot.set(-V.pos.x, -V.pos.y);
-            this.meleeSprite.scale.set(V.scale.x / bodyScale, V.scale.y / bodyScale);
-            this.meleeSprite.rotation = V.rot;
-            this.meleeSprite.tint = V.tint;
-            this.meleeSprite.visible = true;
-            const U = this.handRContainer.getChildIndex(this.handRSprite);
-            const W = math.max(V.renderOnHand ? U + 1 : U - 1, 0);
-            if (this.handRContainer.getChildIndex(this.meleeSprite) != W) {
-                this.handRContainer.addChildAt(this.meleeSprite, W);
+        if (weapDef.type == "melee" && this.m_netData.m_activeWeapon != "fists") {
+            const img = weapDef.worldImg!;
+            this.meleeSprite.texture = PIXI.Texture.from(img.sprite);
+
+            let pos = img.pos;
+            if (this.m_netData.m_animType === Anim.DeployMelee && img.deployPos) {
+                pos = img.deployPos;
             }
-            const G = this.bodyContainer.getChildIndex(this.handRContainer);
-            const X = math.max(V.leftHandOntop ? G + 1 : G - 1, 0);
-            if (this.bodyContainer.getChildIndex(this.handLContainer) != X) {
-                this.bodyContainer.addChildAt(this.handLContainer, X);
+
+            this.meleeSprite.pivot.set(-pos.x, -pos.y);
+            this.meleeSprite.scale.set(img.scale.x / bodyScale, img.scale.y / bodyScale);
+            this.meleeSprite.rotation = img.rot;
+            this.meleeSprite.tint = img.tint;
+            this.meleeSprite.visible = true;
+            const handRSpriteIdx = this.handRContainer.getChildIndex(this.handRSprite);
+            const maxHRSIdx = math.max(
+                img.renderOnHand ? handRSpriteIdx + 1 : handRSpriteIdx - 1,
+                0,
+            );
+            if (this.handRContainer.getChildIndex(this.meleeSprite) != maxHRSIdx) {
+                this.handRContainer.addChildAt(this.meleeSprite, maxHRSIdx);
+            }
+            const handRContainerIdx = this.bodyContainer.getChildIndex(
+                this.handRContainer,
+            );
+            const maxHandRCIdx = math.max(
+                img.leftHandOntop ? handRContainerIdx + 1 : handRContainerIdx - 1,
+                0,
+            );
+            if (this.bodyContainer.getChildIndex(this.handLContainer) != maxHandRCIdx) {
+                this.bodyContainer.addChildAt(this.handLContainer, maxHandRCIdx);
             }
         } else {
             this.meleeSprite.visible = false;
         }
-        if (R.type == "throwable") {
+        if (weapDef.type == "throwable") {
             const K = function (
                 e: PIXI.Sprite,
                 t: {
@@ -1722,7 +1738,7 @@ export class Player implements AbstractObject {
                     e.visible = false;
                 }
             };
-            const Z = R.handImg?.[this.throwableState]!;
+            const Z = weapDef.handImg?.[this.throwableState]!;
             K(this.objectLSprite, Z.left);
             K(this.objectRSprite, Z.right);
         } else {
@@ -2084,37 +2100,51 @@ export class Player implements AbstractObject {
     }
 
     selectAnim(type: Anim) {
-        const t = function (e: string, t: boolean) {
+        const makeAnim = function (type: string, mirror: boolean) {
             return {
-                type: e,
-                mirror: !!t && Math.random() < 0.5,
+                type: type,
+                mirror: !!mirror && Math.random() < 0.5,
             };
         };
         switch (type) {
             case Anim.None:
-                return t("none", false);
+                return makeAnim("none", false);
             case Anim.Cook:
-                return t("cook", false);
+                return makeAnim("cook", false);
             case Anim.Throw:
-                return t("throw", false);
+                return makeAnim("throw", false);
             case Anim.Revive:
-                return t("revive", false);
+                return makeAnim("revive", false);
             case Anim.CrawlForward:
-                return t("crawl_forward", true);
+                return makeAnim("crawl_forward", true);
             case Anim.CrawlBackward:
-                return t("crawl_backward", true);
+                return makeAnim("crawl_backward", true);
             case Anim.Melee: {
-                const r = GameObjectDefs[this.m_netData.m_activeWeapon] as MeleeDef;
-                if (!r.anim?.attackAnims) {
-                    return t("fists", true);
+                const meleeDef = GameObjectDefs[
+                    this.m_netData.m_activeWeapon
+                ] as MeleeDef;
+                if (!meleeDef.anim?.attackAnims) {
+                    return makeAnim("fists", true);
                 }
-                const a = r.anim.attackAnims;
-                const i = Math.floor(Math.random() * a.length);
-                const o = a[i];
-                return t(o, o == "fists" && a.length == 1);
+                const anims = meleeDef.anim.attackAnims;
+                const idx = Math.floor(Math.random() * anims.length);
+                const selectedAnim = anims[idx];
+                return makeAnim(
+                    selectedAnim,
+                    selectedAnim == "fists" && anims.length == 1,
+                );
+            }
+            case Anim.DeployMelee: {
+                const meleeDef = GameObjectDefs[
+                    this.m_netData.m_activeWeapon
+                ] as MeleeDef;
+                if (!meleeDef.anim?.deploy) {
+                    return makeAnim("fists", true);
+                }
+                return makeAnim(meleeDef.anim.deploy, false);
             }
             default:
-                return t("none", false);
+                return makeAnim("none", false);
         }
     }
 
