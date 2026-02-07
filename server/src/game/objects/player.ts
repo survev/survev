@@ -819,6 +819,8 @@ export class Player extends BaseGameObject {
     aimLayer = 0;
     dead = false;
     downed = false;
+    reviveProgress = 0;
+    reviveDuration = 8;
 
     downedCount = 0;
     /**
@@ -1624,19 +1626,64 @@ export class Player extends BaseGameObject {
             this.weaponManager.scheduledReload = true;
         }
 
+        // Downed player revive logic
+
+        if (this.downed && this.actionType == GameConfig.Action.None) {
+            this.reviveProgress = 0;
+        }
+
+        if (this.isBeingRevived()) {
+            let reviveMultiplier = this.getReviveMultiplier();
+            this.reviveProgress += dt * reviveMultiplier;
+
+            this.reviveProgress = math.clamp(
+                this.reviveProgress,
+                0,
+                this.reviveDuration
+            );
+
+            if (this.reviveProgress >= this.reviveDuration) {
+                this.downed = false;
+                this.downedBy = undefined;
+                this.downedDamageTicker = 0;
+                this.health = GameConfig.player.reviveHealth;
+                
+                // checks 2 conditions in one, player has pan AND has it selected
+                if (this.weapons[this.curWeapIdx].type === "pan") {
+                    this.wearingPan = false;
+                }
+                const revivers = this.getActiveRevivers();
+                for (const reviver of revivers) {
+                    reviver.playerBeingRevived = undefined;
+                    reviver.cancelAction();
+                    reviver.cancelAnim();
+                }
+                this.revivedBy = undefined;
+
+                this.setDirty();
+                this.setGroupStatuses();
+                this.game.pluginManager.emit("playerRevived", this);
+            }
+        }
+
+        // Reviver revive logic
+
+        if (
+            this.isReviving() &&
+            this.playerBeingRevived
+        ) {
+            const target = this.playerBeingRevived;
+            this.action.time = target.reviveProgress;
+            this.action.duration = target.reviveDuration;
+        }
+
         // handle heal and boost actions
 
-        if (this.actionType !== GameConfig.Action.None) {
-            if (
-                (this.downed && this.isBeingRevived()) ||
-                (!this.downed && this.isReviving())
-            ) {
-                let reviveMultiplier = this.getReviveMultiplier();
-                this.action.time += dt * reviveMultiplier;
-            } else {
-                this.action.time += dt;
-            }
-
+        if (
+            this.actionType !== GameConfig.Action.None &&
+            this.actionType !== GameConfig.Action.Revive
+        ) {
+            this.action.time += dt;
             this.action.time = math.clamp(
                 this.action.time,
                 0,
@@ -1659,35 +1706,6 @@ export class Player extends BaseGameObject {
                     this.invManager.take(this.actionItem as InventoryItem, 1);
                 } else if (this.isReloading()) {
                     this.weaponManager.reload();
-                } else if (
-                    this.actionType === GameConfig.Action.Revive &&
-                    this.playerBeingRevived
-                ) {
-                    this.applyActionFunc((target: Player) => {
-                        if (!target.downed) return;
-                        target.downed = false;
-                        target.downedBy = undefined;
-                        target.downedDamageTicker = 0;
-                        target.health = GameConfig.player.reviveHealth;
-
-                        // checks 2 conditions in one, player has pan AND has it selected
-                        if (target.weapons[target.curWeapIdx].type === "pan") {
-                            target.wearingPan = false;
-                        }
-                        // stop all revivers from reviving if downed player is no longer downed
-                        const revivers = target.getActiveRevivers();
-                        for (const reviver of revivers) {
-                            reviver.playerBeingRevived = undefined;
-                            reviver.cancelAction();
-                            reviver.cancelAnim();
-                        }
-
-                        target.revivedBy = undefined;
-
-                        target.setDirty();
-                        target.setGroupStatuses();
-                        this.game.pluginManager.emit("playerRevived", target);
-                    });
                 }
 
                 this.cancelAction();
@@ -1695,8 +1713,7 @@ export class Player extends BaseGameObject {
                 if (
                     (this.curWeapIdx == GameConfig.WeaponSlot.Primary ||
                         this.curWeapIdx == GameConfig.WeaponSlot.Secondary) &&
-                    this.weapons[this.curWeapIdx].ammo == 0 &&
-                    this.actionType !== GameConfig.Action.Revive
+                    this.weapons[this.curWeapIdx].ammo == 0
                 ) {
                     this.weaponManager.scheduledReload = true;
                 }
@@ -2737,6 +2754,8 @@ export class Player extends BaseGameObject {
         this.downedDamageTicker = GameConfig.player.downedDamageBuffer;
         this.boost = 0;
         this.health = 100;
+        this.reviveProgress = 0;
+        this.reviveDuration = 8;
 
         if (this.game.gas.currentRad <= 0.1) {
             this.health = 50;
@@ -3148,7 +3167,7 @@ export class Player extends BaseGameObject {
     isBeingRevived() {
         if (!this.downed) return false;
 
-        if (this.getActiveRevivers().length > 0) return true;
+        if (this.actionType == GameConfig.Action.Revive) return true;
 
         const numMedics = this.game.playerBarn.aoeHealPlayers.length;
         if (numMedics) {
