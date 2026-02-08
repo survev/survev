@@ -60,9 +60,17 @@ const mapDef: PartialMapDef = {
             { name: "l86", count: 1, weight: 0.75 }, // ?
             { name: "svd", count: 1, weight: 0.75 }, // ?
             { name: "garand", count: 1, weight: 0.45 }, // ?
-            { name: "scarssr", count: 1, weight: 0.15 }, // ?
-            { name: "awc", count: 1, weight: 0.15 }, // ?
-            { name: "sv98", count: 1, weight: 0.1 }, // ?
+            { name: "scarssr", count: 1, weight: 0.12 }, // ?
+            { name: "awc", count: 1, weight: 0.12 }, // ?
+            { name: "sv98", count: 1, weight: 0.09 }, // ?
+        ],
+        tier_armor: [
+            { name: "helmet01", count: 1, weight: 4 },
+            { name: "helmet02", count: 1, weight: 4 },
+            { name: "helmet03", count: 1, weight: 0.2 },
+            { name: "chest01", count: 1, weight: 6 },
+            { name: "chest02", count: 1, weight: 4 },
+            { name: "chest03", count: 1, weight: 0.2 },
         ],
         tier_airdrop_uncommon: [
             { name: "mk12", count: 1, weight: 2.5 },

@@ -9693,7 +9693,11 @@ export const MapObjectDefs: Record<string, MapObjectDef> = {
     } as unknown as Partial<ObstacleDef>),
     crate_02sv: createCrate({
         health: 140,
-        loot: [tierLoot("tier_soviet", 4, 5), tierLoot("tier_world", 1, 1)],
+        loot: [
+            tierLoot("tier_soviet", 4, 5),
+            tierLoot("tier_world", 1, 1),
+            tierLoot("tier_medical", 1, 1),
+        ],
         map: { display: true, color: 0xffc000 },
         terrain: { grass: true, beach: false },
         img: { sprite: "map-crate-02sv.img" },
@@ -9701,7 +9705,7 @@ export const MapObjectDefs: Record<string, MapObjectDef> = {
     } as unknown as Partial<ObstacleDef>),
     crate_02sv_lake: createCrate({
         health: 140,
-        loot: [tierLoot("tier_soviet", 5, 6)],
+        loot: [tierLoot("tier_soviet", 5, 6), tierLoot("tier_medical", 1, 1)],
         map: { display: true, color: 0xffc000 },
         terrain: { lakeCenter: true },
         img: { sprite: "map-crate-02sv.img" },

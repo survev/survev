@@ -1432,6 +1432,10 @@ export class Player extends BaseGameObject {
 
         this.setLoadout(loadout ? loadout : joinMsg.loadout, !loadout);
 
+        if (this.game.map.sniperMode) {
+            this.invManager.give("2xscope", 1);
+        }
+
         this.weaponManager.showNextThrowable();
         this.recalculateScale();
     }

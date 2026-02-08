@@ -701,6 +701,7 @@ export const Main: MapDef = {
             { name: "martyrdom", count: 1, weight: 1 },
             { name: "self_revive", count: 1, weight: 1 },
             { name: "bonus_9mm", count: 1, weight: 1 },
+            { name: "bonus_45", count: 1, weight: 1 },
             { name: "high_velocity", count: 1, weight: 1 },
         ],
         tier_potato_perks: [
