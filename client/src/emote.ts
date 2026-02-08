@@ -828,23 +828,23 @@ export class EmoteBarn {
         if (input.lostFocus) {
             this.inputReset();
         }
-        if (inputBinds.isBindPressed(Input.TeamPingMenu)) {
+        if (inputBinds.isBindPressed(Input.TeamPingHold)) {
             if (!this.pingKeyDown && !spectating) {
                 this.pingKeyDown = true;
                 this.pingKeyTriggered = true;
             }
         }
-        if (inputBinds.isBindReleased(Input.TeamPingMenu) && this.pingKeyDown) {
+        if (inputBinds.isBindReleased(Input.TeamPingHold) && this.pingKeyDown) {
             this.pingKeyDown = false;
             this.pingKeyTriggered = this.wheelDisplayed;
         }
-        if (inputBinds.isBindPressed(Input.TeamPingSingle)) {
+        if (inputBinds.isBindPressed(Input.TeamPingMenu)) {
             if (!this.pingMouseTriggered && !this.emoteMouseTriggered) {
                 this.emoteScreenPos = v2.copy(mousePos);
                 this.pingMouseTriggered = true;
             }
         }
-        if (inputBinds.isBindReleased(Input.TeamPingSingle) && this.pingMouseTriggered) {
+        if (inputBinds.isBindReleased(Input.TeamPingMenu) && this.pingMouseTriggered) {
             this.triggerPing();
         }
         if (inputBinds.isBindPressed(Input.EmoteMenu)) {

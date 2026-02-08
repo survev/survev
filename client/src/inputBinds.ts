@@ -60,11 +60,11 @@ const BindDefs = {
     [GameInput.ToggleMap]: def("Toggle Map", inputKey(Key.M)),
     [GameInput.CycleUIMode]: def("Toggle Minimap", inputKey(Key.V)),
     [GameInput.EmoteMenu]: def("Emote Menu", mouseButton(MouseButton.Right)),
-    [GameInput.TeamPingMenu]: def("Team Ping Hold", inputKey(Key.C)),
+    [GameInput.TeamPingHold]: def("Team Ping Hold", null),
     [GameInput.EquipOtherGun]: def("Equip Other Gun", null),
     [GameInput.Fullscreen]: def("Full Screen", inputKey(Key.L)),
     [GameInput.HideUI]: def("Hide UI", null),
-    [GameInput.TeamPingSingle]: def("Team Ping Menu", null),
+    [GameInput.TeamPingMenu]: def("Team Ping Menu", inputKey(Key.C)),
 };
 
 export class InputBinds {
