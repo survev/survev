@@ -28,6 +28,34 @@ Dual M1911:
 + moveSpread 8 -> 3.5
 + shotSpread 9.5 -> 4
 
+VSS:
++ rarity decreased
+~ quality: 1 (rare) -> 0 (common)
++ damage: 22 -> 24 -> 24.5
++ speed: 95 -> 110
++ falloff: 0.8 -> 0.85
+- headshotMult: 2 -> 1.75
+
+Mk 12 SPR:
++ damage: 22.5 -> 23
+- headshotMult: 2 -> 1.75
+
+M39 EMR:
++ damage: 27 -> 28
+- headshotMult: 2 -> 1.75
+
+SVD-63:
++ damage: 36 -> 37
+- headshotMult: 2 -> 1.75
+
+L86A2:
++ damage: 26.5 -> 27
+- headshotMult 2 -> 1.75
+
+Mk45G:
++ damage: 28 -> 29
+- headshotMult: 2 -> 1.75
+
 Mk 20 SSR:
 + damage: 60 -> 81
 - headshotMult: 1.5 -> 1.25
@@ -37,7 +65,8 @@ M1 Garand:
 + shotSpread: 1 -> 0.4
 + speed: 130 -> 144
 + distance: 400 -> 444
-- headshotMult: 2 --> 1.75
++ falloff: 0.9 -> 0.94
+- headshotMult: 2 -> 1.74
 
 SV-98:
 - headshotMult: 1.5 -> 1.25
@@ -51,13 +80,6 @@ Scout Elite:
 Mosin Nagant:
 - rarity increased
 - headshotMult: 1.5 -> 1.25
-
-VSS:
-+ rarity decreased
-~ quality: 1 (rare) -> 0 (common)
-+ damage: 22 -> 24
-+ speed: 95 -> 110
-+ falloff: 0.8 -> 0.85
 
 Groza:
 ~ quality: 1 -> 0
@@ -93,6 +115,9 @@ Loot Caches:
 Loot tables:
 + Added bar to normal loot tables
 + Increased desert camo drop rate from cattle crate 0.1 -> 0.3
+
+## Other Changes
+Sorted by the patch they were done in.
 
 Factions Changes (07/23/2025):
 + Certain roles receive healing when promoted: 
@@ -142,3 +167,10 @@ Savannah Changes (02/02/2026):
 
 + Buffed the Snowball & Potato (incl. heavy versions).
 - Nerfed the M9 (single, dual, & cursed).
+
+Savannah B-Patch (02/09/2026):
++ Added Tier Armor (T3 armor odds increased by ~2x [~0.5% --> ~1%], T2 armor odds made similar to T1).
++ Tier Perks: Added .45 In The Chamber (weight of 1).
+~ Tier Guns: Adjusted SV-98, AWM-S, & Mk 20 SSR weights (0.1 --> 0.09, 0.15 --> 0.12, & 0.15 --> 0.12 respectively)
+~ headshotMult on DMRs reduced across the board, damage increased (excluding the Mk 20 SSR which was adjusted in previous paches), see above. 
++ Gold Crate: Now drop 1 item from Tier Medical.

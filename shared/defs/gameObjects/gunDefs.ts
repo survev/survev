@@ -419,7 +419,7 @@ export const BaseDefs: Record<string, GunDef> = {
         bulletCount: 1,
         bulletType: "bullet_vss",
         bulletTypeBonus: "bullet_vss_bonus",
-        headshotMult: 2,
+        headshotMult: 1.75,
         speed: { equip: 0, attack: 0 },
         lootImg: {
             sprite: "loot-weapon-vss.img",
@@ -612,7 +612,7 @@ export const BaseDefs: Record<string, GunDef> = {
         shotSpread: 1,
         bulletCount: 1,
         bulletType: "bullet_mk12",
-        headshotMult: 2,
+        headshotMult: 1.75,
         speed: { equip: 0, attack: 0 },
         lootImg: {
             sprite: "loot-weapon-mk12.img",
@@ -659,7 +659,7 @@ export const BaseDefs: Record<string, GunDef> = {
         shotSpread: 1,
         bulletCount: 1,
         bulletType: "bullet_l86",
-        headshotMult: 2,
+        headshotMult: 1.75,
         speed: { equip: 0, attack: 0 },
         lootImg: {
             sprite: "loot-weapon-l86.img",
@@ -1354,7 +1354,7 @@ export const BaseDefs: Record<string, GunDef> = {
         shotSpread: 3.5,
         bulletCount: 1,
         bulletType: "bullet_mkg45",
-        headshotMult: 2,
+        headshotMult: 1.75,
         speed: { equip: 0, attack: 0 },
         lootImg: {
             sprite: "loot-weapon-mkg45.img",
@@ -1609,7 +1609,7 @@ export const BaseDefs: Record<string, GunDef> = {
         shotSpread: 1,
         bulletCount: 1,
         bulletType: "bullet_m39",
-        headshotMult: 2,
+        headshotMult: 1.75,
         speed: { equip: 0, attack: 0 },
         lootImg: {
             sprite: "loot-weapon-m39.img",
@@ -1656,7 +1656,7 @@ export const BaseDefs: Record<string, GunDef> = {
         shotSpread: 1,
         bulletCount: 1,
         bulletType: "bullet_svd",
-        headshotMult: 2,
+        headshotMult: 1.75,
         speed: { equip: 0, attack: 0 },
         lootImg: {
             sprite: "loot-weapon-svd.img",
@@ -1703,7 +1703,7 @@ export const BaseDefs: Record<string, GunDef> = {
         shotSpread: 0.4,
         bulletCount: 1,
         bulletType: "bullet_garand",
-        headshotMult: 2,
+        headshotMult: 1.74,
         speed: { equip: 0, attack: 0 },
         lootImg: {
             sprite: "loot-weapon-garand.img",
