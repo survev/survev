@@ -628,7 +628,7 @@ export class Player implements AbstractObject {
                     oldHelmet,
                     this.m_netData.m_helmet,
                 );
-                modAPI._emitLocalPlayerHelmetChange();
+                modAPI._emit("localPlayerHelmetChange", undefined);
                 anyGearChanged = true;
             }
             if (oldChest !== this.m_netData.m_chest) {
@@ -638,7 +638,7 @@ export class Player implements AbstractObject {
                     oldChest,
                     this.m_netData.m_chest,
                 );
-                modAPI._emitLocalPlayerChestChange();
+                modAPI._emit("localPlayerChestChange", undefined);
                 anyGearChanged = true;
             }
             if (oldBackpack !== this.m_netData.m_backpack) {
@@ -648,7 +648,7 @@ export class Player implements AbstractObject {
                     oldBackpack,
                     this.m_netData.m_backpack,
                 );
-                modAPI._emitLocalPlayerBackpackChange();
+                modAPI._emit("localPlayerBackpackChange", undefined);
                 anyGearChanged = true;
             }
             if (oldOutfit !== this.m_netData.m_outfit) {
@@ -658,11 +658,11 @@ export class Player implements AbstractObject {
                     oldOutfit,
                     this.m_netData.m_outfit,
                 );
-                modAPI._emitLocalPlayerOutfitChange();
+                modAPI._emit("localPlayerOutfitChange", undefined);
                 anyGearChanged = true;
             }
             if (anyGearChanged) {
-                modAPI._emitLocalPlayerGearChange();
+                modAPI._emit("localPlayerGearChange", undefined);
             }
         }
     }
@@ -686,7 +686,7 @@ export class Player implements AbstractObject {
 
             if (healthDelta < 0) {
                 modAPI._setLocalPlayerDamageAmount(-healthDelta);
-                modAPI._emitLocalPlayerDamage();
+                modAPI._emit("localPlayerDamage", undefined);
             } else if (healthDelta > 0) {
                 const adrenActive = this.m_localData.m_boost > 0;
                 const smallishHeal = healthDelta <= 15;
@@ -697,7 +697,7 @@ export class Player implements AbstractObject {
                 });
 
                 modAPI._setLocalPlayerHealAmountRaw(healthDelta);
-                modAPI._emitLocalPlayerHeal();
+                modAPI._emit("localPlayerHeal", undefined);
             }
         }
 
@@ -732,13 +732,13 @@ export class Player implements AbstractObject {
 
                 if (inventoryDelta < 0) {
                     modAPI._setLocalPlayerRemoveItem(item, -inventoryDelta);
-                    modAPI._emitLocalPlayerRemovedItem();
+                    modAPI._emit("localPlayerRemovedItem", undefined);
                 } else if (inventoryDelta > 0) {
                     modAPI._setLocalPlayerAddItem(item, inventoryDelta);
-                    modAPI._emitLocalPlayerAddedItem();
+                    modAPI._emit("localPlayerAddedItem", undefined);
                 }
             }
-            modAPI._emitLocalPlayerInventoryItemChange();
+            modAPI._emit("localPlayerInventoryItemChange", undefined);
         }
         if (data.weapsDirty) {
             const oldWeaponSlots = this.m_localData.m_weapons.map((w) => ({
@@ -779,7 +779,7 @@ export class Player implements AbstractObject {
                     newWeapon.type,
                     newWeapon.ammo,
                 );
-                modAPI._emitLocalPlayerEquippedWeaponChange();
+                modAPI._emit("localPlayerEquippedWeaponChange", undefined);
             }
 
             for (let i = 0; i < newWeaponSlots.length; i++) {
@@ -792,7 +792,7 @@ export class Player implements AbstractObject {
                         oldWeapon.type,
                         newWeapon.type,
                     );
-                    modAPI._emitLocalPlayerWeaponChange();
+                    modAPI._emit("localPlayerWeaponChange", undefined);
                     continue;
                 }
 
@@ -805,7 +805,7 @@ export class Player implements AbstractObject {
                         newWeapon.ammo,
                         -ammoDelta,
                     );
-                    modAPI._emitLocalPlayerWeaponAmmoUsed();
+                    modAPI._emit("localPlayerWeaponAmmoUsed", undefined);
                 } else if (ammoDelta > 0) {
                     modAPI._setLocalPlayerWeaponAmmoGained(
                         i,
@@ -813,7 +813,7 @@ export class Player implements AbstractObject {
                         newWeapon.ammo,
                         ammoDelta,
                     );
-                    modAPI._emitLocalPlayerWeaponAmmoGained();
+                    modAPI._emit("localPlayerWeaponAmmoGained", undefined);
                 }
             }
         }
@@ -2789,7 +2789,7 @@ export class PlayerBarn {
         const isDead = activePlayer.m_netData.m_dead;
 
         if (!this.wasDead && isDead) {
-            modAPI._emitLocalPlayerDeath();
+            modAPI._emit("localPlayerDeath", undefined);
         }
 
         this.wasDead = isDead;

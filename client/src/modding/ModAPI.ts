@@ -1,23 +1,63 @@
-type GameStartListener = () => void;
-type GameEndListener = () => void;
-type PlayerDeathListener = () => void;
-type PlayerShootListener = () => void;
-type PlayerLocalShootListener = () => void;
-type PlayerKillListener = () => void;
-type PlayerHealListener = () => void;
-type PlayerDamageListener = () => void;
-type PlayerInventoryListener = () => void;
-type PlayerHelmetListener = () => void;
-type PlayerChestListener = () => void;
-type PlayerBackpackListener = () => void;
-type PlayerOutfitListener = () => void;
-type PlayerGearListener = () => void;
-type PlayerEquippedWeaponListener = () => void;
-type PlayerWeaponListener = () => void;
-type PlayerWeaponUsedAmmoListener = () => void;
-type PlayerWeaponGainedAmmoListener = () => void;
-type PlayerRemovedItemListener = () => void;
-type PlayerAddedItemListener = () => void;
+type OnEventMap = {
+    gameStart: void;
+    gameEnd: void;
+    localPlayerDeath: void;
+    playerShoot: void;
+    localPlayerShoot: void;
+    localPlayerKill: void;
+    localPlayerHeal: void;
+    localPlayerDamage: void;
+    localPlayerInventoryItemChange: void;
+    localPlayerHelmetChange: void;
+    localPlayerChestChange: void;
+    localPlayerBackpackChange: void;
+    localPlayerOutfitChange: void;
+    localPlayerGearChange: void;
+    localPlayerEquippedWeaponChange: void;
+    localPlayerWeaponChange: void;
+    localPlayerWeaponAmmoUsed: void;
+    localPlayerWeaponAmmoGained: void;
+    localPlayerRemovedItem: void;
+    localPlayerAddedItem: void;
+};
+
+type ModEvent = keyof OnEventMap;
+
+type ModEventCallback<E extends ModEvent> = OnEventMap[E] extends void
+    ? () => void
+    : (payload: OnEventMap[E]) => void;
+
+type EventHooks = {
+    [E in ModEvent as `on${Capitalize<E>}`]: (cb: ModEventCallback<E>) => void;
+};
+
+// yes you do have to repeat the on* hook names here but I mean
+// considering that thats all thats needed to you know have both the
+// on("gameStart", () => {}) and onGameStart(() => {}) styles I would say thats fine
+// considering well docs are easier to write and some people prefer one or the other :p
+
+const eventNames = [
+    "gameStart",
+    "gameEnd",
+    "localPlayerDeath",
+    "playerShoot",
+    "localPlayerShoot",
+    "localPlayerKill",
+    "localPlayerHeal",
+    "localPlayerDamage",
+    "localPlayerInventoryItemChange",
+    "localPlayerHelmetChange",
+    "localPlayerChestChange",
+    "localPlayerBackpackChange",
+    "localPlayerOutfitChange",
+    "localPlayerGearChange",
+    "localPlayerEquippedWeaponChange",
+    "localPlayerWeaponChange",
+    "localPlayerWeaponAmmoUsed",
+    "localPlayerWeaponAmmoGained",
+    "localPlayerRemovedItem",
+    "localPlayerAddedItem",
+  ] as const satisfies readonly ModEvent[];  
 
 export interface PlayerKills {
     totalKills: number;
@@ -119,17 +159,33 @@ export interface PlayerWeapons {
 }
 
 export function createModAPI() {
-    const gameStartListeners: GameStartListener[] = [];
-    const gameEndListeners: GameEndListener[] = [];
-    const playerDeathListeners: PlayerDeathListener[] = [];
-    const playerShootListeners: PlayerShootListener[] = [];
-    const playerLocalShootListeners: PlayerLocalShootListener[] = [];
-    const playerKillListeners: PlayerKillListener[] = [];
+    const listeners: { [E in ModEvent]?: ModEventCallback<E>[] } = {};
+
+    const hooks = {} as EventHooks;
+
+    for (const event of eventNames) {
+        const hookName = `on${capitalize(event)}` as keyof EventHooks;
+        hooks[hookName] = (cb: any) => {
+            (listeners[event] ??= []).push(cb);
+        };
+    }
+
+    function on<E extends ModEvent>(event: E, cb: ModEventCallback<E>) {
+        const arr = (listeners[event] ??
+            (listeners[event] = [])) as ModEventCallback<E>[];
+
+        arr.push(cb);
+    }
+
+    function _emit<E extends ModEvent>(event: E, payload: OnEventMap[E]) {
+        for (const fn of listeners[event] ?? []) {
+            (fn as any)(payload);
+        }
+    }
+
     const playerKills: PlayerKills = {
         totalKills: 0,
     };
-    const playerHealListeners: PlayerHealListener[] = [];
-    const playerDamageListeners: PlayerDamageListener[] = [];
     const playerHealth: PlayerHealth = {
         totalHealth: 100,
     };
@@ -151,12 +207,6 @@ export function createModAPI() {
         removedItem: "",
         removedItemAmount: 0,
     };
-    const playerInventoryListeners: PlayerInventoryListener[] = [];
-    const playerHelmetListeners: PlayerHelmetListener[] = [];
-    const playerChestListeners: PlayerChestListener[] = [];
-    const playerBackpackListeners: PlayerBackpackListener[] = [];
-    const playerOutfitListeners: PlayerOutfitListener[] = [];
-    const playerGearListeners: PlayerGearListener[] = [];
     const playerHelmetChange: PlayerHelmetChange = {
         newHelmet: "",
     };
@@ -180,9 +230,6 @@ export function createModAPI() {
         backpack: "",
         outfit: "",
     };
-    const playerEquippedWeaponListeners: PlayerEquippedWeaponListener[] = [];
-    const playerWeaponListeners: PlayerWeaponListener[] = [];
-    const playerWeaponUsedAmmoListeners: PlayerWeaponUsedAmmoListener[] = [];
     const playerActiveWeapon: PlayerActiveWeapon = {
         slot: 0,
         weaponType: "",
@@ -205,7 +252,6 @@ export function createModAPI() {
         weaponAmmo: 0,
         ammoGained: 0,
     };
-    const playerWeaponGainedAmmoListeners: PlayerWeaponGainedAmmoListener[] = [];
     const playerWeapons: PlayerWeapons = {
         primaryWeaponType: "",
         primaryWeaponAmmo: 0,
@@ -216,91 +262,11 @@ export function createModAPI() {
         throwableWeaponType: "",
         throwableWeaponAmmo: 0,
     };
-    const playerRemovedItemListeners: PlayerRemovedItemListener[] = [];
-    const playerAddedItemListeners: PlayerAddedItemListener[] = [];
 
     return Object.freeze({
         // on* hooks start
-        onGameStart(fn: GameStartListener) {
-            gameStartListeners.push(fn);
-        },
-
-        onGameEnd(fn: GameEndListener) {
-            gameEndListeners.push(fn);
-        },
-
-        onLocalPlayerDeath(fn: PlayerDeathListener) {
-            playerDeathListeners.push(fn);
-        },
-
-        onPlayerShoot(fn: PlayerShootListener) {
-            playerShootListeners.push(fn);
-        },
-
-        onLocalPlayerShoot(fn: PlayerLocalShootListener) {
-            playerLocalShootListeners.push(fn);
-        },
-
-        onLocalPlayerKill(fn: PlayerKillListener) {
-            playerKillListeners.push(fn);
-        },
-
-        onLocalPlayerHeal(fn: PlayerHealListener) {
-            playerHealListeners.push(fn);
-        },
-
-        onLocalPlayerDamage(fn: PlayerDamageListener) {
-            playerDamageListeners.push(fn);
-        },
-
-        onLocalPlayerInventoryItemChange(fn: PlayerInventoryListener) {
-            playerInventoryListeners.push(fn);
-        },
-
-        onLocalPlayerHelmetChange(fn: PlayerHelmetListener) {
-            playerHelmetListeners.push(fn);
-        },
-
-        onLocalPlayerChestChange(fn: PlayerChestListener) {
-            playerChestListeners.push(fn);
-        },
-
-        onLocalPlayerBackpackChange(fn: PlayerBackpackListener) {
-            playerBackpackListeners.push(fn);
-        },
-
-        onLocalPlayerOutfitChange(fn: PlayerOutfitListener) {
-            playerOutfitListeners.push(fn);
-        },
-
-        onLocalPlayerGearChange(fn: PlayerGearListener) {
-            playerGearListeners.push(fn);
-        },
-
-        onLocalPlayerEquippedWeaponChange(fn: PlayerEquippedWeaponListener) {
-            playerEquippedWeaponListeners.push(fn);
-        },
-
-        onLocalPlayerWeaponChange(fn: PlayerWeaponListener) {
-            playerWeaponListeners.push(fn);
-        },
-
-        onLocalPlayerWeaponAmmoUse(fn: PlayerWeaponUsedAmmoListener) {
-            playerWeaponUsedAmmoListeners.push(fn);
-        },
-
-        onLocalPlayerWeaponAmmoGained(fn: PlayerWeaponGainedAmmoListener) {
-            playerWeaponGainedAmmoListeners.push(fn);
-        },
-
-        onLocalPlayerRemovedItem(fn: PlayerRemovedItemListener) {
-            playerRemovedItemListeners.push(fn);
-        },
-
-        onLocalPlayerAddedItem(fn: PlayerAddedItemListener) {
-            playerAddedItemListeners.push(fn);
-        },
-
+        on,
+        ...hooks,
         // on* hooks end
         // get* hooks start
 
@@ -378,85 +344,7 @@ export function createModAPI() {
 
         // _emit* internal hooks start
 
-        _emitGameStart() {
-            for (const fn of gameStartListeners) fn();
-        },
-
-        _emitGameEnd() {
-            for (const fn of gameEndListeners) fn();
-        },
-
-        _emitLocalPlayerDeath() {
-            for (const fn of playerDeathListeners) fn();
-        },
-
-        _emitPlayerShoot() {
-            for (const fn of playerShootListeners) fn();
-        },
-
-        _emitLocalPlayerShoot() {
-            for (const fn of playerLocalShootListeners) fn();
-        },
-
-        _emitLocalPlayerKill() {
-            for (const fn of playerKillListeners) fn();
-        },
-
-        _emitLocalPlayerHeal() {
-            for (const fn of playerHealListeners) fn();
-        },
-
-        _emitLocalPlayerDamage() {
-            for (const fn of playerDamageListeners) fn();
-        },
-
-        _emitLocalPlayerInventoryItemChange() {
-            for (const fn of playerInventoryListeners) fn();
-        },
-
-        _emitLocalPlayerHelmetChange() {
-            for (const fn of playerHelmetListeners) fn();
-        },
-
-        _emitLocalPlayerChestChange() {
-            for (const fn of playerChestListeners) fn();
-        },
-
-        _emitLocalPlayerBackpackChange() {
-            for (const fn of playerBackpackListeners) fn();
-        },
-
-        _emitLocalPlayerOutfitChange() {
-            for (const fn of playerOutfitListeners) fn();
-        },
-
-        _emitLocalPlayerGearChange() {
-            for (const fn of playerGearListeners) fn();
-        },
-
-        _emitLocalPlayerEquippedWeaponChange() {
-            for (const fn of playerEquippedWeaponListeners) fn();
-        },
-
-        _emitLocalPlayerWeaponChange() {
-            for (const fn of playerWeaponListeners) fn();
-        },
-
-        _emitLocalPlayerWeaponAmmoUsed() {
-            for (const fn of playerWeaponUsedAmmoListeners) fn();
-        },
-
-        _emitLocalPlayerWeaponAmmoGained() {
-            for (const fn of playerWeaponGainedAmmoListeners) fn();
-        },
-
-        _emitLocalPlayerRemovedItem() {
-            for (const fn of playerRemovedItemListeners) fn();
-        },
-
-        _emitLocalPlayerAddedItem() {
-            for (const fn of playerAddedItemListeners) fn();
-        },
+        _emit,
 
         // _emit* internal hooks end
 
@@ -601,6 +489,10 @@ export function createModAPI() {
         },
         // _set* internal hooks end
     });
+}
+
+function capitalize(s: string) {
+    return s[0].toUpperCase() + s.slice(1);
 }
 
 export type ModAPI = ReturnType<typeof createModAPI>;

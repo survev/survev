@@ -355,7 +355,7 @@ export class Game {
         this.m_camera.m_setRotationEnabled(this.m_config.get("localRotation")!);
         this.m_playerBarn.anonPlayerNames = this.m_config.get("anonPlayerNames")!;
         this.initialized = true;
-        modAPI._emitGameStart();
+        modAPI._emit("gameStart", undefined);
     }
 
     free() {
@@ -368,7 +368,7 @@ export class Game {
         this.connected = false;
         if (this.initialized) {
             this.initialized = false;
-            modAPI._emitGameEnd();
+            modAPI._emit("gameEnd", undefined);
             this.m_updatePass = false;
             this.m_updatePassDelay = 0;
             this.m_emoteBarn.m_free();
@@ -1402,7 +1402,7 @@ export class Game {
                     // modAPI.getPlayerKills() then it might be undefined when emit fires I think...
                     // either way cant hurt I guess
                     modAPI._setPlayerKills(msg.killerKills);
-                    modAPI._emitLocalPlayerKill();
+                    modAPI._emit("localPlayerKill", undefined);
                 }
 
                 // Add killfeed entry for this kill

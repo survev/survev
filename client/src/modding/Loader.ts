@@ -4,23 +4,24 @@ import { modAPI } from "./ModAPIInstance";
 // put like "fake mods" in here just to make sure the code works
 
 // STRIP_FROM_PROD_CLIENT:START
+
 modAPI.onGameStart(() => {
-    console.log("onGameStart ModAPI hook fired!");
+    console.log("the real onGameStart ModAPI hook fired!");
 });
 
-modAPI.onGameEnd(() => {
+modAPI.on("gameEnd", () => {
     console.log("onGameEnd ModAPI hook fired!");
 });
 
-modAPI.onLocalPlayerDeath(() => {
+modAPI.on("localPlayerDeath", () => {
     console.log("onLocalPlayerDeath ModAPI hook fired!");
 });
 
-modAPI.onPlayerShoot(() => {
+modAPI.on("playerShoot", () => {
     console.log("onPlayerShoot ModAPI hook fired!");
 });
 
-modAPI.onLocalPlayerShoot(() => {
+modAPI.on("localPlayerShoot", () => {
     console.log("onLocalPlayerShoot ModAPI hook fired!");
 });
 
@@ -28,7 +29,7 @@ modAPI.onLocalPlayerShoot(() => {
 // also im gonna stop adding the modAPI.getLocalPlayerTextures because well too much typing...
 // but it will make a return once I actually hook it up
 
-modAPI.onLocalPlayerKill(() => {
+modAPI.on("localPlayerKill", () => {
     console.log("onLocalPlayerKill ModAPI hook fired");
     const totalKills = modAPI.getLocalPlayerKills();
     console.log(
@@ -38,7 +39,7 @@ modAPI.onLocalPlayerKill(() => {
     );
 });
 
-modAPI.onLocalPlayerHeal(() => {
+modAPI.on("localPlayerHeal", () => {
     console.log("onLocalPlayerHeal ModAPI hook fired!");
     const newPlayerHealth = modAPI.getLocalPlayerHealth();
     const playerHealAmount = modAPI.getLocalPlayerHeal();
@@ -59,7 +60,7 @@ modAPI.onLocalPlayerHeal(() => {
     }
 });
 
-modAPI.onLocalPlayerDamage(() => {
+modAPI.on("localPlayerDamage", () => {
     console.log("onLocalPlayerDamage ModAPI hook fired!");
     const newPlayerHealth = modAPI.getLocalPlayerHealth();
     const playerDamageTaken = modAPI.getLocalPlayerDamage();
@@ -76,7 +77,7 @@ modAPI.onLocalPlayerDamage(() => {
 });
 
 // lots of testing time...
-modAPI.onLocalPlayerRemovedItem(() => {
+modAPI.on("localPlayerRemovedItem", () => {
     console.log("onLocalPlayerRemovedItem ModAPI hook fired!");
     const removedItem = modAPI.getLocalPlayerRemovedItem();
     console.log(
@@ -86,7 +87,7 @@ modAPI.onLocalPlayerRemovedItem(() => {
     );
 });
 
-modAPI.onLocalPlayerAddedItem(() => {
+modAPI.on("localPlayerAddedItem", () => {
     console.log("onLocalPlayerAddedItem ModAPI hook fired!");
     const addedItem = modAPI.getLocalPlayerAddedItem();
     console.log(
@@ -96,7 +97,7 @@ modAPI.onLocalPlayerAddedItem(() => {
     );
 });
 
-modAPI.onLocalPlayerGearChange(() => {
+modAPI.on("localPlayerGearChange", () => {
     console.log("onLocalPlayerGearChange ModAPI hook fired!");
     const playerGear = modAPI.getLocalPlayerGear();
     console.log(
@@ -106,7 +107,7 @@ modAPI.onLocalPlayerGearChange(() => {
     );
 });
 
-modAPI.onLocalPlayerWeaponChange(() => {
+modAPI.on("localPlayerWeaponChange", () => {
     console.log("onLocalPlayerWeaponChange ModAPI hook fired!");
     const equippedWeapons = modAPI.getLocalPlayerWeapons();
     console.log(

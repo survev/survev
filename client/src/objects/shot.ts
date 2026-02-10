@@ -116,10 +116,10 @@ export class ShotBarn {
                 // New shot
                 if (shot.ticker == 0) {
                     if (shot.ticker == 0 && shot.playerId === activePlayerId) {
-                        modAPI._emitLocalPlayerShoot();
+                        modAPI._emit("localPlayerShoot", undefined);
                     }
                     if (shot.ticker == 0 && shot.playerId !== activePlayerId) {
-                        modAPI._emitPlayerShoot();
+                        modAPI._emit("playerShoot", undefined);
                     }
                     const player = playerBarn.getPlayerById(shot.playerId);
 
