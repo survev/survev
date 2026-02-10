@@ -30,6 +30,14 @@ const mapDef: PartialMapDef = {
     },
     gameMode: { maxPlayers: 80, sniperMode: true },
     /* STRIP_FROM_PROD_CLIENT:START */
+    gameConfig: {
+        planes: {
+            crates: [
+                { name: "airdrop_crate_01sv", weight: 10 },
+                { name: "airdrop_crate_02sv", weight: 1 },
+            ],
+        },
+    },
     lootTable: {
         tier_scopes: [
             { name: "4xscope", count: 1, weight: 5 },
