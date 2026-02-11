@@ -8,6 +8,7 @@ import type {
     ObstacleDef,
     StructureDef,
 } from "./mapObjectsTyping";
+import { GameConfig, BuildingGroups, MinDistance } from "../gameConfig";
 
 // some errors could be fixed by this but opted to using Partial and casting instead to avoid choking the lsp server
 // type DeepPartial<T> = T extends object ? {
@@ -509,7 +510,7 @@ function createChest<T extends ObstacleDef>(e: Partial<T>): T {
         hitParticle: "woodChip",
         explodeParticle: "woodPlank",
         reflectBullets: false,
-        loot: [tierLoot("tier_chest", 3, 4)],
+        loot: [tierLoot("tier_pirate_treasure", 3, 4)],
         map: { display: false, color: 0x663300, scale: 0.875 },
         terrain: { grass: false, beach: true },
         img: {
@@ -823,7 +824,7 @@ function createDepositBox<T extends ObstacleDef>(e: Partial<T>): T {
         hitParticle: "barrelChip",
         explodeParticle: "depositBoxGreyBreak",
         reflectBullets: true,
-        loot: [tierLoot("tier_world", 1, 1)],
+        loot: [tierLoot("tier_bank_vault_basic", 1, 1), tierLoot("tier_armor", 0, 1), tierLoot("tier_bank_vault_packs", 0, 1)],
         lootSpawn: { offset: v2.create(0, -1), speedMult: 0 },
         map: { display: false, color: 0x663300, scale: 0.875 },
         terrain: { grass: false, beach: true },
@@ -1573,7 +1574,7 @@ function createToilet<T extends ObstacleDef>(e: Partial<T>): T {
         reflectBullets: false,
         hitParticle: "whiteChip",
         explodeParticle: "toiletBreak",
-        loot: [tierLoot("tier_toilet", 2, 3)],
+        loot: [tierLoot("tier_toilet", 2, 3), tierLoot("tier_outfits", 0, 1)],
         map: { display: false, color: 0xb3b3b3, scale: 1 },
         img: {
             sprite: "map-toilet-01.img",
@@ -9174,8 +9175,9 @@ export const MapObjectDefs: Record<string, MapObjectDef> = {
     barrel_01b: createBarrel({
         img: { tint: 0xc9c9c9 },
         loot: [
-            tierLoot("tier_surviv", 2, 3),
+            tierLoot("tier_shotgun_barrel", 1, 1),
             autoLoot("mirv", 1),
+            tierLoot("tier_lvl3_chance", 1, 1),
             autoLoot("mirv", 1),
             autoLoot("mirv", 1),
         ],
@@ -9206,7 +9208,7 @@ export const MapObjectDefs: Record<string, MapObjectDef> = {
     barrel_04: createWoodBarrel({
         collision: collider.createAabbExtents(v2.create(0, 0), v2.create(1.25, 0.5)),
         health: 20,
-        loot: [tierLoot("tier_soviet", 2, 3)],
+        loot: [tierLoot("tier_soviet", 2, 4)],
         img: {
             sprite: "map-barrel-04.img",
             residue: "map-barrel-res-03.img",
@@ -9333,6 +9335,7 @@ export const MapObjectDefs: Record<string, MapObjectDef> = {
     bush_02: createBush({ img: { residue: "map-bush-res-02.img" } }),
     bush_03: createBush({
         img: { sprite: "map-bush-03.img", alpha: 1 },
+        loot: [tierLoot("tier_pink_bush", 1, 1)],
     }),
     bush_04: createBush({
         hitParticle: "leafRiver",
@@ -9465,7 +9468,7 @@ export const MapObjectDefs: Record<string, MapObjectDef> = {
     case_06: createCase({
         health: 140,
         img: { sprite: "map-case-chrys-01.img" },
-        loot: [tierLoot("tier_chest", 2, 3), tierLoot("tier_chrys_case", 1, 1)],
+        loot: [tierLoot("tier_chest_sniper_tea", 1, 1), tierLoot("tier_chest_ar", 1, 2), tierLoot("tier_chest_armor", 0 , 2), tierLoot("tier_chrys_case", 1, 1)],
         hitParticle: "blackChip",
         map: { display: false, color: 0x6b3500, scale: 0.85 },
     }),
@@ -9503,34 +9506,50 @@ export const MapObjectDefs: Record<string, MapObjectDef> = {
     }),
     chest_01: createChest({
         loot: [
-            tierLoot("tier_chest", 3, 4),
+            tierLoot("tier_chest_sniper", 0, 1),
+            tierLoot("tier_chest_ar", 1, 1),
+            tierLoot("tier_chest_armor", 1, 2),
             tierLoot("tier_pirate_melee", 1, 1),
-            tierLoot("tier_pirate_outfits", 1, 1),
+            autoLoot("outfitRoyalFortune", 1),
+            tierLoot("tier_river_pirate", 1, 1),
         ],
     }),
     chest_01cb: createChest({
-        loot: [tierLoot("tier_chest", 3, 4), tierLoot("tier_pirate_melee", 1, 1)],
-    }),
+        loot: [tierLoot("tier_chest_sniper", 0, 1),
+            tierLoot("tier_chest_ar", 2, 2),
+            tierLoot("tier_chest_armor", 1, 2), tierLoot("tier_pirate_melee", 1, 1)],
+        }),
     chest_02: createChest({
         img: { sprite: "map-chest-02.img" },
-        loot: [tierLoot("tier_chest", 2, 2)],
+        loot: [tierLoot("tier_chest_sniper", 0, 1), 
+            tierLoot("tier_chest_ar", 1, 2),
+            tierLoot("tier_chest_armor", 1, 1),],
         map: { display: true, color: 7025920, scale: 0.85 },
     }),
     chest_03: createRiverChest({
         img: { sprite: "map-chest-03.img" },
-        loot: [tierLoot("tier_chest", 3, 5), autoLoot("outfitWaterElem", 1)],
-    }),
+        loot: [tierLoot("tier_chest_sniper", 0, 1),
+            tierLoot("tier_chest_ar", 1, 2),
+            tierLoot("tier_chest_armor", 1, 2), autoLoot("outfitWaterElem", 1),
+            tierLoot("tier_river_pirate", 1, 1)],
+        }),
     chest_03cb: createRiverChest({
         img: { sprite: "map-chest-03.img" },
-        loot: [tierLoot("tier_chest", 3, 5)],
+        loot: [tierLoot("tier_chest_sniper", 0, 1),
+            tierLoot("tier_chest_ar", 2, 3),
+            tierLoot("tier_chest_armor", 1, 2),],
     }),
     chest_03d: createRiverChest({
         img: { sprite: "map-chest-03d.img" },
-        loot: [tierLoot("tier_chest", 3, 5), autoLoot("outfitWaterElem", 1)],
+        loot: [tierLoot("tier_chest_sniper", 0, 1),   
+            tierLoot("tier_chest_ar", 2, 3),
+            tierLoot("tier_chest_armor", 1, 2), autoLoot("outfitWaterElem", 1)],
     }),
     chest_03f: createRiverChest({
         img: { sprite: "map-chest-03f.img" },
-        loot: [tierLoot("tier_chest", 3, 5), autoLoot("outfitKhaki", 1)],
+        loot: [tierLoot("tier_chest_sniper", 0, 1),
+            tierLoot("tier_chest_ar", 2, 3),
+            tierLoot("tier_chest_armor", 1, 2), autoLoot("outfitKhaki", 1)],
     }),
     chest_03sv: createRiverChest({
         img: { sprite: "map-chest-03sv.img" },
@@ -9538,7 +9557,9 @@ export const MapObjectDefs: Record<string, MapObjectDef> = {
     }),
     chest_03x: createRiverChest({
         img: { sprite: "map-chest-03x.img" },
-        loot: [tierLoot("tier_chest", 3, 5), autoLoot("outfitWaterElem", 1)],
+        loot: [tierLoot("tier_chest_sniper", 0, 1),
+            tierLoot("tier_chest_ar", 2, 3),
+            tierLoot("tier_chest_armor", 1, 2), autoLoot("outfitWaterElem", 1)],
     }),
     chest_03tr: createRiverChest({
         img: { sprite: "map-chest-03tr.img" },
@@ -9553,7 +9574,7 @@ export const MapObjectDefs: Record<string, MapObjectDef> = {
             autoLoot("glock_dual", 1),
             autoLoot("smoke", 4),
         ],
-        map: { display: false, color: 0x6b3500, scale: 0.85 },
+        map: { display: false, color: 7025920, scale: 0.85 },
     }),
     chest_04d: createChest({
         health: 200,
@@ -9565,7 +9586,7 @@ export const MapObjectDefs: Record<string, MapObjectDef> = {
             autoLoot("smoke", 4),
             autoLoot("backpack02", 1),
         ],
-        map: { display: false, color: 0x6b3500, scale: 0.85 },
+        map: { display: false, color: 7025920, scale: 0.85 },
     }),
     control_panel_01: createControlPanel({
         collision: collider.createAabbExtents(v2.create(0, 0), v2.create(2.25, 1.7)),
@@ -9855,7 +9876,7 @@ export const MapObjectDefs: Record<string, MapObjectDef> = {
     }),
     crate_08: createCrate({
         health: 140,
-        loot: [tierLoot("tier_surviv", 2, 3)],
+        loot: [tierLoot("tier_utility", 2, 3), tierLoot("tier_grey_crate", 1, 1)],
         map: { display: false },
         terrain: { grass: true, beach: false },
         img: { sprite: "map-crate-08.img" },
@@ -9863,7 +9884,9 @@ export const MapObjectDefs: Record<string, MapObjectDef> = {
     }),
     crate_09: createCrate({
         health: 140,
-        loot: [tierLoot("tier_chest", 1, 2), tierLoot("tier_conch", 1, 1)],
+        loot: [tierLoot("tier_chest_sniper", 0, 1),
+            tierLoot("tier_chest_ar", 2, 2),
+            tierLoot("tier_chest_armor", 1, 2), tierLoot("tier_conch", 1, 1)],
         map: { display: false },
         terrain: { grass: true, beach: false },
         img: { sprite: "map-crate-09.img" },
@@ -9896,6 +9919,26 @@ export const MapObjectDefs: Record<string, MapObjectDef> = {
         },
         sound: { explode: "crate_break_01" },
     } as unknown as Partial<ObstacleDef>),
+    /*EU-Comp Special Supply Drop
+    crate_supply_01: createCrate({
+        health: 100,
+        scale: { destroy: 0.75 },
+        loot: [
+            tierLoot("tier_supply_meds", 4, 5),
+            tierLoot("tier_supply_armor", 3, 5),
+            tierLoot("tier_supply_pistols", 1, 1),
+            tierLoot("tier_supply_scopes", 1, 2),
+            tierLoot("tier_supply_nades", 1, 2),            
+            tierLoot("tier_supply_ammo", 1, 1),
+        ],
+        map: { display: true },
+        img: {
+            sprite: "map-supply-03.img",
+            residue: "map-supply-res-03.img",
+        },
+        sound: { explode: "crate_break_01" },
+    } as unknown as Partial<ObstacleDef>),
+     */
     crate_11: createCrate({
         scale: { destroy: 0.75 },
         health: 200,
@@ -10083,20 +10126,20 @@ export const MapObjectDefs: Record<string, MapObjectDef> = {
     } as unknown as Partial<ObstacleDef>),
     crate_14: createCrate({
         explodeParticle: ["windowBreak", "woodPlank"],
-        loot: [tierLoot("tier_throwables", 1, 1)],
+        loot: [tierLoot("tier_beverage_crate", 1, 1), tierLoot("tier_better_throwables", 0, 1)],
         img: { sprite: "map-crate-14.img" },
         sound: { explode: "window_break_02" },
     }),
     crate_14a: createCrate({
         explodeParticle: ["windowBreak", "woodPlank"],
-        loot: [tierLoot("tier_soviet", 1, 1)],
+        loot: [tierLoot("tier_beverage_crate", 1, 1), tierLoot("tier_better_throwables", 0, 1)],
         img: { sprite: "map-crate-14a.img" },
         sound: { explode: "window_break_02" },
     }),
     crate_15: createCrate({
         collision: collider.createAabbExtents(v2.create(0, 0), v2.create(2.7, 1.25)),
         health: 100,
-        loot: [tierLoot("tier_knives", 4, 4)],
+        loot: [tierLoot("tier_beverage_crate", 1, 1), tierLoot("tier_better_throwables", 0, 1)],
         map: { display: false },
         terrain: { grass: true, beach: true },
         img: { sprite: "map-crate-14.img" },
@@ -10132,7 +10175,7 @@ export const MapObjectDefs: Record<string, MapObjectDef> = {
         health: 75,
         hitParticle: "greenChip",
         explodeParticle: "greenPlank",
-        loot: [tierLoot("tier_armor", 1, 1), tierLoot("tier_world", 1, 1)],
+        loot: [tierLoot("tier_armor", 1, 1), tierLoot("tier_medical", 1, 1), tierLoot("tier_crab", 1, 1)],
         map: { display: true, color: 0x3b452f, scale: 1 },
         terrain: { grass: true, beach: false },
         img: { sprite: "map-crate-20.img" },
@@ -10537,12 +10580,7 @@ export const MapObjectDefs: Record<string, MapObjectDef> = {
     mil_crate_02: createCrate({
         collision: collider.createAabbExtents(v2.create(0, 0), v2.create(2.7, 1.25)),
         health: 100,
-        loot: [
-            autoLoot("ot38", 1),
-            autoLoot("ot38", 1),
-            autoLoot("ot38", 1),
-            autoLoot("ot38", 1),
-        ],
+                loot: [tierLoot("tier_ot_military_crate", 4, 4),],
         map: { display: false },
         terrain: { grass: true, beach: true },
         img: { sprite: "map-crate-mil-02.img" },
@@ -10557,10 +10595,11 @@ export const MapObjectDefs: Record<string, MapObjectDef> = {
         img: { sprite: "map-crate-mil-03.img" },
         sound: { explode: "crate_break_01" },
     }),
+    // club mil crate
     mil_crate_04: createCrate({
         collision: collider.createAabbExtents(v2.create(0, 0), v2.create(2.7, 1.25)),
         health: 100,
-        loot: [tierLoot("tier_guns", 1, 1), tierLoot("tier_throwables", 2, 3)],
+        loot: [tierLoot("tier_ak_military_crate", 1, 1), tierLoot("tier_better_throwables", 1, 2)],
         map: { display: false },
         terrain: { grass: true, beach: true },
         img: { sprite: "map-crate-mil-04.img" },
@@ -10688,12 +10727,12 @@ export const MapObjectDefs: Record<string, MapObjectDef> = {
     },
     deposit_box_01: createDepositBox({
         img: { sprite: "map-deposit-box-01.img" },
-        loot: [tierLoot("tier_world", 1, 1)],
+        loot: [tierLoot("tier_bank_vault_basic", 1, 1), tierLoot("tier_armor", 0, 1)],
     }),
     deposit_box_02: createDepositBox({
         explodeParticle: "depositBoxGoldBreak",
         img: { sprite: "map-deposit-box-02.img" },
-        loot: [tierLoot("tier_soviet", 1, 2), tierLoot("tier_guns", 1, 1)],
+        loot: [tierLoot("tier_bank_vault_gold", 1, 1), tierLoot("tier_armor", 1, 2)],
     }),
     drawers_01: createDrawer({
         img: { sprite: "map-drawers-01.img" },
@@ -10754,7 +10793,7 @@ export const MapObjectDefs: Record<string, MapObjectDef> = {
         img: { sprite: "map-gun-mount-04.img" },
     }),
     gun_mount_05: createGunMount({
-        loot: [autoLoot("m1100", 1)],
+        loot: [autoLoot("spas12", 1)],
         img: { sprite: "map-gun-mount-05.img" },
     }),
     gun_mount_06: createGunMount({
@@ -10771,11 +10810,9 @@ export const MapObjectDefs: Record<string, MapObjectDef> = {
     }),
     locker_03: createLocker({
         img: { sprite: "map-locker-03.img" },
-        loot: [
-            autoLoot("ak47", 1),
-            autoLoot("backpack02", 1),
-            tierLoot("tier_khaki_outfit", 1, 1),
-        ],
+                loot: [tierLoot("tier_ak_locker", 1, 1), 
+                    autoLoot("backpack02", 1), 
+                    tierLoot("tier_scopes", 1, 1)],
     }),
     oven_01: createOven({}),
     piano_01: {
@@ -10851,6 +10888,10 @@ export const MapObjectDefs: Record<string, MapObjectDef> = {
         destructible: true,
     }),
     pot_01: createBottle({}),
+    pot_01purple: createBottle({
+        img: { sprite: "map-pot-01purple.img" },
+        loot: [autoLoot("mkg45", 1)],
+    }),
     pot_02: createBottle({
         img: { sprite: "map-pot-02.img" },
         loot: [autoLoot("spas12", 1)],
@@ -11150,10 +11191,10 @@ export const MapObjectDefs: Record<string, MapObjectDef> = {
             residue: "map-stone-res-01x.img",
         },
     }),
-    stone_02: createStone({
+    stone_02: createStone({ //ak stone
         map: { display: false },
         img: { tint: 0xe5e5e5 },
-        loot: [tierLoot("tier_surviv", 2, 3), autoLoot("ak47", 1)],
+        loot: [tierLoot("tier_surviv", 2, 3), autoLoot("flare_gun_dual", 1)],
     }),
     stone_02sv: createStone({
         map: { display: false },
@@ -11229,7 +11270,7 @@ export const MapObjectDefs: Record<string, MapObjectDef> = {
             sprite: "map-stone-03bh.img",
         },
     }),
-    stone_04: createStone({
+    stone_04: createStone({ //eye stone
         stonePlated: true,
         scale: {
             createMin: 0.8,
@@ -11430,16 +11471,16 @@ export const MapObjectDefs: Record<string, MapObjectDef> = {
     })({}),
     toilet_01: createToilet({
         img: { sprite: "map-toilet-01.img" },
-        loot: [tierLoot("tier_toilet", 2, 3)],
+        loot: [tierLoot("tier_toilet", 2, 3), tierLoot("tier_outfits", 0, 1), tierLoot("tier_playtest", 0, 0)], // checkpoint testing
     }),
     toilet_02: createToilet({
-        img: { sprite: "map-toilet-02.img" },
-        loot: [tierLoot("tier_soviet", 3, 4)],
+        img: { sprite: "map-toilet-02.img" }, 
+        loot: [tierLoot("tier_soviet", 4, 5)],
     }),
     toilet_02b: createToilet({
         img: {
             sprite: "map-toilet-02.img",
-            tint: 0xb4b4b4,
+            tint: 11842740,
         },
         loot: [autoLoot("fireaxe", 1)],
     }),
@@ -11451,7 +11492,7 @@ export const MapObjectDefs: Record<string, MapObjectDef> = {
             sprite: "map-toilet-03.img",
             residue: "map-toilet-res-02.img",
         },
-        loot: [tierLoot("tier_world", 1, 2)],
+        loot: [tierLoot("tier_metal_toilet", 1, 1)],
         sound: {
             bullet: "toilet_metal_bullet",
             punch: "toilet_metal_bullet",
@@ -11466,7 +11507,7 @@ export const MapObjectDefs: Record<string, MapObjectDef> = {
             sprite: "map-toilet-04.img",
             residue: "map-toilet-res-02.img",
         },
-        loot: [tierLoot("tier_soviet", 2, 3)],
+        loot: [tierLoot("tier_metal_toilet", 2, 2)],
         sound: {
             bullet: "toilet_metal_bullet",
             punch: "toilet_metal_bullet",
@@ -11477,6 +11518,7 @@ export const MapObjectDefs: Record<string, MapObjectDef> = {
         collision: collider.createAabbExtents(v2.create(0, 0), v2.create(3, 1)),
         img: { sprite: "map-towelrack-01.img" },
         explodeParticle: ["woodPlank", "clothBreak"],
+        loot: [tierLoot("tier_towel_rack", 1, 2)],
     }),
     tree_01: createTree({}),
     tree_01cb: createTree({
@@ -14983,10 +15025,10 @@ export const MapObjectDefs: Record<string, MapObjectDef> = {
             },
             {
                 type: randomObstacleType({
-                    container_01: 1,
-                    container_02: 1,
-                    container_03: 1,
-                    container_06: 0.08,
+                    container_01: 0.2967,
+                    container_02: 0.2967,
+                    container_03: 0.2967,
+                    container_06: 11,
                 }),
                 pos: v2.create(-37.5, 38),
                 scale: 1,
@@ -15009,7 +15051,7 @@ export const MapObjectDefs: Record<string, MapObjectDef> = {
                     container_01: 1,
                     container_02: 1,
                     container_03: 1,
-                    container_06: 0.08,
+                    //container_06: 0.08,
                 }),
                 pos: v2.create(-37.5, -15),
                 scale: 1,
@@ -15047,7 +15089,7 @@ export const MapObjectDefs: Record<string, MapObjectDef> = {
                     container_02: 1,
                     container_03: 1,
                     container_05: 2,
-                    container_06: 0.08,
+                    //container_06: 0.08,
                     "": 0.75,
                 }),
                 pos: v2.create(-6, -29),
@@ -15060,7 +15102,7 @@ export const MapObjectDefs: Record<string, MapObjectDef> = {
                     container_02: 1,
                     container_03: 1,
                     container_05: 2,
-                    container_06: 0.08,
+                    //container_06: 0.08,
                     "": 0.75,
                 }),
                 pos: v2.create(9.5, -29),
@@ -15097,7 +15139,7 @@ export const MapObjectDefs: Record<string, MapObjectDef> = {
                     container_02: 1,
                     container_03: 1,
                     container_05: 2,
-                    container_06: 0.08,
+                    //container_06: 0.08,
                     "": 0.75,
                 }),
                 pos: v2.create(-3, 22),
@@ -15116,7 +15158,7 @@ export const MapObjectDefs: Record<string, MapObjectDef> = {
                     container_02: 1,
                     container_03: 1,
                     container_05: 2,
-                    container_06: 0.08,
+                    //container_06: 0.08,
                     "": 0.75,
                 }),
                 pos: v2.create(-3, 33),
@@ -15147,7 +15189,7 @@ export const MapObjectDefs: Record<string, MapObjectDef> = {
                     container_02: 1,
                     container_03: 1,
                     container_05: 2,
-                    container_06: 0.08,
+                    //container_06: 0.08,
                     "": 0.75,
                 }),
                 pos: v2.create(53, 22),
@@ -15166,7 +15208,7 @@ export const MapObjectDefs: Record<string, MapObjectDef> = {
                     container_02: 1,
                     container_03: 1,
                     container_05: 2,
-                    container_06: 0.08,
+                    //container_06: 0.08,
                     "": 0.75,
                 }),
                 pos: v2.create(53, 33),
@@ -15185,7 +15227,7 @@ export const MapObjectDefs: Record<string, MapObjectDef> = {
                     container_02: 1,
                     container_03: 1,
                     container_05: 2,
-                    container_06: 0.08,
+                    //container_06: 0.08,
                     "": 0.75,
                 }),
                 pos: v2.create(86.425, 27.5),
@@ -30047,7 +30089,7 @@ export const MapObjectDefs: Record<string, MapObjectDef> = {
             },
         ],
     }),
-    container_06: createContainer({
+    container_06: createContainer({ //sv container
         open: false,
         tint: 0xba9500,
         ceilingSprite: "map-building-container-ceiling-01.img",
@@ -30099,13 +30141,24 @@ export const MapObjectDefs: Record<string, MapObjectDef> = {
         type: "loot_spawner",
         loot: [tierLoot("tier_woodaxe", 1, 1)],
     },
-    // loot_tier_fireaxe: {
-    //     type: "loot_spawner",
-    //     loot: [tierLoot("tier_fireaxe", 1, 1)],
-    // },
+    loot_tier_crossing: {
+        type: "loot_spawner",
+        loot: [
+            tierLoot("tier_crossing", 1, 1),
+            tierLoot("tier_fireaxe", 1, 1)
+        ],
+    },
+    loot_tier_fireaxe: {
+         type: "loot_spawner",
+         loot: [tierLoot("tier_fireaxe", 1, 1)],
+    },
     loot_tier_stonehammer: {
         type: "loot_spawner",
         loot: [tierLoot("tier_stonehammer", 1, 1)],
+    },
+    loot_tier_sledgehammer: {
+        type: "loot_spawner",
+        loot: [tierLoot("tier_sledgehammer", 1, 1)],
     },
     loot_tier_barn_melee: {
         type: "loot_spawner",
@@ -30151,10 +30204,10 @@ export const MapObjectDefs: Record<string, MapObjectDef> = {
         type: "loot_spawner",
         loot: [tierLoot("tier_spetsnaz_outfit", 1, 1)],
     },
-    // loot_tier_eye_01: {
-    //     type: "loot_spawner",
-    //     loot: [tierLoot("tier_eye_01", 1, 1)],
-    // },
+    loot_tier_eye_01: {
+         type: "loot_spawner",
+         loot: [tierLoot("tier_eye_01", 1, 1)],
+    },
     loot_tier_eye_02: {
         type: "loot_spawner",
         loot: [tierLoot("tier_eye_02", 1, 1)],

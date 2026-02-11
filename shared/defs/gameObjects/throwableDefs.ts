@@ -150,7 +150,7 @@ export const ThrowableDefs: Record<string, ThrowableDef> = {
         playerCollision: false,
         fuseTime: 4,
         aimDistance: 0,
-        rad: 1,
+        rad: 1.4,
         throwPhysics: {
             playerVelMult: 0.6,
             velZ: 5,
@@ -158,7 +158,7 @@ export const ThrowableDefs: Record<string, ThrowableDef> = {
             spinVel: 10 * Math.PI,
             spinDrag: 1,
         },
-        numSplit: 6,
+        numSplit: 8,
         splitType: "mirv_mini",
         speed: { equip: 0, attack: 0 },
         lootImg: {

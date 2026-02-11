@@ -160,6 +160,10 @@ export interface BuildingDef {
         alpha: number;
         tint: number;
     }>;
+    group?:{
+        id: number;
+        minDistance?: number;
+    };
     teamId?: number;
 }
 

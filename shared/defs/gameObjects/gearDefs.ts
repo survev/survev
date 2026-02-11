@@ -47,7 +47,7 @@ const ChestDefs: Record<string, ChestDef> = {
         level: 2,
         damageReduction: 0.38,
         skinImg: {
-            baseTint: 0x4b4b4b,
+            baseTint: 4934475,
             baseSprite: "player-armor-base-01.img",
         },
         lootImg: {
@@ -67,7 +67,7 @@ const ChestDefs: Record<string, ChestDef> = {
         level: 3,
         damageReduction: 0.45,
         skinImg: {
-            baseTint: 0x000,
+            baseTint: 0,
             baseSprite: "player-armor-base-01.img",
         },
         lootImg: {
@@ -88,7 +88,7 @@ const ChestDefs: Record<string, ChestDef> = {
         level: 4,
         damageReduction: 0.6,
         skinImg: {
-            baseTint: 0x1c2e06,
+            baseTint: 1846790,
             baseSprite: "player-armor-base-01.img",
         },
         lootImg: {

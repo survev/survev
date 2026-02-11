@@ -20,6 +20,11 @@ export enum DamageType {
     Gas,
     Airdrop,
     Airstrike,
+    filip,
+    deathalls,
+    tenno,
+    Spectator, // used when a player joins as a spectator
+    Disconnect,
 }
 
 export enum Action {
@@ -68,6 +73,7 @@ export enum Anim {
 export enum Plane {
     Airdrop,
     Airstrike,
+    SupplyDrop,
 }
 
 export enum HasteType {
@@ -76,6 +82,24 @@ export enum HasteType {
     Takedown,
     Inspire,
     Count,
+}
+
+export enum BuildingGroups {
+    //Bank, Police, Mansion
+    POIs = 1,
+    //Club, Docs
+    SVSpawns = 2,
+    // Teahouses
+    SniperSpawns = 3,
+    // Hydra bunker, Greenhouse, Storm Bunker
+    BunkerSpawns = 4,
+};
+
+export enum MinDistance {
+    POIs = 250,
+    BunkerSpawns = 250,
+    SVSpawns = 300,
+    SniperSpawns = 300,
 }
 
 export enum Input {
@@ -142,6 +166,17 @@ export const GameConfig = {
         shoreVariation: 3,
         grassVariation: 2,
     },
+    serverSettings:{
+        serverName: "eu-comp", // server saved in the player stats
+        freezeTime: 10, // time until players can move after game start
+        airdropMinDistance: 300, // minimum distance between airdrops
+
+        //SCRIMS SETTINGS
+
+        scrimsFreezeTime: 20, //purely used for freeze
+        scrimsJoinTime: 30, //time until players can join (recommended to be > than scrimsFreeze time)
+        scrims: false, //bigger map more buildings
+    },
     player: {
         radius: 1,
         maxVisualRadius: 3.75,
@@ -156,7 +191,7 @@ export const GameConfig = {
         scopeDelay: 0.25,
         baseSwitchDelay: 0.25,
         freeSwitchCooldown: 1,
-        headshotChance: 0.15,
+        headshotChance: 0.00,
         moveSpeed: 12,
         waterSpeedPenalty: 3,
         cookSpeedPenalty: 3,
@@ -171,8 +206,8 @@ export const GameConfig = {
         reviveRange: 5,
         crawlTime: 0.75,
         teammateSpawnRadius: 5, // radius of circle that teammates spawn inside of, relative to the first player on the team to join
-        emoteSoftCooldown: 2,
-        emoteHardCooldown: 6,
+        emoteSoftCooldown: 0,
+        emoteHardCooldown: 0,
         emoteThreshold: 6,
         throwableMaxMouseDist: 18,
         cookTime: 0.1,
@@ -182,9 +217,20 @@ export const GameConfig = {
         medicHealRange: 8,
         medicReviveRange: 6,
         spectateDeadTimeout: 2,
-        killLeaderMinKills: 3,
-        minSpawnRad: 25,
+        killLeaderMinKills: 1,
         perkModeRoleSelectDuration: 20,
+
+        edgeBuffer: 150, // distance to maps border (to prevent pakistani spawns)
+        centerNoSpawnRadius: 170, // no spawn zone in the center of the map
+        minSpawnRad: 400, // spawn radius away from alive players
+        minPosSpawnRad: 100, // spawn radius from other spawn locations
+        
+        //boost decay settings to disable boostDecayAmount -> 0
+        boostDecayDistance: 10, // distance player has to move to not decay boost
+        boostDecayTime: 6000, // time in ms until boost decays
+        boostDecayAmount: 1.5, // amount of boost to decay per boostDecayDistance
+        camperPunishment: true, // if true, player will have enhanced decay for boostDecayTime after not moving for boostDecayTime
+        boostPunishmentTime: 5000, // time in ms after boost decay to punish player for not moving
 
         /* STRIP_FROM_PROD_CLIENT:START */
         defaultItems: {
@@ -359,11 +405,11 @@ export const GameConfig = {
             "15xscope": 104,
         } as Record<string, number>,
         mobile: {
-            "1xscope": 32,
-            "2xscope": 40,
-            "4xscope": 48,
-            "8xscope": 64,
-            "15xscope": 88,
+            "1xscope": 24,
+            "2xscope": 33,
+            "4xscope": 42,
+            "8xscope": 68,
+            "15xscope": 104,
         } as Record<string, number>,
     },
     bagSizes: {
@@ -374,7 +420,7 @@ export const GameConfig = {
         "50AE": [49, 98, 147, 196],
         "308sub": [10, 20, 40, 80],
         flare: [2, 4, 6, 8],
-        "45acp": [90, 180, 240, 300],
+        "45acp": [150, 300, 420, 540],
         frag: [3, 6, 9, 12],
         smoke: [3, 6, 9, 12],
         strobe: [2, 3, 4, 5],
