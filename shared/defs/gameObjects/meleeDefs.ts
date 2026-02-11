@@ -1057,7 +1057,7 @@ const BaseDefs: Record<string, MeleeDef> = {
         sound: {
             pickup: "frag_pickup_01",
             swing: "knife_swing_01",
-            deploy: "frag_pickup_01",
+            deploy: "stow_weapon_01",
             playerHit: "crowbar_hit_01",
         },
         lootImg: {
