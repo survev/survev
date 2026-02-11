@@ -111,10 +111,10 @@ export enum Input {
     ToggleMap,
     CycleUIMode,
     EmoteMenu,
-    TeamPingMenu,
+    TeamPingHold,
     Fullscreen,
     HideUI,
-    TeamPingSingle,
+    TeamPingMenu,
     Count,
 }
 
