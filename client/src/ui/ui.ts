@@ -1145,6 +1145,8 @@ export class UiManager {
                     if (playerStatus.role == "leader") {
                         // Use a special color if they are a faction leader
                         tint = 0x00ff00;
+                    } else if (playerStatus.role == "captain") {
+                        tint = 0x7b00ff;
                     } else if (activePlayerInfo.groupId == playerInfo.groupId) {
                         // Use group color
                         tint = playerBarn.getGroupColor(playerId);

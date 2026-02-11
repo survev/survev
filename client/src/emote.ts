@@ -633,7 +633,9 @@ export class EmoteBarn {
                     const playerStatus = this.playerBarn.getPlayerStatus(ping.playerId);
                     if (
                         playerStatus &&
-                        (playerStatus.role == "leader" || playerStatus.role == "captain")
+                        (playerStatus.role == "leader" ||
+                            playerStatus.role == "captain" ||
+                            playerStatus.role == "last_man")
                     ) {
                         pingSound = pingData.soundLeader!;
                     }

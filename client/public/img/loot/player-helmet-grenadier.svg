@@ -1,18 +1,18 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <svg
-   xmlns:dc="http://purl.org/dc/elements/1.1/"
-   xmlns:cc="http://creativecommons.org/ns#"
-   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
-   xmlns:svg="http://www.w3.org/2000/svg"
-   xmlns="http://www.w3.org/2000/svg"
-   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
-   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
    width="176"
    height="176"
    version="1.1"
    id="svg31"
-   sodipodi:docname="player-helmet-demo_faction.svg"
-   inkscape:version="0.92.2 (5c3e80d, 2017-08-06)">
+   sodipodi:docname="player-helmet-grenadie-2.svg"
+   inkscape:version="1.3.2 (091e20e, 2023-11-25)"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:dc="http://purl.org/dc/elements/1.1/">
   <metadata
      id="metadata35">
     <rdf:RDF>
@@ -34,23 +34,30 @@
      guidetolerance="10"
      inkscape:pageopacity="0"
      inkscape:pageshadow="2"
-     inkscape:window-width="1920"
-     inkscape:window-height="1017"
+     inkscape:window-width="1472"
+     inkscape:window-height="891"
      id="namedview33"
      showgrid="true"
-     inkscape:zoom="1.3409091"
-     inkscape:cx="-154.56844"
-     inkscape:cy="139.07788"
-     inkscape:window-x="1912"
-     inkscape:window-y="-8"
-     inkscape:window-maximized="1"
-     inkscape:current-layer="svg31">
+     inkscape:zoom="2.6818182"
+     inkscape:cx="38.966101"
+     inkscape:cy="104.22034"
+     inkscape:window-x="0"
+     inkscape:window-y="37"
+     inkscape:window-maximized="0"
+     inkscape:current-layer="svg31"
+     inkscape:showpageshadow="0"
+     inkscape:pagecheckerboard="0"
+     inkscape:deskcolor="#d1d1d1">
     <inkscape:grid
        type="xygrid"
        id="grid4685"
        empspacing="4"
        spacingy="1"
-       spacingx="1" />
+       spacingx="1"
+       originx="0"
+       originy="0"
+       units="px"
+       visible="true" />
   </sodipodi:namedview>
   <defs
      id="defs25">
@@ -63,6 +70,15 @@
          stroke-width="12.537"
          id="path2" />
     </clipPath>
+    <clipPath
+       id="e-8">
+      <path
+         d="m 188,128 c 0,80 -69.756,119.362 -69.756,119.362 C 64,244 8.638,193.922 8.638,128 8.638,62.078 64,12 118.244,8.638 118.244,8.638 188,48 188,128 Z"
+         fill="#252525"
+         fill-opacity="0.601"
+         stroke-width="12.537"
+         id="path2-06" />
+    </clipPath>
   </defs>
   <path
      d="m 188,128 c 0,80 -69.756,119.362 -69.756,119.362 C 64,244 8.638,193.922 8.638,128 8.638,62.078 64,12 118.244,8.638 118.244,8.638 188,48 188,128 Z"
@@ -70,11 +86,10 @@
      transform="matrix(0.52122,0,0,0.52122,24.170001,21.284)"
      id="path27"
      inkscape:connector-curvature="0"
-     style="fill:#2d2d2d;stroke:#090909;stroke-width:37.25899887" />
+     style="fill:#2d2d2d;stroke:#090909;stroke-width:37.259" />
   <path
-     style="fill:#fff00f;fill-opacity:1;stroke:#090909;stroke-width:6;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1;paint-order:normal"
-     d="m 51.57454,96 h 12.98479 4.795327 A 18.04554,18.04554 0 0 0 86.187966,107.55401 18.04554,18.04554 0 0 0 104.23438,89.507605 18.04554,18.04554 0 0 0 86.187966,71.461202 18.04554,18.04554 0 0 0 69.37368,83.015209 H 64.55933 V 65.702155 L 51.57454,78.686946 v 4.328263 z"
-     id="rect4687"
-     inkscape:connector-curvature="0"
-     clip-path="none" />
+     id="path68"
+     style="fill:#fff00f;fill-opacity:1;fill-rule:evenodd;stroke:#000000;stroke-width:6;stroke-linecap:square;stroke-linejoin:miter;stroke-dasharray:none;stroke-opacity:1;paint-order:normal"
+     d="m 52.010625,100.83865 10.50255,-6.705512 h 7.0028 c 2.71101,6.298552 8.86774,10.377112 15.67752,10.385712 9.451675,-3e-5 17.113665,-7.725512 17.113535,-17.255295 -3e-5,-9.529646 -7.662,-17.254926 -17.113535,-17.254976 -6.81556,0.0022 -12.98018,4.081565 -15.69362,10.385379 h -3.19042 l -0.0171,-12.918311 -14.28067,10.671479 z"
+     sodipodi:nodetypes="ccccccccccc" />
 </svg>
