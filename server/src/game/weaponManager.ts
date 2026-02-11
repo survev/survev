@@ -303,7 +303,7 @@ export class WeaponManager {
             this.weapons[i].recoilTime -= dt;
         }
 
-        if (this.weapons[this.curWeapIdx].cooldown <= 0 && this.scheduledReload) {
+        if (/*this.weapons[this.curWeapIdx].cooldown <= 0 &&*/ this.scheduledReload) {
             this.scheduledReload = false;
             this.tryReload();
         }
