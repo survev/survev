@@ -73,10 +73,10 @@ class AirDrop implements AbstractObject {
     }
 }
 export class AirdropBarn {
-    airdropPool = new Pool(AirDrop);
+    m_airdropPool = new Pool(AirDrop);
 
     m_free() {
-        const airdrops = this.airdropPool.m_getPool();
+        const airdrops = this.m_airdropPool.m_getPool();
         for (let i = 0; i < airdrops.length; i++) {
             airdrops[i].m_free();
         }
@@ -91,7 +91,7 @@ export class AirdropBarn {
         renderer: Renderer,
         audioManager: AudioManager,
     ) {
-        const airdrops = this.airdropPool.m_getPool();
+        const airdrops = this.m_airdropPool.m_getPool();
         for (let i = 0; i < airdrops.length; i++) {
             const airdrop = airdrops[i];
             if (!airdrop.active) {

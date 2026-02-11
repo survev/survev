@@ -151,16 +151,16 @@ export class DebugHUD {
                 addCount(name, pool.m_activeCount, pool.m_getPool().length);
             };
 
-            addPool("Players", game.m_playerBarn.playerPool);
-            addPool("Loot", game.m_lootBarn.lootPool);
-            addPool("Projectiles", game.m_projectileBarn.projectilePool);
+            addPool("Players", game.m_playerBarn.m_playerPool);
+            addPool("Loot", game.m_lootBarn.m_lootPool);
+            addPool("Projectiles", game.m_projectileBarn.m_projectilePool);
             addPool("Obstacles", game.m_map.m_obstaclePool);
             addPool("Buildings", game.m_map.m_buildingPool);
             addPool("Structures", game.m_map.m_structurePool);
-            addPool("Decals", game.m_decalBarn.decalPool);
-            addPool("Dead Bodies", game.m_deadBodyBarn.deadBodyPool);
+            addPool("Decals", game.m_decalBarn.m_decalPool);
+            addPool("Dead Bodies", game.m_deadBodyBarn.m_deadBodyPool);
             addPool("Smoke", game.m_smokeBarn.m_smokePool);
-            addPool("Airdrops", game.m_airdropBarn.airdropPool);
+            addPool("Airdrops", game.m_airdropBarn.m_airdropPool);
 
             const activeParticles = game.m_particleBarn.particles.filter(
                 (p) => p.active,
