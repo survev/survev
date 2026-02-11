@@ -3,6 +3,7 @@ import { Main } from "./maps/baseDefs";
 import { Beach } from "./maps/beachDefs";
 import { Birthday } from "./maps/birthdayDefs";
 import { Cobalt } from "./maps/cobaltDefs";
+import { Comp } from "./maps/compDefs";
 import { Desert } from "./maps/desertDefs";
 import { Faction } from "./maps/factionDefs";
 import { Halloween } from "./maps/halloweenDefs";
@@ -34,7 +35,8 @@ export type Atlas =
     | "cobalt"
     | "savannah"
     | "turkey"
-    | "beach";
+    | "beach"
+    | "comp";
 
 export const MapDefs = {
     main: Main,
@@ -55,6 +57,7 @@ export const MapDefs = {
     turkey: Turkey,
     birthday: Birthday,
     beach: Beach,
+    comp: Comp,
 
     /* STRIP_FROM_PROD_CLIENT:START */
     test_normal: testNormal,

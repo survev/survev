@@ -11191,7 +11191,7 @@ export const MapObjectDefs: Record<string, MapObjectDef> = {
             residue: "map-stone-res-01x.img",
         },
     }),
-    stone_ak: createStone({ //formally stone_02
+    stone_02: createStone({ //ak stone
         map: { display: false },
         img: { tint: 0xe5e5e5 },
         loot: [tierLoot("tier_surviv", 2, 3), autoLoot("flare_gun_dual", 1)],
@@ -11270,7 +11270,7 @@ export const MapObjectDefs: Record<string, MapObjectDef> = {
             sprite: "map-stone-03bh.img",
         },
     }),
-    stone_eye: createStone({ //formally stone_04
+    stone_04: createStone({ //eye stone
         stonePlated: true,
         scale: {
             createMin: 0.8,
