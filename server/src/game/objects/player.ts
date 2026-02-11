@@ -2512,7 +2512,14 @@ export class Player extends BaseGameObject {
         const planes = this.game.planeBarn.planes;
         for (let i = 0; i < planes.length; i++) {
             const plane = planes[i];
-            if (coldet.testCircleAabb(plane.pos, plane.rad, rect.min, rect.max)) {
+            if (
+                coldet.testCircleAabb(plane.pos, plane.rad, rect.min, rect.max) &&
+                coldet.testPointAabb(
+                    plane.pos,
+                    this.game.planeBarn.planeBounds.min,
+                    this.game.planeBarn.planeBounds.max,
+                )
+            ) {
                 updateMsg.planes.push(plane);
             }
         }
