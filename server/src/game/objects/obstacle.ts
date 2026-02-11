@@ -508,7 +508,8 @@ export class Obstacle extends BaseGameObject {
                 let collision: Collider | undefined = undefined;
                 if (obj.isDoor) {
                     collision = collider.createCircle(obj.pos, 0.5);
-                } else if (obj.type.includes("window_open")) {
+                } else if (obj.height == 0.2 && obj.isWall && !obj.destructible) {
+                    // broken windows
                     collision = obj.collider;
                 }
                 if (!collision) continue;
