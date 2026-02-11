@@ -705,7 +705,7 @@ export class GameMap {
 
                 const generated = this.genBridge(
                     bridgeType,
-                    this.terrain.rivers[0],
+                    this.normalRivers[0],
                     riverT,
                 );
 
