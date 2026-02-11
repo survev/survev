@@ -342,13 +342,6 @@ const mapDef: PartialMapDef = {
             { name: "scout_elite", count: 1, weight: 2.5 },
             { name: "vss", count: 1, weight: 2.5 }, // !
         ],
-        tier_ghillie: [
-            {
-                name: "outfitGhillie",
-                count: 1,
-                weight: 0.5,
-            },
-        ],
         tier_airdrop_outfits: [
             { name: "", count: 1, weight: 25 },
             { name: "outfitHeaven", count: 1, weight: 1 },

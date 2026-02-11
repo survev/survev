@@ -46,13 +46,6 @@ const mapDef: PartialMapDef = {
             { name: "tier_katanas", count: 1, weight: 3 }, // ?
             { name: "naginata", count: 1, weight: 1 }, // ?
         ],
-        tier_ghillie: [
-            {
-                name: "outfitGhillie",
-                count: 1,
-                weight: 1,
-            },
-        ],
     },
     mapGen: {
         customSpawnRules: {

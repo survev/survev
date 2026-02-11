@@ -10,20 +10,25 @@ describe.for(maps)("Map %s", (map) => {
     const mapDef: MapDef = MapDefs[map as keyof typeof MapDefs];
 
     describe("Loot Tables", () => {
-        test.for(Object.entries(mapDef.lootTable))("Loot table $0", ([, table]) => {
-            const itemsSet = new Set();
-            for (const item of table) {
-                itemsSet.add(item.name);
-                if (item.name.startsWith("tier_")) {
-                    expect(item.name).toBeValidLootTier();
-                } else if (item.name !== "") {
-                    expect(item.name).toBeValidLoot();
+        test.for(Object.entries(mapDef.lootTable))(
+            "Loot table $0",
+            ([tableId, table]) => {
+                const itemsSet = new Set();
+                for (const item of table) {
+                    itemsSet.add(item.name);
+                    if (item.name.startsWith("tier_")) {
+                        expect(item.name).toBeValidLootTier();
+                    } else if (item.name !== "") {
+                        expect(item.name).toBeValidLoot();
+                    }
                 }
-            }
-            expect(itemsSet.size, "Loot table must not have duplicated items").toBe(
-                table.length,
-            );
-        });
+                expect(itemsSet.size, "Loot table must not have duplicated items").toBe(
+                    table.length,
+                );
+
+                expect(tableId).toBeValidLootTier();
+            },
+        );
     });
 
     describe("Airdrop Crates", () => {

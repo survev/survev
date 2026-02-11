@@ -96,7 +96,7 @@ const mapDef: PartialMapDef = {
             { name: "4xscope", count: 1, weight: 0.5 },
             { name: "8xscope", count: 1, weight: 0.25 },
         ],
-        tier_airdrop_throwable: [{ name: "coconut", count: 4, weight: 1 }],
+        tier_airdrop_throwables: [{ name: "coconut", count: 4, weight: 1 }],
         tier_pirate_melee: [
             { name: "hook", count: 1, weight: 1 },
             { name: "cutlass", count: 1, weight: 2 },
