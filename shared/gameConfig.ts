@@ -169,7 +169,7 @@ export const GameConfig = {
     serverSettings:{
         serverName: "eu-comp", // server saved in the player stats
         freezeTime: 10,
-        joinTime: 60, // time until players can move after game start
+        joinTime: 30, // time until players can move after game start
         airdropMinDistance: 300, // minimum distance between airdrops
 
         //SCRIMS SETTINGS

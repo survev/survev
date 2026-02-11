@@ -2148,9 +2148,9 @@ export class GameMap {
                     if (group && player.groupId === group.id) continue;
                     if (team && player.teamId === team.id) continue;
 
-                    /*if (v2.distance(player.pos, pos) < GameConfig.player.minSpawnRad) {
+                    if (v2.distance(player.pos, pos) < GameConfig.player.minSpawnRad) {
                         return false;
-                    }*/
+                    }
                 }
 
                 // prevent players from spawning bellow airdrops or grenades

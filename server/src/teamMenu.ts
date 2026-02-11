@@ -431,7 +431,6 @@ export class TeamMenu {
                 const ip = getHonoIp(c, Config.apiServer.proxyIPHeader);
 
                 let closeReason: TeamMenuErrorType | undefined;
-                console.log(ip);
                 if (
                     !ip ||
                     httpRateLimit.isRateLimited(ip) ||
