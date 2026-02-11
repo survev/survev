@@ -1837,6 +1837,12 @@ export class Player extends BaseGameObject {
         //
         const movement = v2.create(0, 0);
 
+        let freezeTimer = GameConfig.serverSettings.freezeTime;
+        if(this.game.startedTime <= freezeTimer && freezeTimer != 0){
+            return;
+        }
+
+
         if (this.touchMoveActive && this.touchMoveLen) {
             movement.x = this.touchMoveDir.x;
             movement.y = this.touchMoveDir.y;
@@ -2674,6 +2680,7 @@ export class Player extends BaseGameObject {
             params.damageType !== GameConfig.DamageType.Airdrop
         ) {
             const gameSourceDef = GameObjectDefs[params.gameSourceType ?? ""];
+            /*
             let isHeadShot = false;
 
             if (gameSourceDef && "headshotMult" in gameSourceDef && !params.isExplosion) {
@@ -2683,6 +2690,7 @@ export class Player extends BaseGameObject {
                     finalDamage *= gameSourceDef.headshotMult;
                 }
             }
+                */
 
             if (this.hasPerk("flak_jacket")) {
                 reduceDamage(
@@ -2697,13 +2705,13 @@ export class Player extends BaseGameObject {
             }
 
             const chest = GameObjectDefs[this.chest] as ChestDef;
-            if (chest && !isHeadShot) {
+            if (chest /*&& !isHeadShot*/) {
                 reduceDamage(chest.damageReduction);
             }
 
             const helmet = GameObjectDefs[this.helmet] as HelmetDef;
             if (helmet) {
-                reduceDamage(helmet.damageReduction * (isHeadShot ? 1 : 0.3));
+                reduceDamage(helmet.damageReduction * (/*isHeadShot ? 1 :*/ 0.6));
             }
         }
 
@@ -3756,7 +3764,7 @@ export class Player extends BaseGameObject {
 
         const def = GameObjectDefs[obj.type];
         if (
-            (this.actionType == GameConfig.Action.UseItem && def.type != "gun") ||
+            /*(this.actionType == GameConfig.Action.UseItem && def.type != "gun") ||*/
             this.actionType == GameConfig.Action.Revive
         )
             return;
