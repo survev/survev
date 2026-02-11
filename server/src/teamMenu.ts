@@ -431,6 +431,7 @@ export class TeamMenu {
                 const ip = getHonoIp(c, Config.apiServer.proxyIPHeader);
 
                 let closeReason: TeamMenuErrorType | undefined;
+                console.log(ip);
                 if (
                     !ip ||
                     httpRateLimit.isRateLimited(ip) ||
@@ -442,8 +443,6 @@ export class TeamMenu {
                 if (await isBanned(ip!)) {
                     closeReason = "banned";
                 }
-
-                wsRateLimit.ipConnected(ip!);
 
                 let userId: string | null = null;
                 const sessionId = getCookie(c, "session") ?? null;
@@ -465,6 +464,8 @@ export class TeamMenu {
                 if (!closeReason && (await isBehindProxy(ip!, userId ? 0 : 3))) {
                     closeReason = "behind_proxy";
                 }
+
+                if(!closeReason && ip) wsRateLimit.ipConnected(ip!);
 
                 return {
                     onOpen(_event, ws) {
