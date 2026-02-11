@@ -169,23 +169,23 @@ a:active {
 
 #start-row-header {
   /* Main menu logo, don't forget there's also game over logo in game.css */
-  background-image: url(/img/survev_logo_full.png);
+  background-image: url(/img/survev-de_logo_full.png);
   background-repeat: no-repeat;
   /* In case of logo change, update this value to width divided by 2 ceiled  */
-  background-size: 396px;
+  background-size: 500px;
   background-position: center;
-  height: 140px;
+  height: 300px;
   margin: auto;
   margin-top: 75px;
-  margin-bottom: 42px;
+  margin-bottom: 0px;
   position: relative;
   /* In case of logo change, update this value to width divided by 2 ceiled  */
-  width: 396px;
+  width: 500px;
 }
 
 /* Russian locale logo */
 #start-row-header.lang-ru {
-  background-image: url(/img/survev_logo_full_ru.png);
+  background-image: url(/img/survev-de_logo_full.png);
 }
 
 @media (max-width: 850px), (max-width: 900px) and (min-resolution: 3dppx) {
