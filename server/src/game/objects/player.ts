@@ -1371,10 +1371,14 @@ export class Player extends BaseGameObject {
 
         this.bot = Config.debug.allowBots && joinMsg.bot;
 
-        let defaultItems = GameConfig.player.defaultItems;
+        let defaultItems = (this.game.map.mapDef.defaultItems || GameConfig.player.defaultItems);
 
         if (!this.bot) {
-            defaultItems = this.game.playerBarn.defaultItems;
+            defaultItems = util.mergeDeep(
+                {},
+                (this.game.map.mapDef.defaultItems || GameConfig.player.defaultItems),
+                Config.defaultItems,
+            );
         }
 
         // createCircle clones the position
@@ -1422,9 +1426,17 @@ export class Player extends BaseGameObject {
         assertType(this.outfit, "outfit", false);
 
         for (const perk of defaultItems.perks) {
-            assertType(perk.type, "perk", false);
-            this.addPerk(perk.type, perk.droppable);
+            const perkType = typeof perk === "string" ? perk : "type" in perk ? perk.type : perk();
+            const droppable = typeof perk === "object" && "droppable" in perk ? perk.droppable : false;
+            assertType(perkType, "perk", false);
+            this.addPerk(perkType, droppable);
         }
+
+        //if indicator true assign role
+        if(this.game.map.mapDef.gameMode.indicator ?? false) {
+            this.promoteToRole("indicator");
+        }
+
 
         for (const [item, amount] of Object.entries(defaultItems.inventory)) {
             this.invManager.set(item as InventoryItem, amount);
@@ -1517,16 +1529,19 @@ export class Player extends BaseGameObject {
         //
         // Boost logic
         //
+        const unlimitedAdren = this.game.map.mapDef.gameMode.unlimitedAdren ?? false;
         if (!this.downed) {
+            if(unlimitedAdren) this.boost = 100;
             if (this.boost > 0 && this.boost <= 25) this.health += 0.5 * dt;
             else if (this.boost >= 25 && this.boost <= 50) this.health += 1.25 * dt;
             else if (this.boost >= 50 && this.boost <= 87.5) this.health += 1.5 * dt;
             else if (this.boost >= 87.5 && this.boost <= 100) this.health += 1.75 * dt;
 
-            this.boost -= 0.375 * dt;
+            if (!unlimitedAdren)this.boost -= 0.375 * dt;
 
             this.boost = math.clamp(this.boost, this.minBoost, 100);
         } else {
+            if (!unlimitedAdren)
             this.boost = 0;
         }
 
@@ -1837,7 +1852,7 @@ export class Player extends BaseGameObject {
         //
         const movement = v2.create(0, 0);
 
-        let freezeTimer = GameConfig.serverSettings.freezeTime;
+        let freezeTimer = this.game.map.mapDef.gameMode.freezeTime || 0;
         if(this.game.startedTime <= freezeTimer && freezeTimer != 0){
             return;
         }
@@ -3762,6 +3777,10 @@ export class Player extends BaseGameObject {
     pickupLoot(obj: Loot) {
         if (obj.destroyed) return;
 
+        if (!this.game.map.mapDef.gameMode.pickup) {
+            return;
+        }
+
         const def = GameObjectDefs[obj.type];
         if (
             /*(this.actionType == GameConfig.Action.UseItem && def.type != "gun") ||*/
@@ -4192,6 +4211,7 @@ export class Player extends BaseGameObject {
     }
 
     dropLoot(type: string, count = 1, useCountForAmmo?: boolean) {
+
         this.mobileDropTicker = 3;
         this.game.lootBarn.addLoot(
             type,
@@ -4248,6 +4268,7 @@ export class Player extends BaseGameObject {
     }
 
     dropItem(dropMsg: net.DropItemMsg): void {
+        if (!this.game.map.mapDef.gameMode.pickup) return;
         if (this.dead) return;
         if (this.game.map.perkMode && !this.role) return;
 

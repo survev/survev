@@ -337,7 +337,7 @@ export class Game {
         return (
             this.aliveCount < this.map.mapDef.gameMode.maxPlayers &&
             !this.over &&
-            this.startedTime < GameConfig.serverSettings.joinTime
+            this.startedTime < (this.map.mapDef.gameMode.joinTime || 60)
         );
     }
 

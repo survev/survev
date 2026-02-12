@@ -2148,7 +2148,9 @@ export class GameMap {
                     if (group && player.groupId === group.id) continue;
                     if (team && player.teamId === team.id) continue;
 
-                    if (v2.distance(player.pos, pos) < GameConfig.player.minSpawnRad) {
+                    const minSpawnRad = this.mapDef.gameMode.minSpawnRad ?? GameConfig.player.minSpawnRad;
+
+                    if (v2.distance(player.pos, pos) < minSpawnRad) {
                         return false;
                     }
                 }

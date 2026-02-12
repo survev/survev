@@ -7,6 +7,7 @@ import { Comp } from "./maps/compDefs";
 import { Desert } from "./maps/desertDefs";
 import { Faction } from "./maps/factionDefs";
 import { Halloween } from "./maps/halloweenDefs";
+import { Local } from "./maps/localDefs";
 import { MainSpring } from "./maps/mainSpringDefs";
 import { MainSummer } from "./maps/mainSummerDefs";
 import { Potato } from "./maps/potatoDefs";
@@ -36,7 +37,8 @@ export type Atlas =
     | "savannah"
     | "turkey"
     | "beach"
-    | "comp";
+    | "comp"
+    | "local";
 
 export const MapDefs = {
     main: Main,
@@ -58,6 +60,7 @@ export const MapDefs = {
     birthday: Birthday,
     beach: Beach,
     comp: Comp,
+    local: Local,
 
     /* STRIP_FROM_PROD_CLIENT:START */
     test_normal: testNormal,
@@ -111,6 +114,23 @@ export interface MapDef {
     gameMode: {
         maxPlayers: number;
         killLeaderEnabled: boolean;
+        
+        freezeTime?: number,
+        joinTime?: number, // time until players can move after game start
+        airdropMinDistance?: number, // minimum distance between airdrops
+
+        unlimitedAdren?: boolean; //if true, players will not lose adrenaline and start with max adrenaline
+        pickup?: boolean; //true to allow players to pick up items from the ground
+        indicator?: boolean; //true to show all players on the map
+
+        // spawn related settings
+        //spawning can now be changed per map
+        edgeBuffer?: number, // distance to maps border (to prevent pakistani spawns)
+        centerNoSpawnRadius?: number, // no spawn zone in the center of the map
+        minSpawnRad?: number, // spawn radius away from alive players
+        minPosSpawnRad?: number,
+        spawnCenter?: boolean, // spawn in the center of the map
+
         desertMode?: boolean;
         factionMode?: boolean;
         factions?: number;
@@ -163,6 +183,48 @@ export interface MapDef {
         bleedDamage: number;
         bleedDamageMult: number;
     };
+
+    defaultItems?: {
+        weapons: [
+            { type: string, ammo: number },
+            { type: string, ammo: number },
+            { type: string, ammo: number },
+            { type: string, ammo: number },
+        ];
+        outfit: string;
+        backpack: string;
+        helmet: string;
+        chest: string;
+        scope: string;
+        perks: (string | (() => string))[];
+        inventory: {
+            "9mm": number;
+            "762mm": number;
+            "556mm": number;
+            "12gauge": number;
+            "50AE": number;
+            "308sub": number;
+            flare: number;
+            "45acp": number;
+            frag: number;
+            smoke: number;
+            strobe: number;
+            mirv: number;
+            snowball: number;
+            potato: number;
+            coconut: number;
+            bandage: number;
+            healthkit: number;
+            soda: number;
+            painkiller: number;
+            "1xscope": number;
+            "2xscope": number;
+            "4xscope": number;
+            "8xscope": number;
+            "15xscope": number;
+        };
+    };
+
     lootTable: Record<
         string,
         Array<{
