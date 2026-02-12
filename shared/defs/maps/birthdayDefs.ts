@@ -55,13 +55,13 @@ const mapDef: PartialMapDef = {
             { name: "tier_guns", count: 1, weight: 0.4 }, // TODO get more data on this from original
             { name: "tier_scopes", count: 1, weight: 0.15 }, // ?
             { name: "tier_armor", count: 1, weight: 0.15 }, // ?
-            { name: "tier_medical", count: 1, weight: 0.15 }, // ?
-            { name: "tier_packs", count: 1, weight: 0.2 }, // ?
+            { name: "tier_medical", count: 1, weight: 0.2 }, // ?
+            { name: "tier_packs", count: 1, weight: 0.15 }, // ?
             { name: "tier_outfits", count: 1, weight: 0.01 }, // ?
         ],
         tier_scopes: [
-            { name: "2xscope", count: 1, weight: 24 },
-            { name: "4xscope", count: 1, weight: 8 },
+            { name: "2xscope", count: 1, weight: 20 },
+            { name: "4xscope", count: 1, weight: 12 },
             { name: "8xscope", count: 1, weight: 2 }, // ?
             { name: "15xscope", count: 1, weight: 0.08 }, // ?
         ],
@@ -80,14 +80,14 @@ const mapDef: PartialMapDef = {
         ],
         tier_medical: [
             { name: "bandage", count: 5, weight: 16 },
-            { name: "healthkit", count: 1, weight: 4 },
-            { name: "soda", count: 1, weight: 15 },
-            { name: "painkiller", count: 1, weight: 5 },
+            { name: "healthkit", count: 1, weight: 5 },
+            { name: "soda", count: 1, weight: 14 },
+            { name: "painkiller", count: 1, weight: 6 },
         ],
         tier_guns: [
             { name: "ak47", count: 1, weight: 8 },
-            { name: "mosin", count: 1, weight: 1 },
-            { name: "m39", count: 1, weight: 0.5 },
+            { name: "mosin", count: 1, weight: 0.8 },
+            { name: "m39", count: 1, weight: 0.9 },
             { name: "saiga", count: 1, weight: 0.5 },
             { name: "mp5", count: 1, weight: 10 },
             { name: "m870", count: 1, weight: 9 },
@@ -162,9 +162,9 @@ const mapDef: PartialMapDef = {
                 stone_01: 250,
                 barrel_01bd: 70,
                 silo_01: 16,
-                crate_01: 120,
+                crate_01: 150,
                 tree_01: 300,
-                loot_tier_1: 100,
+                loot_tier_1: 120,
             },
         ],
         fixedSpawns: [
