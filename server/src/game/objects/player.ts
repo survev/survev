@@ -3777,7 +3777,7 @@ export class Player extends BaseGameObject {
     pickupLoot(obj: Loot) {
         if (obj.destroyed) return;
 
-        const pickup = this.game.map.mapDef.gameMode.pickup || true;
+        const pickup = this.game.map.mapDef.gameMode.pickup ?? true;
         if (!pickup) return;
 
         const def = GameObjectDefs[obj.type];
@@ -4268,7 +4268,7 @@ export class Player extends BaseGameObject {
 
     dropItem(dropMsg: net.DropItemMsg): void {
 
-        const pickup = this.game.map.mapDef.gameMode.pickup || true;
+        const pickup = this.game.map.mapDef.gameMode.pickup ?? true;
         if (!pickup) return;
         if (this.dead) return;
         if (this.game.map.perkMode && !this.role) return;
