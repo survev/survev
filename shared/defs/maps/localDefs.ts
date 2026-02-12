@@ -11,13 +11,13 @@ import { MapId } from "../types/misc";
 // Arrays are not mergeable, so the derived map will always redefine all
 // elements if that property is set.
 
-export const Comp: MapDef = {
-    mapId: MapId.Comp,
+export const Local: MapDef = {
+    mapId: MapId.Local,
     desc: {
         name: "Normal",
-        icon: "",
-        buttonCss: "",
-        buttonText: "comp",
+        icon: "img/gui/player-the-hunted.svg",
+        buttonCss: "btn-mode-faction",
+        buttonText: "1v1",
         backgroundImg: "img/main_splash.png",
     },
     assets: {
@@ -53,11 +53,20 @@ export const Comp: MapDef = {
         },
     },
     gameMode: {
-        maxPlayers: 8,
+        maxPlayers: 80,
         killLeaderEnabled: true,
-        freezeTime: 10,
+
+        freezeTime: 0,
         joinTime: 30, // time until players can move after game start
-        airdropMinDistance: 300, // minimum distance between airdrops
+        airdropMinDistance: 300,
+        unlimitedAdren: true,
+        pickup: false,
+        indicator: true,
+
+        edgeBuffer: 0, // distance to maps border (to prevent pakistani spawns)
+        centerNoSpawnRadius: 0, // no spawn zone in the center of the map
+        minSpawnRad: 0, // spawn radius away from alive players
+        minPosSpawnRad: 0,
     },
     /* STRIP_FROM_PROD_CLIENT:START */
     gameConfig: {
@@ -90,6 +99,50 @@ export const Comp: MapDef = {
         bleedDamage: 2,
         bleedDamageMult: 1,
     },
+
+    //default items
+    defaultItems: {
+            weapons: [
+                { type: "spas12", ammo: 9 },
+                { type: "mosin", ammo: 5 },
+                { type: "fists", ammo: 0 },
+                { type: "", ammo: 0 },
+            ],
+            outfit: "outfitDarkShirt",
+            backpack: "backpack03",
+            helmet: "helmet03",
+            chest: "chest03",
+            scope: "4xscope",
+            perks: ["takedown", "endless_ammo"],
+            inventory: {
+                "9mm": 0,
+                "762mm": 0,
+                "556mm": 0,
+                "12gauge": 0,
+                "50AE": 0,
+                "308sub": 0,
+                flare: 0,
+                "45acp": 0,
+                frag: 8,
+                smoke: 4,
+                strobe: 1,
+                mirv: 4,
+                snowball: 0,
+                potato: 0,
+                coconut: 12,
+                bandage: 30,
+                healthkit: 4,
+                soda: 0,
+                painkiller: 0,
+                "1xscope": 1,
+                "2xscope": 1,
+                "4xscope": 1,
+                "8xscope": 0,
+                "15xscope": 0,
+            },
+        },
+
+
     // NOTE: this loot table is not the original one so its not accurate
     // ? are guesses based on statistics
     // ! are uncertain data based on leak
@@ -917,28 +970,19 @@ export const Comp: MapDef = {
     },
     mapGen: {
         map: {
-            baseWidth: 512,
-            baseHeight: 512,
-            scale: { small: 1.1875, large: 1.28125 },
-            extension: 112,
-            shoreInset: 48,
-            grassInset: 18,
+            baseWidth: 190,
+            baseHeight: 190,
+            scale: { small: 1, large: 1 },
+            extension: 0,
+            shoreInset: 3,
+            grassInset: 6,
             rivers: {
                 lakes: [],
                 weights: [
-                    { weight: 0.1, widths: [4] },
-                    { weight: 0.15, widths: [8] },
-                    { weight: 0.25, widths: [8, 4] },
-                    { weight: 0.21, widths: [16] },
-                    { weight: 0.09, widths: [16, 8] },
-                    { weight: 0.2, widths: [16, 8, 4] },
-                    {
-                        weight: 1e-4,
-                        widths: [16, 16, 8, 6, 4],
-                    },
+                    { weight: 1, widths: [] },
                 ],
-                smoothness: 0.45,
-                spawnCabins: true,
+                smoothness: 0.1,
+                spawnCabins: false,
                 masks: [],
             },
         },
@@ -982,82 +1026,47 @@ export const Comp: MapDef = {
             xlarge: "",
         },
         customSpawnRules: {
-            locationSpawns: [
-                {
-                    type: "club_complex_01",
-                    pos: v2.create(0.5, 0.5),
-                    rad: 100,
-                    retryOnFailure: true,
-                },
-            ],
+            locationSpawns: [],
             placeSpawns: ["warehouse_01", "house_red_01", "house_red_02", "barn_01"],
         },
         densitySpawns: [
             {
-                stone_01: 350,
-                barrel_01: 76,
-                silo_01: 8,
-                crate_01: 50,
-                crate_02: 4,
-                crate_03: 8, //grenade crates
-                bush_01: 78,
-                cache_06: 12,
-                tree_01: 450,
-                sandbags_01: 7,
-                sandbags_02: 7,
-                hedgehog_01: 24,
-                container_01: 5,
-                container_02: 5,
-                container_03: 5,
-                container_04: 5,
-                shack_01: 7,
-                outhouse_01: 5, //toilet houses
-                loot_tier_1: 24,
-                loot_tier_beach: 12,
+                stone_01: 7,
+                barrel_01: 3,
+                tree_01: 10,
             },
         ],
         fixedSpawns: [
             {
                 // small is spawn count for solos and duos, large is spawn count for squads
-                warehouse_01: { small: 2, large: 5,},
-                house_red_01: { small: 3, large: 7,}, 
-                house_red_02: { small: 3, large: 7,},
-                barn_01: { small: 1, large: 4,}, //green houses
-                barn_02: { small: 1, large: 1,},
-                hut_01: 3, // huts
-                hut_02: 1, // spas hut
-                hut_03: 1, // scout hut
-                shack_03a: 2, // small river / sea cabins
-                shack_03b: { small: 2, large: 3,}, // small river / sea cabins
-                greenhouse_01: { small: 1, large: 1,}, // greenhouses
-                cache_01: 1, // flare stone
-                cache_02: { small: 1, large: 1,}, // mosin tree
-                cache_07: 1, //barrel
-                bunker_structure_01: { odds: 0.15 }, // ak74 bunker
-                bunker_structure_02: 1, // vector bunker
-                bunker_structure_03: 1, // storm bunker
-                bunker_structure_04: 1, // sea bunker
-                bunker_structure_05: 1, // river bunker
-                warehouse_complex_01: 1, // docks
-                chest_01: 1,
-                chest_03: { odds: 0.35 }, // river chest
-                mil_crate_02: { odds: 0.2 }, // ot chest
-                tree_02: 10, // axe logs
-                teahouse_complex_01su: {
-                    small: 1,
-                    large: 3,
-                },
-                stone_04: { small: 1, large: 1,},
-                mansion_structure_01: { small: 0, large: 0,},
-                police_01: { small: 0, large: 0,},
-                bank_01: { small: 0, large: 0,},
+                stone_01: 30,
+                barrel_01: 5,
+                silo_01: 1,
+                tree_01: 40,
+                container_01: 1,
+                container_02: 1,
+                container_03: 1,
+                container_04: 1,
+                outhouse_01: 3,
             },
         ],
         randomSpawns: [
             {
-                spawns: ["mansion_structure_01", "police_01", "bank_01"],
-                choose: 3,
+                spawns: ["mansion_structure_01", "police_01", "club_complex_01", "warehouse_complex_01"],
+                choose: 1,
             },
+            {
+                spawns: ["bank_01", "barn_01", "barn_p30" ],
+                choose: 1,
+            },
+            {
+                spawns: ["warehouse_01", "house_red_01", "house_red_02" ],
+                choose: 2,
+            },
+            {
+                spawns: ["teahouse_complex_01su", "shack_01", "shack_01", "shack_01" ],
+                choose: 3,
+            }
         ],
         spawnReplacements: [{}],
         importantSpawns: ["club_complex_01"],

@@ -167,16 +167,7 @@ export const GameConfig = {
         grassVariation: 2,
     },
     serverSettings:{
-        serverName: "eu-comp", // server saved in the player stats
-        freezeTime: 10,
-        joinTime: 30, // time until players can move after game start
-        airdropMinDistance: 300, // minimum distance between airdrops
 
-        //SCRIMS SETTINGS
-
-        scrimsFreezeTime: 20, //purely used for freeze
-        scrimsJoinTime: 30, //time until players can join (recommended to be > than scrimsFreeze time)
-        scrims: false, //bigger map more buildings
     },
     player: {
         radius: 1,
@@ -221,6 +212,7 @@ export const GameConfig = {
         killLeaderMinKills: 1,
         perkModeRoleSelectDuration: 20,
 
+        //default settings for maps to use if they don't specify their own, can be overridden per map
         edgeBuffer: 150, // distance to maps border (to prevent pakistani spawns)
         centerNoSpawnRadius: 170, // no spawn zone in the center of the map
         minSpawnRad: 400, // spawn radius away from alive players

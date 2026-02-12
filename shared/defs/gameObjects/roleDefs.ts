@@ -452,6 +452,22 @@ export const RoleDefs: Record<string, RoleDef> = {
         },
         perks: ["hunted"],
     },
+    indicator: {
+        type: "role",
+        announce: false,
+        killFeed: { assign: false, dead: false, color: "#ff8400" },
+        sound: {
+            assign: "",
+            dead: "",
+        },
+        mapIndicator: {
+            sprite: "player-the-hunted.img",
+            tint: 0xff8400,
+            pulse: true,
+            pulseTint: 0xff8400,
+        },
+        perks: ["hunted"],
+    },
     healer: {
         type: "role",
         defaultItems: createDefaultItems({
