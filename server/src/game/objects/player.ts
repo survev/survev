@@ -4267,7 +4267,9 @@ export class Player extends BaseGameObject {
     }
 
     dropItem(dropMsg: net.DropItemMsg): void {
-        if (!this.game.map.mapDef.gameMode.pickup) return;
+
+        const pickup = this.game.map.mapDef.gameMode.pickup || true;
+        if (!pickup) return;
         if (this.dead) return;
         if (this.game.map.perkMode && !this.role) return;
 
