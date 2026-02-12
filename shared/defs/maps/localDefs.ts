@@ -981,7 +981,7 @@ export const Local: MapDef = {
                 weights: [
                     { weight: 1, widths: [] },
                 ],
-                smoothness: 0.1,
+                smoothness: 1,
                 spawnCabins: false,
                 masks: [],
             },
@@ -1021,8 +1021,8 @@ export const Local: MapDef = {
             },
         ],
         bridgeTypes: {
-            medium: "bridge_md_structure_01",
-            large: "bridge_lg_structure_01",
+            medium: "",
+            large: "",
             xlarge: "",
         },
         customSpawnRules: {
@@ -1056,7 +1056,7 @@ export const Local: MapDef = {
                 choose: 1,
             },
             {
-                spawns: ["bank_01", "barn_01", "barn_p30" ],
+                spawns: ["bank_01", "barn_01", "barn_02" ],
                 choose: 1,
             },
             {
