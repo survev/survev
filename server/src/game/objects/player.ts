@@ -3777,9 +3777,8 @@ export class Player extends BaseGameObject {
     pickupLoot(obj: Loot) {
         if (obj.destroyed) return;
 
-        if (!this.game.map.mapDef.gameMode.pickup) {
-            return;
-        }
+        const pickup = this.game.map.mapDef.gameMode.pickup || true;
+        if (!pickup) return;
 
         const def = GameObjectDefs[obj.type];
         if (
