@@ -1563,6 +1563,7 @@ export class Game {
                     msg.teamRank,
                     msg.winningTeamId,
                     msg.gameOver,
+                    msg.betterStats,
                     localTeamId,
                     this.teamMode,
                     this.m_spectating,

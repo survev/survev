@@ -81,6 +81,7 @@ export class UiManager {
     statsHeader = $("#ui-stats-header");
     statsInfoBox = $("#ui-stats-info-box");
     statsOptions = $("#ui-stats-options");
+    statsOptions1 = $("#ui-stats-options1");
     statsAds = $(".ui-stats-ad-container");
     statsLogo = $("#ui-stats-logo");
     escMenuElem = $("#ui-game-menu");
@@ -1391,6 +1392,7 @@ export class UiManager {
         teamRank: number,
         winningTeamId: number,
         gameOver: boolean,
+        betterStats: boolean,
         localTeamId: number,
         teamMode: TeamMode,
         spectating: boolean,
@@ -1399,9 +1401,11 @@ export class UiManager {
         map: Map,
         ui2: UiManager2,
     ) {
+        console.log("BetterStats:", betterStats);
         // If we're spectating a team that's not our own, and the game isn't over yet,
         // don't display the stats screen again.
-        if (!spectating || teamId == localTeamId || gameOver) {
+        if (!spectating && !betterStats || teamId == localTeamId && !betterStats || gameOver && !betterStats) {
+            console.log("Not showing better stats screen");
             this.toggleEscMenu(true);
             this.displayingStats = true;
             this.m_pieTimer.stop();
@@ -1540,7 +1544,7 @@ export class UiManager {
                 P += 10;
             }
             const restartButton = $("<a/>", {
-                class: "ui-stats-restart btn-green btn-darken menu-option",
+                class: "ui-stats-restart1 btn-green btn-darken menu-option",
                 html: this.localization.translate("game-play-new-game"),
             });
             restartButton.on("click", () => {
@@ -1548,7 +1552,7 @@ export class UiManager {
                     this.quitGame();
                 });
             });
-            this.statsOptions.append(restartButton);
+            this.statsOptions1.append(restartButton);
             if (gameOver || this.waitingForPlayers) {
                 restartButton.css({
                     width:
@@ -1564,11 +1568,11 @@ export class UiManager {
                             : -46,
                 });
                 const q = $("<a/>", {
-                    class: "btn-green btn-darken menu-option ui-stats-spectate",
+                    class: "btn-green btn-darken menu-option ui-stats-spectate1",
                     html: this.localization.translate("game-spectate"),
                 });
                 q.on("click", this.beginSpectating.bind(this));
-                this.statsOptions.append(q);
+                this.statsOptions1.append(q);
             }
 
             let elemIdx = 0;
@@ -1603,7 +1607,7 @@ export class UiManager {
                 elemIdx++;
             });
 
-            this.statsOptions.children().each((idx, elem) => {
+            this.statsOptions1.children().each((idx, elem) => {
                 const e = $(elem);
                 e.hide();
                 const delay = statsDelay + baseDelay + (elemIdx + idx) * elemDelay + 500;
@@ -1629,25 +1633,265 @@ export class UiManager {
                 1000,
             );
         }
+
+        if (!spectating && betterStats || teamId == localTeamId && betterStats || gameOver && betterStats) {
+            console.log("Showing better stats");
+            this.toggleEscMenu(true);
+            this.displayingStats = true;
+            this.m_pieTimer.stop();
+            this.displayMapLarge(true);
+            
+            this.clearStatsElems();
+            
+            this.setSpectating(false, teamMode);
+            this.removeAds();
+            this.statsMain.css("display", "block");
+            this.statsLogo.css("display", "block");
+    
+            this.statsContentsContainer.css({ top: "" });
+    
+            const victory = localTeamId == winningTeamId;
+            const statsDelay = victory ? 1750 : 2500;
+    
+            this.setBannerAd(statsDelay, ui2);
+    
+            const title = $("<div/>", {
+                class: "ui-stats-title",
+                text: "Battle Result"
+            });
+    
+            const tableContainer = $("<div/>", {
+                class: "ui-stats-table-container",
+                css: { opacity: 0 }
+            });
+    
+            const tableHeader = $("<div/>", {
+                class: "ui-stats-row header"
+            }).append([
+                $("<div/>", { class: "ui-stats-col player-tittle", text: "PLAYER" }),
+                $("<div/>", { class: "ui-stats-col", text: "KILLS" }),
+                $("<div/>", { class: "ui-stats-col", text: "ASSISTS" }),
+                $("<div/>", { class: "ui-stats-col", text: "DAMAGE DEALT" }),
+                $("<div/>", { class: "ui-stats-col", text: "DAMAGE TAKEN" }),
+                $("<div/>", { class: "ui-stats-col", text: "TIME" }),
+                $("<div/>", { class: "ui-stats-col", text: "ELO GAINED" })
+            ]);
+    
+            const sortedPlayerStats = playerStats.sort((a, b) => {
+                if (a.rank === 0) return -1;
+                if (b.rank === 0) return 1;
+                return a.rank - b.rank;
+            });
+    
+            const tableRowsContainer = $("<div/>", {
+                class: "ui-stats-table-rows"
+            });
+
+            let a = 0;
+    
+            for (const stats of sortedPlayerStats) {
+                const playerInfo = playerBarn.getPlayerInfo(stats.playerId);
+                const timeAlive = humanizeTime(stats.timeAlive);
+
+                if (stats.rank === 0) {
+                    a++;
+                }
+                
+    
+                const playerRow = $("<div/>", {
+                    class: "ui-stats-row"
+                }).append([
+                    $("<div/>", {
+                        class: "ui-stats-col rank",
+                        text: stats.rank === 0 ? "#?" : "#" + stats.rank
+                    }),
+                    $("<div/>", {
+                        class: "ui-stats-col name",
+                        text: helpers.htmlEscape(playerInfo.name)
+                    }),
+                    $("<div/>", { class: "ui-stats-col", text: stats.kills }),
+                    $("<div/>", { class: "ui-stats-col", text: stats.damageDealt }),
+                    $("<div/>", { class: "ui-stats-col", text: stats.damageTaken }),
+                    $("<div/>", { class: "ui-stats-col", text: timeAlive }),
+                ]);
+    
+                tableRowsContainer.append(playerRow);
+            }
+    
+            tableContainer.append(tableHeader);
+            tableContainer.append(tableRowsContainer);
+    
+            const statsOptions = $("<div/>", {
+                id: "ui-stats-options",
+            });
+    
+            const restartButton = $("<a/>", {
+                class: "ui-stats-restart btn-green btn-darken menu-option",
+                html: this.localization.translate("game-play-new-game"),
+            });
+            restartButton.on("click", () => {
+                this.quitGame();
+            });
+    
+            /*if (!gameOver && !this.waitingForPlayers && a >= 2) {
+                const spectateButton = $("<a/>", {
+                    class: "btn-green btn-darken menu-option ui-stats-spectate",
+                    html: this.localization.translate("game-spectate"),
+                });
+                spectateButton.on("click", this.beginSpectating.bind(this));
+                statsOptions.append(spectateButton);
+            }else{
+
+                 // Add download button
+            const downloadButton = $("<a/>", {
+                class: "btn-green btn-darken menu-option ui-stats-spectate",
+                text: "Download Stats",
+            });
+            
+            
+            downloadButton.on("click", () => {
+
+                const headers = "Name,Rank,Kills,Damage Dealt,Damage Taken,Time Alive,Elo Gained\n";
+
+                const statsData = headers + playerStats.map(stats => {
+                    const playerInfo = playerBarn.getPlayerInfo(stats.playerId);
+                    return `${playerInfo.name},${stats.rank},${stats.kills},${stats.damageDealt},${stats.damageTaken},${humanizeTime(stats.timeAlive)},${stats.eloGained}`;
+                }).join("\n");
+
+                const now = new Date();
+                const year = now.getFullYear();
+                const month = String(now.getMonth() + 1).padStart(2, '0'); // Months are zero-based
+                const day = String(now.getDate()).padStart(2, '0');
+                const hours = String(now.getHours()).padStart(2, '0');
+                const minutes = String(now.getMinutes()).padStart(2, '0');
+                const seconds = String(now.getSeconds()).padStart(2, '0');
+
+                // Format the file name
+                const fileName = `${year}-${month}-${day}-${hours}-${minutes}-${seconds}_stats.csv`;
+
+                const blob = new Blob([statsData], { type: "text/csv;charset=utf-8" });
+                const url = window.URL.createObjectURL(blob);
+                const a = document.createElement("a");
+                a.href = url;
+                a.download = fileName;
+                a.click();
+                window.URL.revokeObjectURL(url);
+            });
+            statsOptions.append(downloadButton);
+
+            }*/
+
+            const spectateButton = $("<a/>", {
+                    class: "btn-green btn-darken menu-option ui-stats-spectate",
+                    html: this.localization.translate("game-spectate"),
+                });
+                spectateButton.on("click", this.beginSpectating.bind(this));
+                statsOptions.append(spectateButton);
+
+
+                 // Add download button
+            const downloadButton = $("<a/>", {
+                class: "btn-green btn-darken menu-option ui-stats-download",
+                text: "Download Stats",
+            });
+            
+            
+            downloadButton.on("click", () => {
+
+                const headers = "Name,Rank,Kills,Damage Dealt,Damage Taken,Time Alive,Elo Gained\n";
+
+                const statsData = headers + playerStats.map(stats => {
+                    const playerInfo = playerBarn.getPlayerInfo(stats.playerId);
+                    return `${playerInfo.name},${stats.rank},${stats.kills},${stats.damageDealt},${stats.damageTaken},${humanizeTime(stats.timeAlive)}`;
+                }).join("\n");
+
+                const now = new Date();
+                const year = now.getFullYear();
+                const month = String(now.getMonth() + 1).padStart(2, '0'); // Months are zero-based
+                const day = String(now.getDate()).padStart(2, '0');
+                const hours = String(now.getHours()).padStart(2, '0');
+                const minutes = String(now.getMinutes()).padStart(2, '0');
+                const seconds = String(now.getSeconds()).padStart(2, '0');
+
+                // Format the file name
+                const fileName = `${year}-${month}-${day}-${hours}-${minutes}-${seconds}_stats.csv`;
+
+                const blob = new Blob([statsData], { type: "text/csv;charset=utf-8" });
+                const url = window.URL.createObjectURL(blob);
+                const a = document.createElement("a");
+                a.href = url;
+                a.download = fileName;
+                a.click();
+                window.URL.revokeObjectURL(url);
+            });
+            statsOptions.append(downloadButton);
+    
+            statsOptions.append(restartButton);
+            tableContainer.append(statsOptions);
+    
+            tableContainer.prepend(title);
+    
+            this.statsContentsContainer.append(tableContainer);
+    
+            let elemIdx = 0;
+            const elemFadeTime = 200;
+            const elemDelay = 150 / Math.max(1, playerStats.length);
+            const baseDelay = 450 / Math.max(1, playerStats.length);
+    
+            tableContainer.delay(statsDelay).animate({ opacity: 1 }, 1000); 
+    
+            tableContainer.children().each((idx, elem) => {
+                const e = $(elem);
+                e.css("opacity", 0);
+                e.delay(statsDelay + baseDelay + (elemIdx + idx) * elemDelay).animate(
+                    { opacity: 1 },
+                    elemFadeTime,
+                    () => {
+                        e.children().each((idx, elem) => {
+                            $(elem)
+                                .delay(idx * elemDelay)
+                                .animate({ opacity: 1 }, elemFadeTime);
+                        });
+                    }
+                );
+            });
+    
+            this.statsElem.stop();
+            this.statsElem.css("display", "block");
+            this.statsElem.delay(statsDelay).animate(
+                { opacity: 1 },
+                1000
+            );
+    
+            this.statsContents.stop();
+            this.statsContents.css("display", "block");
+            this.statsContents.delay(statsDelay).animate(
+                { opacity: 1 },
+                1000
+            );
+        }
     }
 
     clearStatsElems() {
         this.statsHeader.empty();
         this.statsInfoBox.empty();
         this.statsOptions.empty();
+
         this.statsAds.css("display", "none");
-        this.statsContents.stop();
-        this.statsContents.css({
+
+        this.statsContents.stop(true, true).css({
             display: "none",
             opacity: 0,
         });
-        this.statsElem.stop();
-        this.statsElem.css({
+
+        this.statsElem.stop(true, true).css({
             display: "none",
             opacity: 0,
         });
+
         this.statsMain.css("display", "none");
     }
+
 
     showTeamAd(playerStats: PlayerStatsMsg["playerStats"], _ui2Manager: unknown) {
         this.toggleEscMenu(true);

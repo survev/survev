@@ -58,6 +58,9 @@ export const Comp: MapDef = {
         freezeTime: 10,
         joinTime: 30, // time until players can move after game start
         airdropMinDistance: 300, // minimum distance between airdrops
+
+        betterStats: true,
+        canDespawn: false,
     },
     /* STRIP_FROM_PROD_CLIENT:START */
     gameConfig: {

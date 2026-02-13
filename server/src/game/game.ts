@@ -1,6 +1,6 @@
 import fs from "node:fs";
 import path from "node:path";
-import { GameConfig, TeamMode } from "../../../shared/gameConfig";
+import { DamageType, GameConfig, TeamMode } from "../../../shared/gameConfig";
 import * as net from "../../../shared/net/net";
 import type { Loadout } from "../../../shared/utils/loadout";
 import { math } from "../../../shared/utils/math";
@@ -500,8 +500,15 @@ export class Game {
         player.spectating = undefined;
         player.dirNew = v2.create(1, 0);
         player.setPartDirty();
-        if (player.canDespawn()) {
+
+        if (player.canDespawn() && this.map.mapDef.gameMode.canDespawn) {
             player.game.playerBarn.removePlayer(player);
+        }else {
+            player.kill({
+                damageType: GameConfig.DamageType.Disconnect,
+                dir: player.dir,
+                source: undefined,
+            });
         }
     }
 

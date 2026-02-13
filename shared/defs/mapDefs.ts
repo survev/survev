@@ -119,9 +119,11 @@ export interface MapDef {
         joinTime?: number, // time until players can move after game start
         airdropMinDistance?: number, // minimum distance between airdrops
 
-        unlimitedAdren?: boolean; //if true, players will not lose adrenaline and start with max adrenaline
-        pickup?: boolean; //true to allow players to pick up items from the ground
-        indicator?: boolean; //true to show all players on the map
+        unlimitedAdren?: boolean; //if true, players will not lose adrenaline and start with max adrenaline || default false
+        pickup?: boolean; //true to allow players to pick up items from the ground || default true
+        indicator?: boolean; //true to show all players on the map || default false
+        betterStats?: boolean; //true to show every players stats || default false
+        canDespawn?: boolean; //if set to true players can despawn for a short time after spawning || default: true
 
         // spawn related settings
         //spawning can now be changed per map
