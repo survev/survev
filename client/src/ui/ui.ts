@@ -1311,11 +1311,11 @@ export class UiManager {
     hideStats() {
         this.displayingStats = false;
         this.statsMain.css("display", "none");
-        this.statsElem.stop().css({
+        this.statsElem.stop(true, true).css({
             display: "none",
             opacity: 0,
         });
-        this.statsContents.stop().hide();
+        this.statsContents.stop(true, true).hide();
         SDK.hideStickyAd();
     }
 
@@ -1415,6 +1415,12 @@ export class UiManager {
             this.removeAds();
             this.statsMain.css("display", "block");
             this.statsLogo.css("display", "block");
+
+            this.statsHeader = $("<div/>", { id: "ui-stats-header" });
+            this.statsInfoBox = $("<div/>", { id: "ui-stats-info-box" });
+            this.statsOptions1 = $("<div/>", { id: "ui-stats-options1" });
+
+            this.statsContentsContainer.append(this.statsHeader, this.statsInfoBox, this.statsOptions1);
 
             this.statsContentsContainer.css({
                 top: "",
@@ -1614,7 +1620,7 @@ export class UiManager {
                 elemIdx++;
             });
 
-            this.statsElem.stop();
+            this.statsElem.stop(true, true);
             this.statsElem.css("display", "block");
             this.statsElem.delay(statsDelay).animate(
                 {
@@ -1623,9 +1629,7 @@ export class UiManager {
                 1000,
             );
 
-            this.statsContentsContainer.append(this.statsHeader, this.statsInfoBox, this.statsOptions1);
-
-            this.statsContents.stop();
+            this.statsContents.stop(true, true);
             this.statsContents.css("display", "block");
             this.statsContents.delay(statsDelay).animate(
                 {
@@ -1857,14 +1861,14 @@ export class UiManager {
                 );
             });
     
-            this.statsElem.stop();
+            this.statsElem.stop(true, true);
             this.statsElem.css("display", "block");
             this.statsElem.delay(statsDelay).animate(
                 { opacity: 1 },
                 1000
             );
     
-            this.statsContents.stop();
+            this.statsContents.stop(true, true);
             this.statsContents.css("display", "block");
             this.statsContents.delay(statsDelay).animate(
                 { opacity: 1 },
@@ -1874,27 +1878,37 @@ export class UiManager {
     }
 
     clearStatsElems() {
+        // stop + clear queues überall
+        this.statsContentsContainer.stop(true, true);
+        this.statsHeader.stop(true, true);
+        this.statsInfoBox.stop(true, true);
+        this.statsOptions1.stop(true, true);
+        this.statsContents.stop(true, true);
+        this.statsElem.stop(true, true);
 
+        // DOM leeren
         this.statsContentsContainer.empty();
-
         this.statsHeader.empty();
         this.statsInfoBox.empty();
-        this.statsOptions.empty();
+        this.statsOptions1.empty(); // <-- DAS fehlt dir
+
+        // falls Better-Screen dynamisch sowas erzeugt hat:
+        $("#ui-stats-options").remove();
+
+        // CSS hard reset (gegen opacity/display leftovers)
+        this.statsContentsContainer.css({ top: "", opacity: 1, display: "block" });
+        this.statsHeader.css({ opacity: 1, display: "block" });
+        this.statsInfoBox.css({ height: "", opacity: 1, display: "block" });
+        this.statsOptions1.css({ opacity: 1, display: "block", left: "", width: "" });
 
         this.statsAds.css("display", "none");
 
-        this.statsContents.stop(true, true).css({
-            display: "none",
-            opacity: 0,
-        });
-
-        this.statsElem.stop(true, true).css({
-            display: "none",
-            opacity: 0,
-        });
+        this.statsContents.css({ display: "none", opacity: 0 });
+        this.statsElem.css({ display: "none", opacity: 0 });
 
         this.statsMain.css("display", "none");
     }
+
 
 
     showTeamAd(playerStats: PlayerStatsMsg["playerStats"], _ui2Manager: unknown) {
