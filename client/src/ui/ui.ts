@@ -1412,9 +1412,6 @@ export class UiManager {
             this.displayMapLarge(true);
             this.clearStatsElems();
             this.setSpectating(false, teamMode);
-            this.statsContentsContainer.append(this.statsHeader, this.statsInfoBox, this.statsOptions1);
-
-
             this.removeAds();
             this.statsMain.css("display", "block");
             this.statsLogo.css("display", "block");
@@ -1625,6 +1622,8 @@ export class UiManager {
                 },
                 1000,
             );
+
+            this.statsContentsContainer.append(this.statsHeader, this.statsInfoBox, this.statsOptions1);
 
             this.statsContents.stop();
             this.statsContents.css("display", "block");
