@@ -62,6 +62,8 @@ export const Local: MapDef = {
         unlimitedAdren: true,
         pickup: false,
         indicator: true,
+        betterStats: true,
+        canDespawn: false,
 
         edgeBuffer: 0, // distance to maps border (to prevent pakistani spawns)
         centerNoSpawnRadius: 0, // no spawn zone in the center of the map

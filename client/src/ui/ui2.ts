@@ -1454,6 +1454,11 @@ export class UiManager2 {
                     "game-the-air-strike",
                 )} ${killTxt} ${targetName}`;
             }
+            case DamageType.Disconnect: {
+                return `${targetName} ${this.localization.translate(
+                    "game-disconnected",
+                )}`;
+            }
             default:
                 return "";
         }

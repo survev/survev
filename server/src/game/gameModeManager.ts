@@ -6,7 +6,7 @@ import { util } from "../../../shared/utils/util";
 import { v2 } from "../../../shared/utils/v2";
 import type { Game } from "./game";
 import type { DamageParams } from "./objects/gameObject";
-import type { Player } from "./objects/player";
+import { Player } from "./objects/player";
 
 enum GameMode {
     /** default solos, any map besides factions */
@@ -123,11 +123,15 @@ export class GameModeManager {
         switch (this.mode) {
             case GameMode.Solo: {
                 const winner = this.game.playerBarn.livingPlayers[0];
+                winner.rank = 1;
                 winner.addGameOverMsg(winner.teamId);
                 return true;
             }
             case GameMode.Team: {
                 const winner = this.game.playerBarn.getAliveGroups()[0];
+                for (const player of winner.players) {
+                    player.rank = 1;
+                }
                 for (const player of winner.getAlivePlayers()) {
                     player.addGameOverMsg(winner.id);
                 }
@@ -136,6 +140,7 @@ export class GameModeManager {
             case GameMode.Faction: {
                 const winner = this.game.playerBarn.getAliveTeams()[0];
                 for (const player of winner.livingPlayers) {
+                    player.rank = 1;
                     player.addGameOverMsg(winner.id);
                 }
                 return true;
@@ -144,7 +149,8 @@ export class GameModeManager {
     }
 
     isGameStarted(): boolean {
-        return this.cantDespawnAliveCount() > 1;
+        //return this.cantDespawnAliveCount() > 1;
+        return this.aliveCount() > 1;
     }
 
     updateAliveCounts(aliveCounts: number[]): void {

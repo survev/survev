@@ -1307,6 +1307,7 @@ export class Player extends BaseGameObject {
     emoteHardTicker = 0;
     emoteCounter = 0;
 
+    rank = 0;
     damageTaken = 0;
     damageDealt = 0;
 
@@ -2761,29 +2762,73 @@ export class Player extends BaseGameObject {
      * adds gameover message to "this.msgsToSend" for the player and all their spectators
      */
     addGameOverMsg(winningTeamId: number = 0): void {
-        const aliveCount = this.game.modeManager.aliveCount();
 
-        if (this.game.modeManager.showStatsMsg(this)) {
-            const statsMsg = new net.PlayerStatsMsg();
-            statsMsg.playerStats = this;
-            this.msgsToSend.push({ type: net.MsgType.PlayerStats, msg: statsMsg });
-        } else {
+        const betterStats = this.game.map.mapDef.gameMode.betterStats ?? false;
+
+        if (betterStats) {
+            // Collect stats for all players
+            const allPlayerStats = this.game.playerBarn.players
+
+            .map(player => ({
+                playerId: player.playerId,
+                rank: player.rank,
+                timeAlive: player.timeAlive,
+                kills: player.kills,
+                dead: player.dead,
+                damageDealt: player.damageDealt,
+                damageTaken: player.damageTaken,
+                teamId: player.teamId,
+            })
+            );
+
             const gameOverMsg = new net.GameOverMsg();
-
-            const statsArr: net.PlayerStatsMsg["playerStats"][] =
-                this.game.modeManager.getGameoverPlayers(this);
-            gameOverMsg.playerStats = statsArr;
-            gameOverMsg.teamRank = winningTeamId == this.teamId ? 1 : aliveCount + 1; // gameover msg sent after alive count updated
+            gameOverMsg.playerStats = allPlayerStats;
+            gameOverMsg.teamRank =
+                winningTeamId === this.teamId ? 1 : this.game.modeManager.aliveCount() + 1;
             gameOverMsg.teamId = this.teamId;
             gameOverMsg.winningTeamId = winningTeamId;
             gameOverMsg.gameOver = !!winningTeamId;
-            this.msgsToSend.push({ type: net.MsgType.GameOver, msg: gameOverMsg });
+            gameOverMsg.betterStats = true;
+            //gameOverMsg.spectator = this.isSpectator;
 
+            this.msgsToSend.push({
+                type: net.MsgType.GameOver,
+                msg: gameOverMsg,
+            });
+        
             for (const spectator of this.spectators) {
                 spectator.msgsToSend.push({
                     type: net.MsgType.GameOver,
                     msg: gameOverMsg,
                 });
+            }
+        }else {
+
+            const aliveCount = this.game.modeManager.aliveCount();
+
+            if (this.game.modeManager.showStatsMsg(this)) {
+                const statsMsg = new net.PlayerStatsMsg();
+                statsMsg.playerStats = this;
+                this.msgsToSend.push({ type: net.MsgType.PlayerStats, msg: statsMsg });
+            } else {
+                const gameOverMsg = new net.GameOverMsg();
+
+                const statsArr: net.PlayerStatsMsg["playerStats"][] =
+                    this.game.modeManager.getGameoverPlayers(this);
+                gameOverMsg.playerStats = statsArr;
+                gameOverMsg.teamRank = winningTeamId == this.teamId ? 1 : aliveCount + 1; // gameover msg sent after alive count updated
+                gameOverMsg.teamId = this.teamId;
+                gameOverMsg.winningTeamId = winningTeamId;
+                gameOverMsg.gameOver = !!winningTeamId;
+                gameOverMsg.betterStats = false;
+                this.msgsToSend.push({ type: net.MsgType.GameOver, msg: gameOverMsg });
+
+                for (const spectator of this.spectators) {
+                    spectator.msgsToSend.push({
+                        type: net.MsgType.GameOver,
+                        msg: gameOverMsg,
+                    });
+                }
             }
         }
     }
@@ -2846,6 +2891,7 @@ export class Player extends BaseGameObject {
     kill(params: DamageParams): void {
         if (this.dead) return;
         if (this.downed) this.downed = false;
+        this.rank = this.game.modeManager.aliveCount();
         this.dead = true;
         this.killedIndex = this.game.playerBarn.nextKilledNumber++;
         this.boost = 0;
