@@ -1412,7 +1412,7 @@ export class UiManager {
             this.displayMapLarge(true);
             this.clearStatsElems();
             this.setSpectating(false, teamMode);
-            this.statsContentsContainer.append(this.statsHeader, this.statsInfoBox, this.statsOptions);
+            this.statsContentsContainer.append(this.statsHeader, this.statsInfoBox, this.statsOptions1);
 
 
             this.removeAds();
