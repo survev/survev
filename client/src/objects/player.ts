@@ -50,6 +50,7 @@ import type { InputHandler } from "../input";
 import type { InputBinds } from "./../inputBinds";
 import type { SoundHandle } from "../lib/createJS";
 import type { Map } from "../map";
+import { modAPI } from "../modding/ModAPIInstance";
 import type { Renderer } from "../renderer";
 import type { UiManager2 } from "../ui/ui2";
 import { Pool } from "./objectPool";
@@ -535,6 +536,11 @@ export class Player implements AbstractObject {
         isNew: boolean,
         _ctx: Ctx,
     ) {
+        const oldHelmet = this.m_netData.m_helmet;
+        const oldChest = this.m_netData.m_chest;
+        const oldBackpack = this.m_netData.m_backpack;
+        const oldOutfit = this.m_netData.m_outfit;
+
         if (!v2.eq(data.pos, this.m_visualPosOld)) {
             this.m_visualPosOld = v2.copy(isNew ? data.pos : this.m_pos);
             this.posInterpTicker = 0;
@@ -590,17 +596,117 @@ export class Player implements AbstractObject {
             this.renderZOrd = 18;
             this.renderZIdx = this.__id;
         }
+
+        // I rewrote this block like 4 times... so if it looks a bit weird thats why
+        // (still thinking of why it looks weird to me though...
+        // it might just be because ive looked at it too long I dont know :I)
+        if (!isNew) {
+            let anyGearChanged = false;
+            // yes I guess this could be behind a if () {...} block
+            // but I mean thats more logic for well no if not worse performance / code readability
+            // gained and if I moved it below the if (old* !== this.m_netData.m_*) {...}
+            // blocks to use the anyGearChanged flag then well if someone has code like this
+
+            /**
+             * modAPI.onLocalPlayerHelmetChange(() => {
+             *  const myPlayerGear = modAPI.getLocalPlayerGear();
+             *  // uh oh now modAPI.getLocalPlayerGear is either undefined
+             *  // or it showing old / stale data
+             *  // (and why am I using notes inside a note...)
+             * })
+             */
+            const newHelmet = this.m_netData.m_helmet;
+            const newChest = this.m_netData.m_chest;
+            const newBackpack = this.m_netData.m_backpack;
+            const newOutfit = this.m_netData.m_outfit;
+            modAPI._setLocalPlayerGear({
+                helmet: newHelmet,
+                chest: newChest,
+                backpack: newBackpack,
+                outfit: newOutfit,
+            });
+
+            if (oldHelmet !== this.m_netData.m_helmet) {
+                modAPI._setLocalPlayerHelmet({ newHelmet: this.m_netData.m_helmet });
+                modAPI._setLocalPlayerLastChangedGear({
+                    gearSlot: "helmet",
+                    oldGear: oldHelmet,
+                    newGear: this.m_netData.m_helmet,
+                });
+                modAPI._emit("localPlayerHelmetChange", undefined);
+                anyGearChanged = true;
+            }
+            if (oldChest !== this.m_netData.m_chest) {
+                modAPI._setLocalPlayerChest({ newChest: this.m_netData.m_chest });
+                modAPI._setLocalPlayerLastChangedGear({
+                    gearSlot: "chest",
+                    oldGear: oldChest,
+                    newGear: this.m_netData.m_chest,
+                });
+                modAPI._emit("localPlayerChestChange", undefined);
+                anyGearChanged = true;
+            }
+            if (oldBackpack !== this.m_netData.m_backpack) {
+                modAPI._setLocalPlayerBackpack({
+                    newBackpack: this.m_netData.m_backpack,
+                });
+                modAPI._setLocalPlayerLastChangedGear({
+                    gearSlot: "backpack",
+                    oldGear: oldBackpack,
+                    newGear: this.m_netData.m_backpack,
+                });
+                modAPI._emit("localPlayerBackpackChange", undefined);
+                anyGearChanged = true;
+            }
+            if (oldOutfit !== this.m_netData.m_outfit) {
+                modAPI._setLocalPlayerOutfit({ newOutfit: this.m_netData.m_outfit });
+                modAPI._setLocalPlayerLastChangedGear({
+                    gearSlot: "outfit",
+                    oldGear: oldOutfit,
+                    newGear: this.m_netData.m_outfit,
+                });
+                modAPI._emit("localPlayerOutfitChange", undefined);
+                anyGearChanged = true;
+            }
+            if (anyGearChanged) {
+                modAPI._emit("localPlayerGearChange", undefined);
+            }
+        }
     }
 
     m_setLocalData(data: LocalDataWithDirty) {
         const scopeOld = this.m_localData.m_scope;
-
-        if (data.healthDirty) {
-            this.m_localData.m_health = data.health;
-        }
-
+        // I moved boostDirty above healthDirty (otherwise it wouldnt be here... lol)
+        // hopefully that doesnt cause issues but its needed here so the modAPI can infer
+        // whether or not the health healed is from boost regen
         if (data.boostDirty) {
             this.m_localData.m_boost = data.boost;
+        }
+
+        if (data.healthDirty) {
+            const oldHealth = this.m_localData.m_health;
+            const newHealth = data.health;
+            const healthDelta = newHealth - oldHealth;
+
+            this.m_localData.m_health = newHealth;
+            modAPI._setLocalPlayerHealth({ totalHealth: data.health });
+
+            if (healthDelta < 0) {
+                modAPI._setLocalPlayerDamage({ totalDamage: -healthDelta });
+                modAPI._emit("localPlayerDamage", undefined);
+            } else if (healthDelta > 0) {
+                const adrenActive = this.m_localData.m_boost > 0;
+                const smallishHeal = healthDelta <= 15;
+                const healMightBeRegen = adrenActive || smallishHeal;
+
+                modAPI._setLocalPlayerHeal({
+                    totalHeal: healthDelta,
+                    inferredSource: healMightBeRegen ? "possiblyRegen" : "likelyItem",
+                });
+
+                modAPI._setLocalPlayerHealRaw({ totalHealRaw: healthDelta });
+                modAPI._emit("localPlayerHeal", undefined);
+            }
         }
 
         if (data.zoomDirty) {
@@ -615,6 +721,8 @@ export class Player implements AbstractObject {
         }
 
         if (data.inventoryDirty) {
+            const oldInventory = { ...this.m_localData.m_inventory };
+
             this.m_localData.m_scope = data.scope;
             this.m_localData.m_inventory = {};
             for (const item in GameConfig.bagSizes) {
@@ -622,8 +730,39 @@ export class Player implements AbstractObject {
                     this.m_localData.m_inventory[item] = data.inventory[item];
                 }
             }
+
+            const newInventory = { ...this.m_localData.m_inventory };
+
+            for (const item in newInventory) {
+                const oldItem = oldInventory[item] ?? 0;
+                const newItem = newInventory[item] ?? 0;
+                const inventoryDelta = newItem - oldItem;
+
+                if (inventoryDelta < 0) {
+                    modAPI._setLocalPlayerRemovedItem({
+                        removedItem: item,
+                        removedItemAmount: -inventoryDelta,
+                    });
+                    modAPI._emit("localPlayerRemovedItem", undefined);
+                } else if (inventoryDelta > 0) {
+                    modAPI._setLocalPlayerAddedItem({
+                        addedItem: item,
+                        addedItemAmount: inventoryDelta,
+                    });
+                    modAPI._emit("localPlayerAddedItem", undefined);
+                }
+            }
+            modAPI._emit("localPlayerInventoryItemChange", undefined);
         }
         if (data.weapsDirty) {
+            const oldWeaponSlots = this.m_localData.m_weapons.map((w) => ({
+                type: w.type,
+                ammo: w.ammo,
+            }));
+            const oldIdx = this.m_localData.m_curWeapIdx;
+            const newIdx = data.curWeapIdx;
+            const currentIdxChange = oldIdx !== newIdx;
+
             this.m_localData.m_curWeapIdx = data.curWeapIdx;
             this.m_localData.m_weapons = [];
             for (let i = 0; i < GameConfig.WeaponSlot.Count; i++) {
@@ -632,6 +771,64 @@ export class Player implements AbstractObject {
                     ammo: data.weapons[i].ammo,
                 };
                 this.m_localData.m_weapons.push(w);
+            }
+            const newWeaponSlots = this.m_localData.m_weapons;
+
+            modAPI._setLocalPlayerWeapons({
+                primaryWeaponType: newWeaponSlots[0].type,
+                primaryWeaponAmmo: newWeaponSlots[0].ammo,
+                secondaryWeaponType: newWeaponSlots[1].type,
+                secondaryWeaponAmmo: newWeaponSlots[1].ammo,
+                meleeWeaponType: newWeaponSlots[2].type,
+                meleeWeaponAmmo: newWeaponSlots[2].ammo,
+                throwableWeaponType: newWeaponSlots[3].type,
+                throwableWeaponAmmo: newWeaponSlots[3].ammo,
+            });
+
+            if (currentIdxChange) {
+                const newWeapon = newWeaponSlots[newIdx];
+
+                modAPI._setLocalPlayerCurrentEquippedWeapon({
+                    slot: newIdx,
+                    weaponType: newWeapon.type,
+                    weaponAmmo: newWeapon.ammo,
+                });
+                modAPI._emit("localPlayerEquippedWeaponChange", undefined);
+            }
+
+            for (let i = 0; i < newWeaponSlots.length; i++) {
+                const oldWeapon = oldWeaponSlots[i] ?? { type: "", ammo: 0 };
+                const newWeapon = newWeaponSlots[i];
+
+                if (oldWeapon.type !== newWeapon.type) {
+                    modAPI._setLocalPlayerLastChangedWeapon({
+                        slot: i,
+                        oldWeapon: oldWeapon.type,
+                        newWeapon: newWeapon.type,
+                    });
+                    modAPI._emit("localPlayerWeaponChange", undefined);
+                    continue;
+                }
+
+                const ammoDelta = newWeapon.ammo - oldWeapon.ammo;
+
+                if (ammoDelta < 0) {
+                    modAPI._setLocalPlayerWeaponAmmoUsed({
+                        slot: i,
+                        weaponType: newWeapon.type,
+                        weaponAmmo: newWeapon.ammo,
+                        ammoUsed: -ammoDelta,
+                    });
+                    modAPI._emit("localPlayerWeaponAmmoUsed", undefined);
+                } else if (ammoDelta > 0) {
+                    modAPI._setLocalPlayerWeaponAmmoGained({
+                        slot: i,
+                        weaponType: newWeapon.type,
+                        weaponAmmo: newWeapon.ammo,
+                        ammoGained: ammoDelta,
+                    });
+                    modAPI._emit("localPlayerWeaponAmmoGained", undefined);
+                }
             }
         }
         if (data.spectatorCountDirty) {
@@ -2554,6 +2751,7 @@ export class PlayerBarn {
 
     playerStatus: Record<number, PlayerStatus> = {};
     anonPlayerNames = false;
+    private wasDead = false;
 
     m_update(
         dt: number,
@@ -2601,6 +2799,14 @@ export class PlayerBarn {
         // we always expect the local data to be available.
         const activeInfo = this.getPlayerInfo(activeId);
         const activePlayer = this.getPlayerById(activeId)!;
+
+        const isDead = activePlayer.m_netData.m_dead;
+
+        if (!this.wasDead && isDead) {
+            modAPI._emit("localPlayerDeath", undefined);
+        }
+
+        this.wasDead = isDead;
 
         this.setPlayerStatus(activeId, {
             pos: v2.copy(activePlayer.m_netData.m_pos),

@@ -1,3 +1,5 @@
+import type { ModAPI } from "./src/modding/ModAPI";
+
 /// <reference types="vite/client" />
 /// <reference types="turnstile-types" />
 
@@ -81,6 +83,10 @@ declare global {
     const TURNSTILE_SITE_KEY: string | undefined;
 
     window.fusetag = window.fusetag || (window.fusetag = { que: [] });
+
+    interface Window {
+        survevModAPI?: ModAPI;
+    }
 }
 
 declare module "pixi.js-legacy" {

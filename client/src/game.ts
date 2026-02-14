@@ -25,6 +25,7 @@ import { type InputHandler, Key } from "./input";
 import type { InputBinds, InputBindUi } from "./inputBinds";
 import type { SoundHandle } from "./lib/createJS";
 import { Map } from "./map";
+import { modAPI } from "./modding/ModAPIInstance";
 import { AirdropBarn } from "./objects/airdrop";
 import { BulletBarn, createBullet } from "./objects/bullet";
 import { DeadBodyBarn } from "./objects/deadBody";
@@ -354,6 +355,7 @@ export class Game {
         this.m_camera.m_setRotationEnabled(this.m_config.get("localRotation")!);
         this.m_playerBarn.anonPlayerNames = this.m_config.get("anonPlayerNames")!;
         this.initialized = true;
+        modAPI._emit("gameStart", undefined);
     }
 
     free() {
@@ -366,6 +368,7 @@ export class Game {
         this.connected = false;
         if (this.initialized) {
             this.initialized = false;
+            modAPI._emit("gameEnd", undefined);
             this.m_updatePass = false;
             this.m_updatePassDelay = 0;
             this.m_emoteBarn.m_free();
@@ -1394,6 +1397,12 @@ export class Game {
                 // Update local kill counter
                 if (msg.killCreditId == this.m_localId && msg.killed) {
                     this.m_uiManager.setLocalKills(msg.killerKills);
+                    // I think thats the order they should be in... because if emit
+                    // is updated first and right after that someone calls
+                    // modAPI.getPlayerKills() then it might be undefined when emit fires I think...
+                    // either way cant hurt I guess
+                    modAPI._setLocalPlayerKills({ totalKills: msg.killerKills });
+                    modAPI._emit("localPlayerKill", undefined);
                 }
 
                 // Add killfeed entry for this kill
