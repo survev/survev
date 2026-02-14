@@ -1401,7 +1401,7 @@ export class Game {
                     // is updated first and right after that someone calls
                     // modAPI.getPlayerKills() then it might be undefined when emit fires I think...
                     // either way cant hurt I guess
-                    modAPI._setPlayerKills(msg.killerKills);
+                    modAPI._setLocalPlayerKills({ totalKills: msg.killerKills });
                     modAPI._emit("localPlayerKill", undefined);
                 }
 
