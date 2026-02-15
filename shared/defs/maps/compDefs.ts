@@ -331,7 +331,7 @@ export const Comp: MapDef = {
             { name: "spas12", count: 1, weight: 0.7 },
             { name: "qbb97", count: 1, weight: 0.03 },
             { name: "flare_gun", count: 1, weight: 0.145 }, // !
-            { name: "flare_gun_dual", count: 1, weight: 0.0025 }, // !
+            //{ name: "flare_gun_dual", count: 1, weight: 0.0025 }, // !
             { name: "groza", count: 1, weight: 0.8 },
             //{ name: "scout_elite", count: 1, weight: 0.05 },
             { name: "vss", count: 1, weight: 1.5 }, // !
@@ -486,6 +486,7 @@ export const Comp: MapDef = {
             { name: "spas12", count: 1, weight: 1 },
             { name: "deagle", count: 1, weight: 0.15 },
             { name: "vector", count: 1, weight: 0.1 },
+            { name: "", count: 1, weight: 0.25},
             //{ name: "awc", count: 1, weight: 0.074 },
         ],
         tier_chest_sniper_spec: [
@@ -507,9 +508,9 @@ export const Comp: MapDef = {
             { name: "scar", count: 1, weight: 0.27 },
             { name: "dp28", count: 1, weight: 0.4 },
             { name: "m39", count: 1, weight: 0.45 },
-            { name: "spas12", count: 1, weight: 0.4 },
+            { name: "spas12", count: 1, weight: 0.25 },
             { name: "saiga", count: 1, weight: 0.26 },
-            { name: "mp220", count: 1, weight: 0.8 },
+            { name: "mp220", count: 1, weight: 0.6 },
             //{ name: "pkm", count: 1, weight: 0.05 }, // ~1%
         ],
         tier_chest_armor: [
@@ -558,8 +559,8 @@ export const Comp: MapDef = {
         ],
         tier_snipers: [
             { name: "model94", count: 1, weight: 6 }, // ?
-            { name: "blr", count: 1, weight: 6 }, // ?
-            { name: "scout_elite", count: 1, weight: 3 }, // ?
+            { name: "blr", count: 1, weight: 1 }, // ?
+            { name: "scout_elite", count: 1, weight: 1 }, // ?
             { name: "mk12", count: 1, weight: 2 }, // ?
             { name: "m39", count: 1, weight: 2 }, // ?
             { name: "vss", count: 1, weight: 1.5 }, // ?
@@ -614,6 +615,7 @@ export const Comp: MapDef = {
             //{ name: "tier_hawk", count: 1, weight: 0.30},
             { name: "bar", count: 1, weight: 0.4},
             { name: "usas", count: 1, weight: 0.30},
+            { name: "m1014", count: 1, weight: 0.2},
         ],
         tier_lvl3_chance: [
             { name: "chest03", count: 1, weight: 0.15},

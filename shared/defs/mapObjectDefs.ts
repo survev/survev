@@ -7221,7 +7221,7 @@ function createPoliceStation<T extends BuildingDef>(e: Partial<T>): T {
                 ori: 0,
             },
             {
-                type: "crate_06",
+                type: randomObstacleType({ crate_06: 7, crate_06s: 1}),
                 pos: v2.create(10.5, 1.25),
                 scale: 1,
                 ori: 0,
@@ -8703,7 +8703,7 @@ function createWarehouse2<T extends BuildingDef>(e: Partial<T>): T {
                 ori: 0,
             },
             {
-                type: randomObstacleType({ crate_08: 24, crate_09: 1 }),
+                type: randomObstacleType({ crate_08: 5, crate_09: 1 }),
                 pos: v2.create(0, 0),
                 scale: 1,
                 ori: 0,
@@ -9468,7 +9468,8 @@ export const MapObjectDefs: Record<string, MapObjectDef> = {
     case_06: createCase({
         health: 140,
         img: { sprite: "map-case-chrys-01.img" },
-        loot: [tierLoot("tier_chest_sniper_tea", 1, 1), tierLoot("tier_chest_ar", 1, 2), tierLoot("tier_chest_armor", 0 , 2), tierLoot("tier_chrys_case", 1, 1)],
+        loot: [tierLoot("tier_chest_sniper_tea", 1, 1), tierLoot("tier_chest_ar", 1, 2), tierLoot("tier_chest_armor", 0 , 2), 
+            tierLoot("tier_chrys_case", 1, 1)],
         hitParticle: "blackChip",
         map: { display: false, color: 0x6b3500, scale: 0.85 },
     }),
@@ -9819,6 +9820,20 @@ export const MapObjectDefs: Record<string, MapObjectDef> = {
         armorPlated: true,
         hitParticle: "greenChip",
         loot: [tierLoot("tier_ammo", 1, 1)],
+        map: { display: false },
+        img: { sprite: "map-crate-06.img" },
+        sound: {
+            bullet: "ammo_crate_bullet",
+            punch: "ammo_crate_bullet",
+        },
+    }),
+    crate_06s: createCrate({
+        collision: collider.createAabbExtents(v2.create(0, 0), v2.create(2.25, 1.1)),
+        health: 175,
+        destructible: true,
+        armorPlated: true,
+        hitParticle: "greenChip",
+        loot: [autoLoot("m1014", 1)],
         map: { display: false },
         img: { sprite: "map-crate-06.img" },
         sound: {
@@ -11194,7 +11209,7 @@ export const MapObjectDefs: Record<string, MapObjectDef> = {
     stone_02: createStone({ //ak stone
         map: { display: false },
         img: { tint: 0xe5e5e5 },
-        loot: [tierLoot("tier_surviv", 2, 3), autoLoot("flare_gun_dual", 1)],
+        loot: [tierLoot("tier_surviv", 2, 3), tierLoot("tier_medical", 1, 1), autoLoot("flare_gun", 1)],
     }),
     stone_02sv: createStone({
         map: { display: false },
