@@ -277,7 +277,7 @@ export const BaseDefs: Record<string, GunDef> = {
         bulletType: "bullet_vector",
         bulletTypeBonus: "bullet_vector_bonus",
         headshotMult: 1,
-        speed: { equip: 0, attack: 0 },
+        speed: { equip: 0, attack: -2 },
         lootImg: {
             sprite: "loot-weapon-vector.img",
             tint: 65280,
@@ -1997,7 +1997,7 @@ export const BaseDefs: Record<string, GunDef> = {
         extendedClip: 8,
         extendedReload: 8,
         reloadTime: 2.5,
-        fireDelay: 0.4,
+        fireDelay: 0.6,
         switchDelay: 0.75,
         barrelLength: 3.75,
         barrelOffset: 0,
