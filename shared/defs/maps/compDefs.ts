@@ -14,7 +14,7 @@ import { MapId } from "../types/misc";
 export const Comp: MapDef = {
     mapId: MapId.Comp,
     desc: {
-        name: "Normal",
+        name: "Comp",
         icon: "",
         buttonCss: "",
         buttonText: "comp",
@@ -58,6 +58,8 @@ export const Comp: MapDef = {
         freezeTime: 10,
         joinTime: 30, // time until players can move after game start
         airdropMinDistance: 300, // minimum distance between airdrops
+        betterSpawn: true,
+        betterMapGen: true,
 
         betterStats: true,
         canDespawn: false,

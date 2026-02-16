@@ -95,6 +95,8 @@ function getBuildingBounds(type: string, layer = 0, pos: Vec2, rot: number) {
     return bounds;
 }
 
+
+
 interface GridCollider {
     __gridQueryId?: number;
     collision: Collider;
@@ -1149,36 +1151,89 @@ export class GameMap {
             }
         }
 
+        const betterMapGen = this.mapDef.gameMode.betterMapGen ?? false;
         let buildingBounds: ReturnType<typeof getBuildingBounds> | undefined = undefined;
-        if (def.type === "building" || def.type === "structure") {
-            buildingBounds = getBuildingBounds(type, 0, pos, rot);
-            for (let i = 0; i < buildingBounds.length; i++) {
-                const coll = buildingBounds[i];
-                const gridColls = this.grid.intersectCollider(coll.collision);
 
-                for (let j = 0; j < gridColls.length; j++) {
-                    const gridColl = gridColls[j];
-                    // underground parts should still collide with ground parts
-                    // so only continue if the thing we are checking for is on ground and the other is underground
-                    if (coll.layer == 0 && gridColls[j].layer != 0) continue;
-                    if (coldet.test(coll.collision, gridColl.collision)) return false;
+        if(betterMapGen){
+            if (def.type === "building" || def.type === "structure") {
+
+                // ---- MIN DISTANCE / GROUP SPACING ----
+                if (def.group?.id && def.group?.minDistance) {
+                    const groupObjects = this.intersectGroup(
+                        def.group.id,
+                        pos,
+                        def.group.minDistance,
+                    );
+                    if (groupObjects.length > 0) {
+                        return false;
+                    }
                 }
+
+              buildingBounds = getBuildingBounds(type, 0, pos, rot);
+                for (let i = 0; i < buildingBounds.length; i++) {
+                    const coll = buildingBounds[i];
+                    const gridColls = this.grid.intersectCollider(coll.collision);
+
+                    for (let j = 0; j < gridColls.length; j++) {
+                        const gridColl = gridColls[j];
+                        // underground parts should still collide with ground parts
+                        // so only continue if the thing we are checking for is on ground and the other is underground
+                        if (coll.layer == 0 && gridColls[j].layer != 0) continue;
+                        if (coldet.test(coll.collision, gridColl.collision)) return false;
+                    }
+                }
+            } else {
+                const bounds = collider.transform(
+                    mapHelpers.getBoundingCollider(type),
+                    pos,
+                    rot,
+                    scale,
+                );
+                const colliders = this.grid.intersectCollider(bounds);
+
+                for (let i = 0; i < colliders.length; i++) {
+                    const coll = colliders[i];
+                    if (coll.layer !== 0 || coll.type !== "obstacle") continue;
+                    if (coldet.test(coll.collision, bounds)) {
+                        return false;
+                    }
+                }
+            
             }
-        } else {
-            const bounds = collider.transform(
-                mapHelpers.getBoundingCollider(type),
-                pos,
-                rot,
-                scale,
-            );
-            const colliders = this.grid.intersectCollider(bounds);
 
-            for (let i = 0; i < colliders.length; i++) {
-                const coll = colliders[i];
-                if (coll.layer !== 0 || coll.type !== "obstacle") continue;
-                if (coldet.test(coll.collision, bounds)) {
-                    return false;
+        }else{
+
+            if (def.type === "building" || def.type === "structure") {
+              buildingBounds = getBuildingBounds(type, 0, pos, rot);
+                for (let i = 0; i < buildingBounds.length; i++) {
+                    const coll = buildingBounds[i];
+                    const gridColls = this.grid.intersectCollider(coll.collision);
+
+                    for (let j = 0; j < gridColls.length; j++) {
+                        const gridColl = gridColls[j];
+                        // underground parts should still collide with ground parts
+                        // so only continue if the thing we are checking for is on ground and the other is underground
+                        if (coll.layer == 0 && gridColls[j].layer != 0) continue;
+                        if (coldet.test(coll.collision, gridColl.collision)) return false;
+                    }
                 }
+            } else {
+                const bounds = collider.transform(
+                    mapHelpers.getBoundingCollider(type),
+                    pos,
+                    rot,
+                    scale,
+                );
+                const colliders = this.grid.intersectCollider(bounds);
+
+                for (let i = 0; i < colliders.length; i++) {
+                    const coll = colliders[i];
+                    if (coll.layer !== 0 || coll.type !== "obstacle") continue;
+                    if (coldet.test(coll.collision, bounds)) {
+                        return false;
+                    }
+                }
+            
             }
         }
 
@@ -1313,6 +1368,41 @@ export class GameMap {
         }
 
         return true;
+    }
+
+    intersectGroup(
+    groupId: number,
+    pos: Vec2,
+    candidateMinDistance: number,
+    exclude?: { pos: Vec2 }, // z.B. das Objekt selbst, wenn du verschiebst
+    ): any[] { // Rückgabetyp wie oben (z.B. Building[])
+        const groupObjects = this.getObjectsInGroup(groupId);
+        return groupObjects.filter(obj => {
+            if (exclude && obj === exclude) return false;
+            if (!obj.pos) return false;
+
+            // Hole das minDistance der schon existierenden Definition, falls vorhanden
+            const def = MapObjectDefs[obj.type] as BuildingDef;
+            const existingMinDistance = def.group?.minDistance ?? 0;
+            const requiredDistance = Math.max(candidateMinDistance, existingMinDistance);
+            const requiredDistSq = requiredDistance * requiredDistance;
+
+            const dx = obj.pos.x - pos.x;
+            const dy = obj.pos.y - pos.y;
+            const distSq = dx * dx + dy * dy;
+
+            return distSq < requiredDistSq;
+        });
+    }
+
+    getObjectsInGroup(groupId: number): any[] { // Ersetze `any` durch deinen konkreten Objekt-Typ, z.B. Building
+        const all = this.game.grid.getAllObjects();
+        return all.filter(o => {
+            if (o.__type !== ObjectType.Building) return false;
+            const def = MapObjectDefs[o.type] as BuildingDef;
+            if (!def.group) return false;
+            return def.group.id === groupId;
+        });
     }
 
     getOriAndScale(type: string): { ori: number; scale: number } {
@@ -2095,7 +2185,48 @@ export class GameMap {
 
         let getPos: () => Vec2;
 
-        if (!group?.spawnPosition) {
+        const betterSpawns = this.mapDef.gameMode.betterSpawn ?? false;
+
+        if (betterSpawns) {
+
+            const edgeBuffer = this.mapDef.gameMode.edgeBuffer ?? GameConfig.player.edgeBuffer;
+
+                let getPos: () => Vec2;
+                
+                if (!group?.players[0]) {
+                    // Define spawnable area (excluding edges and center)
+                    const spawnMin = v2.create(edgeBuffer, edgeBuffer);
+                    const spawnMax = v2.create(
+                        this.width - edgeBuffer,
+                        this.height - edgeBuffer
+                    );
+
+                    let spawnAabb = collider.createAabb(spawnMin, spawnMax);
+
+                    if (this.factionMode && team) {
+                        const rad = math.oriToRad(this.factionModeSplitOri);
+                        const vec = v2.create(Math.cos(rad), Math.sin(rad));
+                        const idx = team.id - 1;
+                        // split it 2 times to get 1/4 of the map
+                        // Only extract min and max to match expected AABB shape
+                        const split1 = coldet.splitAabb(spawnAabb, vec)[idx];
+                        const split2 = coldet.splitAabb(split1, vec)[idx];
+                        spawnAabb = collider.createAabb(split2.min, split2.max);
+                    }
+
+                    getPos = () => {
+                        return util.randomPointInAabb(spawnAabb);
+                    };
+                } else {
+                    const rad = GameConfig.player.teammateSpawnRadius;
+                    const pos = group.players[0].pos;
+                    getPos = () => v2.add(pos, util.randomPointInCircle(rad));
+                }
+
+            return this.getRandomSpawnPos(getPos, true, group, team, edgeBuffer);
+
+        }else{
+            if (!group?.spawnPosition) {
             const spawnMin = v2.create(this.shoreInset, this.shoreInset);
             const spawnMax = v2.create(
                 this.width - this.shoreInset,
@@ -2128,61 +2259,137 @@ export class GameMap {
                 return v2.add(pos, util.randomPointInCircle(rad));
             };
         }
-        return this.getRandomSpawnPos(getPos, group, team);
+        return this.getRandomSpawnPos(getPos, false, group, team);
+    }
     }
 
-    getRandomSpawnPos(getPos: () => Vec2, group?: Group, team?: Team): Vec2 {
-        let pos = getPos();
+    getRandomSpawnPos(getPos: () => Vec2, betterSpawn: boolean, group?: Group, team?: Team, edgeBuffer?: number): Vec2 {
+        
 
-        this.trySpawn(
-            "player",
-            () => {
-                v2.set(pos, getPos());
+        if (betterSpawn && edgeBuffer !== undefined) {
+            let pos = getPos();
+            this.trySpawn(
+                "player",
+                () => {
+                    v2.set(pos, getPos());
 
-                if (!this.canPlayerSpawn(pos)) {
-                    return false;
-                }
-
-                for (let i = 0; i < this.game.playerBarn.livingPlayers.length; i++) {
-                    const player = this.game.playerBarn.livingPlayers[i];
-                    if (group && player.groupId === group.id) continue;
-                    if (team && player.teamId === team.id) continue;
-
-                    const minSpawnRad = this.mapDef.gameMode.minSpawnRad ?? GameConfig.player.minSpawnRad;
-
-                    if (v2.distance(player.pos, pos) < minSpawnRad) {
+                    if(!this.canPlayerSpawn(pos)) {
                         return false;
                     }
-                }
 
-                // prevent players from spawning bellow airdrops or grenades
+                    const centerNoSpawnRadius = this.mapDef.gameMode.centerNoSpawnRadius ?? GameConfig.player.centerNoSpawnRadius;
 
-                for (let i = 0; i < this.game.airdropBarn.airdrops.length; i++) {
-                    const airdrop = this.game.airdropBarn.airdrops[i];
-                    if (v2.distance(airdrop.pos, pos) < 8) {
+                    // Check center no-spawn zone
+                    if (v2.distance(pos, this.center) < centerNoSpawnRadius) {
                         return false;
                     }
-                }
 
-                for (let i = 0; i < this.game.projectileBarn.projectiles.length; i++) {
-                    const projectile = this.game.projectileBarn.projectiles[i];
-                    if (projectile.layer !== 0) continue;
-                    const player = this.game.objectRegister.getById(projectile.playerId);
-                    if (player?.__type !== ObjectType.Player) continue;
-                    if (group && player.groupId === group.id) continue;
-                    if (team && player.teamId === team.id) continue;
-
-                    if (v2.distance(projectile.pos, pos) < 16) {
+                    if (
+                        pos.x < edgeBuffer ||
+                        pos.y < edgeBuffer ||
+                        pos.x > this.width - edgeBuffer ||
+                        pos.y > this.height - edgeBuffer
+                    ) {
                         return false;
                     }
-                }
 
-                return true;
-            },
-            500,
-        );
+                    for (let i = 0; i < this.game.playerBarn.livingPlayers.length; i++) {
+                        const player = this.game.playerBarn.livingPlayers[i];
+                        if (group && player.groupId === group.id) continue;
+                        if (team && player.teamId === team.id) continue;
 
-        return pos;
+                        const minSpawnRad = this.mapDef.gameMode.minSpawnRad ?? GameConfig.player.minSpawnRad;
+
+                        if (v2.distance(player.pos, pos) < minSpawnRad) {
+                            return false;
+                        }
+                    }
+
+                    // prevent players from spawning bellow airdrops or grenades
+
+                    for (let i = 0; i < this.game.airdropBarn.airdrops.length; i++) {
+                        const airdrop = this.game.airdropBarn.airdrops[i];
+                        if (v2.distance(airdrop.pos, pos) < 8) {
+                            return false;
+                        }
+                    }
+
+                    for (let i = 0; i < this.game.projectileBarn.projectiles.length; i++) {
+                        const projectile = this.game.projectileBarn.projectiles[i];
+                        if (projectile.layer !== 0) continue;
+                        const player = this.game.objectRegister.getById(projectile.playerId);
+                        if (player?.__type !== ObjectType.Player) continue;
+                        if (group && player.groupId === group.id) continue;
+                        if (team && player.teamId === team.id) continue;
+
+                        if (v2.distance(projectile.pos, pos) < 16) {
+                            return false;
+                        }
+                    }
+
+                    return true;
+
+
+                },
+                5000,
+            );
+
+            return pos;
+
+        }else {
+        
+            let pos = getPos();
+
+            this.trySpawn(
+                "player",
+                () => {
+                    v2.set(pos, getPos());
+
+                    if (!this.canPlayerSpawn(pos)) {
+                        return false;
+                    }
+
+                    for (let i = 0; i < this.game.playerBarn.livingPlayers.length; i++) {
+                        const player = this.game.playerBarn.livingPlayers[i];
+                        if (group && player.groupId === group.id) continue;
+                        if (team && player.teamId === team.id) continue;
+
+                        const minSpawnRad = this.mapDef.gameMode.minSpawnRad ?? GameConfig.player.minSpawnRad;
+
+                        if (v2.distance(player.pos, pos) < minSpawnRad) {
+                            return false;
+                        }
+                    }
+
+                    // prevent players from spawning bellow airdrops or grenades
+
+                    for (let i = 0; i < this.game.airdropBarn.airdrops.length; i++) {
+                        const airdrop = this.game.airdropBarn.airdrops[i];
+                        if (v2.distance(airdrop.pos, pos) < 8) {
+                            return false;
+                        }
+                    }
+
+                    for (let i = 0; i < this.game.projectileBarn.projectiles.length; i++) {
+                        const projectile = this.game.projectileBarn.projectiles[i];
+                        if (projectile.layer !== 0) continue;
+                        const player = this.game.objectRegister.getById(projectile.playerId);
+                        if (player?.__type !== ObjectType.Player) continue;
+                        if (group && player.groupId === group.id) continue;
+                        if (team && player.teamId === team.id) continue;
+
+                        if (v2.distance(projectile.pos, pos) < 16) {
+                            return false;
+                        }
+                    }
+
+                    return true;
+                },
+                500,
+            );
+
+            return pos;
+        }
     }
 
     canPlayerSpawn(pos: Vec2) {

@@ -125,12 +125,15 @@ export interface MapDef {
         betterStats?: boolean; //true to show every players stats || default false
         canDespawn?: boolean; //if set to true players can despawn for a short time after spawning || default: true
 
+        betterMapGen?: boolean; //if set to true, will do MinDistances between POIs || default: false
+
         // spawn related settings
         //spawning can now be changed per map
-        edgeBuffer?: number, // distance to maps border (to prevent pakistani spawns)
-        centerNoSpawnRadius?: number, // no spawn zone in the center of the map
-        minSpawnRad?: number, // spawn radius away from alive players
-        minPosSpawnRad?: number,
+        betterSpawn?: boolean; //use our better spawn algorithm (only for 2 team matches) | default: false
+        edgeBuffer?: number, // distance to maps border (to prevent pakistani spawns) | default: 150
+        centerNoSpawnRadius?: number, // no spawn zone in the center of the map | default: 170
+        minSpawnRad?: number, // spawn radius away from alive players | default: 400 (used for default spawn system too)
+        minPosSpawnRad?: number, // spawn radius away from other spawn points |default: 100
         spawnCenter?: boolean, // spawn in the center of the map
 
         desertMode?: boolean;
