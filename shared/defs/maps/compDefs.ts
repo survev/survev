@@ -1029,6 +1029,10 @@ export const Comp: MapDef = {
                 house_red_02: { small: 3, large: 7,},
                 barn_01: { small: 1, large: 4,}, //green houses
                 barn_02: { small: 1, large: 1,},
+                teahouse_complex_01su: {
+                    small: 1,
+                    large: 3,
+                },
                 hut_01: 3, // huts
                 hut_02: 1, // spas hut
                 hut_03: 1, // scout hut
@@ -1048,10 +1052,6 @@ export const Comp: MapDef = {
                 chest_03: { odds: 0.35 }, // river chest
                 mil_crate_02: { odds: 0.2 }, // ot chest
                 tree_02: 10, // axe logs
-                teahouse_complex_01su: {
-                    small: 1,
-                    large: 3,
-                },
                 stone_04: { small: 1, large: 1,},
                 mansion_structure_01: { small: 0, large: 0,},
                 police_01: { small: 0, large: 0,},
