@@ -16,7 +16,6 @@ function computeBoundingCollider(type: string): Collider {
         throw new Error(`[MapHelpers] Unknown map object. Type: ${type}`);
     }
 
-
     if (def.type === "structure") {
         const aabbs: AABB[] = [];
         for (let i = 0; i < def.layers.length; i++) {
