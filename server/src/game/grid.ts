@@ -164,6 +164,19 @@ export class Grid<T extends GameObject = GameObject> {
         return [...this._grid[pos.x][pos.y]];
     }
 
+    // in Grid<T> class (grid.ts)
+    getAllObjects(): T[] {
+        const set = new Set<T>();
+        for (let x = 0; x < this.width; x++) {
+            for (let y = 0; y < this.height; y++) {
+                for (const obj of this._grid[x][y]) {
+                    set.add(obj);
+                }
+            }
+        }
+        return [...set];
+    }
+
     intersectLineSegment(lineStart: Vec2, lineEnd: Vec2): T[] {
         const start = this._roundToCells(lineStart);
         const end = this._roundToCells(lineEnd);

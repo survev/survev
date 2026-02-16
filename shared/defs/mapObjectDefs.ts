@@ -2201,6 +2201,7 @@ function createBank<T extends BuildingDef>(e: Partial<T>): T {
                 ori: 0,
             },
         ],
+        group: { id: BuildingGroups.POIs, minDistance: MinDistance.POIs },
     };
     return util.mergeDeep(t, e || {});
 }
@@ -4464,6 +4465,7 @@ function createGreenhouse<T extends BuildingDef>(e: Partial<T>): T {
                 ori: 0,
             },
         ],
+        group: { id: BuildingGroups.BunkerSpawns, minDistance: MinDistance.BunkerSpawns },
     };
     return util.mergeDeep(t, e || {});
 }
@@ -5795,6 +5797,7 @@ function createMansion<T extends ExtendedBuildingDef>(e: Partial<T>): T {
                 ori: 0,
             },
         ],
+        group: { id: BuildingGroups.POIs, minDistance: MinDistance.POIs }
     };
     return util.mergeDeep(t, e || {});
 }
@@ -6612,6 +6615,7 @@ function createTeaHouseComplex<T extends BuildingDef>(
                 ori: 0,
             },
         ],
+        group: { id: BuildingGroups.SniperSpawns, minDistance: MinDistance.SniperSpawns }
     };
     return util.mergeDeep(t, e || {});
 }
@@ -7341,6 +7345,7 @@ function createPoliceStation<T extends BuildingDef>(e: Partial<T>): T {
                 ignoreMapSpawnReplacement: true,
             },
         ],
+        group: { id: BuildingGroups.POIs, minDistance: MinDistance.POIs }
     };
     return util.mergeDeep(t, e || {});
 }
@@ -12351,7 +12356,9 @@ export const MapObjectDefs: Record<string, MapObjectDef> = {
             },
         ],
     },
-    greenhouse_01: createGreenhouse({}),
+    greenhouse_01: createGreenhouse({
+        group: { id: BuildingGroups.SniperSpawns, minDistance: MinDistance.SniperSpawns },
+    }),
     greenhouse_02: createGreenhouse({
         floor_images: [
             {
@@ -15511,6 +15518,7 @@ export const MapObjectDefs: Record<string, MapObjectDef> = {
             },
         ],
         teamId: 2,
+        group: { id: BuildingGroups.SVSpawns, minDistance: MinDistance.SVSpawns },
     },
     logging_complex_01: createLoggingComplex({}),
     logging_complex_01sp: createLoggingComplex({
@@ -23781,6 +23789,7 @@ export const MapObjectDefs: Record<string, MapObjectDef> = {
                 ori: 1,
             },
         ],
+        group: { id: BuildingGroups.SVSpawns, minDistance: MinDistance.SVSpawns },
     },
     bunker_egg_01: {
         type: "building",
@@ -24655,6 +24664,7 @@ export const MapObjectDefs: Record<string, MapObjectDef> = {
                 inheritOri: false,
             },
         ],
+        group: { id: BuildingGroups.BunkerSpawns, minDistance: MinDistance.BunkerSpawns },
     },
     bunker_hydra_sublevel_01: {
         type: "building",
@@ -26033,6 +26043,7 @@ export const MapObjectDefs: Record<string, MapObjectDef> = {
             },
         ],
         mask: [collider.createAabbExtents(v2.create(8.5, -3.7), v2.create(18, 9.5))],
+        group: { id: BuildingGroups.BunkerSpawns, minDistance: MinDistance.BunkerSpawns },
     },
     bunker_conch_01: {
         type: "building",
@@ -26209,6 +26220,7 @@ export const MapObjectDefs: Record<string, MapObjectDef> = {
                 ori: 0,
             },
         ],
+        group: { id: BuildingGroups.BunkerSpawns, minDistance: MinDistance.BunkerSpawns },
     },
     bunker_conch_sublevel_01: {
         type: "building",
