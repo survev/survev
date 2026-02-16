@@ -11,6 +11,12 @@ const cachedColliders: Record<string, Collider> = {};
 
 function computeBoundingCollider(type: string): Collider {
     const def = MapObjectDefs[type];
+
+    if (!def) {
+        throw new Error(`[MapHelpers] Unknown map object. Type: ${type}`);
+    }
+
+
     if (def.type === "structure") {
         const aabbs: AABB[] = [];
         for (let i = 0; i < def.layers.length; i++) {
