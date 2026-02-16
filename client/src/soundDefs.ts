@@ -278,6 +278,38 @@ const Sounds: Record<string, Record<string, SoundDef>> = {
             path: "audio/guns/pkp_switch_01.mp3",
             volume: 1,
         },
+        pkm_02: {
+            path: "audio/guns/pkm_02.mp3",
+            volume: 1,
+            maxInstances: 10,
+        },
+        pkm_reload_01: {
+            path: "audio/guns/pkm_reload_01.mp3",
+            volume: 1,
+        },
+        m134_01: {
+            path: "audio/guns/m134_01.mp3",
+            volume: 1,
+            maxInstances: 10,
+        },
+        m134_reload_01: {
+            path: "audio/guns/m134_reload_01.mp3",
+            volume: 1,
+        },
+        hawk_02: {
+            path: "audio/guns/hawk12g_02.mp3",
+            volume: 1,
+            maxInstances: 10,
+        },
+        special_shotgun_01: {
+            path: "audio/guns/special_shotgun_01.mp3",
+            volume: 5,
+            maxInstances: 10,
+        },
+        ak74_reload_01: {
+            path: "audio/guns/ak74_reload_01.mp3",
+            volume: 1,
+        },
         m870_01: {
             path: "audio/guns/m870_01.mp3",
             volume: 1,

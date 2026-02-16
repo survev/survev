@@ -326,6 +326,11 @@ export const LoadoutAtlas: AtlasDef = {
         "guns/gun-vector-01.svg",
         "guns/gun-vector45-01.svg",
         "guns/gun-vss-01.svg",
+        // guns added by survev.de
+        "guns/gun-long-ak74.svg",
+        "guns/gun-pkm-01.svg",
+        "guns/gun-hawk-01.svg",
+        "guns/gun-m134-01.svg",
         "loot/loot-ammo-box.svg",
         "loot/loot-chest-01.svg",
         "loot/loot-chest-02.svg",
@@ -536,6 +541,11 @@ export const LoadoutAtlas: AtlasDef = {
         "loot/loot-weapon-vector.svg",
         "loot/loot-weapon-vector45.svg",
         "loot/loot-weapon-vss.svg",
+        // survev.de weapons
+        "loot/loot-weapon-ak74.svg",
+        "loot/loot-weapon-hawk.svg",
+        "loot/loot-weapon-m134.svg",
+        "loot/loot-weapon-pkm.svg",
         "loot/loot-xp-bone-01.svg",
         "loot/loot-xp-book-01.svg",
         "loot/loot-xp-book-02.svg",

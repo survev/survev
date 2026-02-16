@@ -3519,7 +3519,7 @@ function createCabin<T extends ExtendedBuildingDef>(e: Partial<T>): T {
                 ori: 0,
             },
             {
-                type: "pot_01",
+                type: randomObstacleType({ pot_01: 24, pot_01purple : 1 }),
                 pos: v2.create(-16, -8.5),
                 scale: 1,
                 ori: 0,
@@ -3563,13 +3563,13 @@ function createCabin<T extends ExtendedBuildingDef>(e: Partial<T>): T {
                 ori: 0,
             },
             {
-                type: "pot_01",
+                type: randomObstacleType({ pot_01: 24, pot_01purple : 1 }),
                 pos: v2.create(16, 9.5),
                 scale: 1,
                 ori: 0,
             },
             {
-                type: "pot_01",
+                type: randomObstacleType({ pot_01: 24, pot_01purple : 1 }),
                 pos: v2.create(16, -8.5),
                 scale: 1,
                 ori: 0,
@@ -3706,31 +3706,31 @@ function createHut<T extends BuildingDef>(e: Partial<T>): T {
                 ori: 0,
             },
             {
-                type: randomObstacleType({ pot_01: 2, "": 1 }),
+                type: randomObstacleType({ pot_01: 20, "": 4, pot_01purple : 1 }),
                 pos: v2.create(4.5, 4.5),
                 scale: 1,
                 ori: 0,
             },
             {
-                type: randomObstacleType({ pot_01: 2, "": 1 }),
+                type: randomObstacleType({ pot_01: 20, "": 4, pot_01purple : 1 }),
                 pos: v2.create(4.5, -4.5),
                 scale: 1,
                 ori: 0,
             },
             {
-                type: randomObstacleType({ pot_01: 2, "": 1 }),
+                type: randomObstacleType({ pot_01: 20, "": 4, pot_01purple : 1 }),
                 pos: v2.create(-4.5, 4.5),
                 scale: 1,
                 ori: 0,
             },
             {
-                type: randomObstacleType({ pot_01: 2, "": 1 }),
+                type: randomObstacleType({ pot_01: 20, "": 4, pot_01purple : 1 }),
                 pos: v2.create(-4.5, -4.5),
                 scale: 1,
                 ori: 0,
             },
             {
-                type: e.specialLoot || "pot_01",
+                type: e.specialLoot || randomObstacleType({ pot_01: 20, "": 4, pot_01purple : 1 }),
                 pos: v2.create(0, 0),
                 scale: 1,
                 ori: 0,
@@ -4125,13 +4125,13 @@ function createShack3<T extends BuildingDef>(e: Partial<T>): T {
                 ori: 0,
             },
             {
-                type: "pot_01",
+                type: randomObstacleType({ pot_01: 24, pot_01purple : 1 }),
                 pos: v2.create(-4.25, -1.25),
                 scale: 1,
                 ori: 0,
             },
             {
-                type: "pot_01",
+                type: randomObstacleType({ pot_01: 24, pot_01purple : 1 }),
                 pos: v2.create(-1.25, -1.25),
                 scale: 1,
                 ori: 0,
@@ -7107,7 +7107,7 @@ function createPoliceStation<T extends BuildingDef>(e: Partial<T>): T {
                 ori: 1,
             },
             {
-                type: randomObstacleType({ locker_01: 8, locker_02: 1 }),
+                type: "locker_02",
                 pos: v2.create(33, 4.15),
                 scale: 1,
                 ori: 2,
@@ -7119,13 +7119,13 @@ function createPoliceStation<T extends BuildingDef>(e: Partial<T>): T {
                 ori: 1,
             },
             {
-                type: randomObstacleType({ locker_01: 8, locker_02: 1 }),
+                type: randomObstacleType({ locker_01: 7, locker_02: 1 }),
                 pos: v2.create(33, 20.85),
                 scale: 1,
                 ori: 0,
             },
             {
-                type: randomObstacleType({ locker_01: 8, locker_02: 1 }),
+                type: randomObstacleType({ locker_01: 7, locker_02: 1 }),
                 pos: v2.create(38, 20.85),
                 scale: 1,
                 ori: 0,
@@ -7137,13 +7137,13 @@ function createPoliceStation<T extends BuildingDef>(e: Partial<T>): T {
                 ori: 0,
             },
             {
-                type: randomObstacleType({ locker_01: 8, locker_02: 1 }),
+                type: randomObstacleType({ locker_01: 7, locker_02: 1 }),
                 pos: v2.create(40.85, 7.5),
                 scale: 1,
                 ori: 3,
             },
             {
-                type: randomObstacleType({ locker_01: 8, locker_02: 1 }),
+                type: randomObstacleType({ locker_01: 7, locker_02: 1 }),
                 pos: v2.create(40.85, 17.5),
                 scale: 1,
                 ori: 3,
@@ -7155,13 +7155,13 @@ function createPoliceStation<T extends BuildingDef>(e: Partial<T>): T {
                 ori: 1,
             },
             {
-                type: randomObstacleType({ locker_01: 8, locker_02: 1 }),
+                type: randomObstacleType({ locker_01: 7, locker_02: 1 }),
                 pos: v2.create(38, 11.35),
                 scale: 1,
                 ori: 0,
             },
             {
-                type: randomObstacleType({ locker_01: 8, locker_02: 1 }),
+                type: randomObstacleType({ locker_01: 7, locker_02: 1 }),
                 pos: v2.create(33, 13.65),
                 scale: 1,
                 ori: 2,
@@ -7197,7 +7197,7 @@ function createPoliceStation<T extends BuildingDef>(e: Partial<T>): T {
                 ori: 1,
             },
             {
-                type: "crate_06",
+                type: randomObstacleType({ crate_06: 2, crate_06red: 1 }), // super90 crate implementation
                 pos: v2.create(-24.5, 20.25),
                 scale: 1,
                 ori: 0,
@@ -10248,6 +10248,30 @@ export const MapObjectDefs: Record<string, MapObjectDef> = {
         img: { sprite: "map-crate-22.img" },
         sound: { explode: "crate_break_01" },
     }),
+    // Survev.de crates
+    case_03purple: createCase({
+        health: 140,
+        img: {
+            sprite: "map-case-hatchet-01purple.img",
+            residue: "map-case-hatchet-res-01.img",
+        },
+        loot: [autoLoot("vector45", 1)],
+        hitParticle: "blackChip",
+    }),
+    crate_06red: createCrate({ // super90 crate
+        collision: collider.createAabbExtents(v2.create(0, 0), v2.create(2.25, 1.1)),
+        health: 175,
+        destructible: true,
+        armorPlated: true,
+        hitParticle: "greenChip",
+        loot: [autoLoot("m1014", 1)],
+        map: { display: false },
+        img: { sprite: "map-crate-06red.img" },
+        sound: {
+            bullet: "ammo_crate_bullet",
+            punch: "ammo_crate_bullet",
+        },
+    }),
     airdrop_crate_01: createAirdrop({
         button: {
             useImg: "map-airdrop-02.img",
@@ -10903,7 +10927,7 @@ export const MapObjectDefs: Record<string, MapObjectDef> = {
         destructible: true,
     }),
     pot_01: createBottle({}),
-    pot_01purple: createBottle({
+    pot_01purple: createBottle({ // purple pots, mk45g pot
         img: { sprite: "map-pot-01purple.img" },
         loot: [autoLoot("mkg45", 1)],
     }),
@@ -24956,6 +24980,12 @@ export const MapObjectDefs: Record<string, MapObjectDef> = {
                 ori: 2,
             },
             {
+                type: "loot_tier_hydra_floor",
+                pos: v2.create(39.95, -60.45),
+                scale: 1,
+                ori: 0,
+            },
+            {
                 type: "locker_01",
                 pos: v2.create(46.5, -55.15),
                 scale: 1,
@@ -25524,7 +25554,7 @@ export const MapObjectDefs: Record<string, MapObjectDef> = {
                 ori: 0,
             },
             {
-                type: "case_03",
+                type: randomObstacleType({ case_03: 4, case_03purple: 1 }), //vector crate / hatchet crate
                 pos: v2.create(7, -4),
                 scale: 1,
                 ori: 3,
@@ -27422,7 +27452,7 @@ export const MapObjectDefs: Record<string, MapObjectDef> = {
                 ignoreMapSpawnReplacement: true,
             },
             {
-                type: "loot_tier_woodaxe",
+                type: "loot_tier_crossing",
                 pos: v2.create(-23.5, -8.5),
                 scale: 0.8,
                 ori: 0,
@@ -28348,7 +28378,7 @@ export const MapObjectDefs: Record<string, MapObjectDef> = {
                 ori: 0,
             },
             {
-                type: "case_03",
+                type: randomObstacleType({ case_03: 4, case_03purple: 1 }),
                 pos: v2.create(-2.5, 6.5),
                 scale: 1,
                 ori: 0,

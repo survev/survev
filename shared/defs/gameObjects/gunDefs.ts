@@ -337,7 +337,7 @@ export const BaseDefs: Record<string, GunDef> = {
         },
         worldImg: {
             sprite: "gun-vector45-01.img",
-            scale: { x: 0.58, y: 0.45 },
+            scale: { x: 0.16, y: 0.12 },
             tint: 0xffffff,
             leftHandOffset: { x: 7, y: 0 },
             recoil: 0.89,
@@ -1284,7 +1284,6 @@ export const BaseDefs: Record<string, GunDef> = {
             deploy: "pkp_switch_01",
         },
     },
-    /* EU-Comp Special pkm
     pkm: {
         name: "PKM",
         type: "gun",
@@ -1335,8 +1334,7 @@ export const BaseDefs: Record<string, GunDef> = {
             empty: "empty_fire_02",
             deploy: "pkp_switch_01",
         },
-    },
-    */
+    },    
     m134: {
         name: "M134",
         type: "gun",
@@ -2032,7 +2030,7 @@ export const BaseDefs: Record<string, GunDef> = {
             deploy: "saiga_switch_01",
         },
     },
-    /* EU-Comp Special Hawk and funny Hawk
+    // EU-Comp Special Hawk and funny Hawk
     hawk: {
         name: "HAWK-12G",
         type: "gun",
@@ -2067,7 +2065,7 @@ export const BaseDefs: Record<string, GunDef> = {
         },
         worldImg: {
             sprite: "gun-hawk-01.img",
-            scale: { x: 0.4, y: 0.4 },
+            scale: { x: 0.5, y: 0.4 },
             tint: 0xffffff,
             leftHandOffset: { x: 8, y: 0 },
             recoil: 1.33,
@@ -2129,7 +2127,6 @@ export const BaseDefs: Record<string, GunDef> = {
             deploy: "saiga_switch_01",
         },
     },
-    */
     spas12: {
         name: "SPAS-12",
         type: "gun",
@@ -3569,7 +3566,6 @@ export const BaseDefs: Record<string, GunDef> = {
             deploy: "stow_weapon_01",
         },
     },
-    /* EU-Comp special gun
     ak74: {
         name: "AK-74",
         type: "gun",
@@ -3603,7 +3599,7 @@ export const BaseDefs: Record<string, GunDef> = {
         },
         worldImg: {
             sprite: "gun-long-ak74.img",
-            scale: { x: 0.65, y: 0.5655 },
+            scale: { x: 0.55, y: 0.5655 },
             tint: 0xffffff, // not tint at all
             leftHandOffset: { x: 2.8, y: 0 },
             recoil: 1.33,
@@ -3617,7 +3613,6 @@ export const BaseDefs: Record<string, GunDef> = {
             deploy: "ak47_switch_01",
         },
     },
-    */
 };
 
 const SkinDefs: Record<string, GunDef> = {
