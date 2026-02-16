@@ -378,7 +378,7 @@ export const Comp: MapDef = {
         ],
         tier_ak_locker: [
             { name: "ak47", count: 1, weight: 0.4 }, // ?
-            { name: "ak74", count: 1, weight: 0.2 },
+            //{ name: "ak74", count: 1, weight: 0.2 },
             { name: "scar", count: 1, weight: 0.2 },
             { name: "bar", count: 1, weight: 0.2 },
         ],
@@ -421,7 +421,7 @@ export const Comp: MapDef = {
             { name: "ots38", count: 1, weight: 0.2 },
             { name: "saiga", count: 1, weight: 0.05 },
             //{ name: "tier_hawk", count: 1, weight: 0.05 },
-            { name: "ak74", count: 1, weight: 0.05 }, 
+            //{ name: "ak74", count: 1, weight: 0.05 }, 
             { name: "l86", count: 1, weight: 0.1 },
         ],
         tier_bank_vault_basic: [
@@ -462,7 +462,7 @@ export const Comp: MapDef = {
             { name: "", count: 1, weight: 0.33},
         ],
         tier_ak_bunker: [
-            { name: "ak74", count: 1, weight: 0.6 },
+            //{ name: "ak74", count: 1, weight: 0.6 },
             { name: "ak47", count: 1, weight: 0.4 }, 
         ],
         tier_chest_sniper_tea: [

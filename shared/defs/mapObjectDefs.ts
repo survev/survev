@@ -7221,7 +7221,7 @@ function createPoliceStation<T extends BuildingDef>(e: Partial<T>): T {
                 ori: 0,
             },
             {
-                type: randomObstacleType({ crate_06: 7, crate_06s: 1}),
+                type: randomObstacleType({ crate_06: 2, crate_06s: 1}),
                 pos: v2.create(10.5, 1.25),
                 scale: 1,
                 ori: 0,
