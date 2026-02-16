@@ -1164,6 +1164,7 @@ export class GameMap {
                         pos,
                         def.group.minDistance,
                     );
+                    console.log(groupObjects.length);
                     if (groupObjects.length > 0) {
                         return false;
                     }
@@ -2293,6 +2294,8 @@ export class GameMap {
                         return false;
                     }
 
+                    console.log("spawn pos candidate:", pos);
+
                     for (let i = 0; i < this.game.playerBarn.livingPlayers.length; i++) {
                         const player = this.game.playerBarn.livingPlayers[i];
                         if (group && player.groupId === group.id) continue;
@@ -2301,6 +2304,7 @@ export class GameMap {
                         const minSpawnRad = this.mapDef.gameMode.minSpawnRad ?? GameConfig.player.minSpawnRad;
 
                         if (v2.distance(player.pos, pos) < minSpawnRad) {
+                            console.log("too close to player:", v2.distance(player.pos, pos));
                             return false;
                         }
                     }
