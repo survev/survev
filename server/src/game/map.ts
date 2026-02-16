@@ -849,7 +849,7 @@ export class GameMap {
             }
         }
 
-        /*const sortFn = (a: MapSpawn, b: MapSpawn) => {
+        const sortFn = (a: MapSpawn, b: MapSpawn) => {
             const priorityA = mapGen.importantSpawns.indexOf(a.type) + 1;
             const priorityB = mapGen.importantSpawns.indexOf(b.type) + 1;
 
@@ -869,43 +869,8 @@ export class GameMap {
             const sizeB = widthB * heightB;
 
             return sizeB - sizeA;
-        };*/
+        };
 
-        const sortFn = (a: MapSpawn, b: MapSpawn) => {
-        const priorityA = mapGen.importantSpawns.indexOf(a.type) + 1;
-        const priorityB = mapGen.importantSpawns.indexOf(b.type) + 1;
-
-        if (priorityA !== priorityB) {
-            return priorityB - priorityA;
-        }
-
-        // ---- GUARD: invalid types ----
-        const defA = MapObjectDefs[a.type];
-        const defB = MapObjectDefs[b.type];
-
-        if (!defA || !defB) {
-            if (!defA) this.game.logger.warn("[mapgen] Unknown MapObjectDefs type in spawns:", a.type);
-            if (!defB) this.game.logger.warn("[mapgen] Unknown MapObjectDefs type in spawns:", b.type);
-
-            // unknown types last
-            if (!defA && defB) return 1;
-            if (defA && !defB) return -1;
-            return 0;
-        }
-
-        const boundsA = collider.toAabb(mapHelpers.getBoundingCollider(a.type));
-        const boundsB = collider.toAabb(mapHelpers.getBoundingCollider(b.type));
-
-        const widthA = boundsA.max.x - boundsA.min.x;
-        const heightA = boundsA.max.y - boundsA.min.y;
-        const sizeA = widthA * heightA;
-
-        const widthB = boundsB.max.x - boundsB.min.x;
-        const heightB = boundsB.max.y - boundsB.min.y;
-        const sizeB = widthB * heightB;
-
-        return sizeB - sizeA;
-    };
 
         objsToSpawn.stage1.sort(sortFn);
 

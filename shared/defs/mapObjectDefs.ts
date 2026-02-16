@@ -30186,6 +30186,10 @@ export const MapObjectDefs: Record<string, MapObjectDef> = {
         type: "loot_spawner",
         loot: [tierLoot("tier_mansion_floor", 1, 1)],
     },
+    loot_tier_hydra_floor: {
+            type: "loot_spawner",
+            loot: [tierLoot("tier_hydra_floor", 1, 1)],
+        },
     loot_tier_sv98: {
         type: "loot_spawner",
         loot: [tierLoot("tier_sv98", 1, 1)],
