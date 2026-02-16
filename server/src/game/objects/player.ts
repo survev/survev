@@ -2459,7 +2459,9 @@ export class Player extends BaseGameObject {
 
                 // faction team leader
                 if (
-                    (emotePlayer.role === "leader" || emotePlayer.role === "captain") &&
+                    (emotePlayer.role === "leader" ||
+                        emotePlayer.role === "captain" ||
+                        emotePlayer.role === "last_man") &&
                     emotePlayer.teamId === player.teamId
                 ) {
                     return true;
