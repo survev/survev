@@ -14,7 +14,7 @@ import { MapId } from "../types/misc";
 export const Local: MapDef = {
     mapId: MapId.Local,
     desc: {
-        name: "Normal",
+        name: "Local",
         icon: "img/gui/player-the-hunted.svg",
         buttonCss: "btn-mode-faction",
         buttonText: "1v1",

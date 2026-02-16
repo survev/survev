@@ -37,4 +37,8 @@ export interface StructureDef {
     bridgeLandBounds?: AABB[];
     bridgeWaterBounds?: AABB[];
     teamId?: number;
+    group?: {
+        id: number;
+        minDistance?: number;
+    };
 }
