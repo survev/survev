@@ -56,7 +56,7 @@ export const Comp: MapDef = {
         maxPlayers: 8,
         killLeaderEnabled: true,
         freezeTime: 10,
-        joinTime: 30, // time until players can move after game start
+        joinTime: 10, // time until players can move after game start
         airdropMinDistance: 300, // minimum distance between airdrops
         betterSpawn: true,
         betterMapGen: true,
@@ -1027,12 +1027,12 @@ export const Comp: MapDef = {
                 warehouse_01: { small: 2, large: 5,},
                 house_red_01: { small: 3, large: 7,}, 
                 house_red_02: { small: 3, large: 7,},
-                barn_01: { small: 1, large: 4,}, //green houses
-                barn_02: { small: 1, large: 1,},
                 teahouse_complex_01su: {
                     small: 1,
                     large: 3,
                 },
+                barn_01: { small: 1, large: 4,}, //green houses
+                barn_02: { small: 1, large: 1,},
                 hut_01: 3, // huts
                 hut_02: 1, // spas hut
                 hut_03: 1, // scout hut
@@ -1065,7 +1065,7 @@ export const Comp: MapDef = {
             },
         ],
         spawnReplacements: [{}],
-        importantSpawns: ["club_complex_01"],
+        importantSpawns: ["club_complex_01", "teahouse_complex_01su", "mansion_structure_01", "police_01", "bank_01", "warehouse_complex_01"],
     },
     /* STRIP_FROM_PROD_CLIENT:END */
 };
