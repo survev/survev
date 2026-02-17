@@ -29,7 +29,8 @@ GoogleRouter.get("/", (c) => {
     const url = google.createAuthorizationURL(state, codeVerifier, ["openid", "email"]);
 
     setCookie(c, stateCookieName, state, {
-        secure: process.env.NODE_ENV === "production",
+        //secure: process.env.NODE_ENV === "production",
+        secure: false,
         path: "/",
         httpOnly: false,
         maxAge: 60 * 10,
@@ -38,7 +39,8 @@ GoogleRouter.get("/", (c) => {
     });
 
     setCookie(c, codeVerifierCookieName, codeVerifier, {
-        secure: process.env.NODE_ENV === "production",
+        //secure: process.env.NODE_ENV === "production",
+        secure: false,
         path: "/",
         httpOnly: false,
         maxAge: 60 * 10,

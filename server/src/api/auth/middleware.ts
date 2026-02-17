@@ -26,7 +26,8 @@ export const authMiddleware = async (c: Context, next: Next) => {
         if (session) {
             setCookie(c, "session", sessionToken, {
                 httpOnly: true,
-                secure: process.env.NODE_ENV === "production",
+                //secure: process.env.NODE_ENV === "production",
+                secure: false,
                 sameSite: "lax",
                 path: "/",
                 expires: session.expiresAt,
