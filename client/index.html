@@ -852,7 +852,9 @@
                   <a class="btn-darken menu-option btn-team-option" id="btn-join-team" data-l10n="index-join-team">Join Team</a>
                   <a class="btn-darken menu-option btn-team-option" id="btn-create-team" data-l10n="index-create-team">Create Team</a>
                 </div>
-                <div id="btn-help" class="menu-option btn-darken" data-l10n="index-how-to-play">How to Play</div>
+                <!--<div id="btn-help" class="menu-option btn-darken" data-l10n="index-how-to-play">How to Play</div>-->
+
+                <a class="btn-green btn-darken menu-option" id="btn-spectator-menu">Spectate</a>
                 <div id="start-help">
                   <h1 data-l10n="index-controls">Controls</h1>
                   <p><span class="help-action" data-l10n="index-movement"></span>: <span class="help-control" data-l10n="index-movement-ctrl"></span></p>
@@ -927,6 +929,51 @@
                       </div>
                     </div>
                   </div>
+                </div>
+              </div>
+            </div>
+            <div id="spectator-menu" class="menu-column menu-block">
+              <div class="play-button-container">
+                <a class='btn-darken menu-option' id='btn-leave-spectator' data-l10n='index-leave-spectator'>Return</a>
+                <a class='btn-darken menu-option' id='btn-reload-games' data-l10n='index-reload-games'>Reload Games</a>
+                <div id="spectator-menu-header">Spectator Menu</div>
+                <div id="spectator-menu-contents">
+                    <div id="spectator-menu-options">
+                      <select id='server-select-spectate' class='server-select menu-option btn-hollow btn-hollow-selected'>
+                        <optgroup id='spectate-server-opts' label='Region' data-l10n='index-region'>
+                        </optgroup>
+                      </select>
+                      <select id='game-select-main' class='server-select menu-option btn-hollow btn-hollow-selected'>
+                        <optgroup id='game-opts' label='Games' data-l10n='index-games'>
+                        </optgroup>
+                      </select>
+                      <a class='btn-green btn-darken menu-option' id='btn-start-spectate' data-l10n='index-spectate'>Spectate</a>
+                    </div>
+
+                    <div id="spectator-menu-gameinfo">
+                      <div id="spectator-menu-gameinfo-header">Game Info</div>
+                      <div id="spectator-menu-gameinfo-contents">
+                        <div class="spectator-menu-gameinfo-item">
+                          <span class="spectator-menu-gameinfo-label" data-l10n='index-teamMode'>Team Mode:</span>
+                          <span class="spectator-menu-gameinfo-value" id="spectate-teamMode-name"></span>
+                        </div>
+                        <div class="spectator-menu-gameinfo-item">
+                          <span class="spectator-menu-gameinfo-label" data-l10n='index-playerCount'>Player Count:</span>
+                          <span class="spectator-menu-gameinfo-value" id="spectate-playerCount"></span>
+                        </div>
+                        <!--<div class="spectator-menu-gameinfo-item">
+                          <span class="spectator-menu-gameinfo-label" data-i10n="index-players">Players:</span>
+                          <button id="players-toggle" class="spectator-menu-toggle" type="button">Show</button>
+                        </div>
+                        <div id="spectate-players" class="spectator-menu-players collapsed"></div>-->
+                        <div class="spectator-menu-gameinfo-item">
+                          <span class="spectator-menu-gameinfo-label" data-l10n='index-runtime'>Runtime:</span>
+                          <span class="spectator-menu-gameinfo-value" id="spectate-runtime"></span>
+                        </div>
+                      </div>
+                    </div>
+
+
                 </div>
               </div>
             </div>

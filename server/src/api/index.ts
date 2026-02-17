@@ -185,6 +185,43 @@ app.post("/api/find_game", validateParams(zFindGameBody), async (c) => {
     });
 });
 
+const zRegionOnly = z.object({ region: z.string() });
+const zFindSpectator = z.object({
+  region: z.string(),
+  version: z.number().optional(),
+  zones: z.array(z.string()).optional(),
+  gameModeIdx: z.number().optional(),
+  appsid: z.string().optional(),
+  gameId: z.string().optional(),
+});
+const zFindGameById = z.object({
+  region: z.string(),
+  gameId: z.string(),
+  version: z.number().optional(),
+});
+
+// /api/game_infos
+app.post("/api/game_infos", validateParams(zRegionOnly), async (c) => {
+  const body = c.req.valid("json");
+  const data = await server.collectGameInfos(body.region);
+  return c.json(data);
+});
+
+// /api/find_spectator_game
+app.post("/api/find_spectator_game", validateParams(zFindSpectator), async (c) => {
+  const body = c.req.valid("json");
+  const data = await server.findSpectatorGame(body);
+  return c.json(data);
+});
+
+// /api/find_game_by_id
+app.post("/api/find_game_by_id", validateParams(zFindGameById), async (c) => {
+  const body = c.req.valid("json");
+  const data = await server.findGameById(body.region, body.gameId);
+  return c.json(data);
+});
+
+
 app.post(
     "/api/report_error",
     rateLimitMiddleware(5, 60 * 1000),

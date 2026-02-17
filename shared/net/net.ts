@@ -351,6 +351,7 @@ export enum MsgType {
     UpdatePass,
     AliveCounts,
     PerkModeRoleSelect,
+    JoinAsSpectator,
 }
 
 export enum PickupMsgType {
@@ -383,4 +384,5 @@ export { PickupMsg } from "./pickupMsg";
 export { PlayerStatsMsg } from "./playerStatsMsg";
 export { RoleAnnouncementMsg } from "./roleAnnouncementMsg";
 export { SpectateMsg } from "./spectateMsg";
+export { JoinAsSpectatorMsg } from "./joinAsSpectatorMsg";
 export { getPlayerStatusUpdateRate, UpdateMsg } from "./updateMsg";

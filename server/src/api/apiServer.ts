@@ -46,6 +46,23 @@ class Region {
         }
         return data;
     }
+
+    // in class Region
+    async collectGameInfos(): Promise<any> {
+    const data = await this.fetch<any>("api/game_infos", { region: this.id });
+    return data ?? { error: "game_infos_failed" };
+    }
+
+    async findSpectatorGame(body: any): Promise<any> {
+    const data = await this.fetch<any>("api/find_spectator_game", body);
+    return data ?? { error: "find_spectator_game_failed" };
+    }
+
+    async findGameById(gameId: string): Promise<any> {
+    const data = await this.fetch<any>("api/find_game_by_id", { region: this.id, gameId });
+    return data ?? { error: "find_game_by_id_failed" };
+    }
+
 }
 
 interface RegionData {
@@ -111,6 +128,25 @@ export class ApiServer {
         }
         return { error: "find_game_failed" };
     }
+
+    async collectGameInfos(region: string) {
+    const r = this.regions[region];
+    if (!r) return { error: "Invalid Region" };
+        return await r.collectGameInfos();
+    }
+
+    async findSpectatorGame(body: any) {
+    const r = this.regions[body.region];
+    if (!r) return { error: "Invalid Region" };
+        return await r.findSpectatorGame(body);
+    }
+
+    async findGameById(region: string, gameId: string) {
+    const r = this.regions[region];
+    if (!r) return { error: "Invalid Region" };
+        return await r.findGameById(gameId);
+    }
+
 }
 
 export const server = new ApiServer();

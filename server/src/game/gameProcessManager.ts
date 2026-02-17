@@ -143,6 +143,15 @@ class GameProcess implements GameData {
         });
         this.avaliableSlots--;
     }
+    addJoinTokensAsSpectator(tokens: FindGamePrivateBody["playerData"], autoFill: boolean) {
+        console.log("Adding join tokens as spectator:", tokens, "autoFill:", autoFill);
+        this.send({
+            type: ProcessMsgType.AddJoinTokenAsSpectator,
+            autoFill,
+            tokens,
+        });
+        //this.avaliableSlots--;
+    }
 
     handleMsg(data: ArrayBuffer, socketId: string, ip: string) {
         this.send({
@@ -313,6 +322,18 @@ export class GameProcessManager implements GameManager {
         }
 
         game.addJoinTokens(body.playerData, body.autoFill);
+
+        return game.id;
+    }
+
+    async findGameById(gameId: string, playerData: any[], autoFill: boolean): Promise<string> {
+        let game = this.processById.get(gameId);
+
+        if (!game || game.aliveCount < 0) {
+            return "";
+        }
+
+        game.addJoinTokensAsSpectator(playerData, autoFill);
 
         return game.id;
     }

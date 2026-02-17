@@ -140,6 +140,7 @@ export class Group extends BasePlayerGroup {
 
     maxPlayers: number;
     reservedSlots = 0;
+    isSpectatorGroup: boolean;
 
     /**
      * We update the group spawn position (where new teammates will spawn) to the leader position
@@ -148,11 +149,12 @@ export class Group extends BasePlayerGroup {
     spawnPositionTicker = 0;
     spawnPosition?: Vec2;
 
-    constructor(hash: string, groupId: number, autoFill: boolean, maxPlayers: number) {
+    constructor(hash: string, groupId: number, autoFill: boolean, maxPlayers: number, isSpectatorGroup: boolean) {
         super(groupId, "group");
         this.hash = hash;
         this.autoFill = autoFill;
         this.maxPlayers = maxPlayers;
+        this.isSpectatorGroup = isSpectatorGroup;
     }
 
     canJoin(players: number) {
