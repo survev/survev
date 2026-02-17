@@ -33,7 +33,8 @@ DiscordRouter.get("/", (c) => {
 
     setCookie(c, stateCookieName, state, {
         path: "/",
-        secure: process.env.NODE_ENV === "production",
+        //secure: process.env.NODE_ENV === "production",
+        secure: false,
         httpOnly: true,
         maxAge: 60 * 10,
         sameSite: "Lax",
@@ -41,7 +42,8 @@ DiscordRouter.get("/", (c) => {
     });
 
     setCookie(c, codeVerifierCookieName, codeVerifier, {
-        secure: process.env.NODE_ENV === "production",
+        //secure: process.env.NODE_ENV === "production",
+        secure: false,
         path: "/",
         httpOnly: false,
         maxAge: 60 * 10,
@@ -54,10 +56,15 @@ DiscordRouter.get("/", (c) => {
 });
 
 DiscordRouter.get("/callback", async (c) => {
+    console.log("Discord callback");
     const code = c.req.query("code")?.toString() ?? null;
     const state = c.req.query("state")?.toString() ?? null;
     const storedState = getCookie(c)[stateCookieName] ?? null;
     const storedCodeVerifier = getCookie(c)[codeVerifierCookieName] ?? null;
+    console.log("code:", code);
+    console.log("state:", state);
+    console.log("storedState:", storedState);
+    console.log("storedCodeVerifier:", storedCodeVerifier);
 
     if (!code || !state || !storedCodeVerifier || !storedState || state !== storedState) {
         return c.json({}, 400);
