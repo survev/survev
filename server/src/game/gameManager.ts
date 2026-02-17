@@ -22,6 +22,8 @@ export abstract class GameManager {
 
     abstract findGame(body: FindGamePrivateBody): Promise<string>;
 
+    abstract findGameById(gameId: string, playerData: any[], autoFill: boolean): Promise<string>;
+
     abstract onOpen(socketId: string, socket: WebSocket<GameSocketData>): void;
 
     abstract onMsg(socketId: string, msg: ArrayBuffer): void;
@@ -150,6 +152,18 @@ export class SingleThreadGameManager implements GameManager {
         }
 
         game.addJoinTokens(body.playerData, body.autoFill);
+
+        return game.id;
+    }
+
+    async findGameById(gameId: string, playerData: any[], autoFill: false): Promise<string> {
+        let game = this.gamesById.get(gameId);
+
+        if (!game || game.aliveCount < 0) {
+            return "";
+        }
+
+        game.addJoinTokensAsSpectator(playerData, autoFill);
 
         return game.id;
     }

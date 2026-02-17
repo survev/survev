@@ -353,6 +353,7 @@ export class Game {
 
         let msg:
             | net.JoinMsg
+            | net.JoinAsSpectatorMsg
             | net.InputMsg
             | net.EmoteMsg
             | net.DropItemMsg
@@ -381,6 +382,28 @@ export class Game {
                 stream.index = oldIdx;
 
                 msg = new net.JoinMsg();
+                msg.deserialize(stream);
+                break;
+            }
+            case net.MsgType.JoinAsSpectator: {
+                // read protocol version outside of JoinAsSpectatorMsg
+                // reason: if theres a protocol change in JoinAsSpectatorMsg it will fail to deserialize the entire msg
+                // and won't give the proper invalid-protocol error
+                // so we read it before deserializing the msg to avoid it throwing and giving the wrong error
+
+                const oldIdx = stream.index;
+                const protocol = stream.readUint32();
+
+                if (protocol !== GameConfig.protocolVersion) {
+                    return {
+                        type: net.MsgType.JoinAsSpectator,
+                        msg: undefined,
+                        error: "index-invalid-protocol",
+                    };
+                }
+                stream.index = oldIdx;
+
+                msg = new net.JoinAsSpectatorMsg();
                 msg.deserialize(stream);
                 break;
             }
@@ -455,6 +478,11 @@ export class Game {
 
         if (type === net.MsgType.Join && !player) {
             this.playerBarn.addPlayer(socketId, msg as net.JoinMsg, ip);
+            return;
+        }
+
+        if (type === net.MsgType.JoinAsSpectator && !player) {
+            this.playerBarn.addSpectator(socketId, msg as net.JoinAsSpectatorMsg, ip);
             return;
         }
 
@@ -533,6 +561,25 @@ export class Game {
     }
 
     addJoinTokens(tokens: FindGamePrivateBody["playerData"], autoFill: boolean) {
+        const groupData = {
+            playerCount: tokens.length,
+            groupHashToJoin: "",
+            autoFill,
+        };
+
+        for (const token of tokens) {
+            this.joinTokens.set(token.token, {
+                expiresAt: Date.now() + 10000,
+                userId: token.userId,
+                groupData,
+                findGameIp: token.ip,
+                loadout: token.loadout,
+            });
+        }
+    }
+
+    addJoinTokensAsSpectator(tokens: FindGamePrivateBody["playerData"], autoFill: boolean) {
+        console.log("Adding join tokens as spectator:", tokens, "autoFill:", autoFill);
         const groupData = {
             playerCount: tokens.length,
             groupHashToJoin: "",

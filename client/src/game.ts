@@ -97,7 +97,7 @@ export class Game {
     m_playing!: boolean;
     m_gameOver!: boolean;
     m_spectating!: boolean;
-    m_spectateCooldown!: number;
+    //m_spectateCooldown!: number;
     m_inputMsgTimeout!: number;
     m_prevInputMsg!: net.InputMsg;
     m_playingTicker!: number;
@@ -223,6 +223,77 @@ export class Game {
         }
     }
 
+    tryJoinGameAsSpectator(
+        url: string,
+        matchPriv: string,
+        questPriv: string,
+        onConnectFail: () => void,
+    ) {
+        if (!this.connecting && !this.connected && !this.initialized) {
+            if (this.m_ws) {
+                this.m_ws.onerror = function () {};
+                this.m_ws.onopen = function () {};
+                this.m_ws.onmessage = function () {};
+                this.m_ws.onclose = function () {};
+                this.m_ws.close();
+                this.m_ws = null;
+            }
+            this.connecting = true;
+            this.connected = false;
+            try {
+                this.m_ws = new WebSocket(url);
+                this.m_ws.binaryType = "arraybuffer";
+                this.m_ws.onerror = (_err) => {
+                    this.m_ws?.close();
+                };
+                this.m_ws.onopen = () => {
+                    this.connecting = false;
+                    this.connected = true;
+                    const name = this.m_config.get("playerName")!;
+                    const joinMessage = new net.JoinAsSpectatorMsg();
+                    joinMessage.protocol = GameConfig.protocolVersion;
+                    joinMessage.matchPriv = matchPriv;
+                    joinMessage.questPriv = questPriv;
+                    joinMessage.name = name;
+                    joinMessage.useTouch = device.touch;
+                    joinMessage.isMobile = device.mobile || window.mobile!;
+                    joinMessage.bot = false;
+                    joinMessage.loadout = this.m_config.get("loadout")!;
+
+                    this.m_sendMessage(net.MsgType.JoinAsSpectator, joinMessage, 8192);
+                };
+                this.m_ws.onmessage = (e) => {
+                    const msgStream = new net.MsgStream(e.data);
+                    while (true) {
+                        const type = msgStream.deserializeMsgType();
+                        if (type == net.MsgType.None) {
+                            break;
+                        }
+                        this.m_onMsg(type, msgStream.getStream());
+                    }
+                };
+                this.m_ws.onclose = () => {
+                    const displayingStats = this.m_uiManager?.displayingStats;
+                    const connecting = this.connecting;
+                    const connected = this.connected;
+                    this.connecting = false;
+                    this.connected = false;
+                    if (connecting) {
+                        onConnectFail();
+                    } else if (connected && !this.m_gameOver && !displayingStats) {
+                        const errMsg = this.m_disconnectMsg || "index-host-closed";
+                        this.onQuit(errMsg);
+                    }
+                };
+            } catch (err) {
+                console.error(err);
+                this.connecting = false;
+                this.connected = false;
+                onConnectFail();
+            }
+        }
+    }
+
     init() {
         this.m_canvasMode = this.m_pixi.renderer.type == PIXI.RENDERER_TYPE.CANVAS;
 
@@ -323,7 +394,7 @@ export class Game {
         this.m_playing = false;
         this.m_gameOver = false;
         this.m_spectating = false;
-        this.m_spectateCooldown = 0;
+        //this.m_spectateCooldown = 0;
         this.m_inputMsgTimeout = 0;
         this.m_prevInputMsg = new net.InputMsg();
         this.m_playingTicker = 0;
@@ -736,7 +807,7 @@ export class Game {
             }
         }
 
-        this.m_spectateCooldown -= dt;
+        //this.m_spectateCooldown -= dt;
         const specBegin = this.m_uiManager.specBegin;
         const specNext = (this.m_uiManager.specNext ||=
             this.m_spectating && this.m_input.keyPressed(Key.Right));
@@ -747,9 +818,9 @@ export class Game {
 
         if (
             specBegin ||
-            (this.m_spectating && this.m_spectateCooldown < 0 && (specNext || specPrev))
+            (this.m_spectating && (specNext || specPrev))
         ) {
-            this.m_spectateCooldown = 1;
+            //this.m_spectateCooldown = 1;
 
             const specMsg = new net.SpectateMsg();
             specMsg.specBegin = specBegin;
@@ -1563,6 +1634,7 @@ export class Game {
                     msg.teamRank,
                     msg.winningTeamId,
                     msg.gameOver,
+                    msg.spectator,
                     msg.betterStats,
                     localTeamId,
                     this.teamMode,

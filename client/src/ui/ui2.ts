@@ -1459,6 +1459,11 @@ export class UiManager2 {
                     "game-disconnected",
                 )}`;
             }
+            case DamageType.Spectator: {
+                return `${targetName} ${this.localization.translate(
+                    "game-joined-as-spectator",
+                )}`;
+            }
             default:
                 return "";
         }

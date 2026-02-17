@@ -1392,6 +1392,7 @@ export class UiManager {
         teamRank: number,
         winningTeamId: number,
         gameOver: boolean,
+        spectator: boolean,
         betterStats: boolean,
         localTeamId: number,
         teamMode: TeamMode,
@@ -1401,6 +1402,12 @@ export class UiManager {
         map: Map,
         ui2: UiManager2,
     ) {
+
+        if(spectator) {
+            console.log("Player is spectating");
+            this.beginSpectating();
+            return;
+        }
         console.log("BetterStats:", betterStats);
         // If we're spectating a team that's not our own, and the game isn't over yet,
         // don't display the stats screen again.

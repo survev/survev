@@ -189,6 +189,12 @@ app.options("/api/find_game", (res) => {
     res.end();
 });
 
+app.options("/api/find_spectator_game", (res) => {
+    cors(res);
+    res.end();
+});
+
+
 app.post("/api/find_game", (res, req) => {
     res.onAborted(() => {
         res.aborted = true;
@@ -225,295 +231,6 @@ app.post("/api/find_game", (res, req) => {
                 res.end();
             });
             server.logger.warn("/api/find_game: Error retrieving body");
-        },
-    );
-});
-
-app.post("/api/find_game_by_id", async (res, req) => {
-    res.onAborted(() => {
-        res.aborted = true;
-    });
-
-    cors(res);
-
-    // Accept BOTH header auth (new) and body apiKey (legacy via API server)
-    const headerKey = req.getHeader("survev-api-key");
-    if (headerKey && headerKey !== Config.secrets.SURVEV_API_KEY) {
-        forbidden(res);
-        return;
-    }
-
-    readPostedJSON(
-        res,
-        async (body: any) => {
-            try {
-                if (res.aborted) return;
-
-                if (!headerKey) {
-                    if (body?.apiKey !== Config.secrets.SURVEV_API_KEY) {
-                        forbidden(res);
-                        return;
-                    }
-                }
-
-                const region = body?.region;
-                const gameId = body?.gameId;
-
-                if (typeof region !== "string" || typeof gameId !== "string") {
-                    returnJson(res, { err: "failed_to_parse_body" });
-                    return;
-                }
-
-                if (region !== server.regionId) {
-                    returnJson(res, { err: "Invalid Region" });
-                    return;
-                }
-
-                const g = server.manager.getById(gameId);
-                if (!g) {
-                    returnJson(res, { err: "Invalid gameId" });
-                    return;
-                }
-
-                const token = randomUUID();
-                const ip = getIp(res, req, Config.gameServer.proxyIPHeader) ?? "";
-
-                const playerData = [
-                {
-                    token,
-                    ip,
-                },
-                ];
-
-                const game = await server.manager.findGameById(
-                gameId,
-                playerData,
-                false,
-                );
-
-                if (!game) {
-                returnJson(res, { err: "Invalid gameId" });
-                return;
-                }
-
-                returnJson(res, {
-                res: [
-                    {
-                    zone: "",
-                    data: token, // 👈 DAS ist matchPriv
-                    gameId,
-                    useHttps: server.region.https,
-                    hosts: [server.region.address],
-                    addrs: [server.region.address],
-                    },
-                ],
-                });
-
-
-                
-                
-
-                returnJson(res, {
-                    res: [
-                        {
-                            zone: "",
-                            data: (g as any).data ?? "",
-                            gameId,
-                            useHttps: server.region.https,
-                            hosts: [server.region.address],
-                            addrs: [server.region.address],
-                        },
-                    ],
-                });
-            } catch (error) {
-                server.logger.warn("API find_game_by_id error: ", error);
-            }
-        },
-        () => {
-            if (res.aborted) return;
-            res.cork(() => {
-                if (res.aborted) return;
-                res.writeStatus("500 Internal Server Error");
-                res.write("500 Internal Server Error");
-                res.end();
-            });
-            server.logger.warn("/api/find_game_by_id: Error retrieving body");
-        },
-    );
-});
-
-app.post("/api/game_infos", async (res, req) => {
-    res.onAborted(() => {
-        res.aborted = true;
-    });
-
-    cors(res);
-
-    const headerKey = req.getHeader("survev-api-key");
-    if (headerKey && headerKey !== Config.secrets.SURVEV_API_KEY) {
-        forbidden(res);
-        return;
-    }
-
-    readPostedJSON(
-        res,
-        async (body: any) => {
-            try {
-                if (res.aborted) return;
-
-                if (!headerKey) {
-                    if (body?.apiKey !== Config.secrets.SURVEV_API_KEY) {
-                        forbidden(res);
-                        return;
-                    }
-                }
-
-                const region = body?.region;
-                if (typeof region !== "string") {
-                    returnJson(res, { err: "failed_to_parse_body", data: [] });
-                    return;
-                }
-
-                if (region !== server.regionId) {
-                    returnJson(res, { err: "Invalid Region", data: [] });
-                    return;
-                }
-
-                // Expected by client: { data: [{id, teamMode, playerCount, playerNames, runtime, stopped}] }
-                const games = (server.manager as any).getGames?.() ?? (server.manager as any).games ?? [];
-                const now = Date.now();
-
-                const data = (Array.isArray(games) ? games : []).map((g: any) => ({
-                    id: g.id,
-                    teamMode: g.teamMode,
-                    playerCount: g.aliveCount,
-                    playerNames: "",
-                    runtime: g.startedTime,
-                    stopped: g.stopped ?? false,
-                })).filter((g: any) => g.id);
-
-                returnJson(res, { data });
-            } catch (error) {
-                server.logger.warn("API game_infos error: ", error);
-            }
-        },
-        () => {
-            if (res.aborted) return;
-            res.cork(() => {
-                if (res.aborted) return;
-                res.writeStatus("500 Internal Server Error");
-                res.write("500 Internal Server Error");
-                res.end();
-            });
-            server.logger.warn("/api/game_infos: Error retrieving body");
-        },
-    );
-});
-
-
-app.options("/api/find_spectator_game", (res) => {
-    cors(res);
-    res.end();
-});
-
-app.post("/api/find_spectator_game", (res, req) => {
-    res.onAborted(() => {
-        res.aborted = true;
-    });
-
-    cors(res);
-
-    const headerKey = req.getHeader("survev-api-key");
-    if (headerKey && headerKey !== Config.secrets.SURVEV_API_KEY) {
-        forbidden(res);
-        return;
-    }
-
-    readPostedJSON(
-        res,
-        async (body: any) => {
-            try {
-                if (res.aborted) return;
-
-                if (!headerKey) {
-                    if (body?.apiKey !== Config.secrets.SURVEV_API_KEY) {
-                        forbidden(res);
-                        return;
-                    }
-                }
-
-                const region = body?.region;
-                const gameId = body?.gameId;
-
-                if (typeof region !== "string") {
-                    returnJson(res, { err: "failed_to_parse_body" });
-                    return;
-                }
-
-                if (region !== server.regionId) {
-                    returnJson(res, { err: "Invalid Region" });
-                    return;
-                }
-
-                // If a specific gameId is provided, return it if it exists
-                if (typeof gameId === "string" && gameId.length > 0) {
-                    const g = server.manager.getById(gameId);
-                    if (!g) {
-                        returnJson(res, { err: "Invalid gameId" });
-                        return;
-                    }
-                    returnJson(res, {
-                        res: [
-                            {
-                                zone: "",
-                                data: (g as any).data ?? "",
-                                gameId,
-                                useHttps: server.region.https,
-                                hosts: [server.region.address],
-                                addrs: [server.region.address],
-                            },
-                        ],
-                    });
-                    return;
-                }
-
-                // Otherwise, pick any running game (simple heuristic)
-                const games = (server.manager as any).getGames?.() ?? (server.manager as any).games ?? [];
-                const pick = (Array.isArray(games) ? games : []).find((g: any) => !g.stopped && (g.playerCount ?? g.players?.length ?? 0) > 0)
-                    ?? (Array.isArray(games) ? games : [])[0];
-
-                if (!pick?.id) {
-                    returnJson(res, { err: "No Spectatable game" });
-                    return;
-                }
-
-                const pickedId = String(pick.id);
-
-                returnJson(res, {
-                    res: [
-                        {
-                            zone: "",
-                            data: pick.data ?? "",
-                            gameId: pickedId,
-                            useHttps: server.region.https,
-                            hosts: [server.region.address],
-                            addrs: [server.region.address],
-                        },
-                    ],
-                });
-            } catch (error) {
-                server.logger.warn("API find_spectator_game error: ", error);
-            }
-        },
-        () => {
-            if (res.aborted) return;
-            res.cork(() => {
-                if (res.aborted) return;
-                res.writeStatus("500 Internal Server Error");
-                res.write("500 Internal Server Error");
-                res.end();
-            });
-            server.logger.warn("/api/find_spectator_game: Error retrieving body");
         },
     );
 });
@@ -641,10 +358,9 @@ app.ws<GameSocketData>("/play", {
 app.ws<GameSocketData & { spectator?: boolean }>("/spectate", {
     idleTimeout: 30,
     maxPayloadLength: 1024,
-    
 
-    async upgrade(res, req, context): Promise<void> {
-        res.onAborted((): void => {
+    async upgrade(res, req, context) {
+        res.onAborted(() => {
             res.aborted = true;
         });
 
@@ -685,11 +401,16 @@ app.ws<GameSocketData & { spectator?: boolean }>("/spectate", {
             return;
         }
 
+        // WICHTIG: Spectator darf auch joinen wenn das Game schon gestartet ist.
+        // Optional: wenn du "stopped"/"ended" hast, kannst du das hier blocken.
+        // if ((gameData as any).stopped) { forbidden(res); return; }
+
         gameWsRateLimit.ipConnected(ip);
 
         const socketId = randomUUID();
         let disconnectReason = "";
 
+        // Optional: gleiche IP-Checks wie /play (kannst du auch weglassen)
         const ipData = await server.checkIp(ip);
         if (ipData?.banned) {
             disconnectReason = "ip_banned";
@@ -698,7 +419,6 @@ app.ws<GameSocketData & { spectator?: boolean }>("/spectate", {
         }
 
         if (res.aborted) return;
-
         res.cork(() => {
             if (res.aborted) return;
 
@@ -710,7 +430,7 @@ app.ws<GameSocketData & { spectator?: boolean }>("/spectate", {
                     rateLimit: {},
                     ip,
                     disconnectReason,
-                    spectator: true,
+                    spectator: true, // <-- Marker (falls du ihn im Game brauchst)
                 },
                 wskey,
                 wsProtocol,
@@ -733,10 +453,10 @@ app.ws<GameSocketData & { spectator?: boolean }>("/spectate", {
             return;
         }
 
-        server.manager.onOpen(data.id, socket as any);
+        server.manager.onOpen(data.id, socket);
     },
 
-    message(socket, message: ArrayBuffer, _isBinary: boolean) {
+    message(socket, message) {
         if (gameWsRateLimit.isRateLimited(socket.getUserData().rateLimit)) {
             server.logger.warn("Spectate websocket rate limited, closing socket.");
             socket.close();
@@ -752,6 +472,7 @@ app.ws<GameSocketData & { spectator?: boolean }>("/spectate", {
         gameWsRateLimit.ipDisconnected(data.ip);
     },
 });
+
 
 const pingHTTPRateLimit = new HTTPRateLimit(1, 3000);
 const pingWsRateLimit = new WebSocketRateLimit(50, 1000, 10);

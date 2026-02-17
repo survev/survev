@@ -34,6 +34,8 @@ import { Pass } from "./ui/pass";
 import { ProfileUi } from "./ui/profileUi";
 import { TeamMenu } from "./ui/teamMenu";
 import { loadStaticDomImages } from "./ui/ui2";
+import { MatchData, SpectatorMenu } from "./ui/spectatorMenu";
+import { GameInfo } from "./gameInfo";
 
 export class Application {
     nameInput = $("#player-name-input-solo");
@@ -41,6 +43,7 @@ export class Application {
     playMode0Btn = $("#btn-start-mode-0");
     playMode1Btn = $("#btn-start-mode-1");
     playMode2Btn = $("#btn-start-mode-2");
+    spectatorModeBtn = $("#btn-spectator-menu");
     muteBtns = $(".btn-sound-toggle");
     aimLineBtn = $("#btn-game-aim-line");
     masterSliders = $<HTMLInputElement>(".sl-master-volume");
@@ -69,6 +72,8 @@ export class Application {
 
     siteInfo!: SiteInfo;
     teamMenu!: TeamMenu;
+    gameInfo!: GameInfo;
+    spectatorMenu!: SpectatorMenu;
 
     pixi: PIXI.Application<PIXI.ICanvas> | null = null;
     resourceManager: ResourceManager | null = null;
@@ -113,6 +118,7 @@ export class Application {
             this.errorModal,
         );
         this.siteInfo = new SiteInfo(this.config, this.localization);
+        this.gameInfo = new GameInfo(this.config);
 
         this.teamMenu = new TeamMenu(
             this.config,
@@ -131,6 +137,16 @@ export class Application {
             });
         };
         this.loadBrowserDeps(onLoadComplete);
+        // Fix: initialize spectatorMenu to avoid undefined error
+        this.spectatorMenu = new SpectatorMenu(
+            this.config, 
+            this.pingTest, 
+            this.siteInfo,
+            this.gameInfo, 
+            this.localization, 
+            this.account, 
+            this.joinGameAsSpectator.bind(this)
+        );
     }
 
     async loadBrowserDeps(onLoadCompleteCb: () => void) {
@@ -178,6 +194,9 @@ export class Application {
                 SDK.requestMidGameAd(() => {
                     this.tryQuickStartGame(2);
                 });
+            });
+            this.spectatorModeBtn.on("click", () => {
+                this.spectatorMenu.loadSpectatorMenu();
             });
 
             this.serverSelect.on("change", () => {
@@ -791,6 +810,44 @@ export class Application {
                 joinGameImpl(urls, matchData);
             };
             this.game!.tryJoinGame(
+                url,
+                matchData.data,
+                this.account.questPriv,
+                onFailure,
+            );
+        };
+        joinGameImpl(urls, matchData);
+    }
+
+    joinGameAsSpectator(matchData: MatchData) {
+        if (!this.game) {
+            setTimeout(() => {
+                this.joinGameAsSpectator(matchData);
+            }, 250);
+            return;
+        }
+        const hosts = matchData.hosts || [];
+        const urls: string[] = [];
+        const appsid = localStorage.getItem('appsid'); // Retrieve the appsid from local storage
+        console.log(`Appsid retrieved from localStorage: ${appsid}`); // Log the appsid to check its value
+        for (let i = 0; i < hosts.length; i++) {
+            let url = `ws${matchData.useHttps ? "s" : ""}://${hosts[i]}/spectate?gameId=${matchData.gameId}`;
+            if (appsid !== null) {
+                url += `&appsid=${appsid}`; // Include the appsid in the URL if it is not null
+            }
+            urls.push(url);
+        }
+        console.log(`WebSocket URLs: ${urls}`); // Log the constructed URLs
+        const joinGameImpl = (urls: string[], matchData: MatchData) => {
+            const url = urls.shift();
+            if (!url) {
+                this.onJoinGameError("join_game_failed");
+                return;
+            }
+            const onFailure = function () {
+                joinGameImpl(urls, matchData);
+            };
+            this.game!.tryJoinGameAsSpectator(
                 url,
                 matchData.data,
                 this.account.questPriv,

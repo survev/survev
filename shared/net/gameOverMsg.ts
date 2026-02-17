@@ -7,7 +7,7 @@ export class GameOverMsg implements AbstractMsg {
     rank = 0;
     gameOver = false;
     winningTeamId = 0;
-    //spectator = false;
+    spectator = false;
     betterStats = false;
     playerStats: Array<PlayerStatsMsg["playerStats"]> = [];
 
@@ -18,7 +18,7 @@ export class GameOverMsg implements AbstractMsg {
         s.writeUint8(this.rank);
         s.writeUint8(+this.gameOver);
         s.writeUint8(this.winningTeamId);
-        //s.writeUint8(+this.spectator);
+        s.writeUint8(+this.spectator);
         s.writeUint8(+this.betterStats);
 
         s.writeArray(this.playerStats, 8, (stats) => {
@@ -35,7 +35,7 @@ export class GameOverMsg implements AbstractMsg {
         this.rank = s.readUint8();
         this.gameOver = s.readUint8() as unknown as boolean;
         this.winningTeamId = s.readUint8();
-        //this.spectator = s.readUint8() as unknown as boolean;
+        this.spectator = s.readUint8() as unknown as boolean;
         this.betterStats = s.readUint8() as unknown as boolean;
 
         this.playerStats = s.readArray(8, () => {

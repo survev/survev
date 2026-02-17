@@ -85,6 +85,7 @@ export enum ProcessMsgType {
     KeepAlive,
     UpdateData,
     AddJoinToken,
+    AddJoinTokenAsSpectator,
     SocketMsg,
     SocketClose,
 }
@@ -109,6 +110,12 @@ export interface UpdateDataMsg extends GameData {
 
 export interface AddJoinTokenMsg {
     type: ProcessMsgType.AddJoinToken;
+    autoFill: boolean;
+    tokens: FindGamePrivateBody["playerData"];
+}
+
+export interface AddJoinTokenAsSpectatorMsg {
+    type: ProcessMsgType.AddJoinTokenAsSpectator;
     autoFill: boolean;
     tokens: FindGamePrivateBody["playerData"];
 }
@@ -144,5 +151,15 @@ export type ProcessMsg =
     | KeepAliveMsg
     | UpdateDataMsg
     | AddJoinTokenMsg
+    | AddJoinTokenAsSpectatorMsg
     | SocketMsgsMsg
     | SocketCloseMsg;
+
+    export interface GameInfo {
+    id: string,
+    teamMode: TeamMode,
+    playerCount: number,
+    playerNames: string[],
+    runtime: number,
+    stopped: boolean,
+    }

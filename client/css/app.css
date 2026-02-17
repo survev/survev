@@ -1168,6 +1168,210 @@ a:active {
   width: 140px;
 }
 
+#btn-spectator-menu {
+  background: #50afab;
+  border-bottom: 2px solid #387c79;
+  box-shadow: inset 0 -2px #387c79;
+}
+
+#btn-start-spectate{
+  background: #50afab;
+  border-bottom: 2px solid #387c79;
+  box-shadow: inset 0 -2px #387c79;
+}
+
+
+#btn-leave-spectator {
+  background: #7a7a7a;
+  border-bottom: 2px solid #3e3e3e;
+  bottom: -32px;
+  box-shadow: inset 0 -2px #3e3e3e;
+  color: #fff;
+  cursor: pointer;
+  font-size: 16px;
+  position: absolute;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.25);
+  right: 14px;
+  top: 5px;
+  transform: scale(1);
+  transform-origin: top right;
+  width: 140px;
+}
+
+#btn-reload-games {
+  background: #7a7a7a;
+  border-bottom: 2px solid #3e3e3e;
+  bottom: -32px;
+  box-shadow: inset 0 -2px #3e3e3e;
+  color: #fff;
+  cursor: pointer;
+  font-size: 16px;
+  position: absolute;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.25);
+  right: 14px;
+  top: 50px;
+  transform: scale(1);
+  transform-origin: top right;
+  width: 140px;
+}
+
+
+#spectator-menu-header {
+    font-size: 40px;
+    font-weight: bold;
+    position: absolute;
+    margin: 20px;
+    margin-top: 25px;
+    margin-left: 15%;
+  }
+
+  @media (max-height: 800px) {
+  #btn-leave-spectator {
+    font-size: 16px;
+    right: 14px;
+    top: 20px;
+    transform: scale(0.9);
+    transform-origin: top right;
+    width: 140px;
+  }
+}
+@media (max-height: 800px) {
+  #btn-reload-games {
+    font-size: 16px;
+    right: 14px;
+    top: 20px;
+    transform: scale(0.9);
+    transform-origin: top right;
+    width: 140px;
+  }
+}
+
+@media (max-width: 850px), (max-width: 900px) and (min-resolution: 3dppx) {
+  #btn-leave-spectator {
+    box-shadow: none;
+    font-size: 14px;
+    line-height: 28px;
+    right: 0;
+    top: 0;
+    width: 124px;
+  }
+}
+
+@media (max-width: 850px), (max-width: 900px) and (min-resolution: 3dppx) {
+  #btn-reload-games {
+    box-shadow: none;
+    font-size: 14px;
+    line-height: 28px;
+    right: 0;
+    top: 0;
+    width: 124px;
+  }
+}
+
+#spectator-menu {
+  display: none;
+  min-height: 325px;
+  max-height: none !important;
+  padding: 12px;
+  position: relative;
+  width: 625px;  
+  height: auto;
+}
+
+#spectator-menu-contents{
+  padding: 12px;
+  padding-top: 15%;
+  display: flex;
+  gap: 16px;
+  height: auto;
+}
+
+#spectator-menu-options {  /* linker Block (deine Controls) */
+  width: 50%;
+  padding-right: 16px;
+  margin-top: 5px;
+}
+
+#spectator-menu-gameinfo {
+    width: 50%;                 /* halbe Breite im Flex-Container */
+    background: rgba(0, 0, 0, 0.35);
+    border-radius: 8px;
+    padding: 12px 16px;
+    box-sizing: border-box;
+    color: #fff;
+    font-family: inherit;
+    margin-top: 5px;
+}
+
+#spectator-menu-gameinfo-header {
+    font-size: 18px;
+    font-weight: bold;
+    margin-bottom: 10px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+    padding-bottom: 4px;
+}
+
+#spectator-menu-gameinfo-contents {
+    display: flex;
+    flex-direction: column;
+    gap: 6px; /* Abstand zwischen Items */
+}
+
+.spectator-menu-gameinfo-item {
+    display: flex;
+    justify-content: space-between;
+    font-size: 14px;
+}
+
+.spectator-menu-gameinfo-label {
+    color: rgba(255, 255, 255, 0.7);
+}
+
+.spectator-menu-gameinfo-value {
+    font-weight: bold;
+    color: #fff;
+}
+
+.spectator-menu-toggle{
+  background: rgba(255,255,255,.12);
+  border: 0;
+  border-radius: 6px;
+  padding: 2px 8px;
+  color: #fff;
+  cursor: pointer;
+  font-size: 12px;
+}
+.spectator-menu-toggle:hover{ background: rgba(255,255,255,.2); }
+
+.spectator-menu-players{
+  margin-top: 6px;
+  padding-left: 14px;
+  max-height: 160px;        /* scrollt ab ~8 Spielern */
+  overflow: auto;
+  line-height: 1.35;
+}
+.spectator-menu-players.collapsed{ display: none; }
+#spectate-players ul {
+    margin: 0;
+    padding-left: 16px; /* Abstand für die Bullets */
+}
+
+#spectate-players li {
+    list-style: disc;
+    margin-bottom: 2px; /* kleiner Abstand zwischen Spielern */
+    white-space: nowrap;
+    font-size: 14px;
+}
+
+@media (max-width: 850px), (max-width: 900px) and (min-resolution: 3dppx) {
+  #spectator-menu {
+    height: 230px;
+    width: 418px;
+  }
+}
+
+
+
 @media (max-height: 800px) {
   #btn-team-leave {
     font-size: 16px;
@@ -6901,6 +7105,15 @@ input [type="image"]:focus {
   }
 
   #btn-team-leave {
+    bottom: initial;
+    top: 400px;
+  }
+
+    #btn-leave-spectator {
+    bottom: initial;
+    top: 400px;
+  }
+  #btn-reload-games {
     bottom: initial;
     top: 400px;
   }

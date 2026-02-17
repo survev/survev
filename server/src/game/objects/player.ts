@@ -158,7 +158,7 @@ export class PlayerBarn {
             }
         }
 
-        const result = this.getGroupAndTeam(joinData);
+        const result = this.getGroupAndTeam(joinData, false);
         const group = result?.group;
         // solo 50v50 just chooses the smallest team everytime no matter what
         const team =
@@ -219,21 +219,106 @@ export class PlayerBarn {
         return player;
     }
 
-    activatePlayer(player: Player, group?: Group, team?: Team) {
-        if (team && group) {
-            team.addPlayer(player);
-            group.addPlayer(player);
-            player.setGroupStatuses();
-        } else if (!team && group) {
-            group.addPlayer(player);
-            player.teamId = player.groupId;
-            player.setGroupStatuses();
-        } else if (team && !group) {
-            team.addPlayer(player);
-            player.groupId = this.groupIdAllocator.getNextId();
-        } else {
-            player.groupId = player.teamId = this.groupIdAllocator.getNextId();
+    addSpectator(socketId: string, joinMsg: net.JoinAsSpectatorMsg, ip: string) {
+        const joinData = this.game.joinTokens.get(joinMsg.matchPriv);
+
+        if (!joinData || joinData.expiresAt < Date.now()) {
+            this.game.closeSocket(socketId);
+            if (joinData) {
+                this.game.joinTokens.delete(joinMsg.matchPriv);
+            }
+            return;
         }
+        this.game.joinTokens.delete(joinMsg.matchPriv);
+
+        if (Config.rateLimitsEnabled) {
+            const count = this.livingPlayers.filter(
+                (p) =>
+                    p.ip === ip ||
+                    p.findGameIp == joinData.findGameIp ||
+                    (joinData.userId !== null && p.userId === joinData.userId),
+            );
+            if (count.length >= 5) {
+                this.game.closeSocket(socketId, "rate_limited");
+                return;
+            }
+        }
+
+        const result = this.getGroupAndTeam(joinData, true);
+        const group = result?.group;
+        // solo 50v50 just chooses the smallest team everytime no matter what
+        const team =
+            this.game.map.factionMode && !this.game.isTeamMode
+                ? this.getSmallestTeam()
+                : result?.team;
+
+        let pos: Vec2;
+        let layer: number;
+        if (this.game.map.perkMode && this.game.map.perkModeTwinsBunker) {
+            // intermediate spawn point while the player chooses a role before theyre moved to their real spawn point
+            const spawnBuilding = this.game.map.perkModeTwinsBunker;
+            pos = spawnBuilding.pos;
+            layer = spawnBuilding.layer;
+        } else {
+            pos = v2.create(0, 0);
+            layer = 0;
+        }
+
+        const originalName = validateUserName(joinMsg.name).validName;
+        let finalName = originalName;
+
+        if (Config.uniqueInGameNames) {
+            let count = 0;
+            const loggedOutPlayers = this.game.playerBarn.players.filter(
+                (p) => !p.userId,
+            );
+            while (loggedOutPlayers.find((p) => p.name === finalName)) {
+                const postFix = `-${++count}`;
+                const trimmed = originalName.substring(
+                    0,
+                    net.Constants.PlayerNameMaxLen - postFix.length,
+                );
+                finalName = trimmed + postFix;
+            }
+        }
+
+        const player = new Player(
+            this.game,
+            pos,
+            layer,
+            finalName,
+            socketId,
+            joinMsg,
+            ip,
+            joinData.findGameIp,
+            joinData.userId,
+            joinData.loadout,
+        );
+
+        this.socketIdToPlayer.set(socketId, player);
+        player.spectator = true;
+
+        this.activatePlayer(player, group, team);
+
+        return player;
+    }
+
+    activatePlayer(player: Player, group?: Group, team?: Team) {
+            if (team && group) {
+                team.addPlayer(player);
+                group.addPlayer(player);
+                player.setGroupStatuses();
+            } else if (!team && group) {
+                group.addPlayer(player);
+                player.teamId = player.groupId;
+                player.setGroupStatuses();
+            } else if (team && !group) {
+                team.addPlayer(player);
+                player.groupId = this.groupIdAllocator.getNextId();
+            } else {
+                player.groupId = player.teamId = this.groupIdAllocator.getNextId();
+            }
+        
 
         if (player.game.map.perkMode) {
             /*
@@ -244,19 +329,28 @@ export class PlayerBarn {
             player.roleMenuTicker = GameConfig.player.perkModeRoleSelectDuration + 5;
         }
 
-        this.game.logger.info(`Player ${player.name} joined`);
+        if(player.spectator){
+            this.game.logger.info(`Spectator ${player.name} joined`);
 
-        this.newPlayers.push(player);
-        this.game.objectRegister.register(player);
-        this.players.push(player);
-        this.livingPlayers.push(player);
-        if (!this.game.modeManager.isSolo) {
-            this.livingPlayers.sort((a, b) => a.teamId - b.teamId);
+            this.newPlayers.push(player);
+            this.game.objectRegister.register(player);
+            this.players.push(player);
+            
+        }else{
+            this.game.logger.info(`Player ${player.name} joined`);
+            this.newPlayers.push(player);
+            this.game.objectRegister.register(player);
+            this.players.push(player);
+            this.livingPlayers.push(player);
+            if (!this.game.modeManager.isSolo) {
+                this.livingPlayers.sort((a, b) => a.teamId - b.teamId);
+            }
+            this.aliveCountDirty = true;
+        
         }
-        this.aliveCountDirty = true;
         this.game.pluginManager.emit("playerJoin", player);
 
-        this.game.updateData();
+        this.game.updateData();       
     }
 
     testPlayerCount = 0;
@@ -270,7 +364,7 @@ export class PlayerBarn {
         let team = params.team;
 
         if (!group && this.game.isTeamMode) {
-            group = this.addGroup(false);
+            group = this.addGroup(false, false);
         }
 
         if (!team && this.game.map.factionMode) {
@@ -305,6 +399,8 @@ export class PlayerBarn {
                 this.sentWinEmotes = true;
             }
         }
+
+        
 
         if (this.game.isTeamMode || this.game.map.factionMode) {
             this.playerStatusTicker += dt;
@@ -481,7 +577,7 @@ export class PlayerBarn {
         return team;
     }
 
-    getGroupAndTeam({ groupData }: JoinTokenData):
+    getGroupAndTeam({ groupData }: JoinTokenData, isSpectator: boolean):
         | {
               group?: Group;
               team?: Team;
@@ -503,7 +599,7 @@ export class PlayerBarn {
         // but keeping it just in case
         // since more than 4 players in a group crashes the client
         if (!group || group.players.length >= this.game.teamMode) {
-            group = this.addGroup(groupData.autoFill);
+            group = this.addGroup(groupData.autoFill, isSpectator);
         }
 
         // only reserve slots on the first time this join token is used
@@ -524,12 +620,13 @@ export class PlayerBarn {
         return { group, team };
     }
 
-    addGroup(autoFill: boolean) {
+    addGroup(autoFill: boolean, isSpectator: boolean) {
         // not using nodejs crypto because i want it to run in the browser too
         // and doesn't need to be cryptographically secure lol
         const hash = Math.random().toString(16).slice(2);
         const groupId = this.groupIdAllocator.getNextId();
-        const group = new Group(hash, groupId, autoFill, this.game.teamMode);
+        const group = new Group(hash, groupId, autoFill, this.game.teamMode, isSpectator);
+        if(!group.isSpectatorGroup)
         this.groups.push(group);
         this.groupsByHash.set(hash, group);
         return group;
@@ -627,6 +724,8 @@ export class Player extends BaseGameObject {
 
     team: Team | undefined = undefined;
     group: Group | undefined = undefined;
+
+    spectator: boolean = false;
 
     /**
      * set true if any member on the team changes health or disconnects
@@ -778,10 +877,10 @@ export class Player extends BaseGameObject {
         this.startedSpectating = true;
     }
 
-    spectateCooldown = 0;
+    /*spectateCooldown = 0;
     spectateCooldownCount = 0;
     spectateMsgCount = 0;
-    spectateMsgTicker = 0;
+    spectateMsgTicker = 0;*/
 
     spectators = new Set<Player>();
 
@@ -1454,16 +1553,26 @@ export class Player extends BaseGameObject {
     }
 
     update(dt: number): void {
-        if (this.dead) {
-            this.spectateCooldown -= dt;
 
-            if (this.spectateMsgCount > 0) {
+        if(this.spectator){
+            this.kill({
+                damageType: GameConfig.DamageType.Spectator,
+                dir: this.dir,
+                source: undefined,
+            });
+        }
+
+        if (this.dead) {
+            //this.spectateCooldown -= dt;
+            //this.spectateCooldown = 0;
+
+            /*if (this.spectateMsgCount > 0) {
                 this.spectateMsgTicker += dt;
                 if (this.spectateMsgTicker > 3) {
                     this.spectateMsgCount--;
                     this.spectateMsgTicker = 0;
                 }
-            }
+            }*/
 
             if (!this.sentDeathEmote) {
                 this.sendDeathEmoteTicker -= dt;
@@ -2588,7 +2697,7 @@ export class Player extends BaseGameObject {
     spectate(spectateMsg: net.SpectateMsg): void {
         if (!this.dead) return;
 
-        if (this.spectateCooldown >= 0.75) {
+        /*if (this.spectateCooldown >= 0.75) {
             this.spectateCooldownCount++;
 
             if (this.spectateCooldownCount > 10) {
@@ -2609,7 +2718,7 @@ export class Player extends BaseGameObject {
                 `Game ${this.game.id} - Player ${this.name} Player ${this.name} disconnected for spamming SpectateMsg (count)`,
             );
             return;
-        }
+        }*/
 
         // livingPlayers is used here instead of a more "efficient" option because its sorted while other options are not
         const spectatablePlayers = this.game.playerBarn.livingPlayers.filter(
@@ -2780,6 +2889,7 @@ export class Player extends BaseGameObject {
                 teamId: player.teamId,
             })
             );
+            console.log("Spectator:", this.spectator);
 
             const gameOverMsg = new net.GameOverMsg();
             gameOverMsg.playerStats = allPlayerStats;
@@ -2789,7 +2899,7 @@ export class Player extends BaseGameObject {
             gameOverMsg.winningTeamId = winningTeamId;
             gameOverMsg.gameOver = !!winningTeamId;
             gameOverMsg.betterStats = true;
-            //gameOverMsg.spectator = this.isSpectator;
+            gameOverMsg.spectator = this.spectator;
 
             this.msgsToSend.push({
                 type: net.MsgType.GameOver,
@@ -2820,6 +2930,7 @@ export class Player extends BaseGameObject {
                 gameOverMsg.teamId = this.teamId;
                 gameOverMsg.winningTeamId = winningTeamId;
                 gameOverMsg.gameOver = !!winningTeamId;
+                gameOverMsg.spectator = this.spectator;
                 gameOverMsg.betterStats = false;
                 this.msgsToSend.push({ type: net.MsgType.GameOver, msg: gameOverMsg });
 
@@ -2891,7 +3002,11 @@ export class Player extends BaseGameObject {
     kill(params: DamageParams): void {
         if (this.dead) return;
         if (this.downed) this.downed = false;
-        this.rank = this.game.modeManager.aliveCount();
+        if(!this.spectator){
+            this.rank = this.game.modeManager.aliveCount();
+        }else{
+            this.rank = 999;
+        }
         this.dead = true;
         this.killedIndex = this.game.playerBarn.nextKilledNumber++;
         this.boost = 0;
@@ -2910,8 +3025,11 @@ export class Player extends BaseGameObject {
 
         this.game.playerBarn.aliveCountDirty = true;
 
-        util.removeFrom(this.game.playerBarn.livingPlayers, this);
+        if(!this.spectator){
 
+            util.removeFrom(this.game.playerBarn.livingPlayers, this);
+
+        }
         this.game.playerBarn.killedPlayers.push(this);
 
         this.group?.checkPlayers();
@@ -3108,6 +3226,7 @@ export class Player extends BaseGameObject {
 
         this.game.modeManager.assignNewSpectate(this);
 
+        if(!this.spectator)
         this.game.deadBodyBarn.addDeadBody(this.pos, this.__id, this.layer, params.dir);
 
         //
@@ -3120,88 +3239,125 @@ export class Player extends BaseGameObject {
         //
         // drop loot
         //
-
-        for (let i = 0; i < GameConfig.WeaponSlot.Count; i++) {
-            const weap = this.weapons[i];
-            if (!weap.type) continue;
-            const def = GameObjectDefs[weap.type];
-            switch (def.type) {
-                case "gun":
-                    this.weaponManager.dropGun(i);
-                    weap.type = "";
-                    break;
-                case "melee":
-                    if (def.noDropOnDeath || weap.type === "fists") break;
-                    this.game.lootBarn.addLoot(weap.type, this.pos, this.layer, 1);
-                    weap.type = "fists";
-                    break;
-                case "throwable":
-                    weap.type = "";
-                    break;
+        if(!this.spectator){
+            for (let i = 0; i < GameConfig.WeaponSlot.Count; i++) {
+                const weap = this.weapons[i];
+                if (!weap.type) continue;
+                const def = GameObjectDefs[weap.type];
+                switch (def.type) {
+                    case "gun":
+                        this.weaponManager.dropGun(i);
+                        weap.type = "";
+                        break;
+                    case "melee":
+                        if (def.noDropOnDeath || weap.type === "fists") break;
+                        this.game.lootBarn.addLoot(weap.type, this.pos, this.layer, 1);
+                        weap.type = "fists";
+                        break;
+                    case "throwable":
+                        weap.type = "";
+                        break;
+                }
             }
-        }
-        this.weaponManager.setCurWeapIndex(GameConfig.WeaponSlot.Melee);
+        
+            this.weaponManager.setCurWeapIndex(GameConfig.WeaponSlot.Melee);
 
-        for (const item of Object.keys(this.invManager.items) as InventoryItem[]) {
-            // const def = GameObjectDefs[item] as AmmoDef | HealDef;
-            if (item == "1xscope") {
-                continue;
+            for (const item of Object.keys(this.invManager.items) as InventoryItem[]) {
+                // const def = GameObjectDefs[item] as AmmoDef | HealDef;
+                if (item == "1xscope") {
+                    continue;
+                }
+
+                const amount = this.invManager.get(item);
+                if (amount > 0) {
+                    this.game.lootBarn.addLoot(item, this.pos, this.layer, amount);
+                }
             }
 
-            const amount = this.invManager.get(item);
-            if (amount > 0) {
-                this.game.lootBarn.addLoot(item, this.pos, this.layer, amount);
+            for (const item of GEAR_TYPES) {
+                const type = this[item];
+                if (!type) continue;
+                const def = GameObjectDefs[type] as HelmetDef | ChestDef | BackpackDef;
+                if (!!(def as ChestDef).noDrop || def.level < 1) continue;
+                this.game.lootBarn.addLoot(type, this.pos, this.layer, 1);
             }
-        }
 
-        for (const item of GEAR_TYPES) {
-            const type = this[item];
-            if (!type) continue;
-            const def = GameObjectDefs[type] as HelmetDef | ChestDef | BackpackDef;
-            if (!!(def as ChestDef).noDrop || def.level < 1) continue;
-            this.game.lootBarn.addLoot(type, this.pos, this.layer, 1);
-        }
-
-        if (this.outfit) {
-            const def = GameObjectDefs[this.outfit] as OutfitDef;
-            if (!def.noDropOnDeath && !def.noDrop) {
-                this.game.lootBarn.addLoot(this.outfit, this.pos, this.layer, 1);
+            if (this.outfit) {
+                const def = GameObjectDefs[this.outfit] as OutfitDef;
+                if (!def.noDropOnDeath && !def.noDrop) {
+                    this.game.lootBarn.addLoot(this.outfit, this.pos, this.layer, 1);
+                }
             }
-        }
 
-        for (let i = this.perks.length - 1; i >= 0; i--) {
-            const perk = this.perks[i];
-            if (perk.droppable || perk.replaceOnDeath) {
-                this.game.lootBarn.addLoot(
-                    perk.replaceOnDeath || perk.type,
-                    this.pos,
-                    this.layer,
-                    1,
-                );
+            for (let i = this.perks.length - 1; i >= 0; i--) {
+                const perk = this.perks[i];
+                if (perk.droppable || perk.replaceOnDeath) {
+                    this.game.lootBarn.addLoot(
+                        perk.replaceOnDeath || perk.type,
+                        this.pos,
+                        this.layer,
+                        1,
+                    );
+                }
             }
-        }
-        this._perks.length = 0;
-        this._perkTypes.length = 0;
+            this._perks.length = 0;
+            this._perkTypes.length = 0;
 
-        // death emote
-        this.sendDeathEmoteTicker = 0.3;
+            // death emote
+            this.sendDeathEmoteTicker = 0.3;
 
-        // Building gore region (club pool)
-        const objs = this.game.grid.intersectGameObject(this);
-        for (const obj of objs) {
-            if (
-                obj.__type === ObjectType.Building &&
-                obj.goreRegion &&
-                util.sameLayer(this.layer, obj.layer) &&
-                coldet.testCircleAabb(
-                    this.pos,
-                    this.rad,
-                    obj.goreRegion.min,
-                    obj.goreRegion.max,
-                )
-            ) {
-                obj.onGoreRegionKill();
+            // Building gore region (club pool)
+            const objs = this.game.grid.intersectGameObject(this);
+            for (const obj of objs) {
+                if (
+                    obj.__type === ObjectType.Building &&
+                    obj.goreRegion &&
+                    util.sameLayer(this.layer, obj.layer) &&
+                    coldet.testCircleAabb(
+                        this.pos,
+                        this.rad,
+                        obj.goreRegion.min,
+                        obj.goreRegion.max,
+                    )
+                ) {
+                    obj.onGoreRegionKill();
+                }
             }
+        }else{
+            for (let i = 0; i < GameConfig.WeaponSlot.Count; i++) {
+                const weap = this.weapons[i];
+                if (!weap.type) continue;
+                const def = GameObjectDefs[weap.type];
+                switch (def.type) {
+                    case "gun":
+                        weap.type = "";
+                        break;
+                    case "melee":
+                        if (def.noDropOnDeath || weap.type === "fists") break;
+                        weap.type = "fists";
+                        break;
+                    case "throwable":
+                        weap.type = "";
+                        break;
+                }
+            }
+        
+            this.weaponManager.setCurWeapIndex(GameConfig.WeaponSlot.Melee);
+
+            for (const item of Object.keys(this.invManager.items) as InventoryItem[]) {
+                // const def = GameObjectDefs[item] as AmmoDef | HealDef;
+                if (item == "1xscope") {
+                    continue;
+                }
+
+                const amount = this.invManager.get(item);
+                if (amount > 0) {
+                    this.invManager.set(item, 0);
+                }
+            }
+
+            this._perks.length = 0;
+            this._perkTypes.length = 0;
         }
 
         // Check for game over

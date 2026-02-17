@@ -66,6 +66,9 @@ process.on("message", async (msg: ProcessMsg) => {
         case ProcessMsgType.AddJoinToken:
             game.addJoinTokens(msg.tokens, msg.autoFill);
             break;
+        case ProcessMsgType.AddJoinTokenAsSpectator:
+            game.addJoinTokensAsSpectator(msg.tokens, false);
+            break;
         case ProcessMsgType.SocketMsg:
             const sMsg = msg.msgs[0];
             game.handleMsg(sMsg.data as ArrayBuffer, sMsg.socketId, sMsg.ip);

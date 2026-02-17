@@ -25,6 +25,7 @@ export class SiteInfo {
 
         const mainSelector = $("#server-opts");
         const teamSelector = $("#team-server-opts");
+        const spectatorSelector = $("#spectate-server-opts");
 
         for (const region in GAME_REGIONS) {
             const data = GAME_REGIONS[region];
@@ -32,6 +33,7 @@ export class SiteInfo {
             const elm = `<option value='${region}' data-l10n='${data.l10n}' data-label='${name}'>${name}</option>`;
             mainSelector.append(elm);
             teamSelector.append(elm);
+            spectatorSelector.append(elm);
         }
 
         $.ajax(siteInfoUrl).done((data: SiteInfoRes) => {
