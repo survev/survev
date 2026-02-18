@@ -23,6 +23,7 @@ export abstract class GameManager {
     abstract findGame(body: FindGamePrivateBody): Promise<string>;
 
     abstract findGameById(gameId: string, playerData: any[], autoFill: boolean): Promise<string>;
+    abstract getGames(): Promise<GameData[]>;
 
     abstract onOpen(socketId: string, socket: WebSocket<GameSocketData>): void;
 
@@ -166,6 +167,10 @@ export class SingleThreadGameManager implements GameManager {
         game.addJoinTokensAsSpectator(playerData, autoFill);
 
         return game.id;
+    }
+
+    async getGames(): Promise<GameData[]> {
+        return this.games.map((game) => game);
     }
 
     onOpen(socketId: string, socket: WebSocket<GameSocketData>): void {
