@@ -338,6 +338,10 @@ export class GameProcessManager implements GameManager {
         return game.id;
     }
 
+    async getGames(): Promise<GameData[]> {
+        return this.processes.map((game) => game);
+    }
+
     onOpen(socketId: string, socket: WebSocket<GameSocketData>): void {
         const data = socket.getUserData();
         const proc = this.processById.get(data.gameId);

@@ -380,7 +380,7 @@ app.post("/api/game_infos", async (res, req) => {
                 }
 
                 // Expected by client: { data: [{id, teamMode, playerCount, playerNames, runtime, stopped}] }
-                const games = (server.manager as any).getGames?.() ?? (server.manager as any).games ?? [];
+                const games = await server.manager.getGames();
                 const now = Date.now();
 
                 const data = (Array.isArray(games) ? games : []).map((g: any) => ({
