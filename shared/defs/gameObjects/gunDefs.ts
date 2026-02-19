@@ -2151,9 +2151,9 @@ export const BaseDefs: Record<string, GunDef> = {
         jitter: 1,
         bulletType: "bullet_buckshot_origin",
         headshotMult: 1,
-        speed: { equip: 0, attack: 0 },
+        speed: { equip: 0, attack: 4 },
         lootImg: {
-            sprite: "loot-weapon-saiga.img",
+            sprite: "loot-weapon-origin12.img",
             tint: 65280,
             border: "loot-circle-outer-01.img",
             borderTint: 0,

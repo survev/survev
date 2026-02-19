@@ -5705,7 +5705,7 @@ function createMansion<T extends ExtendedBuildingDef>(e: Partial<T>): T {
                 type:
                     e.bush ||
                     randomObstacleType({
-                        bush_01: 25,
+                        bush_01: 7,
                         bush_03: 1,
                         "": e.bush_chance || 0,
                     }),
@@ -5718,7 +5718,7 @@ function createMansion<T extends ExtendedBuildingDef>(e: Partial<T>): T {
                 type:
                     e.bush ||
                     randomObstacleType({
-                        bush_01: 25,
+                        bush_01: 7,
                         bush_03: 1,
                         "": e.bush_chance || 0,
                     }),
@@ -5731,7 +5731,7 @@ function createMansion<T extends ExtendedBuildingDef>(e: Partial<T>): T {
                 type:
                     e.bush ||
                     randomObstacleType({
-                        bush_01: 25,
+                        bush_01: 7,
                         bush_03: 1,
                         "": e.bush_chance || 0,
                     }),
@@ -5744,7 +5744,7 @@ function createMansion<T extends ExtendedBuildingDef>(e: Partial<T>): T {
                 type:
                     e.bush ||
                     randomObstacleType({
-                        bush_01: 25,
+                        bush_01: 7,
                         bush_03: 1,
                         "": e.bush_chance || 0,
                     }),
@@ -8708,7 +8708,7 @@ function createWarehouse2<T extends BuildingDef>(e: Partial<T>): T {
                 ori: 0,
             },
             {
-                type: randomObstacleType({ crate_08: 5, crate_09: 1 }),
+                type: randomObstacleType({ crate_08: 3, crate_09: 1 }),
                 pos: v2.create(0, 0),
                 scale: 1,
                 ori: 0,
