@@ -228,8 +228,8 @@ export const GameConfig = {
         /* STRIP_FROM_PROD_CLIENT:START */
         defaultItems: {
             weapons: [
-                { type: "origin", ammo: 30 },
-                { type: "saiga", ammo: 30 },
+                { type: "", ammo: 0 },
+                { type: "", ammo: 0 },
                 { type: "fists", ammo: 0 },
                 { type: "", ammo: 0 },
             ],
@@ -243,7 +243,7 @@ export const GameConfig = {
                 "9mm": 0,
                 "762mm": 0,
                 "556mm": 0,
-                "12gauge": 300,
+                "12gauge": 0,
                 "50AE": 0,
                 "308sub": 0,
                 flare: 0,
