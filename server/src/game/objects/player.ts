@@ -2774,8 +2774,8 @@ export class Player extends BaseGameObject {
         this.boost = 0;
         this.health = 100;
 
-        if (this.game.gas.currentRad <= 0.1) {
-            this.health = 50;
+        if (this.game.gas.isInGas(this.pos)) {
+            this.health = 80;
         }
 
         this.animType = GameConfig.Anim.None;
