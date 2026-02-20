@@ -2168,8 +2168,8 @@ export const BaseDefs: Record<string, GunDef> = {
         },
         particle: { shellScale: 1, shellOffset: 0.45 },
         sound: {
-            shoot: "saiga_01",
-            reload: "saiga_reload_01",
+            shoot: "origin12_01",
+            reload: "origin12_reload_01",
             pickup: "gun_pickup_01",
             empty: "empty_fire_02",
             deploy: "saiga_switch_01",
