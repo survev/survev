@@ -1118,7 +1118,7 @@ export class GameMap {
         maxAttempts?: number,
         logOnFailure = true,
     ): boolean {
-        maxAttempts ??= this.mapDef.mapGen.importantSpawns.includes(type) ? 5000 : 500;
+        maxAttempts ??= this.mapDef.mapGen.importantSpawns.includes(type) ? 15000 : 500;
         let attempts = 0;
         while (attempts < maxAttempts) {
             if (cb()) {
@@ -1160,12 +1160,18 @@ export class GameMap {
 
                 // ---- MIN DISTANCE / GROUP SPACING ----
                 if (def.group?.id && def.group?.minDistance) {
+                    if (def.group.noSpawnRadius && def.group.noSpawnRadius != 0) {
+                        const radiusObject = this.intersectNoSpawnRadius(pos, def.group.noSpawnRadius ?? 0, def);
+                        if (radiusObject.length > 0) {
+                            console.log(`Failed to spawn ${type}`);
+                            return false;
+                        }
+                    }
                     const groupObjects = this.intersectGroup(
                         def.group.id,
                         pos,
                         def.group.minDistance,
                     );
-                    console.log(groupObjects.length);
                     if (groupObjects.length > 0) {
                         return false;
                     }
@@ -1372,6 +1378,29 @@ export class GameMap {
         return true;
     }
 
+    intersectNoSpawnRadius(pos: Vec2, noSpawnRadius: number, exclude?: any): any[] {
+        const all = this.game.grid.getAllObjects();
+
+        return all.filter((obj: any) => {
+            if (exclude && obj === exclude) return false;
+            if (!obj.pos) return true;
+            if (obj.__type !== ObjectType.Building) return false;
+
+            const def = MapObjectDefs[obj.type] as BuildingDef;
+
+            let radius = def.group?.noSpawnRadius;
+            
+            if (!radius || radius <= 0) return false;
+            if (radius < noSpawnRadius) radius = noSpawnRadius;
+
+            const dx = obj.pos.x - pos.x;
+            const dy = obj.pos.y - pos.y;
+            const distSq = dx * dx + dy * dy;
+
+            return distSq < radius * radius;
+        });
+    }
+
     intersectGroup(
     groupId: number,
     pos: Vec2,
@@ -1386,7 +1415,8 @@ export class GameMap {
             // Hole das minDistance der schon existierenden Definition, falls vorhanden
             const def = MapObjectDefs[obj.type] as BuildingDef;
             const existingMinDistance = def.group?.minDistance ?? 0;
-            const requiredDistance = Math.max(candidateMinDistance, existingMinDistance);
+            //const requiredDistance = Math.max(candidateMinDistance, existingMinDistance);
+            const requiredDistance = candidateMinDistance;
             const requiredDistSq = requiredDistance * requiredDistance;
 
             const dx = obj.pos.x - pos.x;

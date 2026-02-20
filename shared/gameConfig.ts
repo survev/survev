@@ -96,10 +96,17 @@ export enum BuildingGroups {
 };
 
 export enum MinDistance {
-    POIs = 250,
-    BunkerSpawns = 250,
-    SVSpawns = 300,
-    SniperSpawns = 300,
+    POIs = 275,
+    BunkerSpawns = 200,
+    SVSpawns = 600,
+    SniperSpawns = 225,
+}
+
+export enum NoSpawnRadius {
+    POIs = 100,
+    BunkerSpawns = 0,
+    SVSpawns = 200,
+    SniperSpawns = 100,
 }
 
 export enum Input {
@@ -214,7 +221,7 @@ export const GameConfig = {
 
         //default settings for maps to use if they don't specify their own, can be overridden per map
         edgeBuffer: 150, // distance to maps border (to prevent pakistani spawns)
-        centerNoSpawnRadius: 170, // no spawn zone in the center of the map
+        centerNoSpawnRadius: 230, // no spawn zone in the center of the map
         minSpawnRad: 400, // spawn radius away from alive players
         minPosSpawnRad: 100, // spawn radius from other spawn locations
         

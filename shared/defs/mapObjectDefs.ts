@@ -8,7 +8,7 @@ import type {
     ObstacleDef,
     StructureDef,
 } from "./mapObjectsTyping";
-import { GameConfig, BuildingGroups, MinDistance } from "../gameConfig";
+import { GameConfig, BuildingGroups, MinDistance, NoSpawnRadius } from "../gameConfig";
 
 // some errors could be fixed by this but opted to using Partial and casting instead to avoid choking the lsp server
 // type DeepPartial<T> = T extends object ? {
@@ -2201,7 +2201,7 @@ function createBank<T extends BuildingDef>(e: Partial<T>): T {
                 ori: 0,
             },
         ],
-        group: { id: BuildingGroups.POIs, minDistance: MinDistance.POIs },
+        group: { id: BuildingGroups.POIs, minDistance: MinDistance.POIs, noSpawnRadius: NoSpawnRadius.POIs },
     };
     return util.mergeDeep(t, e || {});
 }
@@ -4465,7 +4465,7 @@ function createGreenhouse<T extends BuildingDef>(e: Partial<T>): T {
                 ori: 0,
             },
         ],
-        group: { id: BuildingGroups.BunkerSpawns, minDistance: MinDistance.BunkerSpawns },
+        group: { id: BuildingGroups.BunkerSpawns, minDistance: MinDistance.BunkerSpawns, noSpawnRadius: NoSpawnRadius.BunkerSpawns },
     };
     return util.mergeDeep(t, e || {});
 }
@@ -5797,7 +5797,7 @@ function createMansion<T extends ExtendedBuildingDef>(e: Partial<T>): T {
                 ori: 0,
             },
         ],
-        group: { id: BuildingGroups.POIs, minDistance: MinDistance.POIs }
+        group: { id: BuildingGroups.POIs, minDistance: MinDistance.POIs, noSpawnRadius: NoSpawnRadius.POIs },
     };
     return util.mergeDeep(t, e || {});
 }
@@ -6615,7 +6615,7 @@ function createTeaHouseComplex<T extends BuildingDef>(
                 ori: 0,
             },
         ],
-        group: { id: BuildingGroups.SniperSpawns, minDistance: MinDistance.SniperSpawns }
+        group: { id: BuildingGroups.SniperSpawns, minDistance: MinDistance.SniperSpawns, noSpawnRadius: NoSpawnRadius.SniperSpawns },
     };
     return util.mergeDeep(t, e || {});
 }
@@ -7345,7 +7345,7 @@ function createPoliceStation<T extends BuildingDef>(e: Partial<T>): T {
                 ignoreMapSpawnReplacement: true,
             },
         ],
-        group: { id: BuildingGroups.POIs, minDistance: MinDistance.POIs }
+        group: { id: BuildingGroups.POIs, minDistance: MinDistance.POIs, noSpawnRadius: NoSpawnRadius.POIs }
     };
     return util.mergeDeep(t, e || {});
 }
@@ -12357,7 +12357,7 @@ export const MapObjectDefs: Record<string, MapObjectDef> = {
         ],
     },
     greenhouse_01: createGreenhouse({
-        group: { id: BuildingGroups.SniperSpawns, minDistance: MinDistance.SniperSpawns },
+        group: { id: BuildingGroups.SniperSpawns, minDistance: MinDistance.SniperSpawns, noSpawnRadius: NoSpawnRadius.SniperSpawns },
     }),
     greenhouse_02: createGreenhouse({
         floor_images: [
@@ -15518,7 +15518,7 @@ export const MapObjectDefs: Record<string, MapObjectDef> = {
             },
         ],
         teamId: 2,
-        group: { id: BuildingGroups.SVSpawns, minDistance: MinDistance.SVSpawns },
+        group: { id: BuildingGroups.SVSpawns, minDistance: MinDistance.SVSpawns, noSpawnRadius: 300 },
     },
     logging_complex_01: createLoggingComplex({}),
     logging_complex_01sp: createLoggingComplex({
@@ -23789,7 +23789,7 @@ export const MapObjectDefs: Record<string, MapObjectDef> = {
                 ori: 1,
             },
         ],
-        group: { id: BuildingGroups.SVSpawns, minDistance: MinDistance.SVSpawns },
+        group: { id: BuildingGroups.SVSpawns, minDistance: 200, noSpawnRadius: NoSpawnRadius.SniperSpawns },
     },
     bunker_egg_01: {
         type: "building",
@@ -24664,7 +24664,7 @@ export const MapObjectDefs: Record<string, MapObjectDef> = {
                 inheritOri: false,
             },
         ],
-        group: { id: BuildingGroups.BunkerSpawns, minDistance: MinDistance.BunkerSpawns },
+        group: { id: BuildingGroups.BunkerSpawns, minDistance: MinDistance.BunkerSpawns, noSpawnRadius: 0 },
     },
     bunker_hydra_sublevel_01: {
         type: "building",
@@ -26043,7 +26043,7 @@ export const MapObjectDefs: Record<string, MapObjectDef> = {
             },
         ],
         mask: [collider.createAabbExtents(v2.create(8.5, -3.7), v2.create(18, 9.5))],
-        group: { id: BuildingGroups.BunkerSpawns, minDistance: MinDistance.BunkerSpawns },
+        group: { id: BuildingGroups.BunkerSpawns, minDistance: MinDistance.BunkerSpawns, noSpawnRadius: NoSpawnRadius.BunkerSpawns },
     },
     bunker_conch_01: {
         type: "building",
@@ -26220,7 +26220,7 @@ export const MapObjectDefs: Record<string, MapObjectDef> = {
                 ori: 0,
             },
         ],
-        group: { id: BuildingGroups.BunkerSpawns, minDistance: MinDistance.BunkerSpawns },
+        group: { id: BuildingGroups.BunkerSpawns, minDistance: MinDistance.BunkerSpawns, noSpawnRadius: NoSpawnRadius.BunkerSpawns },
     },
     bunker_conch_sublevel_01: {
         type: "building",
