@@ -2845,7 +2845,7 @@ export class Player extends BaseGameObject {
         this.game.pluginManager.emit("playerDamage", { ...params, player: this });
 
         this.damageTaken += finalDamage;
-        if (playerSource && params.source !== this) {
+        if (playerSource && params.source !== this && !this.downed) {
             if (playerSource.groupId !== this.groupId) {
                 playerSource.damageDealt += finalDamage;
             }

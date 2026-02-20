@@ -578,6 +578,22 @@ export class Bullet {
             const distT = math.clamp(this.distanceTraveled / this.distance, 0, 1);
             const falloff = math.remap(distT, 0, 1, 1, def.falloff);
             finalDamage *= falloff;
+
+            finalDamage *= math.remap(distT, 0, 1, 1, def.falloff);
+
+            // 2. New rule: Stacking -10% every 5 units after 55
+            const falloffStartDist = 55;    // Start penalty after 55 units
+            const falloffIncrement = 1;     // Penalty every 1 units beyond
+            const falloffRate = 0.065;        // -6.5% per increment
+
+            if (this.distanceTraveled > falloffStartDist) {
+                const incrementsPastThreshold = Math.floor(
+                    (this.distanceTraveled - falloffStartDist) / falloffIncrement
+                );
+                // Apply penalty multiplicatively (e.g., 0.9 for 60 units, 0.8 for 65 units...)
+                finalDamage *= Math.max(1 - (incrementsPastThreshold * falloffRate), 0.2); // Math.max makes sure to prevent bullets from doing 0 damage (0.1 equals min damage of 10%)
+            }
+
         }
 
         for (let i = 0; i < collisions.length; i++) {

@@ -40,5 +40,6 @@ export interface StructureDef {
     group?: {
         id: number;
         minDistance?: number;
+        noSpawnRadius?: number;
     };
 }
