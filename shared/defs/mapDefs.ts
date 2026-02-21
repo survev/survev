@@ -1,10 +1,13 @@
 import type { Vec2 } from "../utils/v2";
 import { TwoVsTwo } from "./maps/2v2Defs";
+import { FourVsFour } from "./maps/4v4Defs";
 import { Main } from "./maps/baseDefs";
 import { Beach } from "./maps/beachDefs";
 import { Birthday } from "./maps/birthdayDefs";
 import { Cobalt } from "./maps/cobaltDefs";
 import { Comp } from "./maps/compDefs";
+import { CompDuo } from "./maps/compDuoDefs";
+import { CompSolo } from "./maps/compSoloDefs";
 import { Desert } from "./maps/desertDefs";
 import { Faction } from "./maps/factionDefs";
 import { Halloween } from "./maps/halloweenDefs";
@@ -40,7 +43,10 @@ export type Atlas =
     | "beach"
     | "comp"
     | "local"
-    | "two_vs_two";
+    | "two_vs_two"
+    | "four_vs_four"
+    | "comp_solo"
+    | "comp_duo";
 
 export const MapDefs = {
     main: Main,
@@ -64,6 +70,9 @@ export const MapDefs = {
     comp: Comp,
     local: Local,
     two_vs_two: TwoVsTwo,
+    four_vs_four: FourVsFour,
+    comp_solo: CompSolo,
+    comp_duo : CompDuo,
 
     /* STRIP_FROM_PROD_CLIENT:START */
     test_normal: testNormal,
