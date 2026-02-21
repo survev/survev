@@ -9850,7 +9850,7 @@ export const MapObjectDefs: Record<string, MapObjectDef> = {
         health: 140,
         loot: [
             tierLoot("tier_surviv", 4, 5),
-            tierLoot("tier_ak_bunker", 1, 1),
+            tierLoot("tier_ak_bunker", 4, 4),
             tierLoot("tier_khaki_outfit", 1, 1),
             tierLoot("tier_khaki_outfit", 1, 1),
             tierLoot("tier_khaki_outfit", 1, 1),

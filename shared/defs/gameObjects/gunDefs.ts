@@ -744,7 +744,6 @@ export const BaseDefs: Record<string, GunDef> = {
         quality: 1,
         fireMode: "auto",
         caseTiming: "shoot",
-        isBullpup: true,
         ammo: "556mm",
         ammoSpawnCount: 150,
         maxClip: 75,
@@ -2151,7 +2150,7 @@ export const BaseDefs: Record<string, GunDef> = {
         jitter: 1,
         bulletType: "bullet_buckshot_origin",
         headshotMult: 1,
-        speed: { equip: 0, attack: 4 },
+        speed: { equip: 0, attack: 6 },
         lootImg: {
             sprite: "loot-weapon-origin12.img",
             tint: 65280,
