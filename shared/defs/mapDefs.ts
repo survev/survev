@@ -1,4 +1,5 @@
 import type { Vec2 } from "../utils/v2";
+import { TwoVsTwo } from "./maps/2v2Defs";
 import { Main } from "./maps/baseDefs";
 import { Beach } from "./maps/beachDefs";
 import { Birthday } from "./maps/birthdayDefs";
@@ -38,7 +39,8 @@ export type Atlas =
     | "turkey"
     | "beach"
     | "comp"
-    | "local";
+    | "local"
+    | "two_vs_two";
 
 export const MapDefs = {
     main: Main,
@@ -61,6 +63,7 @@ export const MapDefs = {
     beach: Beach,
     comp: Comp,
     local: Local,
+    two_vs_two: TwoVsTwo,
 
     /* STRIP_FROM_PROD_CLIENT:START */
     test_normal: testNormal,

@@ -11,13 +11,13 @@ import { MapId } from "../types/misc";
 // Arrays are not mergeable, so the derived map will always redefine all
 // elements if that property is set.
 
-export const Local: MapDef = {
-    mapId: MapId.Local,
+export const TwoVsTwo: MapDef = {
+    mapId: MapId.TwoVsTwo,
     desc: {
-        name: "Local",
-        icon: "img/gui/player-the-hunted.svg",
-        buttonCss: "",
-        buttonText: "1v1",
+        name: "2v2",
+        icon: "img/gui/gas.svg",
+        buttonCss: "btn-mode-faction",
+        buttonText: "2v2",
         backgroundImg: "img/main_splash.png",
     },
     assets: {
