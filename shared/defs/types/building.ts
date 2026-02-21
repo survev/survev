@@ -163,6 +163,7 @@ export interface BuildingDef {
     group?:{
         id: number;
         minDistance?: number;
+        noSpawnRadius?: number;
     };
     teamId?: number;
 }
