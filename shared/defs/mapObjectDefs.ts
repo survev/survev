@@ -5705,7 +5705,7 @@ function createMansion<T extends ExtendedBuildingDef>(e: Partial<T>): T {
                 type:
                     e.bush ||
                     randomObstacleType({
-                        bush_01: 25,
+                        bush_01: 9,
                         bush_03: 1,
                         "": e.bush_chance || 0,
                     }),
@@ -5718,7 +5718,7 @@ function createMansion<T extends ExtendedBuildingDef>(e: Partial<T>): T {
                 type:
                     e.bush ||
                     randomObstacleType({
-                        bush_01: 25,
+                        bush_01: 9,
                         bush_03: 1,
                         "": e.bush_chance || 0,
                     }),
@@ -5731,7 +5731,7 @@ function createMansion<T extends ExtendedBuildingDef>(e: Partial<T>): T {
                 type:
                     e.bush ||
                     randomObstacleType({
-                        bush_01: 25,
+                        bush_01: 9,
                         bush_03: 1,
                         "": e.bush_chance || 0,
                     }),
@@ -5744,7 +5744,7 @@ function createMansion<T extends ExtendedBuildingDef>(e: Partial<T>): T {
                 type:
                     e.bush ||
                     randomObstacleType({
-                        bush_01: 25,
+                        bush_01: 9,
                         bush_03: 1,
                         "": e.bush_chance || 0,
                     }),
@@ -7123,13 +7123,13 @@ function createPoliceStation<T extends BuildingDef>(e: Partial<T>): T {
                 ori: 1,
             },
             {
-                type: randomObstacleType({ locker_01: 7, locker_02: 1 }),
+                type: randomObstacleType({ locker_01: 8, locker_02: 1 }),
                 pos: v2.create(33, 20.85),
                 scale: 1,
                 ori: 0,
             },
             {
-                type: randomObstacleType({ locker_01: 7, locker_02: 1 }),
+                type: randomObstacleType({ locker_01: 8, locker_02: 1 }),
                 pos: v2.create(38, 20.85),
                 scale: 1,
                 ori: 0,
@@ -7141,13 +7141,13 @@ function createPoliceStation<T extends BuildingDef>(e: Partial<T>): T {
                 ori: 0,
             },
             {
-                type: randomObstacleType({ locker_01: 7, locker_02: 1 }),
+                type: randomObstacleType({ locker_01: 8, locker_02: 1 }),
                 pos: v2.create(40.85, 7.5),
                 scale: 1,
                 ori: 3,
             },
             {
-                type: randomObstacleType({ locker_01: 7, locker_02: 1 }),
+                type: randomObstacleType({ locker_01: 8, locker_02: 1 }),
                 pos: v2.create(40.85, 17.5),
                 scale: 1,
                 ori: 3,
@@ -7159,13 +7159,13 @@ function createPoliceStation<T extends BuildingDef>(e: Partial<T>): T {
                 ori: 1,
             },
             {
-                type: randomObstacleType({ locker_01: 7, locker_02: 1 }),
+                type: randomObstacleType({ locker_01: 8, locker_02: 1 }),
                 pos: v2.create(38, 11.35),
                 scale: 1,
                 ori: 0,
             },
             {
-                type: randomObstacleType({ locker_01: 7, locker_02: 1 }),
+                type: randomObstacleType({ locker_01: 8, locker_02: 1 }),
                 pos: v2.create(33, 13.65),
                 scale: 1,
                 ori: 2,
@@ -7225,7 +7225,7 @@ function createPoliceStation<T extends BuildingDef>(e: Partial<T>): T {
                 ori: 0,
             },
             {
-                type: randomObstacleType({ crate_06: 2, crate_06s: 1}),
+                type: "crate_06",
                 pos: v2.create(10.5, 1.25),
                 scale: 1,
                 ori: 0,
@@ -8482,7 +8482,7 @@ function createWarehouse<T extends BuildingDef>(e: Partial<T>): T {
                 ignoreMapSpawnReplacement: e.ignoreMapSpawnReplacement,
             },
             {
-                type: randomObstacleType({ crate_02: 1, crate_01: 3 }),
+                type: "crate_02",
                 pos: v2.create(0, 0),
                 scale: 1,
                 ori: 0,
@@ -8708,7 +8708,7 @@ function createWarehouse2<T extends BuildingDef>(e: Partial<T>): T {
                 ori: 0,
             },
             {
-                type: randomObstacleType({ crate_08: 5, crate_09: 1 }),
+                type: randomObstacleType({ crate_08: 3, crate_09: 1 }),
                 pos: v2.create(0, 0),
                 scale: 1,
                 ori: 0,
@@ -9797,7 +9797,7 @@ export const MapObjectDefs: Record<string, MapObjectDef> = {
         destructible: true,
         armorPlated: true,
         hitParticle: "greenChip",
-        loot: [tierLoot("tier_ammo_crate", 1, 1)],
+        loot: [tierLoot("tier_ammo_crate", 1, 2)],
         map: { display: true, color: 0x537054, scale: 0.875 },
         img: { sprite: "map-crate-04.img" },
         sound: {
@@ -9850,10 +9850,7 @@ export const MapObjectDefs: Record<string, MapObjectDef> = {
         health: 140,
         loot: [
             tierLoot("tier_surviv", 4, 5),
-            autoLoot("ak47", 1),
-            autoLoot("ak47", 1),
-            autoLoot("ak47", 1),
-            autoLoot("ak47", 1),
+            tierLoot("tier_ak_bunker", 1, 1),
             tierLoot("tier_khaki_outfit", 1, 1),
             tierLoot("tier_khaki_outfit", 1, 1),
             tierLoot("tier_khaki_outfit", 1, 1),
@@ -10771,12 +10768,12 @@ export const MapObjectDefs: Record<string, MapObjectDef> = {
     },
     deposit_box_01: createDepositBox({
         img: { sprite: "map-deposit-box-01.img" },
-        loot: [tierLoot("tier_bank_vault_basic", 1, 1), tierLoot("tier_armor", 0, 1)],
+        loot: [tierLoot("tier_bank_vault_basic", 1, 1), tierLoot("tier_armor", 0, 1), tierLoot("tier_bank_vault_packs", 0, 1)],
     }),
     deposit_box_02: createDepositBox({
         explodeParticle: "depositBoxGoldBreak",
         img: { sprite: "map-deposit-box-02.img" },
-        loot: [tierLoot("tier_bank_vault_gold", 1, 1), tierLoot("tier_armor", 1, 2)],
+        loot: [tierLoot("tier_bank_vault_gold", 1, 1), tierLoot("tier_armor", 1, 2), tierLoot("tier_bank_vault_packs", 0, 1)],
     }),
     drawers_01: createDrawer({
         img: { sprite: "map-drawers-01.img" },
