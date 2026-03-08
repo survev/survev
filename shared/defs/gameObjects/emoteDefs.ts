@@ -1137,7 +1137,7 @@ export const EmotesDefs: Record<string, EmoteDef> = {
     },
     emote_flagguatemala: {
         type: "emote",
-        name: "Flag Gautemala",
+        name: "Flag Guatemala",
         rarity: Rarity.Common,
         texture: "flag-guatemala.img",
         sound: "emote_01",

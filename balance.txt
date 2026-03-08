@@ -125,7 +125,7 @@ Barrel Cache (Woods)
 ## Other Changes
 Sorted by the patch they were done in.
 
-Factions Changes (07/23/2025):
+Factions Changes (2025/07/23):
 + Certain roles receive healing when promoted: 
     Commander recieves 5 bandages and 1 medkit;
     Lieutenant receives 10 bandages and 3 sodas; 
@@ -137,7 +137,7 @@ Factions Changes (07/23/2025):
 + Bugler now recieves a pan on-promotion.
 ~ Grenadier recieves a MP220 -> Saiga-12 on-promotion.
 
-Cobalt Loot Changes (10/22/2025):
+Cobalt Loot Changes (2025/10/22):
 + Medic Common: Added VSS (weight of 1)
 + Scout Common: Added Dual M93R, DEagle (weights of 1 & 0.2 respectively).
 + Demo Common: Added MP220 (weight 1).
@@ -150,12 +150,12 @@ Cobalt Loot Changes (10/22/2025):
 ~ Demo Rare: Adjusted Saiga weight (0.5 -> 1) 
 ~ Tank Rare: Adjusted QBB-97 & M249 weights (1 -> 1.3 & 0.05 -> 0.2 respectively).
 
-Turkey Cache Changes (11/1/2025): 
+Turkey Cache Changes (2025/11/01): 
 + 50 Leafpile Loot Caches
 - 12 Berry Bush Caches (cache removed from mode)
 - 30 Turkey Leafpiles (non-cache piles)
 
-0.2.0 (Winter + Beach Update) (12/30/2025):
+0.2.0 (Winter + Beach Update) (2025/12/30):
 + Hardstone Block amount increased from 1 -> 3 (reskinned to iced hardstone block)
 - Tier Eye Block: Removed Peacemaker, .45 ACP, Pills, M4A1-S, & M249
 + Tier Eye Block: Added SVD, 7.62 mm, Snowball, SCAR-H, SV (weights of 1.5, 1, 1, 1.5, & 1 respectively)
@@ -166,7 +166,7 @@ Turkey Cache Changes (11/1/2025):
 ~ Tier Throwables: Adjusted Snowball weight (0.5 -> 1).
 + Density Spawns (Classic): Added 30 Palm Trees
 
-0.2.1 (Savannah Update) (02/02/2026):
+0.2.1 (Savannah Update) (2026/02/02):
 ~ Replaced a Warehouse with the alt. Warehouse in solos / duos.
 + Added an alt. Warehouse in squads.
     ~ Both changes apply to Classic (incl. all season reskins) & Winter.
@@ -174,14 +174,14 @@ Turkey Cache Changes (11/1/2025):
 + Buffed the Snowball & Potato (incl. heavy versions).
 - Nerfed the M9 (single, dual, & cursed).
 
-0.2.12 (Savannah B-Patch) (02/09/2026):
+0.2.12 (Savannah B-Patch) (2026/02/09):
 + Added Tier Armor (T3 armor odds increased by ~2x [~0.5% -> ~1%], T2 armor odds made similar to T1).
 + Tier Perks: Added .45 In The Chamber (weight of 1).
 ~ Tier Guns: Adjusted SV-98, AWM-S, & Mk 20 SSR weights (0.1 -> 0.09, 0.15 -> 0.12, & 0.15 -> 0.12 respectively)
 ~ headshotMult on DMRs reduced across the board, damage increased (excluding the Mk 20 SSR which was adjusted in previous paches), see above. 
 + Gold Crate: Now drop 1 item from Tier Medical.
 
-0.2.2 (Woods Update) (03/09/2026):
+0.2.2 (Woods Update) (2026/03/09):
 - 1 Logging Complex 03 (Winter Woods, 3 -> 2).
 + 2-3 Camps (fixedSpawns, Winter Woods & Winter, 0 -> 2-3 depending on map size).
 + 1 Barrel Cache (fixedSpawns, Woods, 0 -> 1).
