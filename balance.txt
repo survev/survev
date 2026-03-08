@@ -15,7 +15,7 @@ M9 + Cursed:
 
 Dual M9 + Cursed:
 + damage 12 -> 14 -> 13
-+ moveSpread 9 -> 3.5 --> 5.5
++ moveSpread 9 -> 3.5 -> 5.5
 + shotSpread 11 -> 4
 
 M1911:
@@ -92,22 +92,22 @@ Snowball:
 + speed: 40 -> 52
 
 Heavy Snowball: 
-+ damage: 5 --> 28
-+ freezeDuration: 1 --> 2
++ damage: 5 -> 28
++ freezeDuration: 1 -> 2
 + speed: 40 -> 52
 
 Potato:
-+ damage: 2 --> 8
++ damage: 2 -> 8
 
 Heavy Potato
-+ damage: 5 --> 15
-+ dropRandomLoot: 1 --> 2
++ damage: 5 -> 15
++ dropRandomLoot: 1 -> 2
 
 Flak Jacket:
-+ Increased Size (Mult): 0.2 --> 0.1
++ Increased Size (Mult): 0.2 -> 0.1
 
 Ironskin:
-+ Damage Reduction (%): 50 --> 40
++ Damage Reduction (%): 50 -> 40
 
 Loot tables:
 + Added bar to normal loot tables
@@ -135,20 +135,20 @@ Factions Changes (07/23/2025):
 + Lone Survivr now gets 4 perks (Splinter Rounds/AP Rounds, Windwalk/Combat Medic, Takedown, & Cast Ironskin)
 + Last Breath adjusted (overall buff).
 + Bugler now recieves a pan on-promotion.
-~ Grenadier recieves a MP220 --> Saiga-12 on-promotion.
+~ Grenadier recieves a MP220 -> Saiga-12 on-promotion.
 
 Cobalt Loot Changes (10/22/2025):
 + Medic Common: Added VSS (weight of 1)
 + Scout Common: Added Dual M93R, DEagle (weights of 1 & 0.2 respectively).
 + Demo Common: Added MP220 (weight 1).
 + Tank Common: Added BAR M1918 (weight of 0.5), 
-~ Tank Common: Adjusted QBB-97 weight (0.1 --> 0.2)
+~ Tank Common: Adjusted QBB-97 weight (0.1 -> 0.2)
 + Sniper Common: Added Scout Elite (weight of 1)
 + Medic Rare: Added SCAR SSR (weight of 0.05)
 - Demo Rare: Removed MP220
 + Demo Rare: Added Super-90 (weight of 0.1).
-~ Demo Rare: Adjusted Saiga weight (0.5 --> 1) 
-~ Tank Rare: Adjusted QBB-97 & M249 weights (1 --> 1.3 & 0.05 --> 0.2 respectively).
+~ Demo Rare: Adjusted Saiga weight (0.5 -> 1) 
+~ Tank Rare: Adjusted QBB-97 & M249 weights (1 -> 1.3 & 0.05 -> 0.2 respectively).
 
 Turkey Cache Changes (11/1/2025): 
 + 50 Leafpile Loot Caches
@@ -156,14 +156,14 @@ Turkey Cache Changes (11/1/2025):
 - 30 Turkey Leafpiles (non-cache piles)
 
 0.2.0 (Winter + Beach Update) (12/30/2025):
-+ Hardstone Block amount increased from 1 --> 3 (reskinned to iced hardstone block)
++ Hardstone Block amount increased from 1 -> 3 (reskinned to iced hardstone block)
 - Tier Eye Block: Removed Peacemaker, .45 ACP, Pills, M4A1-S, & M249
 + Tier Eye Block: Added SVD, 7.62 mm, Snowball, SCAR-H, SV (weights of 1.5, 1, 1, 1.5, & 1 respectively)
-~ Tier Eye Block: Adjusted Dual OTs-38, Flare Gun, AWM-S, & PKP weights (1 --> 1.5, 1 --> 1.5, 1 --> 0.75, & 1 --> 0.75 respectively)
+~ Tier Eye Block: Adjusted Dual OTs-38, Flare Gun, AWM-S, & PKP weights (1 -> 1.5, 1 -> 1.5, 1 -> 0.75, & 1 -> 0.75 respectively)
 ~ Sledgehammer replaced with Ice Axe
 + Tier Airdrop Melee: Added Ice Axe (weight of 1).
-~ Tier Airdrop Melee: Adjusted no drop weight (19 --> 18).
-~ Tier Throwables: Adjusted Snowball weight (0.5 --> 1).
+~ Tier Airdrop Melee: Adjusted no drop weight (19 -> 18).
+~ Tier Throwables: Adjusted Snowball weight (0.5 -> 1).
 + Density Spawns (Classic): Added 30 Palm Trees
 
 0.2.1 (Savannah Update) (02/02/2026):
@@ -175,29 +175,30 @@ Turkey Cache Changes (11/1/2025):
 - Nerfed the M9 (single, dual, & cursed).
 
 0.2.12 (Savannah B-Patch) (02/09/2026):
-+ Added Tier Armor (T3 armor odds increased by ~2x [~0.5% --> ~1%], T2 armor odds made similar to T1).
++ Added Tier Armor (T3 armor odds increased by ~2x [~0.5% -> ~1%], T2 armor odds made similar to T1).
 + Tier Perks: Added .45 In The Chamber (weight of 1).
-~ Tier Guns: Adjusted SV-98, AWM-S, & Mk 20 SSR weights (0.1 --> 0.09, 0.15 --> 0.12, & 0.15 --> 0.12 respectively)
+~ Tier Guns: Adjusted SV-98, AWM-S, & Mk 20 SSR weights (0.1 -> 0.09, 0.15 -> 0.12, & 0.15 -> 0.12 respectively)
 ~ headshotMult on DMRs reduced across the board, damage increased (excluding the Mk 20 SSR which was adjusted in previous paches), see above. 
 + Gold Crate: Now drop 1 item from Tier Medical.
 
 0.2.2 (Woods Update) (03/09/2026):
-- 1 Logging Complex 03 (Winter Woods, 3 --> 2).
-+ 2-3 Camps (fixedSpawns, Winter Woods & Winter, 0 --> 2-3 depending on map size).
-+ 1 Barrel Cache (fixedSpawns, Woods, 0 --> 1).
-+ 1 Workshop (fixedSpawns, 0 --> 1).
-+ 5 Outhouses (densitySpawns, 1 --> 6).
+- 1 Logging Complex 03 (Winter Woods, 3 -> 2).
++ 2-3 Camps (fixedSpawns, Winter Woods & Winter, 0 -> 2-3 depending on map size).
++ 1 Barrel Cache (fixedSpawns, Woods, 0 -> 1).
++ 1 Workshop (fixedSpawns, 0 -> 1).
++ 5 Outhouses (densitySpawns, 1 -> 6).
 
 ~ Adjusted tier_outfits (Winter & Winter Woods)
 + Added Tier Toilet (tier_medical made more common).
-~ Tier Throwables: Adjusted MIRV, Smoke, & Snowball weights (0.5 --> 0.75, 1 -- 0.75, & 0.25 --> 0.5, respectively) // TODO
+~ Replaced the Stone Hammer with the Ice Axe (tier_airdrop_melee, tier_hatchet_melee).
+~ Tier Throwables: Adjusted MIRV, Smoke, & Snowball weights (0.5 -> 0.75, 1 -- 0.75, & 0.25 -> 0.5, respectively) // TODO
 + Tier Guns: Added IMB-2 & M870 (weights of 2.75 & 2.5, respectively).
-~ Tier Guns: Adjusted DP-28, Bar M1918, MP220, Saiga-12, Spas-12, QBB-97, PKP, & M249 weights (3.5 --> 2.75, 3 --> 2.75, 1.5 --> 3, 0.1 --> 0.15, 3 --> 2.5, 0.1 --> 0.125, 0.005 --> 0.008, & 0.008 --> 0.012, respecitvely).
-~ Tier Armor: Adjusted Level 1 Helmet, Level 2 Helmet, Level 1 Vest, & Level 2 Vest weights (3 --> 2.5, 2 --> 2.5, 3 --> 2.5, & 2 --> 2.5, respectively).
-~ Tier Packs: Adjusted Small Pack, Regular Pack weights (3 --> 2 & 2 --> 3, respectively).
+~ Tier Guns: Adjusted DP-28, Bar M1918, MP220, Saiga-12, Spas-12, QBB-97, PKP, & M249 weights (3.5 -> 2.75, 3 -> 2.75, 1.5 -> 3, 0.1 -> 0.15, 3 -> 2.5, 0.1 -> 0.125, 0.005 -> 0.008, & 0.008 -> 0.012, respecitvely).
+~ Tier Armor: Adjusted Level 1 Helmet, Level 2 Helmet, Level 1 Vest, & Level 2 Vest weights (3 -> 2.5, 2 -> 2.5, 3 -> 2.5, & 2 -> 2.5, respectively).
+~ Tier Packs: Adjusted Small Pack, Regular Pack weights (3 -> 2 & 2 -> 3, respectively).
 + Tier Airdrop Uncommon: Added Spas-16 (weight of 1).
-~ Tier Airdrop Uncommon: Adjusted MIRV, Strobe, & QBB-97 weights (1 --> 0.75, 0.5 --> 0.75, & 2 --> 1, respectively).
-~ Tier Airdrop Rare: Adjusted USAS, PKP weights (2 --> 1.5, 0.08 --> 0.75, respectively).
-~ Tier Hatchet: Adjusted PKP & M249 weights (0.08 --> 0.25 & 1 --> 0.75, respectively).
-~ Tier Airdrop Melee: Adjusted "" (19 --> 13).
-~ Tier Airdrop Throwables (Winter Woods): Adjusted Snowball amount (10 --> 20).
+~ Tier Airdrop Uncommon: Adjusted MIRV, Strobe, & QBB-97 weights (1 -> 0.75, 0.5 -> 0.75, & 2 -> 1, respectively).
+~ Tier Airdrop Rare: Adjusted USAS, PKP weights (2 -> 1.5, 0.08 -> 0.75, respectively).
+~ Tier Hatchet: Adjusted PKP & M249 weights (0.08 -> 0.25 & 1 -> 0.75, respectively).
+~ Tier Airdrop Melee: Adjusted "" (19 -> 13).
+~ Tier Airdrop Throwables (Winter Woods): Adjusted Snowball amount (10 -> 20).
