@@ -23,7 +23,6 @@ export interface GunDef {
     shotSpread: number;
     bulletCount: number;
     bulletType: string;
-    bulletTypeBonus?: string;
     headshotMult: number;
     speed: {
         equip: number;
@@ -129,7 +128,6 @@ export const BaseDefs: Record<string, GunDef> = {
         shotSpread: 3,
         bulletCount: 1,
         bulletType: "bullet_mp5",
-        bulletTypeBonus: "bullet_mp5_bonus",
         headshotMult: 2,
         speed: { equip: 0, attack: 0 },
         lootImg: {
@@ -177,7 +175,6 @@ export const BaseDefs: Record<string, GunDef> = {
         shotSpread: 10,
         bulletCount: 1,
         bulletType: "bullet_mac10",
-        bulletTypeBonus: "bullet_mac10_bonus",
         headshotMult: 2,
         speed: { equip: 0, attack: 0 },
         lootImg: {
@@ -227,7 +224,6 @@ export const BaseDefs: Record<string, GunDef> = {
         bulletCount: 1,
         burstCount: 3,
         bulletType: "bullet_ump9",
-        bulletTypeBonus: "bullet_ump9_bonus",
         headshotMult: 2,
         speed: { equip: 0, attack: 0 },
         lootImg: {
@@ -275,7 +271,6 @@ export const BaseDefs: Record<string, GunDef> = {
         shotSpread: 2.5,
         bulletCount: 1,
         bulletType: "bullet_vector",
-        bulletTypeBonus: "bullet_vector_bonus",
         headshotMult: 2,
         speed: { equip: 0, attack: 0 },
         lootImg: {
@@ -370,7 +365,6 @@ export const BaseDefs: Record<string, GunDef> = {
         shotSpread: 4,
         bulletCount: 1,
         bulletType: "bullet_scorpion",
-        bulletTypeBonus: "bullet_scorpion_bonus",
         headshotMult: 2,
         speed: { equip: 0, attack: 0 },
         lootImg: {
@@ -418,7 +412,6 @@ export const BaseDefs: Record<string, GunDef> = {
         shotSpread: 2,
         bulletCount: 1,
         bulletType: "bullet_vss",
-        bulletTypeBonus: "bullet_vss_bonus",
         headshotMult: 1.75,
         speed: { equip: 0, attack: 0 },
         lootImg: {
@@ -2196,7 +2189,6 @@ export const BaseDefs: Record<string, GunDef> = {
         shotSpread: 3,
         bulletCount: 1,
         bulletType: "bullet_m9",
-        bulletTypeBonus: "bullet_m9_bonus",
         headshotMult: 2,
         speed: { equip: 0, attack: 0 },
         lootImg: {
@@ -2247,7 +2239,6 @@ export const BaseDefs: Record<string, GunDef> = {
         shotSpread: 4,
         bulletCount: 1,
         bulletType: "bullet_m9",
-        bulletTypeBonus: "bullet_m9_bonus",
         headshotMult: 2,
         speed: { equip: 0, attack: 0 },
         lootImg: {
@@ -2350,7 +2341,6 @@ export const BaseDefs: Record<string, GunDef> = {
         bulletCount: 1,
         burstCount: 3,
         bulletType: "bullet_m93r",
-        bulletTypeBonus: "bullet_m93r_bonus",
         headshotMult: 2,
         speed: { equip: 0, attack: 0 },
         lootImg: {
@@ -2403,7 +2393,6 @@ export const BaseDefs: Record<string, GunDef> = {
         bulletCount: 1,
         burstCount: 3,
         bulletType: "bullet_m93r",
-        bulletTypeBonus: "bullet_m93r_bonus",
         headshotMult: 2,
         speed: { equip: 0, attack: 0 },
         lootImg: {
@@ -2453,7 +2442,6 @@ export const BaseDefs: Record<string, GunDef> = {
         shotSpread: 12,
         bulletCount: 1,
         bulletType: "bullet_glock",
-        bulletTypeBonus: "bullet_glock_bonus",
         headshotMult: 2,
         speed: { equip: 0, attack: 0 },
         lootImg: {
@@ -2504,7 +2492,6 @@ export const BaseDefs: Record<string, GunDef> = {
         shotSpread: 18,
         bulletCount: 1,
         bulletType: "bullet_glock",
-        bulletTypeBonus: "bullet_glock_bonus",
         headshotMult: 2,
         speed: { equip: 0, attack: 0 },
         lootImg: {
@@ -2554,7 +2541,6 @@ export const BaseDefs: Record<string, GunDef> = {
         shotSpread: 2,
         bulletCount: 1,
         bulletType: "bullet_p30l",
-        bulletTypeBonus: "bullet_p30l_bonus",
         headshotMult: 2,
         speed: { equip: 1, attack: 1 },
         lootImg: {
@@ -2605,7 +2591,6 @@ export const BaseDefs: Record<string, GunDef> = {
         shotSpread: 3,
         bulletCount: 1,
         bulletType: "bullet_p30l",
-        bulletTypeBonus: "bullet_p30l_bonus",
         headshotMult: 2,
         speed: { equip: 0, attack: 0 },
         lootImg: {
