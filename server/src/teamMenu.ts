@@ -1,5 +1,4 @@
 import { randomUUID } from "crypto";
-import { inArray } from "drizzle-orm";
 import type { Hono } from "hono";
 import { getCookie } from "hono/cookie";
 import type { UpgradeWebSocket, WSContext } from "hono/ws";
@@ -15,15 +14,13 @@ import {
     type TeamPlayGameMsg,
     zTeamClientMsg,
 } from "../../shared/types/team";
-import type { Loadout } from "../../shared/utils/loadout";
 import { assert, util } from "../../shared/utils/util";
 import type { ApiServer } from "./api/apiServer";
 import { validateSessionToken } from "./api/auth";
-import { db } from "./api/db";
-import { usersTable } from "./api/db/schema";
 import { hashIp, isBanned } from "./api/routes/private/ModerationRouter";
 import { Config } from "./config";
 import { ServerLogger } from "./utils/logger";
+import { getFindGamePlayerData } from "./utils/playerData";
 import {
     getHonoIp,
     HTTPRateLimit,
@@ -251,29 +248,17 @@ class Room {
 
         const tokenMap = new Map<Player, string>();
 
-        const userIds = this.players.map((p) => p.userId).filter((p) => p !== null);
-
-        let loadouts: Array<{ userId: string; loadout: Loadout }> = [];
-        if (userIds.length > 0) {
-            loadouts = await db
-                .select({
-                    userId: usersTable.id,
-                    loadout: usersTable.loadout,
-                })
-                .from(usersTable)
-                .where(inArray(usersTable.id, userIds));
-        }
-
-        const playerData = this.players.map((p) => {
-            const token = randomUUID();
-            tokenMap.set(p, token);
-            return {
-                token,
-                userId: p.userId,
-                ip: p.ip,
-                loadout: loadouts.find((l) => l.userId == p.userId)?.loadout,
-            } satisfies FindGamePrivateBody["playerData"][0];
-        });
+        const playerData = await getFindGamePlayerData(
+            this.players.map((player) => {
+                const token = randomUUID();
+                tokenMap.set(player, token);
+                return {
+                    token,
+                    userId: player.userId,
+                    ip: player.ip,
+                } satisfies FindGamePrivateBody["playerData"][0];
+            }),
+        );
 
         const mode = this.teamMenu.server.modes[this.data.gameModeIdx];
         if (!mode || !mode.enabled) {

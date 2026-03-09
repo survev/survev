@@ -17,4 +17,4 @@ export const TeamModeToString = {
     [TeamMode.Solo]: "solo",
     [TeamMode.Duo]: "duo",
     [TeamMode.Squad]: "squad",
-};
+} as const;

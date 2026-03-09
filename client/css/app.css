@@ -3780,12 +3780,23 @@ a:active {
   background-image: url(/img/gui/pass.svg);
 }
 
+#right-column {
+  position: relative;
+  width: 330px;
+}
+
+#pass-wrapper,
+#news-wrapper {
+  position: relative;
+  width: 330px;
+}
+
 #pass-wrapper {
-  display: none;
+  display: block;
 }
 
 #news-wrapper {
-  display: block;
+  display: none;
 }
 
 #news-block {

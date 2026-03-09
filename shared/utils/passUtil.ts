@@ -1,4 +1,4 @@
-import { PassDefs } from "../../../shared/defs/gameObjects/passDefs";
+import { PassDefs } from "../defs/gameObjects/passDefs";
 
 const passMaxLevel = 99;
 
@@ -37,5 +37,8 @@ export const passUtil = {
             25200000 -
             Date.now()
         );
+    },
+    getNextQuestRefreshAt(timeAcquired: number) {
+        return timeAcquired + this.timeUntilQuestRefresh(timeAcquired);
     },
 };

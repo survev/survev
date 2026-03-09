@@ -411,6 +411,18 @@ export class Obstacle extends BaseGameObject {
         this.dead = true;
         this.setDirty();
 
+        if (params.source?.__type === ObjectType.Player) {
+            params.source.questManager.trackEvent("destruction", {
+                objectType: this.type,
+            });
+        }
+
+        if (def.airdropCrate && this.interactedBy) {
+            this.interactedBy.questManager.trackEvent("item_used", {
+                itemType: "airdrop_crate",
+            });
+        }
+
         this.scale = this.minScale;
         this.updateCollider();
 

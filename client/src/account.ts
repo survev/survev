@@ -1,5 +1,6 @@
 import $ from "jquery";
 import type {
+    GetPassRequest,
     LoadoutRequest,
     LoadoutResponse,
     ProfileResponse,
@@ -176,29 +177,6 @@ export class Account {
         document.cookie = "app-data=;expires=Thu, 01 Jan 1970 00:00:01 GMT;";
     }
 
-    loginWithAccessToken(
-        authUrl: string,
-        requestTokenFn: (cb: (...args: any[]) => void) => void,
-        extractTokenFn: (...args: any[]) => void,
-    ) {
-        requestTokenFn((err, data) => {
-            if (err) {
-                this.emit("error", "login_failed");
-                return;
-            }
-            const token = extractTokenFn(data) as unknown as string;
-            this.ajaxRequest(`${authUrl}?access_token=${token}`, (err, res) => {
-                if (err) {
-                    this.emit("error", "login_failed");
-                } else {
-                    this.config.set("sessionCookie", res.cookie);
-                    this.setSessionCookies();
-                    this.login();
-                }
-            });
-        });
-    }
-
     login() {
         if (helpers.getCookie("app-data")) {
             this.loadProfile();
@@ -345,8 +323,7 @@ export class Account {
     }
 
     getPass(tryRefreshQuests: boolean) {
-        return;
-        const args = {
+        const args: GetPassRequest = {
             tryRefreshQuests,
         };
         this.ajaxRequest("/api/user/get_pass", args, (err, res) => {

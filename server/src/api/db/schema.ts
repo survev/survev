@@ -8,6 +8,7 @@ import {
     serial,
     text,
     timestamp,
+    uniqueIndex,
     uuid,
 } from "drizzle-orm/pg-core";
 import { TeamMode } from "../../../../shared/gameConfig";
@@ -49,18 +50,66 @@ export const usersTable = pgTable("users", {
 export type UsersTableInsert = typeof usersTable.$inferInsert;
 export type UsersTableSelect = typeof usersTable.$inferSelect;
 
-export const itemsTable = pgTable("items", {
-    userId: text("user_id")
-        .notNull()
-        .references(() => usersTable.id, {
-            onDelete: "cascade",
-            onUpdate: "cascade",
-        }),
-    type: text("type").notNull(),
-    timeAcquired: bigint("time_acquired", { mode: "number" }).notNull(),
-    source: text("source").notNull().default("unlock_new_account"),
-    status: integer("status").notNull().default(ItemStatus.New),
-});
+export const itemsTable = pgTable(
+    "items",
+    {
+        userId: text("user_id")
+            .notNull()
+            .references(() => usersTable.id, {
+                onDelete: "cascade",
+                onUpdate: "cascade",
+            }),
+        type: text("type").notNull(),
+        timeAcquired: bigint("time_acquired", { mode: "number" }).notNull(),
+        source: text("source").notNull().default("unlock_new_account"),
+        status: integer("status").notNull().default(ItemStatus.New),
+    },
+    (table) => [uniqueIndex("uq_items_user_type").on(table.userId, table.type)],
+);
+export const userPassTable = pgTable(
+    "user_pass",
+    {
+        userId: text("user_id")
+            .notNull()
+            .references(() => usersTable.id, {
+                onDelete: "cascade",
+                onUpdate: "cascade",
+            }),
+        passType: text("pass_type").notNull().default("pass_survivr1"),
+        totalXp: integer("total_xp").notNull().default(0),
+        unlocks: json("unlocks").notNull().default({}).$type<Record<string, boolean>>(),
+        newItems: boolean("new_items").notNull().default(false),
+        createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+        updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow(),
+    },
+    (table) => [uniqueIndex("user_pass_user_type").on(table.userId, table.passType)],
+);
+
+export type UserPassTableSelect = typeof userPassTable.$inferSelect;
+
+export const userQuestTable = pgTable(
+    "user_quest",
+    {
+        id: serial("id").primaryKey(),
+        userId: text("user_id")
+            .notNull()
+            .references(() => usersTable.id, {
+                onDelete: "cascade",
+                onUpdate: "cascade",
+            }),
+        idx: integer("idx").notNull(),
+        questType: text("quest_type").notNull(),
+        progress: integer("progress").notNull().default(0),
+        target: integer("target").notNull(),
+        complete: boolean("complete").notNull().default(false),
+        rerolled: boolean("rerolled").notNull().default(false),
+        timeAcquired: bigint("time_acquired", { mode: "number" }).notNull(),
+        nextRefreshAt: bigint("next_refresh_at", { mode: "number" }).notNull(),
+    },
+    (table) => [uniqueIndex("user_quest_user_idx").on(table.userId, table.idx)],
+);
+
+export type UserQuestTableSelect = typeof userQuestTable.$inferSelect;
 
 export const matchDataTable = pgTable(
     "match_data",
