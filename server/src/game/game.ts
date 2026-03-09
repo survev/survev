@@ -39,6 +39,7 @@ export interface JoinTokenData {
     userId: string | null;
     findGameIp: string;
     loadout?: Loadout;
+    quests?: string[];
     groupData: {
         autoFill: boolean;
         playerCount: number;
@@ -174,7 +175,7 @@ export class Game {
         this.updateData();
     }
 
-    update(dt?: number): void {
+    update(dt?: number) {
         if (!this.allowJoin) return;
         this.profiler.flush();
 
@@ -424,7 +425,7 @@ export class Game {
         };
     }
 
-    handleMsg(buff: ArrayBuffer | Buffer, socketId: string, ip: string): void {
+    handleMsg(buff: ArrayBuffer | Buffer, socketId: string, ip: string) {
         if (!(buff instanceof ArrayBuffer)) return;
 
         const player = this.playerBarn.socketIdToPlayer.get(socketId);
@@ -509,10 +510,12 @@ export class Game {
         }
     }
 
-    handleSocketClose(socketId: string): void {
+    handleSocketClose(socketId: string) {
         const player = this.playerBarn.socketIdToPlayer.get(socketId);
         if (!player) return;
         this.logger.info(`"${player.name}" left`);
+        player.questManager.trackGameOverQuests();
+        player.questManager.flushProgress();
         player.disconnected = true;
         player.group?.checkPlayers();
         player.spectating = undefined;
@@ -527,7 +530,20 @@ export class Game {
         this.msgsToSend.serializeMsg(type, msg);
     }
 
-    checkGameOver(): void {
+    sendQuestProgress(userId: string, progress: Array<{ id: string; delta: number }>) {
+        try {
+            apiPrivateRouter.quest_progress.$post({
+                json: {
+                    userId,
+                    progress,
+                },
+            });
+        } catch (err) {
+            this.logger.error(`Failed to fetch API save game:`, err);
+        }
+    }
+
+    checkGameOver() {
         if (this.over) return;
         const didGameEnd: boolean = this.modeManager.handleGameEnd();
 
@@ -557,6 +573,7 @@ export class Game {
                 groupData,
                 findGameIp: token.ip,
                 loadout: token.loadout,
+                quests: token.quests,
             });
         }
     }
@@ -574,7 +591,7 @@ export class Game {
         });
     }
 
-    stop(): void {
+    stop() {
         if (this.stopped) return;
         this.stopped = true;
         this.allowJoin = false;

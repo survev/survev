@@ -2,17 +2,11 @@ import { and, eq, inArray, ne, notInArray } from "drizzle-orm";
 import { Hono } from "hono";
 import { UnlockDefs } from "../../../../../shared/defs/gameObjects/unlockDefs";
 import {
-    type GetPassResponse,
     type LoadoutResponse,
     type ProfileResponse,
-    type RefreshQuestResponse,
-    type SetPassUnlockResponse,
     type UsernameResponse,
-    zGetPassRequest,
     zLoadoutRequest,
-    zRefreshQuestRequest,
     zSetItemStatusRequest,
-    zSetPassUnlockRequest,
     zUsernameRequest,
 } from "../../../../../shared/types/user";
 import loadout from "../../../../../shared/utils/loadout";
@@ -32,12 +26,14 @@ import {
     logoutUser,
     sanitizeSlug,
 } from "./auth/authUtils";
+import { PassRouter } from "./PassRouter";
 
 export const UserRouter = new Hono<Context>();
 
 UserRouter.use(databaseEnabledMiddleware);
 UserRouter.use(rateLimitMiddleware(40, 60 * 1000));
 UserRouter.use(authMiddleware);
+UserRouter.route("/", PassRouter);
 
 UserRouter.post("/profile", async (c) => {
     const user = c.get("user")!;
@@ -230,19 +226,4 @@ UserRouter.post("/reset_stats", async (c) => {
         .where(eq(matchDataTable.userId, user.id));
 
     return c.json({}, 200);
-});
-
-//
-// NOT IMPLEMENTED
-//
-UserRouter.post("/set_pass_unlock", validateParams(zSetPassUnlockRequest), (c) => {
-    return c.json<SetPassUnlockResponse>({ success: true }, 200);
-});
-
-UserRouter.post("/get_pass", validateParams(zGetPassRequest), (c) => {
-    return c.json<GetPassResponse>({ success: true }, 200);
-});
-
-UserRouter.post("/refresh_quest", validateParams(zRefreshQuestRequest), (c) => {
-    return c.json<RefreshQuestResponse>({ success: true }, 200);
 });

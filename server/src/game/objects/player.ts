@@ -21,6 +21,8 @@ import { PerkProperties } from "../../../../shared/defs/gameObjects/perkDefs";
 import type { RoleDef } from "../../../../shared/defs/gameObjects/roleDefs";
 import type { ThrowableDef } from "../../../../shared/defs/gameObjects/throwableDefs";
 import { UnlockDefs } from "../../../../shared/defs/gameObjects/unlockDefs";
+import { MapObjectDefs } from "../../../../shared/defs/mapObjectDefs";
+import type { StructureDef } from "../../../../shared/defs/mapObjectsTyping";
 import {
     type Action,
     type Anim,
@@ -45,6 +47,7 @@ import { validateUserName } from "../../utils/serverHelpers";
 import type { Game, JoinTokenData } from "../game";
 import { Group, Team } from "../group";
 import { InventoryManager } from "../inventoryManager";
+import { QuestManager } from "../questManager";
 import { WeaponManager } from "../weaponManager";
 import type { Building } from "./building";
 import { BaseGameObject, type DamageParams, type GameObject } from "./gameObject";
@@ -224,6 +227,7 @@ export class PlayerBarn {
             joinData.findGameIp,
             joinData.userId,
             joinData.loadout,
+            joinData.quests,
         );
 
         this.socketIdToPlayer.set(socketId, player);
@@ -1361,6 +1365,8 @@ export class Player extends BaseGameObject {
 
     damageTaken = 0;
     damageDealt = 0;
+    currentBuildingType = "";
+    questManager = new QuestManager(this);
 
     // infinity since we aren't dead yet ;)
     // this is used for sorting and getting player ranks
@@ -1404,6 +1410,7 @@ export class Player extends BaseGameObject {
         findGameIp: string,
         userId: string | null,
         loadout?: Loadout,
+        questIds?: string[],
     ) {
         super(game, pos);
 
@@ -1416,6 +1423,8 @@ export class Player extends BaseGameObject {
         this.ip = ip;
         this.findGameIp = findGameIp;
         this.userId = userId;
+
+        this.questManager.quests = (questIds ?? []).map((id) => ({ id, delta: 0 }));
 
         this.isMobile = joinMsg.isMobile;
 
@@ -1738,6 +1747,9 @@ export class Player extends BaseGameObject {
                         });
                     }
                     this.invManager.take(this.actionItem as InventoryItem, 1);
+                    this.questManager.trackEvent("item_used", {
+                        itemType: this.actionItem,
+                    });
                 } else if (this.isReloading()) {
                     this.weaponManager.reload();
                 } else if (
@@ -2207,6 +2219,13 @@ export class Player extends BaseGameObject {
                 }
             }
         }
+
+        // guh, works for the club, might need testing for other buildings idk
+        const parentStructureType = occupiedBuilding?.parentStructure
+            ? (MapObjectDefs[occupiedBuilding.parentStructure.type] as StructureDef)
+                  .structureType
+            : undefined;
+        this.currentBuildingType = parentStructureType ?? occupiedBuilding?.type ?? "";
 
         // only dirty if healEffect changed from last tick to current tick (leaving or entering a heal region)
         if (oldHealEffect != this.healEffect) {
@@ -2819,6 +2838,10 @@ export class Player extends BaseGameObject {
         if (playerSource && params.source !== this) {
             if (playerSource.groupId !== this.groupId) {
                 playerSource.damageDealt += finalDamage;
+                playerSource.questManager.trackEvent("damage", {
+                    amount: finalDamage,
+                    weaponType: params.gameSourceType ?? "",
+                });
             }
             this.lastDamagedBy = playerSource;
         }
@@ -2842,7 +2865,11 @@ export class Player extends BaseGameObject {
      * adds gameover message to "this.msgsToSend" for the player and all their spectators
      */
     addGameOverMsg(winningTeamId: number = 0): void {
+        this.questManager.trackGameOverQuests(winningTeamId);
+        this.questManager.flushProgress();
+
         const aliveCount = this.game.modeManager.aliveCount();
+        const teamRank = winningTeamId == this.teamId ? 1 : aliveCount + 1;
 
         if (this.game.modeManager.showStatsMsg(this)) {
             const statsMsg = new net.PlayerStatsMsg();
@@ -2854,7 +2881,7 @@ export class Player extends BaseGameObject {
             const statsArr: net.PlayerStatsMsg["playerStats"][] =
                 this.game.modeManager.getGameoverPlayers(this);
             gameOverMsg.playerStats = statsArr;
-            gameOverMsg.teamRank = winningTeamId == this.teamId ? 1 : aliveCount + 1; // gameover msg sent after alive count updated
+            gameOverMsg.teamRank = teamRank; // gameover msg sent after alive count updated
             gameOverMsg.teamId = this.teamId;
             gameOverMsg.winningTeamId = winningTeamId;
             gameOverMsg.gameOver = !!winningTeamId;
@@ -2980,6 +3007,10 @@ export class Player extends BaseGameObject {
             if (killCreditSource !== this && killCreditSource.teamId !== this.teamId) {
                 killCreditSource.killedIds.push(this.matchDataId);
                 killCreditSource.kills++;
+                killCreditSource.questManager.trackEvent("kill", {
+                    weaponType: params.gameSourceType ?? "",
+                    buildingType: killCreditSource.currentBuildingType,
+                });
 
                 if (killCreditSource.isKillLeader) {
                     this.game.playerBarn.killLeaderDirty = true;
@@ -3079,6 +3110,9 @@ export class Player extends BaseGameObject {
         ) {
             this.lastDamagedBy.randomWeaponSwap(params);
         }
+
+        this.questManager.trackGameOverQuests();
+        this.questManager.flushProgress();
 
         this.game.broadcastMsg(net.MsgType.Kill, killMsg);
 

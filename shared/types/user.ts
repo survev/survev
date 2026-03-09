@@ -70,7 +70,29 @@ export const zGetPassRequest = z.object({
     tryRefreshQuests: z.boolean(),
 });
 export type GetPassRequest = z.infer<typeof zGetPassRequest>;
-export type GetPassResponse = { success: boolean };
+export type PassState = {
+    type: string;
+    level: number;
+    xp: number;
+    unlocks: Record<string, boolean>;
+    newItems: boolean;
+};
+
+export type QuestState = {
+    idx: number;
+    type: string;
+    progress: number;
+    target: number;
+    complete: boolean;
+    rerolled: boolean;
+    timeToRefresh: number;
+};
+
+export type GetPassResponse = {
+    success: true;
+    pass: PassState;
+    quests: QuestState[];
+};
 
 export const zRefreshQuestRequest = z.object({
     idx: z.number(),

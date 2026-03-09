@@ -14,6 +14,7 @@ import {
 } from "../../../shared/types/api";
 import { Config } from "../config";
 import { GIT_VERSION } from "../utils/gitRevision";
+import { getFindGamePlayerData } from "../utils/playerData";
 import {
     getHonoIp,
     HTTPRateLimit,
@@ -150,20 +151,21 @@ app.post("/api/find_game", validateParams(zFindGameBody), async (c) => {
         return c.json<FindGameResponse>({ error: "full" });
     }
 
+    const playerData = await getFindGamePlayerData([
+        {
+            token,
+            userId: user?.id || null,
+            ip,
+        },
+    ]);
+
     const data = await server.findGame({
         region: body.region,
         version: body.version,
         mapName: mode.mapName,
         teamMode: mode.teamMode,
         autoFill: true,
-        playerData: [
-            {
-                token,
-                userId: user?.id || null,
-                ip,
-                loadout: user?.loadout,
-            },
-        ],
+        playerData,
     });
 
     if ("error" in data) {

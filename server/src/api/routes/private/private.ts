@@ -1,14 +1,17 @@
-import { and, eq, inArray } from "drizzle-orm";
+import { and, eq, inArray, sql } from "drizzle-orm";
 import { Hono } from "hono";
 import { z } from "zod";
 import { saveConfig } from "../../../../../config";
 import { GameObjectDefs } from "../../../../../shared/defs/gameObjectDefs";
+import { PassDefs } from "../../../../../shared/defs/gameObjects/passDefs";
+import { QuestDefs } from "../../../../../shared/defs/gameObjects/questDefs";
 import { MapDefs } from "../../../../../shared/defs/mapDefs";
 import { TeamMode } from "../../../../../shared/gameConfig";
 import {
     zGiveItemParams,
     zRemoveItemParams,
 } from "../../../../../shared/types/moderation";
+import { passUtil } from "../../../../../shared/utils/passUtil";
 import { serverConfigPath } from "../../../config";
 import { isBehindProxy } from "../../../utils/serverHelpers";
 import {
@@ -31,9 +34,12 @@ import {
     itemsTable,
     type MatchDataTable,
     matchDataTable,
+    userPassTable,
+    userQuestTable,
     usersTable,
 } from "../../db/schema";
 import { MOCK_USER_ID } from "../user/auth/mock";
+import { passType } from "../user/PassRouter";
 import { isBanned, logPlayerIPs, ModerationRouter } from "./ModerationRouter";
 
 export const PrivateRouter = new Hono<Context>()
@@ -146,6 +152,156 @@ export const PrivateRouter = new Hono<Context>()
         server.logger.info(`Saved game data for ${matchData[0].gameId}`);
         return c.json({}, 200);
     })
+    .post(
+        "/quest_progress",
+        databaseEnabledMiddleware,
+        validateParams(
+            z.object({
+                userId: z.string(),
+                progress: z
+                    .array(
+                        z.object({
+                            id: z.string(),
+                            delta: z.number().finite().positive(),
+                        }),
+                    )
+                    .refine(
+                        (entries) =>
+                            new Set(entries.map((e) => e.id)).size === entries.length,
+                        { message: "duplicate quest ids" },
+                    ),
+            }),
+        ),
+        async (c) => {
+            const { userId, progress } = c.req.valid("json");
+
+            if (progress.length === 0) {
+                return c.json({ success: true }, 200);
+            }
+
+            const validEntries = progress
+                .map((e) => ({ id: e.id, delta: Math.round(e.delta) }))
+                .filter((e) => QuestDefs[e.id] && e.delta > 0);
+
+            if (validEntries.length === 0) {
+                return c.json({ success: true }, 200);
+            }
+
+            const userQuests = await db.query.userQuestTable.findMany({
+                where: and(
+                    eq(userQuestTable.userId, userId),
+                    inArray(
+                        userQuestTable.questType,
+                        validEntries.map((e) => e.id),
+                    ),
+                ),
+            });
+
+            if (userQuests.length === 0) {
+                return c.json({ success: true }, 200);
+            }
+
+            let xpGain = 0;
+
+            const deltaById = new Map(validEntries.map((e) => [e.id, e.delta]));
+            const passDef = PassDefs[passType];
+            const now = Date.now();
+
+            await db.transaction(async (tx) => {
+                let pass = await tx.query.userPassTable.findFirst({
+                    where: and(
+                        eq(userPassTable.userId, userId),
+                        eq(userPassTable.passType, passType),
+                    ),
+                });
+
+                if (!pass) return;
+
+                for (const quest of userQuests) {
+                    const delta = deltaById.get(quest.questType) ?? 0;
+                    if (delta <= 0) continue;
+
+                    const def = QuestDefs[quest.questType];
+                    if (!def) continue;
+                    const nextProgress = Math.min(quest.target, quest.progress + delta);
+                    const wasComplete = quest.complete;
+                    const nowComplete = nextProgress >= quest.target;
+
+                    if (!wasComplete && nowComplete) {
+                        xpGain += def.xp;
+                    }
+
+                    if (nextProgress === quest.progress && wasComplete === nowComplete) {
+                        continue;
+                    }
+
+                    await tx
+                        .update(userQuestTable)
+                        .set({
+                            progress: nextProgress,
+                            complete: nowComplete,
+                        })
+                        .where(eq(userQuestTable.id, quest.id));
+                }
+
+                if (xpGain <= 0) return;
+
+                const oldTotalXp = pass.totalXp;
+                const newTotalXp = oldTotalXp + xpGain;
+                const oldLevel = passUtil.getPassLevelAndXp(passType, oldTotalXp).level;
+                const newLevel = passUtil.getPassLevelAndXp(passType, newTotalXp).level;
+
+                const unlockedRewardItems = passDef.items
+                    .filter(
+                        (reward) => reward.level > oldLevel && reward.level <= newLevel,
+                    )
+                    .map((reward) => reward.item)
+                    .filter((item) => !!GameObjectDefs[item]);
+
+                let unlockedNewItems = false;
+
+                if (unlockedRewardItems.length > 0) {
+                    const insertedRewards = await tx
+                        .insert(itemsTable)
+                        .values(
+                            unlockedRewardItems.map((item) => ({
+                                userId,
+                                type: item,
+                                source: passType,
+                                timeAcquired: now,
+                            })),
+                        )
+                        .onConflictDoNothing()
+                        .returning({
+                            type: itemsTable.type,
+                        });
+
+                    unlockedNewItems = insertedRewards.length > 0;
+                }
+
+                await tx
+                    .insert(userPassTable)
+                    .values({
+                        userId,
+                        passType,
+                        totalXp: newTotalXp,
+                        newItems: unlockedNewItems,
+                    })
+                    .onConflictDoUpdate({
+                        target: [userPassTable.userId, userPassTable.passType],
+                        set: {
+                            totalXp: newTotalXp,
+                            newItems: unlockedNewItems
+                                ? true
+                                : sql`${userPassTable.newItems}`,
+                            updatedAt: new Date(),
+                        },
+                    });
+            });
+
+            return c.json({ success: true }, 200);
+        },
+    )
     .post(
         "/give_item",
         databaseEnabledMiddleware,

@@ -36,6 +36,13 @@
       "when": 1760380431165,
       "tag": "0004_famous_mulholland_black",
       "breakpoints": true
+    },
+    {
+      "idx": 5,
+      "version": "7",
+      "when": 1773018085822,
+      "tag": "0005_rare_rick_jones",
+      "breakpoints": true
     }
   ]
 }

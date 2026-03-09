@@ -64,6 +64,7 @@ export const zFindGamePrivateBody = z.object({
             userId: z.string().nullable(),
             ip: z.string(),
             loadout: loadoutSchema.optional(),
+            quests: z.array(z.string()).optional(),
         }),
     ),
 });
