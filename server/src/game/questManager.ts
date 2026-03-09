@@ -21,7 +21,7 @@ export class QuestManager {
     /**
      * When winningTeamId is not known yet it falls for the rank
      */
-    trackGameOverQuests(winningTeamId?: number) {
+    private trackGameOverQuests(winningTeamId?: number) {
         if (this.gameOverFlushed) return;
 
         const aliveCount = this.game.modeManager.aliveCount();
@@ -37,8 +37,11 @@ export class QuestManager {
         });
     }
 
-    flushProgress() {
+    flushProgress(winningTeamId?: number) {
         if (!this.player.userId || this.gameOverFlushed) return;
+
+        this.trackGameOverQuests(winningTeamId);
+
         this.gameOverFlushed = true;
 
         const progress = this.quests
@@ -156,7 +159,6 @@ export function questDelta<E extends keyof QuestEventPayloads>(
         }
 
         case "destruction": {
-            console.log({ payload });
             const p = payload as QuestEventPayloads["destruction"];
             const obstacleType = where?.obstacleType;
 
