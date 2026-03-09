@@ -514,7 +514,6 @@ export class Game {
         const player = this.playerBarn.socketIdToPlayer.get(socketId);
         if (!player) return;
         this.logger.info(`"${player.name}" left`);
-        player.questManager.trackGameOverQuests();
         player.questManager.flushProgress();
         player.disconnected = true;
         player.group?.checkPlayers();
@@ -539,7 +538,7 @@ export class Game {
                 },
             });
         } catch (err) {
-            this.logger.error(`Failed to fetch API save game:`, err);
+            this.logger.error(`Failed to save quest progress:`, err);
         }
     }
 

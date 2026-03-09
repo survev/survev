@@ -2865,8 +2865,7 @@ export class Player extends BaseGameObject {
      * adds gameover message to "this.msgsToSend" for the player and all their spectators
      */
     addGameOverMsg(winningTeamId: number = 0): void {
-        this.questManager.trackGameOverQuests(winningTeamId);
-        this.questManager.flushProgress();
+        this.questManager.flushProgress(winningTeamId);
 
         const aliveCount = this.game.modeManager.aliveCount();
         const teamRank = winningTeamId == this.teamId ? 1 : aliveCount + 1;
@@ -3111,7 +3110,6 @@ export class Player extends BaseGameObject {
             this.lastDamagedBy.randomWeaponSwap(params);
         }
 
-        this.questManager.trackGameOverQuests();
         this.questManager.flushProgress();
 
         this.game.broadcastMsg(net.MsgType.Kill, killMsg);
