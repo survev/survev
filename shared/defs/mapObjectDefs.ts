@@ -9599,7 +9599,7 @@ function createWorkshop<T extends BuildingDef>(e: Partial<T>): T {
             },
             {
                 type: "table_01",
-                pos: v2.create(-14.5, 3.5),
+                pos: v2.create(-14.5, 2.25),
                 scale: 1,
                 ori: 1,
             },

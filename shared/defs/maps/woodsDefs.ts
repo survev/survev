@@ -77,7 +77,7 @@ const mapDef: PartialMapDef = {
             { name: "imbel", count: 1, weight: 2.75 },
             { name: "m870", count: 1, weight: 2.5 },
             { name: "m1100", count: 1, weight: 3 },
-            { name: "mp220", count: 1, weight: 3 },
+            { name: "mp220", count: 1, weight: 2 },
             { name: "saiga", count: 1, weight: 0.15 },
             { name: "spas12", count: 1, weight: 2.5 },
             { name: "qbb97", count: 1, weight: 0.125 },

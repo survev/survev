@@ -202,3 +202,6 @@ Turkey Cache Changes (2025/11/01):
 ~ Tier Hatchet: Adjusted PKP & M249 weights (0.08 -> 0.25 & 1 -> 0.75, respectively).
 ~ Tier Airdrop Melee: Adjusted "" (19 -> 13).
 ~ Tier Airdrop Throwables (Winter Woods): Adjusted Snowball amount (10 -> 20).
+
+0.2.21 (Woods B-Patch) (2026/03/09):
+- Tier Guns: Adjusted MP220 weight (3 -> 2).

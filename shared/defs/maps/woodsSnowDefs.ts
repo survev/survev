@@ -12,6 +12,7 @@ const mapDef: PartialMapDef = {
             { name: "snowball_01", channel: "sfx" },
             { name: "snowball_02", channel: "sfx" },
             { name: "snowball_pickup_01", channel: "ui" },
+            { name: "helmet03_forest_pickup_01", channel: "ui" },
         ],
         atlases: ["gradient", "loadout", "shared", "woods"],
     },
@@ -25,6 +26,7 @@ const mapDef: PartialMapDef = {
             grass: 0xbdbdbd,
             underground: 0x1b0d03,
             playerSubmerge: 0x2b8ca4,
+            playerGhillie: 0xbbbbbb,
         },
         particles: { camera: "falling_snow_slow" },
         tracerColors: {
