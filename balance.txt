@@ -203,5 +203,5 @@ Turkey Cache Changes (2025/11/01):
 ~ Tier Airdrop Melee: Adjusted "" (19 -> 13).
 ~ Tier Airdrop Throwables (Winter Woods): Adjusted Snowball amount (10 -> 20).
 
-0.2.21 (Woods B-Patch) (2026/03/09):
+0.2.21 (Woods B-Patch) (2026/03/10):
 - Tier Guns: Adjusted MP220 weight (3 -> 2).

@@ -130,6 +130,9 @@ const mapDef: PartialMapDef = {
                 stone_01: "stone_01x",
                 stone_03: "stone_03x",
                 tree_01: "tree_07",
+                // make eye bunkers have the proper woods recorders
+                recorder_01: "recorder_08",
+                recorder_02: "recorder_09",
             },
         ],
     },
