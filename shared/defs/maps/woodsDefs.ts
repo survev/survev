@@ -83,7 +83,7 @@ const mapDef: PartialMapDef = {
             { name: "qbb97", count: 1, weight: 0.125 },
             { name: "pkp", count: 1, weight: 0.007 },
             { name: "m249", count: 1, weight: 0.011 },
-        ], 
+        ],
         tier_ammo: [
             { name: "762mm", count: 60, weight: 3 },
             { name: "556mm", count: 60, weight: 6 },
