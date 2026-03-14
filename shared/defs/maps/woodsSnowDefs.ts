@@ -77,6 +77,18 @@ const mapDef: PartialMapDef = {
             { name: "tier_katanas", count: 1, weight: 3 },
             { name: "iceaxe", count: 1, weight: 1 },
         ],
+        tier_eye_block: [
+            { name: "m9", count: 1, weight: 1 },
+            { name: "ots38_dual", count: 1, weight: 1.5 },
+            { name: "flare_gun", count: 1, weight: 1.5 },
+            { name: "svd_winter", count: 1, weight: 1.5 },
+            { name: "762mm", count: 1, weight: 1 },
+            { name: "snowball", count: 1, weight: 1 },
+            { name: "scar", count: 1, weight: 1.5 },
+            { name: "sv98_winter", count: 1, weight: 1 },
+            { name: "awc_winter", count: 1, weight: 0.75 },
+            { name: "pkp", count: 1, weight: 0.75 },
+        ],
     },
     mapGen: {
         fixedSpawns: [
