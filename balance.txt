@@ -206,7 +206,7 @@ Turkey Cache Changes (2025/11/01):
 0.2.21 (Woods B-Patch) (2026/03/10):
 - Tier Guns: Adjusted MP220 weight (3 -> 2).
 
-0.2.22 (Woods C-Patch) (2026/03/17):
+0.2.22 (Woods C-Patch) (2026/03/16):
 + Increased .308 Subsonic capcity from 10/20/40/80 to 20/40/60/80.
 ~ Tier Eye: Loot table changed to match the one on the Winter map (see 0.2.0 Tier Eye balances).
 - Tier Guns: Adjusted M249, PKP weights (s.t. it matches the old rarity prior to the 0.2.21 changes) (0.012 -> 0.011, 0.008 -> 0.007).
