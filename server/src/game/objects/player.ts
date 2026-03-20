@@ -2888,6 +2888,8 @@ export class Player extends BaseGameObject {
         this.animType = GameConfig.Anim.None;
         this.animSeq++;
         this.healEffect = false;
+        this.boostDirty = true;
+        this.inventoryDirty = true;
         this.setDirty();
 
         this.shootHold = false;
@@ -3168,6 +3170,13 @@ export class Player extends BaseGameObject {
         }
         this._perks.length = 0;
         this._perkTypes.length = 0;
+
+        // Wipe inventory
+        this.invManager.wipeInventory();
+        this.chest = "";
+        this.helmet = "";
+        this.backpack = "backpack00";
+        this.weaponManager.showNextThrowable();
 
         // death emote
         this.sendDeathEmoteTicker = 0.3;
