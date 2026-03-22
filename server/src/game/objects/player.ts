@@ -635,6 +635,7 @@ export class Player extends BaseGameObject {
     activeIdDirty = true;
     hasFiredFlare = false;
     flareTimer = 0;
+    didReviveAbuse = false;
 
     sendDeathEmoteTicker = 0;
     sentDeathEmote = false;
@@ -1661,7 +1662,11 @@ export class Player extends BaseGameObject {
         }
 
         if (this.game.gas.doDamage && this.game.gas.isInGas(this.pos)) {
-            if (this.downed && this.hasPerk("self_revive")) {
+            if (
+                this.downed &&
+                this.hasPerk("self_revive") &&
+                (this.game.gas.currentRad < 30 || this.didReviveAbuse)
+            ) {
                 this.damage({
                     amount: this.game.gas.damage * PerkProperties.self_revive.gasMult,
                     damageType: GameConfig.DamageType.Gas,
@@ -1725,6 +1730,10 @@ export class Player extends BaseGameObject {
                         // checks 2 conditions in one, player has pan AND has it selected
                         if (target.weapons[target.curWeapIdx].type === "pan") {
                             target.wearingPan = false;
+                        }
+
+                        if (this.__id == target.__id && this.game.gas.isInGas(this.pos)) {
+                            this.didReviveAbuse = true;
                         }
 
                         target.setDirty();
