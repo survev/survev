@@ -30,6 +30,9 @@ export const PerkProperties = {
     trick_size: {
         scale: 0.25,
     },
+    self_revive: {
+        gasMult: 1.2,
+    },
     final_bugle: {
         scaleOnDeath: 0.2,
     },

@@ -1661,11 +1661,19 @@ export class Player extends BaseGameObject {
         }
 
         if (this.game.gas.doDamage && this.game.gas.isInGas(this.pos)) {
-            this.damage({
-                amount: this.game.gas.damage,
-                damageType: GameConfig.DamageType.Gas,
-                dir: this.dir,
-            });
+            if (this.downed && this.hasPerk("self_revive")) {
+                this.damage({
+                    amount: this.game.gas.damage * PerkProperties.self_revive.gasMult,
+                    damageType: GameConfig.DamageType.Gas,
+                    dir: this.dir,
+                });
+            } else {
+                this.damage({
+                    amount: this.game.gas.damage,
+                    damageType: GameConfig.DamageType.Gas,
+                    dir: this.dir,
+                });
+            }
             // don't continue the update if we died
             if (this.dead) {
                 return;
@@ -2828,10 +2836,6 @@ export class Player extends BaseGameObject {
         this.downedDamageTicker = GameConfig.player.downedDamageBuffer;
         this.boost = 0;
         this.health = 100;
-
-        if (this.game.gas.currentRad <= 0.1) {
-            this.health = 50;
-        }
 
         this.animType = GameConfig.Anim.None;
         this.setDirty();
