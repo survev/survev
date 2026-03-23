@@ -52,7 +52,7 @@ const mapDef: PartialMapDef = {
         ],
         tier_airdrop_melee: [
             { name: "", count: 1, weight: 13 },
-            { name: "iceaxe", count: 1, weight: 1 },
+            { name: "iceaxe", count: 1, weight: 3 },
             { name: "pan", count: 1, weight: 1 },
         ],
         tier_airdrop_outfits: [
