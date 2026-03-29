@@ -304,11 +304,11 @@ export class GameModeManager {
     handlePlayerDeath(player: Player, params: DamageParams): void {
         const nonPlayerKill =
                     params.damageType != GameConfig.DamageType.Player;
-        params.suicide = params.damageType == GameConfig.DamageType.Player 
+        const suicide = params.damageType == GameConfig.DamageType.Player 
                             && params.source == player;
 
         // give kill credit to the person that damaged the player
-        if (nonPlayerKill || params.suicide && player.lastDamagedBy) {
+        if (nonPlayerKill || suicide && player.lastDamagedBy) {
             params.killCreditSource = player.lastDamagedBy;
         }
         if (this.isSolo) {
