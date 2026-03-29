@@ -306,9 +306,12 @@ export class GameModeManager {
         const suicide =
             params.damageType == GameConfig.DamageType.Player && params.source == player;
 
+        const MAX_TIME_CREDIT_KILL = 20000;
         // give kill credit to the person that damaged the player
         if (nonPlayerKill || (suicide && player.lastDamagedBy)) {
-            params.killCreditSource = player.lastDamagedBy;
+            if (this.game.now - player.lastDamagedByAt! < MAX_TIME_CREDIT_KILL) {
+                params.killCreditSource = player.lastDamagedBy;
+            }
         }
         if (this.isSolo) {
             player.kill(params);

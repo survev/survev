@@ -2693,6 +2693,7 @@ export class Player extends BaseGameObject {
      * the last player to damage you (excludes yourself)
      */
     lastDamagedBy: Player | undefined;
+    lastDamagedByAt: number | undefined;
 
     damage(params: DamageParams) {
         if (this.debug.godMode) return;
@@ -2773,6 +2774,7 @@ export class Player extends BaseGameObject {
                 playerSource.damageDealt += finalDamage;
             }
             this.lastDamagedBy = playerSource;
+            this.lastDamagedByAt = this.game.now;
         }
 
         this.health -= finalDamage;
