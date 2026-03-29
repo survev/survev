@@ -1370,8 +1370,9 @@ export class Game {
                 if (msg.killCreditId == this.m_activeId) {
                     const completeKill = msg.killerId == this.m_activeId;
                     const suicide =
-                        msg.killCreditId == msg.killerId && msg.killerId == msg.targetId
-                        || msg.killCreditId == msg.targetId;
+                        (msg.killCreditId == msg.killerId &&
+                            msg.killerId == msg.targetId) ||
+                        msg.killCreditId == msg.targetId;
                     const killText = this.m_ui2Manager.getKillText(
                         killerName,
                         targetName,

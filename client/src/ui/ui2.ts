@@ -1407,7 +1407,7 @@ export class UiManager2 {
                 )} ${targetName} ${this.localization.translate(
                     "game-with",
                 )} ${this.localization.translate(`game-${sourceType}`)}
-                ${isCreditKill ? `(${creditName})`:""}`;
+                ${isCreditKill ? `(${creditName})` : ""}`;
             case DamageType.Bleeding: {
                 const killTxt = this.localization.translate(
                     killerName ? "game-finally-killed" : "game-finally-bled-out",
@@ -1425,7 +1425,9 @@ export class UiManager2 {
                     killTxt = this.localization.translate("game-knocked-out");
                 } else {
                     killTxt = this.localization.translate(
-                        killerName && !creditName ? "game-finally-killed" : "game-died-outside",
+                        killerName && !creditName
+                            ? "game-finally-killed"
+                            : "game-died-outside",
                     );
                 }
                 if (killName) {
