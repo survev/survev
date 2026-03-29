@@ -1394,9 +1394,11 @@ export class UiManager2 {
     getKillFeedText(
         targetName: string,
         killerName: string,
+        creditName: string,
         sourceType: string,
         damageType: DamageType,
         downed: boolean,
+        isCreditKill: boolean,
     ) {
         switch (damageType) {
             case DamageType.Player:
@@ -1404,7 +1406,8 @@ export class UiManager2 {
                     downed ? "game-knocked-out" : "game-killed",
                 )} ${targetName} ${this.localization.translate(
                     "game-with",
-                )} ${this.localization.translate(`game-${sourceType}`)}`;
+                )} ${this.localization.translate(`game-${sourceType}`)}
+                ${isCreditKill ? `(${creditName})`:""}`;
             case DamageType.Bleeding: {
                 const killTxt = this.localization.translate(
                     killerName ? "game-finally-killed" : "game-finally-bled-out",
@@ -1422,13 +1425,13 @@ export class UiManager2 {
                     killTxt = this.localization.translate("game-knocked-out");
                 } else {
                     killTxt = this.localization.translate(
-                        killerName ? "game-finally-killed" : "game-died-outside",
+                        killerName && !creditName ? "game-finally-killed" : "game-died-outside",
                     );
                 }
                 if (killName) {
                     return `${killName} ${killTxt} ${targetName}`;
                 }
-                return `${targetName} ${killTxt}`;
+                return `${targetName} ${killTxt} ${isCreditKill ? `(${creditName})` : ""}`;
             }
             case DamageType.Airdrop: {
                 const mapObj = MapObjectDefs[sourceType] as ObstacleDef;
@@ -1438,7 +1441,7 @@ export class UiManager2 {
                     : mapObj && !mapObj.airdropCrate
                       ? this.localization.translate("game-killed")
                       : this.localization.translate("game-crushed");
-                return `${killName} ${killTxt} ${targetName}`;
+                return `${killName} ${killTxt} ${targetName} ${isCreditKill ? `(${creditName})` : ""}`;
             }
             case DamageType.Airstrike: {
                 const killTxt = this.localization.translate(
@@ -1451,7 +1454,7 @@ export class UiManager2 {
                 }
                 return `${this.localization.translate(
                     "game-the-air-strike",
-                )} ${killTxt} ${targetName}`;
+                )} ${killTxt} ${targetName} ${isCreditKill ? `(${creditName})` : ""}`;
             }
             default:
                 return "";

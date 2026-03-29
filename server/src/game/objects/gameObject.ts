@@ -41,6 +41,7 @@ export interface DamageParams {
     source?: GameObject;
     killCreditSource?: Player;
     isExplosion?: boolean;
+    suicide?: boolean;
     /**
      * The source weapon that originally triggered the damage
      * Used by potato weapon swaps, gets passed down to e.g explosions

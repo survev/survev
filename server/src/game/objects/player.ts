@@ -2690,7 +2690,7 @@ export class Player extends BaseGameObject {
     }
 
     /**
-     * doesn't care about kill credit or anything, simply the last player to damage you (excludes yourself)
+     * the last player to damage you (excludes yourself)
      */
     lastDamagedBy: Player | undefined;
 
