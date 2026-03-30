@@ -48,6 +48,7 @@ export class Building implements AbstractObject {
     __id!: number;
     __type!: ObjectType.Building;
     active!: boolean;
+    __poolIdx!: number;
 
     sprites: Array<{
         active: boolean;

@@ -148,7 +148,7 @@ export class DebugHUD {
             };
 
             const addPool = (name: string, pool: Pool<AbstractObject>) => {
-                addCount(name, pool.m_activeCount, pool.m_getPool().length);
+                addCount(name, pool.m_activeCount, pool.m_getTotalSize());
             };
 
             addPool("Players", game.m_playerBarn.playerPool);

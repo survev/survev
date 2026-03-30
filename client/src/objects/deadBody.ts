@@ -36,6 +36,7 @@ class DeadBody implements AbstractObject {
     __id!: number;
     __type!: ObjectType.DeadBody;
     active = false;
+    __poolIdx!: number;
 
     pos = v2.create(0, 0);
     container = new PIXI.Container();
