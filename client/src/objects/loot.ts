@@ -24,6 +24,7 @@ export class Loot implements AbstractObject {
     __id!: number;
     __type!: ObjectType.Loot;
     active!: boolean;
+    __poolIdx!: number;
 
     ticker = 0;
     playDropSfx = false;

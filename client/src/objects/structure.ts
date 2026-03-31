@@ -34,6 +34,7 @@ export class Structure implements AbstractObject {
     __id!: number;
     __type!: ObjectType.Structure;
     active!: boolean;
+    __poolIdx!: number;
 
     soundTransitionT!: number;
     soundEnabledT!: number;
