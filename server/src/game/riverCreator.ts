@@ -122,7 +122,7 @@ export class RiverCreator {
 
         const riverPoints = [start, end];
 
-        const nPasses = isFactionRiver ? 6 : 5; // faction rivers need to be smoother than normal rivers
+        const nPasses = 4;
         for (let i = 0; i < nPasses; i++) {
             for (let j = 1; j < riverPoints.length; j++) {
                 const lastPoint = riverPoints[j - 1];
@@ -133,7 +133,10 @@ export class RiverCreator {
                 // since the first midpoint of the river determines its overall structure
                 // will replace will a cleaner solution when i figure out one lmao
                 if (isFactionRiver && i == 0) {
-                    midPoint = v2.midpoint(lastPoint, nextPoint);
+                    midPoint = v2.add(
+                        v2.midpoint(lastPoint, nextPoint),
+                        util.randomPointInCircle(16, this.randomGenerator),
+                    );
                 } else {
                     midPoint = this.getMidPoint(lastPoint, nextPoint, offsetDir);
                 }
@@ -178,7 +181,26 @@ export class RiverCreator {
 
         this.handleIntersection(riverPoints);
 
-        return riverPoints;
+        if (riverPoints.length < 10) {
+            return [];
+        }
+
+        // smooth out rivers using the spline logic
+        const smoothPoints = new Array(riverPoints.length * (isFactionRiver ? 4 : 2));
+        for (let i = 0; i < smoothPoints.length; i += 1) {
+            const { pt, p0, p1, p2, p3 } = getControlPoints(
+                i / (smoothPoints.length - 1),
+                riverPoints,
+                false,
+            );
+
+            smoothPoints[i] = v2.create(
+                catmullRom(pt, p0.x, p1.x, p2.x, p3.x),
+                catmullRom(pt, p0.y, p1.y, p2.y, p3.y),
+            );
+            this.map.clampToMapBounds(smoothPoints[i]);
+        }
+        return smoothPoints;
     }
 
     createLake(lake: MapDef["mapGen"]["map"]["rivers"]["lakes"][number]) {
@@ -208,7 +230,7 @@ export class RiverCreator {
         const smoothPoints = new Array(33);
         for (let i = 0; i < smoothPoints.length; i += 1) {
             const { pt, p0, p1, p2, p3 } = getControlPoints(
-                i / smoothPoints.length,
+                i / (smoothPoints.length - 1),
                 points,
                 true,
             );

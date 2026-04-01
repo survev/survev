@@ -367,7 +367,10 @@ export async function isBehindProxy(ip: string, vpn: 0 | 1 | 2 | 3): Promise<boo
     if (!proxyCheck) return false;
 
     let info: IPAddressInfo | undefined = undefined;
-    const cached = proxyCheckCache.get(ip);
+
+    const key = `${ip}_${vpn}`;
+
+    const cached = proxyCheckCache.get(key);
     if (cached && cached.expiresAt > Date.now()) {
         info = cached.info;
     }
@@ -397,7 +400,7 @@ export async function isBehindProxy(ip: string, vpn: 0 | 1 | 2 | 3): Promise<boo
     if (!info) {
         return false;
     }
-    proxyCheckCache.set(ip, {
+    proxyCheckCache.set(key, {
         info,
         expiresAt: Date.now() + util.daysToMs(1),
     });

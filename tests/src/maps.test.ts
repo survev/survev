@@ -3,6 +3,7 @@ import { describe, expect, test } from "vitest";
 import { Atlases } from "../../client/atlas-builder/atlasDefs";
 import { type MapDef, MapDefs } from "../../shared/defs/mapDefs";
 import { Constants } from "../../shared/net/net";
+import { getAllAtlasSprites, getAllMapSprites } from "./spriteHelpers";
 
 const maps = Object.keys(MapDefs);
 
@@ -113,5 +114,17 @@ describe.for(maps)("Map %s", (map) => {
                 sprites.add(sprite);
             }
         });
+    });
+
+    test("Map has no missing sprites", () => {
+        const atlasSprites = getAllAtlasSprites(map as keyof typeof MapDefs);
+        const mapSprites = getAllMapSprites(map as keyof typeof MapDefs);
+
+        const diff = mapSprites.difference(atlasSprites);
+
+        expect(
+            diff.size,
+            `Map ${map} is missing ${[...diff].join(", ")} sprites on its atlases`,
+        ).toBe(0);
     });
 });

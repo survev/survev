@@ -442,12 +442,20 @@ export class Game {
                 // the slice is to make sure it doesn't overflow the error webhook
                 JSON.stringify([...new Uint8Array(buff.slice(0, 255))]),
             );
-            this.closeSocket(socketId);
+            if (player) {
+                player.disconnect();
+            } else {
+                this.closeSocket(socketId);
+            }
             return;
         }
 
         if (error) {
-            this.closeSocket(socketId, error);
+            if (player) {
+                player.disconnect();
+            } else {
+                this.closeSocket(socketId);
+            }
             return;
         }
 
@@ -460,6 +468,10 @@ export class Game {
 
         if (!player) {
             this.closeSocket(socketId);
+            return;
+        }
+
+        if (player.disconnected) {
             return;
         }
 
@@ -562,7 +574,7 @@ export class Game {
         this.allowJoin = false;
         for (const player of this.playerBarn.players) {
             if (!player.disconnected) {
-                this.closeSocket(player.socketId);
+                player.disconnect();
             }
         }
         this.logger.info("Game Ended");

@@ -763,6 +763,11 @@ export class Player extends BaseGameObject {
         this.setGroupStatuses();
     }
 
+    disconnect(reason?: string) {
+        this.disconnected = true;
+        this.game.closeSocket(this.socketId, reason);
+    }
+
     private _spectatorCount = 0;
     set spectatorCount(spectatorCount: number) {
         if (this._spectatorCount === spectatorCount) return;
@@ -1675,7 +1680,7 @@ export class Player extends BaseGameObject {
                 });
             } else {
                 this.damage({
-                    amount: this.game.gas.damage,
+                    amount: this.disconnected ? 22 : this.game.gas.damage,
                     damageType: GameConfig.DamageType.Gas,
                     dir: this.dir,
                 });
@@ -2421,12 +2426,13 @@ export class Player extends BaseGameObject {
             width = height;
             height = tmp;
         }
-        const rect = collider.createAabbExtents(this.pos, v2.create(width, height));
+        const rect = collider.createAabbExtents(player.pos, v2.create(width, height));
 
         const newVisibleObjects = game.grid.intersectColliderSet(rect);
         // client crashes if active player is not visible
         // so make sure its always added to visible objects
         newVisibleObjects.add(this);
+        newVisibleObjects.add(player);
 
         for (const obj of this.visibleObjects) {
             if (!newVisibleObjects.has(obj)) {
@@ -2643,7 +2649,7 @@ export class Player extends BaseGameObject {
             this.spectateCooldownCount++;
 
             if (this.spectateCooldownCount > 10) {
-                this.game.closeSocket(this.socketId);
+                this.disconnect();
                 this.game.logger.error(
                     `Game ${this.game.id} - Player ${this.name} disconnected for spamming SpectateMsg (cooldown)`,
                 );
@@ -2655,7 +2661,7 @@ export class Player extends BaseGameObject {
         this.spectateMsgCount++;
 
         if (this.spectateMsgCount > 50) {
-            this.game.closeSocket(this.socketId);
+            this.disconnect();
             this.game.logger.error(
                 `Game ${this.game.id} - Player ${this.name} Player ${this.name} disconnected for spamming SpectateMsg (count)`,
             );

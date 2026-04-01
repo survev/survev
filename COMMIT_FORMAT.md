@@ -6,9 +6,9 @@ Commit messages should follow a format that includes a `type`, `scope`, `file`, 
 ```
 Note: `scope` and `file` are optional.
 
-Example - `fix (server): prevented downed players from interacting with objects`
+Example - `fix (server): prevent downed players from interacting with objects`
 
-Any line of the commit message cannot be longer than 100 characters. This makes the message easier to read on GitHub as well as in various git tools.
+Any line of the commit message cannot be longer than 100 characters. This makes the message easier to read on GitHub as well as in various Git tools.
 
 ## Type
 Must be one of the following:
@@ -23,6 +23,8 @@ Must be one of the following:
 * **refactor**: A code change that reimplements an existing feature, but does not alter its functionality.
 * **style**: Changes that do not affect the meaning of the code (whitespace, formatting, missing semicolons, etc.)
 
+Multiple types can be expressed as `<type1>+<type2>` in place of `<type>`.
+
 ## Scope
 The scope is optional and can be anything specifying the location of the commit change.
 
@@ -32,7 +34,7 @@ The file is optional and could specify a change in a specific file. This should 
 ## Subject
 The subject contains succinct description of the change:
 
-* Use the past tense: `changed` not `change` nor `changes`.
+* Use the imperative, present tense: `change` not `changed` nor `changes`.
 * Do not use a period (.) at the end.
 * Do not use markdown formatting.
-* Do not capitalize: `fix (server): prevented ...` not `fix (server): Prevented ...`.
+* Do not capitalize: `fix (server): prevent ...` not `fix (server): Prevent ...`.

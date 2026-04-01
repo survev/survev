@@ -397,7 +397,9 @@ export class GameMap {
         this.timerEnd("Calculating map areas");
 
         this.timerStart();
-        this.generateObjects();
+        if (!this.generateObjects()) {
+            return;
+        }
         this.timerEnd("Generating all objects");
 
         this.mapStream.stream.index = 0;
@@ -703,27 +705,75 @@ export class GameMap {
             [0.7, 0.85],
         ];
 
+        const bridgeGenData: Array<{ type: string; pos: Vec2; ori: number }> = [];
+
         for (let i = 0; i < bridges.length; i++) {
             inner: for (let j = 0; j < riverTs.length; j++) {
                 const bridgeType = bridges[i];
                 const riverT = riverTs[j];
 
-                const generated = this.genBridge(
-                    bridgeType,
-                    this.normalRivers[0],
-                    riverT,
-                );
+                const data = this.genFactionBridge(bridgeType, riverT);
 
-                if (generated) {
+                if (data) {
+                    bridgeGenData.push(data);
                     riverTs.splice(j, 1);
                     j--;
                     break inner;
+                }
+                if (j == riverTs.length - 1) {
+                    return [];
                 }
                 // if we couldn't spawn it, continue the loop trying other spawn positions
                 // this will make the main town bridge spawn on the sides
                 // if it fails to spawn on the center
             }
         }
+
+        return bridgeGenData;
+    }
+
+    genFactionBridge(type: string, progress: [number, number]) {
+        const river = this.normalRivers[0];
+        const getPosAndOri = () => {
+            // sometimes the position exactly at "progress" is invalid so "canSpawn()" will always fail
+            // we avoid this by adding a tiny bit of random variation to the position so it'll eventually find a valid one
+            const t = math.clamp(util.random(progress[0], progress[1]), 0, 1);
+            const pos = river.spline.getPos(t);
+
+            const norm = river.spline.getNormal(t);
+            let ori = math.radToOri(Math.atan2(norm.y, norm.x));
+
+            if (type == "river_town_01") {
+                // we flip the orientation because river town has red on left and blue on right by default
+                // the faction mode ori that gets us a left/right split vs top/bottom split is 1
+                // so of course we need to flip this value and vice versa for the other case
+                ori = this.factionModeSplitOri ^ 1;
+            }
+
+            return { pos, ori };
+        };
+
+        let bridge:
+            | {
+                  type: string;
+                  pos: Vec2;
+                  ori: number;
+              }
+            | undefined = undefined;
+        this.trySpawn(type, () => {
+            const { pos, ori } = getPosAndOri();
+
+            if (!this.canSpawn(type, pos, ori, 1)) {
+                return false;
+            }
+            bridge = {
+                type,
+                pos,
+                ori,
+            };
+            return true;
+        });
+        return bridge;
     }
 
     /** only called inside generateObjects, separates logic into function to simplify control flow */
@@ -766,13 +816,34 @@ export class GameMap {
                 maxBridges[bridgeSize] * (river.spline.points.length / 33),
             );
             for (let i = 0; i < max; i++) {
-                this.genBridge(bridgeType, river, undefined, false);
+                this.genBridge(bridgeType, river, false);
             }
         }
     }
 
     generateObjects() {
         const mapGen = this.mapDef.mapGen;
+
+        // generate faction bridges here
+        // so we can abort and restart map gen if they fail to spawn
+
+        if (this.factionMode && this.normalRivers.length) {
+            this.timerStart();
+            const bridges = this.generateFactionBridges();
+            this.timerEnd("Generating faction bridges");
+            if (bridges.length) {
+                for (const bridge of bridges) {
+                    this.genAuto(bridge.type, bridge.pos, 0, bridge.ori);
+                }
+            } else {
+                this.game.logger.warn(
+                    "Failed to generate faction bridges, restarting map gen",
+                );
+                this.loggingTimes.length = 0;
+                this.init();
+                return false;
+            }
+        }
 
         type MapSpawn = {
             type: string;
@@ -915,14 +986,6 @@ export class GameMap {
             }
         }
 
-        // faction mode bridges should have second highest priority to make sure
-        // nothing breaks their spawning
-        if (this.factionMode) {
-            this.timerStart();
-            this.generateFactionBridges();
-            this.timerEnd("Generating faction bridges");
-        }
-
         this.timerStart();
         for (const spawn of objsToSpawn.stage1) {
             genSpawn(spawn, true);
@@ -998,6 +1061,8 @@ export class GameMap {
             this.genDensitySpawn(type, densitySpawns[type]);
         }
         this.timerEnd("Generating density spawns");
+
+        return true;
     }
 
     genDensitySpawn(type: string, density: number) {
@@ -1599,12 +1664,7 @@ export class GameMap {
      *
      * 0 would be at the start, 1 would be at the end, 0.5 would be in the middle, etc
      */
-    genBridge(
-        type: string,
-        river?: River,
-        progress?: [number, number],
-        logOnFailure = true,
-    ): boolean {
+    genBridge(type: string, river?: River, logOnFailure = true): boolean {
         if (this.normalRivers.length == 0) {
             return false;
         }
@@ -1623,21 +1683,8 @@ export class GameMap {
             ori = oriAndScale.ori;
             scale = oriAndScale.scale;
 
-            let t: number;
-            if (progress) {
-                // sometimes the position exactly at "progress" is invalid so "canSpawn()" will always fail
-                // we avoid this by adding a tiny bit of random variation to the position so it'll eventually find a valid one
-                t = math.clamp(util.random(progress[0], progress[1]), 0, 1);
-            } else {
-                t = util.random(0, 1);
-            }
-
-            let finalRiver: River;
-            if (type == "river_town_01") {
-                finalRiver = rivers[0];
-            } else {
-                finalRiver = river ?? rivers[util.randomInt(0, rivers.length - 1)];
-            }
+            const t = util.random(0, 1);
+            let finalRiver = river ?? rivers[util.randomInt(0, rivers.length - 1)];
 
             let pos = finalRiver.spline.getPos(t);
 
@@ -1662,12 +1709,6 @@ export class GameMap {
             }
             if (type === "bunker_structure_05") {
                 ori %= 2;
-            }
-            if (type == "river_town_01") {
-                // we flip the orientation because river town has red on left and blue on right by default
-                // the faction mode ori that gets us a left/right split vs top/bottom split is 1
-                // so of course we need to flip this value and vice versa for the other case
-                ori = this.factionModeSplitOri ^ 1;
             }
 
             return { pos, ori };

@@ -578,12 +578,13 @@ export const Main: MapDef = {
             { name: "ots38_dual", count: 1, weight: 4.5 },
         ],
         tier_airdrop_mythic: [
-            { name: "scarssr", count: 1, weight: 1 }, // ?
-            { name: "usas", count: 1, weight: 0.5 }, // ?
-            { name: "p30l_dual", count: 1, weight: 1 }, // ?
-            { name: "awc", count: 1, weight: 0.1 }, // ?
-            { name: "pkp", count: 1, weight: 0.3 }, // ?
-            { name: "m249", count: 1, weight: 0.3 }, // ?
+            { name: "usas", count: 1, weight: 1 },
+            { name: "scarssr", count: 1, weight: 1 },
+            { name: "sv98", count: 1, weight: 1 },
+            { name: "p30l_dual", count: 1, weight: 1 },
+            { name: "awc", count: 1, weight: 0.75 },
+            { name: "pkp", count: 1, weight: 1 },
+            { name: "m249", count: 1, weight: 1 },
         ],
         tier_airdrop_ammo: [
             { name: "9mm", count: 30, weight: 3 },

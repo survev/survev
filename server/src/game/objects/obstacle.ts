@@ -475,18 +475,39 @@ export class Obstacle extends BaseGameObject {
             if ("tier" in lootTierOrItem) {
                 const count = util.randomInt(lootTierOrItem.min!, lootTierOrItem.max!);
 
+                const colliderRad =
+                    def.collision.type === collider.Type.Aabb
+                        ? coldet.aabbToCircle(def.collision.min, def.collision.max).rad
+                        : def.collision.rad;
+
+                const rad = math.remap(count, 0, 5, 0, colliderRad);
+
                 for (let i = 0; i < count; i++) {
                     const item = this.game.lootBarn.getLootTable(lootTierOrItem.tier!);
                     if (!item) continue;
 
+                    const pos = v2.add(lootPos, util.randomPointInCircle(rad));
+
+                    let pushSpeed: number | undefined = undefined;
+                    let dir;
+                    // if spawning more than 5 loot
+                    // ignore the push speed (eg player melee direction)
+                    // and push loot to outside the center of the obstacle
+                    if (count > 5) {
+                        pushSpeed = math.max(count, 14);
+                        dir = v2.normalize(v2.sub(pos, lootPos));
+                    } else {
+                        dir = params.dir;
+                    }
+
                     this.game.lootBarn.addLoot(
                         item.name,
-                        v2.add(lootPos, v2.mul(v2.randomUnit(), 0.2)),
+                        pos,
                         this.layer,
                         item.count,
                         undefined,
-                        undefined, // undefined to use default push speed value
-                        params.dir,
+                        pushSpeed, // undefined to use default push speed value
+                        dir,
                         lootTierOrItem.props?.preloadGuns || item.preload,
                         "obstacle",
                     );
