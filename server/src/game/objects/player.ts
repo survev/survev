@@ -1661,6 +1661,7 @@ export class Player extends BaseGameObject {
             );
         }
 
+        // stop players from stormcamping with revivify by increasing gas damage if they revived in the gas or if final zone is closing
         if (this.game.gas.doDamage && this.game.gas.isInGas(this.pos)) {
             if (
                 this.downed &&
