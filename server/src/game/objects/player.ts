@@ -4264,13 +4264,23 @@ export class Player extends BaseGameObject {
             this.cancelAction();
         }
 
-        this.weaponManager.setWeapon(
-            index,
-            chosenWeaponType,
-            chosenWeaponDef.type == "gun"
-                ? this.weaponManager.getAmmoStats(chosenWeaponDef).maxClip
-                : 0,
-        );
+        switch (chosenWeaponDef.type) {
+            case "gun":
+                this.weaponManager.setWeapon(
+                    index,
+                    chosenWeaponType,
+                    this.weaponManager.getAmmoStats(chosenWeaponDef).maxClip,
+                );
+                break;
+            case "melee":
+                this.weaponManager.setWeapon(index, chosenWeaponType, 0);
+                break;
+            case "throwable":
+                if (!this.weaponManager.cookingThrowable) {
+                    this.weaponManager.setWeapon(index, chosenWeaponType, 0);
+                }
+                break;
+        }
 
         if ("switchDelay" in chosenWeaponDef) {
             this.weaponManager.weapons[index].cooldown = chosenWeaponDef.switchDelay;
