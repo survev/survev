@@ -553,7 +553,7 @@ export class Game {
                 const aimLen = touchAimMovement.aimMovement.toAimLen;
                 const toTouchLenAdjusted =
                     math.clamp(aimLen / this.m_touch.padPosRange, 0, 1) *
-                    GameConfig.player.throwableMaxMouseDist;
+                    (GameConfig.player.throwableMaxMouseDist * 1.8);
                 inputMsg.toMouseLen = toTouchLenAdjusted;
                 inputMsg.toMouseDir = aimDir;
             } else {

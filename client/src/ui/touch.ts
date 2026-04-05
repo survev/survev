@@ -127,8 +127,14 @@ export class Touch {
     }
 
     getAimMovement(activePlayer: Player, camera: Camera) {
+        const slot = activePlayer.m_localData.m_curWeapIdx;
         const isHoldingThrowable =
-            activePlayer.m_localData.m_curWeapIdx == GameConfig.WeaponSlot.Throwable;
+            slot == GameConfig.WeaponSlot.Throwable;
+        if (activePlayer.m_hasWeaponInSlot(slot)) {
+            const weaponDef = GameObjectDefs[activePlayer.m_localData.m_weapons[slot].type];
+            const toMouseHit = weaponDef.type == "gun" && (weaponDef.toMouseHit ?? false);
+            return this.getAim(isHoldingThrowable || toMouseHit, camera);
+        }
         return this.getAim(isHoldingThrowable, camera);
     }
 
@@ -185,7 +191,7 @@ export class Touch {
         return this.analogMovement;
     }
 
-    getAim(isHoldingThrowable: boolean, camera: Camera) {
+    getAim(variableDistance: boolean, camera: Camera) {
         let touched = false;
         let posDown: Vec2 | null = null;
         let pos: Vec2 | null = null;
@@ -230,7 +236,8 @@ export class Touch {
         // Special-case throwable logic: once the player begins priming
         // the grenade, dragging back into aim circle will not release
         // it. Only lifting the finger will throw the grenade.
-        if (isHoldingThrowable && this.shotDetectedOld && touched) {
+        // Also applies to guns like the USAS.
+        if (variableDistance && this.shotDetectedOld && touched) {
             this.shotDetected = true;
         }
 
