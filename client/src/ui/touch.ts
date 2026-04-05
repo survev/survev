@@ -128,10 +128,10 @@ export class Touch {
 
     getAimMovement(activePlayer: Player, camera: Camera) {
         const slot = activePlayer.m_localData.m_curWeapIdx;
-        const isHoldingThrowable =
-            slot == GameConfig.WeaponSlot.Throwable;
+        const isHoldingThrowable = slot == GameConfig.WeaponSlot.Throwable;
         if (activePlayer.m_hasWeaponInSlot(slot)) {
-            const weaponDef = GameObjectDefs[activePlayer.m_localData.m_weapons[slot].type];
+            const weaponDef =
+                GameObjectDefs[activePlayer.m_localData.m_weapons[slot].type];
             const toMouseHit = weaponDef.type == "gun" && (weaponDef.toMouseHit ?? false);
             return this.getAim(isHoldingThrowable || toMouseHit, camera);
         }
