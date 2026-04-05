@@ -122,13 +122,13 @@ const mapDef: PartialMapDef = {
                                                 type: "m4a1",
                                                 ammo: 40,
                                                 fillInv: true,
-                                                weight: 0.2,
+                                                weight: 0.8,
                                             },
                                             {
                                                 type: "potato_smg",
                                                 ammo: 40,
                                                 fillInv: false,
-                                                weight: 0.8,
+                                                weight: 0.2,
                                             },
                                         ]),
                                         [TeamColor.Blue]: util.weightedRandom([
