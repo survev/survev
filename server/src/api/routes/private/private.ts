@@ -161,7 +161,7 @@ export const PrivateRouter = new Hono<Context>()
                     .array(
                         z.object({
                             id: z.string(),
-                            delta: z.number().finite().positive(),
+                            delta: z.number().positive(),
                         }),
                     )
                     .refine(
