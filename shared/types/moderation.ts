@@ -72,3 +72,13 @@ export const zRemoveItemParams = z.object({
     item: z.string(),
     slug: z.string(),
 });
+
+export const zResetPassParams = z.object({
+    slug: z.string(),
+    pass: z.string().optional(),
+});
+
+export const zGiveXpParams = z.object({
+    slug: z.string(),
+    xp: z.number().positive(),
+});

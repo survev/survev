@@ -9,7 +9,9 @@ import {
     zBanIpParams,
     zFindDiscordUserSlugParams,
     zGiveItemParams,
+    zGiveXpParams,
     zRemoveItemParams,
+    zResetPassParams,
     zSetAccountNameParams,
     zSetMatchDataNameParams,
     zUnbanAccountParams,
@@ -180,6 +182,7 @@ const commands = {
         name: Command.GiveItem,
         description: "Give an item to a user",
         optionValidator: zGiveItemParams,
+        requiresAdmin: true,
         isPrivateRoute: true,
         options: [
             {
@@ -206,6 +209,7 @@ const commands = {
         name: Command.RemoveItem,
         description: "remove an item from a user",
         optionValidator: zRemoveItemParams,
+        requiresAdmin: true,
         isPrivateRoute: true,
         options: [
             {
@@ -226,6 +230,7 @@ const commands = {
         name: Command.SetGameMode,
         description: "Sets a game mode in the API",
         optionValidator: zSetGameModeBody,
+        requiresAdmin: true,
         isPrivateRoute: true,
         options: [
             {
@@ -258,6 +263,7 @@ const commands = {
         name: Command.SetClientTheme,
         description: "Sets the client theme in the API",
         optionValidator: zSetClientThemeBody,
+        requiresAdmin: true,
         isPrivateRoute: true,
         options: [
             {
@@ -265,6 +271,46 @@ const commands = {
                 description: "The client theme",
                 required: true,
                 type: ApplicationCommandOptionType.String,
+            },
+        ],
+    }),
+    [Command.ResetPass]: createCommand({
+        name: Command.ResetPass,
+        description: "Resets the user pass and removes all items they got from it.",
+        optionValidator: zResetPassParams,
+        requiresAdmin: true,
+        options: [
+            {
+                name: "slug",
+                description: "The user account slug",
+                required: true,
+                type: ApplicationCommandOptionType.String,
+            },
+            {
+                name: "pass",
+                description: "The pass ID, optional and defaults to the active pass",
+                required: false,
+                type: ApplicationCommandOptionType.String,
+            },
+        ],
+    }),
+    [Command.GiveXp]: createCommand({
+        name: Command.GiveXp,
+        description: "Gives pass XP to an user",
+        optionValidator: zGiveXpParams,
+        requiresAdmin: true,
+        options: [
+            {
+                name: "slug",
+                description: "The user account slug",
+                required: true,
+                type: ApplicationCommandOptionType.String,
+            },
+            {
+                name: "xp",
+                description: "The amount of XP to give, must be positive",
+                required: true,
+                type: ApplicationCommandOptionType.Integer,
             },
         ],
     }),
@@ -286,6 +332,7 @@ export const commandHandlers: CommandHandlers = (
                 key,
                 interaction,
                 commands[key].optionValidator,
+                commands[key].requiresAdmin,
                 commands[key].isPrivateRoute,
             );
         return obj;

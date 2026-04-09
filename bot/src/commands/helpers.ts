@@ -12,6 +12,7 @@ export function createCommand<T extends z.ZodSchema = z.ZodSchema>(config: {
     description: string;
     optionValidator: T;
     isPrivateRoute?: boolean;
+    requiresAdmin?: boolean;
     options: {
         name: keyof z.input<T>;
         description: string;
@@ -20,7 +21,8 @@ export function createCommand<T extends z.ZodSchema = z.ZodSchema>(config: {
             | ApplicationCommandOptionType.String
             | ApplicationCommandOptionType.Integer
             | ApplicationCommandOptionType.Boolean
-            | ApplicationCommandOptionType.User;
+            | ApplicationCommandOptionType.User
+            | ApplicationCommandOptionType.Integer;
     }[];
 }) {
     return config;
@@ -30,9 +32,15 @@ export async function genericExecute<N extends Exclude<Command, "search_player">
     name: N,
     interaction: ChatInputCommandInteraction,
     validator: z.ZodTypeAny,
+    requiresAdmin = false,
     isPrivateRoute = false,
 ) {
     await interaction.deferReply();
+
+    if (requiresAdmin && !isAdmin(interaction)) {
+        await sendNoPermissionMessage(interaction);
+        return;
+    }
 
     const options = interaction.options.data.reduce(
         (obj, { name, value }) => {
@@ -74,11 +82,6 @@ async function handlePrivateRoute(
     name: any,
     payload: any,
 ) {
-    if (!isAdmin(interaction)) {
-        await sendNoPermissionMessage(interaction);
-        return;
-    }
-
     // @ts-expect-error - we don't care at this point
     const res = await honoClient[name].$post({
         json: payload,
@@ -111,6 +114,9 @@ export function createSlashCommand(config: ReturnType<typeof createCommand>) {
                 break;
             case ApplicationCommandOptionType.User:
                 builder.addUserOption((opt) => configureBuilderOption(opt, option));
+                break;
+            case ApplicationCommandOptionType.Integer:
+                builder.addIntegerOption((opt) => configureBuilderOption(opt, option));
                 break;
             default:
                 throw new Error(`Unsupported option type: ${option.type}, add it first.`);
