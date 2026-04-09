@@ -10,28 +10,30 @@ export async function getFindGamePlayerData(
         ...new Set(players.map((p) => p.userId).filter((id) => id !== null)),
     ];
 
-    const accountData =
-        userIds.length > 0
-            ? Object.fromEntries(
-                  (
-                      await db
-                          .select({
-                              userId: usersTable.id,
-                              loadout: usersTable.loadout,
-                              quests: sql<
-                                  string[]
-                              >`array_agg(${userQuestTable.questType}) filter (where ${userQuestTable.questType} is not null)`,
-                          })
-                          .from(usersTable)
-                          .leftJoin(
-                              userQuestTable,
-                              and(eq(userQuestTable.userId, usersTable.id)),
-                          )
-                          .where(inArray(usersTable.id, userIds))
-                          .groupBy(usersTable.id)
-                  ).map((r) => [r.userId, r]),
-              )
-            : {};
+    let accountData: Record<
+        string,
+        {
+            loadout: FindGamePrivateBody["playerData"][0]["loadout"];
+            quests: FindGamePrivateBody["playerData"][0]["quests"];
+        }
+    > = {};
+
+    if (userIds.length) {
+        const query = await db
+            .select({
+                userId: usersTable.id,
+                loadout: usersTable.loadout,
+                quests: sql<
+                    string[]
+                >`array_agg(${userQuestTable.questType}) filter (where ${userQuestTable.questType} is not null)`,
+            })
+            .from(usersTable)
+            .leftJoin(userQuestTable, and(eq(userQuestTable.userId, usersTable.id)))
+            .where(inArray(usersTable.id, userIds))
+            .groupBy(usersTable.id);
+
+        accountData = Object.fromEntries(query.map((r) => [r.userId, r]));
+    }
 
     return players.map(({ token, userId, ip }) => ({
         token,
