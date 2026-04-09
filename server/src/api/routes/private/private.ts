@@ -1,9 +1,8 @@
-import { and, eq, inArray, sql } from "drizzle-orm";
+import { and, eq, inArray } from "drizzle-orm";
 import { Hono } from "hono";
 import { z } from "zod";
 import { saveConfig } from "../../../../../config";
 import { GameObjectDefs } from "../../../../../shared/defs/gameObjectDefs";
-import { PassDefs } from "../../../../../shared/defs/gameObjects/passDefs";
 import { QuestDefs } from "../../../../../shared/defs/gameObjects/questDefs";
 import { MapDefs } from "../../../../../shared/defs/mapDefs";
 import { TeamMode } from "../../../../../shared/gameConfig";
@@ -11,8 +10,7 @@ import {
     zGiveItemParams,
     zRemoveItemParams,
 } from "../../../../../shared/types/moderation";
-import { passUtil } from "../../../../../shared/utils/passUtil";
-import { Config, serverConfigPath } from "../../../config";
+import { serverConfigPath } from "../../../config";
 import { isBehindProxy } from "../../../utils/serverHelpers";
 import {
     type SaveGameBody,
@@ -34,12 +32,12 @@ import {
     itemsTable,
     type MatchDataTable,
     matchDataTable,
-    userPassTable,
     userQuestTable,
     usersTable,
 } from "../../db/schema";
 import { MOCK_USER_ID } from "../user/auth/mock";
 import { isBanned, logPlayerIPs, ModerationRouter } from "./ModerationRouter";
+import { incrementPassXp } from "./passXp";
 
 export const PrivateRouter = new Hono<Context>()
     .use(privateMiddleware)
@@ -201,21 +199,9 @@ export const PrivateRouter = new Hono<Context>()
             }
 
             let xpGain = 0;
-
             const deltaById = new Map(validEntries.map((e) => [e.id, e.delta]));
-            const passDef = PassDefs[Config.passType];
-            const now = Date.now();
 
             await db.transaction(async (tx) => {
-                let pass = await tx.query.userPassTable.findFirst({
-                    where: and(
-                        eq(userPassTable.userId, userId),
-                        eq(userPassTable.passType, Config.passType),
-                    ),
-                });
-
-                if (!pass) return;
-
                 for (const quest of userQuests) {
                     const delta = deltaById.get(quest.questType) ?? 0;
                     if (delta <= 0) continue;
@@ -245,63 +231,7 @@ export const PrivateRouter = new Hono<Context>()
 
                 if (xpGain <= 0) return;
 
-                const oldTotalXp = pass.totalXp;
-                const newTotalXp = oldTotalXp + xpGain;
-                const oldLevel = passUtil.getPassLevelAndXp(
-                    Config.passType,
-                    oldTotalXp,
-                ).level;
-                const newLevel = passUtil.getPassLevelAndXp(
-                    Config.passType,
-                    newTotalXp,
-                ).level;
-
-                const unlockedRewardItems = passDef.items
-                    .filter(
-                        (reward) => reward.level > oldLevel && reward.level <= newLevel,
-                    )
-                    .map((reward) => reward.item)
-                    .filter((item) => !!GameObjectDefs[item]);
-
-                let unlockedNewItems = false;
-
-                if (unlockedRewardItems.length > 0) {
-                    const insertedRewards = await tx
-                        .insert(itemsTable)
-                        .values(
-                            unlockedRewardItems.map((item) => ({
-                                userId,
-                                type: item,
-                                source: Config.passType,
-                                timeAcquired: now,
-                            })),
-                        )
-                        .onConflictDoNothing()
-                        .returning({
-                            type: itemsTable.type,
-                        });
-
-                    unlockedNewItems = insertedRewards.length > 0;
-                }
-
-                await tx
-                    .insert(userPassTable)
-                    .values({
-                        userId,
-                        passType: Config.passType,
-                        totalXp: newTotalXp,
-                        newItems: unlockedNewItems,
-                    })
-                    .onConflictDoUpdate({
-                        target: [userPassTable.userId, userPassTable.passType],
-                        set: {
-                            totalXp: newTotalXp,
-                            newItems: unlockedNewItems
-                                ? true
-                                : sql`${userPassTable.newItems}`,
-                            updatedAt: new Date(),
-                        },
-                    });
+                await incrementPassXp(tx, userId, xpGain);
             });
 
             return c.json({ success: true }, 200);
