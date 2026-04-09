@@ -56,9 +56,8 @@ export async function genericExecute<N extends Exclude<Command, "search_player">
 
     if (!args.success) {
         botLogger.error("Failed to parse arguments", options, args.error);
-        await interaction.reply({
-            content: "Invalid arguments",
-            flags: MessageFlags.Ephemeral,
+        await interaction.editReply({
+            content: `Invalid arguments, error: \`\`\`json\n${args.error.message}\`\`\``,
         });
         return;
     }
