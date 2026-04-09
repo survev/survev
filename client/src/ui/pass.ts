@@ -37,7 +37,7 @@ function humanizeTime(time: number, minutesFloor = false) {
 export class Pass {
     pass = {
         data: {
-            type: "pass_survivr1",
+            type: PASS_TYPE,
         },
         currentXp: 0,
         currentLevel: 1,
@@ -581,8 +581,8 @@ export class Pass {
 
     onResize() {}
     loadPlaceholders() {
-        const def = PassDefs.pass_survivr1;
-        const passName = this.localization.translate("pass_survivr1").toUpperCase();
+        const def = PassDefs[this.pass.data.type];
+        const passName = this.localization.translate(this.pass.data.type).toUpperCase();
         $("#pass-name-text").html(passName);
         $("#pass-progress-level").html(1);
         $("#pass-progress-xp-current").html(0);

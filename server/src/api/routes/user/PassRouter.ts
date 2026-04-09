@@ -11,6 +11,7 @@ import {
     zSetQuestRequest,
 } from "../../../../../shared/types/user";
 import { passUtil } from "../../../../../shared/utils/passUtil";
+import { Config } from "../../../config";
 import { validateParams } from "../../auth/middleware";
 import { db } from "../../db";
 import {
@@ -22,7 +23,6 @@ import {
 import type { Context } from "../../index";
 
 // hardcoded for now
-export const passType = "pass_survivr1";
 export const questSlotIndexes = [0, 1];
 
 /**
@@ -43,7 +43,10 @@ async function getPassAndQuests(
             ),
         )
         .where(
-            and(eq(userPassTable.userId, userId), eq(userPassTable.passType, passType)),
+            and(
+                eq(userPassTable.userId, userId),
+                eq(userPassTable.passType, Config.passType),
+            ),
         );
 
     const existingPass = rows[0]?.pass ?? null;
@@ -67,7 +70,7 @@ async function getPassAndQuests(
     return db.transaction(async (tx) => {
         await tx
             .insert(userPassTable)
-            .values({ userId, passType })
+            .values({ userId, passType: Config.passType })
             .onConflictDoNothing({
                 target: [userPassTable.userId, userPassTable.passType],
             });
@@ -104,7 +107,7 @@ async function getPassAndQuests(
         const pass = await tx.query.userPassTable.findFirst({
             where: and(
                 eq(userPassTable.userId, userId),
-                eq(userPassTable.passType, passType),
+                eq(userPassTable.passType, Config.passType),
             ),
         });
 

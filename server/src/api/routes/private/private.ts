@@ -12,7 +12,7 @@ import {
     zRemoveItemParams,
 } from "../../../../../shared/types/moderation";
 import { passUtil } from "../../../../../shared/utils/passUtil";
-import { serverConfigPath } from "../../../config";
+import { Config, serverConfigPath } from "../../../config";
 import { isBehindProxy } from "../../../utils/serverHelpers";
 import {
     type SaveGameBody,
@@ -39,7 +39,6 @@ import {
     usersTable,
 } from "../../db/schema";
 import { MOCK_USER_ID } from "../user/auth/mock";
-import { passType } from "../user/PassRouter";
 import { isBanned, logPlayerIPs, ModerationRouter } from "./ModerationRouter";
 
 export const PrivateRouter = new Hono<Context>()
@@ -204,14 +203,14 @@ export const PrivateRouter = new Hono<Context>()
             let xpGain = 0;
 
             const deltaById = new Map(validEntries.map((e) => [e.id, e.delta]));
-            const passDef = PassDefs[passType];
+            const passDef = PassDefs[Config.passType];
             const now = Date.now();
 
             await db.transaction(async (tx) => {
                 let pass = await tx.query.userPassTable.findFirst({
                     where: and(
                         eq(userPassTable.userId, userId),
-                        eq(userPassTable.passType, passType),
+                        eq(userPassTable.passType, Config.passType),
                     ),
                 });
 
@@ -248,8 +247,14 @@ export const PrivateRouter = new Hono<Context>()
 
                 const oldTotalXp = pass.totalXp;
                 const newTotalXp = oldTotalXp + xpGain;
-                const oldLevel = passUtil.getPassLevelAndXp(passType, oldTotalXp).level;
-                const newLevel = passUtil.getPassLevelAndXp(passType, newTotalXp).level;
+                const oldLevel = passUtil.getPassLevelAndXp(
+                    Config.passType,
+                    oldTotalXp,
+                ).level;
+                const newLevel = passUtil.getPassLevelAndXp(
+                    Config.passType,
+                    newTotalXp,
+                ).level;
 
                 const unlockedRewardItems = passDef.items
                     .filter(
@@ -267,7 +272,7 @@ export const PrivateRouter = new Hono<Context>()
                             unlockedRewardItems.map((item) => ({
                                 userId,
                                 type: item,
-                                source: passType,
+                                source: Config.passType,
                                 timeAcquired: now,
                             })),
                         )
@@ -283,7 +288,7 @@ export const PrivateRouter = new Hono<Context>()
                     .insert(userPassTable)
                     .values({
                         userId,
-                        passType,
+                        passType: Config.passType,
                         totalXp: newTotalXp,
                         newItems: unlockedNewItems,
                     })

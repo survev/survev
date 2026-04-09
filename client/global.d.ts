@@ -71,6 +71,8 @@ declare global {
         }
     >;
 
+    const PASS_TYPE: string;
+
     const IS_DEV: boolean;
     const VITE_ENABLE_SURVEV_ADS: boolean;
 
