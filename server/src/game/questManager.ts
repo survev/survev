@@ -3,6 +3,7 @@ import { type QuestDef, QuestDefs } from "../../../shared/defs/gameObjects/quest
 import { MapObjectDefs } from "../../../shared/defs/mapObjectDefs";
 import type { ObstacleDef } from "../../../shared/defs/mapObjectsTyping";
 import { TeamModeToString } from "../../../shared/defs/types/misc";
+import { MsgType, UpdatePassMsg } from "../../../shared/net/net";
 import type { Game } from "./game";
 import type { Player } from "./objects/player";
 
@@ -52,6 +53,10 @@ export class QuestManager {
             .filter((quest) => quest.delta > 0);
 
         if (progress.length === 0) return;
+
+        if (!this.player.disconnected) {
+            this.player.sendMsg(MsgType.UpdatePass, new UpdatePassMsg());
+        }
 
         this.game.sendQuestProgress(this.player.userId, progress);
     }
