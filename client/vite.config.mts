@@ -118,6 +118,7 @@ export default defineConfig(({ mode }) => {
                     https: data.https,
                 };
             }),
+            PASS_TYPE: JSON.stringify(Config.passType),
             AD_PREFIX: JSON.stringify(Config.secrets.AD_PREFIX),
             VITE_GAMEMONETIZE_ID: JSON.stringify(Config.secrets.GAMEMONETIZE_ID),
             SPELLSYNC_PROJECT_ID: JSON.stringify(Config.secrets.SPELLSYNC_PROJECT_ID),

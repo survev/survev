@@ -134,6 +134,11 @@ export interface ConfigType {
     clientTheme: keyof typeof MapDefs;
 
     /**
+     * The battle pass, set to an empty string to disable it
+     */
+    passType: string;
+
+    /**
      * Game tick rate.
      * Controls how many physics and logic ticks the game will try to process every second, defaults to 100.
      */
