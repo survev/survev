@@ -12,6 +12,7 @@ export function createCommand<T extends z.ZodSchema = z.ZodSchema>(config: {
     description: string;
     optionValidator: T;
     isPrivateRoute?: boolean;
+    requiresAdmin?: boolean;
     options: {
         name: keyof z.input<T>;
         description: string;
@@ -30,9 +31,15 @@ export async function genericExecute<N extends Exclude<Command, "search_player">
     name: N,
     interaction: ChatInputCommandInteraction,
     validator: z.ZodTypeAny,
+    requiresAdmin = false,
     isPrivateRoute = false,
 ) {
     await interaction.deferReply();
+
+    if (requiresAdmin && !isAdmin(interaction)) {
+        await sendNoPermissionMessage(interaction);
+        return;
+    }
 
     const options = interaction.options.data.reduce(
         (obj, { name, value }) => {
@@ -56,32 +63,10 @@ export async function genericExecute<N extends Exclude<Command, "search_player">
         return;
     }
 
-    if (isPrivateRoute) {
-        await handlePrivateRoute(interaction, name, args.data);
-        return;
-    }
-
     // @ts-expect-error - we don't care at this point
-    const res = await honoClient.moderation[name].$post({
+    const route = isPrivateRoute ? honoClient[name] : honoClient.moderation[name];
+    const res = await route.$post({
         json: args.data as any,
-    });
-    const { message } = await res.json();
-    await interaction.editReply(message);
-}
-
-async function handlePrivateRoute(
-    interaction: ChatInputCommandInteraction,
-    name: any,
-    payload: any,
-) {
-    if (!isAdmin(interaction)) {
-        await sendNoPermissionMessage(interaction);
-        return;
-    }
-
-    // @ts-expect-error - we don't care at this point
-    const res = await honoClient[name].$post({
-        json: payload,
     });
     const { message } = await res.json();
     await interaction.editReply(message);

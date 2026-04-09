@@ -8,6 +8,8 @@ import {
     zBanIpParams,
     zFindDiscordUserSlugParams,
     zGetPlayerIpParams,
+    zGiveXpParams,
+    zResetPassParams,
     zSetAccountNameParams,
     zSetMatchDataNameParams,
     zUnbanAccountParams,
@@ -20,8 +22,16 @@ import type { SaveGameBody } from "../../../utils/types";
 import { server } from "../../apiServer";
 import { databaseEnabledMiddleware, validateParams } from "../../auth/middleware";
 import { db } from "../../db";
-import { bannedIpsTable, ipLogsTable, matchDataTable, usersTable } from "../../db/schema";
+import {
+    bannedIpsTable,
+    ipLogsTable,
+    itemsTable,
+    matchDataTable,
+    userPassTable,
+    usersTable,
+} from "../../db/schema";
 import { sanitizeSlug } from "../user/auth/authUtils";
+import { incrementPassXp } from "./passXp";
 
 export const ModerationRouter = new Hono()
     .use(databaseEnabledMiddleware)
@@ -396,7 +406,67 @@ export const ModerationRouter = new Hono()
 
             return c.json({ message: `slug: ${user.slug}` }, 200);
         },
-    );
+    )
+    .post("reset_pass", validateParams(zResetPassParams), async (c) => {
+        const { slug, pass } = c.req.valid("json");
+
+        const user = await db.query.usersTable.findFirst({
+            where: eq(usersTable.slug, slug),
+            columns: {
+                id: true,
+            },
+        });
+
+        if (!user) {
+            return c.json({ message: "No user found with that slug." }, 404);
+        }
+
+        // default to the active pass
+        const actualPass = pass || Config.passType;
+
+        await db.transaction(async (t) => {
+            await t
+                .delete(userPassTable)
+                .where(
+                    and(
+                        eq(userPassTable.userId, user.id),
+                        eq(userPassTable.passType, actualPass),
+                    ),
+                );
+
+            // also remove the pass items from their account
+            await t
+                .delete(itemsTable)
+                .where(
+                    and(
+                        eq(itemsTable.userId, user.id),
+                        eq(itemsTable.source, actualPass),
+                    ),
+                );
+        });
+
+        return c.json({ message: `Successfully reset pass for ${slug}` }, 200);
+    })
+    .post("give_xp", validateParams(zGiveXpParams), async (c) => {
+        const { slug, xp } = c.req.valid("json");
+
+        const user = await db.query.usersTable.findFirst({
+            where: eq(usersTable.slug, slug),
+            columns: {
+                id: true,
+            },
+        });
+
+        if (!user) {
+            return c.json({ message: "No user found with that slug." }, 404);
+        }
+
+        await db.transaction(async (tx) => {
+            await incrementPassXp(tx, user.id, xp);
+        });
+
+        return c.json({ message: `Successfully gave ${xp} xp to ${slug}` }, 200);
+    });
 
 async function banAccount(userId: string, banReason: string, executorId: string) {
     await db
