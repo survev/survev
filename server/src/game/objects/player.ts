@@ -42,7 +42,7 @@ import { assert, util } from "../../../../shared/utils/util";
 import { type Vec2, v2 } from "../../../../shared/utils/v2";
 import { Config } from "../../config";
 import { IDAllocator } from "../../utils/IDAllocator";
-import { validateUserName } from "../../utils/serverHelpers";
+import { apiPrivateRouter, validateUserName } from "../../utils/serverHelpers";
 import type { Game, JoinTokenData } from "../game";
 import { Group, Team } from "../group";
 import { InventoryManager } from "../inventoryManager";
@@ -4185,6 +4185,19 @@ export class Player extends BaseGameObject {
                     );
                 }
                 this.setDirty();
+                break;
+            case "xp":
+                if (!this.userId) return;
+
+                apiPrivateRouter.give_item.$post({
+                    json: {
+                        userId: this.userId,
+                        slug: "",
+                        item: obj.type,
+                        source: "In-game pickup.",
+                    },
+                });
+
                 break;
         }
 

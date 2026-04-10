@@ -13,7 +13,7 @@ import type {
     UsernameRequest,
     UsernameResponse,
 } from "../../shared/types/user";
-import type { ItemStatus } from "../../shared/utils/loadout";
+import type { Item, ItemStatus } from "../../shared/utils/loadout";
 import { type Loadout, loadout as loadouts } from "../../shared/utils/loadout";
 import { util } from "../../shared/utils/util";
 import { api } from "./api";
@@ -21,7 +21,6 @@ import type { ConfigManager } from "./config";
 import { errorLogManager } from "./errorLogs";
 import { helpers } from "./helpers";
 import { proxy } from "./proxy";
-import type { Item } from "./ui/loadoutMenu";
 
 type DataOrCallback =
     | Record<string, unknown>

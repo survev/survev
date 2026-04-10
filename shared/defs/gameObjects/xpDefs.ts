@@ -1,3 +1,4 @@
+import { Rarity } from "../../gameConfig";
 import { type DeepPartial, util } from "../../utils/util";
 
 function defineXpSkin(baseType: string, params: DeepPartial<XPDef>): XPDef {
@@ -8,6 +9,8 @@ export interface XPDef {
     readonly type: "xp";
     name: string;
     xp: number;
+    rarity: Rarity;
+    lore?: string;
     lootImg: {
         sprite: string;
         tint: number;
@@ -27,6 +30,7 @@ const BaseDefs: Record<string, XPDef> = {
         name: "XP",
         type: "xp",
         xp: 8,
+        rarity: Rarity.Rare,
         lootImg: {
             sprite: "loot-xp-book-01.img",
             tint: 0xffffff,
@@ -44,6 +48,7 @@ const BaseDefs: Record<string, XPDef> = {
         name: "XP",
         type: "xp",
         xp: 24,
+        rarity: Rarity.Epic,
         lootImg: {
             sprite: "loot-xp-book-01.img",
             tint: 0xffffff,
@@ -61,6 +66,7 @@ const BaseDefs: Record<string, XPDef> = {
         name: "XP",
         type: "xp",
         xp: 96,
+        rarity: Rarity.Mythic,
         lootImg: {
             sprite: "loot-xp-book-01.img",
             tint: 0xffffff,
@@ -141,6 +147,7 @@ const SkinDefs: Record<string, XPDef> = {
 
     xp_donut: defineXpSkin("xp_100", {
         name: "Cake Donut",
+        lore: "Do not eat.",
         lootImg: {
             sprite: "loot-xp-donut-01.img",
         },

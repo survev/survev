@@ -65,6 +65,7 @@ export const zFindDiscordUserSlugParams = z.object({
 export const zGiveItemParams = z.object({
     item: z.string(),
     slug: z.string(),
+    userId: z.string().optional(), // preferred over slug
     source: z.string().default("unlock_default"),
 });
 
