@@ -69,6 +69,7 @@ UserRouter.post("/profile", async (c) => {
             timeAcquired: itemsTable.timeAcquired,
             source: itemsTable.source,
             status: itemsTable.status,
+            count: itemsTable.count,
         })
         .from(itemsTable)
         .where(

@@ -1,4 +1,4 @@
-import { and, eq, inArray } from "drizzle-orm";
+import { and, eq, inArray, sql } from "drizzle-orm";
 import { Hono } from "hono";
 import { z } from "zod";
 import { saveConfig } from "../../../../../config";
@@ -242,7 +242,7 @@ export const PrivateRouter = new Hono<Context>()
         databaseEnabledMiddleware,
         validateParams(zGiveItemParams),
         async (c) => {
-            const { item, slug, source } = c.req.valid("json");
+            let { item, slug, source, userId } = c.req.valid("json");
 
             const def = GameObjectDefs[item];
 
@@ -250,33 +250,38 @@ export const PrivateRouter = new Hono<Context>()
                 return c.json({ message: "Invalid item type" }, 200);
             }
 
-            const userId = await db.query.usersTable.findFirst({
-                where: eq(usersTable.slug, slug),
-                columns: {
-                    id: true,
-                },
-            });
-
             if (!userId) {
-                return c.json({ message: "User not found" }, 200);
+                const user = await db.query.usersTable.findFirst({
+                    where: eq(usersTable.slug, slug),
+                    columns: {
+                        id: true,
+                    },
+                });
+
+                if (!user) {
+                    return c.json({ message: "User not found" }, 200);
+                }
+
+                userId = user.id;
             }
 
-            const existing = await db.query.itemsTable.findFirst({
-                where: and(eq(itemsTable.userId, userId.id), eq(itemsTable.type, item)),
-                columns: {
-                    type: true,
-                },
-            });
+            await db.transaction(async (t) => {
+                await t
+                    .insert(itemsTable)
+                    .values({
+                        userId: userId,
+                        type: item,
+                        source,
+                        timeAcquired: Date.now(),
+                    })
+                    .onConflictDoUpdate({
+                        target: [itemsTable.userId, itemsTable.type],
+                        set: { count: sql`${itemsTable.count} + 1` },
+                    });
 
-            if (existing) {
-                return c.json({ message: "User already has item" }, 200);
-            }
-
-            await db.insert(itemsTable).values({
-                userId: userId.id,
-                type: item,
-                source,
-                timeAcquired: Date.now(),
+                if (def.type === "xp") {
+                    await incrementPassXp(t, userId, def.xp);
+                }
             });
 
             return c.json({ message: `Item "${item}" given to ${slug}` }, 200);

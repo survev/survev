@@ -63,6 +63,7 @@ export const itemsTable = pgTable(
         timeAcquired: bigint("time_acquired", { mode: "number" }).notNull(),
         source: text("source").notNull().default("unlock_new_account"),
         status: integer("status").notNull().default(ItemStatus.New),
+        count: integer("count").notNull().default(1),
     },
     (table) => [uniqueIndex("uq_items_user_type").on(table.userId, table.type)],
 );

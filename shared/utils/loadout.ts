@@ -9,6 +9,7 @@ export type Item = {
     type: string;
     timeAcquired: number;
     source: string;
+    count: number;
     status?: ItemStatus;
     ackd?: ItemStatus.Ackd;
 };
@@ -140,6 +141,7 @@ export const loadout = {
                 type: unlock,
                 source: "unlock_default",
                 timeAcquired: 0,
+                count: 1,
                 ackd: loadout.ItemStatus.Ackd,
             });
         }

@@ -5,7 +5,7 @@ import { EmoteCategory, type EmoteDef } from "../../../shared/defs/gameObjects/e
 import type { MeleeDef } from "../../../shared/defs/gameObjects/meleeDefs";
 import type { UnlockDef } from "../../../shared/defs/gameObjects/unlockDefs";
 import { EmoteSlot, Rarity } from "../../../shared/gameConfig";
-import type { ItemStatus } from "../../../shared/utils/loadout";
+import type { Item } from "../../../shared/utils/loadout";
 import { type Crosshair, type Loadout, loadout } from "../../../shared/utils/loadout";
 import { util } from "../../../shared/utils/util";
 import type { Account } from "../account";
@@ -92,13 +92,6 @@ const sortTypes: Record<string, any> = {
     subcat: itemSort(sortSubcat),
 };
 
-export interface Item {
-    type: string;
-    source: string;
-    timeAcquired: number;
-    status?: ItemStatus;
-    ackd?: ItemStatus.Ackd;
-}
 interface ItemInfo {
     type: string;
     loadoutType: string;
@@ -159,6 +152,11 @@ export class LoadoutMenu {
             loadoutType: "boost",
             gameType: "boost_effect",
             categoryImage: "img/gui/loadout-boost.svg",
+        },
+        {
+            loadoutType: "xp",
+            gameType: "xp",
+            categoryImage: "img/gui/pass.svg",
         },
     ];
 
@@ -1010,6 +1008,13 @@ export class LoadoutMenu {
                 "data-img": `url(${svg})`,
                 draggable,
             });
+            if (item.count > 1) {
+                const count = $("<div/>", {
+                    class: "customize-item-count",
+                    text: `${item.count}`,
+                });
+                outerDiv.append(count);
+            }
             outerDiv.append(innerDiv);
 
             // Notification pulse

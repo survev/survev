@@ -43,6 +43,13 @@
       "when": 1773018085822,
       "tag": "0005_rare_rick_jones",
       "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "7",
+      "when": 1775795075120,
+      "tag": "0006_useful_jackpot",
+      "breakpoints": true
     }
   ]
 }

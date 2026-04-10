@@ -5098,6 +5098,16 @@ input [type="image"]:focus {
   width: 100%;
 }
 
+.customize-item-count {
+  position: absolute;
+  right: 8px;
+  bottom: 8px;
+  color: #fff;
+  font-size: 18px;
+  font-weight: 700;
+  text-shadow: 2px 2px 2px rgba(0, 0, 0, 0.75);
+}
+
 #customize-crosshair-selected {
   background-color: rgba(0, 0, 0, 0.5);
   display: block;
@@ -5693,32 +5703,32 @@ input [type="image"]:focus {
   position: fixed;
   top: 45%;
   transform: translateY(-50%) translateX(-50%);
-  width: 940px;
+  width: 1040px;
 }
 
 @media (max-width: 1600px) {
   #modal-customize-wrapper {
-    left: 800px;
+    left: 700px;
   }
 }
 
 @media (max-width: 1300px) {
   #modal-customize-wrapper {
-    left: 740px;
+    left: 640px;
     transform: translateY(-50%) translateX(-50%) scale(0.9);
   }
 }
 
 @media (max-width: 1200px) {
   #modal-customize-wrapper {
-    left: 667px;
+    left: 567px;
     transform: translateY(-50%) translateX(-50%) scale(0.75);
   }
 }
 
 @media (max-width: 960px) {
   #modal-customize-wrapper {
-    left: 604px;
+    left: 404px;
     transform: translateY(-50%) translateX(-50%) scale(0.75);
   }
 }
@@ -5741,7 +5751,7 @@ input [type="image"]:focus {
   position: fixed;
   top: 50%;
   transform: translateY(-50%);
-  width: 578px;
+  width: 676px;
 }
 
 .modal-content-right {
