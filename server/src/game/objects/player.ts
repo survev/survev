@@ -37,7 +37,6 @@ import { ObjectType } from "../../../../shared/net/objectSerializeFns";
 import type { GroupStatus } from "../../../../shared/net/updateMsg";
 import { type Circle, coldet } from "../../../../shared/utils/coldet";
 import { collider } from "../../../../shared/utils/collider";
-import type { Loadout } from "../../../../shared/utils/loadout";
 import { math } from "../../../../shared/utils/math";
 import { assert, util } from "../../../../shared/utils/util";
 import { type Vec2, v2 } from "../../../../shared/utils/v2";
@@ -226,13 +225,16 @@ export class PlayerBarn {
             ip,
             joinData.findGameIp,
             joinData.userId,
-            joinData.loadout,
             joinData.quests,
         );
 
         this.socketIdToPlayer.set(socketId, player);
 
         this.activatePlayer(player, group, team);
+        player.setLoadout(
+            joinData.loadout ? joinData.loadout : joinMsg.loadout,
+            !joinData.loadout,
+        );
 
         return player;
     }
@@ -824,8 +826,14 @@ export class Player extends BaseGameObject {
 
     setOutfit(outfit: string) {
         if (this.outfit === outfit) return;
-        this.outfit = outfit;
         const def = GameObjectDefs[outfit] as OutfitDef;
+        if (this.game.map.factionMode) {
+            if (def.teamId && this.teamId !== def.teamId) {
+                return;
+            }
+        }
+        this.outfit = outfit;
+
         this.obstacleOutfit?.destroy();
         this.obstacleOutfit = undefined;
 
@@ -1409,7 +1417,6 @@ export class Player extends BaseGameObject {
         ip: string,
         findGameIp: string,
         userId: string | null,
-        loadout?: Loadout,
         questIds?: string[],
     ) {
         super(game, pos);
@@ -1490,8 +1497,6 @@ export class Player extends BaseGameObject {
         for (const [item, amount] of Object.entries(defaultItems.inventory)) {
             this.invManager.set(item as InventoryItem, amount);
         }
-
-        this.setLoadout(loadout ? loadout : joinMsg.loadout, !loadout);
 
         if (this.game.map.sniperMode) {
             this.invManager.give("2xscope", 1);
@@ -4103,6 +4108,11 @@ export class Player extends BaseGameObject {
                 }
                 break;
             case "outfit":
+                if (this.game.map.factionMode) {
+                    if (def.teamId && this.teamId !== def.teamId) {
+                        return;
+                    }
+                }
                 if (this.role) {
                     const roleDef = GameObjectDefs[this.role] as RoleDef;
                     if (roleDef.defaultItems?.noDropOutfit) {
