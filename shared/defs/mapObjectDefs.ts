@@ -11419,7 +11419,7 @@ export const MapObjectDefs: Record<string, MapObjectDef> = {
     mil_crate_03: createCrate({
         collision: collider.createAabbExtents(v2.create(0, 0), v2.create(2.7, 1.25)),
         health: 100,
-        loot: [autoLoot("ots38_dual", 1), autoLoot("outfitWhite", 1)], // TODO: Remove Arctic Avenger when the survevr pass is added.
+        loot: [autoLoot("ots38_dual", 1), autoLoot("outfitSpetsnaz", 1)],
         map: { display: false },
         terrain: { grass: true, beach: true },
         img: { sprite: "map-crate-mil-03.img" },
@@ -11831,9 +11831,9 @@ export const MapObjectDefs: Record<string, MapObjectDef> = {
         explodeParticle: "squashBreak",
         loot: [
             autoLoot("turkey_shoot", 1),
-            tierLoot("tier_turkey_outfit", 0, 1),
+            // tierLoot("tier_fruit_xp", 1, 1)], // TODO: enable with artifacts
             tierLoot("tier_world", 0, 1),
-        ], // tierLoot("tier_fruit_xp", 1, 1)], i replaced it with fowl facade %
+        ],
     }),
     squash_02: createPumpkin({
         collision: collider.createCircle(v2.create(0, 0), 1.5),
@@ -11848,9 +11848,9 @@ export const MapObjectDefs: Record<string, MapObjectDef> = {
         loot: [
             autoLoot("turkey_shoot", 1),
             autoLoot("turkey_shoot", 1),
-            tierLoot("tier_turkey_outfit", 1, 2),
+            // tierLoot("tier_fruit_xp", 1, 1)], // TODO: enable with artifacts
             tierLoot("tier_soviet", 1, 2),
-        ], // tierLoot("tier_fruit_xp", 1, 1)], i replaced it with fowl facade %
+        ],
     }),
     refrigerator_01: createRefrigerator({}),
     refrigerator_01b: createRefrigerator({

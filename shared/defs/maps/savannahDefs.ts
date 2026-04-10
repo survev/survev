@@ -152,8 +152,8 @@ const mapDef: PartialMapDef = {
             { name: "mirv", count: 2, weight: 1 },
         ],
         tier_crow_case_skin: [
-            { name: "outfitWheat", count: 1, weight: 1 },
-            { name: "outfitCarbonFiber", count: 1, weight: 1 },
+            { name: "tier_outfits", count: 1, weight: 0.5 },
+            { name: "outfitWheat", count: 1, weight: 0.5 },
         ],
         tier_crow_case_melee: [
             { name: "crowbar", count: 1, weight: 9 },
