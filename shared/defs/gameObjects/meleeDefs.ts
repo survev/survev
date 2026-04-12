@@ -62,7 +62,7 @@ export interface MeleeDef {
             p1: Vec2;
         };
     };
-    armorPiercing?: boolean;
+    canBreakReinforced?: boolean;
     stonePiercing?: boolean;
 }
 
@@ -504,7 +504,7 @@ const BaseDefs: Record<string, MeleeDef> = {
         name: "Wood Axe",
         type: "melee",
         quality: 0,
-        armorPiercing: true,
+        canBreakReinforced: true,
         autoAttack: false,
         switchDelay: 0.25,
         damage: 36,
@@ -559,7 +559,7 @@ const BaseDefs: Record<string, MeleeDef> = {
         name: "Fire Axe",
         type: "melee",
         quality: 1,
-        armorPiercing: true,
+        canBreakReinforced: true,
         autoAttack: false,
         switchDelay: 0.25,
         damage: 44,
@@ -614,7 +614,7 @@ const BaseDefs: Record<string, MeleeDef> = {
         name: "Katana",
         type: "melee",
         quality: 0,
-        armorPiercing: true,
+        canBreakReinforced: true,
         cleave: true,
         autoAttack: false,
         switchDelay: 0.25,
@@ -670,7 +670,7 @@ const BaseDefs: Record<string, MeleeDef> = {
         name: "Naginata",
         type: "melee",
         quality: 1,
-        armorPiercing: true,
+        canBreakReinforced: true,
         cleave: true,
         autoAttack: false,
         switchDelay: 0.25,
@@ -726,7 +726,7 @@ const BaseDefs: Record<string, MeleeDef> = {
         name: "Stone Hammer",
         type: "melee",
         quality: 1,
-        armorPiercing: true,
+        canBreakReinforced: true,
         stonePiercing: true,
         autoAttack: false,
         switchDelay: 0.25,
@@ -782,7 +782,7 @@ const BaseDefs: Record<string, MeleeDef> = {
         name: "Ice Axe",
         type: "melee",
         quality: 1,
-        armorPiercing: true,
+        canBreakReinforced: true,
         stonePiercing: true,
         autoAttack: false,
         switchDelay: 0.25,
