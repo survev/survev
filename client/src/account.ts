@@ -88,6 +88,8 @@ export class Account {
     loggedIn = false;
     profile = {
         linked: false,
+        linkedGoogle: false,
+        linkedDiscord: false,
         usernameSet: false,
         username: "",
         slug: "",
@@ -225,9 +227,9 @@ export class Account {
             this.items = [];
             if (err) {
                 errorLogManager.storeGeneric("account", "load_profile_error");
-            } else if (data.banned) {
+            } else if ("banned" in data && data.banned) {
                 this.emit("error", "account_banned", data.reason);
-            } else if (data.success) {
+            } else if ("success" in data && data.success) {
                 this.loggedIn = true;
                 this.profile = data.profile;
                 this.items = data.items;
