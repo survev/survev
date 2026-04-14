@@ -25,7 +25,7 @@ import { type MapSprite, MapSpriteBarn } from "../objects/mapSprite";
 import type { ParticleBarn } from "../objects/particles";
 import type { PlaneBarn } from "../objects/plane";
 import type { Player, PlayerBarn } from "../objects/player";
-import { SDK } from "../sdk/sdk";
+import { SDK } from "../sdk";
 import type { Localization } from "./localization";
 import { PieTimer } from "./pieTimer";
 import type { Touch } from "./touch";
@@ -168,7 +168,6 @@ export class UiManager {
     specPrev = false;
     specNextButton = $("#btn-spectate-next-player");
     specPrevButton = $("#btn-spectate-prev-player");
-
     // Touch specific buttons
     interactionElems = $("#ui-interaction-press, #ui-interaction");
     interactionTouched = false;
@@ -392,7 +391,6 @@ export class UiManager {
         this.specPrevButton.on("click", () => {
             this.specPrev = true;
         });
-
         // Touch specific buttons
         this.interactionElems.css("pointer-events", "auto");
         this.interactionElems.on("touchstart", (e) => {
@@ -789,7 +787,7 @@ export class UiManager {
                 playing: this.game.m_playingTicker,
                 groupInfo: playerBarn.groupInfo,
             };
-            errorLogManager.logError("badTeamInfo_1", err);
+            errorLogManager.logError(`badTeamInfo_1: ${JSON.stringify(err)}`);
         }
 
         const layoutSm = device.uiLayout == device.UiLayout.Sm;
@@ -1095,6 +1093,7 @@ export class UiManager {
         playerId: number,
         activePlayerId: number,
         playerBarn: PlayerBarn,
+        _factionMode: unknown,
     ) {
         const pingDef = PingDefs[pingType];
         if (pingDef) {
@@ -1271,6 +1270,15 @@ export class UiManager {
 
     removeAds() {
         SDK.removeAllAds();
+
+        if (!window.aiptag) return;
+        const ads = ["728x90", "300x250_2"];
+        for (let i = 0; i < ads.length; i++) {
+            const ad = ads[i];
+            window.aiptag.cmd.display.push(() => {
+                window.aipDisplayTag!.destroy(`${AIP_PLACEMENT_ID}_${ad}`);
+            });
+        }
     }
 
     refreshMainPageAds() {
@@ -1282,7 +1290,13 @@ export class UiManager {
             }
         }
 
-        SDK.showStickyAd();
+        if (!window.aiptag) return;
+        for (let i = 0; i < ads.length; i++) {
+            const ad = ads[i];
+            window.aiptag.cmd.display.push(() => {
+                window.aipDisplayTag!.display(`${AIP_PLACEMENT_ID}_${ad}`);
+            });
+        }
     }
 
     clearUI() {
@@ -1314,7 +1328,6 @@ export class UiManager {
             opacity: 0,
         });
         this.statsContents.stop().hide();
-        SDK.hideStickyAd();
     }
 
     teamModeToString(teamMode: TeamMode) {
@@ -1543,9 +1556,7 @@ export class UiManager {
                 html: this.localization.translate("game-play-new-game"),
             });
             restartButton.on("click", () => {
-                SDK.requestFullscreenAd(() => {
-                    this.quitGame();
-                });
+                this.quitGame();
             });
             this.statsOptions.append(restartButton);
             if (gameOver || this.waitingForPlayers) {
@@ -1694,9 +1705,7 @@ export class UiManager {
             html: this.localization.translate("game-play-new-game"),
         });
         a.on("click", () => {
-            SDK.requestFullscreenAd(() => {
-                this.quitGame();
-            });
+            this.quitGame();
         });
         this.statsOptions.append(a);
         a.css({
@@ -1737,11 +1746,15 @@ export class UiManager {
     }
 
     setBannerAd(time: number, ui2: UiManager2) {
+        if (!window.aiptag) return;
         let delay = Math.max(time - 150, 0);
         setTimeout(() => {
             const bannerAd = $("#ui-stats-ad-container-desktop");
             bannerAd.css("display", "inline-block");
-            SDK.showStickyAd();
+
+            window.aiptag!.cmd.display.push(() => {
+                window.aipDisplayTag!.display(`${AIP_PLACEMENT_ID}_300x250_2`);
+            });
 
             ui2.hideKillMessage();
         }, delay);

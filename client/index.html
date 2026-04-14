@@ -1,6 +1,7 @@
 <!doctype html>
 <html lang="en">
   <head>
+    %VITE_ADIN_PLAY_SCRIPT%
     %VITE_TURNSTILE_SCRIPT%
     <!-- Meta Properties -->
     <meta charset="UTF-8">
@@ -29,7 +30,6 @@
 
     <link href="css/app.css" rel="stylesheet">
     <link href="css/game.css" rel="stylesheet">
-    %VITE_DEBUG_CSS_LINK%
   </head>
   <body>
     <div id="preroll-wrapper">
@@ -212,7 +212,7 @@
             <div id="ui-loot-healthkit" class="ui-loot ui-outline-hover ui-scale-hover ui-medical tooltip">
               <div class="tooltip-text">
                 <div class="tooltip-title" data-l10n="game-healthkit">Med Kit</div>
-                <div class="tooltip-description"><span data-l10n="game-healthkit-tooltip">Left-click to restore 100 health.</span></div>
+                <div class="tooltip-description"><span data-l10n="game-healthkit-tooltip">Left-click to restore 100 health.</div>
               </div>
               <div class="ui-loot-count">0</div>
               <img class="ui-loot-image" src="">
@@ -228,7 +228,7 @@
             <div id="ui-loot-painkiller" class="ui-loot ui-outline-hover ui-scale-hover ui-medical tooltip">
               <div class="tooltip-text">
                 <div class="tooltip-title" data-l10n="game-painkiller">Pills</div>
-                <div class="tooltip-description"><span data-l10n="game-painkiller-tooltip">Left-click to boost adrenaline by 50.</span></div>
+                <div class="tooltip-description"><span data-l10n="game-painkiller-tooltip">Left-click to boost adrenaline by 50.</div>
               </div>
               <div class="ui-loot-count">0</div>
               <img class="ui-loot-image" src="">
@@ -613,11 +613,11 @@
             <div id="ui-stats-logo"></div>
           </div>
           <div id="ui-stats-ad-container-desktop" class="ui-stats-ad-container">
-            <div data-fuse="died_mrec" style="min-height: 250px;"></div>
+            <div id="%VITE_AIP_PLACEMENT_ID%_300x250_2"></div>
           </div>
-          <div id="ui-stats-ad-container-mobile" class="ui-stats-ad-container">
-            <div data-fuse="died_mrec_mobile" style="min-height: 200px;"></div>
-          </div>
+          <!-- <div id="ui-stats-ad-container-mobile" class="ui-stats-ad-container">
+            <div id="%VITE_AIP_PLACEMENT_ID%_300x250_mobile_2"></div>
+          </div> -->
         </div>
       </div>
       <div id="ui-editor" style="display: none">
@@ -636,7 +636,7 @@
       <div id="start-main">
         <div id="start-top-left">
           <div id="btn-hamburger" class="icon-hamburger"></div>
-          <a id="btn-discord-top-right" style="display: none;" href="https://discord.gg/75RAK3p3K2" target="_blank" class="btn-social btn-darken btn-discord"></a>
+          <a id="btn-discord-top-right" style="display: none;" href="https://discord.gg/6uRdCdkTPt" target="_blank" class="btn-social btn-darken btn-discord"></a>
           <div id="start-top-left-desktop">
             <div id="featured-streamers">
               <div class="streaming-header">
@@ -655,15 +655,6 @@
               <a href="" target="_blank" class="btn-youtuber btn-darken"></a>
             </div>
           </div>
-        </div>
-        <div class="ad-block-header hide-on-mobile">
-          <div data-fuse="header" style="min-height: 90px;"></div>
-        </div>
-        <div class="ad-block-left-center hide-on-mobile">
-          <div data-fuse="home_vrec" style="min-height: 250px;"></div>
-        </div>
-        <div class="ad-block-right-center hide-on-mobile" style="min-height: 250px;">
-          <div data-fuse="home_mrec"></div>
         </div>
         <!-- Accounts Modals -->
         <div id="modal-account-name-change" class="modal modal-account">
@@ -803,12 +794,21 @@
           <div id="start-turnstile-container"></div>
           <div id="start-row-top">
             <div id="start-rotate-reminder" class="menu-column menu-block">
-              <span data-l10n="index-rotate-reminder">Rotate to landscape for a better experience.</span>
+              <span>Rotate to landscape for a better experience.</span>
             </div>
             <div id="left-column" class="menu-column">
               <div id="ad-block-left">
                 <div class="surviv-shirts">
                 </div>
+                <!--
+                <div class="adblock-plea">
+                  <span>Please consider supporting us by disabling your adblocker.</span>
+                </div>
+                -->
+                <!--
+                <div class="ad-block-med-rect" id="%VITE_AIP_PLACEMENT_ID%_300x250">
+                </div>
+                -->
               </div>
               <div id="social-share-block-wrapper">
                 <div id="social-share-block" class="menu-block">
@@ -818,9 +818,8 @@
                     <a href="https://twitter.com/survev" target="_blank" class="btn-social btn-darken btn-twitter"></a>
                     <a href="https://www.instagram.com/survev/" target="_blank" class="btn-social btn-darken btn-instagram"></a>
                     -->
-                    <a href="https://discord.gg/75RAK3p3K2" target="_blank" class="btn-social btn-darken btn-discord"></a>
+                    <a href="https://discord.gg/6uRdCdkTPt" target="_blank" class="btn-social btn-darken btn-discord"></a>
                     <a href="https://ko-fi.com/survev" target="_blank" style="display: none;" class="btn-social btn-darken btn-kofi"></a>
-                    <a href="https://survev.wiki.gg/" target="_blank" class="btn-social btn-darken btn-wiki"></a>
                     <!--
                     <a href="https://www.youtube.com/c/survev?sub_confirmation=1" target="_blank" class="btn-social btn-darken btn-youtube"></a>
                     -->
@@ -836,7 +835,7 @@
               </div>
               <div class="play-button-container">
                 <div id="player-options">
-                  <input type="text" class="menu-option player-name-input" tabindex="0" placeholder="Enter your name here" data-l10n="index-enter-name-here" id="player-name-input-solo" maxlength="16" />
+                  <input type="text" class="menu-option player-name-input" tabindex="0" placeholder="Enter your name here" id="player-name-input-solo" maxlength="16" />
                   <a class="btn-darken menu-option player-options-btn" id="btn-customize"></a>
                 </div>
                 <select id="server-select-main" class="server-select menu-option btn-hollow btn-hollow-selected">
@@ -1040,63 +1039,13 @@
                 <div id="news-block" class="menu-block">
                   <div id="news">
                     <h3 class="news-header">What's New!</h3>
-                    <div id="news-current" data-date="2026-04-13">
-                      <small class="news-date">April 13th, 2026</small>
-                      <p class="news-paragraph"><strong>IntElegance</strong></p>
-                      <p class="news-paragraph">As both sides exhaust their nightshade and weapon supplies, the Island rests again... what could have prompted such fierce fighting?</p>
-                      <p class="news-paragraph">Over the past couple of years, PARMA has relied on third-party archives to train newbie survevrs, many of which were either misleading or hard to navigate. We've taken matters into our own hands and begun developing a comprehensive guide: the <a href="https://survev.wiki.gg">Survev.io Wiki</a>!</p>
-                      <p class="news-paragraph">However, many of the sections are still yet to be filled, so we're welcoming our veterans to help contribute! For easier communication between survevrs, be sure to join the <a href="https://discord.gg/75RAK3p3K2">Discord Server</a>!</p>
-                    </div>
-                    <div data-date="2026-04-01">
-                      <small class="news-date">April 1st, 2026</small>
-                      <p class="news-paragraph"><strong>Potato vs. Tomato</strong></p>
-                      <p class="news-paragraph">While survevrs have since become accustomed to the periodical spuddy incursions on the island, life was not always this way. Once, botanist brothers Spud and Percy Solanum worked in tandem, seeking to uncover the mysteries of the <span class="highlight">[REDACTED]</span>. In an act of betrayal, the Soviets obtained their precious research secrets, fragmenting their partnership forever. Join the fight of potato vs <span class="highlight">tomato</span>... and may the best nightshade win!</p>
-                      <p class="news-paragraph">Additionally, PARMA's FSTMS division is proud to present their latest concoction: the <span class="highlight">PMG-134</span> (Potato Minigun 134), using a six-barrel rotary machine gun to blast tater tots at insane firerates. It's perfect for mowing down your local Soviet!</p>
-                    </div>
-                    <div data-date="2026-03-24">
-                      <small class="news-date">March 24th, 2026</small>
-                      <p class="news-paragraph"><strong>Spring Blossoms</strong></p>
-                      <p class="news-paragraph">As PARMA continues to work on their research, the snow has melted and spring has returned to the island! Enjoy the cherry blossoms!</p>
-                      <p class="news-paragraph">For the latest leeks and developments, be sure to join the <a href="https://discord.gg/75RAK3p3K2">Discord Server</a>!</p>
-                    </div>
-                    <div data-date="2026-03-09">
-                      <small class="news-date">March 9th, 2026</small>
-                      <p class="news-paragraph"><strong>Snow, Smoke, & Shells</strong></p>
-                      <p class="news-paragraph">As we head into the final stretch of winter, our favourite arboreal mode has returned with a fresh coat of snow! For those who have been fighting through the winter weather, seek refuge at the <span class="highlight">campfires</span> spread out across the island.</p>
-                      <p class="news-paragraph">In addition, PARMA's Department of Advanced Weaponry would be proud to present the new <span class="highlight">SPAS-16</span>, capable of unloading heavy damage... if they could find where their prototype went, that is.</p>
-                      <p class="news-paragraph">The standard-issue <span class="highlight">IMD-2</span> is great for surpressing enemies with its high fire rate, but will have you asking your squad for ammo more often than not.</p>
-                      <p class="news-paragraph">As PARMA attempts to defrost their simulation equipment, those who persist will be rewarded with the first blossoms of spring.</p>                    
-                    </div>
-                    <div data-date="2026-02-02">
-                      <small class="news-date">February 2nd, 2026</small>
-                      <p class="news-paragraph"><strong>High-Speed Hunting</strong></p>
-                      <p class="news-paragraph">A new structure, lootable perks, and an open map: welcome back to the Savannah hallucination! For the brave, the bold, and the bloodthirsty, a secondary 'perk' is given to the kill leader: <span class="highlight">The Hunted</span>, revealing your position to all enemies.</p>
-                      <p class="news-paragraph">Ever wanted your bullets to travel at absurd speeds? Look no further than PARMA's new perk: <span class="highlight">High-Velocity Rounds</span>! This perk greatly increases bullet speed & range.</p>
-                      <p class="news-paragraph">Additionally, a new <span class="highlight">warehouse</span> has been constructed, offering a more <span><s>dangerous</s></span> secure place to store valuables, such as the new <span class="highlight">construction case</span>.</p>
-                      <p class="news-paragraph">If you need hunting partners, look no further than our <a href="https://discord.gg/75RAK3p3K2">Discord Server</a>!</p>
-                    </div>
-                    <div data-date="2026-01-18">
-                      <small class="news-date">January 18th, 2026</small>
-                      <p class="news-paragraph"><strong>The Palms Sway</strong></p>
-                      <p class="news-paragraph">Tired of the snow and ice? PARMA is providing a limited-time opportunity for Survevrs to escape... to a tropical island! Grab a <span class="highlight">Coconut</span> from the swaying <span class="highlight">Palm Trees</span> and throw it at a friend or foe, or set sail for the new <span class="highlight">Pirate Hut</span> to obtain the mythical <span class="highlight">Golden Cutlass</span>. Legend says those who wield the sword will never fail to find bountiful loot with each enemy they slay.</p>
-                      <p class="news-paragraph">Surprises also await those who choose to tough out the winter weather. Trudge through the snow to find an <span class="highlight">Iced Hardstone Block</span>, which can only be broken by the new <span class="highlight">Ice Axe</span>. Enjoy some gun model redesigns and Winter recolors, some minor balance adjustments, and a plethora of bugfixes and improvements!</p>
-                      <p class="news-paragraph">For an exclusive look at what's happening on the island, and to connect with the player community, check out our <a href="https://discord.gg/75RAK3p3K2">Discord Server!</a>!</p>
-                    </div>
-                    <div data-date="2025-10-21">
-                      <small class="news-date">October 21st, 2025</small>
-                      <p class="news-paragraph"><strong>Anniversary Harvest</strong></p>
-                      <p class="news-paragraph">A strange irregularity emanating from the center of the island has led to the temporal displacement of survevrs back to <span class="highlight">October 2017</span>... perfectly coinciding with <span class="highlight">surviv's birthday!</span></p>
-                      <p class="news-paragraph">Celebrate eight years of chicken dinners with a new limited-time gamemode simulating the Early Access version of the game, featuring <span class="highlight">silos, boxes, trees...</span> and the key to victory: <span class="highlight">weapons</span>! Note that our lack of research funds back then also means that the <span class="highlight">barrels don't explode.</span></p>
-                      <p class="news-paragraph">On top of that, a new and improved <span class="highlight">fall map</span> has returned, with additional obstacles and a <span class="highlight">new type of squash</span>, providing even more loot for you.</p>
-                      <p class="news-paragraph">Thanks to everyone for being a part of this community, and go hunting for the chicken dinner! Beware of the approaching gloom...</p>
-                    </div>
-                    <div data-date="2025-09-09">
+                    <div id="news-current" data-date="2025-09-09">
                       <small class="news-date">September 9th, 2025</small>
                       <p class="news-paragraph"><strong>Remnants</strong></p>
                       <p class="news-paragraph">The war goes quiet once more after both sides exhausted their weaponry (and scheduled fighter flights).</p>
                       <p class="news-paragraph">Luckily, there's still tons of reserve airdrops, so go get rid of them in the <span class="highlight">Desert</span>!</p>
                       <p class="news-paragraph">The <span class="highlight">Mk45G</span> and <span class="highlight">Desert Camo</span> have also been made more common.</p>
-                      <p class="news-paragraph">Stay tuned for new content, with the return of our <span class="highlight">arboreal</span> and <span class="highlight">veld</span> landscapes...</p>
+                      <p class="news-paragraph">Stay tuned for new content, with the return of our <span class="highlight">arboreal</span> and <span class="highlight">veld</span> landscapes...<p>
                     </div>
                     <div data-date="2025-07-23">
                       <small class="news-date">July 23, 2025</small>
@@ -1104,7 +1053,7 @@
                       <p class="news-paragraph">50v50 is back for another round, and getting straight to fighting is easier than ever: select guns are now <span class="highlight">bundled with ammo</span>.</p>
                       <p class="news-paragraph">Additionally, if a team leader fails to fire their flare soon after being promoted, it will now be <span class="highlight">auto-fired</span>.</p>
                       <p class="news-paragraph">A new role, the <span class="highlight">Captain</span>, has joined the ranks, but promotion to this role is not as easy as it seems. Lone Survivrs have also picked up a new perk: <span class="highlight">AP Rounds</span>.</p>
-                      <p class="news-paragraph">Enjoy a selection of role buffs and new gun world images. Let us know your thoughts by hopping into our <a href="https://discord.gg/75RAK3p3K2">Discord server!</a></p>
+                      <p class="news-paragraph">Enjoy a selection of role buffs and new gun world images. Let us know your thoughts by hopping into our <a href="https://discord.gg/6uRdCdkTPt">Discord server!</a></p>
                     </div>
                     <div data-date="2025-05-19">
                       <small class="news-date">May 19, 2025</small>
@@ -1112,7 +1061,34 @@
                       <p class="news-paragraph">Project COBALT has begun once again on the Island! Pick from one of <span class="highlight">six classes</span> and spawn in with special perks, then find <span class="highlight">class-pods</span> to gather unique class loot.</p>
                       <p class="news-paragraph">Be nimble and stealthy as the <span class="highlight">Scout</span>, unleash firepower as the <span class="highlight">Assault</span>, or stand your ground as the deflective <span class="highlight">Tank</span>. Team up with friends and form the perfect strategy, the group combinations are endless!</p>
                       <p class="news-paragraph"><span class="highlight">Accounts</span> have also returned! Personalize them with a unique name and emoji, and have the ability to track and <span class="highlight">view your stats</span> -- even gamemode specific! You can also view the <a href="/stats">leaderboards</a>.</p>
-                      <p class="news-paragraph">Need to assemble a classy squad? Make sure to join our <a href="https://discord.gg/75RAK3p3K2">Discord server</a> to form the perfect team.</p>
+                      <p class="news-paragraph">Need to assemble a classy squad? Make sure to join our <a href="https://discord.gg/6uRdCdkTPt">Discord server</a> to form the perfect team.</p>
+                    </div>
+                    <div data-date="2025-04-01">
+                      <small class="news-date">April 01, 2025</small>
+                      <p class="news-paragraph"><strong>Boiled potato</strong></p>
+                      <p class="news-paragraph">As spring continues to progress on the island, so does the regrowth of vegetation. PARMA's FSTMS division have once again started up more testing on the fan-favorite <span class="highlight">potatoes</span>.</p>
+                      <p class="news-paragraph">Don't worry, there's plenty to go around, and is that…. Is that… An <span class="highlight">egg</span>?</p>
+                    </div>
+                    <div data-date="2025-03-15">
+                      <small class="news-date">March 15, 2025</small>
+                      <p class="news-paragraph"><strong>Spring Hunting</strong></p>
+                      <p class="news-paragraph">Spring has sprung once again on the island, enjoy the cherry trees! And it doesn't come alone, <span class="highlight">woods mode</span> is also back to crown more kings!</p>
+                      <p class="news-paragraph">We also made a few adjustments and balancing changes to the base game. Check the <a href="changelogRec.html" target="_blank">changelog</a>.</p>
+                    </div>
+                    <div data-date="2025-01-27">
+                      <small class="news-date">January 27, 2025</small>
+                      <p class="news-paragraph"><strong>Desert Rain</strong></p>
+                      <p class="news-paragraph">PARMA supplies have reached critical levels again, but this time, they've also got way too much sand! It's coarse and rough and irritating and it's getting everywhere. For a limited time only, squad mode will once more feature massively increased flare gun spawns.</p>
+                      <p class="news-paragraph">This time around, you'll have a few new weapons for the final shootout at Ranchito Pollo. The Model 94 lever-action repeating rifle, chambered in .45 ACP, fires a speedy, accurate and decently powerful bullet.</p>
+                      <p class="news-paragraph">It's companion gun is the Peacemaker revolver, also chambered in .45 ACP. The Peacemaker is deadly accurate when tap-firing, but it's real strength shows when you hold down fire and "fan the hammer." All remaining rounds in the revolver will empty at an insane pace, albeit, with a steep accuracy penalty.</p>
+                    </div>
+                    <div data-date="2025-01-17">
+                      <small class="news-date">January 17, 2025</small>
+                      <p class="news-paragraph"><strong>Incursion recursion</strong></p>
+                      <p class="news-paragraph">50 vs 50 has arrived. To commemorate one of the bloodiest days in Island history, we're holding a field day (or week) of massive team versus team battles.</p>
+                      <p class="news-paragraph">Join up alone or with a squad, and you'll be drafted into the Red Army or the Blue Group. Once both teams have locked in, one Leader will be randomly chosen for each side. Leader get a variety of perks, including a new gun and a new melee weapon! Leader pings are also visible and audible to every member of your team.</p>
+                      <p class="news-paragraph">The enemy team isn't the only new danger in 50v50. Strike aircraft have been tasked with making frequent air strikes and you do not want to be caught in the bombing zone. Head indoors for relative safety, or attempt your best safety dance as the bombs fall around you.</p>
+                      <p class="news-paragraph">Will you rout the Red Army with a devastating flanking maneuver? Or will the Blue Group be crushed under the weight of a decisive pincer attack? Tell us your best war story on our <a href="https://discord.gg/6uRdCdkTPt">Discord server</a></p>
                     </div>
                   </div>
                 </div>
@@ -1122,7 +1098,7 @@
 
         </div>
 
-        <div class="ad-block-leaderboard-bottom" id="%VITE_AD_PREFIX%_728x90"></div>
+        <div class="ad-block-leaderboard-bottom" id="%VITE_AIP_PLACEMENT_ID%_728x90"></div>
         <div id="start-bottom-left">
           <div id="mobile-settings-front">
             <div class="btn-settings menu-option btn-darken btn-start-option"></div>
@@ -1144,6 +1120,7 @@
               <select class="language-select"></select>
             </div>
             <div class="btn-settings menu-option btn-darken btn-start-option"></div>
+            <div class="btn-recorder menu-option btn-darken btn-start-option"></div>
             <div class="btn-keybind menu-option btn-darken btn-start-option"></div>
             <div id="btn-start-fullscreen" class="btn-fullscreen-toggle menu-option btn-darken btn-start-option"></div>
             <div class="btn-start-mute btn-sound-toggle menu-option btn-darken btn-start-option audio-on-icon"></div>
@@ -1151,6 +1128,31 @@
         </div>
       </div>
       <!-- Modals -->
+
+      <div id="ui-modal-recorder" class="ui-modal-recorder modal" oncontextmenu="return false;">
+        <div class="ui-modal-recorder-content modal-content modal-close">
+          <div id="ui-modal-recorder-header" class="modal-header">
+            <span id="ui-close-keybind" class="close close-corner"></span>
+            <h2 data-l10n="index-recorder">Recorder</h2>
+          </div>
+          <div id="ui-modal-recorder-body" class="modal-body">
+            <div class="modal-settings-item">
+              <input id="recordGame" type="checkbox"><p class="modal-settings-checkbox-text" data-l10n="index-record-game">Record all games</p>
+            </div>
+            <label for="recorder-play-local-file" class="menu-option btn-darken btn-game-menu">
+              <input id="recorder-play-local-file" style="display: none;" type="file" accept=".surv" multiple="false"></input>
+              Play from local file
+            </label>
+            <div id="ui-modal-recorder-url">
+              <input type="text" class="menu-option recording-url-input" tabindex="0" placeholder="Enter URL to play" id="recording-url-input">
+              <a class="btn-game-menu btn-darken" id="btn-recorder-load-url">Load</a>
+            </div>
+          </div>
+          <div id="ui-modal-recorder-footer" class="modal-footer modal-footer-round">
+          </div>
+        </div>
+      </div>
+
       <div id="ui-modal-keybind" class="ui-modal-keybind modal" oncontextmenu="return false;">
         <div class="ui-modal-keybind-content modal-content modal-close">
           <div id="ui-modal-keybind-header" class="modal-header">
@@ -1187,6 +1189,7 @@
       </div>
       <!-- Loadouts -->
       <div id="modal-customize" class="modal">
+        <!-- <div class="ad-block-loadouts-left hide-on-mobile" id="%VITE_AIP_PLACEMENT_ID%_300x600"></div> -->
         <div id="modal-customize-wrapper" class="modal-close">
           <div id="modal-content-left" class="modal-content-shadow">
             <div id="modal-customize-cat-title"></div>

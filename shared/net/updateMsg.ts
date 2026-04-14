@@ -1,14 +1,31 @@
-import { GameConfig, type Plane as PlaneType } from "../gameConfig";
-import { type Vec2, v2 } from "./../utils/v2";
-import { type AbstractMsg, BitSizes, type BitStream, Constants } from "./net";
-import {
-    ObjectSerializeFns,
-    type ObjectsFullData,
-    type ObjectsPartialData,
-    type ObjectType,
+import { GameConfig } from "../gameConfig";
+import type { Vec2 } from "./../utils/v2";
+import { type AbstractMsg, type BitStream, Constants } from "./net";
+import type {
+    ObjectsFullData,
+    ObjectsPartialData,
+    ObjectType,
 } from "./objectSerializeFns";
+import {
+    deserializeAirstrikeZones,
+    deserializeBullets,
+    deserializeEmotes,
+    deserializeExplosions,
+    deserializeFullObjects,
+    deserializeMapIndicators,
+    deserializePartObjects,
+    deserializePlanes,
+    serializeAirstrikeZones,
+    serializeBullets,
+    serializeEmotes,
+    serializeExplosions,
+    serializeFullObjects,
+    serializeMapIndicators,
+    serializePartObjects,
+    serializePlanes,
+} from "./updateSections";
 
-function serializeActivePlayer(s: BitStream, data: LocalDataWithDirty) {
+export function serializeActivePlayer(s: BitStream, data: LocalDataWithDirty) {
     s.writeBoolean(data.healthDirty);
     if (data.healthDirty) s.writeFloat(data.health, 0, 100, 8);
 
@@ -52,7 +69,7 @@ function serializeActivePlayer(s: BitStream, data: LocalDataWithDirty) {
     s.writeAlignToNextByte();
 }
 
-function deserializeActivePlayer(s: BitStream, data: LocalDataWithDirty) {
+export function deserializeActivePlayer(s: BitStream, data: LocalDataWithDirty) {
     data.healthDirty = s.readBoolean();
     if (data.healthDirty) {
         data.health = s.readFloat(0, 100, 8);
@@ -104,7 +121,7 @@ function deserializeActivePlayer(s: BitStream, data: LocalDataWithDirty) {
     s.readAlignToNextByte();
 }
 
-function serializePlayerStatus(s: BitStream, players: PlayerStatus[]) {
+export function serializePlayerStatus(s: BitStream, players: PlayerStatus[]) {
     s.writeArray(players, 8, (info) => {
         s.writeBoolean(info.hasData);
 
@@ -124,7 +141,7 @@ function serializePlayerStatus(s: BitStream, players: PlayerStatus[]) {
     s.writeAlignToNextByte();
 }
 
-function deserializePlayerStatus(s: BitStream): PlayerStatus[] {
+export function deserializePlayerStatus(s: BitStream): PlayerStatus[] {
     const players = s.readArray(8, () => {
         const p = {
             hasData: s.readBoolean(),
@@ -148,14 +165,14 @@ function deserializePlayerStatus(s: BitStream): PlayerStatus[] {
     return players;
 }
 
-function serializeGroupStatus(s: BitStream, players: GroupStatus[]) {
+export function serializeGroupStatus(s: BitStream, players: GroupStatus[]) {
     s.writeArray(players, 8, (status) => {
         s.writeFloat(status.health, 0, 100, 7);
         s.writeBoolean(status.disconnected);
     });
 }
 
-function deserializeGroupStatus(s: BitStream): GroupStatus[] {
+export function deserializeGroupStatus(s: BitStream): GroupStatus[] {
     return s.readArray(8, () => {
         return {
             health: s.readFloat(0, 100, 7),
@@ -176,7 +193,7 @@ export interface PlayerInfo {
     };
 }
 
-function serializePlayerInfo(s: BitStream, data: PlayerInfo) {
+export function serializePlayerInfo(s: BitStream, data: PlayerInfo) {
     s.writeUint16(data.playerId);
     s.writeUint8(data.teamId);
     s.writeUint8(data.groupId);
@@ -188,7 +205,7 @@ function serializePlayerInfo(s: BitStream, data: PlayerInfo) {
     s.writeAlignToNextByte();
 }
 
-function deserializePlayerInfo(s: BitStream, data: PlayerInfo) {
+export function deserializePlayerInfo(s: BitStream, data: PlayerInfo) {
     data.playerId = s.readUint16();
     data.teamId = s.readUint8();
     data.groupId = s.readUint8();
@@ -208,7 +225,7 @@ export interface GasData {
     radNew: number;
 }
 
-function serializeGasData(s: BitStream, data: GasData) {
+export function serializeGasData(s: BitStream, data: GasData) {
     s.writeUint8(data.mode);
     s.writeFloat32(data.duration);
     s.writeMapPos(data.posOld);
@@ -217,7 +234,7 @@ function serializeGasData(s: BitStream, data: GasData) {
     s.writeFloat(data.radNew, 0, 2048, 16);
 }
 
-function deserializeGasData(s: BitStream, data: GasData) {
+export function deserializeGasData(s: BitStream, data: GasData) {
     data.mode = s.readUint8();
     data.duration = s.readFloat32();
     data.posOld = s.readMapPos();
@@ -296,7 +313,6 @@ export class UpdateMsg implements AbstractMsg {
     ack = 0;
 
     serialize(s: BitStream) {
-        /* STRIP_FROM_PROD_CLIENT:START */
         let flags = 0;
         const flagsIdx = s.byteIndex;
         s.writeUint16(flags);
@@ -310,19 +326,12 @@ export class UpdateMsg implements AbstractMsg {
         }
 
         if (this.fullObjects.length) {
-            s.writeArray(this.fullObjects, 16, (obj) => {
-                s.writeUint8(obj.__type);
-                s.writeBytes(obj.partialStream, 0, obj.partialStream.byteIndex);
-                s.writeBytes(obj.fullStream, 0, obj.fullStream.byteIndex);
-            });
+            serializeFullObjects(s, this.fullObjects);
 
             flags |= UpdateExtFlags.FullObjects;
         }
 
-        s.writeArray(this.partObjects, 16, (obj) => {
-            s.writeUint8(obj.__type);
-            s.writeBytes(obj.partialStream, 0, obj.partialStream.byteIndex);
-        });
+        serializePartObjects(s, this.partObjects);
 
         if (this.activePlayerIdDirty) {
             s.writeUint16(this.activePlayerId);
@@ -368,118 +377,35 @@ export class UpdateMsg implements AbstractMsg {
         }
 
         if (this.bullets.length) {
-            s.writeArray(this.bullets, 8, (bullet) => {
-                s.writeUint16(bullet.playerId);
-                s.writeMapPos(bullet.startPos);
-                s.writeUnitVec(bullet.dir, 8);
-                s.writeGameType(bullet.bulletType);
-                s.writeBits(bullet.layer, 2);
-                s.writeFloat(bullet.varianceT, 0, 1, 4);
-                s.writeBits(bullet.distAdjIdx, 4);
-                s.writeBoolean(bullet.clipDistance);
-                if (bullet.clipDistance) {
-                    s.writeFloat(bullet.distance, 0, Constants.MaxPosition, 16);
-                }
-                s.writeBoolean(bullet.shotFx);
-                if (bullet.shotFx) {
-                    s.writeGameType(bullet.shotSourceType);
-                    s.writeBoolean(bullet.shotOffhand);
-                    s.writeBoolean(bullet.lastShot);
-                }
-                s.writeBoolean(bullet.reflectCount > 0);
-                if (bullet.reflectCount > 0) {
-                    s.writeBits(bullet.reflectCount, 2);
-                    s.writeUint16(bullet.reflectObjId);
-                }
-                s.writeBoolean(bullet.hasModifier);
-                if (bullet.hasModifier) {
-                    s.writeFloat(bullet.speedMult, 0.5, 2, 8);
-                    s.writeFloat(bullet.distanceMult, 0.5, 2, 8);
-                }
-                s.writeBoolean(bullet.hasSpecialFx);
-
-                if (bullet.hasSpecialFx) {
-                    s.writeBoolean(bullet.shotAlt);
-                    s.writeBoolean(bullet.splinter);
-                    s.writeBoolean(bullet.trailSaturated);
-                    s.writeBoolean(bullet.apRounds);
-                    s.writeBoolean(bullet.highVelocity);
-                    s.writeBoolean(bullet.trailSmall);
-                    s.writeBoolean(bullet.trailThick);
-                }
-            });
-
-            s.writeAlignToNextByte();
+            serializeBullets(s, this.bullets);
             flags |= UpdateExtFlags.Bullets;
         }
 
         if (this.explosions.length) {
-            s.writeArray(this.explosions, 8, (explosion) => {
-                s.writeMapPos(explosion.pos);
-                s.writeGameType(explosion.type);
-                s.writeBits(explosion.layer, 2);
-                s.writeAlignToNextByte();
-            });
+            serializeExplosions(s, this.explosions);
 
             flags |= UpdateExtFlags.Explosions;
         }
 
         if (this.emotes.length) {
-            s.writeArray(this.emotes, 8, (emote) => {
-                s.writeUint16(emote.playerId);
-                s.writeGameType(emote.type);
-                s.writeGameType(emote.itemType);
-                s.writeBoolean(emote.isPing);
-
-                if (emote.isPing) {
-                    s.writeMapPos(emote.pos!);
-                }
-                s.writeAlignToNextByte();
-            });
+            serializeEmotes(s, this.emotes);
 
             flags |= UpdateExtFlags.Emotes;
         }
 
         if (this.planes.length) {
-            s.writeArray(this.planes, 8, (plane) => {
-                s.writeUint8(plane.id);
-                s.writeVec(
-                    plane.pos,
-                    -256,
-                    -256,
-                    Constants.MaxPosition + 256,
-                    Constants.MaxPosition + 256,
-                    10,
-                );
-                s.writeUnitVec(plane.planeDir, 8);
-                s.writeBoolean(plane.actionComplete);
-                s.writeBits(plane.action, 3);
-            });
+            serializePlanes(s, this.planes);
 
             flags |= UpdateExtFlags.Planes;
         }
 
         if (this.airstrikeZones.length) {
-            s.writeArray(this.airstrikeZones, 8, (zone) => {
-                s.writeMapPos(zone.pos, 12);
-                s.writeFloat(zone.rad, 0, Constants.AirstrikeZoneMaxRad, 8);
-                s.writeFloat(zone.duration, 0, Constants.AirstrikeZoneMaxDuration, 8);
-            });
-
-            s.writeAlignToNextByte();
+            serializeAirstrikeZones(s, this.airstrikeZones);
             flags |= UpdateExtFlags.AirstrikeZones;
         }
 
         if (this.mapIndicators.length) {
-            s.writeArray(this.mapIndicators, BitSizes.MapIndicators, (indicator) => {
-                s.writeBits(indicator.id, BitSizes.MapIndicators);
-                s.writeBoolean(indicator.dead);
-                s.writeBoolean(indicator.equipped);
-                s.writeGameType(indicator.type);
-                s.writeMapPos(indicator.pos);
-            });
-
-            s.writeAlignToNextByte();
+            serializeMapIndicators(s, this.mapIndicators);
             flags |= UpdateExtFlags.MapIndicators;
         }
 
@@ -494,7 +420,6 @@ export class UpdateMsg implements AbstractMsg {
         s.byteIndex = flagsIdx;
         s.writeUint16(flags);
         s.byteIndex = idx;
-        /* STRIP_FROM_PROD_CLIENT:END */
     }
 
     // @ts-expect-error deserialize only accept one argument for now
@@ -511,33 +436,10 @@ export class UpdateMsg implements AbstractMsg {
         }
 
         if ((flags & UpdateExtFlags.FullObjects) != 0) {
-            this.fullObjects = s.readArray(16, () => {
-                const data = {} as this["fullObjects"][0];
-                data.__type = s.readUint8();
-                data.__id = s.readUint16();
-
-                ObjectSerializeFns[data.__type].deserializePart(s, data as any);
-                s.readAlignToNextByte();
-
-                ObjectSerializeFns[data.__type].deserializeFull(s, data as any);
-                s.readAlignToNextByte();
-
-                return data;
-            });
+            this.fullObjects = deserializeFullObjects(s);
         }
 
-        this.partObjects = s.readArray(16, () => {
-            const data = {} as this["partObjects"][0];
-            data.__type = s.readUint8();
-            data.__id = s.readUint16();
-
-            // temporary disabled because of issues
-            // data.__type = objectCreator.m_getTypeById(data.__id, s);
-            ObjectSerializeFns[data.__type].deserializePart(s, data as any);
-
-            s.readAlignToNextByte();
-            return data;
-        });
+        this.partObjects = deserializePartObjects(s, objectCreator);
 
         if ((flags & UpdateExtFlags.ActivePlayerId) != 0) {
             this.activePlayerId = s.readUint16();
@@ -585,132 +487,27 @@ export class UpdateMsg implements AbstractMsg {
         }
 
         if ((flags & UpdateExtFlags.Bullets) != 0) {
-            this.bullets = s.readArray(8, () => {
-                const bullet = {} as Bullet;
-
-                bullet.playerId = s.readUint16();
-                bullet.pos = s.readMapPos();
-                bullet.dir = s.readUnitVec(8);
-                bullet.bulletType = s.readGameType();
-                bullet.layer = s.readBits(2);
-                bullet.varianceT = s.readFloat(0, 1, 4);
-                bullet.distAdjIdx = s.readBits(4);
-                bullet.clipDistance = s.readBoolean();
-                if (bullet.clipDistance) {
-                    bullet.distance = s.readFloat(0, Constants.MaxPosition, 16);
-                }
-                bullet.shotFx = s.readBoolean();
-                if (bullet.shotFx) {
-                    bullet.shotSourceType = s.readGameType();
-                    bullet.shotOffhand = s.readBoolean();
-                    bullet.lastShot = s.readBoolean();
-                }
-                bullet.reflectCount = 0;
-                bullet.reflectObjId = 0;
-                if (s.readBoolean()) {
-                    bullet.reflectCount = s.readBits(2);
-                    bullet.reflectObjId = s.readUint16();
-                }
-                bullet.speedMult = 1;
-                bullet.distanceMult = 1;
-                bullet.hasModifier = s.readBoolean();
-                if (bullet.hasModifier) {
-                    bullet.speedMult = s.readFloat(0.5, 2, 8);
-                    bullet.distanceMult = s.readFloat(0.5, 2, 8);
-                }
-
-                bullet.hasSpecialFx = s.readBoolean();
-                if (bullet.hasSpecialFx) {
-                    bullet.shotAlt = s.readBoolean();
-                    bullet.splinter = s.readBoolean();
-                    bullet.trailSaturated = s.readBoolean();
-                    bullet.apRounds = s.readBoolean();
-                    bullet.highVelocity = s.readBoolean();
-                    bullet.trailSmall = s.readBoolean();
-                    bullet.trailThick = s.readBoolean();
-                }
-
-                return bullet;
-            });
-
-            s.readAlignToNextByte();
+            this.bullets = deserializeBullets(s);
         }
 
         if ((flags & UpdateExtFlags.Explosions) != 0) {
-            this.explosions = s.readArray(8, () => {
-                const explosion = {} as Explosion;
-                explosion.pos = s.readMapPos();
-                explosion.type = s.readGameType();
-                explosion.layer = s.readBits(2);
-                s.readAlignToNextByte();
-
-                return explosion;
-            });
+            this.explosions = deserializeExplosions(s);
         }
 
         if ((flags & UpdateExtFlags.Emotes) != 0) {
-            this.emotes = s.readArray(8, () => {
-                const emote = {} as Emote;
-                emote.playerId = s.readUint16();
-                emote.type = s.readGameType();
-                emote.itemType = s.readGameType();
-                emote.isPing = s.readBoolean();
-
-                if (emote.isPing) {
-                    emote.pos = s.readMapPos();
-                }
-                s.readAlignToNextByte();
-                return emote;
-            });
+            this.emotes = deserializeEmotes(s);
         }
 
         if ((flags & UpdateExtFlags.Planes) != 0) {
-            this.planes = s.readArray(8, () => {
-                const plane = {} as Plane;
-                plane.id = s.readUint8();
-                const pos = s.readVec(
-                    -256,
-                    -256,
-                    Constants.MaxPosition + 256,
-                    Constants.MaxPosition + 256,
-                    10,
-                );
-                plane.pos = v2.create(pos.x, pos.y);
-                plane.planeDir = s.readUnitVec(8);
-                plane.actionComplete = s.readBoolean();
-                plane.action = s.readBits(3);
-                return plane;
-            });
+            this.planes = deserializePlanes(s);
         }
 
         if ((flags & UpdateExtFlags.AirstrikeZones) != 0) {
-            this.airstrikeZones = s.readArray(8, () => {
-                const airStrikeZone = {} as Airstrike;
-                airStrikeZone.pos = s.readMapPos(12);
-                airStrikeZone.rad = s.readFloat(0, Constants.AirstrikeZoneMaxRad, 8);
-                airStrikeZone.duration = s.readFloat(
-                    0,
-                    Constants.AirstrikeZoneMaxDuration,
-                    8,
-                );
-                return airStrikeZone;
-            });
-
-            s.readAlignToNextByte();
+            this.airstrikeZones = deserializeAirstrikeZones(s);
         }
 
         if ((flags & UpdateExtFlags.MapIndicators) != 0) {
-            this.mapIndicators = s.readArray(BitSizes.MapIndicators, () => {
-                const mapIndicator = {} as MapIndicator;
-                mapIndicator.id = s.readBits(BitSizes.MapIndicators);
-                mapIndicator.dead = s.readBoolean();
-                mapIndicator.equipped = s.readBoolean();
-                mapIndicator.type = s.readGameType();
-                mapIndicator.pos = s.readMapPos();
-                return mapIndicator;
-            });
-
-            s.readAlignToNextByte();
+            this.mapIndicators = deserializeMapIndicators(s);
         }
 
         if ((flags & UpdateExtFlags.KillLeader) != 0) {
@@ -751,12 +548,8 @@ export interface Bullet {
     splinter: boolean;
     trailSaturated: boolean;
     apRounds: boolean;
-    highVelocity: boolean;
     trailSmall: boolean;
     trailThick: boolean;
-    speedMult: number;
-    distanceMult: number;
-    hasModifier: boolean;
 }
 
 export interface Explosion {
@@ -783,7 +576,7 @@ export interface Plane {
     planeDir: Vec2;
     pos: Vec2;
     actionComplete: boolean;
-    action: PlaneType;
+    action: number;
     id: number;
 }
 
