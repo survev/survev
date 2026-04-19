@@ -1,10 +1,10 @@
 import $ from "jquery";
-import { ProcessMsgType } from "../../server/src/game/game";
 import type {
     FindGamePrivateBody,
     GameData,
     ProcessMsg,
 } from "../../server/src/utils/types";
+import { ProcessMsgType } from "../../server/src/utils/types";
 import { type MapDef, MapDefs } from "../../shared/defs/mapDefs";
 import type { TeamMode } from "../../shared/gameConfig";
 import { math } from "../../shared/utils/math";

@@ -6,6 +6,7 @@ import { v2 } from "../../../shared/utils/v2";
 import { Config } from "../config";
 import { ServerLogger } from "../utils/logger";
 import { apiPrivateRouter } from "../utils/serverHelpers";
+import { ProcessMsgType } from "../utils/types";
 import type {
     FindGamePrivateBody,
     SaveGameBody,
@@ -31,26 +32,6 @@ import { SmokeBarn } from "./objects/smoke";
 import { PluginManager } from "./pluginManager";
 import { Profiler } from "./profiler";
 import { ReplayCaptureService } from "./replayCaptureService";
-
-export enum ProcessMsgType {
-    Create,
-    Created,
-    KeepAlive,
-    UpdateData,
-    AddJoinToken,
-    SocketMsg,
-    SocketClose,
-}
-
-export enum ProcessMsgType {
-    Create,
-    Created,
-    KeepAlive,
-    UpdateData,
-    AddJoinToken,
-    SocketMsg,
-    SocketClose,
-}
 
 export interface JoinTokenData {
     expiresAt: number;
@@ -632,9 +613,10 @@ export class Game {
                 // we dump the game  to a local db if we failed to save;
                 // avoid importing sqlite and creating the database at process startup
                 // since this code should rarely run anyway
-                const sqliteDb = (await import("better-sqlite3")).default(
-                    "lost_game_data.db",
-                );
+                const sqliteModuleName = "better-" + "sqlite3";
+                const sqliteDb = (
+                    await import(/* @vite-ignore */ sqliteModuleName)
+                ).default("lost_game_data.db");
 
                 sqliteDb
                     .prepare(`

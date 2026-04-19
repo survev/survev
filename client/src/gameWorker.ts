@@ -1,5 +1,5 @@
-import { Game, ProcessMsgType } from "../../server/src/game/game";
-import type { ProcessMsg } from "../../server/src/utils/types";
+import { Game } from "../../server/src/game/game";
+import { ProcessMsgType, type ProcessMsg } from "../../server/src/utils/types";
 
 let game: Game | undefined;
 

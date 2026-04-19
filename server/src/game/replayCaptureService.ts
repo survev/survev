@@ -1,5 +1,3 @@
-import { mkdir, writeFile } from "node:fs/promises";
-import path from "node:path";
 import * as net from "../../../shared/net/net";
 import { coldet } from "../../../shared/utils/coldet";
 import { PacketRecorder, PacketType } from "../../../shared/utils/packetRecorder";
@@ -109,10 +107,20 @@ export class ReplayCaptureService {
         const replayBuffer = this.recorder?.getData();
         if (!replayBuffer) return;
 
-        const recordingsDir = path.resolve(process.cwd(), "recordings");
-        const replayPath = path.join(recordingsDir, `recording-${this.game.id}.surv`);
+        if (typeof process === "undefined" || !process.versions?.node) {
+            return;
+        }
 
         try {
+            const fsModuleName = "node:fs/promises";
+            const pathModuleName = "node:path";
+            const [{ mkdir, writeFile }, path] = await Promise.all([
+                import(/* @vite-ignore */ fsModuleName),
+                import(/* @vite-ignore */ pathModuleName),
+            ]);
+            const recordingsDir = path.resolve(process.cwd(), "recordings");
+            const replayPath = path.join(recordingsDir, `recording-${this.game.id}.surv`);
+
             await mkdir(recordingsDir, { recursive: true });
             await writeFile(replayPath, Buffer.from(replayBuffer));
             this.game.logger.info(`Saved replay: ${replayPath}`);

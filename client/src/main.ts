@@ -154,7 +154,6 @@ class Application {
             const language =
                 this.config.get("language") || this.localization.detectLocale();
             this.config.set("language", language);
-            this.updateLogoBasedOnLanguage(window.spellSync.language);
             this.localization.setLocale(language);
             this.updateLogoBasedOnLanguage(language);
             this.localization.populateLanguageSelect();
