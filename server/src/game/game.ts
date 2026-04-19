@@ -6,12 +6,11 @@ import { v2 } from "../../../shared/utils/v2";
 import { Config } from "../config";
 import { ServerLogger } from "../utils/logger";
 import { apiPrivateRouter } from "../utils/serverHelpers";
-import {
-    type FindGamePrivateBody,
-    ProcessMsgType,
-    type SaveGameBody,
-    type ServerGameConfig,
-    type UpdateDataMsg,
+import type {
+    FindGamePrivateBody,
+    SaveGameBody,
+    ServerGameConfig,
+    UpdateDataMsg,
 } from "../utils/types";
 import { GameModeManager } from "./gameModeManager";
 import { Grid } from "./grid";
@@ -32,6 +31,16 @@ import { SmokeBarn } from "./objects/smoke";
 import { PluginManager } from "./pluginManager";
 import { Profiler } from "./profiler";
 import { ReplayCaptureService } from "./replayCaptureService";
+
+export enum ProcessMsgType {
+    Create,
+    Created,
+    KeepAlive,
+    UpdateData,
+    AddJoinToken,
+    SocketMsg,
+    SocketClose,
+}
 
 export interface JoinTokenData {
     expiresAt: number;

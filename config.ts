@@ -1,7 +1,3 @@
-import { randomBytes } from "node:crypto";
-import fs from "node:fs";
-import path from "node:path";
-import hjson from "hjson";
 import type { ConfigType, PartialConfig } from "./configType";
 import { TeamMode } from "./shared/gameConfig";
 import { util } from "./shared/utils/util";
@@ -73,11 +69,12 @@ export function getConfig(isProduction: boolean, dir: string) {
         defaultItems: {},
     };
 
-    const dirname = import.meta?.dirname || __dirname;
+    let localConfig: PartialConfig = {};
 
+    /*
+    const dirname = import.meta?.dirname || __dirname;
     const configPath = path.join(dirname, dir, configFileName);
 
-    let localConfig: PartialConfig = {};
 
     if (fs.existsSync(configPath)) {
         console.log(`Sourcing config ${configPath}`);
@@ -99,6 +96,7 @@ export function getConfig(isProduction: boolean, dir: string) {
             hjson.stringify(localConfig, { bracesSameLine: true }),
         );
     }
+    */
 
     util.mergeDeep(config, localConfig);
 
@@ -139,6 +137,7 @@ export function getConfig(isProduction: boolean, dir: string) {
     return config;
 }
 
+/*
 export function saveConfig(dir: string, config: PartialConfig) {
     try {
         const dirname = import.meta?.dirname || __dirname;
@@ -159,3 +158,81 @@ export function saveConfig(dir: string, config: PartialConfig) {
         console.error("Failed saving config", err);
     }
 }
+
+function migrateConfig(localConfig: PartialConfig, legacyConfigPath: string) {
+    const configText = fs.readFileSync(legacyConfigPath).toString();
+
+    const oldConfig = JSON.parse(configText) as PartialConfig & {
+        thisRegion?: string;
+        apiKey?: string;
+        encryptLoadoutSecret?: string;
+        client?: {
+            AIP_ID?: string;
+            AIP_PLACEMENT_ID?: string;
+            theme?: string;
+        };
+        DISCORD_CLIENT_ID?: string;
+        DISCORD_SECRET_ID?: string;
+
+        GOOGLE_CLIENT_ID?: string;
+        GOOGLE_SECRET_ID?: string;
+
+        PROXYCHECK_KEY?: string;
+    };
+
+    if (oldConfig.thisRegion) {
+        localConfig.gameServer ??= {};
+        localConfig.gameServer.thisRegion = oldConfig.thisRegion;
+        delete oldConfig.thisRegion;
+    }
+
+    localConfig.secrets ??= {};
+
+    if (oldConfig.apiKey) {
+        localConfig.secrets.SURVEV_API_KEY = oldConfig.apiKey;
+        delete oldConfig.encryptLoadoutSecret;
+    }
+    if (oldConfig.encryptLoadoutSecret) {
+        localConfig.secrets.SURVEV_LOADOUT_SECRET = oldConfig.encryptLoadoutSecret;
+        delete oldConfig.encryptLoadoutSecret;
+    }
+
+    for (const key of [
+        "DISCORD_CLIENT_ID",
+        "DISCORD_SECRET_ID",
+        "GOOGLE_CLIENT_ID",
+        "GOOGLE_SECRET_ID",
+        "PROXYCHECK_KEY",
+    ] as const) {
+        if (oldConfig[key]) {
+            localConfig.secrets[key] = oldConfig[key];
+            delete oldConfig[key];
+        }
+    }
+
+    if (oldConfig.client) {
+        if (oldConfig.client.theme) {
+            localConfig.clientTheme = oldConfig.client.theme as "main";
+        }
+        if (oldConfig.client.AIP_PLACEMENT_ID) {
+            localConfig.secrets ??= {};
+            localConfig.secrets.AIP_PLACEMENT_ID = oldConfig.client.AIP_PLACEMENT_ID;
+        }
+
+        if (oldConfig.client.AIP_ID) {
+            localConfig.secrets ??= {};
+            localConfig.secrets.AIP_ID = oldConfig.client.AIP_ID;
+        }
+        delete oldConfig.client;
+    }
+
+    if (!localConfig.secrets.SURVEV_API_KEY) {
+        localConfig.secrets.SURVEV_API_KEY = randomBytes(64).toString("base64");
+    }
+    if (!localConfig.secrets.SURVEV_LOADOUT_SECRET) {
+        localConfig.secrets.SURVEV_LOADOUT_SECRET = randomBytes(32).toString("base64");
+    }
+
+    util.mergeDeep(localConfig, oldConfig);
+}
+*/
