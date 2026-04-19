@@ -607,6 +607,7 @@ export class EmoteBarn {
                     ping.playerId,
                     this.activePlayer.__id,
                     this.playerBarn,
+                    factionMode,
                 );
                 let indicator: Indicator | null = null;
                 let pingSound = pingData.sound!;

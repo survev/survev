@@ -79,7 +79,7 @@ export class LootBarn {
 
     flush() {
         for (let i = 0; i < this.newLoots.length; i++) {
-            this.newLoots[i].isOld = true;
+            this.newLoots[i].isOld = false;
             this.newLoots[i].serializeFull();
         }
         this.newLoots.length = 0;
@@ -207,23 +207,21 @@ export class LootBarn {
         return fn();
     }
 
-    getLootTable(tier: string): LootTierItem | undefined {
-        assert(
-            this.game.map.mapDef.lootTable[tier],
-            `Unknown loot tier with type ${tier}`,
-        );
-
-        let item: LootTierItem | undefined = this._getLootTable(tier);
-
-        if (!item.name) {
-            return undefined;
+    getLootTable(tier: string): Array<LootTierItem> {
+        if (!this.game.map.mapDef.lootTable[tier]) {
+            this.game.logger.warn(`Unknown loot tier with type ${tier}`);
+            return [];
         }
+        const items: Array<LootTierItem> = [];
 
+        const item = this._getLootTable(tier);
         if (item.name.startsWith("tier_")) {
-            item = this.getLootTable(item.name);
+            items.push(...this.getLootTable(item.name));
+        } else if (item.name) {
+            items.push(item);
         }
 
-        return item;
+        return items;
     }
 }
 

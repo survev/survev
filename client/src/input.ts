@@ -358,6 +358,8 @@ export enum Key {
     X = 88,
     Windows = 91,
     ContextMenu = 93,
+    LeftBracket = 219,
+    RightBracket = 221,
     F1 = 112,
     F2 = 113,
     F3 = 114,

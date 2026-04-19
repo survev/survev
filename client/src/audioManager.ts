@@ -29,8 +29,6 @@ interface Options {
 
 export class AudioManager {
     mute = false;
-    // Mute controlled by external systems (e.g. ads)
-    forcedMute = false;
     masterVolume = 1;
     soundVolume = 1;
     musicVolume = 1;
@@ -203,9 +201,6 @@ export class AudioManager {
         options.volumeScale = options.volumeScale || 1;
         let instance = null;
         const a = soundDefs.Channels[options.channel];
-        if (this.forcedMute) {
-            return null;
-        }
         if (a && (!this.mute || options.forceStart)) {
             const baseVolume =
                 this.baseVolume * 1 * this.getTypeVolume(a.type) * options.volumeScale;
@@ -361,17 +356,8 @@ export class AudioManager {
 
     setMute(mute: boolean) {
         this.mute = mute;
-        CreateJS.Sound.setMute(this.mute || this.forcedMute);
+        CreateJS.Sound.setMute(this.mute);
         return this.mute;
-    }
-
-    setForcedMute(mute: boolean) {
-        this.forcedMute = mute;
-        if (this.forcedMute) {
-            this.stopAll();
-        }
-        CreateJS.Sound.setMute(this.mute || this.forcedMute);
-        return this.forcedMute;
     }
 
     muteToggle() {

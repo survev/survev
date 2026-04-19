@@ -545,9 +545,7 @@ export class LoadoutMenu {
             const itemInfo = {
                 type: currentNewItem.type,
                 rarity: objDef.rarity || Rarity.Stock,
-                displayName:
-                    this.localization.translate(`game-${currentNewItem.type}`) ||
-                    objDef.name!,
+                displayName: objDef.name!,
                 category: objDef.type,
             };
             const svg = helpers.getSvgFromGameType(currentNewItem.type);
@@ -765,14 +763,14 @@ export class LoadoutMenu {
 
         // Use the 2nd line on emotes to display the subcategory
         const emoteSubcatNames = {
-            [EmoteCategory.Locked]: this.localization.translate("emote-subcat-locked"),
-            [EmoteCategory.Faces]: this.localization.translate("emote-subcat-faces"),
-            [EmoteCategory.Food]: this.localization.translate("emote-subcat-food"),
-            [EmoteCategory.Animals]: this.localization.translate("emote-subcat-animals"),
-            [EmoteCategory.Logos]: this.localization.translate("emote-subcat-logos"),
-            [EmoteCategory.Other]: this.localization.translate("emote-subcat-other"),
-            [EmoteCategory.Flags]: this.localization.translate("emote-subcat-flags"),
-            [EmoteCategory.Default]: this.localization.translate("emote-subcat-default"),
+            [EmoteCategory.Locked]: "Locked",
+            [EmoteCategory.Faces]: "Faces",
+            [EmoteCategory.Food]: "Food",
+            [EmoteCategory.Animals]: "Animals",
+            [EmoteCategory.Logos]: "Logos",
+            [EmoteCategory.Other]: "Other",
+            [EmoteCategory.Flags]: "Flags",
+            [EmoteCategory.Default]: "Default",
         };
         const localizedLore =
             selectedItem.loadoutType == "emote"
@@ -877,10 +875,8 @@ export class LoadoutMenu {
                 loadoutType: "emote",
                 type,
                 rarity: emoteDef.rarity || Rarity.Stock,
-                displayName:
-                    this.localization.translate(`game-${type}`) || emoteDef.name!,
-                displayLore:
-                    this.localization.translate(`game-${type}-lore`) || emoteDef.lore,
+                displayName: emoteDef.name!,
+                displayLore: emoteDef.lore,
                 subcat: emoteDef.category,
             };
             this.equippedItems[slotIdx] = itemInfo;
@@ -982,11 +978,9 @@ export class LoadoutMenu {
                 loadoutType: category.loadoutType,
                 type: item.type,
                 rarity: objDef.rarity || Rarity.Stock,
-                displayName:
-                    this.localization.translate(`game-${item.type}`) || objDef.name,
-                displayLore:
-                    this.localization.translate(`game-${item.type}-lore`) || objDef.lore!,
+                displayName: objDef.name,
                 displaySource: getItemSourceName(item.source),
+                displayLore: objDef.lore!,
                 timeAcquired: item.timeAcquired,
                 idx: i,
                 subcat: (objDef as unknown as EmoteDef).category,

@@ -442,7 +442,7 @@ export class Building implements AbstractObject {
         // Create residue if the ceiling has been destroyed
         if (this.ceilingDead && !this.residue) {
             const def = MapObjectDefs[this.type] as BuildingDef;
-            if (def.ceiling.destroy?.residue && def.ceiling.destroy.residue !== "none") {
+            if (def.ceiling.destroy?.residue) {
                 const r = this.allocSprite();
                 r.texture = PIXI.Texture.from(def.ceiling.destroy.residue);
                 r.position.set(0, 0);

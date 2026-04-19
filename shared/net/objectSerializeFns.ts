@@ -1,4 +1,4 @@
-import { type Action, type Anim, GameConfig, HasteType } from "../gameConfig";
+import { GameConfig, HasteType } from "../gameConfig";
 import type { Vec2 } from "../utils/v2";
 import { BitSizes, type BitStream, Constants } from "./net";
 
@@ -77,10 +77,10 @@ export interface ObjectsFullData {
         dead: boolean;
         downed: boolean;
 
-        animType: Anim;
+        animType: number;
         animSeq: number;
 
-        actionType: Action;
+        actionType: number;
         actionSeq: number;
 
         wearingPan: boolean;
@@ -88,9 +88,8 @@ export interface ObjectsFullData {
 
         frozen: boolean;
         frozenOri: number;
-        frozenType: string;
 
-        hasteType: Exclude<HasteType, HasteType.Count>;
+        hasteType: number;
         hasteSeq: number;
 
         actionItem: string;
@@ -187,7 +186,6 @@ export const ObjectSerializeFns: {
 } = {
     [ObjectType.Player]: {
         serializedFullSize: 32,
-        /* STRIP_FROM_PROD_CLIENT:START */
         serializePart: (s, data) => {
             s.writeMapPos(data.pos);
             s.writeUnitVec(data.dir, 8);
@@ -215,7 +213,6 @@ export const ObjectSerializeFns: {
             s.writeBoolean(data.frozen);
             if (data.frozen) {
                 s.writeBits(data.frozenOri, 2);
-                s.writeGameType(data.frozenType);
             }
 
             s.writeBoolean(data.hasteType !== HasteType.None);
@@ -255,7 +252,6 @@ export const ObjectSerializeFns: {
                 });
             }
         },
-        /* STRIP_FROM_PROD_CLIENT:END */
         deserializePart: (s, data) => {
             data.pos = s.readMapPos();
             data.dir = s.readUnitVec(8);
@@ -281,12 +277,7 @@ export const ObjectSerializeFns: {
             data.healEffect = s.readBoolean();
 
             data.frozen = s.readBoolean();
-            data.frozenOri = 0;
-            data.frozenType = "";
-            if (data.frozen) {
-                data.frozenOri = s.readBits(2);
-                data.frozenType = s.readGameType();
-            }
+            data.frozenOri = data.frozen ? s.readBits(2) : 0;
 
             data.hasteType = HasteType.None;
             data.hasteSeq = -1;
@@ -322,7 +313,6 @@ export const ObjectSerializeFns: {
     },
     [ObjectType.Obstacle]: {
         serializedFullSize: 0,
-        /* STRIP_FROM_PROD_CLIENT:START */
         serializePart: (s, data) => {
             s.writeMapPos(data.pos);
             s.writeBits(data.ori, 2);
@@ -359,8 +349,6 @@ export const ObjectSerializeFns: {
             s.writeBoolean(data.isSkin);
             if (data.isSkin) s.writeUint16(data.skinPlayerId!);
         },
-        /* STRIP_FROM_PROD_CLIENT:END */
-
         deserializePart: (s, data) => {
             data.pos = s.readMapPos();
             data.ori = s.readBits(2);
@@ -402,7 +390,6 @@ export const ObjectSerializeFns: {
     },
     [ObjectType.Building]: {
         serializedFullSize: 0,
-        /* STRIP_FROM_PROD_CLIENT:START */
         serializePart: (s, data) => {
             s.writeBoolean(data.ceilingDead);
             s.writeBoolean(data.occupied);
@@ -419,8 +406,6 @@ export const ObjectSerializeFns: {
             s.writeBits(data.ori, 2);
             s.writeBits(data.layer, 2);
         },
-        /* STRIP_FROM_PROD_CLIENT:END */
-
         deserializePart: (s, data) => {
             data.ceilingDead = s.readBoolean();
             data.occupied = s.readBoolean();
@@ -440,7 +425,6 @@ export const ObjectSerializeFns: {
     },
     [ObjectType.Structure]: {
         serializedFullSize: 0,
-        /* STRIP_FROM_PROD_CLIENT:START */
         serializePart: () => {},
         serializeFull: (s, data) => {
             s.writeMapPos(data.pos);
@@ -452,8 +436,6 @@ export const ObjectSerializeFns: {
                 s.writeUint16(data.layerObjIds[r]);
             }
         },
-        /* STRIP_FROM_PROD_CLIENT:END */
-
         deserializePart: () => {},
         deserializeFull: (s, data) => {
             data.pos = s.readMapPos();
@@ -470,15 +452,12 @@ export const ObjectSerializeFns: {
     },
     [ObjectType.LootSpawner]: {
         serializedFullSize: 0,
-        /* STRIP_FROM_PROD_CLIENT:START */
         serializePart: (s, data) => {
             s.writeMapPos(data.pos);
             s.writeMapType(data.type);
             s.writeBits(data.layer, 2);
         },
         serializeFull: () => {},
-        /* STRIP_FROM_PROD_CLIENT:END */
-
         deserializePart: (s, data) => {
             data.pos = s.readMapPos();
             data.type = s.readMapType();
@@ -488,7 +467,6 @@ export const ObjectSerializeFns: {
     },
     [ObjectType.Loot]: {
         serializedFullSize: 5,
-        /* STRIP_FROM_PROD_CLIENT:START */
         serializePart: (s, data) => {
             s.writeMapPos(data.pos);
         },
@@ -503,8 +481,6 @@ export const ObjectSerializeFns: {
                 s.writeUint16(data.ownerId);
             }
         },
-        /* STRIP_FROM_PROD_CLIENT:END */
-
         deserializePart: (s, data) => {
             data.pos = s.readMapPos();
         },
@@ -522,7 +498,6 @@ export const ObjectSerializeFns: {
     },
     [ObjectType.DeadBody]: {
         serializedFullSize: 0,
-        /* STRIP_FROM_PROD_CLIENT:START */
         serializePart: (s, data) => {
             s.writeMapPos(data.pos);
         },
@@ -530,8 +505,6 @@ export const ObjectSerializeFns: {
             s.writeUint8(data.layer);
             s.writeUint16(data.playerId);
         },
-        /* STRIP_FROM_PROD_CLIENT:END */
-
         deserializePart: (s, data) => {
             data.pos = s.readMapPos();
         },
@@ -542,7 +515,6 @@ export const ObjectSerializeFns: {
     },
     [ObjectType.Decal]: {
         serializedFullSize: 0,
-        /* STRIP_FROM_PROD_CLIENT:START */
         serializePart: () => {},
         serializeFull: (s, data) => {
             s.writeMapPos(data.pos);
@@ -557,8 +529,6 @@ export const ObjectSerializeFns: {
             s.writeBits(data.layer, 2);
             s.writeUint8(data.goreKills);
         },
-        /* STRIP_FROM_PROD_CLIENT:END */
-
         deserializePart: () => {},
         deserializeFull: (s, data) => {
             data.pos = s.readMapPos();
@@ -575,7 +545,6 @@ export const ObjectSerializeFns: {
     },
     [ObjectType.Projectile]: {
         serializedFullSize: 0,
-        /* STRIP_FROM_PROD_CLIENT:START */
         serializePart: (s, data) => {
             s.writeMapPos(data.pos);
             s.writeFloat(data.posZ, 0, GameConfig.projectile.maxHeight, 10);
@@ -585,8 +554,6 @@ export const ObjectSerializeFns: {
             s.writeGameType(data.type);
             s.writeBits(data.layer, 2);
         },
-        /* STRIP_FROM_PROD_CLIENT:END */
-
         deserializePart: (s, data) => {
             data.pos = s.readMapPos();
             data.posZ = s.readFloat(0, GameConfig.projectile.maxHeight, 10);
@@ -599,7 +566,6 @@ export const ObjectSerializeFns: {
     },
     [ObjectType.Smoke]: {
         serializedFullSize: 0,
-        /* STRIP_FROM_PROD_CLIENT:START */
         serializePart: (s, data) => {
             s.writeMapPos(data.pos);
             s.writeFloat(data.rad, 0, Constants.SmokeMaxRad, 8);
@@ -608,8 +574,6 @@ export const ObjectSerializeFns: {
             s.writeBits(data.layer, 2);
             s.writeBits(data.interior, 6);
         },
-        /* STRIP_FROM_PROD_CLIENT:END */
-
         deserializePart: (s, data) => {
             data.pos = s.readMapPos();
             data.rad = s.readFloat(0, Constants.SmokeMaxRad, 8);
@@ -621,7 +585,6 @@ export const ObjectSerializeFns: {
     },
     [ObjectType.Airdrop]: {
         serializedFullSize: 0,
-        /* STRIP_FROM_PROD_CLIENT:START */
         serializePart: (s, data) => {
             s.writeFloat(data.fallT, 0, 1, 7);
             s.writeBoolean(data.landed);
@@ -629,8 +592,6 @@ export const ObjectSerializeFns: {
         serializeFull: (s, data) => {
             s.writeMapPos(data.pos);
         },
-        /* STRIP_FROM_PROD_CLIENT:END */
-
         deserializePart: (s, data) => {
             data.fallT = s.readFloat(0, 1, 7);
             data.landed = s.readBoolean();

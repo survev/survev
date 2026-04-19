@@ -1,5 +1,5 @@
 import * as PIXI from "pixi.js-legacy";
-import { GameConfig, type Plane as PlaneType } from "../../../shared/gameConfig";
+import { GameConfig } from "../../../shared/gameConfig";
 import type { Plane as PlaneData, UpdateMsg } from "../../../shared/net/updateMsg";
 import { collider } from "../../../shared/utils/collider";
 import { math } from "../../../shared/utils/math";
@@ -38,7 +38,7 @@ class Plane {
     renderAlpha!: number;
     spriteUpdateTime!: number;
 
-    type!: PlaneType;
+    type!: number;
     config!: typeof GameConfig.airdrop | typeof GameConfig.airstrike;
 
     rad!: number;

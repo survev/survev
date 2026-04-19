@@ -1,5 +1,4 @@
 import { GameConfig } from "../gameConfig";
-import type { AABB } from "./coldet";
 import { collider } from "./collider";
 import { River } from "./river";
 import { util } from "./util";
@@ -9,7 +8,6 @@ export interface MapRiverData {
     width: number;
     looped: boolean;
     points: Vec2[];
-    aabb?: AABB;
 }
 
 export function generateJaggedAabbPoints(

@@ -1,6 +1,5 @@
 import * as PIXI from "pixi.js-legacy";
 import { GameObjectDefs, type LootDef } from "../../../shared/defs/gameObjectDefs";
-import type { ExplosionDef } from "../../../shared/defs/gameObjects/explosionsDefs";
 import type {
     BackpackDef,
     BoostDef,
@@ -338,7 +337,6 @@ export class Player implements AbstractObject {
         m_healEffect: boolean;
         m_frozen: boolean;
         m_frozenOri: number;
-        m_frozenType: string;
         m_hasteType: Exclude<HasteType, HasteType.Count>;
         m_hasteSeq: number;
         m_actionItem: string;
@@ -492,7 +490,6 @@ export class Player implements AbstractObject {
             m_healEffect: false,
             m_frozen: false,
             m_frozenOri: 0,
-            m_frozenType: "",
             m_hasteType: HasteType.None,
             m_hasteSeq: 0,
             m_actionItem: "",
@@ -567,10 +564,6 @@ export class Player implements AbstractObject {
             this.m_netData.m_healEffect = data.healEffect;
             this.m_netData.m_frozen = data.frozen;
             this.m_netData.m_frozenOri = data.frozenOri;
-            if (this.m_netData.m_frozenType !== data.frozenType) {
-                this.updateFrozenImage = true;
-            }
-            this.m_netData.m_frozenType = data.frozenType;
             this.m_netData.m_hasteType = data.hasteType;
             this.m_netData.m_hasteSeq = data.hasteSeq;
             this.m_netData.m_actionItem = data.actionItem;
@@ -1479,13 +1472,8 @@ export class Player implements AbstractObject {
         this.bodySprite.scale.set(0.25, 0.25);
         this.bodySprite.visible = true;
 
-        if (
-            this.m_netData.m_frozen &&
-            this.updateFrozenImage &&
-            this.m_netData.m_frozenType
-        ) {
-            const frozenDef = GameObjectDefs[this.m_netData.m_frozenType] as ExplosionDef;
-            const frozenSprites = frozenDef.frozenSprites || [];
+        if (this.m_netData.m_frozen && this.updateFrozenImage) {
+            const frozenSprites = map.getMapDef().biome.frozenSprites || [];
             if (frozenSprites.length > 0) {
                 const sprite =
                     frozenSprites[Math.floor(Math.random() * frozenSprites.length)];
@@ -1504,26 +1492,16 @@ export class Player implements AbstractObject {
         if (map.factionMode && !outfitDef.ghillie) {
             const playerInfo = playerBarn.getPlayerInfo(this.__id);
             const teamId = playerInfo.teamId;
-
-            const teamSprites = map.potatoMode
-                ? ["player-patch-01po.img", "player-patch-02po.img"]
-                : ["player-patch-01.img", "player-patch-02.img"];
-
+            const teamSprites = ["player-patch-01.img", "player-patch-02.img"];
             const teamIdx = (teamId - 1) % teamSprites.length;
             const sprite = teamSprites[teamIdx];
+            const tint = GameConfig.teamColors[teamIdx];
             const rot = math.oriToRad(3) + Math.PI * 0.5;
-
             this.patchSprite.texture = PIXI.Texture.from(sprite);
             this.patchSprite.rotation = rot;
+            this.patchSprite.tint = tint;
             this.patchSprite.scale.set(0.25, 0.25);
             this.patchSprite.visible = true;
-
-            if (map.potatoMode) {
-                this.patchSprite.tint = 0xffffff;
-            } else {
-                const tint = GameConfig.teamColors[teamIdx];
-                this.patchSprite.tint = tint;
-            }
         } else {
             this.patchSprite.visible = false;
         }
@@ -2094,8 +2072,6 @@ export class Player implements AbstractObject {
                 idlePose = "bullpup";
             } else if (curWeapDef.isLauncher) {
                 idlePose = "launcher";
-            } else if (curWeapDef.isMinigun) {
-                idlePose = "minigun";
             } else {
                 idlePose = curWeapDef.isDual ? "dualRifle" : "rifle";
             }
@@ -2316,7 +2292,7 @@ export class Player implements AbstractObject {
                             this.m_pos,
                             meleeDir,
                             meleeDist,
-                            obstacle.height,
+                            GameConfig.player.meleeHeight,
                             this.layer,
                             false,
                         );

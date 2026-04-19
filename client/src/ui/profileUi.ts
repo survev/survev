@@ -5,7 +5,7 @@ import { api } from "../api";
 import { device } from "../device";
 import { helpers } from "../helpers";
 import { proxy } from "../proxy";
-import { SDK } from "../sdk/sdk";
+import { SDK } from "../sdk";
 import type { LoadoutMenu } from "./loadoutMenu";
 import type { Localization } from "./localization";
 import { MenuModal } from "./menuModal";
@@ -33,7 +33,11 @@ function createLoginOptions(
         class: "account-buttons",
     });
     contentsElem.append(buttonParentElem);
-    const addLoginOption = function (method: string, onClick: () => void) {
+    const addLoginOption = function (
+        method: string,
+        linked: boolean,
+        onClick: () => void,
+    ) {
         const el = $("<div/>", {
             class: `menu-option btn-darken btn-standard btn-login-${method}`,
         });
@@ -52,28 +56,31 @@ function createLoginOptions(
                     }),
                 ),
         );
-
-        el.on("click", (_e) => {
-            onClick();
-        });
-
+        if (linkAccount && linked) {
+            el.addClass("btn-login-linked");
+            el.find("span.login-button-name").html('<div class="icon"></div>');
+        } else {
+            el.on("click", (_e) => {
+                onClick();
+            });
+        }
         buttonParentElem.append(el);
     };
 
     // Define the available login methods
     if (proxy.loginSupported("google")) {
-        addLoginOption("google", () => {
+        addLoginOption("google", account.profile.linkedGoogle, () => {
             window.location.href = api.resolveUrl("/api/auth/google");
         });
     }
     if (proxy.loginSupported("discord")) {
-        addLoginOption("discord", () => {
+        addLoginOption("discord", account.profile.linkedDiscord, () => {
             window.location.href = api.resolveUrl("/api/auth/discord");
         });
     }
 
     if (proxy.loginSupported("mock")) {
-        addLoginOption("mock", () => {
+        addLoginOption("mock", false, () => {
             window.location.href = api.resolveUrl("/api/auth/mock");
         });
     }

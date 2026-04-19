@@ -106,10 +106,6 @@ export const IdlePoses: Record<string, Partial<Record<Bones, Pose>>> = {
         [Bones.HandL]: new Pose(v2.create(14, -12.25)),
         [Bones.HandR]: new Pose(v2.create(1, 17.75)),
     },
-    cutlass: {
-        [Bones.HandL]: new Pose(v2.create(14, -12.25)),
-        [Bones.HandR]: new Pose(v2.create(6, 16)),
-    },
     rifle: {
         [Bones.HandL]: new Pose(v2.create(28, 5.25)),
         [Bones.HandR]: new Pose(v2.create(14, 1.75)),
@@ -121,10 +117,6 @@ export const IdlePoses: Record<string, Partial<Record<Bones, Pose>>> = {
     bullpup: {
         [Bones.HandL]: new Pose(v2.create(28, 5.25)),
         [Bones.HandR]: new Pose(v2.create(24, 1.75)),
-    },
-    minigun: {
-        [Bones.HandL]: new Pose(v2.create(18, 7.25)),
-        [Bones.HandR]: new Pose(v2.create(44, 0)),
     },
     launcher: {
         [Bones.HandL]: new Pose(v2.create(20, 10)),

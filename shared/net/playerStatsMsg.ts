@@ -11,7 +11,6 @@ export class PlayerStatsMsg implements AbstractMsg {
     };
 
     serialize(s: BitStream) {
-        /* STRIP_FROM_PROD_CLIENT:START */
         s.writeUint16(this.playerStats.playerId);
         s.writeUint16(this.playerStats.timeAlive);
         s.writeUint8(this.playerStats.kills);
@@ -20,7 +19,6 @@ export class PlayerStatsMsg implements AbstractMsg {
         // so without rounding 99.9999... will become 99 instead of 100
         s.writeUint16(Math.round(this.playerStats.damageDealt));
         s.writeUint16(Math.round(this.playerStats.damageTaken));
-        /* STRIP_FROM_PROD_CLIENT:END */
     }
 
     deserialize(s: BitStream) {

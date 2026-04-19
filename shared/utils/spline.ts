@@ -2,7 +2,7 @@ import { math } from "./math";
 import { assert } from "./util";
 import { type Vec2, v2 } from "./v2";
 
-export function getControlPoints(t: number, points: Vec2[], looped: boolean) {
+function getControlPoints(t: number, points: Vec2[], looped: boolean) {
     const count = points.length;
     let i: number;
     let i0: number;
@@ -35,7 +35,7 @@ export function getControlPoints(t: number, points: Vec2[], looped: boolean) {
 }
 
 // Taken from https://www.mvps.org/directx/articles/catmull/
-export function catmullRom(t: number, p0: number, p1: number, p2: number, p3: number) {
+function catmullRom(t: number, p0: number, p1: number, p2: number, p3: number) {
     return (
         0.5 *
         (2.0 * p1 +
@@ -88,7 +88,12 @@ export class Spline {
     }
 
     getPos(t: number) {
-        const { pt, p0, p1, p2, p3 } = getControlPoints(t, this.points, this.looped);
+        const _getControlPoints = getControlPoints(t, this.points, this.looped);
+        const { pt } = _getControlPoints;
+        const { p0 } = _getControlPoints;
+        const { p1 } = _getControlPoints;
+        const { p2 } = _getControlPoints;
+        const { p3 } = _getControlPoints;
 
         return v2.create(
             catmullRom(pt, p0.x, p1.x, p2.x, p3.x),
@@ -97,7 +102,12 @@ export class Spline {
     }
 
     getTangent(t: number) {
-        const { pt, p0, p1, p2, p3 } = getControlPoints(t, this.points, this.looped);
+        const _getControlPoints2 = getControlPoints(t, this.points, this.looped);
+        const { pt } = _getControlPoints2;
+        const { p0 } = _getControlPoints2;
+        const { p1 } = _getControlPoints2;
+        const { p2 } = _getControlPoints2;
+        const { p3 } = _getControlPoints2;
 
         return v2.create(
             catmullRomDerivative(pt, p0.x, p1.x, p2.x, p3.x),

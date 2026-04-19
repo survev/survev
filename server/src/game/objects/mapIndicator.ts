@@ -49,6 +49,14 @@ export class MapIndicatorBarn {
         return indicator;
     }
 
+    getReplayUpdates(fullSnapshot: boolean) {
+        if (fullSnapshot) {
+            return [...this.mapIndicators];
+        }
+
+        return this.mapIndicators.filter((indicator) => indicator.dirty);
+    }
+
     flush() {
         for (let i = 0; i < this.mapIndicators.length; i++) {
             const indicator = this.mapIndicators[i];

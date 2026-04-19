@@ -38,7 +38,7 @@ export class ProjectileBarn {
         layer: number,
         vel: Vec2,
         fuseTime: number,
-        damageType: DamageType,
+        damageType: number,
         throwDir?: Vec2,
         weaponSourceType?: string,
     ): Projectile {
@@ -234,7 +234,7 @@ export class Projectile extends BaseGameObject {
                             weaponSourceType: this.weaponSourceType,
                             source: this.game.objectRegister.getById(this.playerId),
                             mapSourceType: "",
-                            dir: this.dir,
+                            dir: this.vel,
                         });
 
                         if (obj.dead || !obj.collidable) continue;
@@ -254,7 +254,7 @@ export class Projectile extends BaseGameObject {
                         if (def.explodeOnImpact) {
                             this.explode();
                         } else {
-                            const len = math.max(v2.length(this.vel), 0.000001);
+                            const len = v2.length(this.vel);
                             const dir = v2.div(this.vel, len);
                             const normal = intersection
                                 ? intersection.dir
@@ -272,7 +272,6 @@ export class Projectile extends BaseGameObject {
                 obj.__type === ObjectType.Player &&
                 def.playerCollision &&
                 !obj.dead &&
-                util.sameLayer(this.layer, obj.layer) &&
                 obj.__id !== this.playerId
             ) {
                 if (coldet.testCircleCircle(this.pos, this.rad, obj.pos, obj.rad)) {

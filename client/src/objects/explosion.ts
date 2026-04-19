@@ -638,30 +638,6 @@ const ExplosionEffectDefs: Record<string, ExplotionDef> = {
         shakeDur: 0,
         lifetime: 0.5,
     },
-    potato_lmgshot: {
-        burst: {
-            particle: "",
-            scale: 0.1,
-            sound: {
-                grass: "potato_01",
-                water: "potato_02",
-                detune: 400,
-                volume: 0.5,
-            },
-        },
-        scatter: {
-            particle: "potato_smg_impact",
-            count: 1,
-            speed: {
-                min: 5,
-                max: 20,
-            },
-        },
-        rippleCount: 1,
-        shakeStr: 0,
-        shakeDur: 0,
-        lifetime: 0.3,
-    },
     bomb_iron: {
         burst: {
             particle: "explosionBomb",
@@ -675,49 +651,5 @@ const ExplosionEffectDefs: Record<string, ExplotionDef> = {
         shakeStr: 0.25,
         shakeDur: 0.4,
         lifetime: 2,
-    },
-    coconut: {
-        burst: {
-            particle: "",
-            scale: 0.75,
-            sound: {
-                grass: "coconut_01",
-                water: "frag_water_01",
-            },
-        },
-        scatter: {
-            particle: "coconut_impact",
-            count: 6,
-            speed: {
-                min: 5,
-                max: 25,
-            },
-        },
-        rippleCount: 1,
-        shakeStr: 0,
-        shakeDur: 0,
-        lifetime: 1,
-    },
-    tomato: {
-        burst: {
-            particle: "",
-            scale: 0.75,
-            sound: {
-                grass: "tomato_01", // TODO: add sound
-                water: "frag_water_01",
-            },
-        },
-        scatter: {
-            particle: "tomato_impact",
-            count: 4,
-            speed: {
-                min: 5,
-                max: 25,
-            },
-        },
-        rippleCount: 1,
-        shakeStr: 0,
-        shakeDur: 0,
-        lifetime: 1,
     },
 };

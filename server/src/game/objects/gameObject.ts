@@ -1,4 +1,3 @@
-import type { DamageType } from "../../../../shared/gameConfig";
 import { BitStream } from "../../../../shared/net/net";
 import {
     ObjectSerializeFns,
@@ -34,7 +33,7 @@ export type GameObject =
 
 export interface DamageParams {
     amount?: number;
-    damageType: DamageType;
+    damageType: number;
     dir: Vec2;
     gameSourceType?: string;
     mapSourceType?: string;
@@ -74,16 +73,15 @@ export class ObjectRegister {
         }
 
         const preAllocIds = (type: ObjectType, amount: number) => {
-            this.freeLists[type] = new Array(amount);
             for (let i = 0; i < amount; i++) {
-                const id = this.idNext++;
-                this.freeLists[type][i] = id;
+                const id = this.allocId(type);
+                this.freeId(type, id);
             }
         };
 
-        preAllocIds(ObjectType.Player, 128);
+        preAllocIds(ObjectType.Player, 64);
         preAllocIds(ObjectType.Loot, 256);
-        preAllocIds(ObjectType.DeadBody, 128);
+        preAllocIds(ObjectType.DeadBody, 64);
         preAllocIds(ObjectType.Decal, 256);
         preAllocIds(ObjectType.Projectile, 128);
         preAllocIds(ObjectType.Smoke, 64);
@@ -320,8 +318,6 @@ export abstract class BaseGameObject {
         }
         this.game.grid.remove(this as unknown as GameObject);
         this.game.objectRegister.deletedObjs.push(this as unknown as GameObject);
-        this.game.objectRegister.dirtyPart[this.__id] = 0;
-        this.game.objectRegister.dirtyFull[this.__id] = 0;
         this.destroyed = true;
     }
 }

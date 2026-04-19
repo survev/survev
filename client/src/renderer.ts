@@ -65,7 +65,7 @@ export class Renderer {
     addPIXIObj(obj: PIXI.Container, layer: number, zOrd: number, zIdx?: number) {
         if (!obj.transform) {
             const err = new Error();
-            const str = {
+            const str = JSON.stringify({
                 type: "addChild",
                 stack: err.stack,
                 browser: navigator.userAgent,
@@ -77,8 +77,8 @@ export class Renderer {
                 layer,
                 zOrd,
                 zIdx,
-            };
-            errorLogManager.logError("addPixiObj", str);
+            });
+            errorLogManager.logError(str);
         }
         if (obj.__layerIdx === undefined) {
             obj.__layerIdx = -1;

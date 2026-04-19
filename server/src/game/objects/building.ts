@@ -54,11 +54,10 @@ export class Building extends BaseGameObject {
         zoomIn?: AABB;
         zoomOut?: AABB;
         zoom?: number;
-        noZoom?: boolean;
     }> = [];
 
     healRegions?: Array<{
-        collision: Collider;
+        collision: AABB;
         healRate: number;
     }> = [];
 
@@ -109,7 +108,7 @@ export class Building extends BaseGameObject {
                     this.pos,
                     this.rot,
                     this.scale,
-                ),
+                ) as AABB,
                 healRate: hr.healRate,
             };
         });
@@ -168,7 +167,6 @@ export class Building extends BaseGameObject {
                       ) as AABB)
                     : undefined,
                 zoom: region.zoom,
-                noZoom: region.noZoom,
             });
         }
 

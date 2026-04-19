@@ -13,7 +13,6 @@ export class KillMsg implements AbstractMsg {
     killed = false;
 
     serialize(s: BitStream) {
-        /* STRIP_FROM_PROD_CLIENT:START */
         s.writeUint8(this.damageType);
         s.writeGameType(this.itemSourceType);
         s.writeMapType(this.mapSourceType);
@@ -23,7 +22,6 @@ export class KillMsg implements AbstractMsg {
         s.writeUint8(this.killerKills);
         s.writeBoolean(this.downed);
         s.writeBoolean(this.killed);
-        /* STRIP_FROM_PROD_CLIENT:END */
     }
 
     deserialize(s: BitStream) {

@@ -312,19 +312,6 @@ const Sounds: Record<string, Record<string, SoundDef>> = {
             path: "audio/guns/spas12_pull_01.mp3",
             volume: 1,
         },
-        spas16_01: {
-            path: "audio/guns/spas16_01.mp3",
-            volume: 1,
-            maxInstances: 5,
-        },
-        spas16_reload_01: {
-            path: "audio/guns/spas16_reload_01.mp3",
-            volume: 1.25,
-        },
-        spas16_switch_01: {
-            path: "audio/guns/spas16_switch_01.mp3",
-            volume: 1.25,
-        },
         mp220_01: {
             path: "audio/guns/mp220_01.mp3",
             volume: 1,
@@ -595,19 +582,6 @@ const Sounds: Record<string, Record<string, SoundDef>> = {
             path: "audio/guns/l86_switch_01.mp3",
             volume: 1,
         },
-        imbel_01: {
-            path: "audio/guns/imbel_01.mp3",
-            volume: 1,
-            maxInstances: 5,
-        },
-        imbel_reload_01: {
-            path: "audio/guns/imbel_reload_01.mp3",
-            volume: 1.25,
-        },
-        imbel_switch_01: {
-            path: "audio/guns/imbel_switch_01.mp3",
-            volume: 1.25,
-        },
         m249_01: {
             path: "audio/guns/m249_01.mp3",
             volume: 1,
@@ -769,19 +743,6 @@ const Sounds: Record<string, Record<string, SoundDef>> = {
         },
         potato_smg_switch_01: {
             path: "audio/guns/potato_smg_switch_01.mp3",
-            volume: 1,
-        },
-        potato_lmg_01: {
-            path: "audio/guns/potato_lmg_01.mp3",
-            volume: 1,
-            maxInstances: 8,
-        },
-        potato_lmg_reload_01: {
-            path: "audio/guns/potato_lmg_reload_01.mp3",
-            volume: 1,
-        },
-        potato_lmg_switch_01: {
-            path: "audio/guns/potato_lmg_switch_01.mp3",
             volume: 1,
         },
         bugle_01: {
@@ -1143,16 +1104,6 @@ const Sounds: Record<string, Record<string, SoundDef>> = {
             volume: 1,
             preload: false,
         },
-        tomato_break_01: {
-            path: "audio/sfx/tomato_break_01.mp3",
-            volume: 1,
-            preload: false,
-        },
-        tomato_break_02: {
-            path: "audio/sfx/tomato_break_01.mp3",
-            volume: 1,
-            preload: false,
-        },
         ceramic_break_01: {
             path: "audio/sfx/ceramic_break_01.mp3",
             volume: 1,
@@ -1336,16 +1287,6 @@ const Sounds: Record<string, Record<string, SoundDef>> = {
         },
         potato_02: {
             path: "audio/sfx/potato_02.mp3",
-            volume: 1,
-            preload: false,
-        },
-        coconut_01: {
-            path: "audio/sfx/coconut_01.mp3",
-            volume: 1,
-            preload: false,
-        },
-        tomato_01: {
-            path: "audio/sfx/tomato_01.mp3",
             volume: 1,
             preload: false,
         },

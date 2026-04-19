@@ -17,8 +17,6 @@ export class JoinMsg implements AbstractMsg {
     };
 
     serialize(s: BitStream) {
-        // NEVER PUT THIS ANYWHERE ELSE OR CHANGE ITS SIZE!!
-        // PROTOCOL VERSION SHOULD ALWAYS BE THE FIRST WITH THE SAME SIZE TO NOT BREAK OLD CLIENTS!!
         s.writeUint32(this.protocol);
         s.writeString(this.matchPriv);
         s.writeString(this.questPriv);

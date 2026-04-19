@@ -25,12 +25,6 @@ export class AirdropBarn {
     update(dt: number) {
         for (let i = 0; i < this.airdrops.length; i++) {
             const airdrop = this.airdrops[i];
-            if (airdrop.sentLandedToClients) {
-                this.airdrops.splice(i, 1);
-                i--;
-                airdrop.destroy();
-                continue;
-            }
             airdrop.update(dt);
         }
     }
@@ -39,7 +33,8 @@ export class AirdropBarn {
         for (let i = 0; i < this.airdrops.length; i++) {
             const airdrop = this.airdrops[i];
             if (airdrop.landed) {
-                airdrop.sentLandedToClients = true;
+                this.airdrops.splice(i, 1);
+                i--;
             }
         }
     }
@@ -54,7 +49,6 @@ export class Airdrop extends BaseGameObject {
     fallTime = GameConfig.airdrop.fallTime;
     fallT = 0;
     landed = false;
-    sentLandedToClients = false;
 
     obstacleType: string;
     crateCollision: Collider;
@@ -82,22 +76,15 @@ export class Airdrop extends BaseGameObject {
                 if (!util.sameLayer(obj.layer, this.layer)) continue;
 
                 if (
-                    obj.__type === ObjectType.Player ||
-                    obj.__type === ObjectType.Obstacle
+                    (obj.__type === ObjectType.Player ||
+                        obj.__type === ObjectType.Obstacle) &&
+                    coldet.test(obj.collider, this.crateCollision)
                 ) {
-                    let collider: Collider;
-                    if (obj.__type === ObjectType.Player) {
-                        collider = obj.collider;
-                    } else {
-                        collider = obj.obstacleAABB || obj.collider;
-                    }
-                    if (coldet.test(collider, this.crateCollision)) {
-                        obj.damage({
-                            amount: obj.__type === ObjectType.Player ? 100 : 1e10,
-                            damageType: GameConfig.DamageType.Airdrop,
-                            dir: "dir" in obj ? obj.dir : v2.create(0, 0),
-                        });
-                    }
+                    obj.damage({
+                        amount: obj.__type === ObjectType.Player ? 100 : 1e10,
+                        damageType: GameConfig.DamageType.Airdrop,
+                        dir: "dir" in obj ? obj.dir : v2.create(0, 0),
+                    });
                 } else if (
                     obj.__type === ObjectType.Building &&
                     !obj.ceilingDead &&

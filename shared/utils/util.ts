@@ -332,15 +332,6 @@ export const util = {
         return arr.at(index % arr.length) as T;
     },
 
-    removeFrom<T>(arr: T[], item: T): boolean {
-        const idx = arr.indexOf(item);
-        if (idx === -1) {
-            return false;
-        }
-        arr.splice(idx, 1);
-        return true;
-    },
-
     weightedRandom<T extends object>(
         items: Array<T & { weight: number }>,
         rand = Math.random,

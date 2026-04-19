@@ -46,7 +46,6 @@ export class Obstacle implements AbstractObject {
     rot!: number;
     scale!: number;
     pos!: Vec2;
-    imgRot!: number;
     imgMirrorX!: boolean;
     imgMirrorY!: boolean;
 
@@ -136,10 +135,6 @@ export class Obstacle implements AbstractObject {
             this.type = data.type;
             this.layer = data.layer;
             this.healthT = data.healthT;
-            if (!data.dead) {
-                util.removeFrom(ctx.map.deadObstacleIds, this.__id);
-                this.exploded = false;
-            }
             this.dead = data.dead;
             this.isSkin = data.isSkin;
             if (this.isSkin) {
@@ -214,16 +209,6 @@ export class Obstacle implements AbstractObject {
             }
             this.isPuzzlePiece = data.isPuzzlePiece;
             this.parentBuildingId = this.isPuzzlePiece ? data.parentBuildingId! : 0;
-
-            if (def.img.randomRotation) {
-                // use the ID, while its not technically random, the obstacle positions are
-                // which makes the rotation of each obstacle on your screen effectively random
-                // and the id keeps it consistent so the obstacle doesn't rotate every time its re-added
-                // to your screen
-                this.imgRot = math.deg2rad(this.__id % 360);
-            } else {
-                this.imgRot = 0;
-            }
         }
         if (this.isDoor && fullUpdate) {
             this.door.canUse = data.door?.canUse;
@@ -401,38 +386,36 @@ export class Obstacle implements AbstractObject {
                 door.wasOpen = door.open;
             }
         }
-        if (this.dead && !this.exploded) {
-            map.deadObstacleIds.push(this.__id);
-            this.exploded = true;
-            if (this.smokeEmitter) {
-                this.smokeEmitter.stop();
-                this.smokeEmitter = null;
-            }
+        if (
+            this.dead &&
+            !this.exploded &&
+            (map.deadObstacleIds.push(this.__id),
+            (this.exploded = true),
+            this.smokeEmitter && (this.smokeEmitter.stop(), (this.smokeEmitter = null)),
+            !this.isNew)
+        ) {
+            const def = MapObjectDefs[this.type] as ObstacleDef;
 
-            if (!this.isNew) {
-                const def = MapObjectDefs[this.type] as ObstacleDef;
-
-                // Destroy effect
-                const aabb = collider.toAabb(this.collider);
-                const extent = v2.mul(v2.sub(aabb.max, aabb.min), 0.5);
-                const center = v2.add(aabb.min, extent);
-                const numParticles = Math.floor(util.random(5, 11));
-                for (let i = 0; i < numParticles; i++) {
-                    const vel = v2.mul(v2.randomUnit(), util.random(5, 15));
-                    const particle = Array.isArray(this.explodeParticle)
-                        ? this.explodeParticle[
-                              Math.floor(Math.random() * this.explodeParticle.length)
-                          ]
-                        : this.explodeParticle;
-                    particleBarn.addParticle(particle, this.layer, center, vel);
-                }
-                audioManager.playSound(def.sound?.explode!, {
-                    channel: "sfx",
-                    soundPos: center,
-                    layer: this.layer,
-                    filter: "muffled",
-                });
+            // Destroy effect
+            const aabb = collider.toAabb(this.collider);
+            const extent = v2.mul(v2.sub(aabb.max, aabb.min), 0.5);
+            const center = v2.add(aabb.min, extent);
+            const numParticles = Math.floor(util.random(5, 11));
+            for (let i = 0; i < numParticles; i++) {
+                const vel = v2.mul(v2.randomUnit(), util.random(5, 15));
+                const particle = Array.isArray(this.explodeParticle)
+                    ? this.explodeParticle[
+                          Math.floor(Math.random() * this.explodeParticle.length)
+                      ]
+                    : this.explodeParticle;
+                particleBarn.addParticle(particle, this.layer, center, vel);
             }
+            audioManager.playSound(def.sound?.explode!, {
+                channel: "sfx",
+                soundPos: center,
+                layer: this.layer,
+                filter: "muffled",
+            });
         }
 
         if (this.smokeEmitter) {
@@ -498,7 +481,7 @@ export class Obstacle implements AbstractObject {
         if (this.imgMirrorX) {
             this.sprite.scale.x *= -1;
         }
-        this.sprite.rotation = -rot + this.imgRot;
+        this.sprite.rotation = -rot;
 
         if (this.isDoor && this.door?.casingSprite) {
             const casingPos = camera.m_pointToScreen(
@@ -516,13 +499,6 @@ export class Obstacle implements AbstractObject {
 
             const color = def.collidable ? 0xff0000 : 0xffff00;
             debugLines.addCollider(this.collider, color, 0.1);
-
-            // don't feel like adding a debug option for this rn
-            // but its only used for trees
-            // if (def.aabb) {
-            //     const aabb = collider.transform(def.aabb, this.pos, this.rot, this.scale);
-            //     debugLines.addCollider(aabb, 0x00ff00, 0.2);
-            // }
         }
     }
 }

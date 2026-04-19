@@ -199,31 +199,6 @@ export class WeaponManager {
         this.player.weapsDirty = true;
     }
 
-    swapWeaponSlots() {
-        const primary = {
-            ...this.weapons[WeaponSlot.Primary],
-        };
-        const secondary = {
-            ...this.weapons[WeaponSlot.Secondary],
-        };
-
-        this.weapons[WeaponSlot.Primary] = secondary;
-        this.weapons[WeaponSlot.Secondary] = primary;
-
-        if (
-            this.curWeapIdx == WeaponSlot.Primary ||
-            this.curWeapIdx == WeaponSlot.Secondary
-        ) {
-            const newIdx = this.curWeapIdx ^ 1;
-
-            this.lastWeaponIdx = this._curWeapIdx;
-            assert(this.weapons[newIdx].type);
-            this._curWeapIdx = newIdx;
-        }
-
-        this.player.weapsDirty = true;
-    }
-
     setWeapon(idx: number, type: string, ammo: number) {
         const weaponDef = GameObjectDefs[type];
         const isMelee = idx === WeaponSlot.Melee;
@@ -240,19 +215,6 @@ export class WeaponManager {
         // can't wear pan if you're replacing it with another melee
         if (this.weapons[idx].type == "pan") {
             this.player.wearingPan = false;
-            this.player.setDirty();
-        }
-
-        const newPerk = weaponDef && "perk" in weaponDef ? weaponDef.perk : "";
-        const oldDef = GameObjectDefs[this.weapons[idx].type];
-        const oldPerk = oldDef && "perk" in oldDef ? oldDef.perk : "";
-
-        if (oldPerk && oldPerk !== newPerk) {
-            this.player.removePerk(oldPerk);
-            this.player.setDirty();
-        }
-        if (newPerk && newPerk !== oldPerk) {
-            this.player.addPerk(newPerk);
             this.player.setDirty();
         }
 
@@ -284,15 +246,12 @@ export class WeaponManager {
         this.player.weapsDirty = true;
     }
 
-    bufferInput = false;
-
     update(dt: number) {
         const player = this.player;
 
         if (player.downed) {
             return;
         }
-        this.bufferInput = false;
 
         player.freeSwitchTimer -= dt;
 
@@ -344,9 +303,7 @@ export class WeaponManager {
             }
         }
 
-        if (!this.bufferInput) {
-            player.shootStart = false;
-        }
+        player.shootStart = false;
     }
 
     gunUpdate(dt: number) {
@@ -362,13 +319,9 @@ export class WeaponManager {
                 }
                 break;
             case "single":
-                if (player.shootStart) {
-                    if (weapon.cooldown < 0) {
-                        this.fireWeapon(this.offHand);
-                        this.offHand = !this.offHand;
-                    } else if (weapon.cooldown < 0.1) {
-                        this.bufferInput = true;
-                    }
+                if (player.shootStart && weapon.cooldown < 0) {
+                    this.fireWeapon(this.offHand);
+                    this.offHand = !this.offHand;
                 }
                 break;
             case "burst":
@@ -652,9 +605,7 @@ export class WeaponManager {
 
             weap.ammo -= diff;
             this.player.weapsDirty = true;
-            if (this.player.invManager.isValid(ammoType)) {
-                this.player.invManager.giveAndDrop(ammoType, diff);
-            }
+            this.player.invManager.giveAndDrop(ammoType as InventoryItem, diff);
         }
     }
 
@@ -777,7 +728,6 @@ export class WeaponManager {
         const hasExplosive = this.player.hasPerk("explosive");
         const hasSplinter = this.player.hasPerk("splinter");
         const hasApRounds = this.player.hasPerk("ap_rounds");
-        const hasHighVelocity = this.player.hasPerk("high_velocity");
         const shouldApplyChambered =
             this.player.hasPerk("chambered") &&
             itemDef.ammo !== "12gauge" &&
@@ -815,17 +765,9 @@ export class WeaponManager {
 
         let bulletType = itemDef.bulletType;
 
-        let speedMult = 1;
-        let distanceMult = 1;
         if (itemDef.ammo == "9mm" && this.player.hasPerk("bonus_9mm")) {
+            bulletType = itemDef.bulletTypeBonus ?? bulletType;
             spread *= PerkProperties.bonus_9mm.spreadMul;
-            speedMult = PerkProperties.bonus_9mm.speedMult;
-            distanceMult = PerkProperties.bonus_9mm.distanceMult;
-        }
-
-        if (this.player.hasPerk("high_velocity")) {
-            speedMult *= PerkProperties.high_velocity.speedMult;
-            distanceMult *= PerkProperties.high_velocity.distanceMult;
         }
 
         const bulletCount = itemDef.bulletCount;
@@ -880,8 +822,6 @@ export class WeaponManager {
                 distance,
                 clipDistance: itemDef.toMouseHit,
                 damageMult,
-                speedMult,
-                distanceMult,
                 shotFx: i === 0,
                 shotOffhand: offHand,
                 trailSaturated: shouldApplyChambered || saturated,
@@ -890,7 +830,6 @@ export class WeaponManager {
                 reflectCount: 0,
                 splinter: hasSplinter,
                 apRounds: hasApRounds,
-                highVelocity: hasHighVelocity,
                 lastShot: weapon.ammo <= 0,
                 reflectObjId: this.player.obstacleOutfit?.__id,
                 onHitFx: hasExplosive ? "explosion_rounds" : undefined,
@@ -1035,7 +974,7 @@ export class WeaponManager {
                             this.player.pos,
                             normalized,
                             lineEnd,
-                            obstacle.height,
+                            GameConfig.player.meleeHeight,
                             this.player.layer,
                             false,
                         );
@@ -1154,16 +1093,15 @@ export class WeaponManager {
         this.player.playAnim(
             GameConfig.Anim.Cook,
             itemDef.cookable ? itemDef.fuseTime : Infinity,
+            () => {
+                this.throwThrowable();
+            },
         );
     }
 
     throwThrowable(noSpeed?: boolean): void {
         if (!this.cookingThrowable) return;
         this.cookingThrowable = false;
-
-        if (this.cookTicker < GameConfig.player.cookTime) {
-            return;
-        }
 
         const oldThrowableType = this.weapons[GameConfig.WeaponSlot.Throwable].type;
         const amount = this.player.invManager.get(oldThrowableType as InventoryItem);
