@@ -101,6 +101,12 @@ class Application {
 
     offlineServer = new OfflineServer();
 
+    updateLogoBasedOnLanguage(lang: string) {
+        const header = $("#start-row-header");
+        if (!header.length) return;
+        header.toggleClass("lang-ru", lang === "ru");
+    }
+
     constructor() {
         this.account = new Account(this.config);
         this.loadoutMenu = new LoadoutMenu(this.account, this.localization);
@@ -148,7 +154,9 @@ class Application {
             const language =
                 this.config.get("language") || this.localization.detectLocale();
             this.config.set("language", language);
+            this.updateLogoBasedOnLanguage(window.spellSync.language);
             this.localization.setLocale(language);
+            this.updateLogoBasedOnLanguage(language);
             this.localization.populateLanguageSelect();
             this.startPingTest();
             this.siteInfo.load();
@@ -227,6 +235,7 @@ class Application {
                 const r = t.target.value;
                 if (r) {
                     this.config.set("language", r as ConfigType["language"]);
+                    this.updateLogoBasedOnLanguage(r);
                 }
             });
             $("#btn-create-team").on("click", () => {
@@ -535,6 +544,7 @@ class Application {
             ele.selected = ele.value == this.config.get("region");
         });
         this.languageSelect.val(this.config.get("language")!);
+        this.updateLogoBasedOnLanguage(this.config.get("language")!);
     }
 
     onConfigModified(key?: string) {

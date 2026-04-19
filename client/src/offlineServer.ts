@@ -34,7 +34,7 @@ export class Socket<T extends object = object> {
     readonly CLOSED = 3;
 
     send = (_data: ArrayBuffer | Uint8Array) => {};
-    onmessage = (_data: ArrayBuffer | Uint8Array) => {};
+    onmessage = (_e: { data: ArrayBuffer | Uint8Array }) => {};
     close = (_code?: number, _reason?: string) => {};
     onclose = (_code?: number, _reason?: string) => {};
     onerror = (_error: Error) => {};
@@ -46,10 +46,10 @@ function createSocketPair() {
     const serverSocket = new Socket<GameSocketData>();
 
     clientSocket.send = (data) => {
-        serverSocket.onmessage(data);
+        serverSocket.onmessage({ data });
     };
     serverSocket.send = (data) => {
-        clientSocket.onmessage(data);
+        clientSocket.onmessage({ data });
     };
     clientSocket.close = (code?: number, reason?: string) => {
         serverSocket.onclose(code, reason);
@@ -344,10 +344,12 @@ export class OfflineServer {
     connect(gameId: string) {
         const { clientSocket, serverSocket } = createSocketPair();
 
-        serverSocket.onmessage = (data) => {
+        serverSocket.onmessage = (event) => {
             this.onMsg(
                 serverSocket.data.id,
-                data instanceof Uint8Array ? (data.buffer as ArrayBuffer) : data,
+                event.data instanceof Uint8Array
+                    ? (event.data.buffer as ArrayBuffer)
+                    : event.data,
             );
         };
         serverSocket.onclose = () => {

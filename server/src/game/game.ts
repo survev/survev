@@ -42,6 +42,16 @@ export enum ProcessMsgType {
     SocketClose,
 }
 
+export enum ProcessMsgType {
+    Create,
+    Created,
+    KeepAlive,
+    UpdateData,
+    AddJoinToken,
+    SocketMsg,
+    SocketClose,
+}
+
 export interface JoinTokenData {
     expiresAt: number;
     userId: string | null;

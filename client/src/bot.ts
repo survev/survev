@@ -208,7 +208,7 @@ export class Bot {
         this.ws = ws;
 
         ws.onmessage = (msg) => {
-            const msgStream = new MsgStream(msg);
+            const msgStream = new MsgStream(msg.data);
             while (true) {
                 const type = msgStream.deserializeMsgType();
                 if (type == MsgType.None) {
