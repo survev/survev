@@ -8,7 +8,7 @@ import {
     type ObjectType,
 } from "./objectSerializeFns";
 
-function serializeActivePlayer(s: BitStream, data: LocalDataWithDirty) {
+export function serializeActivePlayer(s: BitStream, data: LocalDataWithDirty) {
     s.writeBoolean(data.healthDirty);
     if (data.healthDirty) s.writeFloat(data.health, 0, 100, 8);
 
@@ -52,7 +52,7 @@ function serializeActivePlayer(s: BitStream, data: LocalDataWithDirty) {
     s.writeAlignToNextByte();
 }
 
-function deserializeActivePlayer(s: BitStream, data: LocalDataWithDirty) {
+export function deserializeActivePlayer(s: BitStream, data: LocalDataWithDirty) {
     data.healthDirty = s.readBoolean();
     if (data.healthDirty) {
         data.health = s.readFloat(0, 100, 8);
@@ -104,7 +104,7 @@ function deserializeActivePlayer(s: BitStream, data: LocalDataWithDirty) {
     s.readAlignToNextByte();
 }
 
-function serializePlayerStatus(s: BitStream, players: PlayerStatus[]) {
+export function serializePlayerStatus(s: BitStream, players: PlayerStatus[]) {
     s.writeArray(players, 8, (info) => {
         s.writeBoolean(info.hasData);
 
@@ -124,7 +124,7 @@ function serializePlayerStatus(s: BitStream, players: PlayerStatus[]) {
     s.writeAlignToNextByte();
 }
 
-function deserializePlayerStatus(s: BitStream): PlayerStatus[] {
+export function deserializePlayerStatus(s: BitStream): PlayerStatus[] {
     const players = s.readArray(8, () => {
         const p = {
             hasData: s.readBoolean(),
@@ -148,14 +148,14 @@ function deserializePlayerStatus(s: BitStream): PlayerStatus[] {
     return players;
 }
 
-function serializeGroupStatus(s: BitStream, players: GroupStatus[]) {
+export function serializeGroupStatus(s: BitStream, players: GroupStatus[]) {
     s.writeArray(players, 8, (status) => {
         s.writeFloat(status.health, 0, 100, 7);
         s.writeBoolean(status.disconnected);
     });
 }
 
-function deserializeGroupStatus(s: BitStream): GroupStatus[] {
+export function deserializeGroupStatus(s: BitStream): GroupStatus[] {
     return s.readArray(8, () => {
         return {
             health: s.readFloat(0, 100, 7),
@@ -176,7 +176,7 @@ export interface PlayerInfo {
     };
 }
 
-function serializePlayerInfo(s: BitStream, data: PlayerInfo) {
+export function serializePlayerInfo(s: BitStream, data: PlayerInfo) {
     s.writeUint16(data.playerId);
     s.writeUint8(data.teamId);
     s.writeUint8(data.groupId);
@@ -188,7 +188,7 @@ function serializePlayerInfo(s: BitStream, data: PlayerInfo) {
     s.writeAlignToNextByte();
 }
 
-function deserializePlayerInfo(s: BitStream, data: PlayerInfo) {
+export function deserializePlayerInfo(s: BitStream, data: PlayerInfo) {
     data.playerId = s.readUint16();
     data.teamId = s.readUint8();
     data.groupId = s.readUint8();
@@ -208,7 +208,7 @@ export interface GasData {
     radNew: number;
 }
 
-function serializeGasData(s: BitStream, data: GasData) {
+export function serializeGasData(s: BitStream, data: GasData) {
     s.writeUint8(data.mode);
     s.writeFloat32(data.duration);
     s.writeMapPos(data.posOld);
@@ -217,7 +217,7 @@ function serializeGasData(s: BitStream, data: GasData) {
     s.writeFloat(data.radNew, 0, 2048, 16);
 }
 
-function deserializeGasData(s: BitStream, data: GasData) {
+export function deserializeGasData(s: BitStream, data: GasData) {
     data.mode = s.readUint8();
     data.duration = s.readFloat32();
     data.posOld = s.readMapPos();

@@ -1,6 +1,4 @@
-import fs from "node:fs";
-import path from "node:path";
-import { GameConfig, TeamMode } from "../../../shared/gameConfig";
+import { TeamMode } from "../../../shared/gameConfig";
 import * as net from "../../../shared/net/net";
 import type { Loadout } from "../../../shared/utils/loadout";
 import { math } from "../../../shared/utils/math";
@@ -33,13 +31,13 @@ import { ProjectileBarn } from "./objects/projectile";
 import { SmokeBarn } from "./objects/smoke";
 import { PluginManager } from "./pluginManager";
 import { Profiler } from "./profiler";
+import { ReplayCaptureService } from "./replayCaptureService";
 
 export interface JoinTokenData {
     expiresAt: number;
     userId: string | null;
     findGameIp: string;
     loadout?: Loadout;
-    quests?: string[];
     groupData: {
         autoFill: boolean;
         playerCount: number;
@@ -50,8 +48,6 @@ export interface JoinTokenData {
 export class Game {
     started = false;
     stopped = false;
-    // for debug
-    preventStart = false;
     allowJoin = false;
     over = false;
     startedTime = 0;
@@ -74,6 +70,7 @@ export class Game {
     objectRegister: ObjectRegister;
 
     joinTokens = new Map<string, JoinTokenData>();
+    replayCapture = new ReplayCaptureService(this);
 
     get aliveCount(): number {
         return this.playerBarn.livingPlayers.length;
@@ -115,8 +112,6 @@ export class Game {
     start = Date.now();
 
     profiler = new Profiler();
-
-    debugSpeedMulti = 1;
 
     constructor(
         id: string,
@@ -175,15 +170,13 @@ export class Game {
         this.updateData();
     }
 
-    update(dt?: number) {
+    update(dt?: number): void {
         if (!this.allowJoin) return;
         this.profiler.flush();
 
         const now = performance.now();
         if (!this.now) this.now = now;
         dt ??= math.clamp((now - this.now) / 1000, 0.001, 1 / 8);
-
-        dt *= this.debugSpeedMulti;
 
         this.now = now;
 
@@ -195,7 +188,7 @@ export class Game {
             }
         }
 
-        if (!this.started && !this.preventStart) {
+        if (!this.started) {
             this.started = this.modeManager.isGameStarted();
             if (this.started) {
                 this.gas.advanceGasStage();
@@ -304,6 +297,7 @@ export class Game {
         // serialize objects and send msgs
         this.objectRegister.serializeObjs();
         this.playerBarn.sendMsgs();
+        this.replayCapture.captureTick();
 
         //
         // reset stuff
@@ -351,7 +345,6 @@ export class Game {
     deserializeMsg(buff: ArrayBuffer): {
         type: net.MsgType;
         msg: net.AbstractMsg | undefined;
-        error?: string;
     } {
         const msgStream = new net.MsgStream(buff);
         const stream = msgStream.stream;
@@ -370,23 +363,6 @@ export class Game {
 
         switch (type) {
             case net.MsgType.Join: {
-                // read protocol version outside of JoinMsg
-                // reason: if theres a protocol change in JoinMsg it will fail to deserialize the entire msg
-                // and won't give the proper invalid-protocol error
-                // so we read it before deserializing the msg to avoid it throwing and giving the wrong error
-
-                const oldIdx = stream.index;
-                const protocol = stream.readUint32();
-
-                if (protocol !== GameConfig.protocolVersion) {
-                    return {
-                        type: net.MsgType.Join,
-                        msg: undefined,
-                        error: "index-invalid-protocol",
-                    };
-                }
-                stream.index = oldIdx;
-
                 msg = new net.JoinMsg();
                 msg.deserialize(stream);
                 break;
@@ -425,44 +401,20 @@ export class Game {
         };
     }
 
-    handleMsg(buff: ArrayBuffer | Buffer, socketId: string, ip: string) {
+    handleMsg(buff: ArrayBuffer | Buffer, socketId: string, ip: string): void {
         if (!(buff instanceof ArrayBuffer)) return;
 
         const player = this.playerBarn.socketIdToPlayer.get(socketId);
 
         let msg: net.AbstractMsg | undefined = undefined;
         let type = net.MsgType.None;
-        let error: string | undefined;
 
         try {
             const deserialized = this.deserializeMsg(buff);
             msg = deserialized.msg;
             type = deserialized.type;
-            error = deserialized.error;
         } catch (err) {
-            this.logger.error(
-                "Failed to deserialize msg: ",
-                err,
-                "msg buffer: ",
-                // JSON.stringify doesn't work on buffers, so need to convert to an Uint8Array first
-                // and then to a regular array... 😭
-                // the slice is to make sure it doesn't overflow the error webhook
-                JSON.stringify([...new Uint8Array(buff.slice(0, 255))]),
-            );
-            if (player) {
-                player.disconnect();
-            } else {
-                this.closeSocket(socketId);
-            }
-            return;
-        }
-
-        if (error) {
-            if (player) {
-                player.disconnect();
-            } else {
-                this.closeSocket(socketId);
-            }
+            this.logger.error("Failed to deserialize msg: ", err);
             return;
         }
 
@@ -475,10 +427,6 @@ export class Game {
 
         if (!player) {
             this.closeSocket(socketId);
-            return;
-        }
-
-        if (player.disconnected) {
             return;
         }
 
@@ -510,11 +458,10 @@ export class Game {
         }
     }
 
-    handleSocketClose(socketId: string) {
+    handleSocketClose(socketId: string): void {
         const player = this.playerBarn.socketIdToPlayer.get(socketId);
         if (!player) return;
         this.logger.info(`"${player.name}" left`);
-        player.questManager.flushProgress();
         player.disconnected = true;
         player.group?.checkPlayers();
         player.spectating = undefined;
@@ -529,20 +476,7 @@ export class Game {
         this.msgsToSend.serializeMsg(type, msg);
     }
 
-    sendQuestProgress(userId: string, progress: Array<{ id: string; delta: number }>) {
-        try {
-            apiPrivateRouter.quest_progress.$post({
-                json: {
-                    userId,
-                    progress,
-                },
-            });
-        } catch (err) {
-            this.logger.error(`Failed to save quest progress:`, err);
-        }
-    }
-
-    checkGameOver() {
+    checkGameOver(): void {
         if (this.over) return;
         const didGameEnd: boolean = this.modeManager.handleGameEnd();
 
@@ -572,7 +506,6 @@ export class Game {
                 groupData,
                 findGameIp: token.ip,
                 loadout: token.loadout,
-                quests: token.quests,
             });
         }
     }
@@ -590,15 +523,16 @@ export class Game {
         });
     }
 
-    stop() {
+    stop(): void {
         if (this.stopped) return;
         this.stopped = true;
         this.allowJoin = false;
         for (const player of this.playerBarn.players) {
             if (!player.disconnected) {
-                player.disconnect();
+                this.closeSocket(player.socketId);
             }
         }
+        this.replayCapture.stop();
         this.logger.info("Game Ended");
         this.updateData();
         this._saveGameToDatabase();
@@ -668,21 +602,37 @@ export class Game {
             this.logger.error(`Failed to fetch API save game:`, err);
         }
 
+        await this.replayCapture.saveReplay();
+
         if (!res || !res.ok) {
             const region = Config.gameServer.thisRegion.toUpperCase();
             this.logger.error(
                 `[${region}] Failed to save game data, saving locally instead`,
             );
+            try {
+                // we dump the game  to a local db if we failed to save;
+                // avoid importing sqlite and creating the database at process startup
+                // since this code should rarely run anyway
+                const sqliteDb = (await import("better-sqlite3")).default(
+                    "lost_game_data.db",
+                );
 
-            const dir = path.resolve("lost_game_data");
-            if (!fs.existsSync(dir)) {
-                fs.mkdirSync(dir);
+                sqliteDb
+                    .prepare(`
+                        CREATE TABLE IF NOT EXISTS lost_game_data (
+                            id INTEGER PRIMARY KEY AUTOINCREMENT,
+                            data TEXT NOT NULL,
+                            timestamp DATETIME DEFAULT CURRENT_TIMESTAMP
+                        )
+                    `)
+                    .run();
+
+                sqliteDb
+                    .prepare("INSERT INTO lost_game_data (data) VALUES (?)")
+                    .run(JSON.stringify(values));
+            } catch (err) {
+                this.logger.error(`[${region}] Failed to save game data locally`, err);
             }
-            fs.writeFileSync(
-                path.join(dir, `${this.id}.json`),
-                JSON.stringify(values),
-                "utf8",
-            );
         }
     }
 

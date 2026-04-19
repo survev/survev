@@ -17,13 +17,13 @@ import { ConfigManager, type ConfigType } from "./config";
 import { device } from "./device";
 import { errorLogManager } from "./errorLogs";
 import { Game } from "./game";
-import { helpers } from "./helpers";
+import { getParameterByName, helpers } from "./helpers";
 import { InputHandler } from "./input";
 import { InputBinds, InputBindUi } from "./inputBinds";
 import { PingTest } from "./pingTest";
 import { proxy } from "./proxy";
 import { ResourceManager } from "./resources";
-import { SDK } from "./sdk/sdk";
+import { SDK } from "./sdk";
 import { SiteInfo } from "./siteInfo";
 import { LoadoutMenu } from "./ui/loadoutMenu";
 import { Localization } from "./ui/localization";
@@ -35,7 +35,7 @@ import { ProfileUi } from "./ui/profileUi";
 import { TeamMenu } from "./ui/teamMenu";
 import { loadStaticDomImages } from "./ui/ui2";
 
-export class Application {
+class Application {
     nameInput = $("#player-name-input-solo");
     serverSelect = $("#server-select-main");
     playMode0Btn = $("#btn-start-mode-0");
@@ -55,6 +55,7 @@ export class Application {
     errorModal = new MenuModal($("#modal-notification"));
     refreshModal = new MenuModal($("#modal-refresh"));
     ipBanModal = new MenuModal($("#modal-ip-banned"));
+    modalRecorder = new MenuModal($("#ui-modal-recorder"));
     config = new ConfigManager();
     localization = new Localization();
 
@@ -96,12 +97,6 @@ export class Application {
     hasFocus = true;
     newsDisplayed = true;
 
-    updateLogoBasedOnLanguage(lang: string) {
-        const header = $("#start-row-header");
-        if (!header.length) return;
-        header.toggleClass("lang-ru", lang === "ru");
-    }
-
     constructor() {
         this.account = new Account(this.config);
         this.loadoutMenu = new LoadoutMenu(this.account, this.localization);
@@ -134,7 +129,7 @@ export class Application {
     }
 
     async loadBrowserDeps(onLoadCompleteCb: () => void) {
-        await SDK.init(this);
+        await SDK.init();
         onLoadCompleteCb();
     }
 
@@ -146,16 +141,10 @@ export class Application {
             if (device.mobile) {
                 Menu.applyMobileBrowserStyling(device.tablet);
             }
-            if (SDK.isSpellSync) {
-                this.localization.setLocale(window.spellSync.language);
-                this.updateLogoBasedOnLanguage(window.spellSync.language);
-            } else {
-                const language =
-                    this.config.get("language") || this.localization.detectLocale();
-                this.config.set("language", language);
-                this.localization.setLocale(language);
-                this.updateLogoBasedOnLanguage(language);
-            }
+            const language =
+                this.config.get("language") || this.localization.detectLocale();
+            this.config.set("language", language);
+            this.localization.setLocale(language);
             this.localization.populateLanguageSelect();
             this.startPingTest();
             this.siteInfo.load();
@@ -234,10 +223,6 @@ export class Application {
                 const r = t.target.value;
                 if (r) {
                     this.config.set("language", r as ConfigType["language"]);
-                    if (SDK.isSpellSync && window.spellSync) {
-                        window.spellSync.changeLanguage(r);
-                    }
-                    this.updateLogoBasedOnLanguage(r);
                 }
             });
             $("#btn-create-team").on("click", () => {
@@ -283,6 +268,48 @@ export class Application {
             if (a > i) {
                 $(".news-toggle").find(".account-alert").css("display", "block");
             }
+
+            $<HTMLInputElement>("#recorder-play-local-file").on("change", async (e) => {
+                const file = e.target.files![0];
+                if (!file) return;
+
+                const buff = await file.arrayBuffer();
+                this.game?.startPacketPlayBack(buff);
+            });
+
+            this.modalRecorder.onShow(() => {});
+
+            this.modalRecorder.onHide(() => {});
+
+            const fetchGame = async (url: string) => {
+                const res = await fetch(url);
+                this.game?.startPacketPlayBack(await res.arrayBuffer());
+            };
+
+            const replayUrl = getParameterByName("replayUrl");
+
+            if (replayUrl) {
+                fetchGame(replayUrl);
+            }
+
+            $(".btn-recorder").on("click", () => {
+                this.modalRecorder.show();
+                return false;
+            });
+
+            $("#btn-recorder-load-url").on("click", (_e) => {
+                const url = $("#recording-url-input").val() as string;
+                this.quickPlayPendingModeIdx = 0;
+                this.refreshUi();
+                this.modalRecorder.hide();
+                try {
+                    fetchGame(url);
+                } catch {
+                    this.quickPlayPendingModeIdx = -1;
+                    this.refreshUi();
+                }
+            });
+
             this.setDOMFromConfig();
             this.setAppActive(true);
             const domCanvas = document.querySelector<HTMLCanvasElement>("#cvs")!;
@@ -322,11 +349,7 @@ export class Application {
             this.resourceManager.loadMapAssets("main");
             this.input = new InputHandler(document.getElementById("game-touch-area")!);
             this.inputBinds = new InputBinds(this.input, this.config);
-            this.inputBindUi = new InputBindUi(
-                this.input,
-                this.inputBinds,
-                this.localization,
-            );
+            this.inputBindUi = new InputBindUi(this.input, this.inputBinds);
             const onJoin = () => {
                 this.loadoutDisplay!.free();
                 this.game!.init();
@@ -352,8 +375,8 @@ export class Application {
                 }
                 if (errMsg) {
                     this.showErrorModal(errMsg);
-                    console.warn("Quitting", errMsg);
                 }
+                console.error("Quitting", errMsg);
                 SDK.gamePlayStop();
             };
             this.game = new Game(
@@ -428,10 +451,7 @@ export class Application {
     }
 
     setPlayLockout(lock: boolean) {
-        let delay = lock ? 0 : 1000;
-        if (IS_DEV) {
-            delay = 0;
-        }
+        const delay = lock ? 0 : 1000;
         this.playButtons
             .stop()
             .delay(delay)
@@ -439,7 +459,7 @@ export class Application {
                 {
                     opacity: lock ? 0.5 : 1,
                 },
-                IS_DEV ? 0 : 250,
+                250,
             );
         this.playLoading
             .stop()
@@ -449,7 +469,7 @@ export class Application {
                     opacity: lock ? 1 : 0,
                 },
                 {
-                    duration: IS_DEV ? 0 : 250,
+                    duration: 250,
                     start: () => {
                         this.playLoading.css({
                             "pointer-events": lock ? "initial" : "none",
@@ -495,13 +515,9 @@ export class Application {
 
         this.nameInput.val(this.config.get("playerName")!);
         this.serverSelect.find("option").each((_i, ele) => {
-            const spellSyncLang = SDK.isSpellSync && window.spellSync.language;
-            const configRegion = this.config.get("region");
-            ele.selected = spellSyncLang
-                ? ele.value === spellSyncLang
-                : ele.value === configRegion;
+            ele.selected = ele.value == this.config.get("region");
         });
-        this.languageSelect.val(this.localization.getLocale());
+        this.languageSelect.val(this.config.get("language")!);
     }
 
     onConfigModified(key?: string) {
@@ -527,7 +543,6 @@ export class Application {
         if (key == "language") {
             const language = this.config.get("language")!;
             this.localization.setLocale(language);
-            this.updateLogoBasedOnLanguage(language);
         }
 
         if (key == "region") {
@@ -645,11 +660,6 @@ export class Application {
             }
             this.findGameTime = Date.now();
             this.findGameAttempts++;
-
-            // the delay is annoying on dev
-            if (IS_DEV) {
-                delay = 0;
-            }
 
             const version = GameConfig.protocolVersion;
             let region = this.config.get("region")!;
@@ -964,10 +974,10 @@ window.addEventListener("beforeunload", (e) => {
         return dialogText;
     }
 });
-window.addEventListener("focus", () => {
+window.addEventListener("onfocus", () => {
     App.hasFocus = true;
 });
-window.addEventListener("blur", () => {
+window.addEventListener("onblur", () => {
     App.hasFocus = false;
 });
 
@@ -977,14 +987,7 @@ window.onerror = function (msg, url, lineNo, columnNo, error) {
     const stacktrace = error ? error.stack : "";
 
     // don't report useless errors lol
-    if (!url || lineNo === undefined || columnNo === undefined) return;
-
-    // ignore errors not generated by our code
-    // and also weird errors that don't have a .js file
-    if (!url.startsWith(location.href) || !/.js|.ts/.test(url)) return;
-
-    // ignore scrappers
-    if (/googlebot|bingbot|yandexbot/gi.test(navigator.userAgent)) return;
+    if (!url && !lineNo && !columnNo) return;
 
     const errObj = {
         msg,

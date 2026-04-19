@@ -324,12 +324,8 @@ export class MsgStream {
 
 export enum MsgType {
     None,
-    // DON'T EVEN THINK ABOUT REORDERING THINGS HERE!!!!
-    // JoinMsg should always be ID 1 to not break protocol version check with old clients!
-    // And DisconnectMsg should always be ID 2, so it receives errors from JoinMsg Properly
-    // Please add new Msg Types always to the end of the enum to stay as safe as possible
-    Join = 1,
-    Disconnect = 2,
+    Join,
+    Disconnect,
     Input,
     Edit,
     Joined,
@@ -351,6 +347,7 @@ export enum MsgType {
     UpdatePass,
     AliveCounts,
     PerkModeRoleSelect,
+    ReplayUpdate,
 }
 
 export enum PickupMsgType {
@@ -360,7 +357,6 @@ export enum PickupMsgType {
     BetterItemEquipped,
     Success,
     GunCannotFire,
-    MaxPerks,
 }
 
 export class UpdatePassMsg {
@@ -382,6 +378,7 @@ export { MapMsg } from "./mapMsg";
 export { PerkModeRoleSelectMsg } from "./perkModeRoleSelectMsg";
 export { PickupMsg } from "./pickupMsg";
 export { PlayerStatsMsg } from "./playerStatsMsg";
+export { ReplayUpdateMsg } from "./replayUpdateMsg";
 export { RoleAnnouncementMsg } from "./roleAnnouncementMsg";
 export { SpectateMsg } from "./spectateMsg";
 export { getPlayerStatusUpdateRate, UpdateMsg } from "./updateMsg";

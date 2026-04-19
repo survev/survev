@@ -4,6 +4,7 @@ import { RoleDefs } from "../../shared/defs/gameObjects/roleDefs";
 import { GameConfig, Input, TeamMode, WeaponSlot } from "../../shared/gameConfig";
 import * as net from "../../shared/net/net";
 import { ObjectType } from "../../shared/net/objectSerializeFns";
+import type { LocalDataWithDirty } from "../../shared/net/updateMsg";
 import { math } from "../../shared/utils/math";
 import { v2 } from "../../shared/utils/v2";
 import type { Ambiance } from "./ambiance";
@@ -19,7 +20,14 @@ import { Editor } from "./debug/editor";
 
 import { device } from "./device";
 import { EmoteBarn } from "./emote";
-import { errorLogManager } from "./errorLogs";
+import {
+    applyObjectUpdates,
+    applyWorldEffects,
+    createWorldUpdateContext,
+    syncActivePlayerWorldState,
+    updateGameTiming,
+    updateReplayTiming,
+} from "./gameUpdateHelpers";
 import { Gas } from "./gas";
 import { helpers } from "./helpers";
 import { type InputHandler, Key } from "./input";
@@ -27,7 +35,7 @@ import type { InputBinds, InputBindUi } from "./inputBinds";
 import type { SoundHandle } from "./lib/createJS";
 import { Map } from "./map";
 import { AirdropBarn } from "./objects/airdrop";
-import { BulletBarn, createBullet } from "./objects/bullet";
+import { BulletBarn } from "./objects/bullet";
 import { DeadBodyBarn } from "./objects/deadBody";
 import { DecalBarn } from "./objects/decal";
 import { ExplosionBarn } from "./objects/explosion";
@@ -40,9 +48,11 @@ import { type Player, PlayerBarn } from "./objects/player";
 import { ProjectileBarn } from "./objects/projectile";
 import { ShotBarn } from "./objects/shot";
 import { SmokeBarn } from "./objects/smoke";
+import { PacketPlayer } from "./packetPlayer";
 import { Renderer } from "./renderer";
+import { ReplaySession } from "./replay/replaySession";
 import type { ResourceManager } from "./resources";
-import { SDK } from "./sdk/sdk";
+import { SDK } from "./sdk";
 import type { Localization } from "./ui/localization";
 import { Touch } from "./ui/touch";
 import { UiManager } from "./ui/ui";
@@ -57,12 +67,37 @@ export interface Ctx {
     decalBarn: DecalBarn;
 }
 
+// copied from the DOM typings
+// with only stuff the game actually needs
+// to use as an abstraction to the recorder playback socket
+export interface GameWebSocket {
+    binaryType: BinaryType;
+
+    onclose: ((this: GameWebSocket, ev: CloseEvent) => any) | null;
+    onerror: ((this: GameWebSocket, ev: Event) => any) | null;
+    onmessage: ((this: GameWebSocket, ev: MessageEvent) => any) | null;
+    onopen: ((this: GameWebSocket, ev: Event) => any) | null;
+
+    readonly readyState: number;
+
+    close(code?: number, reason?: string): void;
+    send(data: string | ArrayBufferLike | Blob | ArrayBufferView): void;
+
+    readonly CONNECTING: 0;
+    readonly OPEN: 1;
+    readonly CLOSING: 2;
+    readonly CLOSED: 3;
+}
+
 export class Game {
     initialized = false;
     teamMode: TeamMode = TeamMode.Solo;
 
     victoryMusic: SoundHandle | null = null;
-    m_ws: WebSocket | null = null;
+    m_ws: GameWebSocket | null = null;
+    m_packetPlayer: PacketPlayer | null = null;
+    m_replaySession: ReplaySession;
+
     connecting = false;
     connected = false;
 
@@ -98,7 +133,6 @@ export class Game {
     m_playing!: boolean;
     m_gameOver!: boolean;
     m_spectating!: boolean;
-    m_spectateCooldown!: number;
     m_inputMsgTimeout!: number;
     m_prevInputMsg!: net.InputMsg;
     m_playingTicker!: number;
@@ -119,6 +153,22 @@ export class Game {
     seqSendTime!: number;
     pings!: number[];
     debugPingTime!: number;
+
+    get m_replayMode() {
+        return this.m_replaySession.active;
+    }
+
+    set m_replayMode(value: boolean) {
+        this.m_replaySession.active = value;
+    }
+
+    get m_replayLocalDataById() {
+        return this.m_replaySession.localDataById;
+    }
+
+    set m_replayLocalDataById(value: Record<number, LocalDataWithDirty>) {
+        this.m_replaySession.localDataById = value;
+    }
     lastUpdateTime!: number;
     updateIntervals!: number[];
 
@@ -144,6 +194,7 @@ export class Game {
         this.m_inputBinds = m_inputBinds;
         this.m_inputBindUi = m_inputBindUi;
         this.m_resourceManager = m_resourceManager;
+        this.m_replaySession = new ReplaySession(this);
 
         if (IS_DEV) {
             this.editor = new Editor(this.m_config);
@@ -167,8 +218,11 @@ export class Game {
             }
             this.connecting = true;
             this.connected = false;
+            this.m_replayMode = false;
+            this.m_replayLocalDataById = {};
             try {
-                this.m_ws = new WebSocket(url);
+                this.m_ws = new WebSocket(url) as GameWebSocket;
+
                 this.m_ws.binaryType = "arraybuffer";
                 this.m_ws.onerror = (_err) => {
                     this.m_ws?.close();
@@ -224,7 +278,73 @@ export class Game {
         }
     }
 
+    startPacketPlayBack(buff: ArrayBuffer) {
+        if (!this.connected && !this.initialized) {
+            if (this.m_ws) {
+                this.m_ws.onerror = function () {};
+                this.m_ws.onopen = function () {};
+                this.m_ws.onmessage = function () {};
+                this.m_ws.onclose = function () {};
+                this.m_ws.close();
+                this.m_ws = null;
+            }
+            this.connecting = true;
+            this.connected = false;
+            this.m_replayMode = true;
+            this.m_replayLocalDataById = {};
+
+            try {
+                this.m_packetPlayer = new PacketPlayer(buff);
+
+                this.m_ws = this.m_packetPlayer.socket;
+
+                this.m_ws.onerror = (_err) => {
+                    this.m_ws?.close();
+                };
+
+                this.m_ws.onopen = () => {
+                    this.connecting = false;
+                    this.connected = true;
+                };
+
+                this.m_ws.onmessage = (e) => {
+                    const msgStream = new net.MsgStream(e.data);
+
+                    while (true) {
+                        const type = msgStream.deserializeMsgType();
+                        if (type == net.MsgType.None) {
+                            break;
+                        }
+                        this.m_onMsg(type, msgStream.getStream());
+                        msgStream.stream.readAlignToNextByte();
+                    }
+                };
+
+                this.m_ws.onclose = () => {
+                    const displayingStats = this.m_uiManager?.displayingStats;
+                    const connected = this.connected;
+                    this.connecting = false;
+                    this.connected = false;
+
+                    if (connected && !this.m_gameOver && !displayingStats) {
+                        const errMsg = this.m_disconnectMsg || "index-host-closed";
+                        this.onQuit(errMsg);
+                    }
+                };
+                this.m_packetPlayer.start();
+            } catch (err) {
+                console.error(err);
+                this.connecting = false;
+                this.connected = false;
+                this.m_replayMode = false;
+            }
+        }
+    }
+
     init() {
+        const replayMode = this.m_replayMode;
+        const replayLocalDataById = this.m_replayLocalDataById;
+
         this.m_canvasMode = this.m_pixi.renderer.type == PIXI.RENDERER_TYPE.CANVAS;
 
         // Modules
@@ -323,8 +443,9 @@ export class Game {
         this.m_disconnectMsg = "";
         this.m_playing = false;
         this.m_gameOver = false;
+        this.m_replayMode = replayMode;
+        this.m_replayLocalDataById = replayLocalDataById;
         this.m_spectating = false;
-        this.m_spectateCooldown = 0;
         this.m_inputMsgTimeout = 0;
         this.m_prevInputMsg = new net.InputMsg();
         this.m_playingTicker = 0;
@@ -365,6 +486,8 @@ export class Game {
         }
         this.connecting = false;
         this.connected = false;
+        this.m_replayMode = false;
+        this.m_replayLocalDataById = {};
         if (this.initialized) {
             this.initialized = false;
             this.m_updatePass = false;
@@ -416,14 +539,20 @@ export class Game {
         let debug: DebugRenderOpts;
         if (IS_DEV) {
             debug = this.m_config.get("debugRenderer")!;
-            dt *= this.editor.toolParams.gameSpeedEnabled
-                ? this.editor.toolParams.gameSpeed
-                : 1;
         } else {
             debug = {} as DebugRenderOpts;
         }
 
         const smokeParticles = this.m_smokeBarn.m_particles;
+
+        if (this.m_replayMode) {
+            if (this.m_input.keyPressed(Key.RightBracket)) {
+                this.m_replaySession.cycleWatchedPlayer(1);
+            }
+            if (this.m_input.keyPressed(Key.LeftBracket)) {
+                this.m_replaySession.cycleWatchedPlayer(-1);
+            }
+        }
 
         if (this.m_playing) {
             this.m_playingTicker += dt;
@@ -739,34 +868,34 @@ export class Game {
                 this.m_config.set("perkModeRole", roleSelectMessage.role);
             }
         }
-
-        this.m_spectateCooldown -= dt;
         const specBegin = this.m_uiManager.specBegin;
-        const specNext = (this.m_uiManager.specNext ||=
-            this.m_spectating && this.m_input.keyPressed(Key.Right));
-        const specPrev = (this.m_uiManager.specPrev ||=
-            this.m_spectating && this.m_input.keyPressed(Key.Left));
+        const specNext =
+            this.m_uiManager.specNext ||
+            ((this.m_spectating || this.m_replayMode) &&
+                this.m_input.keyPressed(Key.Right));
+        const specPrev =
+            this.m_uiManager.specPrev ||
+            ((this.m_spectating || this.m_replayMode) &&
+                this.m_input.keyPressed(Key.Left));
         const specForce =
             this.m_input.keyPressed(Key.Right) || this.m_input.keyPressed(Key.Left);
-
-        if (
-            specBegin ||
-            (this.m_spectating && this.m_spectateCooldown < 0 && (specNext || specPrev))
-        ) {
-            this.m_spectateCooldown = 1;
-
+        if (this.m_replayMode) {
+            if (specNext || specBegin) {
+                this.m_replaySession.cycleWatchedPlayer(1);
+            } else if (specPrev) {
+                this.m_replaySession.cycleWatchedPlayer(-1);
+            }
+        } else if (specBegin || (this.m_spectating && specNext) || specPrev) {
             const specMsg = new net.SpectateMsg();
             specMsg.specBegin = specBegin;
             specMsg.specNext = specNext;
             specMsg.specPrev = specPrev;
             specMsg.specForce = specForce;
             this.m_sendMessage(net.MsgType.Spectate, specMsg, 128);
-
-            this.m_uiManager.specBegin = false;
-            this.m_uiManager.specNext = false;
-            this.m_uiManager.specPrev = false;
         }
-
+        this.m_uiManager.specBegin = false;
+        this.m_uiManager.specNext = false;
+        this.m_uiManager.specPrev = false;
         this.m_uiManager.reloadTouched = false;
         this.m_uiManager.interactionTouched = false;
         this.m_uiManager.swapWeapSlots = false;
@@ -802,7 +931,7 @@ export class Game {
             }
         }
         this.m_inputMsgTimeout -= dt;
-        if (diff || this.m_inputMsgTimeout < 0) {
+        if (!this.m_replayMode && (diff || this.m_inputMsgTimeout < 0)) {
             if (!this.seqInFlight) {
                 this.seq = (this.seq + 1) % 256;
                 this.seqSendTime = Date.now();
@@ -817,7 +946,7 @@ export class Game {
         // Clear cached data
         this.m_ui2Manager.flushInput();
 
-        if (IS_DEV && this.editor.enabled && this.editor.sendMsg) {
+        if (IS_DEV && !this.m_replayMode && this.editor.enabled && this.editor.sendMsg) {
             var msg = this.editor.getMsg();
             this.m_sendMessage(net.MsgType.Edit, msg);
             this.editor.postSerialization();
@@ -953,6 +1082,7 @@ export class Game {
         this.m_renderer.m_update(dt, this.m_camera, this.m_map);
 
         for (let i = 0; i < this.m_emoteBarn.newPings.length; i++) {
+            if (this.m_replayMode) break;
             const ping = this.m_emoteBarn.newPings[i];
             const msg = new net.EmoteMsg();
             msg.type = ping.type;
@@ -962,6 +1092,7 @@ export class Game {
         }
         this.m_emoteBarn.newPings = [];
         for (let i = 0; i < this.m_emoteBarn.newEmotes.length; i++) {
+            if (this.m_replayMode) break;
             const emote = this.m_emoteBarn.newEmotes[i];
             const msg = new net.EmoteMsg();
             msg.type = emote.type;
@@ -1026,7 +1157,7 @@ export class Game {
     m_render(dt: number, debug: DebugRenderOpts) {
         const grassColor = this.m_map.mapLoaded
             ? this.m_map.getMapDef().biome.colors.grass
-            : 0x80af49;
+            : 8433481;
         this.m_pixi.renderer.background.color = grassColor;
         // Module rendering
         this.m_playerBarn.m_render(this.m_camera, debug);
@@ -1098,15 +1229,17 @@ export class Game {
         this.m_renderer.resize(this.m_map, this.m_camera);
     }
 
+    private m_processReplayUpdate(msg: net.ReplayUpdateMsg) {
+        const ctx = createWorldUpdateContext(this);
+        applyObjectUpdates(this, msg, ctx);
+        this.m_replaySession.applyReplayPlayerChanges(msg);
+        syncActivePlayerWorldState(this);
+        applyWorldEffects(this, msg);
+        updateReplayTiming(this);
+    }
+
     m_processGameUpdate(msg: net.UpdateMsg) {
-        const ctx: Ctx = {
-            audioManager: this.m_audioManager,
-            renderer: this.m_renderer,
-            particleBarn: this.m_particleBarn,
-            map: this.m_map,
-            smokeBarn: this.m_smokeBarn,
-            decalBarn: this.m_decalBarn,
-        };
+        const ctx = createWorldUpdateContext(this);
         // Update active playerId
         if (msg.activePlayerIdDirty) {
             this.m_activeId = msg.activePlayerId;
@@ -1139,35 +1272,7 @@ export class Game {
             this.m_playerBarn.updateGroupStatus(groupId, msg.groupStatus);
         }
 
-        // Delete objects
-        for (let i = 0; i < msg.delObjIds.length; i++) {
-            this.m_objectCreator.m_deleteObj(msg.delObjIds[i]);
-        }
-
-        // Update full objects
-        for (let i = 0; i < msg.fullObjects.length; i++) {
-            const obj = msg.fullObjects[i];
-            this.m_objectCreator.m_updateObjFull(obj.__type, obj.__id, obj, ctx);
-        }
-
-        // Update partial objects
-        for (let i = 0; i < msg.partObjects.length; i++) {
-            const obj = msg.partObjects[i];
-
-            const clientType = this.m_objectCreator.m_getObjById(obj.__id)?.__type ?? 0;
-            if (obj.__type !== clientType) {
-                const errString = `updateObjPart: type mismatch, received ${obj.__type}, client has ${clientType};`;
-                errorLogManager.logError(errString, {
-                    id: obj.__id,
-                    ids: Object.keys(this.m_objectCreator.m_idToObj),
-                    msg,
-                });
-                console.error(errString);
-                continue;
-            }
-
-            this.m_objectCreator.m_updateObjPart(obj.__id, obj, ctx);
-        }
+        applyObjectUpdates(this, msg, ctx);
         this.m_spectating = this.m_activeId != this.m_localId;
         this.m_activePlayer = this.m_playerBarn.getPlayerById(this.m_activeId)!;
         this.m_activePlayer.m_setLocalData(msg.activePlayerData);
@@ -1183,90 +1288,9 @@ export class Game {
             );
             this.m_touch.hideAll();
         }
-        this.m_activePlayer.layer = this.m_activePlayer.m_netData.m_layer;
-        this.m_renderer.setActiveLayer(this.m_activePlayer.layer);
-        this.m_audioManager.activeLayer = this.m_activePlayer.layer;
-        const underground = this.m_activePlayer.isUnderground(this.m_map);
-        this.m_renderer.setUnderground(underground);
-        this.m_audioManager.underground = underground;
-
-        // Gas data
-        if (msg.gasDirty) {
-            this.m_gas.setFullState(msg.gasT, msg.gasData, this.m_uiManager);
-        }
-        if (msg.gasTDirty) {
-            this.m_gas.setProgress(msg.gasT);
-        }
-
-        // Create bullets
-        for (let i = 0; i < msg.bullets.length; i++) {
-            const b = msg.bullets[i];
-            createBullet(
-                b,
-                this.m_bulletBarn,
-                this.m_flareBarn,
-                this.m_playerBarn,
-                this.m_renderer,
-            );
-            if (b.shotFx) {
-                this.m_shotBarn.addShot(b);
-            }
-        }
-        // Create explosions
-        for (let i = 0; i < msg.explosions.length; i++) {
-            const e = msg.explosions[i];
-            this.m_explosionBarn.addExplosion(e.type, e.pos, e.layer);
-        }
-
-        // Create emotes and pings
-        for (let i = 0; i < msg.emotes.length; i++) {
-            const e = msg.emotes[i];
-            if (e.isPing) {
-                this.m_emoteBarn.addPing(e, this.m_map.factionMode);
-            } else {
-                this.m_emoteBarn.addEmote(e);
-            }
-        }
-
-        // Update planes
-        this.m_planeBarn.updatePlanes(msg.planes, this.m_map);
-
-        // Create airstrike zones
-        for (let x = 0; x < msg.airstrikeZones.length; x++) {
-            this.m_planeBarn.createAirstrikeZone(msg.airstrikeZones[x]);
-        }
-
-        // Update map indicators
-        this.m_uiManager.updateMapIndicators(msg.mapIndicators);
-
-        // Update kill leader
-        if (msg.killLeaderDirty) {
-            const leaderNameText = helpers.htmlEscape(
-                this.m_playerBarn.getPlayerName(msg.killLeaderId, this.m_activeId, true),
-            );
-            this.m_uiManager.updateKillLeader(
-                msg.killLeaderId,
-                leaderNameText,
-                msg.killLeaderKills,
-                this.m_map.getMapDef().gameMode,
-            );
-        }
-
-        // Latency determination
-        const now = Date.now();
-        this.m_updateRecvCount++;
-        if (msg.ack == this.seq && this.seqInFlight) {
-            this.seqInFlight = false;
-            const ping = now - this.seqSendTime;
-            this.debugHUD.pingGraph.addEntry(ping);
-            this.pings.push(ping);
-        }
-        if (this.lastUpdateTime > 0) {
-            const interval = now - this.lastUpdateTime;
-            this.m_camera.m_interpInterval = interval / 1000;
-            this.updateIntervals.push(interval);
-        }
-        this.lastUpdateTime = now;
+        syncActivePlayerWorldState(this);
+        applyWorldEffects(this, msg);
+        updateGameTiming(this, msg);
     }
 
     // Socket functions
@@ -1275,9 +1299,13 @@ export class Game {
             case net.MsgType.Joined: {
                 const msg = new net.JoinedMsg();
                 msg.deserialize(stream);
+
                 this.onJoin();
                 this.teamMode = msg.teamMode;
                 this.m_localId = msg.playerId;
+                if (this.m_replayMode) {
+                    this.m_activeId = msg.playerId;
+                }
                 this.m_validateAlpha = true;
                 this.m_emoteBarn.updateEmoteWheel(msg.emotes);
                 if (!msg.started) {
@@ -1293,11 +1321,6 @@ export class Game {
                     this.m_audioManager.playSound("notification_start_01", {
                         channel: "ui",
                     });
-                }
-                if (IS_DEV) {
-                    if (this.editor.enabled) {
-                        this.editor.sendMsg = true;
-                    }
                 }
 
                 SDK.gamePlayStart();
@@ -1339,6 +1362,13 @@ export class Game {
                 msg.deserialize(stream, this.m_objectCreator);
                 this.m_playing = true;
                 this.m_processGameUpdate(msg);
+                break;
+            }
+            case net.MsgType.ReplayUpdate: {
+                const msg = new net.ReplayUpdateMsg();
+                msg.deserialize(stream, this.m_objectCreator);
+                this.m_playing = true;
+                this.m_processReplayUpdate(msg);
                 break;
             }
             case net.MsgType.Kill: {

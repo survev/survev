@@ -34,7 +34,8 @@ import {
 } from "../../../../shared/gameConfig";
 import * as net from "../../../../shared/net/net";
 import { ObjectType } from "../../../../shared/net/objectSerializeFns";
-import type { GroupStatus } from "../../../../shared/net/updateMsg";
+import type { ReplayPlayerStatus } from "../../../../shared/net/replayUpdateMsg";
+import type { GroupStatus, LocalDataWithDirty } from "../../../../shared/net/updateMsg";
 import { type Circle, coldet } from "../../../../shared/utils/coldet";
 import { collider } from "../../../../shared/utils/collider";
 import { math } from "../../../../shared/utils/math";
@@ -275,6 +276,7 @@ export class PlayerBarn {
         }
         this.aliveCountDirty = true;
         this.game.pluginManager.emit("playerJoin", player);
+        this.game.replayCapture.startIfNeeded();
 
         this.game.updateData();
     }
@@ -596,6 +598,22 @@ export class PlayerBarn {
             playerId,
             itemType: "",
         });
+    }
+
+    getReplayPlayerStatuses(): ReplayPlayerStatus[] {
+        return [...this.players]
+            .sort((a, b) => a.__id - b.__id)
+            .map((player) => ({
+                playerId: player.__id,
+                pos: v2.copy(player.pos),
+                visible: true,
+                dead: player.dead,
+                downed: player.downed,
+                disconnected: player.disconnected,
+                role: player.role,
+                health: player.health,
+                hasData: true,
+            }));
     }
 }
 
@@ -4988,5 +5006,45 @@ export class Player extends BaseGameObject {
 
     sendData(buffer: Uint8Array): void {
         this.game.sendSocketMsg(this.socketId, buffer);
+    }
+
+    hasReplayLocalDataChanges() {
+        return (
+            this.healthDirty ||
+            this.boostDirty ||
+            this.zoomDirty ||
+            this.actionDirty ||
+            this.inventoryDirty ||
+            this.weapsDirty ||
+            this.spectatorCountDirty
+        );
+    }
+
+    getReplayLocalData(forceDirty = false): LocalDataWithDirty {
+        return {
+            healthDirty: forceDirty || this.healthDirty,
+            health: this.health,
+            boostDirty: forceDirty || this.boostDirty,
+            boost: this.boost,
+            zoomDirty: forceDirty || this.zoomDirty,
+            zoom: this.zoom,
+            actionDirty: forceDirty || this.actionDirty,
+            action: {
+                time: this.action.time,
+                duration: this.action.duration,
+                targetId: this.action.targetId,
+            },
+            inventoryDirty: forceDirty || this.inventoryDirty,
+            inventory: { ...this.inventory },
+            scope: this.scope,
+            weapsDirty: forceDirty || this.weapsDirty,
+            curWeapIdx: this.curWeapIdx,
+            weapons: this.weapons.map((weapon) => ({
+                type: weapon.type,
+                ammo: weapon.ammo,
+            })),
+            spectatorCountDirty: forceDirty || this.spectatorCountDirty,
+            spectatorCount: this.spectatorCount,
+        };
     }
 }
