@@ -166,7 +166,7 @@ const badWordsdataSet = new DataSet<{ originalWord: string }>()
         phrase
             .setMetadata({ originalWord: "epstein" })
             .addPattern(pattern`epstein`)
-            .addPattern(pattern`epstine`)
+            .addPattern(pattern`epstine`),
     );
 
 const matcher = new RegExpMatcher({
