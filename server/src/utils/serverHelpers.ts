@@ -153,10 +153,20 @@ const badWordsdataSet = new DataSet<{ originalWord: string }>()
             .addPattern(pattern`ni55er`)
             .addPattern(pattern`chigger`)
             .addPattern(pattern`chigga`)
-            .addPattern(pattern`n199a`),
+            .addPattern(pattern`n199a`)
+            .addPattern(pattern`niga`)
+            .addPattern(pattern`nga`)
+            .addPattern(pattern`nate higga`)
+            .addPattern(pattern`nate higger`),
     )
     .addPhrase((phrase) =>
         phrase.setMetadata({ originalWord: "dick" }).addPattern(pattern`dlck`),
+    )
+    .addPhrase((phrase) =>
+        phrase
+            .setMetadata({ originalWord: "epstein" })
+            .addPattern(pattern`epstein`)
+            .addPattern(pattern`epstine`)
     );
 
 const matcher = new RegExpMatcher({
