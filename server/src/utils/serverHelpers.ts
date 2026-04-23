@@ -154,10 +154,8 @@ const badWordsdataSet = new DataSet<{ originalWord: string }>()
             .addPattern(pattern`chigger`)
             .addPattern(pattern`chigga`)
             .addPattern(pattern`n199a`)
-            .addPattern(pattern`niga`)
-            .addPattern(pattern`nga`)
-            .addPattern(pattern`nate higga`)
-            .addPattern(pattern`nate higger`),
+            .addPattern(pattern`n[i]ga`)
+            .addPattern(pattern`natehigg`),
     )
     .addPhrase((phrase) =>
         phrase.setMetadata({ originalWord: "dick" }).addPattern(pattern`dlck`),
