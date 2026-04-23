@@ -154,7 +154,7 @@ const badWordsdataSet = new DataSet<{ originalWord: string }>()
             .addPattern(pattern`chigger`)
             .addPattern(pattern`chigga`)
             .addPattern(pattern`n199a`)
-            .addPattern(pattern`|n[?]g[g][?]`)
+            .addPattern(pattern`n[i]ga`)
             .addPattern(pattern`natehigg`),
     )
     .addPhrase((phrase) =>
