@@ -1404,6 +1404,7 @@ export class UiManager2 {
         sourceType: string,
         damageType: DamageType,
         downed: boolean,
+        killCreditName?: string,
     ) {
         switch (damageType) {
             case DamageType.Player:
@@ -1429,13 +1430,13 @@ export class UiManager2 {
                     killTxt = this.localization.translate("game-knocked-out");
                 } else {
                     killTxt = this.localization.translate(
-                        killerName ? "game-finally-killed" : "game-died-outside",
+                        killerName ? "game-killed-fleeing" : "game-died-outside",
                     );
                 }
                 if (killName) {
                     return `${killName} ${killTxt} ${targetName}`;
                 }
-                return `${targetName} ${killTxt}`;
+                return killerName ? `${targetName} ${killTxt} ${killerName}` : `${targetName} ${killTxt}`;
             }
             case DamageType.Airdrop: {
                 const mapObj = MapObjectDefs[sourceType] as ObstacleDef;
@@ -1469,6 +1470,18 @@ export class UiManager2 {
                 return `${targetName} ${this.localization.translate(
                     "game-joined-as-spectator",
                 )}`;
+            }
+            case DamageType.KillSteal:{
+                return `${killerName} ${this.localization.translate("game-stole-kill-1",
+                )} ${killCreditName}${this.localization.translate(
+                    "game-stole-kill-2",
+                )} ${targetName}`;
+            }
+            case DamageType.FriendlyKillSteal:{
+                return `${killerName} ${this.localization.translate("game-finished",
+                )} ${targetName} ${this.localization.translate(
+                    "game-for",
+                )} ${killCreditName}`;
             }
             default:
                 return "";

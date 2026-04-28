@@ -1419,7 +1419,6 @@ export class Game {
             case net.MsgType.ArenaRoles: {
                 const msg = new net.ArenaRolesMsg;
                     msg.deserialize(stream);
-                    console.log("id:", this.m_activeId, "activePlayer:", msg.activePlayer);
                 if(this.m_activeId !== msg.activePlayer) return;
                 if(this.m_map.arenaMode){
                     const role = this.m_config.get("arenaModeRole")!;
@@ -1519,6 +1518,7 @@ export class Game {
                     sourceType,
                     msg.damageType,
                     msg.downed && !msg.killed,
+                    killerInfo.teamId ? killerName : "",
                 );
                 const killColor = this.m_ui2Manager.getKillFeedColor(
                     activeTeamId,

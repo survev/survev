@@ -25,6 +25,8 @@ export enum DamageType {
     tenno,
     Spectator, // used when a player joins as a spectator
     Disconnect,
+    KillSteal,
+    FriendlyKillSteal,
 }
 
 export enum Action {

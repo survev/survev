@@ -592,7 +592,7 @@ export class Game {
             player.kill({
                 damageType: GameConfig.DamageType.Disconnect,
                 dir: player.dir,
-                source: player.downedBy,
+                source: player.lastDamagedBy,
             });
         }
     }

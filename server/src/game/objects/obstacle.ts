@@ -48,6 +48,9 @@ export class Obstacle extends BaseGameObject {
 
     interactionRad = 0;
     interactedBy?: Player;
+    interactCooldown = 0;
+    uses = 0;
+    useCooldown = 0;
 
     obstacleAABB?: AABB = undefined;
 
@@ -244,6 +247,16 @@ export class Obstacle extends BaseGameObject {
             if (this.regrowTicker < 0) {
                 this.regrow();
             }
+        }
+        if (this.interactCooldown > 0){
+            this.interactCooldown -= dt;
+        }
+        if (this.uses > 0 && this.useCooldown > 0){
+            this.useCooldown -= dt;
+        }else if (this.useCooldown <= 0){
+            this.uses = 0;
+        }else if (this.uses <= 0){
+            this.useCooldown = 0;
         }
     }
 
@@ -543,6 +556,17 @@ export class Obstacle extends BaseGameObject {
 
     interact(player?: Player, auto = false): void {
         if (this.dead) return;
+
+        if(player){
+            if (this.interactCooldown > 0){
+                return;}
+        }
+
+        if(this.uses >= 5){
+            this.interactCooldown = 0.5;
+        }
+        this.uses++;
+        this.useCooldown = 0.5;
 
         this.interactedBy = player;
 

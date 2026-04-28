@@ -1,5 +1,5 @@
 import { TeamColor } from "../../../shared/defs/maps/factionDefs";
-import { GameConfig, TeamMode } from "../../../shared/gameConfig";
+import { DamageType, GameConfig, TeamMode } from "../../../shared/gameConfig";
 import { ObjectType } from "../../../shared/net/objectSerializeFns";
 import { collider } from "../../../shared/utils/collider";
 import { util } from "../../../shared/utils/util";
@@ -345,8 +345,14 @@ export class GameModeManager {
 
                 // give kill credit to the person that downed the player if it was killed by:
                 // a teammate, bleeding or non player source (airstrike, gas etc)
-                if (finishedByTeammate || nonPlayerKill) {
-                    params.killCreditSource = player.downedBy;
+
+                //attribute kill to the person downing the player
+                params.killCreditSource = player.downedBy;
+                if(!nonPlayerKill){
+                    params.damageType = DamageType.KillSteal;
+                }
+                if (finishedByTeammate){
+                    params.damageType = DamageType.FriendlyKillSteal;
                 }
 
                 player.kill(params);
