@@ -2364,19 +2364,13 @@ function createBankVault<T extends BuildingDef>(e: Partial<T>): T {
                 ori: 2,
             },
             {
-                type: randomObstacleType({
-                    deposit_box_01: 2,
-                    deposit_box_02: e.gold_box || 1,
-                }),
+                type: "deposit_box_02",
                 pos: v2.create(-12.3, 5),
                 scale: 1,
                 ori: 1,
             },
             {
-                type: randomObstacleType({
-                    deposit_box_01: 2,
-                    deposit_box_02: e.gold_box || 1,
-                }),
+                type: "deposit_box_02",
                 pos: v2.create(-12.3, -5),
                 scale: 1,
                 ori: 1,
@@ -10883,7 +10877,7 @@ export const MapObjectDefs: Record<string, MapObjectDef> = {
             tierLoot("tier_airdrop_outfits", 1, 1),
             tierLoot("tier_airdrop_melee", 1, 1),
             tierLoot("tier_airdrop_ammo", 3, 3),
-            tierLoot("tier_scrap", 2, 3),
+            tierLoot("tier_scrap", 3, 3),
             tierLoot("tier_airdrop_throwables", 1, 1),
         ],
         map: { display: false },
@@ -10905,7 +10899,7 @@ export const MapObjectDefs: Record<string, MapObjectDef> = {
             tierLoot("tier_supply_scopes", 1, 2),
             tierLoot("tier_supply_nades", 1, 2),            
             tierLoot("tier_supply_ammo", 1, 1),
-            tierLoot("tier_scrap", 2, 4),
+            tierLoot("tier_scrap", 3, 5),
         ],
         map: { display: true },
         img: {
