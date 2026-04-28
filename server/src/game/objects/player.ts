@@ -2155,6 +2155,7 @@ export class Player extends BaseGameObject {
             this.damage({
                 amount: this.disconnected ? 22 : this.game.gas.damage,
                 damageType: GameConfig.DamageType.Gas,
+                killCreditSource: this.lastDamagedBy,
                 dir: this.dir,
             });
             // don't continue the update if we died
@@ -3454,10 +3455,15 @@ export class Player extends BaseGameObject {
         downedMsg.targetId = this.__id;
         downedMsg.downed = true;
 
+        //attribute downed allways to the last player damaging
         if (params.source?.__type === ObjectType.Player) {
             this.downedBy = params.source;
             downedMsg.killerId = params.source.__id;
             downedMsg.killCreditId = params.source.__id;
+        }else if (this.lastDamagedBy) {
+            this.downedBy = this.lastDamagedBy;
+            downedMsg.killerId = this.lastDamagedBy.__id;
+            downedMsg.killCreditId = this.lastDamagedBy.__id;
         }
 
         this.game.broadcastMsg(net.MsgType.Kill, downedMsg);
