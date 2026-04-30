@@ -3,7 +3,7 @@ import { Player } from "../game/objects/player";
 
 import * as net from "../../../shared/net/net";
 import { chatLogger } from "./betterLogger";
-import { checkForBadWords } from "./serverHelpers";
+import { apiPrivateRouter, checkForBadWords } from "./serverHelpers";
 import { Config } from "../config";
 import { hashIp, getActiveChatBan } from "../api/routes/private/ModerationRouter";
 import { GameObjectDefs } from "../../../shared/defs/gameObjectDefs";
@@ -23,19 +23,33 @@ export class Chat{
         this.game = game;
         this.isAdmin = isAdmin;
         if(Config.database.enabled){
-            this.checkChatBan();
+            this.checkChatBan(this.player.ip).then((banData) => {
+                if(banData && banData.banned){
+                    this.chatBanned = true;
+                    this.banExpiresAt = new Date(banData.banData.expiresIn).getTime();
+                }    
+            });   
         }
     }
-    async checkChatBan(){
-        const encodedIp = hashIp(this.player.ip);
-        const activeChatBan = await getActiveChatBan(encodedIp);
-        if (activeChatBan) {
-            this.chatBanned = true;
-            this.banExpiresAt = 0; // default to 0 for permanent bans
-            if (!activeChatBan.permanent)
-            this.banExpiresAt = activeChatBan.expiresIn.getTime();
+
+    async checkChatBan(ip: string) {
+            try {
+                const apiRes = await apiPrivateRouter.check_chat_ip.$post({
+                    json: {
+                        ip,
+                    },
+                });
+    
+                if (apiRes.ok) {
+                    const body = await apiRes.json();
+                    return body;
+                }
+            } catch (err) {
+                console.error(`Failed request API fetch_ip: `, err);
+            }
+    
+            return undefined;
         }
-    }
 
     handleChatMessage(msg: net.KillFeedMsg){
         if(this.chatBanned){
