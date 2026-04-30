@@ -624,12 +624,6 @@ export class Game {
             autoFill,
         };
 
-        console.log("JOIN TOKEN DEBUG", tokens.map(t => ({
-            token: t.token,
-            ip: t.ip,
-            userId: t.userId,
-        })));
-
         for (const token of tokens) {
             this.joinTokens.set(token.token, {
                 expiresAt: Date.now() + 10000,
