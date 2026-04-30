@@ -35,7 +35,7 @@ import {
     usersTable,
 } from "../../db/schema";
 import { MOCK_USER_ID } from "../user/auth/mock";
-import { isBanned, logPlayerIPs, ModerationRouter } from "./ModerationRouter";
+import { getActiveChatBan, isBanned, logPlayerIPs, ModerationRouter } from "./ModerationRouter";
 import { _allowedCrosshairs, _allowedEmotes, _allowedHealEffects, _allowedMeleeSkins, _allowedOutfits, UnlockDefs } from "../../../../../shared/defs/gameObjects/unlockDefs";
 import { PassDefs } from "../../../../../shared/defs/gameObjects/passDefs";
 import { level } from "winston";
@@ -332,6 +332,24 @@ export const PrivateRouter = new Hono<Context>()
             const isProxied = await isBehindProxy(ip, 0);
             if (isProxied) {
                 return c.json({ banned: false, banData: undefined, behindProxy: true });
+            }
+
+            return c.json({ banned: false, banData: undefined, behindProxy: false });
+        },
+    )
+    .post(
+        "/check_chat_ip",
+        validateParams(
+            z.object({
+                ip: z.string(),
+            }),
+        ),
+        async (c) => {
+            const { ip } = c.req.valid("json");
+
+            const banData = await getActiveChatBan(ip);
+            if (banData) {
+                return c.json({ banned: true, banData: banData, behindProxy: false });
             }
 
             return c.json({ banned: false, banData: undefined, behindProxy: false });
