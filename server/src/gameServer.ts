@@ -600,6 +600,13 @@ app.ws<GameSocketData>("/play", {
 
         const ip = getIp(res, req, Config.gameServer.proxyIPHeader);
 
+        server.logger.warn("PLAY IP DEBUG", {
+            ip,
+            xRealIp: req.getHeader("x-real-ip"),
+            xForwardedFor: req.getHeader("x-forwarded-for"),
+            remote: res.getRemoteAddressAsText?.(),
+        });
+
         if (!ip) {
             server.logger.warn(`Invalid IP Found`);
             res.end();
