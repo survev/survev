@@ -51,6 +51,7 @@ export class SiteInfo {
     getGameModeStyles() {
         const availableModes = [];
         const modes = this.getModesForSelectedRegion();
+        console.log("Available modes for region", this.config.get("region"), modes);
         for (let i = 0; i < modes.length; i++) {
             const mode = modes[i];
             const mapDef = (MapDefs[mode.mapName as keyof typeof MapDefs] || MapDefs.main).desc;
