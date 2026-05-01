@@ -232,10 +232,13 @@ app.post("/api/get_modes", (res, req) => {
                     return;
                 }
 
+                console.log("Returning modes for region", region, Config.modes);
+
                 returnJson(res, {
                     data: Config.modes,
                 });
             } catch (error) {
+                console.error("Error in /api/get_modes:", error);
                 server.logger.warn("API get_modes error: ", error);
             }
         },
