@@ -52,7 +52,7 @@ class GameServer {
     async findGame(body: FindGamePrivateBody): Promise<FindGamePrivateRes> {
         const parsed = zFindGamePrivateBody.safeParse(body);
 
-        if (!parsed.success || !parsed.data) {
+        if (!parsed.success) {
             this.logger.warn("/api/find_game: Invalid body");
             return {
                 error: "failed_to_parse_body",
@@ -212,19 +212,19 @@ app.post("/api/find_game", (res, req) => {
                 return;
             }
 
-            let body: FindGamePrivateBody;
+            let body: unknown;
             try {
                 body = JSON.parse(Buffer.from(fullBody).toString("utf8"));
             } catch (_error) {
-                res.writeStatus("500 Internal Server Error");
-                res.write("500 Internal Server Error");
+                res.writeStatus("400 Bad Request");
+                res.write("400 Bad Request");
                 res.end();
                 server.logger.warn("/api/find_game: Error retrieving body");
                 return;
             }
 
             const parsed = zFindGamePrivateBody.safeParse(body);
-            if (!parsed.success || !parsed.data) {
+            if (!parsed.success) {
                 returnJson(res, { error: "failed_to_parse_body" });
                 return;
             }
