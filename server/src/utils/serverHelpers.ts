@@ -56,58 +56,6 @@ export function returnJson(res: HttpResponse, data: Record<string, unknown>): vo
     });
 }
 
-/**
- * Read the body of a POST request.
- * @link https://github.com/uNetworking/uWebSockets.js/blob/master/examples/JsonPost.js
- * @param res The response from the client.
- * @param cb A callback containing the request body.
- * @param err A callback invoked whenever the request cannot be retrieved.
- */
-export function readPostedJSON<T>(
-    res: HttpResponse,
-    cb: (json: T) => void,
-    err: () => void,
-): void {
-    let buffer: Buffer | Uint8Array;
-    /* Register data cb */
-    res.onData((ab, isLast) => {
-        const chunk = Buffer.from(ab);
-        if (isLast) {
-            let json: T;
-            if (buffer) {
-                try {
-                    // @ts-expect-error JSON.parse can accept a Buffer as an argument
-                    json = JSON.parse(Buffer.concat([buffer, chunk]));
-                } catch (_e) {
-                    /* res.close calls onAborted */
-                    res.close();
-                    return;
-                }
-                cb(json);
-            } else {
-                try {
-                    // @ts-expect-error JSON.parse can accept a Buffer as an argument
-                    json = JSON.parse(chunk);
-                } catch (_e) {
-                    /* res.close calls onAborted */
-                    res.close();
-                    return;
-                }
-                cb(json);
-            }
-        } else {
-            if (buffer) {
-                buffer = Buffer.concat([buffer, chunk]);
-            } else {
-                buffer = Buffer.concat([chunk]);
-            }
-        }
-    });
-
-    /* Register error cb */
-    res.onAborted(err);
-}
-
 const badWordsdataSet = new DataSet<{ originalWord: string }>()
     .addAll(englishDataset)
     .removePhrasesIf((phrase) => {

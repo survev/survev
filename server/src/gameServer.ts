@@ -19,7 +19,6 @@ import {
     getIp,
     HTTPRateLimit,
     logErrorToWebhook,
-    readPostedJSON,
     returnJson,
     WebSocketRateLimit,
 } from "./utils/serverHelpers";
@@ -199,34 +198,42 @@ app.post("/api/find_game", (res, req) => {
         return;
     }
 
-    readPostedJSON(
-        res,
-        async (body: FindGamePrivateBody) => {
-            try {
-                if (res.aborted) return;
+    const findGameBodyLimit = 1024 * 1024; // 1 MB
 
-                const parsed = zFindGamePrivateBody.safeParse(body);
-                if (!parsed.success || !parsed.data) {
-                    returnJson(res, { error: "failed_to_parse_body" });
-                    return;
-                }
-
-                returnJson(res, await server.findGame(parsed.data));
-            } catch (error) {
-                server.logger.warn("API find_game error: ", error);
-            }
-        },
-        () => {
+    res.collectBody(findGameBodyLimit, async (fullBody) => {
+        try {
             if (res.aborted) return;
-            res.cork(() => {
-                if (res.aborted) return;
+
+            if (!fullBody) {
+                res.writeStatus("413 Content Too Large");
+                res.write("413 Content Too Large");
+                res.end();
+                server.logger.warn("/api/find_game: Body exceeded size limit");
+                return;
+            }
+
+            let body: FindGamePrivateBody;
+            try {
+                body = JSON.parse(Buffer.from(fullBody).toString("utf8"));
+            } catch (_error) {
                 res.writeStatus("500 Internal Server Error");
                 res.write("500 Internal Server Error");
                 res.end();
-            });
-            server.logger.warn("/api/find_game: Error retrieving body");
-        },
-    );
+                server.logger.warn("/api/find_game: Error retrieving body");
+                return;
+            }
+
+            const parsed = zFindGamePrivateBody.safeParse(body);
+            if (!parsed.success || !parsed.data) {
+                returnJson(res, { error: "failed_to_parse_body" });
+                return;
+            }
+
+            returnJson(res, await server.findGame(parsed.data));
+        } catch (error) {
+            server.logger.warn("API find_game error: ", error);
+        }
+    });
 });
 
 const gameHTTPRateLimit = new HTTPRateLimit(5, 1000);
