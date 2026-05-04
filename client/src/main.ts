@@ -148,6 +148,19 @@ export class Application {
             this.account, 
             this.joinGameAsSpectator.bind(this)
         );
+
+        
+        //compare browser cookie version with protocol version
+        const version = helpers.getCookie("version");
+        const versionNumber = version ? Number(version) : 0;
+        this.config.set("version", versionNumber);
+        const cookieProtocolVersion = this.config.get("version");
+        if (cookieProtocolVersion !== GameConfig.protocolVersion) {
+            //this.showInvalidProtocolModal();
+            window.location.href = `/?t=${Date.now()}`;
+            //set version in cookies
+            document.cookie = `version=${GameConfig.protocolVersion};`;
+        }
     }
 
     async loadBrowserDeps(onLoadCompleteCb: () => void) {
@@ -579,7 +592,6 @@ export class Application {
         if (this.active) {
             $("body").removeClass("user-select-none");
             document.removeEventListener("contextmenu", this.contextListener);
-            this.account.getPass(false);
         } else {
             $("body").addClass("user-select-none");
             $("#start-main").stop(true);
@@ -986,7 +998,10 @@ export class Application {
             this.loadoutMenu.hide();
         }
         if (this.active) {
-            this.pass?.update(dt);
+            this.pass.update(dt);
+        }
+        if (this.spectatorMenu.spectatorMenuOpen){
+            this.spectatorMenu.update(dt);
         }
         this.input!.flush();
     }

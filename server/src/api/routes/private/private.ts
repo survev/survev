@@ -10,7 +10,7 @@ import {
     zGiveItemParams,
     zRemoveItemParams,
 } from "../../../../../shared/types/moderation";
-import { serverConfigPath } from "../../../config";
+import { Config, serverConfigPath } from "../../../config";
 import { isBehindProxy } from "../../../utils/serverHelpers";
 import {
     type SaveGameBody,
@@ -394,6 +394,13 @@ export const PrivateRouter = new Hono<Context>()
             await db.insert(matchDataTable).values(matchData);
             return c.json({ success: true }, 200);
         },
+    )
+    .post(
+        "/update_modes",
+        async (c) => {
+                server.refreshRegionModes();
+                return c.json({ success: true }, 200);
+        }
     );
 
     function getPassLevelXp(passType: string, level: number) {
