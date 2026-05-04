@@ -169,7 +169,7 @@ class GameServer {
     async updateApiModes(){
         try {
             const apiRes = await apiPrivateRouter.update_modes.$post({
-                
+
             });
                 if (apiRes.ok) {
                     return true;
@@ -184,9 +184,9 @@ const server = new GameServer();
 
 if (process.env.NODE_ENV !== "production") {
     server.manager.newGame(Config.modes[0]);
-    server.updateApiModes();
-
 }
+
+server.updateApiModes();
 
 const app = Config.gameServer.ssl
     ? SSLApp({
