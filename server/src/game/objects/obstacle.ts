@@ -350,6 +350,7 @@ export class Obstacle extends BaseGameObject {
         if (this.type === "saloon_door_secret" || this.type === "house_door_01") return;
         let newLayer = this.originalLayer;
         const def = MapObjectDefs[this.type] as ObstacleDef;
+        if(!def.door) return;
         const coll = collider.createCircle(this.pos, def.door!.interactionRad + 1);
         const objs = this.game.grid.intersectCollider(coll);
         for (const obj of objs) {

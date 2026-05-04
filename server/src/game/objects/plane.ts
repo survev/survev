@@ -11,6 +11,7 @@ import { collider } from "../../../../shared/utils/collider";
 import { math } from "../../../../shared/utils/math";
 import { assert, util } from "../../../../shared/utils/util";
 import { type Vec2, v2 } from "../../../../shared/utils/v2";
+import { gameLogger } from "../../utils/betterLogger";
 import { Game } from "../game";
 import type { Player } from "./player";
 
@@ -366,6 +367,10 @@ export class PlaneBarn {
         type ||= util.weightedRandom(this.game.map.mapDef.gameConfig.planes.crates).name;
 
         const def = MapObjectDefs[type] as ObstacleDef;
+        if (!def?.collision) {
+            gameLogger.error(`Invalid airdrop type: ${type}`);
+            return;
+        }
 
         let collided = true;
         let airdropPos = v2.copy(pos);
@@ -470,15 +475,14 @@ export class PlaneBarn {
                     break;
             }
 
-            if(!playerCalled)
+            this.game.map.clampToMapBounds(airdropPos, rad);
+        }
+        if(!playerCalled)
             this.placedAirDrops.push({
                 type,
                 pos: airdropPos,
                 collider: collider.transform(def.collision, airdropPos, 0, 1),
             });
-
-            this.game.map.clampToMapBounds(airdropPos, rad);
-        }
 
         const airdrop: ScheduledAirDrop = {
             type,
@@ -516,6 +520,10 @@ export class PlaneBarn {
         type ||= util.weightedRandom(this.game.map.mapDef.gameConfig.planes.crates).name;
 
         const def = MapObjectDefs[type] as ObstacleDef;
+        if (!def?.collision) {
+            gameLogger.error(`Invalid airdrop type: ${type}`);
+            return;
+        }
 
         let collided = true;
         let airdropPos = v2.copy(pos);
