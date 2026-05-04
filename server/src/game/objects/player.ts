@@ -1914,6 +1914,7 @@ export class Player extends BaseGameObject {
             if (this.roleMenuTicker <= 0) {
                 this.roleMenuTicker = 0;
                 const roleChoices = this.game.map.mapDef.gameMode.perkModeRoles!;
+                if(roleChoices.length <= 0) return;
                 const randomRole = roleChoices[util.randomInt(0, roleChoices.length - 1)];
                 this.roleSelect(randomRole);
             }
@@ -3021,7 +3022,7 @@ export class Player extends BaseGameObject {
             updateMsg.playerStatusDirty = true;
         }
 
-        if (player.groupStatusDirty) {
+        if (player.groupStatusDirty && player.group) {
             const teamPlayers = player.group!.players;
 
             let statuses: GroupStatus[] = [];
@@ -5271,7 +5272,7 @@ export class Player extends BaseGameObject {
         if (msg.promoteToRole) {
             if (msg.promoteToRoleType) {
                 const def = GameObjectDefs[msg.promoteToRoleType];
-                if (def.type === "role") {
+                if (def?.type === "role") {
                     this.promoteToRole(msg.promoteToRoleType);
                 }
             } else if (this.role) {

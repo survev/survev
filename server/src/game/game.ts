@@ -150,8 +150,6 @@ export class Game {
         this.airdropBarn = new AirdropBarn(this);
         this.explosionBarn = new ExplosionBarn(this);
         this.planeBarn = new PlaneBarn(this);
-        this.explosionBarn = new ExplosionBarn(this);
-        this.planeBarn = new PlaneBarn(this);
         this.mapIndicatorBarn = new MapIndicatorBarn();
 
         this.gas = new Gas(this);
@@ -206,24 +204,18 @@ export class Game {
         let freezeTimer = this.map.mapDef.gameMode.freezeTime || 0;
         const alivePlayers = this.playerBarn.livingPlayers;
         if(alivePlayers.length > 0 && !this.teamsAnnounced && this.map.mapDef.gameMode.announceTeams && this.startedTime >= freezeTimer ){
-                    const enemieGroups = this.playerBarn.getAliveGroups();
-                    let group1: string[] = [];
-                    let group2: string[] = [];
-                    
-                        
-                        for(const p of enemieGroups[0].getAlivePlayers()){
-                            group1.push(p.name);
-                        }
-                        for(const p of enemieGroups[1].getAlivePlayers()){
-                            group2.push(p.name);
-                        }
-                    
+                    const enemyGroups = this.playerBarn.getAliveGroups();
+                if (enemyGroups.length >= 2) {
+                    const group1 = enemyGroups[0].getAlivePlayers().map(p => p.name);
+                    const group2 = enemyGroups[1].getAlivePlayers().map(p => p.name);
+
                     this.teamsAnnounced = true;
 
-                    let joinFeedMsg = new net.JoinFeedMsg;
+                    const joinFeedMsg = new net.JoinFeedMsg();
                     joinFeedMsg.group1 = group1;
                     joinFeedMsg.group2 = group2;
                     this.broadcastMsg(net.MsgType.JoinFeed, joinFeedMsg);
+                }
         }
 
         //

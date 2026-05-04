@@ -184,7 +184,7 @@ export class Team extends BasePlayerGroup {
     }
 
     getGroups(): Group[] {
-        return this.game.playerBarn.groups.filter((g) => g.players[0].teamId == this.id);
+        return this.game.playerBarn.groups.filter((g) => g.players[0]?.teamId == this.id);
     }
 
     checkAndApplyLastMan() {
