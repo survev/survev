@@ -596,9 +596,8 @@ export class PlaneBarn {
                 }
             }
 
-            if (attemps % 100 === 99) {
-                coll = collider.transform(coll, v2.randomUnit(), 0, 1);
-                attemps = 0;
+            if (attemps % 100 > 75) {
+                coll = collider.transform(coll, v2.mul(v2.randomUnit(), 3), 0, 1);
             }
 
             let rad: number;
@@ -618,15 +617,16 @@ export class PlaneBarn {
                     break;
             }
 
-            if(!playerCalled)
+            this.game.map.clampToMapBounds(airdropPos, rad);
+            
+        }
+        if(!playerCalled)
             this.placedAirDrops.push({
                 type,
                 pos: airdropPos,
                 collider: collider.transform(def.collision, airdropPos, 0, 1),
             });
 
-            this.game.map.clampToMapBounds(airdropPos, rad);
-        }
 
         const airdrop: ScheduledSupplyDrop = {
             type,
