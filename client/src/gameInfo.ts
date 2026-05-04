@@ -11,10 +11,7 @@ export class GameInfo {
     constructor(
         public config: ConfigManager
     ) {
-        //api request an server um gameinfo zu bekommen
-
-        this.fetchGameInfo(this.config.get("region")!);
-        console.log(this.gameInfoMap);
+        
     }
 
     fetchGameInfo(region: string) {

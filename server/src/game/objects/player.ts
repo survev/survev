@@ -3378,6 +3378,10 @@ export class Player extends BaseGameObject {
             this.msgsToSend.push({
                 type: net.MsgType.GameOver,
                 msg: gameOverMsg,
+            },
+            {
+            type: net.MsgType.UpdatePass,
+            msg: new net.UpdatePassMsg(),
             });
         
             for (const spectator of this.spectators) {
@@ -3393,7 +3397,7 @@ export class Player extends BaseGameObject {
             if (this.game.modeManager.showStatsMsg(this)) {
                 const statsMsg = new net.PlayerStatsMsg();
                 statsMsg.playerStats = this;
-                this.msgsToSend.push({ type: net.MsgType.PlayerStats, msg: statsMsg });
+                this.msgsToSend.push({ type: net.MsgType.PlayerStats, msg: statsMsg },{type: net.MsgType.UpdatePass,msg: new net.UpdatePassMsg(),});
             } else {
                 const gameOverMsg = new net.GameOverMsg();
 
@@ -3406,7 +3410,7 @@ export class Player extends BaseGameObject {
                 gameOverMsg.gameOver = !!winningTeamId;
                 gameOverMsg.spectator = this.spectator;
                 gameOverMsg.betterStats = false;
-                this.msgsToSend.push({ type: net.MsgType.GameOver, msg: gameOverMsg });
+                this.msgsToSend.push({ type: net.MsgType.GameOver, msg: gameOverMsg },{type: net.MsgType.UpdatePass,msg: new net.UpdatePassMsg(),});
 
                 for (const spectator of this.spectators) {
                     spectator.msgsToSend.push({

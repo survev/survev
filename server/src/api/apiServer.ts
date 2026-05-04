@@ -90,9 +90,8 @@ export class ApiServer {
     constructor() {
         for (const region in Config.regions) {
             this.regions[region] = new Region(region);
-            this.modesByRegion[region] = [];
-            this.refreshRegionModes();
         }
+        this.refreshRegionModes();
     }
 
     init(app: Hono, upgradeWebSocket: UpgradeWebSocket) {
@@ -160,7 +159,10 @@ export class ApiServer {
     }
 
     async refreshRegionModes() {
+        console.log("Refreshing region modes...");
         for (const region in this.regions) {
+            console.log(`Refreshing modes for region ${region}...`);
+            this.modesByRegion[region] = [];
             try {
                 this.modesByRegion[region] = await this.regions[region].getModes();
             } catch (err) {
