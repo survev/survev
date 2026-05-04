@@ -148,19 +148,6 @@ export class Application {
             this.account, 
             this.joinGameAsSpectator.bind(this)
         );
-
-        
-        //compare browser cookie version with protocol version
-        const version = helpers.getCookie("version");
-        const versionNumber = version ? Number(version) : 0;
-        this.config.set("version", versionNumber);
-        const cookieProtocolVersion = this.config.get("version");
-        if (cookieProtocolVersion !== GameConfig.protocolVersion) {
-            //this.showInvalidProtocolModal();
-            window.location.href = `/?t=${Date.now()}`;
-            //set version in cookies
-            document.cookie = `version=${GameConfig.protocolVersion};`;
-        }
     }
 
     async loadBrowserDeps(onLoadCompleteCb: () => void) {

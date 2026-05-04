@@ -168,7 +168,9 @@ class GameServer {
     }
     async updateApiModes(){
         try {
-            const apiRes = await apiPrivateRouter.update_modes.$post({});
+            const apiRes = await apiPrivateRouter.update_modes.$post({
+                
+            });
                 if (apiRes.ok) {
                     return true;
                 }
