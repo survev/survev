@@ -1802,6 +1802,29 @@ export class Game {
                     const txt = this.m_ui2Manager.getBannedMessage(admin, text, expires);
                     this.m_ui2Manager.addChatMessage(txt, "#ff0000", "#000000");
                 }
+                break;
+            }
+            case net.MsgType.Assist: {
+                const msg = new net.AssistMsg();
+                msg.deserialize(stream);
+                if(msg.assisterId == this.m_activeId) {
+                    const targetInfo = this.m_playerBarn.getPlayerInfo(msg.targetId);
+                    // Add to killfeed
+                    this.m_ui2Manager.addKillFeedMessage(
+                        `Assist on ${targetInfo.name} (${msg.damageAmount} dmg)`,
+                        '#00bfff'
+                    );
+                    // Show assist notification box at bottom
+                    const playerInfo = this.m_playerBarn.getPlayerInfo(this.m_activeId);
+                    
+                    let assistCount = msg.assists;
+                    let assistCountText = assistCount === 1 ? '1 Assist' : `${assistCount} Assists`;
+                    this.m_ui2Manager.displayAssistMessage(
+                        `Assist on ${targetInfo.name} (${msg.damageAmount} dmg)`,
+                        assistCountText
+                    );
+                }
+                break;
             }
         }
     }

@@ -1161,6 +1161,22 @@ export class GameMap {
     canSpawn(type: string, pos: Vec2, ori: number, scale = 1): boolean {
         const def = MapObjectDefs[type];
 
+        if (def.type === "building" && def.mapGroundPatches) {
+            for (const patch of def.mapGroundPatches) {
+                const min = math.addAdjust(pos, patch.bound.min, ori);
+                const max = math.addAdjust(pos, patch.bound.max, ori);
+
+                if (
+                    min.x < 0 || min.y < 0 ||
+                    max.x < 0 || max.y < 0 ||
+                    min.x > this.width || min.y > this.height ||
+                    max.x > this.width || max.y > this.height
+                ) {
+                    return false;
+                }
+            }
+        }
+
         const rot = math.oriToRad(ori);
         const betterMapGen = this.mapDef.gameMode.betterMapGen ?? false;
         let spawnOnRiver = false;
