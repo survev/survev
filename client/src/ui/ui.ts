@@ -1774,7 +1774,7 @@ export class UiManager {
                         $("<div/>", { class: "ui-stats-col", text: stats.damageTaken }),
                         $("<div/>", { class: "ui-stats-col", text: timeAlive }),
                     ]);
-                    if (stats.playerId == this.game.m_activeId) {
+                    if (stats.playerId == this.game.m_localId) {
                         playerRow.addClass("active-player");
                     }
         
