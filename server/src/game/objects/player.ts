@@ -1687,6 +1687,7 @@ export class Player extends BaseGameObject {
 
     kills = 0;
     timeAlive = 0;
+    assists = 0;
 
     msgsToSend: Array<{ type: number; msg: net.Msg }> = [];
 
@@ -3243,6 +3244,7 @@ export class Player extends BaseGameObject {
      * doesn't care about kill credit or anything, simply the last player to damage you (excludes yourself)
      */
     lastDamagedBy: Player | undefined;
+    damageHistory: { source: GameObject, name: string, amount: number, time: number }[] = [];
 
     damage(params: DamageParams) {
         if (this.debug.godMode) return;
@@ -3325,10 +3327,29 @@ export class Player extends BaseGameObject {
             if (playerSource.groupId !== this.groupId) {
                 playerSource.damageDealt += finalDamage;
             }
-            this.lastDamagedBy = playerSource;
+            if(playerSource.teamId !== this.teamId){
+                this.lastDamagedBy = playerSource;
+            }
         }
 
         this.health -= finalDamage;
+
+        //add to damage history
+        //if last dmg is from same source, add to that, otherwise push new entry
+        const last = this.damageHistory[this.damageHistory.length - 1];
+        if(last && last.source === params.source){
+            last.amount += finalDamage;
+        } else {
+            const source = params.source;
+            let name: string;
+            if(source instanceof Player){
+                name = source.name;
+            }else {
+                name = "GameDesign";
+            }
+            if(source)
+            this.damageHistory.push({ source: source, name: name, amount: finalDamage, time: this.game.startedTime });
+        }
 
         if (this.game.isTeamMode) {
             this.setGroupStatuses();
@@ -3359,6 +3380,7 @@ export class Player extends BaseGameObject {
                 rank: player.rank,
                 timeAlive: player.timeAlive,
                 kills: player.kills,
+                assists: player.assists,
                 dead: player.dead,
                 damageDealt: player.damageDealt,
                 damageTaken: player.damageTaken,
@@ -3677,6 +3699,50 @@ export class Player extends BaseGameObject {
         }
 
         this.game.broadcastMsg(net.MsgType.Kill, killMsg);
+
+        //assist logic
+        const lastDmg = this.damageHistory[this.damageHistory.length - 1];
+        let dealtDamage = lastDmg?.amount ?? 0;
+        if (dealtDamage <= 50){
+            //find assist (only if player dealt more than 50 damage)
+            //reversed for loop to find most recent assist
+            let assistPlayer: Player | undefined = undefined;
+            let dmgAmount = 0;
+            let damageToKillHistory: { source: GameObject, amount: number, time: number }[] = [];
+            for (let i = this.damageHistory.length - 2; i >= 0; i--) {
+                console.log(`Checking damage history entry ${i}:`, this.damageHistory[i]);
+                const dmg = this.damageHistory[i];
+                if(!dmg){
+                    break;
+                }
+                const sameSourceDmg = damageToKillHistory.find(d => d.source === dmg.source);
+                if(!sameSourceDmg){
+                    damageToKillHistory.push(dmg);
+                }else{
+                    sameSourceDmg.amount += dmg.amount;
+                }
+                if ((sameSourceDmg ? sameSourceDmg.amount : dmg.amount) >=50 && dmg.source.__type === ObjectType.Player && dmg.source !== params.source && dmg.source !== this){
+                    assistPlayer = dmg.source as Player;
+                    dmgAmount = sameSourceDmg ? sameSourceDmg.amount : dmg.amount;
+                    break;
+                }
+                
+                dealtDamage += dmg.amount;
+                if (dealtDamage > 100){
+                    break;
+                }
+            }
+            if (assistPlayer){
+                assistPlayer.assists++;
+                const assistMsg = new net.AssistMsg();
+                assistMsg.assisterId = assistPlayer.__id;
+                assistMsg.targetId = this.__id;
+                assistMsg.damageAmount = dmgAmount;
+                assistMsg.assists = assistPlayer.assists;
+                assistPlayer.sendMsg(net.MsgType.Assist, assistMsg);
+                console.log(`Assist awarded to player ${assistPlayer.name} for dealing ${dmgAmount} damage`);
+            }
+        }
 
         if (this.role) {
             const roleMsg = new net.RoleAnnouncementMsg();

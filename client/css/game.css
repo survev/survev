@@ -2561,6 +2561,28 @@ img {
   text-shadow: 1px 1px 1px rgba(0, 0, 0, 0.3);
 }
 
+#ui-assists {
+  text-align: center;
+  background: rgba(0, 0, 0, 0.4);
+  color: #fff;
+  border-radius: 5px;
+  padding: 8px;
+  opacity: 0;
+}
+
+#ui-assist-text {
+  font-size: 18px;
+}
+
+#ui-assist-count {
+  font-weight: bold;
+  color: #00bfff;
+  font-size: 32px;
+  text-shadow: 1px 1px 1px rgba(0, 0, 0, 0.3);
+}
+
+
+
 .notify-message {
   color: white;
   text-shadow: 2px 2px 0px #000000;
@@ -4788,6 +4810,27 @@ span.ui-stats-header-value {
     text-shadow: 1px 1px 1px rgba(0, 0, 0, 0.3);
   }
 
+  #ui-assists {
+  text-align: center;
+  background: rgba(0, 0, 0, 0.4);
+  color: #fff;
+  border-radius: 5px;
+  padding: 6px;
+  opacity: 0;
+  }
+
+  #ui-assist-text {
+    font-size: 10px;
+  }
+
+  #ui-assist-count {
+    font-weight: bold;
+    color: #00bfff;
+    font-size: 18px;
+    margin-bottom: -3px;
+    text-shadow: 1px 1px 1px rgba(0, 0, 0, 0.3);
+  }
+
   /**
    * ui-bottom-center-2
    */
@@ -5860,6 +5903,10 @@ span.ui-stats-header-value {
   border-radius: 4px;
   margin-left: 40px;
   margin-right: 40px;
+}
+
+.active-player {
+  background: rgb(112, 112, 110);
 }
 
 .ui-stats-row.header {
