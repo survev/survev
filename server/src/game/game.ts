@@ -629,7 +629,6 @@ export class Game {
     }
 
     addJoinTokensAsSpectator(tokens: FindGamePrivateBody["playerData"], autoFill: boolean) {
-        console.log("Adding join tokens as spectator:", tokens, "autoFill:", autoFill);
         const groupData = {
             playerCount: tokens.length,
             groupHashToJoin: "",
@@ -707,6 +706,7 @@ export class Game {
                 timeAlive: Math.round(player.timeAlive),
                 died: player.dead,
                 kills: player.kills,
+                assists: player.assists,
                 team_kills: teamKills[player.groupId] ?? 0,
                 damageDealt: Math.round(player.damageDealt),
                 damageTaken: Math.round(player.damageTaken),
@@ -715,6 +715,7 @@ export class Game {
                 mapId: this.map.mapId,
                 mapSeed: this.map.seed,
                 killedIds: player.killedIds,
+                assistedIds: player.assistedIds,
                 rank: rank,
                 ip: player.ip,
                 findGameIp: player.findGameIp,

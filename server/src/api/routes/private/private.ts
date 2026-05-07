@@ -383,6 +383,7 @@ export const PrivateRouter = new Hono<Context>()
                     rank: 3,
                     died: true,
                     kills: 5,
+                    assists: 5,
                     damageDealt: 1247,
                     damageTaken: 862,
                     killerId: 18765,

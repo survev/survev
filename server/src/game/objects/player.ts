@@ -1381,40 +1381,12 @@ export class Player extends BaseGameObject {
             // Must be on the same layer (stairs / multi-layer buildings)
             if (!util.sameLayer(obj.layer, layer)) continue;
 
-            // 1) If the object has a collider, use it directly for point testing.
-            if (obj.collider) {
-                if (collider.intersectCircle(obj.collider, pos, 0.0001)) {
-                    return true;
-                }
-            }
+            //do not trigger on destroyed objects
+            if(obj.destructible && obj.health <=1) return false;
 
-            // 2) Buildings can provide cover via their floor surfaces / obstacle bounds.
-            if (obj.__type === ObjectType.Building) {
-                // Floor surfaces (used for stuff like grassy cover areas)
-                if (obj.surfaces) {
-                    for (let j = 0; j < obj.surfaces.length; j++) {
-                        const surface = obj.surfaces[j];
-                        for (let k = 0; k < surface.colliders.length; k++) {
-                            if (collider.intersectCircle(surface.colliders[k], pos, 0.0001)) {
-                                return true;
-                            }
-                        }
-                    }
-                }
+            const scale = obj.scale ?? 1;
 
-                // Some cover buildings define mapObstacleBounds rather than surfaces.
-                const def: any = MapObjectDefs[obj.type];
-                const bounds = def?.mapObstacleBounds as Array<any> | undefined;
-                if (bounds) {
-                    for (const b of bounds) {
-                        if (coldet.testPointAabb(pos, b.min, b.max)) {
-                            return true;
-                        }
-                    }
-                }
-            }
-
-            // 3) Fallback: check bounding box from definition (good for obstacles whose visual cover isn't the same
+            // 2) Fallback: check bounding box from definition (good for obstacles whose visual cover isn't the same
             //    as their collision collider, like trees).
             const def: any = MapObjectDefs[obj.type];
             if (def?.aabb) {
@@ -1422,9 +1394,12 @@ export class Player extends BaseGameObject {
 
                 // Some defs store AABBs as { min, max } (e.g. tree defs), others as { center, extents }.
                 if (def.aabb.min && def.aabb.max) {
+                    
+                
                     const min = v2.add(v2.mul(def.aabb.min, s), obj.pos);
                     const max = v2.add(v2.mul(def.aabb.max, s), obj.pos);
-                    if (coldet.testPointAabb(pos, min, max)) {
+                    const playerRadius = this.collider.rad;
+                    if (this.circleMostlyInsideAabb(pos, playerRadius, min, max, 0.8)) {
                         return true;
                     }
                 } else if (def.aabb.extents) {
@@ -1438,9 +1413,107 @@ export class Player extends BaseGameObject {
                     }
                 }
             }
+
+            // 3) If the object has a collider, use it directly for point testing.
+            if (obj.collider) {
+
+                const playerRadius = this.collider.rad;
+
+            if ( 
+                obj.collider.rad &&
+                this.circleMostlyInsideCircle(
+                    pos,
+                    playerRadius,
+                    obj.pos,
+                    obj.collider.rad,
+                    0.8
+                )
+            ) {
+                return true;
+            }else if(obj.collider.min && obj.collider.max){
+                if(this.circleMostlyInsideAabb(pos, playerRadius, obj.collider.min, obj.collider.max, 0.8)){
+                    return true;
+                }
+            }
+        }
         }
 
         return false;
+    }
+
+    private circleMostlyInsideAabb(
+        center: Vec2,
+        radius: number,
+        min: Vec2,
+        max: Vec2,
+        requiredRatio = 0.8
+    ): boolean {
+        let inside = 0;
+        let total = 0;
+
+        const samples = 7; // höher = genauer, aber teurer
+
+        for (let ix = 0; ix < samples; ix++) {
+            for (let iy = 0; iy < samples; iy++) {
+                const x = center.x - radius + (2 * radius * ix) / (samples - 1);
+                const y = center.y - radius + (2 * radius * iy) / (samples - 1);
+
+                const dx = x - center.x;
+                const dy = y - center.y;
+
+                // nur Punkte innerhalb des Player-Circles zählen
+                if (dx * dx + dy * dy <= radius * radius) {
+                    total++;
+
+                    if (
+                        x >= min.x &&
+                        x <= max.x &&
+                        y >= min.y &&
+                        y <= max.y
+                    ) {
+                        inside++;
+                    }
+                }
+            }
+        }
+
+        return total > 0 && inside / total >= requiredRatio;
+    }
+
+    private circleMostlyInsideCircle(
+        playerPos: Vec2,
+        playerRadius: number,
+        coverPos: Vec2,
+        coverRadius: number,
+        requiredRatio = 0.8
+    ): boolean {
+        let inside = 0;
+        let total = 0;
+
+        const samples = 9;
+
+        for (let ix = 0; ix < samples; ix++) {
+            for (let iy = 0; iy < samples; iy++) {
+                const x = playerPos.x - playerRadius + (2 * playerRadius * ix) / (samples - 1);
+                const y = playerPos.y - playerRadius + (2 * playerRadius * iy) / (samples - 1);
+
+                const dxPlayer = x - playerPos.x;
+                const dyPlayer = y - playerPos.y;
+
+                if (dxPlayer * dxPlayer + dyPlayer * dyPlayer <= playerRadius * playerRadius) {
+                    total++;
+
+                    const dxCover = x - coverPos.x;
+                    const dyCover = y - coverPos.y;
+
+                    if (dxCover * dxCover + dyCover * dyCover <= coverRadius * coverRadius) {
+                        inside++;
+                    }
+                }
+            }
+        }
+
+        return total > 0 && inside / total >= requiredRatio;
     }
 
     private isCoverType(type: string): boolean {
@@ -3504,6 +3577,7 @@ export class Player extends BaseGameObject {
 
     killedBy: Player | undefined;
     killedIds: number[] = [];
+    assistedIds: number[] = [];
 
     kill(params: DamageParams): void {
         if (this.dead) return;
@@ -3710,7 +3784,6 @@ export class Player extends BaseGameObject {
             let dmgAmount = 0;
             let damageToKillHistory: { source: GameObject, amount: number, time: number }[] = [];
             for (let i = this.damageHistory.length - 2; i >= 0; i--) {
-                console.log(`Checking damage history entry ${i}:`, this.damageHistory[i]);
                 const dmg = this.damageHistory[i];
                 if(!dmg){
                     break;
@@ -3721,8 +3794,9 @@ export class Player extends BaseGameObject {
                 }else{
                     sameSourceDmg.amount += dmg.amount;
                 }
-                if ((sameSourceDmg ? sameSourceDmg.amount : dmg.amount) >=50 && dmg.source.__type === ObjectType.Player && dmg.source !== params.source && dmg.source !== this){
+                if ((sameSourceDmg ? sameSourceDmg.amount : dmg.amount) >=50 && dmg.source.__type === ObjectType.Player && dmg.source !== params.killCreditSource && dmg.source !== this){
                     assistPlayer = dmg.source as Player;
+                    assistPlayer.assistedIds.push(this.matchDataId);
                     dmgAmount = sameSourceDmg ? sameSourceDmg.amount : dmg.amount;
                     break;
                 }
@@ -3740,7 +3814,6 @@ export class Player extends BaseGameObject {
                 assistMsg.damageAmount = dmgAmount;
                 assistMsg.assists = assistPlayer.assists;
                 assistPlayer.sendMsg(net.MsgType.Assist, assistMsg);
-                console.log(`Assist awarded to player ${assistPlayer.name} for dealing ${dmgAmount} damage`);
             }
         }
 
