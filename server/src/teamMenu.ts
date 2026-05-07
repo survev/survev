@@ -128,7 +128,6 @@ class Room {
     ) {
         this.data.roomUrl = `#${id}`;
         this.data.enabledGameModeIdxs = teamMenu.allowedGameModeIdxs(initialData.region);
-        console.log("enabled modes for region", initialData.region, this.data.enabledGameModeIdxs);
         this.data.captchaEnabled = teamMenu.server.captchaEnabled;
 
         this.setProps(initialData);

@@ -91,11 +91,13 @@ export const matchDataTable = pgTable(
         rank: integer("rank").notNull(),
         died: boolean("died").notNull(),
         kills: integer("kills").notNull(),
+        assists: integer("assists").notNull().default(0),
         teamKills: integer("team_kills").notNull().default(0),
         damageDealt: integer("damage_dealt").notNull(),
         damageTaken: integer("damage_taken").notNull(),
         killerId: integer("killer_id").notNull(),
         killedIds: integer("killed_ids").array().notNull(),
+        assistedIds: integer("assisted_ids").array().notNull().default([]),
     },
     (table) => [
         index("idx_match_data_user_stats").on(
@@ -103,6 +105,7 @@ export const matchDataTable = pgTable(
             table.teamMode,
             table.rank,
             table.kills,
+            table.assists,
             table.damageDealt,
             table.timeAlive,
         ),
@@ -116,6 +119,7 @@ export const matchDataTable = pgTable(
             table.teamId,
             table.region,
             table.kills,
+            table.assists,
         ),
     ],
 );
