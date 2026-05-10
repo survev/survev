@@ -1387,7 +1387,7 @@ export class Player extends BaseGameObject {
     msgsToSend: Array<{ type: number; msg: net.Msg }> = [];
 
     weaponManager = new WeaponManager(this);
-    recoilTicker = 0;
+    noSpreadTicker = 0;
 
     // to disable auto pickup for some seconds after dropping something
     mobileDropTicker = 0;

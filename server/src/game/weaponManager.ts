@@ -51,7 +51,7 @@ export class WeaponManager {
         type: string;
         ammo: number;
         cooldown: number;
-        recoilTime: number;
+        noSpreadDelay: number;
     }> = [];
 
     scheduledReload = false;
@@ -79,7 +79,7 @@ export class WeaponManager {
                 type: GameConfig.WeaponType[i] === "melee" ? "fists" : "",
                 ammo: 0,
                 cooldown: 0,
-                recoilTime: Infinity,
+                noSpreadDelay: Infinity,
             });
         }
     }
@@ -135,7 +135,7 @@ export class WeaponManager {
         this.meleeAttacks.length = 0;
         this.scheduledReload = false;
 
-        this.player.recoilTicker = 0;
+        this.player.noSpreadTicker = 0;
 
         const curWeapon = this.weapons[this.curWeapIdx];
         const nextWeapon = this.weapons[idx];
@@ -269,7 +269,7 @@ export class WeaponManager {
         this.weapons[idx].cooldown = 0;
         this.weapons[idx].ammo = ammo;
         if (weaponDef?.type === "gun") {
-            this.weapons[idx].recoilTime = weaponDef.recoilTime;
+            this.weapons[idx].noSpreadDelay = weaponDef.noSpreadDelay;
         }
         if (weaponDef && "switchDelay" in weaponDef) {
             this.weapons[idx].cooldown = weaponDef.switchDelay;
@@ -299,13 +299,13 @@ export class WeaponManager {
 
         player.freeSwitchTimer -= dt;
 
-        player.recoilTicker += dt;
+        player.noSpreadTicker += dt;
 
         this.throwableCooldown -= dt;
 
         for (let i = 0; i < this.weapons.length; i++) {
             this.weapons[i].cooldown -= dt;
-            this.weapons[i].recoilTime -= dt;
+            this.weapons[i].noSpreadDelay -= dt;
         }
 
         if (this.weapons[this.curWeapIdx].cooldown <= 0 && this.scheduledReload) {
@@ -694,10 +694,10 @@ export class WeaponManager {
 
         if (weapon.ammo <= 0) return;
 
-        const firstShotAccuracy = weapon.recoilTime <= 0;
+        const noSpreadShot = weapon.noSpreadDelay <= 0;
 
         weapon.cooldown = itemDef.fireDelay;
-        weapon.recoilTime = itemDef.recoilTime;
+        weapon.noSpreadDelay = itemDef.noSpreadDelay;
 
         // Check firing location
         if (itemDef.outsideOnly && this.player.indoors && !forceFire) {
@@ -813,10 +813,10 @@ export class WeaponManager {
         }
 
         // Recoil currently just cancels spread if you shoot slow enough.
-        if (this.player.recoilTicker >= itemDef.recoilTime) {
+        if (this.player.noSpreadTicker >= itemDef.noSpreadDelay) {
             spread = 0.0;
         }
-        this.player.recoilTicker = 0.0;
+        this.player.noSpreadTicker = 0.0;
 
         let bulletType = itemDef.bulletType;
 
@@ -837,9 +837,10 @@ export class WeaponManager {
         const jitter = itemDef.jitter ?? 0.25;
 
         for (let i = 0; i < bulletCount; i++) {
-            const deviation = firstShotAccuracy
-                ? 0
-                : util.random(-0.5, 0.5) * (spread || 0);
+            let deviation = 0;
+            if (!noSpreadShot) {
+                deviation = util.random(-0.5, 0.5) * (spread || 0);
+            }
             const shotDir = v2.rotate(direction, math.deg2rad(deviation));
 
             // Compute shot start position

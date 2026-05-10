@@ -110,7 +110,7 @@ export interface ObstacleDef {
     swapWeaponOnDestroy?: boolean;
     regrow?: boolean;
     regrowTimer?: number;
-    armorPlated?: boolean;
+    isReinforced?: boolean;
     smartLoot?: boolean;
     createSmoke?: boolean;
     teamId?: number;

@@ -10517,7 +10517,7 @@ export const MapObjectDefs: Record<string, MapObjectDef> = {
     crate_04: createCrate({
         health: 225,
         destructible: true,
-        armorPlated: true,
+        isReinforced: true,
         hitParticle: "greenChip",
         loot: [tierLoot("tier_ammo_crate", 1, 1)],
         map: { display: true, color: 0x537054, scale: 0.875 },
@@ -10544,7 +10544,7 @@ export const MapObjectDefs: Record<string, MapObjectDef> = {
         collision: collider.createAabbExtents(v2.create(0, 0), v2.create(2.25, 1.1)),
         health: 175,
         destructible: true,
-        armorPlated: true,
+        isReinforced: true,
         hitParticle: "greenChip",
         loot: [tierLoot("tier_ammo", 1, 1)],
         map: { display: false },

@@ -366,21 +366,21 @@ export class Obstacle extends BaseGameObject {
         if (this.health === 0 || !this.destructible) return;
 
         if (params.damageType === DamageType.Player) {
-            let armorPiercing = false;
+            let canBreakReinforced = false;
             let stonePiercing = false;
 
             if (params.gameSourceType) {
                 const sourceDef = GameObjectDefs[params.gameSourceType] as
                     | {
-                          armorPiercing?: boolean;
+                          canBreakReinforced?: boolean;
                           stonePiercing?: boolean;
                       }
                     | undefined;
-                armorPiercing = sourceDef?.armorPiercing ?? false;
+                canBreakReinforced = sourceDef?.canBreakReinforced ?? false;
                 stonePiercing = sourceDef?.stonePiercing ?? false;
             }
 
-            if (def.armorPlated && !armorPiercing) return;
+            if (def.isReinforced && !canBreakReinforced) return;
             if (def.stonePlated && !stonePiercing) return;
         }
 
