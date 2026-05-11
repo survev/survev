@@ -1026,9 +1026,11 @@ export class EmoteBarn {
                             selector.highlightDisplayed = true;
                         }
                         if (device.touch && this.emoteTouchedPos) {
-                            this.pingMouseTriggered
-                                ? this.triggerPing()
-                                : this.triggerEmote();
+                            if (this.pingMouseTriggered) {
+                                this.triggerPing();
+                            } else {
+                                this.triggerEmote();
+                            }
                         }
                     }
                 }

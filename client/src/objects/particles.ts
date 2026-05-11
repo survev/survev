@@ -101,15 +101,15 @@ export class Particle {
         this.rotDrag = getRangeValue(def.drag) / 2;
         this.scaleUseExp = def.scale.exp !== undefined;
         this.scale = getRangeValue(def.scale.start) * scale;
-        this.scaleEnd = this.scaleUseExp ? 0 : getRangeValue(def.scale?.end!) * scale;
+        this.scaleEnd = this.scaleUseExp ? 0 : getRangeValue(def.scale.end!) * scale;
         this.scaleExp = this.scaleUseExp ? def.scale.exp! : 0;
         this.alphaUseExp = def.alpha.exp !== undefined;
         this.alpha = getRangeValue(def.alpha.start);
-        this.alphaEnd = this.alphaUseExp ? 0 : getRangeValue(def.alpha?.end!);
+        this.alphaEnd = this.alphaUseExp ? 0 : getRangeValue(def.alpha.end!);
         this.alphaExp = this.alphaUseExp ? def.alpha.exp! : 0;
         this.alphaIn = def.alphaIn !== undefined;
-        this.alphaInStart = this.alphaIn ? getRangeValue(def.alphaIn?.start!) : 0;
-        this.alphaInEnd = this.alphaIn ? getRangeValue(def.alphaIn?.end!) : 0;
+        this.alphaInStart = this.alphaIn ? getRangeValue(def.alphaIn!.start!) : 0;
+        this.alphaInEnd = this.alphaIn ? getRangeValue(def.alphaIn!.end!) : 0;
         this.emitterIdx = -1;
         const tex = Array.isArray(def.image)
             ? def.image[Math.floor(Math.random() * def.image.length)]
@@ -383,16 +383,16 @@ export class ParticleBarn {
                     ? p.alpha
                     : math.remap(
                         t,
-                        p.def.alpha.lerp?.min!,
-                        p.def.alpha.lerp?.max!,
+                        p.def.alpha.lerp!.min,
+                        p.def.alpha.lerp!.max,
                         p.alpha,
                         p.alphaEnd,
                     );
-                if (p.alphaIn && t < p.def.alphaIn?.lerp?.max!) {
+                if (p.alphaIn && t < p.def.alphaIn!.lerp!.max) {
                     alpha = math.remap(
                         t,
-                        p.def.alphaIn?.lerp?.min!,
-                        p.def.alphaIn?.lerp?.max!,
+                        p.def.alphaIn!.lerp!.min,
+                        p.def.alphaIn!.lerp!.max,
                         p.alphaInStart,
                         p.alphaInEnd,
                     );

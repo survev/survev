@@ -5,7 +5,7 @@ import type { ObjectData, ObjectType } from "../../../shared/net/objectSerialize
 import type { Collider } from "../../../shared/utils/coldet.ts";
 import { collider } from "../../../shared/utils/collider.ts";
 import { math } from "../../../shared/utils/math.ts";
-import { util } from "../../../shared/utils/util.ts";
+import { assert, util } from "../../../shared/utils/util.ts";
 import { v2, type Vec2 } from "../../../shared/utils/v2.ts";
 import type { AudioManager } from "../audioManager.ts";
 import type { Camera } from "../camera.ts";
@@ -175,19 +175,20 @@ export class Obstacle implements AbstractObject {
             this.isBush = !!def.isBush;
             this.isDoor = def.door !== undefined;
             if (this.isDoor) {
+                assert(def.door && data.door);
                 this.door = {
-                    openOneWay: def.door?.openOneWay!,
+                    openOneWay: def.door.openOneWay,
                     closedPos: v2.copy(data.pos),
-                    autoOpen: def.door?.autoOpen!,
-                    interactionRad: def.door?.interactionRad!,
-                    interpSpeed: def.door?.openSpeed!,
+                    autoOpen: def.door.autoOpen,
+                    interactionRad: def.door.interactionRad,
+                    interpSpeed: def.door.openSpeed,
                     interpPos: v2.copy(data.pos),
                     interpRot: math.oriToRad(data.ori),
-                    seq: data.door?.seq!,
-                    seqOld: data.door?.seq!,
-                    open: data.door?.open!,
-                    wasOpen: data.door?.open!,
-                    locked: data.door?.locked!,
+                    seq: data.door.seq,
+                    seqOld: data.door.seq,
+                    open: data.door.open,
+                    wasOpen: data.door.open,
+                    locked: data.door.locked,
                     casingSprite: null,
                 };
                 const casingImgDef = def.door?.casingImg;
@@ -207,13 +208,14 @@ export class Obstacle implements AbstractObject {
             }
             this.isButton = def.button !== undefined;
             if (this.isButton) {
+                assert(def.button && data.button);
                 this.button = {
-                    interactionRad: def.button?.interactionRad!,
-                    interactionText: def.button?.interactionText || "game-use",
-                    seq: data.button?.seq!,
-                    seqOld: data.button?.seq!,
-                    roleToPromote: def.button?.roleToPromote,
-                    isVat: def.button?.isVat,
+                    interactionRad: def.button.interactionRad,
+                    interactionText: def.button.interactionText || "game-use",
+                    seq: data.button.seq,
+                    seqOld: data.button.seq,
+                    roleToPromote: def.button.roleToPromote,
+                    isVat: def.button.isVat,
                 };
             }
             this.isPuzzlePiece = data.isPuzzlePiece;
@@ -230,21 +232,23 @@ export class Obstacle implements AbstractObject {
             }
         }
         if (this.isDoor && fullUpdate) {
-            this.door.canUse = data.door?.canUse;
-            this.door.open = data.door?.open!;
-            this.door.seq = data.door?.seq!;
+            assert(data.door && def.door);
+            this.door.canUse = data.door.canUse;
+            this.door.open = data.door.open;
+            this.door.seq = data.door.seq;
             const u = v2.rotate(
-                v2.create(def.door?.slideOffset!, 0),
+                v2.create(def.door?.slideOffset, 0),
                 this.rot + Math.PI * 0.5,
             );
-            this.door.closedPos = data.door?.open
+            this.door.closedPos = data.door.open
                 ? v2.add(data.pos, u)
                 : v2.copy(data.pos);
         }
         if (this.isButton && fullUpdate) {
-            this.button.onOff = data.button?.onOff;
-            this.button.canUse = data.button?.canUse;
-            this.button.seq = data.button?.seq!;
+            assert(data.button);
+            this.button.onOff = data.button.onOff;
+            this.button.canUse = data.button.canUse;
+            this.button.seq = data.button.seq;
         }
         if (
             def.explosion !== undefined
@@ -269,7 +273,7 @@ export class Obstacle implements AbstractObject {
         if (w != this.img) {
             let f = v2.create(0.5, 0.5);
             if (this.isDoor) {
-                f = def.door?.spriteAnchor!;
+                f = def.door!.spriteAnchor;
             }
             const _ = w !== undefined;
             if (!_) {
@@ -436,7 +440,7 @@ export class Obstacle implements AbstractObject {
                         : this.explodeParticle;
                     particleBarn.addParticle(particle, this.layer, center, vel);
                 }
-                audioManager.playSound(def.sound?.explode!, {
+                audioManager.playSound(def.sound.explode!, {
                     channel: "sfx",
                     soundPos: center,
                     layer: this.layer,

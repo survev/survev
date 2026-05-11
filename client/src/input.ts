@@ -668,8 +668,6 @@ export class InputValue {
         public type: InputType,
         public code: number,
     ) {
-        this.type = type;
-        this.code = code;
     }
 
     equals(inputValue: InputValue) {

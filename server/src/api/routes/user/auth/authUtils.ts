@@ -32,7 +32,7 @@ export function sanitizeSlug(username: string) {
         username
             .toLowerCase()
             .trim()
-            .replace(/[\.,\?""!@#\$%\^&\*\(\)_=\+;:<>\/\\\|\}\{\[\]`~]/g, "-"),
+            .replace(/[.,?""!@#$%^&*()_=+;:<>/\\|}{[\]`~]/g, "-"),
         {
             trim: true,
             strict: true,

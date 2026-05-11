@@ -278,13 +278,6 @@ export class UiManager {
         public inputBinds: InputBinds,
         public inputBindUi: InputBindUi,
     ) {
-        this.game = game;
-        this.particleBarn = particleBarn;
-        this.localization = localization;
-        this.touch = touch;
-        this.inputBinds = inputBinds;
-        this.inputBindUi = inputBindUi;
-
         this.roleMenuConfirm.on("click", (e) => {
             e.stopPropagation();
             this.roleSelected = this.roleDisplayed;

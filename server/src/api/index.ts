@@ -187,9 +187,9 @@ app.post("/api/report_error", rateLimitMiddleware(5, 60 * 1000), async (c) => {
 
     let stackTrace: string | undefined;
     if (
-        typeof content.data == "object"
+        typeof content.data === "object"
         && "stacktrace" in content.data
-        && typeof content.data.stacktrace == "string"
+        && typeof content.data.stacktrace === "string"
         && content.data.stacktrace
     ) {
         stackTrace = `### Stacktrace:\n \`\`\`${content.data.stacktrace.replaceAll("`", "\\`")}\`\`\``;

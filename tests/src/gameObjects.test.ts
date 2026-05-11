@@ -111,7 +111,7 @@ describe.for(Object.entries(RoleDefs))("Role $0", ([, def]) => {
             test.for(def.defaultItems!.weapons)("Weapon $0", {
                 retry: 200,
             }, (weapon) => {
-                if (typeof weapon == "object" && weapon.type) {
+                if (typeof weapon === "object" && weapon.type) {
                     expect(weapon.type).toBeValidLoot();
                 } else if (typeof weapon === "function") {
                     expect(weapon(TeamColor.Red).type).toBeValidLoot();

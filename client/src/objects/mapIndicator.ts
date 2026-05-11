@@ -3,6 +3,7 @@ import { GameObjectDefs } from "../../../shared/defs/gameObjectDefs.ts";
 import type { RoleDef } from "../../../shared/defs/gameObjects/roleDefs.ts";
 import type { MapIndicator } from "../../../shared/net/updateMsg.ts";
 import { math } from "../../../shared/utils/math.ts";
+import { assert } from "../../../shared/utils/util.ts";
 import { v2, type Vec2 } from "../../../shared/utils/v2.ts";
 import { device } from "../device.ts";
 import type { MapSprite, MapSpriteBarn } from "./mapSprite.ts";
@@ -80,6 +81,7 @@ export class MapIndicatorBarn {
         indicator.equipped = data.equipped;
 
         const objDef = GameObjectDefs[indicator.type] as RoleDef;
+        assert(objDef.mapIndicator);
         const scale = (device.uiLayout == device.UiLayout.Sm ? 0.15 : 0.2) * 1.25;
         const zOrder = indicator.equipped ? 655350 : 1;
 
@@ -89,7 +91,7 @@ export class MapIndicatorBarn {
         mapSprite.alpha = 1;
         mapSprite.zOrder = zOrder;
         mapSprite.visible = true;
-        mapSprite.sprite.texture = PIXI.Texture.from(objDef.mapIndicator?.sprite!);
+        mapSprite.sprite.texture = PIXI.Texture.from(objDef.mapIndicator!.sprite);
 
         mapSprite.sprite.tint = objDef.mapIndicator?.tint ?? 0xffffff;
         if (objDef.mapIndicator?.pulse) {

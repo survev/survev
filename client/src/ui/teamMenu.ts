@@ -611,7 +611,7 @@ export class TeamMenu {
                     });
                     n.val(playerStatus.name);
                     const m = () => {
-                        const name = helpers.sanitizeNameInput(n?.val()!);
+                        const name = helpers.sanitizeNameInput(n!.val() as string);
                         playerStatus.name = name;
                         this.config.set("playerName", name);
                         this.sendMessage("changeName", {

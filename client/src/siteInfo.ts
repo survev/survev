@@ -15,8 +15,6 @@ export class SiteInfo {
         public config: ConfigManager,
         public localization: Localization,
     ) {
-        this.config = config;
-        this.localization = localization;
     }
 
     load() {
