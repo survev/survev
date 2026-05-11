@@ -891,6 +891,8 @@ export class Player extends BaseGameObject {
      */
     reloadAgain = false;
 
+    visionObscured = false;
+    visionRecoveryTicker = 0;
     wearingPan = false;
     healEffect = false;
     healEffectTicker = 0;
@@ -2280,6 +2282,8 @@ export class Player extends BaseGameObject {
             } else if (obj.__type === ObjectType.Smoke) {
                 if (!util.sameLayer(this.layer, obj.layer)) continue;
                 if (coldet.testCircleCircle(this.pos, this.rad, obj.pos, obj.rad)) {
+                    this.visionObscured = true;
+                    this.visionRecoveryTicker = 0;
                     insideSmoke = true;
                 }
             }
@@ -2301,10 +2305,17 @@ export class Player extends BaseGameObject {
             this.setDirty();
         }
 
+        if (!insideSmoke) {
+            this.visionRecoveryTicker += dt;
+            if (this.visionRecoveryTicker >= 0.5) {
+                this.visionObscured = false;
+            }
+        }
+
         if (this.insideZoomRegion) {
             finalZoom = zoomRegionZoom;
         }
-        if (insideSmoke || this.downed) {
+        if (this.visionObscured || this.downed) {
             finalZoom = lowestZoom;
         }
 
