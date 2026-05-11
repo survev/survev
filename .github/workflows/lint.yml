@@ -10,7 +10,7 @@ on:
       - "**.json"
       - "**.css"
       - "**.yaml"
-      - ".github/workflows/biome.yml"
+      - ".github/workflows/lint.yml"
 
   pull_request:
     paths: *paths
@@ -19,7 +19,7 @@ jobs:
   lint:
     name: Lint
     runs-on: ubuntu-latest
-    concurrency: ci-biome-${{ github.ref }}
+    concurrency: ci-lint-${{ github.ref }}
 
     steps:
       - name: Checkout Repository
@@ -29,8 +29,15 @@ jobs:
         with:
           node-version: "22"
 
-      - name: Setup Biome
-        uses: biomejs/setup-biome@v2
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
 
-      - name: Run Biome
-        run: biome ci .
+      - name: Install Packages
+        run: pnpm install
+
+      - name: Run oxlint
+        run: pnpm exec oxlint --max-warnings 0
+
+      - name: Run dprint
+        if: always()
+        run: pnpm exec dprint check
