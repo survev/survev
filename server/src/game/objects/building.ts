@@ -1,22 +1,22 @@
-import { MapObjectDefs } from "../../../../shared/defs/mapObjectDefs";
+import { MapObjectDefs } from "../../../../shared/defs/mapObjectDefs.ts";
 import type {
     BuildingDef,
     ObstacleDef,
     StructureDef,
-} from "../../../../shared/defs/mapObjectsTyping";
-import { Puzzles } from "../../../../shared/defs/puzzles";
-import { DamageType } from "../../../../shared/gameConfig";
-import { ObjectType } from "../../../../shared/net/objectSerializeFns";
-import { type AABB, type Collider, coldet } from "../../../../shared/utils/coldet";
-import { collider } from "../../../../shared/utils/collider";
-import { mapHelpers } from "../../../../shared/utils/mapHelpers";
-import { math } from "../../../../shared/utils/math";
-import { type Vec2, v2 } from "../../../../shared/utils/v2";
-import type { Game } from "../game";
-import type { Decal } from "./decal";
-import { BaseGameObject } from "./gameObject";
-import type { Obstacle } from "./obstacle";
-import type { Structure } from "./structure";
+} from "../../../../shared/defs/mapObjectsTyping.ts";
+import { Puzzles } from "../../../../shared/defs/puzzles.ts";
+import { DamageType } from "../../../../shared/gameConfig.ts";
+import { ObjectType } from "../../../../shared/net/objectSerializeFns.ts";
+import { type AABB, type Collider, coldet } from "../../../../shared/utils/coldet.ts";
+import { collider } from "../../../../shared/utils/collider.ts";
+import { mapHelpers } from "../../../../shared/utils/mapHelpers.ts";
+import { math } from "../../../../shared/utils/math.ts";
+import { type Vec2, v2 } from "../../../../shared/utils/v2.ts";
+import type { Game } from "../game.ts";
+import type { Decal } from "./decal.ts";
+import { BaseGameObject } from "./gameObject.ts";
+import type { Obstacle } from "./obstacle.ts";
+import type { Structure } from "./structure.ts";
 
 export class Building extends BaseGameObject {
     mapObstacleBounds: Collider[] = [];

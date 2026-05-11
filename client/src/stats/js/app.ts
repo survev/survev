@@ -2,17 +2,17 @@ import $ from "jquery";
 // TODO(performance): only load needed bootstrap components
 import "bootstrap";
 import slugify from "slugify";
-import { ConfigManager } from "../../config";
-import { device } from "../../device";
-import { SDK } from "../../sdk/sdk";
-import { MainView } from "./mainView";
-import { PlayerView } from "./playerView";
+import { ConfigManager } from "../../config.ts";
+import { device } from "../../device.ts";
+import { SDK } from "../../sdk/sdk.ts";
+import { MainView } from "./mainView.ts";
+import { PlayerView } from "./playerView.ts";
 import language from "./templates/langauge.ejs";
 
 import "bootstrap/dist/css/bootstrap.css";
 import "../../../css/stats/app.css";
-import { helpers } from "../../helpers";
-import { Localization } from "../../ui/localization";
+import { helpers } from "../../helpers.ts";
+import { Localization } from "../../ui/localization.ts";
 import EnJs from "../en.json";
 
 const templates = {

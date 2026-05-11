@@ -3,9 +3,9 @@ import fs from "node:fs";
 import path from "node:path";
 import enquirer from "enquirer";
 import hjson from "hjson";
-import { configFileName } from "./config";
-import type { PartialConfig } from "./configType";
-import { util } from "./shared/utils/util";
+import { configFileName } from "./config.ts";
+import type { PartialConfig } from "./configType.ts";
+import { util } from "./shared/utils/util.ts";
 
 const prompt = enquirer.prompt;
 

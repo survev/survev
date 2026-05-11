@@ -4,7 +4,7 @@
   "compilerOptions": {
     "lib": ["DOM", "ESNext"],
     "paths": {
-      "@/sdk": ["./src/sdk/sdk-manager.ts"]
+      "@/sdk.ts": ["./src/sdk/sdk-manager.ts"]
     }
   },
   "include": [

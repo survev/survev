@@ -1,8 +1,8 @@
-import { ObjectType } from "../../../../shared/net/objectSerializeFns";
-import { collider } from "../../../../shared/utils/collider";
-import { type Vec2, v2 } from "../../../../shared/utils/v2";
-import type { Game } from "../game";
-import { BaseGameObject } from "./gameObject";
+import { ObjectType } from "../../../../shared/net/objectSerializeFns.ts";
+import { collider } from "../../../../shared/utils/collider.ts";
+import { type Vec2, v2 } from "../../../../shared/utils/v2.ts";
+import type { Game } from "../game.ts";
+import { BaseGameObject } from "./gameObject.ts";
 
 export class DeadBodyBarn {
     deadBodies: DeadBody[] = [];

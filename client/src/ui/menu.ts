@@ -1,8 +1,8 @@
 import $ from "jquery";
-import { device } from "../device";
-import { helpers } from "../helpers";
-import type { InputBinds, InputBindUi } from "../inputBinds";
-import { MenuModal } from "./menuModal";
+import { device } from "../device.ts";
+import { helpers } from "../helpers.ts";
+import type { InputBinds, InputBindUi } from "../inputBinds.ts";
+import { MenuModal } from "./menuModal.ts";
 
 function createToast(
     text: string,

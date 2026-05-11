@@ -1,38 +1,38 @@
 import fs from "node:fs";
 import path from "node:path";
-import { GameConfig, TeamMode } from "../../../shared/gameConfig";
-import * as net from "../../../shared/net/net";
-import type { Loadout } from "../../../shared/utils/loadout";
-import { math } from "../../../shared/utils/math";
-import { v2 } from "../../../shared/utils/v2";
-import { Config } from "../config";
-import { ServerLogger } from "../utils/logger";
-import { apiPrivateRouter } from "../utils/serverHelpers";
+import { GameConfig, TeamMode } from "../../../shared/gameConfig.ts";
+import * as net from "../../../shared/net/net.ts";
+import type { Loadout } from "../../../shared/utils/loadout.ts";
+import { math } from "../../../shared/utils/math.ts";
+import { v2 } from "../../../shared/utils/v2.ts";
+import { Config } from "../config.ts";
+import { ServerLogger } from "../utils/logger.ts";
+import { apiPrivateRouter } from "../utils/serverHelpers.ts";
 import {
     type FindGamePrivateBody,
     ProcessMsgType,
     type SaveGameBody,
     type ServerGameConfig,
     type UpdateDataMsg,
-} from "../utils/types";
-import { GameModeManager } from "./gameModeManager";
-import { Grid } from "./grid";
-import { GameMap } from "./map";
-import { AirdropBarn } from "./objects/airdrop";
-import { BulletBarn } from "./objects/bullet";
-import { DeadBodyBarn } from "./objects/deadBody";
-import { DecalBarn } from "./objects/decal";
-import { ExplosionBarn } from "./objects/explosion";
-import { type GameObject, ObjectRegister } from "./objects/gameObject";
-import { Gas } from "./objects/gas";
-import { LootBarn } from "./objects/loot";
-import { MapIndicatorBarn } from "./objects/mapIndicator";
-import { PlaneBarn } from "./objects/plane";
-import { PlayerBarn } from "./objects/player";
-import { ProjectileBarn } from "./objects/projectile";
-import { SmokeBarn } from "./objects/smoke";
-import { PluginManager } from "./pluginManager";
-import { Profiler } from "./profiler";
+} from "../utils/types.ts";
+import { GameModeManager } from "./gameModeManager.ts";
+import { Grid } from "./grid.ts";
+import { GameMap } from "./map.ts";
+import { AirdropBarn } from "./objects/airdrop.ts";
+import { BulletBarn } from "./objects/bullet.ts";
+import { DeadBodyBarn } from "./objects/deadBody.ts";
+import { DecalBarn } from "./objects/decal.ts";
+import { ExplosionBarn } from "./objects/explosion.ts";
+import { type GameObject, ObjectRegister } from "./objects/gameObject.ts";
+import { Gas } from "./objects/gas.ts";
+import { LootBarn } from "./objects/loot.ts";
+import { MapIndicatorBarn } from "./objects/mapIndicator.ts";
+import { PlaneBarn } from "./objects/plane.ts";
+import { PlayerBarn } from "./objects/player.ts";
+import { ProjectileBarn } from "./objects/projectile.ts";
+import { SmokeBarn } from "./objects/smoke.ts";
+import { PluginManager } from "./pluginManager.ts";
+import { Profiler } from "./profiler.ts";
 
 export interface JoinTokenData {
     expiresAt: number;

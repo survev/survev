@@ -1,5 +1,5 @@
-import { util } from "../../utils/util";
-import { Main, type PartialMapDef } from "./baseDefs";
+import { util } from "../../utils/util.ts";
+import { Main, type PartialMapDef } from "./baseDefs.ts";
 
 const mapDef: PartialMapDef = {
     desc: {

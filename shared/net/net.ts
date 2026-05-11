@@ -1,10 +1,10 @@
-import { GameObjectDefs } from "../defs/gameObjectDefs";
-import { MapObjectDefs } from "../defs/mapObjectDefs";
-import { GameConfig } from "../gameConfig";
-import * as bb from "../lib/bitBuffer";
-import { math } from "../utils/math";
-import { assert } from "../utils/util";
-import type { Vec2 } from "../utils/v2";
+import { GameObjectDefs } from "../defs/gameObjectDefs.ts";
+import { MapObjectDefs } from "../defs/mapObjectDefs.ts";
+import { GameConfig } from "../gameConfig.ts";
+import * as bb from "../lib/bitBuffer.ts";
+import { math } from "../utils/math.ts";
+import { assert } from "../utils/util.ts";
+import type { Vec2 } from "../utils/v2.ts";
 
 const DEV_MODE = false;
 
@@ -368,20 +368,20 @@ export class UpdatePassMsg {
     deserialize(_e: BitStream) {}
 }
 
-export { AliveCountsMsg } from "./aliveCountsMsg";
-export { DisconnectMsg } from "./disconnectMsg";
-export { DropItemMsg } from "./dropItemMsg";
-export { EditMsg } from "./editMsg";
-export { EmoteMsg } from "./emoteMsg";
-export { GameOverMsg } from "./gameOverMsg";
-export { InputMsg } from "./inputMsg";
-export { JoinedMsg } from "./joinedMsg";
-export { JoinMsg } from "./joinMsg";
-export { KillMsg } from "./killMsg";
-export { MapMsg } from "./mapMsg";
-export { PerkModeRoleSelectMsg } from "./perkModeRoleSelectMsg";
-export { PickupMsg } from "./pickupMsg";
-export { PlayerStatsMsg } from "./playerStatsMsg";
-export { RoleAnnouncementMsg } from "./roleAnnouncementMsg";
-export { SpectateMsg } from "./spectateMsg";
-export { getPlayerStatusUpdateRate, UpdateMsg } from "./updateMsg";
+export { AliveCountsMsg } from "./aliveCountsMsg.ts";
+export { DisconnectMsg } from "./disconnectMsg.ts";
+export { DropItemMsg } from "./dropItemMsg.ts";
+export { EditMsg } from "./editMsg.ts";
+export { EmoteMsg } from "./emoteMsg.ts";
+export { GameOverMsg } from "./gameOverMsg.ts";
+export { InputMsg } from "./inputMsg.ts";
+export { JoinedMsg } from "./joinedMsg.ts";
+export { JoinMsg } from "./joinMsg.ts";
+export { KillMsg } from "./killMsg.ts";
+export { MapMsg } from "./mapMsg.ts";
+export { PerkModeRoleSelectMsg } from "./perkModeRoleSelectMsg.ts";
+export { PickupMsg } from "./pickupMsg.ts";
+export { PlayerStatsMsg } from "./playerStatsMsg.ts";
+export { RoleAnnouncementMsg } from "./roleAnnouncementMsg.ts";
+export { SpectateMsg } from "./spectateMsg.ts";
+export { getPlayerStatusUpdateRate, UpdateMsg } from "./updateMsg.ts";

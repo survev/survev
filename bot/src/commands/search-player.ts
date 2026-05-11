@@ -1,8 +1,8 @@
 import { type ChatInputCommandInteraction, SlashCommandBuilder } from "discord.js";
 import type { InferResponseType } from "hono";
-import { createDiscordDropdownUI } from "../components";
-import { botLogger, Command, hasBotPermission, honoClient } from "../utils";
-import { sendNoPermissionMessage } from "./helpers";
+import { createDiscordDropdownUI } from "../components.ts";
+import { botLogger, Command, hasBotPermission, honoClient } from "../utils.ts";
+import { sendNoPermissionMessage } from "./helpers.ts";
 
 export type SelectedPlayer = Extract<
     InferResponseType<typeof honoClient.moderation.get_player_ip.$post, 200>,

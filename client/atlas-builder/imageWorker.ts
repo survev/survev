@@ -6,9 +6,9 @@ import {
     type ImgCache,
     imageFolder,
     imagesCacheFolder,
-} from "./atlasBuilder";
-import { scaledSprites } from "./atlasDefs";
-import { detectEdges, type Edges } from "./detectEdges";
+} from "./atlasBuilder.ts";
+import { scaledSprites } from "./atlasDefs.ts";
+import { detectEdges, type Edges } from "./detectEdges.ts";
 
 const tmpCanvas = createCanvas(0, 0);
 const tmpCtx = tmpCanvas.getContext("2d");

@@ -1,24 +1,24 @@
 import * as PIXI from "pixi.js-legacy";
-import { GameObjectDefs } from "../../../shared/defs/gameObjectDefs";
-import type { ThrowableDef } from "../../../shared/defs/gameObjects/throwableDefs";
-import { MapObjectDefs } from "../../../shared/defs/mapObjectDefs";
-import type { ObstacleDef } from "../../../shared/defs/mapObjectsTyping";
-import { GameConfig } from "../../../shared/gameConfig";
-import type { ObjectData, ObjectType } from "./../../../shared/net/objectSerializeFns";
-import { collider } from "../../../shared/utils/collider";
-import { math } from "../../../shared/utils/math";
-import { util } from "../../../shared/utils/util";
-import { type Vec2, v2 } from "../../../shared/utils/v2";
-import type { AudioManager } from "../audioManager";
-import type { Camera } from "../camera";
-import type { Ctx } from "../game";
-import type { Map } from "../map";
-import type { Renderer } from "../renderer";
-import { playHitFx } from "./bullet";
-import { Pool } from "./objectPool";
-import type { Obstacle } from "./obstacle";
-import type { ParticleBarn } from "./particles";
-import type { AbstractObject, Player } from "./player";
+import { GameObjectDefs } from "../../../shared/defs/gameObjectDefs.ts";
+import type { ThrowableDef } from "../../../shared/defs/gameObjects/throwableDefs.ts";
+import { MapObjectDefs } from "../../../shared/defs/mapObjectDefs.ts";
+import type { ObstacleDef } from "../../../shared/defs/mapObjectsTyping.ts";
+import { GameConfig } from "../../../shared/gameConfig.ts";
+import type { ObjectData, ObjectType } from "./../../../shared/net/objectSerializeFns.ts";
+import { collider } from "../../../shared/utils/collider.ts";
+import { math } from "../../../shared/utils/math.ts";
+import { util } from "../../../shared/utils/util.ts";
+import { type Vec2, v2 } from "../../../shared/utils/v2.ts";
+import type { AudioManager } from "../audioManager.ts";
+import type { Camera } from "../camera.ts";
+import type { Ctx } from "../game.ts";
+import type { Map } from "../map.ts";
+import type { Renderer } from "../renderer.ts";
+import { playHitFx } from "./bullet.ts";
+import { Pool } from "./objectPool.ts";
+import type { Obstacle } from "./obstacle.ts";
+import type { ParticleBarn } from "./particles.ts";
+import type { AbstractObject, Player } from "./player.ts";
 
 export const halloweenSpriteMap: Record<string, string> = {
     "proj-frag-nopin-01.img": "proj-frag-nopin-02.img",

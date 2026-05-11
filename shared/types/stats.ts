@@ -1,6 +1,6 @@
 import { z } from "zod";
-import { MapId } from "../defs/types/misc";
-import { TeamMode } from "../gameConfig";
+import { MapId } from "../defs/types/misc.ts";
+import { TeamMode } from "../gameConfig.ts";
 
 //
 // Match History

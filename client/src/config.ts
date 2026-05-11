@@ -1,9 +1,9 @@
-import type { MapDefs } from "../../shared/defs/mapDefs";
-import { GameConfig } from "../../shared/gameConfig";
-import loadout from "../../shared/utils/loadout";
-import { util } from "../../shared/utils/util";
-import { v2 } from "../../shared/utils/v2";
-import type { Locale } from "./ui/localization";
+import type { MapDefs } from "../../shared/defs/mapDefs.ts";
+import { GameConfig } from "../../shared/gameConfig.ts";
+import loadout from "../../shared/utils/loadout.ts";
+import { util } from "../../shared/utils/util.ts";
+import { v2 } from "../../shared/utils/v2.ts";
+import type { Locale } from "./ui/localization.ts";
 
 export const debugToolsConfig = {
     enabled: false,

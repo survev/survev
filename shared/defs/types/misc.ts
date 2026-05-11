@@ -1,4 +1,4 @@
-import { TeamMode } from "../../gameConfig";
+import { TeamMode } from "../../gameConfig.ts";
 
 export enum MapId {
     Main = 0,

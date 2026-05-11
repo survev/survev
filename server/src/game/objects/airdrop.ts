@@ -1,14 +1,14 @@
-import { MapObjectDefs } from "../../../../shared/defs/mapObjectDefs";
-import type { ObstacleDef } from "../../../../shared/defs/mapObjectsTyping";
-import { GameConfig } from "../../../../shared/gameConfig";
-import { ObjectType } from "../../../../shared/net/objectSerializeFns";
-import { type Collider, coldet } from "../../../../shared/utils/coldet";
-import { collider } from "../../../../shared/utils/collider";
-import { math } from "../../../../shared/utils/math";
-import { util } from "../../../../shared/utils/util";
-import { type Vec2, v2 } from "../../../../shared/utils/v2";
-import type { Game } from "../game";
-import { BaseGameObject } from "./gameObject";
+import { MapObjectDefs } from "../../../../shared/defs/mapObjectDefs.ts";
+import type { ObstacleDef } from "../../../../shared/defs/mapObjectsTyping.ts";
+import { GameConfig } from "../../../../shared/gameConfig.ts";
+import { ObjectType } from "../../../../shared/net/objectSerializeFns.ts";
+import { type Collider, coldet } from "../../../../shared/utils/coldet.ts";
+import { collider } from "../../../../shared/utils/collider.ts";
+import { math } from "../../../../shared/utils/math.ts";
+import { util } from "../../../../shared/utils/util.ts";
+import { type Vec2, v2 } from "../../../../shared/utils/v2.ts";
+import type { Game } from "../game.ts";
+import { BaseGameObject } from "./gameObject.ts";
 
 export class AirdropBarn {
     airdrops: Airdrop[] = [];

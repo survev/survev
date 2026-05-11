@@ -5,10 +5,10 @@ import {
     type InteractionReplyOptions,
     MessageFlags,
 } from "discord.js";
-import { commandHandlers } from "./commands";
-import { sendNoPermissionMessage } from "./commands/helpers";
-import { DISCORD_BOT_TOKEN } from "./config";
-import { botLogger, type Command, hasBotPermission } from "./utils";
+import { sendNoPermissionMessage } from "./commands/helpers.ts";
+import { commandHandlers } from "./commands/index.ts";
+import { DISCORD_BOT_TOKEN } from "./config.ts";
+import { botLogger, type Command, hasBotPermission } from "./utils.ts";
 
 const client = new Client({ intents: [GatewayIntentBits.Guilds] });
 

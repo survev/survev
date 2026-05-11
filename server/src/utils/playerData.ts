@@ -1,7 +1,7 @@
 import { and, eq, inArray, sql } from "drizzle-orm";
-import { db } from "../api/db";
-import { userQuestTable, usersTable } from "../api/db/schema";
-import type { FindGamePrivateBody } from "./types";
+import { db } from "../api/db/index.ts";
+import { userQuestTable, usersTable } from "../api/db/schema.ts";
+import type { FindGamePrivateBody } from "./types.ts";
 
 export async function getFindGamePlayerData(
     players: Pick<FindGamePrivateBody["playerData"][number], "token" | "userId" | "ip">[],

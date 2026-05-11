@@ -1,13 +1,13 @@
-import "./testHelpers";
+import "./testHelpers.ts";
 import { describe, expect, test } from "vitest";
 
-import { BulletDefs } from "../../shared/defs/gameObjects/bulletDefs";
-import { ExplosionDefs } from "../../shared/defs/gameObjects/explosionsDefs";
-import { GunDefs } from "../../shared/defs/gameObjects/gunDefs";
-import { RoleDefs } from "../../shared/defs/gameObjects/roleDefs";
-import { ThrowableDefs } from "../../shared/defs/gameObjects/throwableDefs";
-import { TeamColor } from "../../shared/defs/maps/factionDefs";
-import { GameConfig } from "../../shared/gameConfig";
+import { BulletDefs } from "../../shared/defs/gameObjects/bulletDefs.ts";
+import { ExplosionDefs } from "../../shared/defs/gameObjects/explosionsDefs.ts";
+import { GunDefs } from "../../shared/defs/gameObjects/gunDefs.ts";
+import { RoleDefs } from "../../shared/defs/gameObjects/roleDefs.ts";
+import { ThrowableDefs } from "../../shared/defs/gameObjects/throwableDefs.ts";
+import { TeamColor } from "../../shared/defs/maps/factionDefs.ts";
+import { GameConfig } from "../../shared/gameConfig.ts";
 
 describe.for(Object.entries(GunDefs))("Gun $0", ([, def]) => {
     test("Bullet", () => {

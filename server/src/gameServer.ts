@@ -4,14 +4,14 @@ import fs from "node:fs/promises";
 import path from "node:path";
 import { Cron } from "croner";
 import { randomUUID } from "crypto";
-import { version } from "../../package.json";
-import { GameConfig } from "../../shared/gameConfig";
-import * as net from "../../shared/net/net";
-import { Config } from "./config";
-import { SingleThreadGameManager } from "./game/gameManager";
-import { GameProcessManager } from "./game/gameProcessManager";
-import { GIT_VERSION } from "./utils/gitRevision";
-import { ServerLogger } from "./utils/logger";
+import pkgJson from "../../package.json" with { type: "json" };
+import { GameConfig } from "../../shared/gameConfig.ts";
+import * as net from "../../shared/net/net.ts";
+import { Config } from "./config.ts";
+import { SingleThreadGameManager } from "./game/gameManager.ts";
+import { GameProcessManager } from "./game/gameProcessManager.ts";
+import { GIT_VERSION } from "./utils/gitRevision.ts";
+import { ServerLogger } from "./utils/logger.ts";
 import {
     apiPrivateRouter,
     cors,
@@ -21,14 +21,14 @@ import {
     logErrorToWebhook,
     returnJson,
     WebSocketRateLimit,
-} from "./utils/serverHelpers";
+} from "./utils/serverHelpers.ts";
 import {
     type FindGamePrivateBody,
     type FindGamePrivateRes,
     type GameSocketData,
     type SaveGameBody,
     zFindGamePrivateBody,
-} from "./utils/types";
+} from "./utils/types.ts";
 
 process.on("uncaughtException", async (err) => {
     console.error(err);
@@ -420,7 +420,7 @@ setInterval(() => {
 }, 20 * 1000);
 
 app.listen(Config.gameServer.host, Config.gameServer.port, () => {
-    server.logger.info(`Survev Game Server v${version} - GIT ${GIT_VERSION}`);
+    server.logger.info(`Survev Game Server v${pkgJson.version} - GIT ${GIT_VERSION}`);
     server.logger.info(
         `Listening on ${Config.gameServer.host}:${Config.gameServer.port}`,
     );

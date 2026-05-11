@@ -1,6 +1,6 @@
 import fs from "node:fs";
 import esbuild, { type BuildOptions } from "esbuild";
-import { pluginDir, readDirectory } from "./game/pluginManager";
+import { pluginDir, readDirectory } from "./game/pluginManager.ts";
 
 if (fs.existsSync("./dist")) {
     fs.rmSync("./dist", { recursive: true });

@@ -1,12 +1,12 @@
 import { resolve } from "node:path";
 import { defineConfig, loadEnv, type Plugin, type ServerOptions } from "vite";
 import stripBlockPlugin from "vite-plugin-strip-block";
-import { getConfig } from "../config";
+import { getConfig } from "../config.ts";
 import { version } from "../package.json";
-import { GIT_VERSION } from "../server/src/utils/gitRevision";
-import { atlasBuilderPlugin } from "./atlas-builder/vitePlugin";
-import { codefendPlugin } from "./vite-plugins/codefendPlugin";
-import { ejsPlugin } from "./vite-plugins/ejsPlugin";
+import { GIT_VERSION } from "../server/src/utils/gitRevision.ts";
+import { atlasBuilderPlugin } from "./atlas-builder/vitePlugin.ts";
+import { codefendPlugin } from "./vite-plugins/codefendPlugin.ts";
+import { ejsPlugin } from "./vite-plugins/ejsPlugin.ts";
 
 export default defineConfig(({ mode }) => {
     const viteEnv = loadEnv(mode, process.cwd(), "VITE_");
@@ -100,10 +100,9 @@ export default defineConfig(({ mode }) => {
         resolve: {
             extensions: [".ts", ".js"],
             alias: {
-                "@/sdk":
-                    viteEnv?.VITE_ENABLE_SURVEV_ADS === "true"
-                        ? "./sdk-manager.prod"
-                        : "./sdk-manager",
+                "@/sdk.ts": viteEnv?.VITE_ENABLE_SURVEV_ADS === "true"
+                    ? "./sdk-manager.prod"
+                    : "./sdk-manager",
             },
         },
         define: {

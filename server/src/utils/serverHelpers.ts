@@ -10,11 +10,11 @@ import {
     RegExpMatcher,
 } from "obscenity";
 import ProxyCheck, { type IPAddressInfo } from "proxycheck-ts";
-import { Constants } from "../../../shared/net/net";
-import { util } from "../../../shared/utils/util";
-import type { PrivateRouteApp } from "../api/routes/private/private";
-import { Config } from "../config";
-import { defaultLogger } from "./logger";
+import { Constants } from "../../../shared/net/net.ts";
+import { util } from "../../../shared/utils/util.ts";
+import type { PrivateRouteApp } from "../api/routes/private/private.ts";
+import { Config } from "../config.ts";
+import { defaultLogger } from "./logger.ts";
 
 /**
  * Apply CORS headers to a response.

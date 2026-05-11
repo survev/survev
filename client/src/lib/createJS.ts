@@ -1,7 +1,7 @@
 // Optimized audio backend built around the soundjs interface.
 
-import type { AudioManager } from "../audioManager";
-import type { ReverbDef } from "../soundDefs";
+import type { AudioManager } from "../audioManager.ts";
+import type { ReverbDef } from "../soundDefs.ts";
 
 // @HACK: From soundjs:
 const isIOS =

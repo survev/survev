@@ -1,22 +1,22 @@
 import { and, count, eq, gte, inArray, ne, type SQL, sql } from "drizzle-orm";
 import { Hono } from "hono";
-import { MinGames } from "../../../../../shared/constants";
-import { TeamMode } from "../../../../../shared/gameConfig";
+import { MinGames } from "../../../../../shared/constants.ts";
+import { TeamMode } from "../../../../../shared/gameConfig.ts";
 import {
     type LeaderboardRequest,
     type LeaderboardResponse,
     zLeaderboardsRequest,
-} from "../../../../../shared/types/stats";
-import type { Context } from "../..";
-import { server } from "../../apiServer";
+} from "../../../../../shared/types/stats.ts";
+import { server } from "../../apiServer.ts";
 import {
     databaseEnabledMiddleware,
     rateLimitMiddleware,
     validateParams,
-} from "../../auth/middleware";
-import { leaderboardCache } from "../../cache/leaderboard";
-import { db } from "../../db";
-import { matchDataTable, usersTable } from "../../db/schema";
+} from "../../auth/middleware.ts";
+import { leaderboardCache } from "../../cache/leaderboard.ts";
+import { db } from "../../db/index.ts";
+import { matchDataTable, usersTable } from "../../db/schema.ts";
+import type { Context } from "../../index.ts";
 
 export const leaderboardRouter = new Hono<Context>();
 

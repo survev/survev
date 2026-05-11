@@ -1,8 +1,8 @@
 import { expect, test } from "vitest";
-import { Game } from "../../server/src/game/game";
-import { GameConfig, TeamMode } from "../../shared/gameConfig";
-import { v2 } from "../../shared/utils/v2";
-import { createGame } from "./gameTestHelpers";
+import { Game } from "../../server/src/game/game.ts";
+import { GameConfig, TeamMode } from "../../shared/gameConfig.ts";
+import { v2 } from "../../shared/utils/v2.ts";
+import { createGame } from "./gameTestHelpers.ts";
 
 // don't want the test making requests
 Game.prototype.sendQuestProgress = async () => {};

@@ -1,5 +1,5 @@
 import { isMobile } from "pixi.js-legacy";
-import { getParameterByName } from "./helpers";
+import { getParameterByName } from "./helpers.ts";
 
 function detectMobile() {
     return isMobile.android.device || isMobile.apple.device || isIpad();

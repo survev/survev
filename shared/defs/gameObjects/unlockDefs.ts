@@ -1,4 +1,4 @@
-import { HealEffectDefs } from "./healEffectDefs";
+import { HealEffectDefs } from "./healEffectDefs.ts";
 
 const _allowedHealEffects = Object.keys(HealEffectDefs);
 const _allowedMeleeSkins = [

@@ -3,7 +3,10 @@ import {
     type ChatInputCommandInteraction,
     type SlashCommandOptionsOnlyBuilder,
 } from "discord.js";
-import { zSetClientThemeBody, zSetGameModeBody } from "../../../server/src/utils/types";
+import {
+    zSetClientThemeBody,
+    zSetGameModeBody,
+} from "../../../server/src/utils/types.ts";
 import {
     zBanAccountParams,
     zBanIpParams,
@@ -18,10 +21,10 @@ import {
     zSetMatchDataNameParams,
     zUnbanAccountParams,
     zUnbanIpParams,
-} from "../../../shared/types/moderation";
-import { Command } from "../utils";
-import { createCommand, createSlashCommand, genericExecute } from "./helpers";
-import { searchPlayersHandler } from "./search-player";
+} from "../../../shared/types/moderation.ts";
+import { Command } from "../utils.ts";
+import { createCommand, createSlashCommand, genericExecute } from "./helpers.ts";
+import { searchPlayersHandler } from "./search-player.ts";
 
 /**
  * for generic commands that only makes an api call and return it's meessage

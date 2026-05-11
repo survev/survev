@@ -2,16 +2,16 @@ import type { WebSocket } from "uWebSockets.js";
 import { randomUUID } from "crypto";
 import NanoTimer from "nanotimer";
 import { platform } from "os";
-import type { MapDefs } from "../../../shared/defs/mapDefs";
-import * as net from "../../../shared/net/net";
-import { Config } from "../config";
+import type { MapDefs } from "../../../shared/defs/mapDefs.ts";
+import * as net from "../../../shared/net/net.ts";
+import { Config } from "../config.ts";
 import type {
     FindGamePrivateBody,
     GameData,
     GameSocketData,
     ServerGameConfig,
-} from "../utils/types";
-import { Game } from "./game";
+} from "../utils/types.ts";
+import { Game } from "./game.ts";
 
 export abstract class GameManager {
     abstract sockets: Map<string, WebSocket<GameSocketData>>;

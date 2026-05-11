@@ -1,6 +1,6 @@
-import { earcut } from "./earcut";
-import { assert } from "./util";
-import { type Vec2, v2 } from "./v2";
+import { earcut } from "./earcut.js";
+import { assert } from "./util.ts";
+import { type Vec2, v2 } from "./v2.ts";
 
 const kEpsilon = 0.000001;
 

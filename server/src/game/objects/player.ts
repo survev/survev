@@ -3,8 +3,11 @@ import {
     GameObjectDefs,
     type LootDef,
     WeaponTypeToDefs,
-} from "../../../../shared/defs/gameObjectDefs";
-import { type EmoteDef, EmotesDefs } from "../../../../shared/defs/gameObjects/emoteDefs";
+} from "../../../../shared/defs/gameObjectDefs.ts";
+import {
+    type EmoteDef,
+    EmotesDefs,
+} from "../../../../shared/defs/gameObjects/emoteDefs.ts";
 import {
     type BackpackDef,
     type BoostDef,
@@ -13,16 +16,16 @@ import {
     type HealDef,
     type HelmetDef,
     SCOPE_LEVELS,
-} from "../../../../shared/defs/gameObjects/gearDefs";
-import type { GunDef } from "../../../../shared/defs/gameObjects/gunDefs";
-import type { MeleeDef } from "../../../../shared/defs/gameObjects/meleeDefs";
-import type { OutfitDef } from "../../../../shared/defs/gameObjects/outfitDefs";
-import { PerkProperties } from "../../../../shared/defs/gameObjects/perkDefs";
-import type { RoleDef } from "../../../../shared/defs/gameObjects/roleDefs";
-import type { ThrowableDef } from "../../../../shared/defs/gameObjects/throwableDefs";
-import { UnlockDefs } from "../../../../shared/defs/gameObjects/unlockDefs";
-import { MapObjectDefs } from "../../../../shared/defs/mapObjectDefs";
-import type { StructureDef } from "../../../../shared/defs/mapObjectsTyping";
+} from "../../../../shared/defs/gameObjects/gearDefs.ts";
+import type { GunDef } from "../../../../shared/defs/gameObjects/gunDefs.ts";
+import type { MeleeDef } from "../../../../shared/defs/gameObjects/meleeDefs.ts";
+import type { OutfitDef } from "../../../../shared/defs/gameObjects/outfitDefs.ts";
+import { PerkProperties } from "../../../../shared/defs/gameObjects/perkDefs.ts";
+import type { RoleDef } from "../../../../shared/defs/gameObjects/roleDefs.ts";
+import type { ThrowableDef } from "../../../../shared/defs/gameObjects/throwableDefs.ts";
+import { UnlockDefs } from "../../../../shared/defs/gameObjects/unlockDefs.ts";
+import { MapObjectDefs } from "../../../../shared/defs/mapObjectDefs.ts";
+import type { StructureDef } from "../../../../shared/defs/mapObjectsTyping.ts";
 import {
     type Action,
     type Anim,
@@ -31,28 +34,28 @@ import {
     type HasteType,
     type Input,
     type InventoryItem,
-} from "../../../../shared/gameConfig";
-import * as net from "../../../../shared/net/net";
-import { ObjectType } from "../../../../shared/net/objectSerializeFns";
-import type { GroupStatus } from "../../../../shared/net/updateMsg";
-import { type Circle, coldet } from "../../../../shared/utils/coldet";
-import { collider } from "../../../../shared/utils/collider";
-import { math } from "../../../../shared/utils/math";
-import { assert, util } from "../../../../shared/utils/util";
-import { type Vec2, v2 } from "../../../../shared/utils/v2";
-import { Config } from "../../config";
-import { IDAllocator } from "../../utils/IDAllocator";
-import { validateUserName } from "../../utils/serverHelpers";
-import type { Game, JoinTokenData } from "../game";
-import { Group, Team } from "../group";
-import { InventoryManager } from "../inventoryManager";
-import { QuestManager } from "../questManager";
-import { WeaponManager } from "../weaponManager";
-import type { Building } from "./building";
-import { BaseGameObject, type DamageParams, type GameObject } from "./gameObject";
-import type { Loot } from "./loot";
-import type { MapIndicator } from "./mapIndicator";
-import type { Obstacle } from "./obstacle";
+} from "../../../../shared/gameConfig.ts";
+import * as net from "../../../../shared/net/net.ts";
+import { ObjectType } from "../../../../shared/net/objectSerializeFns.ts";
+import type { GroupStatus } from "../../../../shared/net/updateMsg.ts";
+import { type Circle, coldet } from "../../../../shared/utils/coldet.ts";
+import { collider } from "../../../../shared/utils/collider.ts";
+import { math } from "../../../../shared/utils/math.ts";
+import { assert, util } from "../../../../shared/utils/util.ts";
+import { type Vec2, v2 } from "../../../../shared/utils/v2.ts";
+import { Config } from "../../config.ts";
+import { IDAllocator } from "../../utils/IDAllocator.ts";
+import { validateUserName } from "../../utils/serverHelpers.ts";
+import type { Game, JoinTokenData } from "../game.ts";
+import { Group, Team } from "../group.ts";
+import { InventoryManager } from "../inventoryManager.ts";
+import { QuestManager } from "../questManager.ts";
+import { WeaponManager } from "../weaponManager.ts";
+import type { Building } from "./building.ts";
+import { BaseGameObject, type DamageParams, type GameObject } from "./gameObject.ts";
+import type { Loot } from "./loot.ts";
+import type { MapIndicator } from "./mapIndicator.ts";
+import type { Obstacle } from "./obstacle.ts";
 
 type MoveObjsMode = {
     enabled: boolean;

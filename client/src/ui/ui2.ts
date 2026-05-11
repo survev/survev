@@ -1,4 +1,4 @@
-import { GameObjectDefs, type LootDef } from "../../../shared/defs/gameObjectDefs";
+import { GameObjectDefs, type LootDef } from "../../../shared/defs/gameObjectDefs.ts";
 import {
     type AmmoDef,
     type BoostDef,
@@ -6,32 +6,32 @@ import {
     GEAR_TYPES,
     type HealDef,
     SCOPE_LEVELS,
-} from "../../../shared/defs/gameObjects/gearDefs";
-import type { GunDef } from "../../../shared/defs/gameObjects/gunDefs";
-import type { MeleeDef } from "../../../shared/defs/gameObjects/meleeDefs";
-import type { RoleDef } from "../../../shared/defs/gameObjects/roleDefs";
-import { MapObjectDefs } from "../../../shared/defs/mapObjectDefs";
-import type { ObstacleDef } from "../../../shared/defs/mapObjectsTyping";
+} from "../../../shared/defs/gameObjects/gearDefs.ts";
+import type { GunDef } from "../../../shared/defs/gameObjects/gunDefs.ts";
+import type { MeleeDef } from "../../../shared/defs/gameObjects/meleeDefs.ts";
+import type { RoleDef } from "../../../shared/defs/gameObjects/roleDefs.ts";
+import { MapObjectDefs } from "../../../shared/defs/mapObjectDefs.ts";
+import type { ObstacleDef } from "../../../shared/defs/mapObjectsTyping.ts";
 import {
     Action,
     DamageType,
     GameConfig,
     Input,
     type InventoryItem,
-} from "../../../shared/gameConfig";
-import { PickupMsgType } from "../../../shared/net/net";
-import { collider } from "../../../shared/utils/collider";
-import { math } from "../../../shared/utils/math";
-import { util } from "../../../shared/utils/util";
-import { v2 } from "../../../shared/utils/v2";
-import { device } from "../device";
-import { helpers } from "../helpers";
-import type { InputBinds } from "../inputBinds";
-import type { Map } from "../map";
-import type { Loot, LootBarn } from "../objects/loot";
-import type { Obstacle } from "../objects/obstacle";
-import type { Player, PlayerBarn } from "../objects/player";
-import type { Localization } from "./localization";
+} from "../../../shared/gameConfig.ts";
+import { PickupMsgType } from "../../../shared/net/net.ts";
+import { collider } from "../../../shared/utils/collider.ts";
+import { math } from "../../../shared/utils/math.ts";
+import { util } from "../../../shared/utils/util.ts";
+import { v2 } from "../../../shared/utils/v2.ts";
+import { device } from "../device.ts";
+import { helpers } from "../helpers.ts";
+import type { InputBinds } from "../inputBinds.ts";
+import type { Map } from "../map.ts";
+import type { Loot, LootBarn } from "../objects/loot.ts";
+import type { Obstacle } from "../objects/obstacle.ts";
+import type { Player, PlayerBarn } from "../objects/player.ts";
+import type { Localization } from "./localization.ts";
 
 const maxKillFeedLines = 6;
 const touchHoldDuration = 0.75 * 1000;

@@ -1,7 +1,7 @@
 import { REST, Routes } from "discord.js";
-import { commandsToRegister } from "./commands";
-import { DISCORD_BOT_TOKEN, DISCORD_CLIENT_ID, DISCORD_GUILD_ID } from "./config";
-import { botLogger } from "./utils";
+import { commandsToRegister } from "./commands/index.ts";
+import { DISCORD_BOT_TOKEN, DISCORD_CLIENT_ID, DISCORD_GUILD_ID } from "./config.ts";
+import { botLogger } from "./utils.ts";
 
 async function registerCommands() {
     const rest = new REST({ version: "10" }).setToken(DISCORD_BOT_TOKEN);

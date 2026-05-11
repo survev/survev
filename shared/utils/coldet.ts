@@ -1,6 +1,6 @@
-import { collider } from "./collider";
-import { math } from "./math";
-import { type Vec2, v2 } from "./v2";
+import { collider } from "./collider.ts";
+import { math } from "./math.ts";
+import { type Vec2, v2 } from "./v2.ts";
 
 export interface Circle {
     type: 0;

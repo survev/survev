@@ -1,17 +1,17 @@
-import { GameObjectDefs } from "../../../../shared/defs/gameObjectDefs";
-import type { ExplosionDef } from "../../../../shared/defs/gameObjects/explosionsDefs";
-import { PerkProperties } from "../../../../shared/defs/gameObjects/perkDefs";
-import { ObjectType } from "../../../../shared/net/objectSerializeFns";
-import { coldet } from "../../../../shared/utils/coldet";
-import { collider } from "../../../../shared/utils/collider";
-import { math } from "../../../../shared/utils/math";
-import { assert, util } from "../../../../shared/utils/util";
-import { type Vec2, v2 } from "../../../../shared/utils/v2";
-import type { Game } from "../game";
-import type { DamageParams, GameObject } from "./gameObject";
-import type { Loot } from "./loot";
-import type { Obstacle } from "./obstacle";
-import type { Player } from "./player";
+import { GameObjectDefs } from "../../../../shared/defs/gameObjectDefs.ts";
+import type { ExplosionDef } from "../../../../shared/defs/gameObjects/explosionsDefs.ts";
+import { PerkProperties } from "../../../../shared/defs/gameObjects/perkDefs.ts";
+import { ObjectType } from "../../../../shared/net/objectSerializeFns.ts";
+import { coldet } from "../../../../shared/utils/coldet.ts";
+import { collider } from "../../../../shared/utils/collider.ts";
+import { math } from "../../../../shared/utils/math.ts";
+import { assert, util } from "../../../../shared/utils/util.ts";
+import { type Vec2, v2 } from "../../../../shared/utils/v2.ts";
+import type { Game } from "../game.ts";
+import type { DamageParams, GameObject } from "./gameObject.ts";
+import { type Loot } from "./loot.ts";
+import type { Obstacle } from "./obstacle.ts";
+import type { Player } from "./player.ts";
 
 interface LineCollision {
     obj: GameObject;

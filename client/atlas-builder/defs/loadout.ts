@@ -1,4 +1,4 @@
-import type { AtlasDef } from "../atlasDefs";
+import type { AtlasDef } from "../atlasDefs.ts";
 
 export const LoadoutAtlas: AtlasDef = {
     compress: false,

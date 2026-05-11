@@ -1,7 +1,7 @@
-import { Config } from "../../server/src/config";
-import { Game } from "../../server/src/game/game";
-import type { MapDefs } from "../../shared/defs/mapDefs";
-import type { TeamMode } from "../../shared/gameConfig";
+import { Config } from "../../server/src/config.ts";
+import { Game } from "../../server/src/game/game.ts";
+import type { MapDefs } from "../../shared/defs/mapDefs.ts";
+import type { TeamMode } from "../../shared/gameConfig.ts";
 
 export async function createGame(teamMode: TeamMode, mapName: keyof typeof MapDefs) {
     // we dont want vitest spammed with stdout logs so only log warns and errors

@@ -1,11 +1,11 @@
 import { and, eq, sql } from "drizzle-orm";
-import { GameObjectDefs } from "../../../../../shared/defs/gameObjectDefs";
-import { PassDefs } from "../../../../../shared/defs/gameObjects/passDefs";
-import { passUtil } from "../../../../../shared/utils/passUtil";
-import { Config } from "../../../config";
-import { server } from "../../apiServer";
-import type { db } from "../../db";
-import { itemsTable, userPassTable } from "../../db/schema";
+import { GameObjectDefs } from "../../../../../shared/defs/gameObjectDefs.ts";
+import { PassDefs } from "../../../../../shared/defs/gameObjects/passDefs.ts";
+import { passUtil } from "../../../../../shared/utils/passUtil.ts";
+import { Config } from "../../../config.ts";
+import { server } from "../../apiServer.ts";
+import type { db } from "../../db/index.ts";
+import { itemsTable, userPassTable } from "../../db/schema.ts";
 
 export async function incrementPassXp(
     transaction: Parameters<Parameters<typeof db.transaction>[0]>[0],

@@ -1,20 +1,20 @@
-import { GameObjectDefs } from "../../../shared/defs/gameObjectDefs";
+import { GameObjectDefs } from "../../../shared/defs/gameObjectDefs.ts";
 import {
     type ExplosionDef,
     ExplosionDefs,
-} from "../../../shared/defs/gameObjects/explosionsDefs";
-import { collider } from "../../../shared/utils/collider";
-import { math } from "../../../shared/utils/math";
-import { util } from "../../../shared/utils/util";
-import { type Vec2, v2 } from "../../../shared/utils/v2";
-import type { AudioManager } from "../audioManager";
-import type { Camera } from "../camera";
-import type { DebugRenderOpts } from "../config";
-import { debugLines } from "../debug/debugLines";
-import type { SoundHandle } from "../lib/createJS";
-import type { Map } from "../map";
-import type { Particle, ParticleBarn } from "./particles";
-import type { PlayerBarn } from "./player";
+} from "../../../shared/defs/gameObjects/explosionsDefs.ts";
+import { collider } from "../../../shared/utils/collider.ts";
+import { math } from "../../../shared/utils/math.ts";
+import { util } from "../../../shared/utils/util.ts";
+import { type Vec2, v2 } from "../../../shared/utils/v2.ts";
+import type { AudioManager } from "../audioManager.ts";
+import type { Camera } from "../camera.ts";
+import type { DebugRenderOpts } from "../config.ts";
+import { debugLines } from "../debug/debugLines.ts";
+import type { SoundHandle } from "../lib/createJS.ts";
+import type { Map } from "../map.ts";
+import type { Particle, ParticleBarn } from "./particles.ts";
+import type { PlayerBarn } from "./player.ts";
 
 class PhysicsParticle {
     active: boolean;

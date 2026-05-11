@@ -1,9 +1,9 @@
-import "./testHelpers";
+import "./testHelpers.ts";
 import { describe, expect, test } from "vitest";
-import { Atlases } from "../../client/atlas-builder/atlasDefs";
-import { type MapDef, MapDefs } from "../../shared/defs/mapDefs";
-import { Constants } from "../../shared/net/net";
-import { getAllAtlasSprites, getAllMapSprites } from "./spriteHelpers";
+import { Atlases } from "../../client/atlas-builder/atlasDefs.ts";
+import { type MapDef, MapDefs } from "../../shared/defs/mapDefs.ts";
+import { Constants } from "../../shared/net/net.ts";
+import { getAllAtlasSprites, getAllMapSprites } from "./spriteHelpers.ts";
 
 const maps = Object.keys(MapDefs);
 

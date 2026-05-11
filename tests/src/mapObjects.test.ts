@@ -1,14 +1,14 @@
-import "./testHelpers";
+import "./testHelpers.ts";
 import { describe, expect, test } from "vitest";
 
-import { MapObjectDefs } from "../../shared/defs/mapObjectDefs";
+import { MapObjectDefs } from "../../shared/defs/mapObjectDefs.ts";
 import type {
     BuildingDef,
     LootSpawnerDef,
     ObstacleDef,
     StructureDef,
-} from "../../shared/defs/mapObjectsTyping";
-import { Constants } from "../../shared/net/net";
+} from "../../shared/defs/mapObjectsTyping.ts";
+import { Constants } from "../../shared/net/net.ts";
 
 const mapObjects = Object.entries(MapObjectDefs);
 

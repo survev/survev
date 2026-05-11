@@ -1,32 +1,32 @@
 import * as PIXI from "pixi.js-legacy";
-import { MapObjectDefs } from "../../../shared/defs/mapObjectDefs";
-import type { BuildingDef } from "../../../shared/defs/mapObjectsTyping";
-import type { FloorImage } from "../../../shared/defs/types/building";
-import type { ObjectData, ObjectType } from "../../../shared/net/objectSerializeFns";
-import type { Collider } from "../../../shared/utils/coldet";
-import { collider } from "../../../shared/utils/collider";
-import { collisionHelpers } from "../../../shared/utils/collisionHelpers";
-import { mapHelpers } from "../../../shared/utils/mapHelpers";
-import { math } from "../../../shared/utils/math";
-import { util } from "../../../shared/utils/util";
-import { type Vec2, v2 } from "../../../shared/utils/v2";
-import type { AudioManager } from "../audioManager";
-import type { Camera } from "../camera";
-import type { DebugRenderOpts } from "../config";
+import { MapObjectDefs } from "../../../shared/defs/mapObjectDefs.ts";
+import type { BuildingDef } from "../../../shared/defs/mapObjectsTyping.ts";
+import type { FloorImage } from "../../../shared/defs/types/building.ts";
+import type { ObjectData, ObjectType } from "../../../shared/net/objectSerializeFns.ts";
+import type { Collider } from "../../../shared/utils/coldet.ts";
+import { collider } from "../../../shared/utils/collider.ts";
+import { collisionHelpers } from "../../../shared/utils/collisionHelpers.ts";
+import { mapHelpers } from "../../../shared/utils/mapHelpers.ts";
+import { math } from "../../../shared/utils/math.ts";
+import { util } from "../../../shared/utils/util.ts";
+import { type Vec2, v2 } from "../../../shared/utils/v2.ts";
+import type { AudioManager } from "../audioManager.ts";
+import type { Camera } from "../camera.ts";
+import type { DebugRenderOpts } from "../config.ts";
 import {
     renderBridge,
     renderMapBuildingBounds,
     renderMapObstacleBounds,
     renderWaterEdge,
-} from "../debug/debugHelpers";
-import { debugLines } from "../debug/debugLines";
-import type { Ctx } from "../game";
-import type { SoundHandle } from "../lib/createJS";
-import type { Map } from "../map";
-import type { Renderer } from "../renderer";
-import type { Obstacle } from "./obstacle";
-import type { Emitter, ParticleBarn } from "./particles";
-import type { AbstractObject, Player } from "./player";
+} from "../debug/debugHelpers.ts";
+import { debugLines } from "../debug/debugLines.ts";
+import type { Ctx } from "../game.ts";
+import type { SoundHandle } from "../lib/createJS.ts";
+import type { Map } from "../map.ts";
+import type { Renderer } from "../renderer.ts";
+import type { Obstacle } from "./obstacle.ts";
+import type { Emitter, ParticleBarn } from "./particles.ts";
+import type { AbstractObject, Player } from "./player.ts";
 
 function step(cur: number, target: number, rate: number) {
     const delta = target - cur;

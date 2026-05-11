@@ -1,12 +1,12 @@
-import { TeamColor } from "../../../shared/defs/maps/factionDefs";
-import { GameConfig, TeamMode } from "../../../shared/gameConfig";
-import { ObjectType } from "../../../shared/net/objectSerializeFns";
-import { collider } from "../../../shared/utils/collider";
-import { util } from "../../../shared/utils/util";
-import { v2 } from "../../../shared/utils/v2";
-import type { Game } from "./game";
-import type { DamageParams } from "./objects/gameObject";
-import type { Player } from "./objects/player";
+import { TeamColor } from "../../../shared/defs/maps/factionDefs.ts";
+import { GameConfig, TeamMode } from "../../../shared/gameConfig.ts";
+import { ObjectType } from "../../../shared/net/objectSerializeFns.ts";
+import { collider } from "../../../shared/utils/collider.ts";
+import { util } from "../../../shared/utils/util.ts";
+import { v2 } from "../../../shared/utils/v2.ts";
+import type { Game } from "./game.ts";
+import type { DamageParams } from "./objects/gameObject.ts";
+import type { Player } from "./objects/player.ts";
 
 enum GameMode {
     /** default solos, any map besides factions */

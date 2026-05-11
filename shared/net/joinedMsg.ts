@@ -1,5 +1,5 @@
-import type { TeamMode } from "../gameConfig";
-import type { AbstractMsg, BitStream } from "./net";
+import type { TeamMode } from "../gameConfig.ts";
+import type { AbstractMsg, BitStream } from "./net.ts";
 
 export class JoinedMsg implements AbstractMsg {
     teamMode!: TeamMode;

@@ -1,24 +1,24 @@
-import { MapObjectDefs } from "../../../shared/defs/mapObjectDefs";
-import type { StructureDef } from "../../../shared/defs/mapObjectsTyping";
-import type { ObjectData, ObjectType } from "./../../../shared/net/objectSerializeFns";
-import { type AABB, type Collider, coldet } from "../../../shared/utils/coldet";
-import { collider } from "../../../shared/utils/collider";
-import { mapHelpers } from "../../../shared/utils/mapHelpers";
-import { math } from "../../../shared/utils/math";
-import { type Vec2, v2 } from "../../../shared/utils/v2";
-import type { Ambiance } from "../ambiance";
-import type Camera from "../camera";
-import type { DebugRenderOpts } from "../config";
+import { MapObjectDefs } from "../../../shared/defs/mapObjectDefs.ts";
+import type { StructureDef } from "../../../shared/defs/mapObjectsTyping.ts";
+import type { ObjectData, ObjectType } from "./../../../shared/net/objectSerializeFns.ts";
+import { type AABB, type Collider, coldet } from "../../../shared/utils/coldet.ts";
+import { collider } from "../../../shared/utils/collider.ts";
+import { mapHelpers } from "../../../shared/utils/mapHelpers.ts";
+import { math } from "../../../shared/utils/math.ts";
+import { type Vec2, v2 } from "../../../shared/utils/v2.ts";
+import type { Ambiance } from "../ambiance.ts";
+import type Camera from "../camera.ts";
+import type { DebugRenderOpts } from "../config.ts";
 import {
     renderBridge,
     renderMapBuildingBounds,
     renderMapObstacleBounds,
     renderWaterEdge,
-} from "../debug/debugHelpers";
-import { debugLines } from "../debug/debugLines";
-import type { Ctx } from "../game";
-import type { Map } from "../map";
-import type { AbstractObject, Player } from "./player";
+} from "../debug/debugHelpers.ts";
+import { debugLines } from "../debug/debugLines.ts";
+import type { Ctx } from "../game.ts";
+import type { Map } from "../map.ts";
+import type { AbstractObject, Player } from "./player.ts";
 
 interface Stair {
     collision: AABB;

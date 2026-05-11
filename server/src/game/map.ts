@@ -1,32 +1,32 @@
 import { styleText } from "util";
-import { type MapDef, MapDefs } from "../../../shared/defs/mapDefs";
-import { MapObjectDefs } from "../../../shared/defs/mapObjectDefs";
+import { type MapDef, MapDefs } from "../../../shared/defs/mapDefs.ts";
+import { MapObjectDefs } from "../../../shared/defs/mapObjectDefs.ts";
 import type {
     BuildingDef,
     ObstacleDef,
     StructureDef,
-} from "../../../shared/defs/mapObjectsTyping";
-import type { MapId } from "../../../shared/defs/types/misc";
-import { GameConfig, TeamMode } from "../../../shared/gameConfig";
-import * as net from "../../../shared/net/net";
-import { MsgStream, MsgType } from "../../../shared/net/net";
-import { ObjectType } from "../../../shared/net/objectSerializeFns";
-import { type AABB, type Collider, coldet } from "../../../shared/utils/coldet";
-import { collider } from "../../../shared/utils/collider";
-import { mapHelpers } from "../../../shared/utils/mapHelpers";
-import { math } from "../../../shared/utils/math";
-import type { River } from "../../../shared/utils/river";
-import { generateTerrain, type MapRiverData } from "../../../shared/utils/terrainGen";
-import { assert, util } from "../../../shared/utils/util";
-import { type Vec2, v2 } from "../../../shared/utils/v2";
-import { Config } from "../config";
-import type { Game } from "./game";
-import type { Group, Team } from "./group";
-import { Building } from "./objects/building";
-import { Obstacle } from "./objects/obstacle";
-import type { Player } from "./objects/player";
-import { Structure } from "./objects/structure";
-import { RiverCreator } from "./riverCreator";
+} from "../../../shared/defs/mapObjectsTyping.ts";
+import type { MapId } from "../../../shared/defs/types/misc.ts";
+import { GameConfig, TeamMode } from "../../../shared/gameConfig.ts";
+import * as net from "../../../shared/net/net.ts";
+import { MsgStream, MsgType } from "../../../shared/net/net.ts";
+import { ObjectType } from "../../../shared/net/objectSerializeFns.ts";
+import { type AABB, type Collider, coldet } from "../../../shared/utils/coldet.ts";
+import { collider } from "../../../shared/utils/collider.ts";
+import { mapHelpers } from "../../../shared/utils/mapHelpers.ts";
+import { math } from "../../../shared/utils/math.ts";
+import type { River } from "../../../shared/utils/river.ts";
+import { generateTerrain, type MapRiverData } from "../../../shared/utils/terrainGen.ts";
+import { assert, util } from "../../../shared/utils/util.ts";
+import { type Vec2, v2 } from "../../../shared/utils/v2.ts";
+import { Config } from "../config.ts";
+import type { Game } from "./game.ts";
+import type { Group, Team } from "./group.ts";
+import { Building } from "./objects/building.ts";
+import { Obstacle } from "./objects/obstacle.ts";
+import type { Player } from "./objects/player.ts";
+import { Structure } from "./objects/structure.ts";
+import { RiverCreator } from "./riverCreator.ts";
 
 // most of this logic is based on the `renderMapBuildingBounds` from client debugHelpers
 // which was found on BHA leak

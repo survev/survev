@@ -1,12 +1,12 @@
-import { MapId, TeamModeToString } from "../../../../shared/defs/types/misc";
+import { MapId, TeamModeToString } from "../../../../shared/defs/types/misc.ts";
 import type {
     LeaderboardRequest,
     LeaderboardResponse,
-} from "../../../../shared/types/stats";
-import { Config } from "../../config";
-import { server } from "../apiServer";
-import type { MatchDataTable } from "../db/schema";
-import { getRedisClient } from ".";
+} from "../../../../shared/types/stats.ts";
+import { Config } from "../../config.ts";
+import { server } from "../apiServer.ts";
+import type { MatchDataTable } from "../db/schema.ts";
+import { getRedisClient } from "./index.ts";
 
 const SIX_MINUTES_CACHE_TTL = 360;
 const ONE_DAY_CACHE_TTL = 86400;

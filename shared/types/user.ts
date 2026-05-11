@@ -1,6 +1,6 @@
 import { z } from "zod";
-import { Constants } from "../../shared/net/net";
-import { type Item, ItemStatus, type Loadout, loadoutSchema } from "../utils/loadout";
+import { Constants } from "../../shared/net/net.ts";
+import { type Item, ItemStatus, type Loadout, loadoutSchema } from "../utils/loadout.ts";
 
 export type ProfileResponse =
     | {

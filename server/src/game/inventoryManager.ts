@@ -1,10 +1,13 @@
-import { GameObjectDefs } from "../../../shared/defs/gameObjectDefs";
-import { SCOPE_LEVELS, type ScopeDef } from "../../../shared/defs/gameObjects/gearDefs";
-import { PerkProperties } from "../../../shared/defs/gameObjects/perkDefs";
-import { GameConfig, type InventoryItem } from "../../../shared/gameConfig";
-import { math } from "../../../shared/utils/math";
-import type { Player } from "./objects/player";
-import { throwableList } from "./weaponManager";
+import { GameObjectDefs } from "../../../shared/defs/gameObjectDefs.ts";
+import {
+    SCOPE_LEVELS,
+    type ScopeDef,
+} from "../../../shared/defs/gameObjects/gearDefs.ts";
+import { PerkProperties } from "../../../shared/defs/gameObjects/perkDefs.ts";
+import { GameConfig, type InventoryItem } from "../../../shared/gameConfig.ts";
+import { math } from "../../../shared/utils/math.ts";
+import type { Player } from "./objects/player.ts";
+import { throwableList } from "./weaponManager.ts";
 
 const emptyInventory = Object.keys(GameConfig.bagSizes).reduce(
     (inv, key) => {

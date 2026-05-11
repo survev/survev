@@ -1,10 +1,10 @@
 import * as PIXI from "pixi.js-legacy";
-import { Constants } from "../../shared/net/net";
-import { v2 } from "../../shared/utils/v2";
-import type { Camera } from "./camera";
-import { errorLogManager } from "./errorLogs";
-import type { Game } from "./game";
-import type { Map } from "./map";
+import { Constants } from "../../shared/net/net.ts";
+import { v2 } from "../../shared/utils/v2.ts";
+import type { Camera } from "./camera.ts";
+import { errorLogManager } from "./errorLogs.ts";
+import type { Game } from "./game.ts";
+import type { Map } from "./map.ts";
 
 //
 // Helpers

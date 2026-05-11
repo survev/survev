@@ -1,14 +1,14 @@
-import type { BitStream } from "../../../shared/net/net";
+import type { BitStream } from "../../../shared/net/net.ts";
 import {
     type ObjectData,
     type ObjectsPartialData,
     ObjectType,
-} from "../../../shared/net/objectSerializeFns";
-import { assert } from "../../../shared/utils/util";
-import { errorLogManager } from "../errorLogs";
-import type { Ctx } from "../game";
+} from "../../../shared/net/objectSerializeFns.ts";
+import { assert } from "../../../shared/utils/util.ts";
+import { errorLogManager } from "../errorLogs.ts";
+import type { Ctx } from "../game.ts";
 
-import type { AbstractObject } from "./player";
+import type { AbstractObject } from "./player.ts";
 
 type C<T extends AbstractObject> = new () => T;
 

@@ -1,18 +1,18 @@
-import { MapObjectDefs } from "../../../shared/defs/mapObjectDefs";
+import { MapObjectDefs } from "../../../shared/defs/mapObjectDefs.ts";
 import type {
     BuildingDef,
     ObstacleDef,
     StructureDef,
-} from "../../../shared/defs/mapObjectsTyping";
-import type { AABB } from "../../../shared/utils/coldet";
-import { collider } from "../../../shared/utils/collider";
-import { mapHelpers } from "../../../shared/utils/mapHelpers";
-import type { River } from "../../../shared/utils/river";
-import { type Vec2, v2 } from "../../../shared/utils/v2";
-import type { Building } from "../objects/building";
-import type { Obstacle } from "../objects/obstacle";
-import type { Structure } from "../objects/structure";
-import { debugLines } from "./debugLines";
+} from "../../../shared/defs/mapObjectsTyping.ts";
+import type { AABB } from "../../../shared/utils/coldet.ts";
+import { collider } from "../../../shared/utils/collider.ts";
+import { mapHelpers } from "../../../shared/utils/mapHelpers.ts";
+import type { River } from "../../../shared/utils/river.ts";
+import { type Vec2, v2 } from "../../../shared/utils/v2.ts";
+import type { Building } from "../objects/building.ts";
+import type { Obstacle } from "../objects/obstacle.ts";
+import type { Structure } from "../objects/structure.ts";
+import { debugLines } from "./debugLines.ts";
 
 export function renderMapBuildingBounds(mapObj: Building | Structure) {
     const def = MapObjectDefs[mapObj.type] as BuildingDef;

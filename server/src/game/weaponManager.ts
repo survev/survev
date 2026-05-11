@@ -1,24 +1,28 @@
-import { GameObjectDefs } from "../../../shared/defs/gameObjectDefs";
-import type { GunDef } from "../../../shared/defs/gameObjects/gunDefs";
-import type { MeleeDef } from "../../../shared/defs/gameObjects/meleeDefs";
-import { PerkProperties } from "../../../shared/defs/gameObjects/perkDefs";
+import { GameObjectDefs } from "../../../shared/defs/gameObjectDefs.ts";
+import type { GunDef } from "../../../shared/defs/gameObjects/gunDefs.ts";
+import type { MeleeDef } from "../../../shared/defs/gameObjects/meleeDefs.ts";
+import { PerkProperties } from "../../../shared/defs/gameObjects/perkDefs.ts";
 import {
     type ThrowableDef,
     ThrowableDefs,
-} from "../../../shared/defs/gameObjects/throwableDefs";
-import { GameConfig, type InventoryItem, WeaponSlot } from "../../../shared/gameConfig";
-import * as net from "../../../shared/net/net";
-import { ObjectType } from "../../../shared/net/objectSerializeFns";
-import { coldet } from "../../../shared/utils/coldet";
-import { collider } from "../../../shared/utils/collider";
-import { collisionHelpers } from "../../../shared/utils/collisionHelpers";
-import { math } from "../../../shared/utils/math";
-import { assert, util } from "../../../shared/utils/util";
-import { type Vec2, v2 } from "../../../shared/utils/v2";
-import type { BulletParams } from "../game/objects/bullet";
-import type { GameObject } from "../game/objects/gameObject";
-import type { Player } from "../game/objects/player";
-import type { Projectile } from "./objects/projectile";
+} from "../../../shared/defs/gameObjects/throwableDefs.ts";
+import {
+    GameConfig,
+    type InventoryItem,
+    WeaponSlot,
+} from "../../../shared/gameConfig.ts";
+import * as net from "../../../shared/net/net.ts";
+import { ObjectType } from "../../../shared/net/objectSerializeFns.ts";
+import { coldet } from "../../../shared/utils/coldet.ts";
+import { collider } from "../../../shared/utils/collider.ts";
+import { collisionHelpers } from "../../../shared/utils/collisionHelpers.ts";
+import { math } from "../../../shared/utils/math.ts";
+import { assert, util } from "../../../shared/utils/util.ts";
+import { type Vec2, v2 } from "../../../shared/utils/v2.ts";
+import type { BulletParams } from "../game/objects/bullet.ts";
+import type { GameObject } from "../game/objects/gameObject.ts";
+import type { Player } from "../game/objects/player.ts";
+import type { Projectile } from "./objects/projectile.ts";
 
 /**
  * List of throwables to cycle based on the definition `inventoryOrder`
