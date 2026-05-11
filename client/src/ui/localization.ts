@@ -82,10 +82,10 @@ export class Localization {
         // Also try spaces as dashes
         const spacedKey = key.replace(" ", "-");
         return (
-            this.translations[this.locale]?.[key] ||
-            this.translations[this.locale]?.[spacedKey] ||
-            this.translations["en"][key] ||
-            ""
+            this.translations[this.locale]?.[key]
+            || this.translations[this.locale]?.[spacedKey]
+            || this.translations["en"][key]
+            || ""
         );
     }
 

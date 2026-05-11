@@ -1,6 +1,6 @@
-import { createHash } from "node:crypto";
 import { and, desc, eq, inArray, lt, ne } from "drizzle-orm";
 import { Hono } from "hono";
+import { createHash } from "node:crypto";
 import { z } from "zod";
 import { MapId, TeamModeToString } from "../../../../../shared/defs/types/misc.ts";
 import {
@@ -22,14 +22,7 @@ import type { SaveGameBody } from "../../../utils/types.ts";
 import { server } from "../../apiServer.ts";
 import { databaseEnabledMiddleware, validateParams } from "../../auth/middleware.ts";
 import { db } from "../../db/index.ts";
-import {
-    bannedIpsTable,
-    ipLogsTable,
-    itemsTable,
-    matchDataTable,
-    userPassTable,
-    usersTable,
-} from "../../db/schema.ts";
+import { bannedIpsTable, ipLogsTable, itemsTable, matchDataTable, userPassTable, usersTable } from "../../db/schema.ts";
 import { sanitizeSlug } from "../user/auth/authUtils.ts";
 import { incrementPassXp } from "./passXp.ts";
 

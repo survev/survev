@@ -1,9 +1,9 @@
-import { App, SSLApp, type WebSocket } from "uWebSockets.js";
+import { Cron } from "croner";
+import { randomUUID } from "crypto";
 import { existsSync } from "node:fs";
 import fs from "node:fs/promises";
 import path from "node:path";
-import { Cron } from "croner";
-import { randomUUID } from "crypto";
+import { App, SSLApp, type WebSocket } from "uWebSockets.js";
 import pkgJson from "../../package.json" with { type: "json" };
 import { GameConfig } from "../../shared/gameConfig.ts";
 import * as net from "../../shared/net/net.ts";
@@ -44,10 +44,9 @@ class GameServer {
     readonly region = Config.regions[Config.gameServer.thisRegion];
     readonly regionId = Config.gameServer.thisRegion;
 
-    readonly manager =
-        Config.processMode === "single"
-            ? new SingleThreadGameManager()
-            : new GameProcessManager();
+    readonly manager = Config.processMode === "single"
+        ? new SingleThreadGameManager()
+        : new GameProcessManager();
 
     async findGame(body: FindGamePrivateBody): Promise<FindGamePrivateRes> {
         const parsed = zFindGamePrivateBody.safeParse(body);
@@ -172,9 +171,9 @@ if (process.env.NODE_ENV !== "production") {
 
 const app = Config.gameServer.ssl
     ? SSLApp({
-          key_file_name: Config.gameServer.ssl.keyFile,
-          cert_file_name: Config.gameServer.ssl.certFile,
-      })
+        key_file_name: Config.gameServer.ssl.keyFile,
+        cert_file_name: Config.gameServer.ssl.certFile,
+    })
     : App();
 
 app.get("/health", (res) => {

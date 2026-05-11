@@ -30,10 +30,10 @@ function getCursorCSS(crosshairDef: Crosshair) {
 }
 
 export const crosshair = {
-    getCursorURL: function (crosshairDef: Crosshair) {
+    getCursorURL: function(crosshairDef: Crosshair) {
         return getBaseURL(crosshairDef);
     },
-    setElemCrosshair: function (elem: JQuery<HTMLElement>, crosshairDef: Crosshair) {
+    setElemCrosshair: function(elem: JQuery<HTMLElement>, crosshairDef: Crosshair) {
         let cursor = "crosshair";
         const objDef = CrosshairDefs[crosshairDef.type];
         if (objDef) {
@@ -43,7 +43,7 @@ export const crosshair = {
             cursor,
         });
     },
-    setGameCrosshair: function (crosshairDef: Crosshair) {
+    setGameCrosshair: function(crosshairDef: Crosshair) {
         // Set game pointer
         crosshair.setElemCrosshair($("#game-area-wrapper"), crosshairDef);
 

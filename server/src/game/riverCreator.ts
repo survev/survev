@@ -4,7 +4,7 @@ import { collider } from "../../../shared/utils/collider.ts";
 import { math } from "../../../shared/utils/math.ts";
 import { catmullRom, getControlPoints } from "../../../shared/utils/spline.ts";
 import { util } from "../../../shared/utils/util.ts";
-import { type Vec2, v2 } from "../../../shared/utils/v2.ts";
+import { v2, type Vec2 } from "../../../shared/utils/v2.ts";
 import type { GameMap } from "./map.ts";
 
 export class RiverCreator {
@@ -14,8 +14,7 @@ export class RiverCreator {
         public map: GameMap,
         randomGenerator?: (min?: number, max?: number) => number,
     ) {
-        this.randomGenerator =
-            randomGenerator ?? ((min = 0, max = 1) => Math.random() * (max - min) + min);
+        this.randomGenerator = randomGenerator ?? ((min = 0, max = 1) => Math.random() * (max - min) + min);
     }
 
     private getStartPoint(isFactionRiver: boolean): Vec2 {
@@ -60,10 +59,11 @@ export class RiverCreator {
             if (v2.manhattanDistance(start, end) <= gridSize) continue;
             // if a river starts on corner, it can't end on a corner
             if (
-                isStartNearCorner &&
-                corners.some((c) => v2.manhattanDistance(c, end) < tileSize)
-            )
+                isStartNearCorner
+                && corners.some((c) => v2.manhattanDistance(c, end) < tileSize)
+            ) {
                 continue;
+            }
             return end;
         }
 

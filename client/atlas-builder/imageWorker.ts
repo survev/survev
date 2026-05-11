@@ -1,12 +1,7 @@
+import { createCanvas, loadImage } from "canvas";
 import fs from "node:fs";
 import Path from "node:path";
-import { createCanvas, loadImage } from "canvas";
-import {
-    atlasLogger,
-    type ImgCache,
-    imageFolder,
-    imagesCacheFolder,
-} from "./atlasBuilder.ts";
+import { atlasLogger, imageFolder, imagesCacheFolder, type ImgCache } from "./atlasBuilder.ts";
 import { scaledSprites } from "./atlasDefs.ts";
 import { detectEdges, type Edges } from "./detectEdges.ts";
 

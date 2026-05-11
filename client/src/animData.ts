@@ -3,7 +3,7 @@ import type { MeleeDef } from "../../shared/defs/gameObjects/meleeDefs.ts";
 import { GameConfig } from "../../shared/gameConfig.ts";
 import { math } from "../../shared/utils/math.ts";
 import { assert } from "../../shared/utils/util.ts";
-import { type Vec2, v2 } from "../../shared/utils/v2.ts";
+import { v2, type Vec2 } from "../../shared/utils/v2.ts";
 import type { AnimCtx, Player } from "./objects/player.ts";
 
 function frame(time: number, bones: Partial<Record<Bones, Pose>>) {
@@ -18,8 +18,7 @@ type AnimKeys = {
         this: Player,
         ctx: AnimCtx,
         arg: Record<string, unknown>,
-    ) => void) extends Player[K]
-        ? K
+    ) => void) extends Player[K] ? K
         : never;
 }[keyof Player];
 

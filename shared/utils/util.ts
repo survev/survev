@@ -1,5 +1,5 @@
 import { math } from "./math.ts";
-import { type Vec2, v2 } from "./v2.ts";
+import { v2, type Vec2 } from "./v2.ts";
 
 export class AssertionError extends Error {
     name = "AssertionError";
@@ -18,18 +18,16 @@ export class AssertionError extends Error {
  */
 export function assert(value: unknown, message?: string | Error): asserts value {
     if (!value) {
-        const error =
-            message instanceof Error
-                ? message
-                : new AssertionError(message ?? "Assertation failed");
+        const error = message instanceof Error
+            ? message
+            : new AssertionError(message ?? "Assertation failed");
         throw error;
     }
 }
 
-export type DeepPartial<T> = T extends object
-    ? {
-          [P in keyof T]?: DeepPartial<T[P]>;
-      }
+export type DeepPartial<T> = T extends object ? {
+        [P in keyof T]?: DeepPartial<T[P]>;
+    }
     : T;
 
 export const util = {
@@ -99,7 +97,7 @@ export const util = {
     seededRand(seed: number) {
         // Park-Miller PRNG
         let rng = seed;
-        return function (min = 0, max = 1) {
+        return function(min = 0, max = 1) {
             rng = (rng * 16807) % 2147483647;
             const t = rng / 2147483647;
             return math.lerp(t, min, max);
@@ -258,10 +256,10 @@ export const util = {
         const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
         return result
             ? {
-                  r: parseInt(result[1], 16),
-                  g: parseInt(result[2], 16),
-                  b: parseInt(result[3], 16),
-              }
+                r: parseInt(result[1], 16),
+                g: parseInt(result[2], 16),
+                b: parseInt(result[3], 16),
+            }
             : null;
     },
 
@@ -290,9 +288,9 @@ export const util = {
     // Taken from https://stackoverflow.com/questions/27936772/how-to-deep-merge-instead-of-shallow-merge
     isObject(item: unknown) {
         return (
-            item &&
-            (typeof item === "undefined" ? "undefined" : typeof item) === "object" &&
-            !Array.isArray(item)
+            item
+            && (typeof item === "undefined" ? "undefined" : typeof item) === "object"
+            && !Array.isArray(item)
         );
     },
 
@@ -391,12 +389,12 @@ export const util = {
     formatDate(date?: string | Date) {
         return date
             ? new Date(date).toLocaleDateString("en-US", {
-                  year: "numeric",
-                  month: "long",
-                  day: "numeric",
-                  hour: "2-digit",
-                  minute: "2-digit",
-              })
+                year: "numeric",
+                month: "long",
+                day: "numeric",
+                hour: "2-digit",
+                minute: "2-digit",
+            })
             : "Unknown";
     },
 

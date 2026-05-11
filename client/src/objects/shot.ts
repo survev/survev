@@ -2,7 +2,7 @@ import { GameObjectDefs } from "../../../shared/defs/gameObjectDefs.ts";
 import type { GunDef } from "../../../shared/defs/gameObjects/gunDefs.ts";
 import { GameConfig } from "../../../shared/gameConfig.ts";
 import type { Bullet } from "../../../shared/net/updateMsg.ts";
-import { type Vec2, v2 } from "../../../shared/utils/v2.ts";
+import { v2, type Vec2 } from "../../../shared/utils/v2.ts";
 import type { AudioManager } from "../audioManager.ts";
 import type { ParticleBarn } from "./particles.ts";
 import type { PlayerBarn } from "./player.ts";
@@ -92,8 +92,7 @@ export class ShotBarn {
         shot.lastShot = bullet.lastShot;
         shot.shotAlt = bullet.shotAlt;
         shot.ticker = 0;
-        shot.pullDelay =
-            weaponDef.pullDelay !== undefined ? weaponDef.pullDelay * 0.45 : 0;
+        shot.pullDelay = weaponDef.pullDelay !== undefined ? weaponDef.pullDelay * 0.45 : 0;
         shot.splinter = bullet.splinter;
         shot.trailSaturated = bullet.trailSaturated;
         shot.apRounds = bullet.apRounds;
@@ -140,10 +139,9 @@ export class ShotBarn {
                     }
 
                     audioManager.playSound(shotSound, {
-                        channel:
-                            shot.playerId == activePlayerId
-                                ? "activePlayer"
-                                : "otherPlayers",
+                        channel: shot.playerId == activePlayerId
+                            ? "activePlayer"
+                            : "otherPlayers",
                         soundPos: shot.pos,
                         layer: player ? player.layer : shot.layer,
                         filter: "muffled",
@@ -154,10 +152,9 @@ export class ShotBarn {
 
                     if (shot.splinter) {
                         audioManager.playSound(shotSound, {
-                            channel:
-                                shot.playerId == activePlayerId
-                                    ? "activePlayer"
-                                    : "otherPlayers",
+                            channel: shot.playerId == activePlayerId
+                                ? "activePlayer"
+                                : "otherPlayers",
                             soundPos: shot.pos,
                             layer: player ? player.layer : shot.layer,
                             filter: "muffled",
@@ -172,10 +169,9 @@ export class ShotBarn {
 
                     if (shot.apRounds) {
                         audioManager.playSound(shotSound, {
-                            channel:
-                                shot.playerId == activePlayerId
-                                    ? "activePlayer"
-                                    : "otherPlayers",
+                            channel: shot.playerId == activePlayerId
+                                ? "activePlayer"
+                                : "otherPlayers",
                             soundPos: shot.pos,
                             layer: player ? player.layer : shot.layer,
                             filter: "muffled",
@@ -190,10 +186,9 @@ export class ShotBarn {
 
                     if (shot.highVelocity) {
                         audioManager.playSound(shotSound, {
-                            channel:
-                                shot.playerId == activePlayerId
-                                    ? "activePlayer"
-                                    : "otherPlayers",
+                            channel: shot.playerId == activePlayerId
+                                ? "activePlayer"
+                                : "otherPlayers",
                             soundPos: shot.pos,
                             layer: player ? player.layer : shot.layer,
                             fallOff: weaponDef.sound.fallOff
@@ -208,18 +203,16 @@ export class ShotBarn {
                     if (player) {
                         // If it's our shot, play a cycling or pull sound if needed
                         if (
-                            player.__id == activePlayerId &&
-                            weaponDef.fireMode == "single" &&
-                            weaponDef.pullDelay
+                            player.__id == activePlayerId
+                            && weaponDef.fireMode == "single"
+                            && weaponDef.pullDelay
                         ) {
-                            const ammoLeft =
-                                player.m_localData.m_weapons[
-                                    player.m_localData.m_curWeapIdx
-                                ].ammo;
-                            const soundName =
-                                ammoLeft > 0
-                                    ? weaponDef.sound.cycle
-                                    : weaponDef.sound.pull;
+                            const ammoLeft = player.m_localData.m_weapons[
+                                player.m_localData.m_curWeapIdx
+                            ].ammo;
+                            const soundName = ammoLeft > 0
+                                ? weaponDef.sound.cycle
+                                : weaponDef.sound.pull;
                             audioManager.stopSound(player.cycleSoundInstance!);
                             player.cycleSoundInstance = audioManager.playSound(
                                 soundName!,
@@ -240,10 +233,10 @@ export class ShotBarn {
                 if (shot.ticker >= shot.pullDelay) {
                     const player = playerBarn.getPlayerById(shot.playerId);
                     if (
-                        player &&
-                        !player.m_netData.m_dead &&
-                        player.m_netData.m_activeWeapon == shot.weaponType &&
-                        weaponDef.caseTiming == "shoot"
+                        player
+                        && !player.m_netData.m_dead
+                        && player.m_netData.m_activeWeapon == shot.weaponType
+                        && weaponDef.caseTiming == "shoot"
                     ) {
                         createCasingParticle(
                             shot.weaponType,

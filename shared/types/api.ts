@@ -39,26 +39,26 @@ export type FindGameError =
 
 export type FindGameResponse =
     | {
-          res: FindGameMatchData[];
-          error?: undefined;
+        res: FindGameMatchData[];
+        error?: undefined;
 
-          banned?: undefined;
-      }
+        banned?: undefined;
+    }
     | {
-          error: FindGameError;
+        error: FindGameError;
 
-          res?: undefined;
-          banned?: undefined;
-      }
+        res?: undefined;
+        banned?: undefined;
+    }
     | {
-          banned: true;
-          reason: string;
-          permanent: boolean;
-          expiresIn: Date | string;
+        banned: true;
+        reason: string;
+        permanent: boolean;
+        expiresIn: Date | string;
 
-          res?: undefined;
-          error?: undefined;
-      };
+        res?: undefined;
+        error?: undefined;
+    };
 
 export interface SiteInfoRes {
     country: string;

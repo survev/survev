@@ -21,11 +21,7 @@ import {
 import { db } from "../../db/index.ts";
 import { itemsTable, matchDataTable, usersTable } from "../../db/schema.ts";
 import type { Context } from "../../index.ts";
-import {
-    getTimeUntilNextUsernameChange,
-    logoutUser,
-    sanitizeSlug,
-} from "./auth/authUtils.ts";
+import { getTimeUntilNextUsernameChange, logoutUser, sanitizeSlug } from "./auth/authUtils.ts";
 import { PassRouter } from "./PassRouter.ts";
 
 export const UserRouter = new Hono<Context>();

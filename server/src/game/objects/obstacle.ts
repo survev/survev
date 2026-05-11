@@ -3,11 +3,11 @@ import { MapObjectDefs } from "../../../../shared/defs/mapObjectDefs.ts";
 import type { ObstacleDef } from "../../../../shared/defs/mapObjectsTyping.ts";
 import { DamageType, GameConfig } from "../../../../shared/gameConfig.ts";
 import { ObjectType } from "../../../../shared/net/objectSerializeFns.ts";
-import { type AABB, type Collider, coldet } from "../../../../shared/utils/coldet.ts";
+import { type AABB, coldet, type Collider } from "../../../../shared/utils/coldet.ts";
 import { collider } from "../../../../shared/utils/collider.ts";
 import { math } from "../../../../shared/utils/math.ts";
 import { util } from "../../../../shared/utils/util.ts";
-import { type Vec2, v2 } from "../../../../shared/utils/v2.ts";
+import { v2, type Vec2 } from "../../../../shared/utils/v2.ts";
 import type { Game } from "../game.ts";
 import type { Building } from "./building.ts";
 import { BaseGameObject, type DamageParams } from "./gameObject.ts";
@@ -223,10 +223,10 @@ export class Obstacle extends BaseGameObject {
                 // to avoid it closing for a single tick to open again
                 if (
                     !(
-                        this.door &&
-                        this.door.open &&
-                        this.door.autoClose &&
-                        this.checkNearByPlayers()
+                        this.door
+                        && this.door.open
+                        && this.door.autoClose
+                        && this.checkNearByPlayers()
                     )
                 ) {
                     this.toggleDoor(this.togglePlayer, this.toggleDir);
@@ -380,9 +380,9 @@ export class Obstacle extends BaseGameObject {
             if (params.gameSourceType) {
                 const sourceDef = GameObjectDefs[params.gameSourceType] as
                     | {
-                          armorPiercing?: boolean;
-                          stonePiercing?: boolean;
-                      }
+                        armorPiercing?: boolean;
+                        stonePiercing?: boolean;
+                    }
                     | undefined;
                 armorPiercing = sourceDef?.armorPiercing ?? false;
                 stonePiercing = sourceDef?.stonePiercing ?? false;
@@ -474,8 +474,8 @@ export class Obstacle extends BaseGameObject {
         const lootTablesOrItems = [...def.loot];
 
         if (
-            params.source?.__type === ObjectType.Player &&
-            params.source.hasPerk("scavenger")
+            params.source?.__type === ObjectType.Player
+            && params.source.hasPerk("scavenger")
         ) {
             lootTablesOrItems.push({
                 tier: "tier_world",
@@ -486,8 +486,8 @@ export class Obstacle extends BaseGameObject {
         }
 
         if (
-            params.source?.__type === ObjectType.Player &&
-            params.source.hasPerk("scavenger_adv")
+            params.source?.__type === ObjectType.Player
+            && params.source.hasPerk("scavenger_adv")
         ) {
             lootTablesOrItems.push({
                 tier: "tier_scavenger_adv",
@@ -501,17 +501,16 @@ export class Obstacle extends BaseGameObject {
         let ownerId = 0;
         if (this.shouldApplyLootOwner) {
             // default to whoever broke the class pod
-            ownerId =
-                params.source?.__type === ObjectType.Player ? params.source.__id : 0;
+            ownerId = params.source?.__type === ObjectType.Player ? params.source.__id : 0;
 
             // but then check for the player who unlocked this class pod
             // if they are still alive and close give it to them instead
             const podUnlocker = this.game.objectRegister.getById(this.ownerId);
             if (
-                podUnlocker &&
-                podUnlocker.__type === ObjectType.Player &&
-                !podUnlocker.dead &&
-                util.sameLayer(podUnlocker.layer, this.layer)
+                podUnlocker
+                && podUnlocker.__type === ObjectType.Player
+                && !podUnlocker.dead
+                && util.sameLayer(podUnlocker.layer, this.layer)
             ) {
                 const distance = v2.distance(this.pos, podUnlocker.pos);
                 if (distance <= 8) {
@@ -550,10 +549,9 @@ export class Obstacle extends BaseGameObject {
             }
         }
 
-        const colliderRad =
-            def.collision.type === collider.Type.Aabb
-                ? coldet.aabbToCircle(def.collision.min, def.collision.max).rad / 2
-                : def.collision.rad;
+        const colliderRad = def.collision.type === collider.Type.Aabb
+            ? coldet.aabbToCircle(def.collision.min, def.collision.max).rad / 2
+            : def.collision.rad;
 
         // max items before it changes from pushing in hit direction to
         // the direction between obstacle center and loot (so it spreads better)
@@ -646,10 +644,10 @@ export class Obstacle extends BaseGameObject {
         }
 
         if (
-            player &&
-            this.isButton &&
-            this.button.roleToPromote &&
-            player.role === this.button.roleToPromote
+            player
+            && this.isButton
+            && this.button.roleToPromote
+            && player.role === this.button.roleToPromote
         ) {
             return;
         }
@@ -697,9 +695,9 @@ export class Obstacle extends BaseGameObject {
         if (this.button.useType && this.parentBuilding) {
             for (const obj of this.parentBuilding.childObjects) {
                 if (
-                    obj.__type === ObjectType.Obstacle &&
-                    obj.type === this.button.useType &&
-                    obj.isDoor
+                    obj.__type === ObjectType.Obstacle
+                    && obj.type === this.button.useType
+                    && obj.isDoor
                 ) {
                     obj.delayedToggle(
                         this.button.useDelay,
@@ -791,8 +789,9 @@ export class Obstacle extends BaseGameObject {
             this.parentBuildingId,
             this.puzzlePiece,
         );
-        if (newObstacle.parentBuilding)
+        if (newObstacle.parentBuilding) {
             newObstacle.parentBuilding.childObjects.push(newObstacle);
+        }
         this.destroy();
     }
 }

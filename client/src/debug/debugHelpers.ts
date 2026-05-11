@@ -1,14 +1,10 @@
 import { MapObjectDefs } from "../../../shared/defs/mapObjectDefs.ts";
-import type {
-    BuildingDef,
-    ObstacleDef,
-    StructureDef,
-} from "../../../shared/defs/mapObjectsTyping.ts";
+import type { BuildingDef, ObstacleDef, StructureDef } from "../../../shared/defs/mapObjectsTyping.ts";
 import type { AABB } from "../../../shared/utils/coldet.ts";
 import { collider } from "../../../shared/utils/collider.ts";
 import { mapHelpers } from "../../../shared/utils/mapHelpers.ts";
 import type { River } from "../../../shared/utils/river.ts";
-import { type Vec2, v2 } from "../../../shared/utils/v2.ts";
+import { v2, type Vec2 } from "../../../shared/utils/v2.ts";
 import type { Building } from "../objects/building.ts";
 import type { Obstacle } from "../objects/obstacle.ts";
 import type { Structure } from "../objects/structure.ts";

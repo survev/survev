@@ -1,10 +1,4 @@
-import {
-    Client,
-    Events,
-    GatewayIntentBits,
-    type InteractionReplyOptions,
-    MessageFlags,
-} from "discord.js";
+import { Client, Events, GatewayIntentBits, type InteractionReplyOptions, MessageFlags } from "discord.js";
 import { sendNoPermissionMessage } from "./commands/helpers.ts";
 import { commandHandlers } from "./commands/index.ts";
 import { DISCORD_BOT_TOKEN } from "./config.ts";

@@ -1,5 +1,5 @@
-import fs from "node:fs";
 import esbuild, { type BuildOptions } from "esbuild";
+import fs from "node:fs";
 import { pluginDir, readDirectory } from "./game/pluginManager";
 
 if (fs.existsSync("./dist")) {

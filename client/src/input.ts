@@ -37,9 +37,9 @@ export class InputHandler {
     lostFocus = false;
     captureNextInputCb:
         | ((
-              event: KeyboardEvent | MouseEvent | globalThis.TouchEvent,
-              inputValue: InputValue,
-          ) => void)
+            event: KeyboardEvent | MouseEvent | globalThis.TouchEvent,
+            inputValue: InputValue,
+        ) => void)
         | null = null;
 
     constructor(public touchElem: HTMLElement) {
@@ -110,8 +110,8 @@ export class InputHandler {
         inputCode: number,
     ) {
         return (
-            !!this.captureNextInputCb?.(event, new InputValue(inputType, inputCode)) &&
-            !((this.captureNextInputCb = null), 0)
+            !!this.captureNextInputCb?.(event, new InputValue(inputType, inputCode))
+            && !((this.captureNextInputCb = null), 0)
         );
     }
 
@@ -559,7 +559,7 @@ const KeyNames = [
     "",
     "Circumflex",
     "!",
-    '"',
+    "\"",
     "#",
     "$",
     "%",

@@ -21,9 +21,9 @@ export interface DecalDef {
     };
     lifetime?:
         | {
-              min: number;
-              max: number;
-          }
+            min: number;
+            max: number;
+        }
         | number;
     fadeChance?: number;
     surface?: {

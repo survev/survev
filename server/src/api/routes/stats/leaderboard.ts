@@ -8,11 +8,7 @@ import {
     zLeaderboardsRequest,
 } from "../../../../../shared/types/stats.ts";
 import { server } from "../../apiServer.ts";
-import {
-    databaseEnabledMiddleware,
-    rateLimitMiddleware,
-    validateParams,
-} from "../../auth/middleware.ts";
+import { databaseEnabledMiddleware, rateLimitMiddleware, validateParams } from "../../auth/middleware.ts";
 import { leaderboardCache } from "../../cache/leaderboard.ts";
 import { db } from "../../db/index.ts";
 import { matchDataTable, usersTable } from "../../db/schema.ts";
@@ -38,10 +34,9 @@ leaderboardRouter.post(
         }
 
         const startTime = performance.now();
-        const data =
-            type === "most_kills" && teamMode != TeamMode.Solo
-                ? await multiplePlayersQuery(params)
-                : await soloLeaderboardQuery(params);
+        const data = type === "most_kills" && teamMode != TeamMode.Solo
+            ? await multiplePlayersQuery(params)
+            : await soloLeaderboardQuery(params);
         logQueryPerformance(startTime, params);
 
         // TODO: decide if we should cache empty results;
@@ -73,8 +68,7 @@ async function soloLeaderboardQuery(params: LeaderboardRequest) {
     const { interval, mapId, teamMode, type } = params;
     const minGames = type === "kpg" ? MinGames[type][interval] : 1;
 
-    const usernameQuery =
-        type === "most_kills" ? matchDataTable.username : usersTable.username;
+    const usernameQuery = type === "most_kills" ? matchDataTable.username : usersTable.username;
 
     const result = await db
         .select({
@@ -193,10 +187,9 @@ async function multiplePlayersQuery({
 function logQueryPerformance(startTime: number, params: LeaderboardRequest) {
     const endTime = performance.now();
     const executionTime = endTime - startTime;
-    const timeString =
-        executionTime > 1000
-            ? `${(executionTime / 1000).toFixed(2)}s`
-            : `${executionTime.toFixed(2)}ms`;
+    const timeString = executionTime > 1000
+        ? `${(executionTime / 1000).toFixed(2)}s`
+        : `${executionTime.toFixed(2)}ms`;
     server.logger[executionTime > 1000 ? "warn" : "debug"](
         `leaderboard | Execution time: ${timeString} | ${leaderboardCache.getCacheKey("debug" as any, params)}`,
     );

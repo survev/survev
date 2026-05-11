@@ -9,7 +9,7 @@ import { Config } from "../../../../config.ts";
 import { checkForBadWords } from "../../../../utils/serverHelpers.ts";
 import { createSession, invalidateSession } from "../../../auth/index.ts";
 import { db } from "../../../db/index.ts";
-import { itemsTable, type UsersTableInsert, usersTable } from "../../../db/schema.ts";
+import { itemsTable, usersTable, type UsersTableInsert } from "../../../db/schema.ts";
 
 let oauthBaseURL: URL | undefined = undefined;
 if (URL.canParse(Config.oauthBasePath)) {
@@ -116,8 +116,7 @@ export async function handleAuthUser(c: Context, provider: Provider, authId: str
         generateUsername = !!slugTaken;
     }
 
-    const linkedProvider =
-        provider === "discord" ? { linkedDiscord: true } : { linkedGoogle: true };
+    const linkedProvider = provider === "discord" ? { linkedDiscord: true } : { linkedGoogle: true };
 
     const userId = generateId(15);
     await createNewUser({

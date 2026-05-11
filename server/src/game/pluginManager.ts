@@ -80,7 +80,7 @@ export class PluginManager {
         }
     }
 
-    private loadPlugin(PluginConstructor: new (game: Game) => GamePlugin): void {
+    private loadPlugin(PluginConstructor: new(game: Game) => GamePlugin): void {
         const plugin = new PluginConstructor(this.game);
         this._plugins.add(plugin);
     }
@@ -88,7 +88,7 @@ export class PluginManager {
     async loadPlugins() {
         for (const path of pluginPaths) {
             this.game.logger.info("Loading plugin", path);
-            const plugin = ((await import(path)) as { default: new () => GamePlugin })
+            const plugin = ((await import(path)) as { default: new() => GamePlugin })
                 .default;
 
             this.loadPlugin(plugin);

@@ -14,12 +14,7 @@ import { passUtil } from "../../../../../shared/utils/passUtil.ts";
 import { Config } from "../../../config.ts";
 import { validateParams } from "../../auth/middleware.ts";
 import { db } from "../../db/index.ts";
-import {
-    type UserPassTableSelect,
-    type UserQuestTableSelect,
-    userPassTable,
-    userQuestTable,
-} from "../../db/schema.ts";
+import { userPassTable, type UserPassTableSelect, userQuestTable, type UserQuestTableSelect } from "../../db/schema.ts";
 import type { Context } from "../../index.ts";
 
 // hardcoded for now
@@ -55,9 +50,8 @@ async function getPassAndQuests(
         .filter((quest): quest is UserQuestTableSelect => quest !== null)
         .sort((a, b) => a.idx - b.idx);
 
-    const hasAllSlots =
-        existingQuests.length === questSlotIndexes.length &&
-        questSlotIndexes.every((slot, index) => existingQuests[index]?.idx === slot);
+    const hasAllSlots = existingQuests.length === questSlotIndexes.length
+        && questSlotIndexes.every((slot, index) => existingQuests[index]?.idx === slot);
 
     if (existingPass && hasAllSlots) {
         return {
@@ -183,16 +177,16 @@ PassRouter.post("/get_pass", validateParams(zGetPassRequest), async (c) => {
             activeQuests = activeQuests.map((current) =>
                 current.idx === quest.idx
                     ? {
-                          ...current,
-                          questType: newType,
-                          progress: 0,
-                          target: QuestDefs[newType]!.target,
-                          complete: false,
-                          rerolled: false,
-                          timeAcquired: now,
-                          nextRefreshAt: passUtil.getNextQuestRefreshAt(now),
-                      }
-                    : current,
+                        ...current,
+                        questType: newType,
+                        progress: 0,
+                        target: QuestDefs[newType]!.target,
+                        complete: false,
+                        rerolled: false,
+                        timeAcquired: now,
+                        nextRefreshAt: passUtil.getNextQuestRefreshAt(now),
+                    }
+                    : current
             );
         }
     }

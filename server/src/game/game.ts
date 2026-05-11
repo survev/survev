@@ -285,8 +285,7 @@ export class Game {
             this.perfTicker += dt;
             if (this.perfTicker >= 15) {
                 this.perfTicker = 0;
-                const mspt =
-                    this.tickTimes.reduce((a, b) => a + b) / this.tickTimes.length;
+                const mspt = this.tickTimes.reduce((a, b) => a + b) / this.tickTimes.length;
 
                 this.logger.debug(
                     `Avg ms/tick: ${mspt.toFixed(2)} | Load: ${((mspt / (1000 / Config.gameTps)) * 100).toFixed(1)}%`,
@@ -342,9 +341,9 @@ export class Game {
 
     get canJoin(): boolean {
         return (
-            this.aliveCount < this.map.mapDef.gameMode.maxPlayers &&
-            !this.over &&
-            this.startedTime < 60
+            this.aliveCount < this.map.mapDef.gameMode.maxPlayers
+            && !this.over
+            && this.startedTime < 60
         );
     }
 
@@ -622,8 +621,7 @@ export class Game {
 
         const teamKills = players.reduce(
             (acc, curr) => {
-                acc[curr.player.teamId] =
-                    (acc[curr.player.teamId] ?? 0) + curr.player.kills;
+                acc[curr.player.teamId] = (acc[curr.player.teamId] ?? 0) + curr.player.kills;
                 return acc;
             },
             {} as Record<string, number>,

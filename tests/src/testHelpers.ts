@@ -23,8 +23,7 @@ expect.extend({
     toBeInRange: (received: number, expected: { min: number; max: number }) => {
         if (received > expected.max || received < expected.min) {
             return {
-                message: () =>
-                    `Expected ${received} to be a in range [${expected.min}, ${expected.max}]`,
+                message: () => `Expected ${received} to be a in range [${expected.min}, ${expected.max}]`,
                 pass: false,
             };
         }
@@ -44,8 +43,7 @@ expect.extend({
             const def = MapObjectDefs[received];
             if (def.type !== expected) {
                 return {
-                    message: () =>
-                        `Expected '${received}' to be a be of type ${expected}`,
+                    message: () => `Expected '${received}' to be a be of type ${expected}`,
                     pass: false,
                 };
             }
@@ -66,8 +64,7 @@ expect.extend({
             const def = MapObjectDefs[received];
             if (def.type !== expected) {
                 return {
-                    message: () =>
-                        `Expected '${received}' to be a be of type ${expected}`,
+                    message: () => `Expected '${received}' to be a be of type ${expected}`,
                     pass: false,
                 };
             }
@@ -88,8 +85,7 @@ expect.extend({
             const def = GameObjectDefs[received];
             if (def.type !== expected) {
                 return {
-                    message: () =>
-                        `Expected '${received}' to be a be of type ${expected}`,
+                    message: () => `Expected '${received}' to be a be of type ${expected}`,
                     pass: false,
                 };
             }
@@ -111,8 +107,7 @@ expect.extend({
             const def = GameObjectDefs[received];
             if (def.type !== expected) {
                 return {
-                    message: () =>
-                        `Expected '${received}' to be a be of type ${expected}`,
+                    message: () => `Expected '${received}' to be a be of type ${expected}`,
                     pass: false,
                 };
             }

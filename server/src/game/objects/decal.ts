@@ -6,7 +6,7 @@ import { collider } from "../../../../shared/utils/collider.ts";
 import { mapHelpers } from "../../../../shared/utils/mapHelpers.ts";
 import { math } from "../../../../shared/utils/math.ts";
 import { util } from "../../../../shared/utils/util.ts";
-import { type Vec2, v2 } from "../../../../shared/utils/v2.ts";
+import { v2, type Vec2 } from "../../../../shared/utils/v2.ts";
 import type { Game } from "../game.ts";
 import { BaseGameObject } from "./gameObject.ts";
 
@@ -87,10 +87,9 @@ export class Decal extends BaseGameObject {
         const fadeChance = def.fadeChance ?? 1;
 
         if (def.lifetime && Math.random() < fadeChance) {
-            this.lifeTime =
-                typeof def.lifetime === "number"
-                    ? def.lifetime
-                    : util.random(def.lifetime.min, def.lifetime.max);
+            this.lifeTime = typeof def.lifetime === "number"
+                ? def.lifetime
+                : util.random(def.lifetime.min, def.lifetime.max);
         }
     }
 }

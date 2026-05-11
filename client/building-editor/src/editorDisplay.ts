@@ -6,7 +6,7 @@ import { type ObjectData, ObjectType } from "../../../shared/net/objectSerialize
 import type { LocalDataWithDirty } from "./../../../shared/net/updateMsg.ts";
 import { math } from "../../../shared/utils/math.ts";
 import { assert, util } from "../../../shared/utils/util.ts";
-import { type Vec2, v2 } from "../../../shared/utils/v2.ts";
+import { v2, type Vec2 } from "../../../shared/utils/v2.ts";
 import type { Ambiance } from "../../src/ambiance.ts";
 import type { AudioManager } from "../../src/audioManager.ts";
 import Camera from "../../src/camera.ts";

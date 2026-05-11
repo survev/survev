@@ -1,4 +1,4 @@
-import { Google, generateCodeVerifier, generateState } from "arctic";
+import { generateCodeVerifier, generateState, Google } from "arctic";
 import { Hono } from "hono";
 import { getCookie, setCookie } from "hono/cookie";
 import { Config } from "../../../../config.ts";

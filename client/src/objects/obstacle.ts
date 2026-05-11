@@ -6,7 +6,7 @@ import type { Collider } from "../../../shared/utils/coldet.ts";
 import { collider } from "../../../shared/utils/collider.ts";
 import { math } from "../../../shared/utils/math.ts";
 import { util } from "../../../shared/utils/util.ts";
-import { type Vec2, v2 } from "../../../shared/utils/v2.ts";
+import { v2, type Vec2 } from "../../../shared/utils/v2.ts";
 import type { AudioManager } from "../audioManager.ts";
 import type { Camera } from "../camera.ts";
 import type { DebugRenderOpts } from "../config.ts";
@@ -247,10 +247,10 @@ export class Obstacle implements AbstractObject {
             this.button.seq = data.button?.seq!;
         }
         if (
-            def.explosion !== undefined &&
-            !this.smokeEmitter &&
-            data.healthT < 0.5 &&
-            !data.dead
+            def.explosion !== undefined
+            && !this.smokeEmitter
+            && data.healthT < 0.5
+            && !data.dead
         ) {
             const g = v2.normalize(v2.create(1, 1));
             this.smokeEmitter = ctx.particleBarn.addEmitter("smoke_barrel", {
@@ -276,8 +276,7 @@ export class Obstacle implements AbstractObject {
                 this.sprite.parent?.removeChild(this.sprite);
             }
             if (_) {
-                this.sprite.texture =
-                    w == "none" || !w ? PIXI.Texture.EMPTY : PIXI.Texture.from(w);
+                this.sprite.texture = w == "none" || !w ? PIXI.Texture.EMPTY : PIXI.Texture.from(w);
                 this.sprite.anchor.set(f.x, f.y);
                 this.sprite.tint = def.img.tint!;
                 this.sprite.imgAlpha = this.dead ? 0.75 : def.img.alpha!;
@@ -298,8 +297,8 @@ export class Obstacle implements AbstractObject {
     getInteraction(player: Player) {
         if (this.isButton && this.button.canUse) {
             if (
-                this.button.roleToPromote &&
-                this.button.roleToPromote === player.m_netData.m_role
+                this.button.roleToPromote
+                && this.button.roleToPromote === player.m_netData.m_role
             ) {
                 return null;
             }
@@ -432,8 +431,8 @@ export class Obstacle implements AbstractObject {
                     const vel = v2.mul(v2.randomUnit(), util.random(5, 15));
                     const particle = Array.isArray(this.explodeParticle)
                         ? this.explodeParticle[
-                              Math.floor(Math.random() * this.explodeParticle.length)
-                          ]
+                            Math.floor(Math.random() * this.explodeParticle.length)
+                        ]
                         : this.explodeParticle;
                     particleBarn.addParticle(particle, this.layer, center, vel);
                 }

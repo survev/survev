@@ -1,10 +1,7 @@
 import "@taufik-nurrohman/color-picker";
 import $ from "jquery";
 import { GameObjectDefs } from "../../../shared/defs/gameObjectDefs.ts";
-import {
-    EmoteCategory,
-    type EmoteDef,
-} from "../../../shared/defs/gameObjects/emoteDefs.ts";
+import { EmoteCategory, type EmoteDef } from "../../../shared/defs/gameObjects/emoteDefs.ts";
 import type { MeleeDef } from "../../../shared/defs/gameObjects/meleeDefs.ts";
 import type { UnlockDef } from "../../../shared/defs/gameObjects/unlockDefs.ts";
 import { EmoteSlot, Rarity } from "../../../shared/gameConfig.ts";
@@ -34,7 +31,7 @@ function emoteSlotToDomElem(e: Exclude<EmoteSlot, EmoteSlot.Count>) {
 }
 
 function itemSort(sortFn: (a: Item, b: Item) => void) {
-    return function (a: Item, b: Item) {
+    return function(a: Item, b: Item) {
         // Always put stock items at the front of the list;
         // if not stock, sort by the given sort routine
         const rarityA = (GameObjectDefs[a.type] as EmoteDef).rarity || Rarity.Stock;
@@ -239,7 +236,7 @@ export class LoadoutMenu {
         this.modal.onHide(() => {
             this.onHide();
         });
-        const displayBlockingElem = function () {
+        const displayBlockingElem = function() {
             $("#modal-screen-block").fadeIn(200);
         };
         this.confirmItemModal = new MenuModal($("#modal-item-confirm"));
@@ -334,8 +331,7 @@ export class LoadoutMenu {
                 }
             });
 
-            const colorCode =
-                document.querySelector<HTMLInputElement>("#color-picker-hex")!;
+            const colorCode = document.querySelector<HTMLInputElement>("#color-picker-hex")!;
             const updateColor = () => {
                 const value = colorCode.value;
                 if (value.length) {
@@ -437,19 +433,19 @@ export class LoadoutMenu {
         for (let i = 0; i < this.items.length; i++) {
             const item = this.items[i];
             if (
-                item.status! < loadout.ItemStatus.Confirmed &&
-                !this.localPendingConfirm.find((x) => {
+                item.status! < loadout.ItemStatus.Confirmed
+                && !this.localPendingConfirm.find((x) => {
                     return x.type == item.type;
-                }) &&
-                !this.localConfirmed.find((x) => {
+                })
+                && !this.localConfirmed.find((x) => {
                     return x.type == item.type;
                 })
             ) {
                 this.localPendingConfirm.push(item);
             }
             if (
-                item.status! < loadout.ItemStatus.Ackd &&
-                !this.localAckItems.find((x) => {
+                item.status! < loadout.ItemStatus.Ackd
+                && !this.localAckItems.find((x) => {
                     return x.type == item.type;
                 })
             ) {
@@ -518,9 +514,9 @@ export class LoadoutMenu {
             const item = this.items[i];
             const objDef = GameObjectDefs[item.type];
             if (
-                objDef &&
-                objDef.type == category.gameType &&
-                item?.status! < loadout.ItemStatus.Ackd
+                objDef
+                && objDef.type == category.gameType
+                && item?.status! < loadout.ItemStatus.Ackd
             ) {
                 ackItemTypes.push(item.type);
             }
@@ -553,9 +549,8 @@ export class LoadoutMenu {
             const itemInfo = {
                 type: currentNewItem.type,
                 rarity: objDef.rarity || Rarity.Stock,
-                displayName:
-                    this.localization.translate(`game-${currentNewItem.type}`) ||
-                    objDef.name!,
+                displayName: this.localization.translate(`game-${currentNewItem.type}`)
+                    || objDef.name!,
                 category: objDef.type,
             };
             const svg = helpers.getSvgFromGameType(currentNewItem.type);
@@ -615,8 +610,8 @@ export class LoadoutMenu {
                     const elem = e.currentTarget;
                     if (!$(elem).hasClass("customize-list-item-locked")) {
                         if (
-                            this.itemSelected &&
-                            !$(elem).hasClass("customize-list-item")
+                            this.itemSelected
+                            && !$(elem).hasClass("customize-list-item")
                         ) {
                             this.deselectItem();
                             return;
@@ -649,7 +644,7 @@ export class LoadoutMenu {
                         this.updateLoadoutFromDOM();
                     }
                 });
-                this.droppableSlots.on("dragover", function (e) {
+                this.droppableSlots.on("dragover", function(e) {
                     e.originalEvent?.preventDefault();
                     $(this).parent().find(".ui-emote-hl").css("opacity", 1);
                 });
@@ -741,10 +736,10 @@ export class LoadoutMenu {
 
         // Deselect this emote if it's already selected
         if (
-            selectedItem.type == this.selectedItem.type &&
-            selectedItem.loadoutType == "emote" &&
-            this.selectedItem.loadoutType == "emote" &&
-            deselect
+            selectedItem.type == this.selectedItem.type
+            && selectedItem.loadoutType == "emote"
+            && this.selectedItem.loadoutType == "emote"
+            && deselect
         ) {
             this.deselectItem();
             return;
@@ -764,10 +759,9 @@ export class LoadoutMenu {
             subcat: selectedItem.subcat,
         };
         this.modalCustomizeItemName.html(this.selectedItem.displayName!);
-        const source =
-            this.localization.translate(`loadout-${selectedItem.displaySource}`) ||
-            this.localization.translate(`${selectedItem.displaySource}`) ||
-            this.selectedItem.displaySource;
+        const source = this.localization.translate(`loadout-${selectedItem.displaySource}`)
+            || this.localization.translate(`${selectedItem.displaySource}`)
+            || this.selectedItem.displaySource;
         const sourceTxt = `${this.localization.translate("loadout-acquired")}: ${source}`;
         this.modalCustomizeItemSource.html(sourceTxt);
 
@@ -782,12 +776,9 @@ export class LoadoutMenu {
             [EmoteCategory.Flags]: this.localization.translate("emote-subcat-flags"),
             [EmoteCategory.Default]: this.localization.translate("emote-subcat-default"),
         };
-        const localizedLore =
-            selectedItem.loadoutType == "emote"
-                ? `${this.localization.translate("loadout-category")}: ${
-                      emoteSubcatNames[selectedItem.subcat]
-                  }`
-                : this.selectedItem.displayLore;
+        const localizedLore = selectedItem.loadoutType == "emote"
+            ? `${this.localization.translate("loadout-category")}: ${emoteSubcatNames[selectedItem.subcat]}`
+            : this.selectedItem.displayLore;
         this.modalCustomizeItemLore.html(localizedLore!);
         const rarityNames = ["stock", "common", "uncommon", "rare", "epic", "mythic"];
         const Rarities = [
@@ -885,10 +876,8 @@ export class LoadoutMenu {
                 loadoutType: "emote",
                 type,
                 rarity: emoteDef.rarity || Rarity.Stock,
-                displayName:
-                    this.localization.translate(`game-${type}`) || emoteDef.name!,
-                displayLore:
-                    this.localization.translate(`game-${type}-lore`) || emoteDef.lore,
+                displayName: this.localization.translate(`game-${type}`) || emoteDef.name!,
+                displayLore: this.localization.translate(`game-${type}-lore`) || emoteDef.lore,
                 subcat: emoteDef.category,
             };
             this.equippedItems[slotIdx] = itemInfo;
@@ -919,8 +908,7 @@ export class LoadoutMenu {
         });
 
         // Sort items based on currently selected sort
-        const displaySubcatSort =
-            category.loadoutType == "emote" || category.loadoutType == "player_icon";
+        const displaySubcatSort = category.loadoutType == "emote" || category.loadoutType == "player_icon";
 
         $("#customize-sort-subcat").css("display", displaySubcatSort ? "block" : "none");
 
@@ -971,7 +959,7 @@ export class LoadoutMenu {
         this.modalCustomizeItemLore.html("");
         this.modalCustomizeItemRarity.html("");
 
-        const getItemSourceName = function (source: string) {
+        const getItemSourceName = function(source: string) {
             const sourceDef = GameObjectDefs[source] as EmoteDef;
             if (sourceDef?.name) {
                 return sourceDef.name;
@@ -990,10 +978,8 @@ export class LoadoutMenu {
                 loadoutType: category.loadoutType,
                 type: item.type,
                 rarity: objDef.rarity || Rarity.Stock,
-                displayName:
-                    this.localization.translate(`game-${item.type}`) || objDef.name,
-                displayLore:
-                    this.localization.translate(`game-${item.type}-lore`) || objDef.lore!,
+                displayName: this.localization.translate(`game-${item.type}`) || objDef.name,
+                displayLore: this.localization.translate(`game-${item.type}-lore`) || objDef.lore!,
                 displaySource: getItemSourceName(item.source),
                 timeAcquired: item.timeAcquired,
                 idx: i,
@@ -1054,14 +1040,14 @@ export class LoadoutMenu {
             this.selectedCatItems.push(itemInfo);
             if (!loadoutItemDiv) {
                 if (
-                    category.loadoutType == "crosshair" &&
-                    itemInfo.type == this.loadout.crosshair.type
+                    category.loadoutType == "crosshair"
+                    && itemInfo.type == this.loadout.crosshair.type
                 ) {
                     loadoutItemDiv = itemInfo.outerDiv;
                 } else if (
-                    category.loadoutType != "emote" &&
-                    itemInfo.type ==
-                        this.loadout[category.loadoutType as keyof typeof this.loadout]
+                    category.loadoutType != "emote"
+                    && itemInfo.type
+                        == this.loadout[category.loadoutType as keyof typeof this.loadout]
                 ) {
                     loadoutItemDiv = itemInfo.outerDiv;
                 }
@@ -1111,14 +1097,13 @@ export class LoadoutMenu {
         // Disable crosshair elements on Edge
         if (device.browser == "edge") {
             if (category.loadoutType == "crosshair") {
-                const disableElem = function (
+                const disableElem = function(
                     parentElem: JQuery<HTMLElement>,
                     disableElem: JQuery<HTMLElement>,
                 ) {
-                    const height =
-                        parentElem.height()! +
-                        parseInt(parentElem.css("padding-top")) +
-                        parseInt(parentElem.css("padding-bottom"));
+                    const height = parentElem.height()!
+                        + parseInt(parentElem.css("padding-top"))
+                        + parseInt(parentElem.css("padding-bottom"));
                     disableElem.css("height", height);
                 };
                 disableElem(
@@ -1152,17 +1137,17 @@ export class LoadoutMenu {
     }
 
     setEmoteDraggable(selector: JQuery<HTMLElement>, that: LoadoutMenu) {
-        selector.on("dragstart", function (e) {
+        selector.on("dragstart", function(e) {
             if (
-                !$(this).hasClass("customize-list-item-locked") &&
-                (that.selectItem($(this), false), device.browser != "edge")
+                !$(this).hasClass("customize-list-item-locked")
+                && (that.selectItem($(this), false), device.browser != "edge")
             ) {
                 const imgDiv = document.createElement("img");
                 imgDiv.src = that.selectedItem.img
                     ? that.selectedItem.img
-                          .replace("url(", "")
-                          .replace(")", "")
-                          .replace(/\'/gi, "")
+                        .replace("url(", "")
+                        .replace(")", "")
+                        .replace(/\'/gi, "")
                     : "";
                 e.originalEvent?.dataTransfer?.setDragImage(imgDiv, 64, 64);
             }

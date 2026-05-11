@@ -56,11 +56,9 @@ export class MainView {
         //   interval: daily, weekly, alltime
         //   teamMode: solo, duo, squad
         //   maxCount: 10, 100
-        let type =
-            helpers.getParameterByName<LeaderboardRequest["type"]>("type") ||
-            "most_kills";
-        const interval =
-            helpers.getParameterByName<LeaderboardRequest["interval"]>("t") || "daily";
+        let type = helpers.getParameterByName<LeaderboardRequest["type"]>("type")
+            || "most_kills";
+        const interval = helpers.getParameterByName<LeaderboardRequest["interval"]>("t") || "daily";
         const teamMode = helpers.getParameterByName("team") || "solo";
         const mapId = helpers.getParameterByName("mapId") || "0";
         // Change to most_damage_dealt if faction mode and most_kills selected
@@ -129,11 +127,10 @@ export class MainView {
         } else if (this.error || !this.data.data) {
             content = templates.leaderboardError({});
         } else {
-            const statName =
-                TypeToString[this.data.type as keyof typeof TypeToString] || "";
+            const statName = TypeToString[this.data.type as keyof typeof TypeToString] || "";
             let minGames = MinGames[this.data.type as keyof typeof MinGames]
-                ? // @ts-expect-error go away
-                  MinGames[this.data.type][this.data.interval]
+                // @ts-expect-error go away
+                ? MinGames[this.data.type][this.data.interval]
                 : 1;
             minGames = minGames || 1;
 
@@ -152,12 +149,12 @@ export class MainView {
             // Disable most kills option if 50v50 selected
             const factionMode = Number(this.data.mapId) == 3;
             if (factionMode) {
-                $('#leaderboard-type option[value="most_kills"]').attr(
+                $("#leaderboard-type option[value=\"most_kills\"]").attr(
                     "disabled",
                     "disabled",
                 );
             } else {
-                $('#leaderboard-type option[value="most_kills"]').removeAttr("disabled");
+                $("#leaderboard-type option[value=\"most_kills\"]").removeAttr("disabled");
             }
         }
 

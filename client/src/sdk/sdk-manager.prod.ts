@@ -35,8 +35,8 @@ if (window.self !== window.top) {
             const allowedTags = ["INPUT", "TEXTAREA", "SELECT", "BUTTON"];
 
             if (
-                event.key === " " &&
-                (allowedTags.includes(target.tagName) || target.isContentEditable)
+                event.key === " "
+                && (allowedTags.includes(target.tagName) || target.isContentEditable)
             ) {
                 return;
             }
@@ -68,8 +68,7 @@ function isWithinSpellSync(): boolean {
     const urlParams = new URLSearchParams(self.location.search);
     const isParamPresent = urlParams.has("spellsync");
     const isHostedOnSubdomain = self.location.hostname === "spellsync.survev.io";
-    const isForced =
-        String(import.meta.env.VITE_BUILD_FOR_SPELLSYNC).toLowerCase() === "true";
+    const isForced = String(import.meta.env.VITE_BUILD_FOR_SPELLSYNC).toLowerCase() === "true";
     return isParamPresent || isHostedOnSubdomain || isForced;
 }
 
@@ -106,8 +105,7 @@ export class SDKManager implements BaseSDKManager {
     respawns: number[] = [];
 
     constructor() {
-        this.isAnySDK =
-            this.isPoki || this.isCrazyGames || this.isGameMonetize || this.isSpellSync;
+        this.isAnySDK = this.isPoki || this.isCrazyGames || this.isGameMonetize || this.isSpellSync;
 
         console.log(
             "Poki SDK:",
@@ -573,7 +571,7 @@ export class SDKManager implements BaseSDKManager {
     }
 
     private initPoki(): Promise<void> {
-        return new Promise(function (resolve) {
+        return new Promise(function(resolve) {
             const pokiScript = document.createElement("script");
             pokiScript.src = "https://game-cdn.poki.com/scripts/v2/poki-sdk.js";
             document.head.appendChild(pokiScript);

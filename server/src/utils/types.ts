@@ -73,11 +73,11 @@ export type FindGamePrivateBody = z.infer<typeof zFindGamePrivateBody>;
 
 export type FindGamePrivateRes =
     | {
-          gameId: string;
-          useHttps: boolean;
-          hosts: string[];
-          addrs: string[];
-      }
+        gameId: string;
+        useHttps: boolean;
+        hosts: string[];
+        addrs: string[];
+    }
     | { error: FindGameError };
 
 export enum ProcessMsgType {

@@ -1,16 +1,11 @@
-import type { WebSocket } from "uWebSockets.js";
 import { randomUUID } from "crypto";
 import NanoTimer from "nanotimer";
 import { platform } from "os";
+import type { WebSocket } from "uWebSockets.js";
 import type { MapDefs } from "../../../shared/defs/mapDefs.ts";
 import * as net from "../../../shared/net/net.ts";
 import { Config } from "../config.ts";
-import type {
-    FindGamePrivateBody,
-    GameData,
-    GameSocketData,
-    ServerGameConfig,
-} from "../utils/types.ts";
+import type { FindGamePrivateBody, GameData, GameSocketData, ServerGameConfig } from "../utils/types.ts";
 import { Game } from "./game.ts";
 
 export abstract class GameManager {
@@ -91,8 +86,8 @@ export class SingleThreadGameManager implements GameManager {
     getPlayerCount(): number {
         return this.games.reduce((a, b) => {
             return (
-                a +
-                (b ? b.playerBarn.livingPlayers.filter((p) => !p.disconnected).length : 0)
+                a
+                + (b ? b.playerBarn.livingPlayers.filter((p) => !p.disconnected).length : 0)
             );
         }, 0);
     }
@@ -136,9 +131,9 @@ export class SingleThreadGameManager implements GameManager {
         let game = this.games
             .filter((game) => {
                 return (
-                    game.canJoin &&
-                    game.teamMode === body.teamMode &&
-                    game.mapName === body.mapName
+                    game.canJoin
+                    && game.teamMode === body.teamMode
+                    && game.mapName === body.mapName
                 );
             })
             .sort((a, b) => {

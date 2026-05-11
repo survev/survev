@@ -26,10 +26,9 @@ export class QuestManager {
         if (this.gameOverFlushed) return;
 
         const aliveCount = this.game.modeManager.aliveCount();
-        const teamRank =
-            winningTeamId !== undefined && winningTeamId == this.player.teamId
-                ? 1
-                : aliveCount + 1;
+        const teamRank = winningTeamId !== undefined && winningTeamId == this.player.teamId
+            ? 1
+            : aliveCount + 1;
 
         this.trackEvent("survived", { seconds: this.player.timeAlive });
         this.trackEvent("placement", {

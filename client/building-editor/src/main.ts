@@ -49,7 +49,7 @@ class Application {
     active = false;
     hasFocus = true;
 
-    contextListener = function (e: MouseEvent) {
+    contextListener = function(e: MouseEvent) {
         e.preventDefault();
     };
 
@@ -70,8 +70,7 @@ class Application {
     tryLoad() {
         if (this.domContentLoaded && this.configLoaded && !this.initialized) {
             this.initialized = true;
-            const language =
-                this.config.get("language") || this.localization.detectLocale();
+            const language = this.config.get("language") || this.localization.detectLocale();
             this.config.set("language", language);
             this.localization.setLocale(language);
             this.localization.populateLanguageSelect();

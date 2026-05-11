@@ -3,7 +3,7 @@ import type { AABB } from "./coldet.ts";
 import { collider } from "./collider.ts";
 import { River } from "./river.ts";
 import { util } from "./util.ts";
-import { type Vec2, v2 } from "./v2.ts";
+import { v2, type Vec2 } from "./v2.ts";
 
 export interface MapRiverData {
     width: number;

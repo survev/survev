@@ -1,8 +1,5 @@
 import { GameObjectDefs } from "../../../shared/defs/gameObjectDefs.ts";
-import {
-    SCOPE_LEVELS,
-    type ScopeDef,
-} from "../../../shared/defs/gameObjects/gearDefs.ts";
+import { SCOPE_LEVELS, type ScopeDef } from "../../../shared/defs/gameObjects/gearDefs.ts";
 import { PerkProperties } from "../../../shared/defs/gameObjects/perkDefs.ts";
 import { GameConfig, type InventoryItem } from "../../../shared/gameConfig.ts";
 import { math } from "../../../shared/utils/math.ts";
@@ -227,8 +224,8 @@ export class InventoryManager {
             case "throwable": {
                 // set the throwable slot to this item if there was no throwables before
                 if (
-                    !this.player.weapons[GameConfig.WeaponSlot.Throwable].type &&
-                    throwableList.includes(item)
+                    !this.player.weapons[GameConfig.WeaponSlot.Throwable].type
+                    && throwableList.includes(item)
                 ) {
                     this.player.weaponManager.setWeapon(
                         GameConfig.WeaponSlot.Throwable,
@@ -242,9 +239,9 @@ export class InventoryManager {
                 // automatically reloads gun if inventory has 0 ammo and ammo is picked up
                 const weaponInfo = GameObjectDefs[this.player.activeWeapon];
                 if (
-                    weaponInfo.type === "gun" &&
-                    this.player.weapons[this.player.curWeapIdx].ammo <= 0 &&
-                    weaponInfo.ammo === item
+                    weaponInfo.type === "gun"
+                    && this.player.weapons[this.player.curWeapIdx].ammo <= 0
+                    && weaponInfo.ammo === item
                 ) {
                     this.player.weaponManager.scheduledReload = true;
                 }

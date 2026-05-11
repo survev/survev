@@ -104,7 +104,6 @@ class BasePlayerGroup {
     }
 
     /**
-     *
      * @param player optional player to exclude
      * @returns random alive player
      */
@@ -127,8 +126,7 @@ class BasePlayerGroup {
     prevPlayer(currentPlayer: Player) {
         const alivePlayers = this.getAlivePlayers();
         const currentPlayerIndex = alivePlayers.indexOf(currentPlayer);
-        const newIndex =
-            currentPlayerIndex == 0 ? alivePlayers.length - 1 : currentPlayerIndex - 1;
+        const newIndex = currentPlayerIndex == 0 ? alivePlayers.length - 1 : currentPlayerIndex - 1;
         return alivePlayers[newIndex];
     }
 }
@@ -157,8 +155,8 @@ export class Group extends BasePlayerGroup {
 
     canJoin(players: number) {
         return (
-            this.maxPlayers - this.reservedSlots - players >= 0 &&
-            !this.allDeadOrDisconnected
+            this.maxPlayers - this.reservedSlots - players >= 0
+            && !this.allDeadOrDisconnected
         );
     }
 }

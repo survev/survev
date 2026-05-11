@@ -3,7 +3,7 @@ import type { ObjectData, ObjectType } from "../../../shared/net/objectSerialize
 import { collider } from "../../../shared/utils/collider.ts";
 import { math } from "../../../shared/utils/math.ts";
 import { util } from "../../../shared/utils/util.ts";
-import { type Vec2, v2 } from "../../../shared/utils/v2.ts";
+import { v2, type Vec2 } from "../../../shared/utils/v2.ts";
 import type { Camera } from "../camera.ts";
 import type { Ctx } from "../game.ts";
 import type { Map } from "../map.ts";
@@ -152,11 +152,11 @@ export class SmokeBarn {
                 // level but occluded by the cellar when on the stairs).
                 let layer = p.layer;
                 if (
-                    (!!util.sameLayer(p.layer, activePlayer.layer) ||
-                        !!(activePlayer.layer & 2)) &&
-                    (p.layer == 1 ||
-                        !(activePlayer.layer & 2) ||
-                        !map.insideStructureMask(collider.createCircle(p.pos, 1)))
+                    (!!util.sameLayer(p.layer, activePlayer.layer)
+                        || !!(activePlayer.layer & 2))
+                    && (p.layer == 1
+                        || !(activePlayer.layer & 2)
+                        || !map.insideStructureMask(collider.createCircle(p.pos, 1)))
                 ) {
                     layer |= 2;
                 }

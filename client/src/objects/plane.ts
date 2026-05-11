@@ -66,10 +66,9 @@ class Plane {
         this.spriteUpdateTime = 0;
 
         this.type = data.action;
-        this.config =
-            this.type == GameConfig.Plane.Airdrop
-                ? GameConfig.airdrop
-                : GameConfig.airstrike;
+        this.config = this.type == GameConfig.Plane.Airdrop
+            ? GameConfig.airdrop
+            : GameConfig.airstrike;
 
         this.rad = this.config.planeRad;
         switch (this.type) {
@@ -168,9 +167,8 @@ class AirstrikeZone {
             this.gfx.endFill();
         }
 
-        const alpha =
-            math.smoothstep(this.ticker, 0, 0.5) *
-            (1 - math.smoothstep(this.ticker, this.duration - 0.5, this.duration));
+        const alpha = math.smoothstep(this.ticker, 0, 0.5)
+            * (1 - math.smoothstep(this.ticker, this.duration - 0.5, this.duration));
         this.gfx.alpha = alpha;
     }
 }
@@ -263,10 +261,10 @@ export class PlaneBarn {
             if (p.active) {
                 let layer = 0;
                 if (
-                    (!!util.sameLayer(layer, activePlayer.layer) ||
-                        !!(activePlayer.layer & 2)) &&
-                    (!(activePlayer.layer & 2) ||
-                        !map.insideStructureMask(collider.createCircle(p.pos, 1)))
+                    (!!util.sameLayer(layer, activePlayer.layer)
+                        || !!(activePlayer.layer & 2))
+                    && (!(activePlayer.layer & 2)
+                        || !map.insideStructureMask(collider.createCircle(p.pos, 1)))
                 ) {
                     layer |= 2;
                 }
@@ -321,14 +319,13 @@ export class PlaneBarn {
                         const minDist = 150;
                         const maxSoundOffset = 2.25;
                         const distToCompare = math.max(minDist, distToPlane);
-                        offset =
-                            (1 -
-                                math.clamp(
-                                    math.max(0, distToCompare) / maxDistToOffset,
-                                    0,
-                                    1,
-                                )) *
-                            maxSoundOffset;
+                        offset = (1
+                            - math.clamp(
+                                math.max(0, distToCompare) / maxDistToOffset,
+                                0,
+                                1,
+                            ))
+                            * maxSoundOffset;
                     }
                     if (distToPlane < maxRange) {
                         p.soundInstance = this.audioManager.playSound(p.planeSound, {

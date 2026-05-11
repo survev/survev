@@ -33,7 +33,7 @@ function createLoginOptions(
         class: "account-buttons",
     });
     contentsElem.append(buttonParentElem);
-    const addLoginOption = function (method: string, onClick: () => void) {
+    const addLoginOption = function(method: string, onClick: () => void) {
         const el = $("<div/>", {
             class: `menu-option btn-darken btn-standard btn-login-${method}`,
         });
@@ -112,7 +112,7 @@ export class ProfileUi {
 
     initUi() {
         // Set username
-        const clearNamePrompt = function () {
+        const clearNamePrompt = function() {
             $("#modal-body-warning").css("display", "none");
             $("#modal-account-name-input").val("");
         };
@@ -128,13 +128,11 @@ export class ProfileUi {
                         failed: "Failed setting username.",
                         invalid: "Invalid username.",
                         taken: "Name already taken!",
-                        change_time_not_expired:
-                            "Username has already been set recently.",
+                        change_time_not_expired: "Username has already been set recently.",
                     };
-                    const message =
-                        ERROR_CODE_TO_LOCALIZATION[
-                            error as keyof typeof ERROR_CODE_TO_LOCALIZATION
-                        ] || ERROR_CODE_TO_LOCALIZATION.failed;
+                    const message = ERROR_CODE_TO_LOCALIZATION[
+                        error as keyof typeof ERROR_CODE_TO_LOCALIZATION
+                    ] || ERROR_CODE_TO_LOCALIZATION.failed;
                     $("#modal-body-warning").hide();
                     $("#modal-body-warning").html(message);
                     $("#modal-body-warning").fadeIn();
@@ -269,8 +267,8 @@ export class ProfileUi {
         });
         $(".account-details-user").on("click", () => {
             if (
-                this.userSettingsModal!.isVisible() ||
-                this.loginOptionsModal!.isVisible()
+                this.userSettingsModal!.isVisible()
+                || this.loginOptionsModal!.isVisible()
             ) {
                 this.userSettingsModal!.hide();
                 this.loginOptionsModal!.hide();
@@ -339,14 +337,10 @@ export class ProfileUi {
     onError(type: string, data?: string) {
         const typeText = {
             server_error: "Operation failed, please try again later.",
-            facebook_account_in_use:
-                "Failed linking Facebook account.<br/>Account already in use!",
-            google_account_in_use:
-                "Failed linking Google account.<br/>Account already in use!",
-            twitch_account_in_use:
-                "Failed linking Twitch account.<br/>Account already in use!",
-            discord_account_in_use:
-                "Failed linking Discord account.<br/>Account already in use!",
+            facebook_account_in_use: "Failed linking Facebook account.<br/>Account already in use!",
+            google_account_in_use: "Failed linking Google account.<br/>Account already in use!",
+            twitch_account_in_use: "Failed linking Twitch account.<br/>Account already in use!",
+            discord_account_in_use: "Failed linking Discord account.<br/>Account already in use!",
             account_banned: `Account banned: ${data}`,
             login_failed: "Login failed.",
         };
@@ -418,16 +412,15 @@ export class ProfileUi {
         const modal = opts.modal
             ? this.createAccountModal
             : device.mobile
-              ? this.loginOptionsModalMobile
-              : this.loginOptionsModal;
+            ? this.loginOptionsModalMobile
+            : this.loginOptionsModal;
         createLoginOptions(modal!.selector, opts.link, this.account, this.localization);
         modal!.show();
     }
 
     updateUserIcon() {
-        const icon =
-            helpers.getSvgFromGameType(this.account.loadout.player_icon) ||
-            "img/gui/player-gui.svg";
+        const icon = helpers.getSvgFromGameType(this.account.loadout.player_icon)
+            || "img/gui/player-gui.svg";
         $(".account-details-user .account-avatar").css(
             "background-image",
             `url(${icon})`,

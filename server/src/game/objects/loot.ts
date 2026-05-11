@@ -7,7 +7,7 @@ import { collider } from "../../../../shared/utils/collider.ts";
 import { math } from "../../../../shared/utils/math.ts";
 import type { River } from "../../../../shared/utils/river.ts";
 import { assert, util } from "../../../../shared/utils/util.ts";
-import { type Vec2, v2 } from "../../../../shared/utils/v2.ts";
+import { v2, type Vec2 } from "../../../../shared/utils/v2.ts";
 import type { Game } from "../game.ts";
 import { HashGrid } from "../grid.ts";
 import { BaseGameObject } from "./gameObject.ts";
@@ -47,8 +47,8 @@ export class LootBarn {
             this.loots,
             (a, b) => {
                 return (
-                    (util.sameLayer(a.layer, b.layer) as boolean) &&
-                    coldet.testCircleCircle(a.pos, a.lootRad, b.pos, b.lootRad)
+                    (util.sameLayer(a.layer, b.layer) as boolean)
+                    && coldet.testCircleCircle(a.pos, a.lootRad, b.pos, b.lootRad)
                 );
             },
             (a, b) => {
@@ -90,8 +90,9 @@ export class LootBarn {
         for (let i = 0; i < dropCount; i++) {
             this.addLoot(item, player.pos, player.layer, 60, undefined, -4, dir);
         }
-        if (amount % 60 !== 0)
+        if (amount % 60 !== 0) {
             this.addLoot(item, player.pos, player.layer, amount % 60, undefined, -4, dir);
+        }
     }
 
     /**
@@ -158,10 +159,10 @@ export class LootBarn {
         this._addLoot(loot);
 
         if (
-            def.type === "gun" &&
-            preloadGun &&
-            !def.ammoInfinite &&
-            source !== "player"
+            def.type === "gun"
+            && preloadGun
+            && !def.ammoInfinite
+            && source !== "player"
         ) {
             loot.isPreloadedGun = true;
         }
@@ -347,11 +348,10 @@ export class Loot extends BaseGameObject {
             }
         }
 
-        const shouldUpdate =
-            this.forceUpdateTicker > 0.3 ||
-            Math.abs(this.vel.x) > 0.001 ||
-            Math.abs(this.vel.y) > 0.001 ||
-            !v2.eq(this.oldPos, this.pos);
+        const shouldUpdate = this.forceUpdateTicker > 0.3
+            || Math.abs(this.vel.x) > 0.001
+            || Math.abs(this.vel.y) > 0.001
+            || !v2.eq(this.oldPos, this.pos);
 
         if (!shouldUpdate) {
             // force a loot update few ms to make sure if e.g an obstacle spawned on top of the loot (airdrop, potato respawning etc)
@@ -422,8 +422,8 @@ export class Loot extends BaseGameObject {
                     if (this.bellowBridge) continue;
                     // Prioritize layer0 building surfaces when on stairs
                     if (
-                        (obj.layer !== this.layer && !onStairs) ||
-                        (obj.layer === 1 && onStairs)
+                        (obj.layer !== this.layer && !onStairs)
+                        || (obj.layer === 1 && onStairs)
                     ) {
                         continue;
                     }
@@ -474,15 +474,15 @@ export class Loot extends BaseGameObject {
         // ignore rivers if we are in the ocean
         const beachAABB = this.game.map.beachBounds;
         if (
-            !surface.type &&
-            coldet.testPointAabb(this.pos, beachAABB.min, beachAABB.max)
+            !surface.type
+            && coldet.testPointAabb(this.pos, beachAABB.min, beachAABB.max)
         ) {
             const rivers = this.game.map.normalRivers;
             for (let i = 0; i < rivers.length; i++) {
                 const river = rivers[i];
                 if (
-                    coldet.testPointAabb(this.pos, river.aabb.min, river.aabb.max) &&
-                    math.pointInsidePolygon(this.pos, river.waterPoly)
+                    coldet.testPointAabb(this.pos, river.aabb.min, river.aabb.max)
+                    && math.pointInsidePolygon(this.pos, river.waterPoly)
                 ) {
                     finalRiver = river;
                     break;
