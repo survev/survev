@@ -410,7 +410,7 @@ export class BulletBarn {
                 for (let i = 0; i < colObjs.length; i++) {
                     const col = colObjs[i];
                     if (col.type == "obstacle") {
-                        const mapDef = MapObjectDefs[col?.obstacleType!] as ObstacleDef;
+                        const mapDef = MapObjectDefs[col.obstacleType!] as ObstacleDef;
                         playHitFx(
                             mapDef.hitParticle,
                             mapDef.sound.bullet!,
@@ -487,7 +487,7 @@ export class BulletBarn {
                                 if (
                                     !se?.lootOnly
                                     && collider.intersectSegment(
-                                        se?.collision!,
+                                        se?.collision,
                                         b.pos,
                                         posOld,
                                     )

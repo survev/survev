@@ -516,7 +516,7 @@ export class LoadoutMenu {
             if (
                 objDef
                 && objDef.type == category.gameType
-                && item?.status! < loadout.ItemStatus.Ackd
+                && item.status! < loadout.ItemStatus.Ackd
             ) {
                 ackItemTypes.push(item.type);
             }
@@ -1147,7 +1147,7 @@ export class LoadoutMenu {
                     ? that.selectedItem.img
                         .replace("url(", "")
                         .replace(")", "")
-                        .replace(/\'/gi, "")
+                        .replace(/'/gi, "")
                     : "";
                 e.originalEvent?.dataTransfer?.setDragImage(imgDiv, 64, 64);
             }

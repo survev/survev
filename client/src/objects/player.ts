@@ -146,7 +146,7 @@ class Gun {
             this.gunMag.visible = false;
         }
 
-        this.magTop = imgDef.magImg?.top!;
+        this.magTop = !!(imgDef.magImg?.top);
 
         const handOffset = gunDef.isDual ? v2.create(-5.95, 0) : v2.create(-4.25, -1.75);
         if (imgDef.gunOffset) {
@@ -928,7 +928,7 @@ export class Player implements AbstractObject {
         // Enter/exit bush effects
         const isInside = insideObstacle != null;
         if (isInside) {
-            this.insideObstacleType = insideObstacle?.type!;
+            this.insideObstacleType = insideObstacle!.type;
         }
         this.lastInsideObstacleTime -= dt;
         if (
@@ -977,7 +977,7 @@ export class Player implements AbstractObject {
         if (this.isNearDoorError && !wasNearDoorError && this.doorErrorTicker <= 0) {
             this.doorErrorTicker = 0.5;
 
-            const doorDef = MapObjectDefs[doorErrorObstacle?.type!] as ObstacleDef;
+            const doorDef = MapObjectDefs[doorErrorObstacle!.type] as ObstacleDef;
             const doorSfx = doorDef.door?.sound.error!;
             audioManager.playSound(doorSfx, {
                 channel: "sfx",
@@ -1762,9 +1762,9 @@ export class Player implements AbstractObject {
                     e.visible = false;
                 }
             };
-            const Z = R.handImg?.[this.throwableState]!;
-            K(this.objectLSprite, Z.left);
-            K(this.objectRSprite, Z.right);
+            const Z = R.handImg?.[this.throwableState];
+            K(this.objectLSprite, Z!.left);
+            K(this.objectRSprite, Z!.right);
         } else {
             this.objectLSprite.visible = false;
             this.objectRSprite.visible = false;

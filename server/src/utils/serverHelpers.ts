@@ -116,7 +116,7 @@ export function checkForBadWords(name: string) {
     return matcher.hasMatch(name);
 }
 
-const allowedCharsRegex = /[^A-Za-z 0-9 \.,\?""!@#\$%\^&\*\(\)-_=\+;:<>\/\\\|\}\{\[\]`~]*/g;
+const allowedCharsRegex = /[^A-Za-z 0-9 .,?""!@#$%^&*()-_=+;:<>/\\|}{[\]`~]*/g;
 
 export function validateUserName(name: string): {
     originalWasInvalid: boolean;
@@ -423,7 +423,7 @@ export async function logErrorToWebhook(from: "server" | "client", ...messages: 
                 if (msg instanceof Error) {
                     return `\`\`\`${msg.cause}\n${msg.stack}\`\`\``;
                 }
-                if (typeof msg == "object") {
+                if (typeof msg === "object") {
                     return `\`\`\`json\n${JSON.stringify(msg, null, 2).replaceAll("`", "\\`")}\`\`\``;
                 }
                 return `${msg}`;

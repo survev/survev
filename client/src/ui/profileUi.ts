@@ -96,11 +96,6 @@ export class ProfileUi {
         public loadoutMenu: LoadoutMenu,
         public errorModal: MenuModal,
     ) {
-        this.account = account;
-        this.localization = localization;
-        this.loadoutMenu = loadoutMenu;
-        this.errorModal = errorModal;
-
         account.addEventListener("error", this.onError.bind(this));
         account.addEventListener("login", this.onLogin.bind(this));
         account.addEventListener("loadout", this.onLoadoutUpdated.bind(this));

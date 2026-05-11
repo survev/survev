@@ -60,7 +60,7 @@ function getBuildingSprites(type: string, sprites: Set<string>) {
             const types = [];
             if (typeof obj.type === "string") {
                 types.push(obj.type);
-            } else if (typeof obj.type == "object") {
+            } else if (typeof obj.type === "object") {
                 types.push(...Object.keys(obj.type));
             }
             for (const t of types) {

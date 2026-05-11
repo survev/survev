@@ -468,7 +468,7 @@ export class Map {
         }> = [];
         if ((def as BuildingDef).map?.shapes !== undefined) {
             // @ts-expect-error stfu
-            shapes = (def as BuildingDef).map?.shapes!;
+            shapes = (def as BuildingDef).map?.shapes;
         } else {
             let col = null;
             if (
@@ -481,8 +481,8 @@ export class Map {
             ) {
                 shapes.push({
                     collider: collider.copy(col) as Circle,
-                    scale: def.map?.scale! || 1,
-                    color: def.map?.color!,
+                    scale: def.map!.scale || 1,
+                    color: def.map!.color!,
                 });
             }
         }
@@ -722,7 +722,7 @@ export class Map {
         // Check rivers
         let onRiverShore = false;
         if (layer != 1) {
-            const rivers = this.terrain?.rivers!;
+            const rivers = this.terrain!.rivers;
             for (let v = 0; v < rivers.length; v++) {
                 const river = rivers[v];
                 if (
@@ -739,22 +739,22 @@ export class Map {
         // Check terrain
         return groundSurface(
             // Use a stone step sound if we're in the main-spring def
-            math.pointInsidePolygon(pos, this.terrain?.grass!)
+            math.pointInsidePolygon(pos, this.terrain!.grass)
                 ? onRiverShore
                     ? this.mapDef.biome.sound.riverShore
                     : "grass"
-                : math.pointInsidePolygon(pos, this.terrain?.shore!)
+                : math.pointInsidePolygon(pos, this.terrain!.shore)
                 ? "sand"
                 : "water",
         );
     }
 
     isInOcean(pos: Vec2) {
-        return !math.pointInsidePolygon(pos, this.terrain?.shore!);
+        return !math.pointInsidePolygon(pos, this.terrain!.shore);
     }
 
     distanceToShore(pos: Vec2) {
-        return math.distToPolygon(pos, this.terrain?.shore!);
+        return math.distToPolygon(pos, this.terrain!.shore);
     }
 
     insideStructureStairs(collision: Collider) {

@@ -5,6 +5,7 @@ import { type AABB, coldet, type Collider } from "../../../shared/utils/coldet.t
 import { collider } from "../../../shared/utils/collider.ts";
 import { mapHelpers } from "../../../shared/utils/mapHelpers.ts";
 import { math } from "../../../shared/utils/math.ts";
+import { assert } from "../../../shared/utils/util.ts";
 import { v2, type Vec2 } from "../../../shared/utils/v2.ts";
 import type { Ambiance } from "../ambiance.ts";
 import type Camera from "../camera.ts";
@@ -158,17 +159,19 @@ export class Structure implements AbstractObject {
 
     updateInteriorSounds(dt: number, map: Map, activePlayer: Player, ambience: Ambiance) {
         const def = MapObjectDefs[this.type] as StructureDef;
+        assert(def.interiorSound);
+
         collider.createCircle(activePlayer.m_pos, 0.001);
         map.m_buildingPool.m_getPool();
         const building0 = this.layers.length > 0 ? map.getBuildingById(this.layers[0].objId) : null;
         const building1 = this.layers.length > 1 ? map.getBuildingById(this.layers[1].objId) : null;
-        const maxDist = def.interiorSound?.outsideMaxDist !== undefined
+        const maxDist = def.interiorSound.outsideMaxDist !== undefined
             ? def.interiorSound.outsideMaxDist
             : 10;
-        const outsideVol = def.interiorSound?.outsideVolume !== undefined
+        const outsideVol = def.interiorSound.outsideVolume !== undefined
             ? def.interiorSound.outsideVolume
             : 0;
-        const undergroundVol = def.interiorSound?.undergroundVolume !== undefined
+        const undergroundVol = def.interiorSound.undergroundVolume !== undefined
             ? def.interiorSound.undergroundVolume
             : 1;
 
@@ -197,7 +200,7 @@ export class Structure implements AbstractObject {
         }
 
         // Transition between sound and soundAlt tracks
-        const transitionTime = def.interiorSound?.transitionTime !== undefined
+        const transitionTime = def.interiorSound.transitionTime !== undefined
             ? def.interiorSound.transitionTime
             : 1;
         if (this.interiorSoundAlt) {
@@ -216,8 +219,8 @@ export class Structure implements AbstractObject {
 
         // Choose the actual track based on the state of the transition
         const sound = this.soundTransitionT > 0.5
-            ? def.interiorSound?.soundAlt
-            : def.interiorSound?.sound;
+            ? def.interiorSound.soundAlt
+            : def.interiorSound.sound;
 
         // Set the track data
         const track0 = ambience.getTrack("interior_0");
@@ -227,7 +230,7 @@ export class Structure implements AbstractObject {
 
         const track1 = ambience.getTrack("interior_1");
         track1.sound = sound!;
-        track1.filter = def.interiorSound?.filter!;
+        track1.filter = def.interiorSound.filter || "";
         track1.weight = sound ? weight1 * transitionWeight * this.soundEnabledT : 0;
     }
 
@@ -256,7 +259,7 @@ export class Structure implements AbstractObject {
 
     insideStairs(collision: Collider) {
         for (let i = 0; i < this.stairs.length; i++) {
-            if (collider.intersect(this.stairs[i]?.collision!, collision)) {
+            if (collider.intersect(this.stairs[i]?.collision, collision)) {
                 return true;
             }
         }

@@ -182,7 +182,7 @@ export class SoundHandle {
     check(_checkCoalesce?: unknown) {
         if (this.id != this.instance.id) {
             this.instance = nullInstance!;
-            this.id = nullInstance?.id!;
+            this.id = nullInstance?.id || 0;
         }
     }
 

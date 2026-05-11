@@ -497,7 +497,7 @@ export class Building implements AbstractObject {
         const ceilingStep = step(
             this.ceiling.fadeAlpha,
             visible ? 0 : 1,
-            dt * (visible ? 12 : vision?.fadeRate!),
+            dt * (visible ? 12 : (vision.fadeRate ?? 1)),
         );
         this.ceiling.fadeAlpha += ceilingStep;
 

@@ -238,7 +238,7 @@ export class Application {
                 this.tryJoinTeam(true);
             });
             $("#btn-team-mobile-link-join").on("click", () => {
-                let t = $<HTMLInputElement>("#team-link-input").val()?.trim()!;
+                let t = $<HTMLInputElement>("#team-link-input").val()!.trim()!;
                 const r = t.indexOf("#");
                 if (r >= 0) {
                     t = t.slice(r + 1);

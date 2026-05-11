@@ -142,7 +142,7 @@ export class FlareBarn {
 
                 // Grow the flare size over time
                 d.timeAlive += dt;
-                d.flareScale = math.easeOutExpo(d.timeAlive / d.maxTimeAlive) * d?.maxFlareScale!;
+                d.flareScale = math.easeOutExpo(d.timeAlive / d.maxTimeAlive) * d.maxFlareScale!;
 
                 // Make a smoke trail
                 if (d.smokeThrottle <= 0) {
