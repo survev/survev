@@ -1,16 +1,9 @@
 import base64 from "base64-js";
 import $ from "jquery";
-import { Input as GameInput, type Input } from "../../shared/gameConfig.ts";
+import { type Input, Input as GameInput } from "../../shared/gameConfig.ts";
 import { BitStream } from "../../shared/lib/bitBuffer.ts";
 import type { ConfigManager } from "./config.ts";
-import {
-    type InputHandler,
-    InputType,
-    InputValue,
-    Key,
-    MouseButton,
-    MouseWheel,
-} from "./input.ts";
+import { type InputHandler, InputType, InputValue, Key, MouseButton, MouseWheel } from "./input.ts";
 import { crc16 } from "./lib/crc.ts";
 import type { Localization } from "./ui/localization.ts";
 
@@ -121,7 +114,7 @@ export class InputBinds {
         const stream = new BitStream(arrayBuf);
         const version = stream.readUint8();
         this.clearAllBinds();
-        for (let idx = 0; stream.length - stream.index >= 10; ) {
+        for (let idx = 0; stream.length - stream.index >= 10;) {
             const bind = idx++;
             const type = stream.readBits(2);
             const code = stream.readUint8();
@@ -274,9 +267,8 @@ export class InputBindUi {
             const key = defKeys[i];
             const bindDef = BindDefs[key as unknown as keyof typeof BindDefs];
             const bind = binds[key as unknown as number];
-            const nameKey =
-                "bind-" +
-                bindDef.name
+            const nameKey = "bind-"
+                + bindDef.name
                     .toLowerCase()
                     .replace(/[^a-z0-9]+/g, "-")
                     .replace(/-+/g, "-")
@@ -316,8 +308,8 @@ export class InputBindUi {
                         Key.F12,
                     ];
                     if (
-                        inputValue.type == InputType.Key &&
-                        disallowKeys.includes(inputValue.code)
+                        inputValue.type == InputType.Key
+                        && disallowKeys.includes(inputValue.code)
                     ) {
                         return false;
                     }

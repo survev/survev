@@ -7,7 +7,7 @@ import { collider } from "../../../../shared/utils/collider.ts";
 import { math } from "../../../../shared/utils/math.ts";
 import type { River } from "../../../../shared/utils/river.ts";
 import { assert, util } from "../../../../shared/utils/util.ts";
-import { type Vec2, v2 } from "../../../../shared/utils/v2.ts";
+import { v2, type Vec2 } from "../../../../shared/utils/v2.ts";
 import type { Game } from "../game.ts";
 import { HashGrid } from "../grid.ts";
 import { BaseGameObject } from "./gameObject.ts";
@@ -37,8 +37,8 @@ export class LootBarn {
             this.loots,
             (a, b) => {
                 return (
-                    (util.sameLayer(a.layer, b.layer) as boolean) &&
-                    coldet.testCircleCircle(a.pos, a.lootRad, b.pos, b.lootRad)
+                    (util.sameLayer(a.layer, b.layer) as boolean)
+                    && coldet.testCircleCircle(a.pos, a.lootRad, b.pos, b.lootRad)
                 );
             },
             (a, b) => {
@@ -124,10 +124,10 @@ export class LootBarn {
         if (noSideAmmo) return;
 
         if (
-            def.type === "gun" &&
-            preloadGun &&
-            !def.ammoInfinite &&
-            source !== "player"
+            def.type === "gun"
+            && preloadGun
+            && !def.ammoInfinite
+            && source !== "player"
         ) {
             loot.isPreloadedGun = true;
         }
@@ -325,9 +325,9 @@ export class Loot extends BaseGameObject {
             const owner = this.game.objectRegister.getById(this.ownerId);
             this.removeOwnerTicker += dt;
             if (
-                this.removeOwnerTicker > 2 ||
-                !owner ||
-                (owner.__type === ObjectType.Player && (owner.dead || owner.disconnected))
+                this.removeOwnerTicker > 2
+                || !owner
+                || (owner.__type === ObjectType.Player && (owner.dead || owner.disconnected))
             ) {
                 this.ownerId = 0;
                 this.setDirty();
@@ -336,10 +336,9 @@ export class Loot extends BaseGameObject {
 
         // make loots "sleep" if they are not moving
         // `forceUpdate` is set when obstacles around the loot change their colliders
-        const shouldUpdate =
-            this.forceUpdate ||
-            !v2.eq(this.vel, v2.create(0, 0), 0.01) ||
-            !v2.eq(this.lastClientPos, this.pos, 0.01);
+        const shouldUpdate = this.forceUpdate
+            || !v2.eq(this.vel, v2.create(0, 0), 0.01)
+            || !v2.eq(this.lastClientPos, this.pos, 0.01);
 
         if (!shouldUpdate) {
             return;
@@ -397,8 +396,8 @@ export class Loot extends BaseGameObject {
                     if (this.bellowBridge) continue;
                     // Prioritize layer0 building surfaces when on stairs
                     if (
-                        (obj.layer !== this.layer && !onStairs) ||
-                        (obj.layer === 1 && onStairs)
+                        (obj.layer !== this.layer && !onStairs)
+                        || (obj.layer === 1 && onStairs)
                     ) {
                         continue;
                     }
@@ -449,15 +448,15 @@ export class Loot extends BaseGameObject {
         // ignore rivers if we are in the ocean
         const beachAABB = this.game.map.beachBounds;
         if (
-            !surface.type &&
-            coldet.testPointAabb(this.pos, beachAABB.min, beachAABB.max)
+            !surface.type
+            && coldet.testPointAabb(this.pos, beachAABB.min, beachAABB.max)
         ) {
             const rivers = this.game.map.normalRivers;
             for (let i = 0; i < rivers.length; i++) {
                 const river = rivers[i];
                 if (
-                    coldet.testPointAabb(this.pos, river.aabb.min, river.aabb.max) &&
-                    math.pointInsidePolygon(this.pos, river.waterPoly)
+                    coldet.testPointAabb(this.pos, river.aabb.min, river.aabb.max)
+                    && math.pointInsidePolygon(this.pos, river.waterPoly)
                 ) {
                     finalRiver = river;
                     break;

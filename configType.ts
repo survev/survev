@@ -290,7 +290,6 @@ export interface ConfigType {
 
         /**
          * Enables proxycheck.io to ban VPNs and proxies from connecting.
-         *
          */
         PROXYCHECK_KEY?: string;
 

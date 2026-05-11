@@ -1,17 +1,9 @@
 import { aliasedTable, and, desc, eq, gt, sum } from "drizzle-orm";
 import { Hono } from "hono";
 import type { TeamMode } from "../../../../../shared/gameConfig.ts";
-import {
-    ALL_TEAM_MODES,
-    type MatchHistoryResponse,
-    zMatchHistoryRequest,
-} from "../../../../../shared/types/stats.ts";
+import { ALL_TEAM_MODES, type MatchHistoryResponse, zMatchHistoryRequest } from "../../../../../shared/types/stats.ts";
 import { util } from "../../../../../shared/utils/util.ts";
-import {
-    databaseEnabledMiddleware,
-    rateLimitMiddleware,
-    validateParams,
-} from "../../auth/middleware.ts";
+import { databaseEnabledMiddleware, rateLimitMiddleware, validateParams } from "../../auth/middleware.ts";
 import { db } from "../../db/index.ts";
 import { matchDataTable, usersTable } from "../../db/schema.ts";
 import type { Context } from "../../index.ts";

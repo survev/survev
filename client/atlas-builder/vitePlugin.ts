@@ -5,7 +5,7 @@ import type { ISpritesheetData } from "pixi.js-legacy";
 import type { Plugin } from "vite";
 import type { Atlas } from "../../shared/defs/mapDefs.ts";
 import { assert } from "../../shared/utils/util.ts";
-import { AtlasManager, atlasLogger, imageFolder } from "./atlasBuilder.ts";
+import { atlasLogger, AtlasManager, imageFolder } from "./atlasBuilder.ts";
 import { type AtlasRes, AtlasResolutions } from "./atlasDefs.ts";
 
 export function atlasBuilderPlugin(): Plugin[] {

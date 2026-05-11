@@ -8,7 +8,7 @@ import type { ObjectData, ObjectType } from "./../../../shared/net/objectSeriali
 import { collider } from "../../../shared/utils/collider.ts";
 import { math } from "../../../shared/utils/math.ts";
 import { util } from "../../../shared/utils/util.ts";
-import { type Vec2, v2 } from "../../../shared/utils/v2.ts";
+import { v2, type Vec2 } from "../../../shared/utils/v2.ts";
 import type { AudioManager } from "../audioManager.ts";
 import type { Camera } from "../camera.ts";
 import type { Ctx } from "../game.ts";
@@ -227,8 +227,8 @@ export class ProjectileBarn {
                         if (res) {
                             const col = o.height > p.posZ ? wallCol : groundCol;
                             if (
-                                res.pen > col.pen &&
-                                (!col.obj || col.obj.height <= o.height)
+                                res.pen > col.pen
+                                && (!col.obj || col.obj.height <= o.height)
                             ) {
                                 col.obj = o;
                                 col.pen = res.pen;
@@ -241,10 +241,10 @@ export class ProjectileBarn {
                 const vel = v2.div(v2.sub(p.pos, p.posOld), dt);
                 const speed = v2.length(vel);
                 if (
-                    wallCol.obj &&
-                    wallCol.obj.__id != p.lastSoundObjId &&
-                    speed > 7.5 &&
-                    ((p.lastSoundObjId = wallCol.obj.__id), p.playHitSfx)
+                    wallCol.obj
+                    && wallCol.obj.__id != p.lastSoundObjId
+                    && speed > 7.5
+                    && ((p.lastSoundObjId = wallCol.obj.__id), p.playHitSfx)
                 ) {
                     const dir = v2.mul(v2.normalizeSafe(vel, v2.create(1, 0)), -1);
                     const mapDef = MapObjectDefs[wallCol.obj.type] as ObstacleDef;
@@ -296,8 +296,7 @@ export class ProjectileBarn {
                         }
                     } else {
                         p.grounded = true;
-                        sound.name =
-                            groundSounds[surface.type as keyof typeof groundSounds];
+                        sound.name = groundSounds[surface.type as keyof typeof groundSounds];
                         // @HACK: Attept to use a footstep sound if we failed
                         // finding a surface
                         if (sound.name === undefined) {
@@ -335,15 +334,14 @@ export class ProjectileBarn {
                 // Trail
                 if (itemDef.trail) {
                     const speed = v2.length(vel);
-                    const trailT =
-                        math.remap(
-                            speed,
-                            itemDef.throwPhysics.speed * 0.25,
-                            itemDef.throwPhysics.speed * 1,
-                            0,
-                            1,
-                        ) *
-                        math.remap(
+                    const trailT = math.remap(
+                        speed,
+                        itemDef.throwPhysics.speed * 0.25,
+                        itemDef.throwPhysics.speed * 1,
+                        0,
+                        1,
+                    )
+                        * math.remap(
                             p.posZ,
                             0.1,
                             GameConfig.projectile.maxHeight * 0.5,
@@ -368,10 +366,10 @@ export class ProjectileBarn {
                 const onStairs = map.insideStructureStairs(stairCollider);
                 const onMask = map.insideStructureMask(stairCollider);
                 if (
-                    p.posZ >= 0.25 &&
-                    !!onStairs &&
-                    (p.layer & 1) == (activePlayer.layer & 1) &&
-                    (!onMask || !(activePlayer.layer & 2))
+                    p.posZ >= 0.25
+                    && !!onStairs
+                    && (p.layer & 1) == (activePlayer.layer & 1)
+                    && (!onMask || !(activePlayer.layer & 2))
                 ) {
                     layer |= 2;
                     zOrd += 100;
@@ -381,9 +379,8 @@ export class ProjectileBarn {
                     layer |= 2;
                 }
                 renderer.addPIXIObj(p.container, layer, zOrd);
-                const scale =
-                    p.imgScale *
-                    math.remap(p.posZ, 0, GameConfig.projectile.maxHeight, 1, 4.75);
+                const scale = p.imgScale
+                    * math.remap(p.posZ, 0, GameConfig.projectile.maxHeight, 1, 4.75);
 
                 let pos = p.pos;
                 if (camera.m_interpEnabled) {

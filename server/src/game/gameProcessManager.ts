@@ -1,6 +1,6 @@
-import type { WebSocket } from "uWebSockets.js";
 import { type ChildProcess, fork } from "child_process";
 import { randomUUID } from "crypto";
+import type { WebSocket } from "uWebSockets.js";
 import { type MapDef, MapDefs } from "../../../shared/defs/mapDefs.ts";
 import type { TeamMode } from "../../../shared/gameConfig.ts";
 import * as net from "../../../shared/net/net.ts";
@@ -188,17 +188,21 @@ export class GameProcessManager implements GameManager {
 
                 if (Date.now() - gameProc.lastMsgTime > 10000) {
                     this.logger.warn(
-                        `Process ${gameProc.process.pid} - #${gameProc.id.substring(0, 4)} did not send a message in more 10 seconds, killing`,
+                        `Process ${gameProc.process.pid} - #${
+                            gameProc.id.substring(0, 4)
+                        } did not send a message in more 10 seconds, killing`,
                     );
                     // sigquit can dump a core of the process
                     // useful for debugging infinite loops
                     this.killProcess(gameProc, "SIGQUIT");
                 } else if (
-                    gameProc.stopped &&
-                    Date.now() - gameProc.stoppedTime > 60000
+                    gameProc.stopped
+                    && Date.now() - gameProc.stoppedTime > 60000
                 ) {
                     this.logger.warn(
-                        `Process ${gameProc.process.pid} - #${gameProc.id.substring(0, 4)} stopped more than a minute ago, killing`,
+                        `Process ${gameProc.process.pid} - #${
+                            gameProc.id.substring(0, 4)
+                        } stopped more than a minute ago, killing`,
                     );
                     this.killProcess(gameProc);
                 }
@@ -284,10 +288,10 @@ export class GameProcessManager implements GameManager {
         let game = this.processes
             .filter((proc) => {
                 return (
-                    (proc.canJoin || proc.creating) &&
-                    proc.avaliableSlots > 0 &&
-                    proc.teamMode === body.teamMode &&
-                    proc.mapName === body.mapName
+                    (proc.canJoin || proc.creating)
+                    && proc.avaliableSlots > 0
+                    && proc.teamMode === body.teamMode
+                    && proc.mapName === body.mapName
                 );
             })
             .sort((a, b) => {

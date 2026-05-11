@@ -1,8 +1,8 @@
+import enquirer from "enquirer";
+import hjson from "hjson";
 import { randomBytes } from "node:crypto";
 import fs from "node:fs";
 import path from "node:path";
-import enquirer from "enquirer";
-import hjson from "hjson";
 import { configFileName } from "./config.ts";
 import type { PartialConfig } from "./configType.ts";
 import { util } from "./shared/utils/util.ts";
@@ -70,8 +70,7 @@ async function setupGameServer(config: PartialConfig) {
         });
 
         const l10n = await prompt<{ value: string }>({
-            message:
-                "Enter region translation key (eg: index-north-america, index-south-america)",
+            message: "Enter region translation key (eg: index-north-america, index-south-america)",
             name: "value",
             type: "text",
         });
@@ -101,8 +100,7 @@ async function setupGameServer(config: PartialConfig) {
 
 async function setupDatabase(config: PartialConfig, initial = true) {
     const dbEnabled = await prompt<{ value: boolean }>({
-        message:
-            "Would you like to setup database support (required for accounts, IP bans, leaderboards etc)",
+        message: "Would you like to setup database support (required for accounts, IP bans, leaderboards etc)",
         name: "value",
         type: "confirm",
         initial,
@@ -131,8 +129,7 @@ async function setupDatabase(config: PartialConfig, initial = true) {
 
 async function setupAccounts(config: PartialConfig) {
     const redirectURI = await prompt<{ value: string }>({
-        message:
-            "Enter the full base URL of the website for oauth2 redirects (eg: https://survev.io)",
+        message: "Enter the full base URL of the website for oauth2 redirects (eg: https://survev.io)",
         name: "value",
         type: "text",
         initial: `http://${config.apiServer?.host ?? "127.0.0.1"}:${config.apiServer?.port ?? 8000}`,
@@ -198,8 +195,7 @@ async function setupAccounts(config: PartialConfig) {
 
 async function setupAPIServer(config: PartialConfig) {
     const shouldImportKeys = await prompt<{ value: "import" | "random" }>({
-        message:
-            "Would you like to import the API and loadout secret keys or use random ones?",
+        message: "Would you like to import the API and loadout secret keys or use random ones?",
         name: "value",
         type: "select",
         choices: ["import", "random"],
@@ -239,8 +235,7 @@ async function setupRegions(config: PartialConfig) {
         });
 
         const l10n = await prompt<{ value: string }>({
-            message:
-                "Enter region translation key (eg: index-north-america, index-south-america)",
+            message: "Enter region translation key (eg: index-north-america, index-south-america)",
             name: "value",
             type: "text",
         });
@@ -429,8 +424,7 @@ async function setupConfig() {
     await loadExistingConfig(config);
 
     const devOrProd = await prompt<{ value: "development" | "production" }>({
-        message:
-            "Are you setting up a local development environment or a production server?",
+        message: "Are you setting up a local development environment or a production server?",
         name: "value",
         type: "select",
         choices: ["production", "development"],

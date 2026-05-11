@@ -3,10 +3,7 @@ import {
     type ChatInputCommandInteraction,
     type SlashCommandOptionsOnlyBuilder,
 } from "discord.js";
-import {
-    zSetClientThemeBody,
-    zSetGameModeBody,
-} from "../../../server/src/utils/types.ts";
+import { zSetClientThemeBody, zSetGameModeBody } from "../../../server/src/utils/types.ts";
 import {
     zBanAccountParams,
     zBanIpParams,
@@ -132,8 +129,7 @@ const commands = {
     }),
     [Command.SetMatchDataName]: createCommand({
         name: Command.SetMatchDataName,
-        description:
-            "update the name of a player in a game, useful for purging bad names from leaderboards",
+        description: "update the name of a player in a game, useful for purging bad names from leaderboards",
         optionValidator: zSetMatchDataNameParams,
         options: [
             {
@@ -163,8 +159,7 @@ const commands = {
             },
             {
                 name: "new_name",
-                description:
-                    "The new name of the account (get randomized if not provided)",
+                description: "The new name of the account (get randomized if not provided)",
                 required: false,
                 type: ApplicationCommandOptionType.String,
             },

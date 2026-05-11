@@ -127,8 +127,8 @@ export class TeamMenu {
                 {
                     queue: false,
                     duration: 300,
-                    complete: function () {
-                        $(this).fadeOut(250, function () {
+                    complete: function() {
+                        $(this).fadeOut(250, function() {
                             $(this).remove();
                         });
                     },
@@ -179,9 +179,7 @@ export class TeamMenu {
     connect(create: boolean, roomUrl: string) {
         if (!this.active || roomUrl !== this.roomData.roomUrl) {
             const roomHost = api.resolveRoomHost();
-            const url = `w${
-                window.location.protocol === "https:" ? "ss" : "s"
-            }://${roomHost}/team_v2`;
+            const url = `w${window.location.protocol === "https:" ? "ss" : "s"}://${roomHost}/team_v2`;
             this.active = true;
             this.joined = false;
             this.create = create;
@@ -205,7 +203,7 @@ export class TeamMenu {
             this.refreshUi();
 
             if (this.ws) {
-                this.ws.onclose = function () {};
+                this.ws.onclose = function() {};
                 this.ws.close();
                 this.ws = null;
             }
@@ -221,8 +219,8 @@ export class TeamMenu {
                         errMsg = this.joined
                             ? "lost_conn"
                             : this.create
-                              ? "create_failed"
-                              : "join_failed";
+                            ? "create_failed"
+                            : "join_failed";
                     }
                     this.leave(errMsg);
                 };
@@ -377,7 +375,7 @@ export class TeamMenu {
     }
 
     refreshUi() {
-        const setButtonState = function (
+        const setButtonState = function(
             el: JQuery<HTMLElement>,
             selected: boolean,
             enabled: boolean,
@@ -408,8 +406,8 @@ export class TeamMenu {
         this.serverWarning.html(errorTxt);
 
         if (
-            this.roomData.lastError == "find_game_invalid_protocol" &&
-            !this.displayedInvalidProtocolModal
+            this.roomData.lastError == "find_game_invalid_protocol"
+            && !this.displayedInvalidProtocolModal
         ) {
             $("#modal-refresh").fadeIn(200);
             this.displayedInvalidProtocolModal = true;
@@ -493,7 +491,7 @@ export class TeamMenu {
             // Play button
             this.playBtn.html(
                 this.roomData.findingGame || this.joiningGame
-                    ? '<div class="ui-spinner"></div>'
+                    ? "<div class=\"ui-spinner\"></div>"
                     : this.playBtn.attr("data-label")!,
             );
 
@@ -522,9 +520,11 @@ export class TeamMenu {
 
             if (this.isLeader) {
                 waitReason.html(
-                    `${this.localization.translate(
-                        "index-game-in-progress",
-                    )}<span> ...</span>`,
+                    `${
+                        this.localization.translate(
+                            "index-game-in-progress",
+                        )
+                    }<span> ...</span>`,
                 );
 
                 const showWaitMessage = playersInGame && !this.joiningGame;
@@ -533,21 +533,27 @@ export class TeamMenu {
             } else {
                 if (this.roomData.findingGame || this.joiningGame) {
                     waitReason.html(
-                        `<div class="ui-spinner" style="margin-right:16px"></div>${this.localization.translate(
-                            "index-joining-game",
-                        )}<span> ...</span>`,
+                        `<div class="ui-spinner" style="margin-right:16px"></div>${
+                            this.localization.translate(
+                                "index-joining-game",
+                            )
+                        }<span> ...</span>`,
                     );
                 } else if (playersInGame) {
                     waitReason.html(
-                        `${this.localization.translate(
-                            "index-game-in-progress",
-                        )}<span> ...</span>`,
+                        `${
+                            this.localization.translate(
+                                "index-game-in-progress",
+                            )
+                        }<span> ...</span>`,
                     );
                 } else {
                     waitReason.html(
-                        `${this.localization.translate(
-                            "index-waiting-for-leader",
-                        )}<span> ...</span>`,
+                        `${
+                            this.localization.translate(
+                                "index-waiting-for-leader",
+                            )
+                        }<span> ...</span>`,
                     );
                 }
                 waitReason.css("display", "block");
@@ -682,10 +688,10 @@ export class TeamMenu {
             });
             const playJoinSound = localPlayer && !localPlayer.inGame;
             if (
-                !document.hasFocus() &&
-                this.prevPlayerCount < this.players.length &&
-                this.players.length > 1 &&
-                playJoinSound
+                !document.hasFocus()
+                && this.prevPlayerCount < this.players.length
+                && this.players.length > 1
+                && playJoinSound
             ) {
                 this.audioManager.playSound("notification_join_01", {
                     channel: "ui",

@@ -5,17 +5,9 @@ import { OutfitDefs } from "../../shared/defs/gameObjects/outfitDefs.ts";
 import { UnlockDefs } from "../../shared/defs/gameObjects/unlockDefs.ts";
 import { GameConfig, type Input } from "../../shared/gameConfig.ts";
 import * as net from "../../shared/net/net.ts";
-import {
-    type ObjectData,
-    type ObjectsPartialData,
-    ObjectType,
-} from "../../shared/net/objectSerializeFns.ts";
+import { type ObjectData, type ObjectsPartialData, ObjectType } from "../../shared/net/objectSerializeFns.ts";
 import type { LocalData } from "../../shared/net/updateMsg.ts";
-import type {
-    FindGameBody,
-    FindGameMatchData,
-    FindGameResponse,
-} from "../../shared/types/api.ts";
+import type { FindGameBody, FindGameMatchData, FindGameResponse } from "../../shared/types/api.ts";
 import { util } from "../../shared/utils/util.ts";
 import { v2 } from "../../shared/utils/v2.ts";
 import { Config } from "./config.ts";
@@ -253,7 +245,9 @@ class Bot {
                 const msg = new net.GameOverMsg();
                 msg.deserialize(stream);
                 console.log(
-                    `Bot ${this.id} ${msg.gameOver ? "won" : "died"} | kills: ${msg.playerStats[0].kills} | rank: ${msg.teamRank}`,
+                    `Bot ${this.id} ${msg.gameOver ? "won" : "died"} | kills: ${
+                        msg.playerStats[0].kills
+                    } | rank: ${msg.teamRank}`,
                 );
                 if (!msg.gameOver) {
                     this.disconnect = true;
@@ -428,14 +422,16 @@ void (() => {
                     headers: {
                         "Content-Type": "application/json",
                     },
-                    body: JSON.stringify({
-                        region: config.region,
-                        autoFill: true,
-                        gameModeIdx: config.gameModeIdx,
-                        playerCount: 1,
-                        version: GameConfig.protocolVersion,
-                        zones: [config.region],
-                    } satisfies FindGameBody),
+                    body: JSON.stringify(
+                        {
+                            region: config.region,
+                            autoFill: true,
+                            gameModeIdx: config.gameModeIdx,
+                            playerCount: 1,
+                            version: GameConfig.protocolVersion,
+                            zones: [config.region],
+                        } satisfies FindGameBody,
+                    ),
                 })
             ).json()) as FindGameResponse;
             if ("error" in response || "banned" in response) {

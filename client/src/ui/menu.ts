@@ -27,8 +27,8 @@ function createToast(
         {
             queue: false,
             duration: 300,
-            complete: function () {
-                $(this).fadeOut(250, function () {
+            complete: function() {
+                $(this).fadeOut(250, function() {
                     $(this).remove();
                 });
             },
@@ -97,7 +97,7 @@ function setupModals(inputBinds: InputBinds, inputBindUi: InputBindUi) {
 
     // Scroll to name input on mobile
     if (device.mobile && device.os != "ios") {
-        $("#player-name-input-solo").on("focus", function () {
+        $("#player-name-input-solo").on("focus", function() {
             if (device.isLandscape) {
                 const height = device.screenHeight;
                 const offset = height <= 282 ? 18 : 36;
@@ -183,7 +183,7 @@ function setupModals(inputBinds: InputBinds, inputBindUi: InputBindUi) {
         modalSettings.show();
         return false;
     });
-    $(".modal-settings-text").on("click", function (_e) {
+    $(".modal-settings-text").on("click", function(_e) {
         const checkbox = $(this).siblings("input:checkbox");
         checkbox.prop("checked", !checkbox.is(":checked"));
         checkbox.trigger("change");
@@ -201,7 +201,7 @@ function setupModals(inputBinds: InputBinds, inputBindUi: InputBindUi) {
         modalHamburger.show();
         return false;
     });
-    $(".modal-body-text").on("click", function () {
+    $(".modal-body-text").on("click", function() {
         const checkbox = $(this).siblings("input:checkbox");
         checkbox.prop("checked", !checkbox.is(":checked"));
         checkbox.trigger("change");

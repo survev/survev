@@ -132,9 +132,11 @@ export class ImageManager {
             });
 
             const promise = new Promise<void>((resolve) => {
-                proc.send({
-                    images,
-                } satisfies ParentMsg);
+                proc.send(
+                    {
+                        images,
+                    } satisfies ParentMsg,
+                );
 
                 proc.on("message", (msg: ImgCache) => {
                     Object.assign(this.cache, msg);
@@ -241,8 +243,8 @@ export class AtlasManager {
             const hash = `${hashBuff(data)}-${100 * scale}`;
 
             if (
-                this.imageCache.get(file)?.hash !== hash ||
-                !fs.existsSync(Path.join(imagesCacheFolder, `${hash}.png`))
+                this.imageCache.get(file)?.hash !== hash
+                || !fs.existsSync(Path.join(imagesCacheFolder, `${hash}.png`))
             ) {
                 this.imageCache.queueImage(file, hash);
             }

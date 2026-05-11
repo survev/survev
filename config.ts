@@ -1,7 +1,7 @@
+import hjson from "hjson";
 import { randomBytes } from "node:crypto";
 import fs from "node:fs";
 import path from "node:path";
-import hjson from "hjson";
 import type { ConfigType, PartialConfig } from "./configType.ts";
 import { TeamMode } from "./shared/gameConfig.ts";
 import { util } from "./shared/utils/util.ts";

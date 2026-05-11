@@ -1,6 +1,6 @@
 import { earcut } from "./earcut.js";
 import { assert } from "./util.ts";
-import { type Vec2, v2 } from "./v2.ts";
+import { v2, type Vec2 } from "./v2.ts";
 
 const kEpsilon = 0.000001;
 
@@ -240,8 +240,7 @@ export const math = {
             const xj = poly[j].x;
             const yj = poly[j].y;
 
-            const intersect =
-                yi > y !== yj > y && x < ((xj - xi) * (y - yi)) / (yj - yi) + xi;
+            const intersect = yi > y !== yj > y && x < ((xj - xi) * (y - yi)) / (yj - yi) + xi;
             if (intersect) {
                 inside = !inside;
             }

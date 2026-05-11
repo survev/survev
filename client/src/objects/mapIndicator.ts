@@ -3,7 +3,7 @@ import { GameObjectDefs } from "../../../shared/defs/gameObjectDefs.ts";
 import type { RoleDef } from "../../../shared/defs/gameObjects/roleDefs.ts";
 import type { MapIndicator } from "../../../shared/net/updateMsg.ts";
 import { math } from "../../../shared/utils/math.ts";
-import { type Vec2, v2 } from "../../../shared/utils/v2.ts";
+import { v2, type Vec2 } from "../../../shared/utils/v2.ts";
 import { device } from "../device.ts";
 import type { MapSprite, MapSpriteBarn } from "./mapSprite.ts";
 
@@ -115,8 +115,8 @@ export class MapIndicatorBarn {
             // Ease up and down
             indicator.pulseScale = indicator.pulseTicker * indicator.pulseScaleMax;
             if (
-                indicator.pulseScale >= indicator.pulseScaleMax ||
-                indicator.pulseTicker <= indicator.pulseScaleMin
+                indicator.pulseScale >= indicator.pulseScaleMax
+                || indicator.pulseTicker <= indicator.pulseScaleMin
             ) {
                 indicator.pulseDir *= -1;
             }

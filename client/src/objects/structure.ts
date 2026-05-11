@@ -1,11 +1,11 @@
 import { MapObjectDefs } from "../../../shared/defs/mapObjectDefs.ts";
 import type { StructureDef } from "../../../shared/defs/mapObjectsTyping.ts";
 import type { ObjectData, ObjectType } from "./../../../shared/net/objectSerializeFns.ts";
-import { type AABB, type Collider, coldet } from "../../../shared/utils/coldet.ts";
+import { type AABB, coldet, type Collider } from "../../../shared/utils/coldet.ts";
 import { collider } from "../../../shared/utils/collider.ts";
 import { mapHelpers } from "../../../shared/utils/mapHelpers.ts";
 import { math } from "../../../shared/utils/math.ts";
-import { type Vec2, v2 } from "../../../shared/utils/v2.ts";
+import { v2, type Vec2 } from "../../../shared/utils/v2.ts";
 import type { Ambiance } from "../ambiance.ts";
 import type Camera from "../camera.ts";
 import type { DebugRenderOpts } from "../config.ts";
@@ -95,8 +95,7 @@ export class Structure implements AbstractObject {
                 const objId = data.layerObjIds[i];
 
                 const inheritOri = layer?.inheritOri === undefined || layer.inheritOri;
-                const underground =
-                    layer.underground !== undefined ? layer.underground : i == 1;
+                const underground = layer.underground !== undefined ? layer.underground : i == 1;
                 const pos = v2.add(this.pos, layer.pos);
                 const rot = math.oriToRad(inheritOri ? data.ori + layer.ori : layer.ori);
                 const collision = collider.transform(
@@ -161,22 +160,17 @@ export class Structure implements AbstractObject {
         const def = MapObjectDefs[this.type] as StructureDef;
         collider.createCircle(activePlayer.m_pos, 0.001);
         map.m_buildingPool.m_getPool();
-        const building0 =
-            this.layers.length > 0 ? map.getBuildingById(this.layers[0].objId) : null;
-        const building1 =
-            this.layers.length > 1 ? map.getBuildingById(this.layers[1].objId) : null;
-        const maxDist =
-            def.interiorSound?.outsideMaxDist !== undefined
-                ? def.interiorSound.outsideMaxDist
-                : 10;
-        const outsideVol =
-            def.interiorSound?.outsideVolume !== undefined
-                ? def.interiorSound.outsideVolume
-                : 0;
-        const undergroundVol =
-            def.interiorSound?.undergroundVolume !== undefined
-                ? def.interiorSound.undergroundVolume
-                : 1;
+        const building0 = this.layers.length > 0 ? map.getBuildingById(this.layers[0].objId) : null;
+        const building1 = this.layers.length > 1 ? map.getBuildingById(this.layers[1].objId) : null;
+        const maxDist = def.interiorSound?.outsideMaxDist !== undefined
+            ? def.interiorSound.outsideMaxDist
+            : 10;
+        const outsideVol = def.interiorSound?.outsideVolume !== undefined
+            ? def.interiorSound.outsideVolume
+            : 0;
+        const undergroundVol = def.interiorSound?.undergroundVolume !== undefined
+            ? def.interiorSound.undergroundVolume
+            : 1;
 
         // Compute weights for the normal (weight0) and filtered (weight1) tracks
         let weight0 = 0;
@@ -203,10 +197,9 @@ export class Structure implements AbstractObject {
         }
 
         // Transition between sound and soundAlt tracks
-        const transitionTime =
-            def.interiorSound?.transitionTime !== undefined
-                ? def.interiorSound.transitionTime
-                : 1;
+        const transitionTime = def.interiorSound?.transitionTime !== undefined
+            ? def.interiorSound.transitionTime
+            : 1;
         if (this.interiorSoundAlt) {
             this.soundTransitionT = math.clamp(
                 this.soundTransitionT + dt / transitionTime,
@@ -222,10 +215,9 @@ export class Structure implements AbstractObject {
         }
 
         // Choose the actual track based on the state of the transition
-        const sound =
-            this.soundTransitionT > 0.5
-                ? def.interiorSound?.soundAlt
-                : def.interiorSound?.sound;
+        const sound = this.soundTransitionT > 0.5
+            ? def.interiorSound?.soundAlt
+            : def.interiorSound?.sound;
 
         // Set the track data
         const track0 = ambience.getTrack("interior_0");

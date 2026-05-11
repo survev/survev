@@ -310,12 +310,12 @@ export class LoadoutDisplay {
     getCameraTargetZoom() {
         return (
             ((document.getElementById("modal-content-left")!.getBoundingClientRect()
-                .height /
-                this.camera.m_screenHeight) *
-                0.2 *
-                this.camera.m_screenHeight *
-                0.5) /
-            this.camera.m_ppu
+                .height
+                / this.camera.m_screenHeight)
+                * 0.2
+                * this.camera.m_screenHeight
+                * 0.5)
+            / this.camera.m_ppu
         );
     }
 
@@ -388,13 +388,13 @@ export class LoadoutDisplay {
         // DebugLines.addCircle(this.m_activePlayer.pos, 1.5, 0xff0000, 0.0);
 
         if (
-            hasFocus &&
-            (this.view == this.viewOld ||
-                (this.view != "heal" && this.view != "boost") ||
-                (this.animIdleTicker = 0),
-            (this.viewOld = this.view),
-            (this.animIdleTicker -= dt),
-            this.animIdleTicker < 0)
+            hasFocus
+            && (this.view == this.viewOld
+                || (this.view != "heal" && this.view != "boost")
+                || (this.animIdleTicker = 0),
+                (this.viewOld = this.view),
+                (this.animIdleTicker -= dt),
+                this.animIdleTicker < 0)
         ) {
             if (this.view == "heal") {
                 this.actionSeq = (this.actionSeq + 1) % 8;

@@ -1,17 +1,13 @@
 import { MapObjectDefs } from "../../../../shared/defs/mapObjectDefs.ts";
-import type {
-    BuildingDef,
-    ObstacleDef,
-    StructureDef,
-} from "../../../../shared/defs/mapObjectsTyping.ts";
+import type { BuildingDef, ObstacleDef, StructureDef } from "../../../../shared/defs/mapObjectsTyping.ts";
 import { Puzzles } from "../../../../shared/defs/puzzles.ts";
 import { DamageType } from "../../../../shared/gameConfig.ts";
 import { ObjectType } from "../../../../shared/net/objectSerializeFns.ts";
-import { type AABB, type Collider, coldet } from "../../../../shared/utils/coldet.ts";
+import { type AABB, coldet, type Collider } from "../../../../shared/utils/coldet.ts";
 import { collider } from "../../../../shared/utils/collider.ts";
 import { mapHelpers } from "../../../../shared/utils/mapHelpers.ts";
 import { math } from "../../../../shared/utils/math.ts";
-import { type Vec2, v2 } from "../../../../shared/utils/v2.ts";
+import { v2, type Vec2 } from "../../../../shared/utils/v2.ts";
 import type { Game } from "../game.ts";
 import type { Decal } from "./decal.ts";
 import { BaseGameObject } from "./gameObject.ts";
@@ -94,9 +90,9 @@ export class Building extends BaseGameObject {
             this.parentStructure = parent;
         }
         if (
-            this.parentBuilding &&
-            !this.parentStructure &&
-            this.parentBuilding.parentStructure
+            this.parentBuilding
+            && !this.parentStructure
+            && this.parentBuilding.parentStructure
         ) {
             this.parentStructure = this.parentBuilding.parentStructure;
         }
@@ -159,11 +155,11 @@ export class Building extends BaseGameObject {
             const region = def.ceiling.zoomRegions[i];
             const zoomIn = region.zoomIn
                 ? (collider.transform(
-                      region.zoomIn,
-                      this.pos,
-                      this.rot,
-                      this.scale,
-                  ) as AABB)
+                    region.zoomIn,
+                    this.pos,
+                    this.rot,
+                    this.scale,
+                ) as AABB)
                 : undefined;
 
             if (zoomIn) {
@@ -174,19 +170,18 @@ export class Building extends BaseGameObject {
                 zoomIn,
                 zoomOut: region.zoomOut
                     ? (collider.transform(
-                          region.zoomOut,
-                          this.pos,
-                          this.rot,
-                          this.scale,
-                      ) as AABB)
+                        region.zoomOut,
+                        this.pos,
+                        this.rot,
+                        this.scale,
+                    ) as AABB)
                     : undefined,
                 zoom: region.zoom,
                 noZoom: region.noZoom,
             });
         }
 
-        this.hasOccupiedEmitters =
-            !!def.occupiedEmitters && def.occupiedEmitters.length > 0;
+        this.hasOccupiedEmitters = !!def.occupiedEmitters && def.occupiedEmitters.length > 0;
         const emitterBounds = coldet.boundingAabb(zoomInBounds);
         this.emitterBounds = collider.createAabb(emitterBounds.min, emitterBounds.max);
 
@@ -311,8 +306,8 @@ export class Building extends BaseGameObject {
         if (this.puzzleOrder.join("-") === puzzleOrder.join("-")) {
             for (const obj of this.childObjects) {
                 if (
-                    obj.__type === ObjectType.Obstacle &&
-                    obj.type === puzzleDef.completeUseType
+                    obj.__type === ObjectType.Obstacle
+                    && obj.type === puzzleDef.completeUseType
                 ) {
                     setTimeout(() => {
                         if (obj.isDoor) {
@@ -372,9 +367,9 @@ export class Building extends BaseGameObject {
         this.puzzleOrder.length = 0;
         for (const piece of this.childObjects) {
             if (
-                piece.__type === ObjectType.Obstacle &&
-                piece.isButton &&
-                piece.puzzlePiece
+                piece.__type === ObjectType.Obstacle
+                && piece.isButton
+                && piece.puzzlePiece
             ) {
                 piece.button.canUse = !this.puzzleSolved;
                 piece.button.onOff = false;

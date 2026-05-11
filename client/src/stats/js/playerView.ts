@@ -64,8 +64,7 @@ function getPlayerCardData(
     let tmpSlug = userData.slug.toLowerCase();
     tmpSlug = tmpSlug.replace(userData.username.toLowerCase(), "");
 
-    const tmpslugToShow =
-        tmpSlug != "" ? `${userData.username}#${tmpSlug}` : userData.username;
+    const tmpslugToShow = tmpSlug != "" ? `${userData.username}#${tmpSlug}` : userData.username;
 
     const profile = {
         username: userData.username,
@@ -297,8 +296,7 @@ export class PlayerView {
 
                 for (let i = 0; i < games.length; i++) {
                     // @ts-expect-error string or number, IT STILL WORKS
-                    games[i].team_mode =
-                        TeamModeToString[games[i].team_mode as unknown as TeamMode];
+                    games[i].team_mode = TeamModeToString[games[i].team_mode as unknown as TeamMode];
 
                     const gameMode = gameModes.find((x) => x.mapId == games[i].map_id);
                     games[i].icon = gameMode ? gameMode.desc.icon : "";

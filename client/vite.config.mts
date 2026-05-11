@@ -16,7 +16,8 @@ export default defineConfig(({ mode }) => {
 
     process.env.VITE_TURNSTILE_SCRIPT = "";
     if (Config.secrets.TURNSTILE_SITE_KEY) {
-        process.env.VITE_TURNSTILE_SCRIPT = `<script src="https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit" defer></script>`;
+        process.env.VITE_TURNSTILE_SCRIPT =
+            `<script src="https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit" defer></script>`;
     }
 
     process.env.VITE_DEBUG_CSS_LINK = isDev
@@ -78,11 +79,11 @@ export default defineConfig(({ mode }) => {
                     stats: resolve(import.meta.dirname, "stats/index.html"),
                     ...(isDev
                         ? {
-                              "building-editor": resolve(
-                                  import.meta.dirname,
-                                  "building-editor/index.html",
-                              ),
-                          }
+                            "building-editor": resolve(
+                                import.meta.dirname,
+                                "building-editor/index.html",
+                            ),
+                        }
                         : {}),
                 },
                 output: {

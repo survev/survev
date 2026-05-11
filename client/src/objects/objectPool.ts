@@ -1,16 +1,12 @@
 import type { BitStream } from "../../../shared/net/net.ts";
-import {
-    type ObjectData,
-    type ObjectsPartialData,
-    ObjectType,
-} from "../../../shared/net/objectSerializeFns.ts";
+import { type ObjectData, type ObjectsPartialData, ObjectType } from "../../../shared/net/objectSerializeFns.ts";
 import { assert } from "../../../shared/utils/util.ts";
 import { errorLogManager } from "../errorLogs.ts";
 import type { Ctx } from "../game.ts";
 
 import type { AbstractObject } from "./player.ts";
 
-type C<T extends AbstractObject> = new () => T;
+type C<T extends AbstractObject> = new() => T;
 
 export class Pool<T extends AbstractObject> {
     m_pool: T[] = [];

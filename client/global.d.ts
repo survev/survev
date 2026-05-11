@@ -14,10 +14,10 @@ declare global {
                 | JQuery.htmlString
                 | JQuery.Node
                 | ((
-                      this: TElement,
-                      index: number,
-                      oldhtml: JQuery.htmlString,
-                  ) => JQuery.htmlString | JQuery.Node),
+                    this: TElement,
+                    index: number,
+                    oldhtml: JQuery.htmlString,
+                ) => JQuery.htmlString | JQuery.Node),
         ): this;
     }
 

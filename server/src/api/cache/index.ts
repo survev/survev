@@ -31,7 +31,7 @@ export async function cleanupRedis() {
                     `CacheStore - Error while disconnecting from redis: ${
                         err instanceof Error ? err.message : "Unknown error"
                     }`,
-                ),
+                )
             );
     }
 }

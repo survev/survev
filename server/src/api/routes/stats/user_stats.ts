@@ -6,11 +6,7 @@ import {
     type UserStatsResponse,
     zUserStatsRequest,
 } from "../../../../../shared/types/stats.ts";
-import {
-    databaseEnabledMiddleware,
-    rateLimitMiddleware,
-    validateParams,
-} from "../../auth/middleware.ts";
+import { databaseEnabledMiddleware, rateLimitMiddleware, validateParams } from "../../auth/middleware.ts";
 import { db } from "../../db/index.ts";
 import { matchDataTable, usersTable } from "../../db/schema.ts";
 import type { Context } from "../../index.ts";
@@ -73,9 +69,10 @@ async function userStatsSqlQuery(
                     "wins",
                 ),
                 kills: sum(matchDataTable.kills).as("kills"),
-                winPct: sql`ROUND(SUM(CASE WHEN ${matchDataTable.rank} = 1 THEN 1 ELSE 0 END) * 100.0 / COUNT(*), 1)`.as(
-                    "winpct",
-                ),
+                winPct: sql`ROUND(SUM(CASE WHEN ${matchDataTable.rank} = 1 THEN 1 ELSE 0 END) * 100.0 / COUNT(*), 1)`
+                    .as(
+                        "winpct",
+                    ),
                 most_kills: max(matchDataTable.kills).as("most_kills"),
                 most_damage: max(matchDataTable.damageDealt).as("most_damage"),
                 kpg: sql`ROUND(SUM(${matchDataTable.kills}) * 1.0 / COUNT(*), 1)`.as(

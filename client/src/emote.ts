@@ -12,7 +12,7 @@ import type { Emote } from "../../shared/net/updateMsg.ts";
 import { coldet } from "../../shared/utils/coldet.ts";
 import { math } from "../../shared/utils/math.ts";
 import { util } from "../../shared/utils/util.ts";
-import { type Vec2, v2 } from "../../shared/utils/v2.ts";
+import { v2, type Vec2 } from "../../shared/utils/v2.ts";
 import type { AudioManager } from "./audioManager.ts";
 import type { Camera } from "./camera.ts";
 import { device } from "./device.ts";
@@ -451,7 +451,7 @@ export class EmoteBarn {
 
         this.container.scale.set(this.baseScale, this.baseScale);
         this.container.addChild(this.pingContainer);
-        const createIndicator = function (idx: number, indTint = 0xffffff) {
+        const createIndicator = function(idx: number, indTint = 0xffffff) {
             const pingContainer = new PIXI.Container();
             const indContainer = new PIXI.Container();
             const tint = GameConfig.groupColors[idx] || indTint;
@@ -631,8 +631,8 @@ export class EmoteBarn {
                     }
                     const playerStatus = this.playerBarn.getPlayerStatus(ping.playerId);
                     if (
-                        playerStatus &&
-                        (playerStatus.role == "leader" || playerStatus.role == "captain")
+                        playerStatus
+                        && (playerStatus.role == "leader" || playerStatus.role == "captain")
                     ) {
                         pingSound = pingData.soundLeader!;
                     }
@@ -692,8 +692,8 @@ export class EmoteBarn {
             for (let i = 0; i < this.emotes.length; i++) {
                 if (this.emotes[i].alive || e) {
                     if (
-                        this.emotes[i].alive &&
-                        this.emotes[i].playerId == emote.playerId
+                        this.emotes[i].alive
+                        && this.emotes[i].playerId == emote.playerId
                     ) {
                         this.emotes[i].alive = false;
                     }
@@ -801,10 +801,9 @@ export class EmoteBarn {
     incrementEmote() {
         this.emoteCounter++;
         if (this.emoteCounter >= GameConfig.player.emoteThreshold) {
-            this.emoteHardTicker =
-                this.emoteHardTicker > 0
-                    ? this.emoteHardTicker
-                    : GameConfig.player.emoteHardCooldown * 1.5;
+            this.emoteHardTicker = this.emoteHardTicker > 0
+                ? this.emoteHardTicker
+                : GameConfig.player.emoteHardCooldown * 1.5;
         }
     }
 
@@ -848,9 +847,9 @@ export class EmoteBarn {
         }
         if (inputBinds.isBindPressed(Input.EmoteMenu)) {
             if (
-                !this.pingMouseTriggered &&
-                !this.emoteMouseTriggered &&
-                !!this.pingKeyDown
+                !this.pingMouseTriggered
+                && !this.emoteMouseTriggered
+                && !!this.pingKeyDown
             ) {
                 this.emoteScreenPos = v2.copy(mousePos);
                 this.pingMouseTriggered = true;
@@ -884,8 +883,8 @@ export class EmoteBarn {
             // Manage emote throttle
             this.emoteSoftTicker -= dt;
             if (
-                this.emoteCounter >= GameConfig.player.emoteThreshold &&
-                this.emoteHardTicker > 0.0
+                this.emoteCounter >= GameConfig.player.emoteThreshold
+                && this.emoteHardTicker > 0.0
             ) {
                 this.emoteHardTicker -= dt;
                 if (this.emoteHardTicker < 0.0) {
@@ -897,8 +896,8 @@ export class EmoteBarn {
             }
 
             if (
-                (this.pingMouseTriggered || this.emoteMouseTriggered) &&
-                !this.wheelDisplayed
+                (this.pingMouseTriggered || this.emoteMouseTriggered)
+                && !this.wheelDisplayed
             ) {
                 this.parentDisplayed = this.pingMouseTriggered
                     ? this.teamPingWheel
@@ -953,8 +952,7 @@ export class EmoteBarn {
                         const angleB = vectorToDegreeAngle(vB);
                         const distMinLength = 35;
 
-                        const equippedWeapon =
-                            player.m_localData.m_weapons[player.m_localData.m_curWeapIdx];
+                        const equippedWeapon = player.m_localData.m_weapons[player.m_localData.m_curWeapIdx];
                         const weapDef = GameObjectDefs[equippedWeapon.type] as GunDef;
                         let ammoType = "";
                         if (weapDef && weapDef.ammo) {
@@ -994,20 +992,20 @@ export class EmoteBarn {
 
                             const disableInSolo = teamOnly && teamMode == 1;
                             if (
-                                distToCenter <= distMinLength &&
-                                !highlight &&
-                                this.emoteHardTicker <= 0.0 &&
-                                !disableInSolo
+                                distToCenter <= distMinLength
+                                && !highlight
+                                && this.emoteHardTicker <= 0.0
+                                && !disableInSolo
                             ) {
                                 selector = s;
                                 continue;
                             }
                             if (
-                                isAngleBetween(angleB, s.angleC, s.angleA) &&
-                                distToCenter > distMinLength &&
-                                highlight &&
-                                this.emoteHardTicker <= 0.0 &&
-                                !disableInSolo
+                                isAngleBetween(angleB, s.angleC, s.angleA)
+                                && distToCenter > distMinLength
+                                && highlight
+                                && this.emoteHardTicker <= 0.0
+                                && !disableInSolo
                             ) {
                                 selector = s;
                                 continue;
@@ -1182,8 +1180,7 @@ export class EmoteBarn {
                     indSpriteInner.position.y = topConstrain;
 
                     // Update ping border pulse
-                    const pulseAlpha =
-                        borderSprite.alpha <= 0 ? 1 : borderSprite.alpha - dt;
+                    const pulseAlpha = borderSprite.alpha <= 0 ? 1 : borderSprite.alpha - dt;
                     borderSprite.alpha = pulseAlpha;
                     const pulseScale = camera.m_pixels(
                         indicator.borderSprite.baseScale * (2 - pulseAlpha),
@@ -1301,8 +1298,7 @@ export class EmoteBarn {
                     v2.mul(emote.posOffset, 1 / math.clamp(camera.m_zoom, 0.75, 1)),
                 );
                 const screenPos = camera.m_pointToScreen(pos);
-                const screenScale =
-                    scale * emote.baseScale * math.clamp(camera.m_zoom, 0.9, 1.75);
+                const screenScale = scale * emote.baseScale * math.clamp(camera.m_zoom, 0.9, 1.75);
 
                 emote.container.position.set(screenPos.x, screenPos.y);
                 emote.container.scale.set(screenScale, screenScale);

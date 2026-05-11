@@ -340,8 +340,7 @@ class Room {
     sendState() {
         const players = this.players.map((p) => p.data);
         // all players must be logged in to disable it
-        this.data.captchaEnabled =
-            this.teamMenu.server.captchaEnabled && !this.players.every((p) => !!p.userId);
+        this.data.captchaEnabled = this.teamMenu.server.captchaEnabled && !this.players.every((p) => !!p.userId);
         for (const player of this.players) {
             player.send("state", {
                 localPlayerId: player.playerId,
@@ -417,9 +416,9 @@ export class TeamMenu {
 
                 let closeReason: TeamMenuErrorType | undefined;
                 if (
-                    !ip ||
-                    httpRateLimit.isRateLimited(ip) ||
-                    wsRateLimit.isIpRateLimited(ip)
+                    !ip
+                    || httpRateLimit.isRateLimited(ip)
+                    || wsRateLimit.isIpRateLimited(ip)
                 ) {
                     closeReason = "rate_limited";
                 }
@@ -461,12 +460,14 @@ export class TeamMenu {
 
                         if (closeReason) {
                             ws.send(
-                                JSON.stringify({
-                                    type: "error",
-                                    data: {
-                                        type: closeReason as TeamMenuErrorType,
-                                    },
-                                } satisfies TeamErrorMsg),
+                                JSON.stringify(
+                                    {
+                                        type: "error",
+                                        data: {
+                                            type: closeReason as TeamMenuErrorType,
+                                        },
+                                    } satisfies TeamErrorMsg,
+                                ),
                             );
                             teamMenu.logger.warn(`closed socket for ${closeReason}`);
                             ws.close();

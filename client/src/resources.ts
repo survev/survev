@@ -66,9 +66,9 @@ function selectTextureRes(renderer: PIXI.IRenderer, config: ConfigManager) {
     let textureRes: "high" | "low" = config.get("highResTex") ? "high" : "low";
 
     if (
-        smallScreen ||
-        (device.mobile && !device.tablet) ||
-        renderer.type == PIXI.RENDERER_TYPE.CANVAS
+        smallScreen
+        || (device.mobile && !device.tablet)
+        || renderer.type == PIXI.RENDERER_TYPE.CANVAS
     ) {
         textureRes = "low";
     }

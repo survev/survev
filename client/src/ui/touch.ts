@@ -8,7 +8,7 @@ import { GameConfig } from "../../../shared/gameConfig.ts";
 import { collider } from "../../../shared/utils/collider.ts";
 import { math } from "../../../shared/utils/math.ts";
 import { util } from "../../../shared/utils/util.ts";
-import { type Vec2, v2 } from "../../../shared/utils/v2.ts";
+import { v2, type Vec2 } from "../../../shared/utils/v2.ts";
 import type { Camera } from "../camera.ts";
 import type { ConfigManager } from "../config.ts";
 import { device } from "../device.ts";
@@ -88,7 +88,7 @@ export class Touch {
         public input: InputHandler,
         public config: ConfigManager,
     ) {
-        const createPadSprite = function (parent: PIXI.Container, tint: number) {
+        const createPadSprite = function(parent: PIXI.Container, tint: number) {
             const pad = PIXI.Sprite.from("pad.img");
             pad.anchor.set(0.5, 0.5);
             pad.scale.set(1, 1);
@@ -108,7 +108,7 @@ export class Touch {
             };
         };
         this.touchPads = [createPad(), createPad()];
-        const validateTouchStyle = function (style: "locked" | "anywhere") {
+        const validateTouchStyle = function(style: "locked" | "anywhere") {
             if (!["locked", "anywhere"].includes(style)) {
                 return "anywhere";
             }
@@ -127,8 +127,7 @@ export class Touch {
     }
 
     getAimMovement(activePlayer: Player, camera: Camera) {
-        const isHoldingThrowable =
-            activePlayer.m_localData.m_curWeapIdx == GameConfig.WeaponSlot.Throwable;
+        const isHoldingThrowable = activePlayer.m_localData.m_curWeapIdx == GameConfig.WeaponSlot.Throwable;
         return this.getAim(isHoldingThrowable, camera);
     }
 
@@ -145,19 +144,16 @@ export class Touch {
         for (let i = 0; i < this.input.touches.length; i++) {
             const t = this.input.touches[i];
             if (!t.isDead && this.isLeftSideTouch(t.posDown.x, camera)) {
-                const center =
-                    this.moveStyle == "anywhere" ? t.posDown : this.leftLockedPadCenter;
+                const center = this.moveStyle == "anywhere" ? t.posDown : this.leftLockedPadCenter;
                 const pull = v2.sub(t.pos, center);
                 const dist = v2.length(pull);
 
                 if (dist > deadZone) {
-                    const toMoveLen =
-                        (dist - deadZone) /
-                        (this.padPosRange / this.movePadDetectMult - deadZone);
-                    toMoveDir =
-                        toMoveLen > sensitivityThereshold
-                            ? v2.div(pull, toMoveLen)
-                            : this.analogMovement.toMoveDir;
+                    const toMoveLen = (dist - deadZone)
+                        / (this.padPosRange / this.movePadDetectMult - deadZone);
+                    toMoveDir = toMoveLen > sensitivityThereshold
+                        ? v2.div(pull, toMoveLen)
+                        : this.analogMovement.toMoveDir;
                     this.analogMovement = {
                         toMoveDir: v2.create(toMoveDir.x, toMoveDir.y * -1),
                         toMoveLen,
@@ -193,18 +189,16 @@ export class Touch {
         for (let i = 0; i < this.input.touches.length; i++) {
             const t = this.input.touches[i];
             if (!t.isDead && !this.isLeftSideTouch(t.posDown.x, camera)) {
-                const center =
-                    this.aimStyle == "anywhere" ? t.posDown : this.rightLockedPadCenter;
+                const center = this.aimStyle == "anywhere" ? t.posDown : this.rightLockedPadCenter;
                 const pull = v2.sub(t.pos, center);
                 const dist = v2.length(pull);
 
                 if (dist > deadZone) {
                     const toAimPos = v2.sub(t.pos, center);
                     const toAimLen = v2.length(toAimPos);
-                    toAimDir =
-                        toAimLen > sensitivityThereshold
-                            ? v2.div(toAimPos, toAimLen)
-                            : this.aimMovement.toAimDir;
+                    toAimDir = toAimLen > sensitivityThereshold
+                        ? v2.div(toAimPos, toAimLen)
+                        : this.aimMovement.toAimDir;
                     this.aimMovement = {
                         toAimDir: v2.create(toAimDir.x, toAimDir.y * -1),
                         toAimLen,
@@ -222,9 +216,8 @@ export class Touch {
 
         // Detect if user has moved far enough from center to shoot
         this.shotDetectedOld = this.shotDetected;
-        this.shotDetected =
-            this.aimMovement.toAimLen > this.padPosRange / this.shotPadDetectMult &&
-            touched;
+        this.shotDetected = this.aimMovement.toAimLen > this.padPosRange / this.shotPadDetectMult
+            && touched;
         this.touchingAim = touched;
 
         // Special-case throwable logic: once the player begins priming
@@ -391,8 +384,7 @@ export class Touch {
                 leftLockedPadOffsetLandscape.y = leftLockedPadOffsetLandscape.y * 0.9;
                 rightLockedPadOffsetLandscape.y = rightLockedPadOffsetLandscape.y * 0.9;
             } else {
-                let lockedPadOffsetYLandscapeSafari =
-                    this.lockedPadOffsetYLandscapeSafari;
+                let lockedPadOffsetYLandscapeSafari = this.lockedPadOffsetYLandscapeSafari;
                 let lockedPadOffsetYPortraitSafari = this.lockedPadOffsetYPortraitSafari;
 
                 if (device.tablet) {
@@ -620,14 +612,14 @@ class LineSprites {
             for (let i = 0; i < obstacles.length; i++) {
                 const obstacle = obstacles[i];
                 if (
-                    !!obstacle.active &&
-                    !obstacle.dead &&
-                    obstacle.height >= GameConfig.bullet.height &&
-                    !!obstacle.collidable &&
-                    !obstacle.isWindow &&
-                    util.sameLayer(activePlayer.layer, obstacle.layer) &&
-                    (curWeapDef.type != "throwable" ||
-                        obstacle.height > GameConfig.projectile.maxHeight)
+                    !!obstacle.active
+                    && !obstacle.dead
+                    && obstacle.height >= GameConfig.bullet.height
+                    && !!obstacle.collidable
+                    && !obstacle.isWindow
+                    && util.sameLayer(activePlayer.layer, obstacle.layer)
+                    && (curWeapDef.type != "throwable"
+                        || obstacle.height > GameConfig.projectile.maxHeight)
                 ) {
                     const res = collider.intersectSegment(obstacle.collider, start, end);
 

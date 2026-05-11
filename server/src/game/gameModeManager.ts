@@ -91,10 +91,9 @@ export class GameModeManager {
                 // by basing it on the last player to die killed index
                 const groups = this.game.playerBarn[key].map((group) => {
                     return {
-                        killedIndex:
-                            group.players.sort((a, b) => {
-                                return b.killedIndex - a.killedIndex;
-                            })[0].killedIndex ?? Infinity,
+                        killedIndex: group.players.sort((a, b) => {
+                            return b.killedIndex - a.killedIndex;
+                        })[0].killedIndex ?? Infinity,
                         players: group.players,
                     };
                 });
@@ -208,8 +207,8 @@ export class GameModeManager {
         if (alivePlayersContext.length <= 4) {
             return alivePlayersContext.filter(
                 (p) =>
-                    !!util.sameLayer(player.layer, p.layer) &&
-                    v2.lengthSqr(v2.sub(player.pos, p.pos)) <= range * range,
+                    !!util.sameLayer(player.layer, p.layer)
+                    && v2.lengthSqr(v2.sub(player.pos, p.pos)) <= range * range,
             );
         }
 
@@ -217,11 +216,11 @@ export class GameModeManager {
             .intersectCollider(collider.createCircle(player.pos, range))
             .filter(
                 (obj): obj is Player =>
-                    obj.__type == ObjectType.Player &&
-                    player.teamId === obj.teamId &&
-                    !obj.dead && // necessary since player isnt deleted from grid on death
-                    !!util.sameLayer(player.layer, obj.layer) &&
-                    v2.lengthSqr(v2.sub(player.pos, obj.pos)) <= range * range,
+                    obj.__type == ObjectType.Player
+                    && player.teamId === obj.teamId
+                    && !obj.dead // necessary since player isnt deleted from grid on death
+                    && !!util.sameLayer(player.layer, obj.layer)
+                    && v2.lengthSqr(v2.sub(player.pos, obj.pos)) <= range * range,
             );
     }
 
@@ -288,11 +287,12 @@ export class GameModeManager {
         for (const spectator of player.spectators) {
             // If all group members have died, they need to be sent a game over message instead.
             if (
-                player.group &&
-                player.group.allDeadOrDisconnected &&
-                player.group.players.includes(spectator)
-            )
+                player.group
+                && player.group.allDeadOrDisconnected
+                && player.group.players.includes(spectator)
+            ) {
                 continue;
+            }
 
             // Set remaining spectators to new player.
             spectator.spectating = playerToSpec;
@@ -305,25 +305,21 @@ export class GameModeManager {
         } else {
             const group = this.mode === GameMode.Faction ? player.team! : player.group!;
 
-            const playerSource =
-                params.source?.__type === ObjectType.Player
-                    ? (params.source as Player)
-                    : undefined;
+            const playerSource = params.source?.__type === ObjectType.Player
+                ? (params.source as Player)
+                : undefined;
             if (player.downed) {
-                const finishedByTeammate =
-                    player.downedBy &&
-                    playerSource &&
-                    player.downedBy.teamId === playerSource.teamId;
+                const finishedByTeammate = player.downedBy
+                    && playerSource
+                    && player.downedBy.teamId === playerSource.teamId;
 
-                const nonPlayerKill =
-                    player.downedBy && params.damageType != GameConfig.DamageType.Player;
+                const nonPlayerKill = player.downedBy && params.damageType != GameConfig.DamageType.Player;
 
-                const teammateStoleKill =
-                    player.downedBy &&
-                    playerSource &&
-                    player.downedBy.__type === ObjectType.Player &&
-                    player.downedBy.teamId !== playerSource.teamId &&
-                    player.teamId === playerSource.teamId;
+                const teammateStoleKill = player.downedBy
+                    && playerSource
+                    && player.downedBy.__type === ObjectType.Player
+                    && player.downedBy.teamId !== playerSource.teamId
+                    && player.teamId === playerSource.teamId;
                 // give kill credit to the person that downed the player if it was killed by:
                 // a teammate, bleeding or non player source (airstrike, gas etc)
                 if (finishedByTeammate || nonPlayerKill || teammateStoleKill) {

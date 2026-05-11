@@ -6,34 +6,16 @@ import { GameObjectDefs } from "../../../../../shared/defs/gameObjectDefs.ts";
 import { QuestDefs } from "../../../../../shared/defs/gameObjects/questDefs.ts";
 import { MapDefs } from "../../../../../shared/defs/mapDefs.ts";
 import { TeamMode } from "../../../../../shared/gameConfig.ts";
-import {
-    zGiveItemParams,
-    zRemoveItemParams,
-} from "../../../../../shared/types/moderation.ts";
+import { zGiveItemParams, zRemoveItemParams } from "../../../../../shared/types/moderation.ts";
 import { serverConfigPath } from "../../../config.ts";
 import { isBehindProxy } from "../../../utils/serverHelpers.ts";
-import {
-    type SaveGameBody,
-    zSetClientThemeBody,
-    zSetGameModeBody,
-    zUpdateRegionBody,
-} from "../../../utils/types.ts";
+import { type SaveGameBody, zSetClientThemeBody, zSetGameModeBody, zUpdateRegionBody } from "../../../utils/types.ts";
 import { server } from "../../apiServer.ts";
-import {
-    databaseEnabledMiddleware,
-    privateMiddleware,
-    validateParams,
-} from "../../auth/middleware.ts";
+import { databaseEnabledMiddleware, privateMiddleware, validateParams } from "../../auth/middleware.ts";
 import { getRedisClient } from "../../cache/index.ts";
 import { leaderboardCache } from "../../cache/leaderboard.ts";
 import { db } from "../../db/index.ts";
-import {
-    itemsTable,
-    type MatchDataTable,
-    matchDataTable,
-    userQuestTable,
-    usersTable,
-} from "../../db/schema.ts";
+import { itemsTable, type MatchDataTable, matchDataTable, userQuestTable, usersTable } from "../../db/schema.ts";
 import type { Context } from "../../index.ts";
 import { MOCK_USER_ID } from "../user/auth/mock.ts";
 import { isBanned, logPlayerIPs, ModerationRouter } from "./ModerationRouter.ts";
@@ -163,8 +145,7 @@ export const PrivateRouter = new Hono<Context>()
                         }),
                     )
                     .refine(
-                        (entries) =>
-                            new Set(entries.map((e) => e.id)).size === entries.length,
+                        (entries) => new Set(entries.map((e) => e.id)).size === entries.length,
                         { message: "duplicate quest ids" },
                     ),
             }),

@@ -10,7 +10,7 @@ import { coldet } from "../../../shared/utils/coldet.ts";
 import { collider } from "../../../shared/utils/collider.ts";
 import { math } from "../../../shared/utils/math.ts";
 import { util } from "../../../shared/utils/util.ts";
-import { type Vec2, v2 } from "../../../shared/utils/v2.ts";
+import { v2, type Vec2 } from "../../../shared/utils/v2.ts";
 import type { AudioManager } from "../audioManager.ts";
 import type { Camera } from "../camera.ts";
 import type { Map } from "../map.ts";
@@ -128,9 +128,8 @@ export class BulletBarn {
 
         const variance = 1 + bullet.varianceT * bulletDef.variance;
         const distAdj = math.remap(bullet.distAdjIdx, 0, 16, -1, 1);
-        let distance =
-            bulletDef.distance /
-            Math.pow(GameConfig.bullet.reflectDistDecay, bullet.reflectCount);
+        let distance = bulletDef.distance
+            / Math.pow(GameConfig.bullet.reflectDistDecay, bullet.reflectCount);
         if (bullet.clipDistance) {
             distance = bullet.distance;
         }
@@ -237,11 +236,11 @@ export class BulletBarn {
                 }
 
                 if (
-                    !activePlayer.m_netData.m_dead &&
-                    util.sameAudioLayer(activePlayer.layer, b.layer) &&
-                    v2.length(v2.sub(camera.m_pos, b.pos)) < 7.5 &&
-                    !b.whizHeard &&
-                    b.playerId != activePlayer.__id
+                    !activePlayer.m_netData.m_dead
+                    && util.sameAudioLayer(activePlayer.layer, b.layer)
+                    && v2.length(v2.sub(camera.m_pos, b.pos)) < 7.5
+                    && !b.whizHeard
+                    && b.playerId != activePlayer.__id
                 ) {
                     audioManager.playGroup("bullet_whiz", {
                         soundPos: b.pos,
@@ -276,11 +275,11 @@ export class BulletBarn {
                 for (let i = 0; i < obstacles.length; i++) {
                     const obstacle = obstacles[i];
                     if (
-                        !!obstacle.active &&
-                        !obstacle.dead &&
-                        !!util.sameLayer(obstacle.layer, b.layer) &&
-                        obstacle.height >= GameConfig.bullet.height &&
-                        (b.reflectCount <= 0 || obstacle.__id != b.reflectObjId)
+                        !!obstacle.active
+                        && !obstacle.dead
+                        && !!util.sameLayer(obstacle.layer, b.layer)
+                        && obstacle.height >= GameConfig.bullet.height
+                        && (b.reflectCount <= 0 || obstacle.__id != b.reflectObjId)
                     ) {
                         const res = collider.intersectSegment(
                             obstacle.collider,
@@ -301,11 +300,11 @@ export class BulletBarn {
                 for (let C = 0; C < players.length; C++) {
                     const player = players[C];
                     if (
-                        player.active &&
-                        !player.m_netData.m_dead &&
-                        (util.sameLayer(player.m_netData.m_layer, b.layer) ||
-                            player.m_netData.m_layer & 2) &&
-                        (player.__id != b.playerId || b.damageSelf)
+                        player.active
+                        && !player.m_netData.m_dead
+                        && (util.sameLayer(player.m_netData.m_layer, b.layer)
+                            || player.m_netData.m_layer & 2)
+                        && (player.__id != b.playerId || b.damageSelf)
                     ) {
                         let panCollision = null;
                         if (player.m_hasActivePan()) {
@@ -353,10 +352,10 @@ export class BulletBarn {
                             player.m_rad,
                         );
                         if (
-                            collision &&
-                            (!panCollision ||
-                                v2.length(v2.sub(collision.point, b.startPos)) <
-                                    v2.length(v2.sub(panCollision.point, b.startPos)))
+                            collision
+                            && (!panCollision
+                                || v2.length(v2.sub(collision.point, b.startPos))
+                                    < v2.length(v2.sub(panCollision.point, b.startPos)))
                         ) {
                             colObjs.push({
                                 type: "player",
@@ -486,8 +485,8 @@ export class BulletBarn {
                             for (let oe = 0; oe < re.stairs.length; oe++) {
                                 const se = re.stairs[oe];
                                 if (
-                                    !se?.lootOnly &&
-                                    collider.intersectSegment(
+                                    !se?.lootOnly
+                                    && collider.intersectSegment(
                                         se?.collision!,
                                         b.pos,
                                         posOld,

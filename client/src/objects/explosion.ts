@@ -1,12 +1,9 @@
 import { GameObjectDefs } from "../../../shared/defs/gameObjectDefs.ts";
-import {
-    type ExplosionDef,
-    ExplosionDefs,
-} from "../../../shared/defs/gameObjects/explosionsDefs.ts";
+import { type ExplosionDef, ExplosionDefs } from "../../../shared/defs/gameObjects/explosionsDefs.ts";
 import { collider } from "../../../shared/utils/collider.ts";
 import { math } from "../../../shared/utils/math.ts";
 import { util } from "../../../shared/utils/util.ts";
-import { type Vec2, v2 } from "../../../shared/utils/v2.ts";
+import { v2, type Vec2 } from "../../../shared/utils/v2.ts";
 import type { AudioManager } from "../audioManager.ts";
 import type { Camera } from "../camera.ts";
 import type { DebugRenderOpts } from "../config.ts";
@@ -51,9 +48,9 @@ class PhysicsParticle {
         for (let i = 0; i < obstacles.length; i++) {
             const obstacle = obstacles[i];
             if (
-                obstacle.active &&
-                !obstacle.dead &&
-                util.sameLayer(this.layer, obstacle.layer)
+                obstacle.active
+                && !obstacle.dead
+                && util.sameLayer(this.layer, obstacle.layer)
             ) {
                 colliders.push(obstacle.collider);
             }
@@ -63,9 +60,9 @@ class PhysicsParticle {
         for (let i = 0; i < players.length; i++) {
             const player = players[i];
             if (
-                player.active &&
-                !player.dead &&
-                util.sameLayer(this.layer, player.layer)
+                player.active
+                && !player.dead
+                && util.sameLayer(this.layer, player.layer)
             ) {
                 colliders.push(collider.createCircle(player.m_pos, player.m_rad));
             }
@@ -165,9 +162,9 @@ class Explosion {
                 }
             }
             if (
-                renderVisuals &&
-                (def.burst.particle &&
-                    particleBarn.addParticle(
+                renderVisuals
+                && (def.burst.particle
+                    && particleBarn.addParticle(
                         def.burst.particle,
                         this.layer,
                         this.pos,
@@ -176,7 +173,7 @@ class Explosion {
                         0,
                         null,
                     ),
-                def.scatter)
+                    def.scatter)
             ) {
                 for (let i = 0; i < def.scatter.count; i++) {
                     const particle = particleBarn.addParticle(
@@ -197,8 +194,7 @@ class Explosion {
                 }
             }
             const surface = map.getGroundSurface(this.pos, this.layer);
-            const sound =
-                surface.type == "water" ? def.burst.sound.water : def.burst.sound.grass;
+            const sound = surface.type == "water" ? def.burst.sound.water : def.burst.sound.grass;
 
             let detune = 0;
             if (def.burst.sound.detune != undefined) {

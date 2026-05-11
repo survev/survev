@@ -3,12 +3,7 @@ import type { ConfigManager } from "../config.ts";
 import type { Game } from "../game.ts";
 import type { Pool } from "../objects/objectPool.ts";
 import type { AbstractObject } from "../objects/player.ts";
-import {
-    defaultLabelTextOptions,
-    Graph,
-    type GraphKey,
-    type GraphOptions,
-} from "./graph.ts";
+import { defaultLabelTextOptions, Graph, type GraphKey, type GraphOptions } from "./graph.ts";
 
 const padding = 6;
 

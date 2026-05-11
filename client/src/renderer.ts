@@ -94,9 +94,9 @@ export class Renderer {
         }
 
         if (
-            obj.parent == this.layers[layerIdx] &&
-            obj.__zOrd == zOrd &&
-            (zIdx === undefined || obj.__zIdx == zIdx)
+            obj.parent == this.layers[layerIdx]
+            && obj.__zOrd == zOrd
+            && (zIdx === undefined || obj.__zIdx == zIdx)
         ) {
             return;
         }
@@ -273,9 +273,7 @@ class RenderGroup extends PIXI.Container {
 
     checkSort() {
         if (this.dirty) {
-            this.children.sort((a, b) =>
-                a.__zOrd == b.__zOrd ? a.__zIdx - b.__zIdx : a.__zOrd - b.__zOrd,
-            );
+            this.children.sort((a, b) => a.__zOrd == b.__zOrd ? a.__zIdx - b.__zIdx : a.__zOrd - b.__zOrd);
             this.dirty = false;
             return true;
         }

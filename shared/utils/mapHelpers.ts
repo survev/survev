@@ -1,10 +1,10 @@
 import { MapObjectDefs } from "../defs/mapObjectDefs.ts";
 import type { BuildingDef } from "../defs/mapObjectsTyping.ts";
-import { type AABB, type Collider, coldet } from "./coldet.ts";
+import { type AABB, coldet, type Collider } from "./coldet.ts";
 import { collider } from "./collider.ts";
 import { math } from "./math.ts";
 import { assert, util } from "./util.ts";
-import { type Vec2, v2 } from "./v2.ts";
+import { v2, type Vec2 } from "./v2.ts";
 
 // Memoize computed object colliders
 const cachedColliders: Record<string, Collider> = {};

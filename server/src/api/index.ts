@@ -7,11 +7,7 @@ import { getCookie } from "hono/cookie";
 import { cors } from "hono/cors";
 import { HTTPException } from "hono/http-exception";
 import pkgJson from "../../../package.json" with { type: "json" };
-import {
-    type FindGameResponse,
-    type SiteInfoRes,
-    zFindGameBody,
-} from "../../../shared/types/api.ts";
+import { type FindGameResponse, type SiteInfoRes, zFindGameBody } from "../../../shared/types/api.ts";
 import { Config } from "../config.ts";
 import { GIT_VERSION } from "../utils/gitRevision.ts";
 import { getFindGamePlayerData } from "../utils/playerData.ts";
@@ -191,10 +187,10 @@ app.post("/api/report_error", rateLimitMiddleware(5, 60 * 1000), async (c) => {
 
     let stackTrace: string | undefined;
     if (
-        typeof content.data == "object" &&
-        "stacktrace" in content.data &&
-        typeof content.data.stacktrace == "string" &&
-        content.data.stacktrace
+        typeof content.data == "object"
+        && "stacktrace" in content.data
+        && typeof content.data.stacktrace == "string"
+        && content.data.stacktrace
     ) {
         stackTrace = `### Stacktrace:\n \`\`\`${content.data.stacktrace.replaceAll("`", "\\`")}\`\`\``;
         delete content.data.stacktrace;

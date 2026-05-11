@@ -51,10 +51,9 @@ export class QuestManager {
         this.gameOverFlushed = true;
 
         const aliveCount = this.game.modeManager.aliveCount();
-        const teamRank =
-            winningTeamId !== undefined && winningTeamId == this.player.teamId
-                ? 1
-                : aliveCount + 1;
+        const teamRank = winningTeamId !== undefined && winningTeamId == this.player.teamId
+            ? 1
+            : aliveCount + 1;
 
         this.trackEvent("placement", {
             rank: teamRank,

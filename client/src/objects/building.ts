@@ -9,7 +9,7 @@ import { collisionHelpers } from "../../../shared/utils/collisionHelpers.ts";
 import { mapHelpers } from "../../../shared/utils/mapHelpers.ts";
 import { math } from "../../../shared/utils/math.ts";
 import { util } from "../../../shared/utils/util.ts";
-import { type Vec2, v2 } from "../../../shared/utils/v2.ts";
+import { v2, type Vec2 } from "../../../shared/utils/v2.ts";
 import type { AudioManager } from "../audioManager.ts";
 import type { Camera } from "../camera.ts";
 import type { DebugRenderOpts } from "../config.ts";
@@ -191,11 +191,9 @@ export class Building implements AbstractObject {
 
         if (isNew) {
             this.isNew = true;
-            this.playedCeilingDeadFx =
-                def.ceiling.destroy !== undefined &&
-                ctx.map.deadCeilingIds.includes(this.__id);
-            this.playedSolvedPuzzleFx =
-                this.hasPuzzle && ctx.map.solvedPuzzleIds.includes(this.__id);
+            this.playedCeilingDeadFx = def.ceiling.destroy !== undefined
+                && ctx.map.deadCeilingIds.includes(this.__id);
+            this.playedSolvedPuzzleFx = this.hasPuzzle && ctx.map.solvedPuzzleIds.includes(this.__id);
             const createSpriteFromDef = (imgDef: FloorImage) => {
                 const posOffset = imgDef.pos || v2.create(0, 0);
                 const rotOffset = math.oriToRad(imgDef.rot || 0);
@@ -276,19 +274,19 @@ export class Building implements AbstractObject {
                 this.ceiling.zoomRegions?.push({
                     zoomIn: region.zoomIn
                         ? collider.transform(
-                              region.zoomIn,
-                              this.pos,
-                              this.rot,
-                              this.scale,
-                          )
+                            region.zoomIn,
+                            this.pos,
+                            this.rot,
+                            this.scale,
+                        )
                         : null,
                     zoomOut: region.zoomOut
                         ? collider.transform(
-                              region.zoomOut,
-                              this.pos,
-                              this.rot,
-                              this.scale,
-                          )
+                            region.zoomOut,
+                            this.pos,
+                            this.rot,
+                            this.scale,
+                        )
                         : null,
                 });
             }
@@ -387,8 +385,8 @@ export class Building implements AbstractObject {
             const def = MapObjectDefs[this.type] as BuildingDef;
             // Play puzzle error effects
             if (
-                this.puzzleErrSeqModified &&
-                ((this.puzzleErrSeqModified = false), !this.isNew)
+                this.puzzleErrSeqModified
+                && ((this.puzzleErrSeqModified = false), !this.isNew)
             ) {
                 // Find the nearest puzzle-piece obstacle and play the
                 // sound from that location. Fallback to the building location
@@ -463,9 +461,9 @@ export class Building implements AbstractObject {
         for (let i = 0; i < this.ceiling.zoomRegions.length; i++) {
             const zoomIn = this.ceiling.zoomRegions[i].zoomIn;
             if (
-                zoomIn &&
-                (this.layer == activePlayer.layer || activePlayer.layer & 2) &&
-                collisionHelpers.scanCollider(
+                zoomIn
+                && (this.layer == activePlayer.layer || activePlayer.layer & 2)
+                && collisionHelpers.scanCollider(
                     zoomIn,
                     map.m_obstaclePool.m_getPool(),
                     activePlayer.m_pos,
@@ -506,10 +504,10 @@ export class Building implements AbstractObject {
         // Immediately reveal a ceiling if we're on stairs and
         // can see inside the other layer
         if (
-            canSeeInside &&
-            activePlayer.noCeilingRevealTicker <= 0 &&
-            activePlayer.layer & 2 &&
-            !util.sameLayer(activePlayer.layer, this.layer)
+            canSeeInside
+            && activePlayer.noCeilingRevealTicker <= 0
+            && activePlayer.layer & 2
+            && !util.sameLayer(activePlayer.layer, this.layer)
         ) {
             this.ceiling.fadeAlpha = 0;
         }
@@ -527,8 +525,8 @@ export class Building implements AbstractObject {
 
                 // Play sound if it's loaded
                 if (
-                    !soundEmitter.instance &&
-                    audioManager.isSoundLoaded(soundEmitter.sound, soundEmitter.channel)
+                    !soundEmitter.instance
+                    && audioManager.isSoundLoaded(soundEmitter.sound, soundEmitter.channel)
                 ) {
                     soundEmitter.instance = audioManager.playSound(soundEmitter.sound, {
                         channel: soundEmitter.channel,
@@ -550,12 +548,11 @@ export class Building implements AbstractObject {
                     );
                     const volumeFalloff = Math.pow(distT, soundEmitter.falloff);
                     const visibilityMult = math.lerp(this.ceiling.fadeAlpha, 1, 0.25);
-                    let volume =
-                        audioManager.baseVolume *
-                        audioManager.getTypeVolume("sound") *
-                        soundEmitter.volume *
-                        volumeFalloff *
-                        visibilityMult;
+                    let volume = audioManager.baseVolume
+                        * audioManager.getTypeVolume("sound")
+                        * soundEmitter.volume
+                        * volumeFalloff
+                        * visibilityMult;
                     if (!util.sameAudioLayer(this.layer, activePlayer.layer)) {
                         volume = 0;
                     }
@@ -583,9 +580,9 @@ export class Building implements AbstractObject {
             // It fixes an issue when outside of the mansion with players
             // standing on the interior mansion stairs.
             if (
-                img.isCeiling &&
-                (this.layer == activePlayer.layer ||
-                    (activePlayer.layer & 2 && this.layer == 1))
+                img.isCeiling
+                && (this.layer == activePlayer.layer
+                    || (activePlayer.layer & 2 && this.layer == 1))
             ) {
                 layer |= 2;
             }
