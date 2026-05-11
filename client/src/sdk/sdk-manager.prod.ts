@@ -319,6 +319,10 @@ export class SDKManager implements BaseSDKManager {
             return;
         }
 
+        const nitroDebugParam = new URLSearchParams(window.location.search).get(
+            "nitroads_debug",
+        );
+
         if (this.nitroLoadPromise) {
             return await this.nitroLoadPromise;
         }
@@ -352,6 +356,9 @@ export class SDKManager implements BaseSDKManager {
 
             const script = existing ?? document.createElement("script");
             script.dataset.cfasync = "false";
+            if (!nitroDebugParam) {
+                script.dataset.logLevel = "silent";
+            }
             script.async = true;
             script.src = `https://s.nitropay.com/ads-${this.nitroSiteID}.js`;
             script.addEventListener("load", onLoad, { once: true });
