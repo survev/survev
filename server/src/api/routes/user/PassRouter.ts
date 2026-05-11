@@ -289,7 +289,6 @@ PassRouter.post("/refresh_quest", validateParams(zRefreshQuestRequest), async (c
 PassRouter.post(
     "/set_quest",
     validateParams(zSetQuestRequest),
-    // biome-ignore lint/suspicious/useAwait: to please the client
     async (c) => {
         return c.json({ success: true }, 200);
     },
