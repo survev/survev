@@ -1,6 +1,6 @@
-import type { InventoryItem } from "../../gameConfig";
-import { type DeepPartial, util } from "../../utils/util";
-import { TeamColor } from "../maps/factionDefs";
+import type { InventoryItem } from "../../gameConfig.ts";
+import { type DeepPartial, util } from "../../utils/util.ts";
+import { TeamColor } from "../maps/factionDefs.ts";
 
 type BasicRoleWeapon = {
     type: string;

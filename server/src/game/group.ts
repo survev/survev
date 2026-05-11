@@ -1,8 +1,8 @@
-import { GameConfig } from "../../../shared/gameConfig";
-import { util } from "../../../shared/utils/util";
-import type { Vec2 } from "../../../shared/utils/v2";
-import type { Game } from "./game";
-import type { Player } from "./objects/player";
+import { GameConfig } from "../../../shared/gameConfig.ts";
+import { util } from "../../../shared/utils/util.ts";
+import type { Vec2 } from "../../../shared/utils/v2.ts";
+import type { Game } from "./game.ts";
+import type { Player } from "./objects/player.ts";
 
 class BasePlayerGroup {
     id: number;

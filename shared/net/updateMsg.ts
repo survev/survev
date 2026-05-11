@@ -1,12 +1,12 @@
-import { GameConfig, type Plane as PlaneType } from "../gameConfig";
-import { type Vec2, v2 } from "./../utils/v2";
-import { type AbstractMsg, BitSizes, type BitStream, Constants } from "./net";
+import { GameConfig, type Plane as PlaneType } from "../gameConfig.ts";
+import { type Vec2, v2 } from "./../utils/v2.ts";
+import { type AbstractMsg, BitSizes, type BitStream, Constants } from "./net.ts";
 import {
     ObjectSerializeFns,
     type ObjectsFullData,
     type ObjectsPartialData,
     type ObjectType,
-} from "./objectSerializeFns";
+} from "./objectSerializeFns.ts";
 
 function serializeActivePlayer(s: BitStream, data: LocalDataWithDirty) {
     s.writeBoolean(data.healthDirty);

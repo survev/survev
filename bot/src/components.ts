@@ -9,9 +9,9 @@ import {
     StringSelectMenuBuilder,
     type StringSelectMenuInteraction,
 } from "discord.js";
-import { util } from "../../shared/utils/util";
-import { BUTTON_PREFIXES, type SelectedPlayer } from "./commands/search-player";
-import { createCollector, honoClient } from "./utils";
+import { util } from "../../shared/utils/util.ts";
+import { BUTTON_PREFIXES, type SelectedPlayer } from "./commands/search-player.ts";
+import { createCollector, honoClient } from "./utils.ts";
 
 export async function createDiscordDropdownUI(
     interaction: RepliableInteraction,

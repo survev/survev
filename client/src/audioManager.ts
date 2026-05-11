@@ -1,8 +1,8 @@
-import { math } from "../../shared/utils/math";
-import { util } from "../../shared/utils/util";
-import { type Vec2, v2 } from "../../shared/utils/v2";
-import { CreateJS, type SoundHandle } from "./lib/createJS";
-import soundDefs from "./soundDefs";
+import { math } from "../../shared/utils/math.ts";
+import { util } from "../../shared/utils/util.ts";
+import { type Vec2, v2 } from "../../shared/utils/v2.ts";
+import { CreateJS, type SoundHandle } from "./lib/createJS.ts";
+import soundDefs from "./soundDefs.ts";
 
 const AudioManagerMinAllowedVolume = 0.003;
 const DiffLayerMult = 0.5;

@@ -1,4 +1,4 @@
-import type { LeaderboardRequest } from "./types/stats";
+import type { LeaderboardRequest } from "./types/stats.ts";
 
 export const MinGames = {
     kpg: {

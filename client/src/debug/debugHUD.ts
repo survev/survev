@@ -1,14 +1,14 @@
 import * as PIXI from "pixi.js-legacy";
-import type { ConfigManager } from "../config";
-import type { Game } from "../game";
-import type { Pool } from "../objects/objectPool";
-import type { AbstractObject } from "../objects/player";
+import type { ConfigManager } from "../config.ts";
+import type { Game } from "../game.ts";
+import type { Pool } from "../objects/objectPool.ts";
+import type { AbstractObject } from "../objects/player.ts";
 import {
     defaultLabelTextOptions,
     Graph,
     type GraphKey,
     type GraphOptions,
-} from "./graph";
+} from "./graph.ts";
 
 const padding = 6;
 

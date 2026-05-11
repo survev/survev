@@ -1,33 +1,36 @@
 import * as PIXI from "pixi.js-legacy";
-import { type MapDef, MapDefs } from "../../shared/defs/mapDefs";
-import { MapObjectDefs } from "../../shared/defs/mapObjectDefs";
-import type { BuildingDef, ObstacleDef } from "../../shared/defs/mapObjectsTyping";
-import { GameConfig } from "../../shared/gameConfig";
-import type { GroundPatch, MapMsg } from "../../shared/net/mapMsg";
-import { type Circle, type Collider, coldet } from "../../shared/utils/coldet";
-import { collider } from "../../shared/utils/collider";
-import { mapHelpers } from "../../shared/utils/mapHelpers";
-import { math } from "../../shared/utils/math";
-import type { River } from "../../shared/utils/river";
-import { generateJaggedAabbPoints, generateTerrain } from "../../shared/utils/terrainGen";
-import { util } from "../../shared/utils/util";
-import { type Vec2, v2 } from "../../shared/utils/v2";
-import type { Ambiance } from "./ambiance";
-import type { AudioManager } from "./audioManager";
-import type { Camera } from "./camera";
-import type { DebugRenderOpts } from "./config";
-import { renderSpline } from "./debug/debugHelpers";
-import { debugLines } from "./debug/debugLines";
-import { device } from "./device";
-import { Building } from "./objects/building";
-import type { DecalBarn } from "./objects/decal";
-import { Pool } from "./objects/objectPool";
-import { Obstacle } from "./objects/obstacle";
-import type { Emitter, ParticleBarn } from "./objects/particles";
-import type { Player, PlayerBarn } from "./objects/player";
-import type { SmokeParticle } from "./objects/smoke";
-import { Structure } from "./objects/structure";
-import type { Renderer } from "./renderer";
+import { type MapDef, MapDefs } from "../../shared/defs/mapDefs.ts";
+import { MapObjectDefs } from "../../shared/defs/mapObjectDefs.ts";
+import type { BuildingDef, ObstacleDef } from "../../shared/defs/mapObjectsTyping.ts";
+import { GameConfig } from "../../shared/gameConfig.ts";
+import type { GroundPatch, MapMsg } from "../../shared/net/mapMsg.ts";
+import { type Circle, type Collider, coldet } from "../../shared/utils/coldet.ts";
+import { collider } from "../../shared/utils/collider.ts";
+import { mapHelpers } from "../../shared/utils/mapHelpers.ts";
+import { math } from "../../shared/utils/math.ts";
+import type { River } from "../../shared/utils/river.ts";
+import {
+    generateJaggedAabbPoints,
+    generateTerrain,
+} from "../../shared/utils/terrainGen.ts";
+import { util } from "../../shared/utils/util.ts";
+import { type Vec2, v2 } from "../../shared/utils/v2.ts";
+import type { Ambiance } from "./ambiance.ts";
+import type { AudioManager } from "./audioManager.ts";
+import type { Camera } from "./camera.ts";
+import type { DebugRenderOpts } from "./config.ts";
+import { renderSpline } from "./debug/debugHelpers.ts";
+import { debugLines } from "./debug/debugLines.ts";
+import { device } from "./device.ts";
+import { Building } from "./objects/building.ts";
+import type { DecalBarn } from "./objects/decal.ts";
+import { Pool } from "./objects/objectPool.ts";
+import { Obstacle } from "./objects/obstacle.ts";
+import type { Emitter, ParticleBarn } from "./objects/particles.ts";
+import type { Player, PlayerBarn } from "./objects/player.ts";
+import type { SmokeParticle } from "./objects/smoke.ts";
+import { Structure } from "./objects/structure.ts";
+import type { Renderer } from "./renderer.ts";
 
 // Drawing
 

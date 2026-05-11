@@ -1,5 +1,5 @@
-import { math } from "../../shared/utils/math";
-import { type Vec2, v2 } from "../../shared/utils/v2";
+import { math } from "../../shared/utils/math.ts";
+import { type Vec2, v2 } from "../../shared/utils/v2.ts";
 
 export default class Camera {
     m_pos = v2.create(0, 0);

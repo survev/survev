@@ -1,4 +1,4 @@
-import type { Vec2 } from "../../utils/v2";
+import type { Vec2 } from "../../utils/v2.ts";
 
 export interface ThrowableDef {
     readonly type: "throwable";

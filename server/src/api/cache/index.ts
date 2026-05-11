@@ -1,6 +1,6 @@
 import { createClient } from "redis";
-import { Config } from "../../config";
-import { server } from "../apiServer";
+import { Config } from "../../config.ts";
+import { server } from "../apiServer.ts";
 
 export const CACHE_TTL = 3 * 24 * 60 * 60;
 

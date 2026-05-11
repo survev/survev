@@ -1,5 +1,5 @@
-import { math } from "./math";
-import { type Vec2, v2 } from "./v2";
+import { math } from "./math.ts";
+import { type Vec2, v2 } from "./v2.ts";
 
 export class AssertionError extends Error {
     name = "AssertionError";

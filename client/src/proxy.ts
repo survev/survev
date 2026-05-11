@@ -1,4 +1,4 @@
-import type { ProxyDef } from "../../shared/types/api";
+import type { ProxyDef } from "../../shared/types/api.ts";
 
 declare const PROXY_DEFS: Record<string, ProxyDef>;
 

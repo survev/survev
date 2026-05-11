@@ -1,6 +1,6 @@
-import { type Action, type Anim, GameConfig, HasteType } from "../gameConfig";
-import type { Vec2 } from "../utils/v2";
-import { BitSizes, type BitStream, Constants } from "./net";
+import { type Action, type Anim, GameConfig, HasteType } from "../gameConfig.ts";
+import type { Vec2 } from "../utils/v2.ts";
+import { BitSizes, type BitStream, Constants } from "./net.ts";
 
 export enum ObjectType {
     Invalid,

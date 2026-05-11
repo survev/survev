@@ -1,11 +1,11 @@
 import * as PIXI from "pixi.js-legacy";
-import { GameObjectDefs } from "../../../shared/defs/gameObjectDefs";
-import type { RoleDef } from "../../../shared/defs/gameObjects/roleDefs";
-import type { MapIndicator } from "../../../shared/net/updateMsg";
-import { math } from "../../../shared/utils/math";
-import { type Vec2, v2 } from "../../../shared/utils/v2";
-import { device } from "../device";
-import type { MapSprite, MapSpriteBarn } from "./mapSprite";
+import { GameObjectDefs } from "../../../shared/defs/gameObjectDefs.ts";
+import type { RoleDef } from "../../../shared/defs/gameObjects/roleDefs.ts";
+import type { MapIndicator } from "../../../shared/net/updateMsg.ts";
+import { math } from "../../../shared/utils/math.ts";
+import { type Vec2, v2 } from "../../../shared/utils/v2.ts";
+import { device } from "../device.ts";
+import type { MapSprite, MapSpriteBarn } from "./mapSprite.ts";
 
 interface Indicator {
     id: number;

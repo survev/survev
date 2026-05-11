@@ -1,15 +1,15 @@
 import * as PIXI from "pixi.js-legacy";
-import type { ObjectData, ObjectType } from "../../../shared/net/objectSerializeFns";
-import { collider } from "../../../shared/utils/collider";
-import { util } from "../../../shared/utils/util";
-import { v2 } from "../../../shared/utils/v2";
-import type { Camera } from "../camera";
-import { device } from "../device";
-import type { Ctx } from "../game";
-import type { Map } from "../map";
-import type { Renderer } from "../renderer";
-import { Pool } from "./objectPool";
-import type { AbstractObject, Player, PlayerBarn } from "./player";
+import type { ObjectData, ObjectType } from "../../../shared/net/objectSerializeFns.ts";
+import { collider } from "../../../shared/utils/collider.ts";
+import { util } from "../../../shared/utils/util.ts";
+import { v2 } from "../../../shared/utils/v2.ts";
+import type { Camera } from "../camera.ts";
+import { device } from "../device.ts";
+import type { Ctx } from "../game.ts";
+import type { Map } from "../map.ts";
+import type { Renderer } from "../renderer.ts";
+import { Pool } from "./objectPool.ts";
+import type { AbstractObject, Player, PlayerBarn } from "./player.ts";
 
 function createDeadBodyText() {
     const nameStyle: Partial<PIXI.TextStyle> = {

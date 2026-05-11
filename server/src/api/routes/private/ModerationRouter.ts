@@ -2,7 +2,7 @@ import { createHash } from "node:crypto";
 import { and, desc, eq, inArray, lt, ne } from "drizzle-orm";
 import { Hono } from "hono";
 import { z } from "zod";
-import { MapId, TeamModeToString } from "../../../../../shared/defs/types/misc";
+import { MapId, TeamModeToString } from "../../../../../shared/defs/types/misc.ts";
 import {
     zBanAccountParams,
     zBanIpParams,
@@ -14,14 +14,14 @@ import {
     zSetMatchDataNameParams,
     zUnbanAccountParams,
     zUnbanIpParams,
-} from "../../../../../shared/types/moderation";
-import { util } from "../../../../../shared/utils/util";
-import { Config } from "../../../config";
-import { validateUserName } from "../../../utils/serverHelpers";
-import type { SaveGameBody } from "../../../utils/types";
-import { server } from "../../apiServer";
-import { databaseEnabledMiddleware, validateParams } from "../../auth/middleware";
-import { db } from "../../db";
+} from "../../../../../shared/types/moderation.ts";
+import { util } from "../../../../../shared/utils/util.ts";
+import { Config } from "../../../config.ts";
+import { validateUserName } from "../../../utils/serverHelpers.ts";
+import type { SaveGameBody } from "../../../utils/types.ts";
+import { server } from "../../apiServer.ts";
+import { databaseEnabledMiddleware, validateParams } from "../../auth/middleware.ts";
+import { db } from "../../db/index.ts";
 import {
     bannedIpsTable,
     ipLogsTable,
@@ -29,9 +29,9 @@ import {
     matchDataTable,
     userPassTable,
     usersTable,
-} from "../../db/schema";
-import { sanitizeSlug } from "../user/auth/authUtils";
-import { incrementPassXp } from "./passXp";
+} from "../../db/schema.ts";
+import { sanitizeSlug } from "../user/auth/authUtils.ts";
+import { incrementPassXp } from "./passXp.ts";
 
 export const ModerationRouter = new Hono()
     .use(databaseEnabledMiddleware)

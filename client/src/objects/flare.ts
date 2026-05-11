@@ -1,15 +1,18 @@
 import * as PIXI from "pixi.js-legacy";
-import { type BulletDef, BulletDefs } from "../../../shared/defs/gameObjects/bulletDefs";
-import { GameConfig } from "../../../shared/gameConfig";
-import type { Bullet } from "../../../shared/net/updateMsg";
-import { collider } from "../../../shared/utils/collider";
-import { math } from "../../../shared/utils/math";
-import { util } from "../../../shared/utils/util";
-import { type Vec2, v2 } from "../../../shared/utils/v2";
-import type { Camera } from "../camera";
-import type { Map } from "../map";
-import type { Renderer } from "../renderer";
-import type { Player, PlayerBarn } from "./player";
+import {
+    type BulletDef,
+    BulletDefs,
+} from "../../../shared/defs/gameObjects/bulletDefs.ts";
+import { GameConfig } from "../../../shared/gameConfig.ts";
+import type { Bullet } from "../../../shared/net/updateMsg.ts";
+import { collider } from "../../../shared/utils/collider.ts";
+import { math } from "../../../shared/utils/math.ts";
+import { util } from "../../../shared/utils/util.ts";
+import { type Vec2, v2 } from "../../../shared/utils/v2.ts";
+import type { Camera } from "../camera.ts";
+import type { Map } from "../map.ts";
+import type { Renderer } from "../renderer.ts";
+import type { Player, PlayerBarn } from "./player.ts";
 
 interface FlareBullet extends BulletDef {
     flareContainer: PIXI.Container;

@@ -1,24 +1,24 @@
 import assert from "assert";
-import { EmotesDefs } from "../../shared/defs/gameObjects/emoteDefs";
-import { MeleeDefs } from "../../shared/defs/gameObjects/meleeDefs";
-import { OutfitDefs } from "../../shared/defs/gameObjects/outfitDefs";
-import { UnlockDefs } from "../../shared/defs/gameObjects/unlockDefs";
-import { GameConfig, type Input } from "../../shared/gameConfig";
-import * as net from "../../shared/net/net";
+import { EmotesDefs } from "../../shared/defs/gameObjects/emoteDefs.ts";
+import { MeleeDefs } from "../../shared/defs/gameObjects/meleeDefs.ts";
+import { OutfitDefs } from "../../shared/defs/gameObjects/outfitDefs.ts";
+import { UnlockDefs } from "../../shared/defs/gameObjects/unlockDefs.ts";
+import { GameConfig, type Input } from "../../shared/gameConfig.ts";
+import * as net from "../../shared/net/net.ts";
 import {
     type ObjectData,
     type ObjectsPartialData,
     ObjectType,
-} from "../../shared/net/objectSerializeFns";
-import type { LocalData } from "../../shared/net/updateMsg";
+} from "../../shared/net/objectSerializeFns.ts";
+import type { LocalData } from "../../shared/net/updateMsg.ts";
 import type {
     FindGameBody,
     FindGameMatchData,
     FindGameResponse,
-} from "../../shared/types/api";
-import { util } from "../../shared/utils/util";
-import { v2 } from "../../shared/utils/v2";
-import { Config } from "./config";
+} from "../../shared/types/api.ts";
+import { util } from "../../shared/utils/util.ts";
+import { v2 } from "../../shared/utils/v2.ts";
+import { Config } from "./config.ts";
 
 const config = {
     address: Config.gameServer.apiServerUrl,

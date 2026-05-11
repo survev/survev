@@ -1,14 +1,14 @@
 import $ from "jquery";
-import loadout from "../../../shared/utils/loadout";
-import type { Account } from "../account";
-import { api } from "../api";
-import { device } from "../device";
-import { helpers } from "../helpers";
-import { proxy } from "../proxy";
-import { SDK } from "../sdk/sdk";
-import type { LoadoutMenu } from "./loadoutMenu";
-import type { Localization } from "./localization";
-import { MenuModal } from "./menuModal";
+import loadout from "../../../shared/utils/loadout.ts";
+import type { Account } from "../account.ts";
+import { api } from "../api.ts";
+import { device } from "../device.ts";
+import { helpers } from "../helpers.ts";
+import { proxy } from "../proxy.ts";
+import { SDK } from "../sdk/sdk.ts";
+import type { LoadoutMenu } from "./loadoutMenu.ts";
+import type { Localization } from "./localization.ts";
+import { MenuModal } from "./menuModal.ts";
 
 function createLoginOptions(
     parentElem: JQuery<HTMLElement>,

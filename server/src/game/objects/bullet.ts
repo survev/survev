@@ -1,23 +1,23 @@
-import { GameObjectDefs } from "../../../../shared/defs/gameObjectDefs";
+import { GameObjectDefs } from "../../../../shared/defs/gameObjectDefs.ts";
 import {
     type BulletDef,
     BulletDefs,
-} from "../../../../shared/defs/gameObjects/bulletDefs";
-import { PerkProperties } from "../../../../shared/defs/gameObjects/perkDefs";
-import { MapObjectDefs } from "../../../../shared/defs/mapObjectDefs";
-import type { ObstacleDef } from "../../../../shared/defs/mapObjectsTyping";
-import { type DamageType, GameConfig } from "../../../../shared/gameConfig";
-import { Constants } from "../../../../shared/net/net";
-import { ObjectType } from "../../../../shared/net/objectSerializeFns";
-import { coldet } from "../../../../shared/utils/coldet";
-import { collider } from "../../../../shared/utils/collider";
-import { math } from "../../../../shared/utils/math";
-import { util } from "../../../../shared/utils/util";
-import { type Vec2, v2 } from "../../../../shared/utils/v2";
-import type { Game } from "../game";
-import type { DamageParams, GameObject } from "./gameObject";
-import type { Obstacle } from "./obstacle";
-import type { Player } from "./player";
+} from "../../../../shared/defs/gameObjects/bulletDefs.ts";
+import { PerkProperties } from "../../../../shared/defs/gameObjects/perkDefs.ts";
+import { MapObjectDefs } from "../../../../shared/defs/mapObjectDefs.ts";
+import type { ObstacleDef } from "../../../../shared/defs/mapObjectsTyping.ts";
+import { type DamageType, GameConfig } from "../../../../shared/gameConfig.ts";
+import { Constants } from "../../../../shared/net/net.ts";
+import { ObjectType } from "../../../../shared/net/objectSerializeFns.ts";
+import { coldet } from "../../../../shared/utils/coldet.ts";
+import { collider } from "../../../../shared/utils/collider.ts";
+import { math } from "../../../../shared/utils/math.ts";
+import { util } from "../../../../shared/utils/util.ts";
+import { type Vec2, v2 } from "../../../../shared/utils/v2.ts";
+import type { Game } from "../game.ts";
+import type { DamageParams, GameObject } from "./gameObject.ts";
+import type { Obstacle } from "./obstacle.ts";
+import type { Player } from "./player.ts";
 
 // NOTE: most of this code was copied from surviv client and bit heroes arena client
 // to get bullet collision the most accurate possible

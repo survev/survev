@@ -1,9 +1,9 @@
 import NanoTimer from "nanotimer";
 import { platform } from "os";
-import { Config } from "../config";
-import { logErrorToWebhook } from "../utils/serverHelpers";
-import { type ProcessMsg, ProcessMsgType } from "../utils/types";
-import { Game } from "./game";
+import { Config } from "../config.ts";
+import { logErrorToWebhook } from "../utils/serverHelpers.ts";
+import { type ProcessMsg, ProcessMsgType } from "../utils/types.ts";
+import { Game } from "./game.ts";
 
 let game: Game | undefined;
 

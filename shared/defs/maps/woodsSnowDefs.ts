@@ -1,7 +1,7 @@
-import { util } from "../../utils/util";
-import type { MapDef } from "../mapDefs";
-import type { PartialMapDef } from "./baseDefs";
-import { Woods } from "./woodsDefs";
+import { util } from "../../utils/util.ts";
+import type { MapDef } from "../mapDefs.ts";
+import type { PartialMapDef } from "./baseDefs.ts";
+import { Woods } from "./woodsDefs.ts";
 
 const mapDef: PartialMapDef = {
     assets: {

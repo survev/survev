@@ -1,11 +1,11 @@
 import type { WebSocket } from "uWebSockets.js";
 import { type ChildProcess, fork } from "child_process";
 import { randomUUID } from "crypto";
-import { type MapDef, MapDefs } from "../../../shared/defs/mapDefs";
-import type { TeamMode } from "../../../shared/gameConfig";
-import * as net from "../../../shared/net/net";
-import { util } from "../../../shared/utils/util";
-import { ServerLogger } from "../utils/logger";
+import { type MapDef, MapDefs } from "../../../shared/defs/mapDefs.ts";
+import type { TeamMode } from "../../../shared/gameConfig.ts";
+import * as net from "../../../shared/net/net.ts";
+import { util } from "../../../shared/utils/util.ts";
+import { ServerLogger } from "../utils/logger.ts";
 import {
     type FindGamePrivateBody,
     type GameData,
@@ -13,8 +13,8 @@ import {
     type ProcessMsg,
     ProcessMsgType,
     type ServerGameConfig,
-} from "../utils/types";
-import type { GameManager } from "./gameManager";
+} from "../utils/types.ts";
+import type { GameManager } from "./gameManager.ts";
 
 let path: string;
 if (process.env.NODE_ENV === "production") {

@@ -1,7 +1,7 @@
-import { type BulletDef, BulletDefs } from "./gameObjects/bulletDefs";
-import { type CrosshairDef, CrosshairDefs } from "./gameObjects/crosshairDefs";
-import { type EmoteDef, EmotesDefs } from "./gameObjects/emoteDefs";
-import { type ExplosionDef, ExplosionDefs } from "./gameObjects/explosionsDefs";
+import { type BulletDef, BulletDefs } from "./gameObjects/bulletDefs.ts";
+import { type CrosshairDef, CrosshairDefs } from "./gameObjects/crosshairDefs.ts";
+import { type EmoteDef, EmotesDefs } from "./gameObjects/emoteDefs.ts";
+import { type ExplosionDef, ExplosionDefs } from "./gameObjects/explosionsDefs.ts";
 import {
     type AmmoDef,
     type BackpackDef,
@@ -11,19 +11,19 @@ import {
     type HealDef,
     type HelmetDef,
     type ScopeDef,
-} from "./gameObjects/gearDefs";
-import { type GunDef, GunDefs } from "./gameObjects/gunDefs";
-import { type HealEffectDef, HealEffectDefs } from "./gameObjects/healEffectDefs";
-import { type MeleeDef, MeleeDefs } from "./gameObjects/meleeDefs";
-import { type OutfitDef, OutfitDefs } from "./gameObjects/outfitDefs";
-import { type PassDef, PassDefs } from "./gameObjects/passDefs";
-import { type PerkDef, PerkDefs } from "./gameObjects/perkDefs";
-import { type PingDef, PingDefs } from "./gameObjects/pingDefs";
-import { type QuestDef, QuestDefs } from "./gameObjects/questDefs";
-import { type RoleDef, RoleDefs } from "./gameObjects/roleDefs";
-import { type ThrowableDef, ThrowableDefs } from "./gameObjects/throwableDefs";
-import { type UnlockDef, UnlockDefs } from "./gameObjects/unlockDefs";
-import { type XPDef, XPDefs } from "./gameObjects/xpDefs";
+} from "./gameObjects/gearDefs.ts";
+import { type GunDef, GunDefs } from "./gameObjects/gunDefs.ts";
+import { type HealEffectDef, HealEffectDefs } from "./gameObjects/healEffectDefs.ts";
+import { type MeleeDef, MeleeDefs } from "./gameObjects/meleeDefs.ts";
+import { type OutfitDef, OutfitDefs } from "./gameObjects/outfitDefs.ts";
+import { type PassDef, PassDefs } from "./gameObjects/passDefs.ts";
+import { type PerkDef, PerkDefs } from "./gameObjects/perkDefs.ts";
+import { type PingDef, PingDefs } from "./gameObjects/pingDefs.ts";
+import { type QuestDef, QuestDefs } from "./gameObjects/questDefs.ts";
+import { type RoleDef, RoleDefs } from "./gameObjects/roleDefs.ts";
+import { type ThrowableDef, ThrowableDefs } from "./gameObjects/throwableDefs.ts";
+import { type UnlockDef, UnlockDefs } from "./gameObjects/unlockDefs.ts";
+import { type XPDef, XPDefs } from "./gameObjects/xpDefs.ts";
 
 export type GameObjectDef =
     | BulletDef

@@ -1,21 +1,24 @@
 import "@taufik-nurrohman/color-picker";
 import $ from "jquery";
-import { GameObjectDefs } from "../../../shared/defs/gameObjectDefs";
-import { EmoteCategory, type EmoteDef } from "../../../shared/defs/gameObjects/emoteDefs";
-import type { MeleeDef } from "../../../shared/defs/gameObjects/meleeDefs";
-import type { UnlockDef } from "../../../shared/defs/gameObjects/unlockDefs";
-import { EmoteSlot, Rarity } from "../../../shared/gameConfig";
-import type { ItemStatus } from "../../../shared/utils/loadout";
-import { type Crosshair, type Loadout, loadout } from "../../../shared/utils/loadout";
-import { util } from "../../../shared/utils/util";
-import type { Account } from "../account";
-import { crosshair } from "../crosshair";
-import { device } from "../device";
-import { helpers } from "../helpers";
-import { SDK } from "../sdk/sdk";
-import type { Localization } from "./localization";
-import { MenuModal } from "./menuModal";
-import type { LoadoutDisplay } from "./opponentDisplay";
+import { GameObjectDefs } from "../../../shared/defs/gameObjectDefs.ts";
+import {
+    EmoteCategory,
+    type EmoteDef,
+} from "../../../shared/defs/gameObjects/emoteDefs.ts";
+import type { MeleeDef } from "../../../shared/defs/gameObjects/meleeDefs.ts";
+import type { UnlockDef } from "../../../shared/defs/gameObjects/unlockDefs.ts";
+import { EmoteSlot, Rarity } from "../../../shared/gameConfig.ts";
+import type { ItemStatus } from "../../../shared/utils/loadout.ts";
+import { type Crosshair, type Loadout, loadout } from "../../../shared/utils/loadout.ts";
+import { util } from "../../../shared/utils/util.ts";
+import type { Account } from "../account.ts";
+import { crosshair } from "../crosshair.ts";
+import { device } from "../device.ts";
+import { helpers } from "../helpers.ts";
+import { SDK } from "../sdk/sdk.ts";
+import type { Localization } from "./localization.ts";
+import { MenuModal } from "./menuModal.ts";
+import type { LoadoutDisplay } from "./opponentDisplay.ts";
 
 function emoteSlotToDomElem(e: Exclude<EmoteSlot, EmoteSlot.Count>) {
     const emoteSlotToDomId = {

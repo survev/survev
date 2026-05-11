@@ -1,8 +1,8 @@
-import type { MapDefs } from "./shared/defs/mapDefs";
-import type { TeamMode } from "./shared/gameConfig";
-import type { ProxyDef } from "./shared/types/api";
-import type { DeepPartial } from "./shared/utils/util";
-import type { Vec2 } from "./shared/utils/v2";
+import type { MapDefs } from "./shared/defs/mapDefs.ts";
+import type { TeamMode } from "./shared/gameConfig.ts";
+import type { ProxyDef } from "./shared/types/api.ts";
+import type { DeepPartial } from "./shared/utils/util.ts";
+import type { Vec2 } from "./shared/utils/v2.ts";
 
 /**
  * Common keys used by both API and game server.

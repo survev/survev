@@ -1,4 +1,4 @@
-import type { AbstractMsg, BitStream } from "./net";
+import type { AbstractMsg, BitStream } from "./net.ts";
 
 export class DisconnectMsg implements AbstractMsg {
     reason = "";

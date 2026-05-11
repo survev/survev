@@ -1,10 +1,10 @@
 import $ from "jquery";
-import { GameObjectDefs } from "../../shared/defs/gameObjectDefs";
-import type { MeleeDef } from "../../shared/defs/gameObjects/meleeDefs";
-import type { OutfitDef } from "../../shared/defs/gameObjects/outfitDefs";
-import { MapDefs } from "../../shared/defs/mapDefs";
-import * as net from "../../shared/net/net";
-import { device } from "./device";
+import { GameObjectDefs } from "../../shared/defs/gameObjectDefs.ts";
+import type { MeleeDef } from "../../shared/defs/gameObjects/meleeDefs.ts";
+import type { OutfitDef } from "../../shared/defs/gameObjects/outfitDefs.ts";
+import { MapDefs } from "../../shared/defs/mapDefs.ts";
+import * as net from "../../shared/net/net.ts";
+import { device } from "./device.ts";
 
 const truncateCanvas = document.createElement("canvas");
 

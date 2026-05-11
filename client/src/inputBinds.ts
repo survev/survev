@@ -1,8 +1,8 @@
 import base64 from "base64-js";
 import $ from "jquery";
-import { Input as GameInput, type Input } from "../../shared/gameConfig";
-import { BitStream } from "../../shared/lib/bitBuffer";
-import type { ConfigManager } from "./config";
+import { Input as GameInput, type Input } from "../../shared/gameConfig.ts";
+import { BitStream } from "../../shared/lib/bitBuffer.ts";
+import type { ConfigManager } from "./config.ts";
 import {
     type InputHandler,
     InputType,
@@ -10,9 +10,9 @@ import {
     Key,
     MouseButton,
     MouseWheel,
-} from "./input";
-import { crc16 } from "./lib/crc";
-import type { Localization } from "./ui/localization";
+} from "./input.ts";
+import { crc16 } from "./lib/crc.ts";
+import type { Localization } from "./ui/localization.ts";
 
 function def(name: string, defaultValue: InputValue | null) {
     return {

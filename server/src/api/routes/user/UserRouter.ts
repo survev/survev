@@ -1,6 +1,6 @@
 import { and, eq, inArray, ne, notInArray } from "drizzle-orm";
 import { Hono } from "hono";
-import { UnlockDefs } from "../../../../../shared/defs/gameObjects/unlockDefs";
+import { UnlockDefs } from "../../../../../shared/defs/gameObjects/unlockDefs.ts";
 import {
     type LoadoutResponse,
     type ProfileResponse,
@@ -8,25 +8,25 @@ import {
     zLoadoutRequest,
     zSetItemStatusRequest,
     zUsernameRequest,
-} from "../../../../../shared/types/user";
-import loadout from "../../../../../shared/utils/loadout";
-import { validateUserName } from "../../../utils/serverHelpers";
-import { server } from "../../apiServer";
+} from "../../../../../shared/types/user.ts";
+import loadout from "../../../../../shared/utils/loadout.ts";
+import { validateUserName } from "../../../utils/serverHelpers.ts";
+import { server } from "../../apiServer.ts";
 import {
     authMiddleware,
     databaseEnabledMiddleware,
     rateLimitMiddleware,
     validateParams,
-} from "../../auth/middleware";
-import { db } from "../../db";
-import { itemsTable, matchDataTable, usersTable } from "../../db/schema";
-import type { Context } from "../../index";
+} from "../../auth/middleware.ts";
+import { db } from "../../db/index.ts";
+import { itemsTable, matchDataTable, usersTable } from "../../db/schema.ts";
+import type { Context } from "../../index.ts";
 import {
     getTimeUntilNextUsernameChange,
     logoutUser,
     sanitizeSlug,
-} from "./auth/authUtils";
-import { PassRouter } from "./PassRouter";
+} from "./auth/authUtils.ts";
+import { PassRouter } from "./PassRouter.ts";
 
 export const UserRouter = new Hono<Context>();
 

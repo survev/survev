@@ -1,6 +1,6 @@
-import { util } from "../../utils/util";
-import type { MapDef } from "../mapDefs";
-import { Main, type PartialMapDef } from "./baseDefs";
+import { util } from "../../utils/util.ts";
+import type { MapDef } from "../mapDefs.ts";
+import { Main, type PartialMapDef } from "./baseDefs.ts";
 
 export const testNormal = util.mergeDeep({}, Main, {
     mapGen: {

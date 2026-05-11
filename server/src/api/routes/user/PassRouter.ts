@@ -1,6 +1,6 @@
 import { and, eq, inArray } from "drizzle-orm";
 import { Hono } from "hono";
-import { QuestDefs } from "../../../../../shared/defs/gameObjects/questDefs";
+import { QuestDefs } from "../../../../../shared/defs/gameObjects/questDefs.ts";
 import {
     type GetPassResponse,
     type RefreshQuestResponse,
@@ -9,18 +9,18 @@ import {
     zRefreshQuestRequest,
     zSetPassUnlockRequest,
     zSetQuestRequest,
-} from "../../../../../shared/types/user";
-import { passUtil } from "../../../../../shared/utils/passUtil";
-import { Config } from "../../../config";
-import { validateParams } from "../../auth/middleware";
-import { db } from "../../db";
+} from "../../../../../shared/types/user.ts";
+import { passUtil } from "../../../../../shared/utils/passUtil.ts";
+import { Config } from "../../../config.ts";
+import { validateParams } from "../../auth/middleware.ts";
+import { db } from "../../db/index.ts";
 import {
     type UserPassTableSelect,
     type UserQuestTableSelect,
     userPassTable,
     userQuestTable,
-} from "../../db/schema";
-import type { Context } from "../../index";
+} from "../../db/schema.ts";
+import type { Context } from "../../index.ts";
 
 // hardcoded for now
 export const questSlotIndexes = [0, 1];

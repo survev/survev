@@ -1,4 +1,4 @@
-import { getConfig } from "../../config";
+import { getConfig } from "../../config.ts";
 
 const isProd = process.env["NODE_ENV"] === "production";
 export const serverConfigPath = isProd ? "../../" : "";

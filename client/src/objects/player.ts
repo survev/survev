@@ -1,20 +1,20 @@
 import * as PIXI from "pixi.js-legacy";
-import { GameObjectDefs, type LootDef } from "../../../shared/defs/gameObjectDefs";
-import type { ExplosionDef } from "../../../shared/defs/gameObjects/explosionsDefs";
+import { GameObjectDefs, type LootDef } from "../../../shared/defs/gameObjectDefs.ts";
+import type { ExplosionDef } from "../../../shared/defs/gameObjects/explosionsDefs.ts";
 import type {
     BackpackDef,
     BoostDef,
     ChestDef,
     HealDef,
     HelmetDef,
-} from "./../../../shared/defs/gameObjects/gearDefs";
-import type { GunDef } from "../../../shared/defs/gameObjects/gunDefs";
-import type { MeleeDef } from "../../../shared/defs/gameObjects/meleeDefs";
-import type { OutfitDef } from "../../../shared/defs/gameObjects/outfitDefs";
-import type { RoleDef } from "../../../shared/defs/gameObjects/roleDefs";
-import type { ThrowableDef } from "../../../shared/defs/gameObjects/throwableDefs";
-import { MapObjectDefs } from "../../../shared/defs/mapObjectDefs";
-import type { ObstacleDef } from "../../../shared/defs/mapObjectsTyping";
+} from "./../../../shared/defs/gameObjects/gearDefs.ts";
+import type { GunDef } from "../../../shared/defs/gameObjects/gunDefs.ts";
+import type { MeleeDef } from "../../../shared/defs/gameObjects/meleeDefs.ts";
+import type { OutfitDef } from "../../../shared/defs/gameObjects/outfitDefs.ts";
+import type { RoleDef } from "../../../shared/defs/gameObjects/roleDefs.ts";
+import type { ThrowableDef } from "../../../shared/defs/gameObjects/throwableDefs.ts";
+import { MapObjectDefs } from "../../../shared/defs/mapObjectDefs.ts";
+import type { ObstacleDef } from "../../../shared/defs/mapObjectsTyping.ts";
 import {
     Action,
     Anim,
@@ -22,42 +22,42 @@ import {
     HasteType,
     Input,
     type WeaponSlot,
-} from "../../../shared/gameConfig";
-import type { ObjectData, ObjectType } from "../../../shared/net/objectSerializeFns";
+} from "../../../shared/gameConfig.ts";
+import type { ObjectData, ObjectType } from "../../../shared/net/objectSerializeFns.ts";
 import {
     type GroupStatus,
     getPlayerStatusUpdateRate,
     type LocalDataWithDirty,
     type PlayerInfo,
     type PlayerStatus,
-} from "../../../shared/net/updateMsg";
-import { coldet } from "../../../shared/utils/coldet";
-import { collider } from "../../../shared/utils/collider";
-import { collisionHelpers } from "../../../shared/utils/collisionHelpers";
-import { math } from "../../../shared/utils/math";
-import type { River } from "../../../shared/utils/river";
-import { util } from "../../../shared/utils/util";
-import { type Vec2, v2 } from "../../../shared/utils/v2";
-import { Animations, Bones, IdlePoses, Pose } from "../animData";
-import type { AudioManager } from "../audioManager";
-import type { Camera } from "../camera";
-import type { DebugRenderOpts } from "../config";
-import { debugLines } from "../debug/debugLines";
-import { device } from "../device";
-import { errorLogManager } from "../errorLogs";
-import type { Ctx } from "../game";
-import { helpers } from "../helpers";
-import type { InputHandler } from "../input";
-import type { InputBinds } from "./../inputBinds";
-import type { SoundHandle } from "../lib/createJS";
-import type { Map } from "../map";
-import type { Renderer } from "../renderer";
-import type { UiManager2 } from "../ui/ui2";
-import { Pool } from "./objectPool";
-import type { Obstacle } from "./obstacle";
-import type { Emitter, ParticleBarn } from "./particles";
-import { halloweenSpriteMap } from "./projectile";
-import { createCasingParticle } from "./shot";
+} from "../../../shared/net/updateMsg.ts";
+import { coldet } from "../../../shared/utils/coldet.ts";
+import { collider } from "../../../shared/utils/collider.ts";
+import { collisionHelpers } from "../../../shared/utils/collisionHelpers.ts";
+import { math } from "../../../shared/utils/math.ts";
+import type { River } from "../../../shared/utils/river.ts";
+import { util } from "../../../shared/utils/util.ts";
+import { type Vec2, v2 } from "../../../shared/utils/v2.ts";
+import { Animations, Bones, IdlePoses, Pose } from "../animData.ts";
+import type { AudioManager } from "../audioManager.ts";
+import type { Camera } from "../camera.ts";
+import type { DebugRenderOpts } from "../config.ts";
+import { debugLines } from "../debug/debugLines.ts";
+import { device } from "../device.ts";
+import { errorLogManager } from "../errorLogs.ts";
+import type { Ctx } from "../game.ts";
+import { helpers } from "../helpers.ts";
+import type { InputHandler } from "../input.ts";
+import type { InputBinds } from "./../inputBinds.ts";
+import type { SoundHandle } from "../lib/createJS.ts";
+import type { Map } from "../map.ts";
+import type { Renderer } from "../renderer.ts";
+import type { UiManager2 } from "../ui/ui2.ts";
+import { Pool } from "./objectPool.ts";
+import type { Obstacle } from "./obstacle.ts";
+import type { Emitter, ParticleBarn } from "./particles.ts";
+import { halloweenSpriteMap } from "./projectile.ts";
+import { createCasingParticle } from "./shot.ts";
 
 const submergeMaskScaleFactor = 0.1;
 

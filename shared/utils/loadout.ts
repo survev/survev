@@ -1,9 +1,9 @@
 import { z } from "zod";
 
-import { GameObjectDefs } from "../defs/gameObjectDefs";
-import { UnlockDefs } from "../defs/gameObjects/unlockDefs";
-import { GameConfig } from "../gameConfig";
-import { deepEqual } from "./deepEqual";
+import { GameObjectDefs } from "../defs/gameObjectDefs.ts";
+import { UnlockDefs } from "../defs/gameObjects/unlockDefs.ts";
+import { GameConfig } from "../gameConfig.ts";
+import { deepEqual } from "./deepEqual.js";
 
 export type Item = {
     type: string;

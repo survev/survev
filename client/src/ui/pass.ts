@@ -1,14 +1,14 @@
 import $ from "jquery";
-import { GameObjectDefs } from "../../../shared/defs/gameObjectDefs";
-import type { EmoteDef } from "../../../shared/defs/gameObjects/emoteDefs";
-import { PassDefs } from "../../../shared/defs/gameObjects/passDefs";
-import { QuestDefs } from "../../../shared/defs/gameObjects/questDefs";
-import { math } from "../../../shared/utils/math";
-import { passUtil } from "../../../shared/utils/passUtil";
-import type { Account } from "../account";
-import { helpers } from "../helpers";
-import type { LoadoutMenu } from "./loadoutMenu";
-import type { Localization } from "./localization";
+import { GameObjectDefs } from "../../../shared/defs/gameObjectDefs.ts";
+import type { EmoteDef } from "../../../shared/defs/gameObjects/emoteDefs.ts";
+import { PassDefs } from "../../../shared/defs/gameObjects/passDefs.ts";
+import { QuestDefs } from "../../../shared/defs/gameObjects/questDefs.ts";
+import { math } from "../../../shared/utils/math.ts";
+import { passUtil } from "../../../shared/utils/passUtil.ts";
+import type { Account } from "../account.ts";
+import { helpers } from "../helpers.ts";
+import type { LoadoutMenu } from "./loadoutMenu.ts";
+import type { Localization } from "./localization.ts";
 
 function getNextPassUnlockItemId(passType: string, currentLevel: number) {
     const passDef = PassDefs[passType];

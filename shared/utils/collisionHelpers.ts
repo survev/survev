@@ -1,8 +1,8 @@
-import type { Collider } from "./coldet";
-import { collider } from "./collider";
-import { math } from "./math";
-import { util } from "./util";
-import { type Vec2, v2 } from "./v2";
+import type { Collider } from "./coldet.ts";
+import { collider } from "./collider.ts";
+import { math } from "./math.ts";
+import { util } from "./util.ts";
+import { type Vec2, v2 } from "./v2.ts";
 
 interface Obstacle {
     __id: number;

@@ -1,13 +1,13 @@
-import { collider } from "../utils/collider";
-import { util } from "../utils/util";
-import { v2 } from "../utils/v2";
+import { collider } from "../utils/collider.ts";
+import { util } from "../utils/util.ts";
+import { v2 } from "../utils/v2.ts";
 import type {
     BuildingDef,
     LootSpawnDef,
     MapObjectDef,
     ObstacleDef,
     StructureDef,
-} from "./mapObjectsTyping";
+} from "./mapObjectsTyping.ts";
 
 // some errors could be fixed by this but opted to using Partial and casting instead to avoid choking the lsp server
 // type DeepPartial<T> = T extends object ? {

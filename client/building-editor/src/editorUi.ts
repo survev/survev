@@ -1,17 +1,17 @@
 import { type FolderApi, Pane, type TabPageApi } from "tweakpane";
-import { MapDefs } from "../../../shared/defs/mapDefs";
-import { MapObjectDefs } from "../../../shared/defs/mapObjectDefs";
-import { math } from "../../../shared/utils/math";
-import { v2 } from "../../../shared/utils/v2";
+import { MapDefs } from "../../../shared/defs/mapDefs.ts";
+import { MapObjectDefs } from "../../../shared/defs/mapObjectDefs.ts";
+import { math } from "../../../shared/utils/math.ts";
+import { v2 } from "../../../shared/utils/v2.ts";
 import {
     type BuildingEditorConfig,
     type ConfigKey,
     type ConfigManager,
     type ConfigType,
     debugRenderConfig,
-} from "../../src/config";
-import { type InputHandler, Key, MouseWheel } from "../../src/input";
-import type { EditorDisplay } from "./editorDisplay";
+} from "../../src/config.ts";
+import { type InputHandler, Key, MouseWheel } from "../../src/input.ts";
+import type { EditorDisplay } from "./editorDisplay.ts";
 
 function camelCaseToText(str: string) {
     return str

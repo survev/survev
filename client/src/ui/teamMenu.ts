@@ -1,23 +1,23 @@
 import $ from "jquery";
-import { GameConfig } from "../../../shared/gameConfig";
-import * as net from "../../../shared/net/net";
-import type { FindGameMatchData } from "../../../shared/types/api";
+import { GameConfig } from "../../../shared/gameConfig.ts";
+import * as net from "../../../shared/net/net.ts";
+import type { FindGameMatchData } from "../../../shared/types/api.ts";
 import type {
     RoomData,
     ServerToClientTeamMsg,
     TeamMenuErrorType,
     TeamPlayGameMsg,
     TeamStateMsg,
-} from "../../../shared/types/team";
-import { api } from "../api";
-import type { AudioManager } from "../audioManager";
-import type { ConfigManager } from "../config";
-import { device } from "../device";
-import { helpers } from "../helpers";
-import type { PingTest } from "../pingTest";
-import { SDK } from "../sdk/sdk";
-import type { SiteInfo } from "../siteInfo";
-import type { Localization } from "./localization";
+} from "../../../shared/types/team.ts";
+import { api } from "../api.ts";
+import type { AudioManager } from "../audioManager.ts";
+import type { ConfigManager } from "../config.ts";
+import { device } from "../device.ts";
+import { helpers } from "../helpers.ts";
+import type { PingTest } from "../pingTest.ts";
+import { SDK } from "../sdk/sdk.ts";
+import type { SiteInfo } from "../siteInfo.ts";
+import type { Localization } from "./localization.ts";
 
 function errorTypeToString(type: string, localization: Localization) {
     const typeMap = {

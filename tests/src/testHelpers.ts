@@ -1,8 +1,8 @@
 import { expect } from "vitest";
-import { type GameObjectDef, GameObjectDefs } from "../../shared/defs/gameObjectDefs";
-import { MapObjectDefs } from "../../shared/defs/mapObjectDefs";
-import type { MapObjectDef } from "../../shared/defs/mapObjectsTyping";
-import { Main } from "../../shared/defs/maps/baseDefs";
+import { type GameObjectDef, GameObjectDefs } from "../../shared/defs/gameObjectDefs.ts";
+import { MapObjectDefs } from "../../shared/defs/mapObjectDefs.ts";
+import type { MapObjectDef } from "../../shared/defs/mapObjectsTyping.ts";
+import { Main } from "../../shared/defs/maps/baseDefs.ts";
 
 interface GameTestHelpers<R = unknown> {
     toBeInRange: (value: { min: number; max: number }) => R;

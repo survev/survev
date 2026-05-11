@@ -1,8 +1,8 @@
-import { GameConfig } from "../../gameConfig";
-import { util } from "../../utils/util";
-import type { MapDef } from "../mapDefs";
-import { MapId } from "../types/misc";
-import { Main, type PartialMapDef } from "./baseDefs";
+import { GameConfig } from "../../gameConfig.ts";
+import { util } from "../../utils/util.ts";
+import type { MapDef } from "../mapDefs.ts";
+import { MapId } from "../types/misc.ts";
+import { Main, type PartialMapDef } from "./baseDefs.ts";
 
 const mapDef: PartialMapDef = {
     mapId: MapId.Halloween,

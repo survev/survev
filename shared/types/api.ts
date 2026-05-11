@@ -1,6 +1,6 @@
 import { z } from "zod";
-import type { MapDefs } from "../defs/mapDefs";
-import type { TeamMode } from "../gameConfig";
+import type { MapDefs } from "../defs/mapDefs.ts";
+import type { TeamMode } from "../gameConfig.ts";
 
 export const zFindGameBody = z.object({
     region: z.string(),

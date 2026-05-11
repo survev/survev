@@ -1,4 +1,4 @@
-import { type AbstractMsg, type BitStream, Constants } from "./net";
+import { type AbstractMsg, type BitStream, Constants } from "./net.ts";
 
 export class JoinMsg implements AbstractMsg {
     protocol = 0;

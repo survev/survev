@@ -1,11 +1,11 @@
 import * as PIXI from "pixi.js-legacy";
 import highResAtlasDefs from "virtual-atlases-high";
 import lowResAtlasDefs from "virtual-atlases-low";
-import { type Atlas, MapDefs } from "../../shared/defs/mapDefs";
-import type { AudioManager } from "./audioManager";
-import type { ConfigManager } from "./config";
-import { device } from "./device";
-import SoundDefs from "./soundDefs";
+import { type Atlas, MapDefs } from "../../shared/defs/mapDefs.ts";
+import type { AudioManager } from "./audioManager.ts";
+import type { ConfigManager } from "./config.ts";
+import { device } from "./device.ts";
+import SoundDefs from "./soundDefs.ts";
 
 type AtlasDef = Record<Atlas, PIXI.ISpritesheetData[]>;
 

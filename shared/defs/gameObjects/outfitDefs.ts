@@ -1,5 +1,5 @@
-import { Rarity } from "../../gameConfig";
-import { type DeepPartial, util } from "../../utils/util";
+import { Rarity } from "../../gameConfig.ts";
+import { type DeepPartial, util } from "../../utils/util.ts";
 
 export interface OutfitDef {
     readonly type: "outfit";

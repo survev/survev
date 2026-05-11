@@ -1,5 +1,5 @@
 import $ from "jquery";
-import { device } from "../device";
+import { device } from "../device.ts";
 import english from "../en.json";
 
 export function downloadFile(

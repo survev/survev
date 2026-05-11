@@ -3,13 +3,13 @@ import { eq } from "drizzle-orm";
 import type { Context } from "hono";
 import { deleteCookie, setCookie } from "hono/cookie";
 import slugify from "slugify";
-import { UnlockDefs } from "../../../../../../shared/defs/gameObjects/unlockDefs";
-import { util } from "../../../../../../shared/utils/util";
-import { Config } from "../../../../config";
-import { checkForBadWords } from "../../../../utils/serverHelpers";
-import { createSession, invalidateSession } from "../../../auth";
-import { db } from "../../../db";
-import { itemsTable, type UsersTableInsert, usersTable } from "../../../db/schema";
+import { UnlockDefs } from "../../../../../../shared/defs/gameObjects/unlockDefs.ts";
+import { util } from "../../../../../../shared/utils/util.ts";
+import { Config } from "../../../../config.ts";
+import { checkForBadWords } from "../../../../utils/serverHelpers.ts";
+import { createSession, invalidateSession } from "../../../auth/index.ts";
+import { db } from "../../../db/index.ts";
+import { itemsTable, type UsersTableInsert, usersTable } from "../../../db/schema.ts";
 
 let oauthBaseURL: URL | undefined = undefined;
 if (URL.canParse(Config.oauthBasePath)) {

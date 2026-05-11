@@ -1,11 +1,11 @@
-import type { MapDef } from "../../../shared/defs/mapDefs";
-import { coldet } from "../../../shared/utils/coldet";
-import { collider } from "../../../shared/utils/collider";
-import { math } from "../../../shared/utils/math";
-import { catmullRom, getControlPoints } from "../../../shared/utils/spline";
-import { util } from "../../../shared/utils/util";
-import { type Vec2, v2 } from "../../../shared/utils/v2";
-import type { GameMap } from "./map";
+import type { MapDef } from "../../../shared/defs/mapDefs.ts";
+import { coldet } from "../../../shared/utils/coldet.ts";
+import { collider } from "../../../shared/utils/collider.ts";
+import { math } from "../../../shared/utils/math.ts";
+import { catmullRom, getControlPoints } from "../../../shared/utils/spline.ts";
+import { util } from "../../../shared/utils/util.ts";
+import { type Vec2, v2 } from "../../../shared/utils/v2.ts";
+import type { GameMap } from "./map.ts";
 
 export class RiverCreator {
     randomGenerator: (min?: number, max?: number) => number;

@@ -1,19 +1,19 @@
-import { GameObjectDefs, type LootDef } from "../../../../shared/defs/gameObjectDefs";
-import type { MapDef } from "../../../../shared/defs/mapDefs";
-import { GameConfig } from "../../../../shared/gameConfig";
-import { ObjectType } from "../../../../shared/net/objectSerializeFns";
-import { type AABB, type Circle, coldet } from "../../../../shared/utils/coldet";
-import { collider } from "../../../../shared/utils/collider";
-import { math } from "../../../../shared/utils/math";
-import type { River } from "../../../../shared/utils/river";
-import { assert, util } from "../../../../shared/utils/util";
-import { type Vec2, v2 } from "../../../../shared/utils/v2";
-import type { Game } from "../game";
-import { HashGrid } from "../grid";
-import { BaseGameObject } from "./gameObject";
-import type { MapIndicator } from "./mapIndicator";
-import type { Player } from "./player";
-import type { Structure } from "./structure";
+import { GameObjectDefs, type LootDef } from "../../../../shared/defs/gameObjectDefs.ts";
+import type { MapDef } from "../../../../shared/defs/mapDefs.ts";
+import { GameConfig } from "../../../../shared/gameConfig.ts";
+import { ObjectType } from "../../../../shared/net/objectSerializeFns.ts";
+import { type AABB, type Circle, coldet } from "../../../../shared/utils/coldet.ts";
+import { collider } from "../../../../shared/utils/collider.ts";
+import { math } from "../../../../shared/utils/math.ts";
+import type { River } from "../../../../shared/utils/river.ts";
+import { assert, util } from "../../../../shared/utils/util.ts";
+import { type Vec2, v2 } from "../../../../shared/utils/v2.ts";
+import type { Game } from "../game.ts";
+import { HashGrid } from "../grid.ts";
+import { BaseGameObject } from "./gameObject.ts";
+import type { MapIndicator } from "./mapIndicator.ts";
+import type { Player } from "./player.ts";
+import type { Structure } from "./structure.ts";
 
 // velocity drag applied every tick
 const LOOT_DRAG = 4;

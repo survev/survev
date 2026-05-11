@@ -1,7 +1,7 @@
-import { Atlases } from "../../client/atlas-builder/atlasDefs";
-import { type MapDef, MapDefs } from "../../shared/defs/mapDefs";
-import { MapObjectDefs } from "../../shared/defs/mapObjectDefs";
-import type { BuildingDef, ObstacleDef } from "../../shared/defs/mapObjectsTyping";
+import { Atlases } from "../../client/atlas-builder/atlasDefs.ts";
+import { type MapDef, MapDefs } from "../../shared/defs/mapDefs.ts";
+import { MapObjectDefs } from "../../shared/defs/mapObjectDefs.ts";
+import type { BuildingDef, ObstacleDef } from "../../shared/defs/mapObjectsTyping.ts";
 
 export function getAllAtlasSprites(map: keyof typeof MapDefs) {
     const def = MapDefs[map] as MapDef;

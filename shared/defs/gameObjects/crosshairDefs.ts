@@ -1,4 +1,4 @@
-import { Rarity } from "../../gameConfig";
+import { Rarity } from "../../gameConfig.ts";
 
 export interface CrosshairDef {
     readonly type: "crosshair";

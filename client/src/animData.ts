@@ -1,10 +1,10 @@
-import { GameObjectDefs } from "../../shared/defs/gameObjectDefs";
-import type { MeleeDef } from "../../shared/defs/gameObjects/meleeDefs";
-import { GameConfig } from "../../shared/gameConfig";
-import { math } from "../../shared/utils/math";
-import { assert } from "../../shared/utils/util";
-import { type Vec2, v2 } from "../../shared/utils/v2";
-import type { AnimCtx, Player } from "./objects/player";
+import { GameObjectDefs } from "../../shared/defs/gameObjectDefs.ts";
+import type { MeleeDef } from "../../shared/defs/gameObjects/meleeDefs.ts";
+import { GameConfig } from "../../shared/gameConfig.ts";
+import { math } from "../../shared/utils/math.ts";
+import { assert } from "../../shared/utils/util.ts";
+import { type Vec2, v2 } from "../../shared/utils/v2.ts";
+import type { AnimCtx, Player } from "./objects/player.ts";
 
 function frame(time: number, bones: Partial<Record<Bones, Pose>>) {
     return {

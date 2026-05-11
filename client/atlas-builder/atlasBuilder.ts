@@ -6,13 +6,13 @@ import Path from "node:path";
 
 import { loadImage } from "canvas";
 import type { ISpritesheetData } from "pixi.js-legacy";
-import type { Atlas } from "../../shared/defs/mapDefs";
-import { Logger } from "../../shared/utils/logger";
-import { util } from "../../shared/utils/util";
-import { Atlases, type AtlasRes, scaledSprites } from "./atlasDefs";
-import type { MainToWorkerMsg, WorkerToMainMsg } from "./atlasWorker";
-import type { Edges } from "./detectEdges";
-import type { ParentMsg } from "./imageWorker";
+import type { Atlas } from "../../shared/defs/mapDefs.ts";
+import { Logger } from "../../shared/utils/logger.ts";
+import { util } from "../../shared/utils/util.ts";
+import { Atlases, type AtlasRes, scaledSprites } from "./atlasDefs.ts";
+import type { MainToWorkerMsg, WorkerToMainMsg } from "./atlasWorker.ts";
+import type { Edges } from "./detectEdges.ts";
+import type { ParentMsg } from "./imageWorker.ts";
 
 export const cacheFolder = Path.resolve(
     import.meta.dirname,

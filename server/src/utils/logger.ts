@@ -1,6 +1,6 @@
-import { Logger } from "../../../shared/utils/logger";
-import { Config } from "../config";
-import { logErrorToWebhook } from "./serverHelpers";
+import { Logger } from "../../../shared/utils/logger.ts";
+import { Config } from "../config.ts";
+import { logErrorToWebhook } from "./serverHelpers.ts";
 
 const logCfg = Config.logging;
 

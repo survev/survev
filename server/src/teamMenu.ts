@@ -2,7 +2,7 @@ import { randomUUID } from "crypto";
 import type { Hono } from "hono";
 import { getCookie } from "hono/cookie";
 import type { UpgradeWebSocket, WSContext } from "hono/ws";
-import type { FindGameError } from "../../shared/types/api";
+import type { FindGameError } from "../../shared/types/api.ts";
 import {
     type ClientRoomData,
     type ClientToServerTeamMsg,
@@ -13,14 +13,14 @@ import {
     type TeamMenuPlayer,
     type TeamPlayGameMsg,
     zTeamClientMsg,
-} from "../../shared/types/team";
-import { assert, util } from "../../shared/utils/util";
-import type { ApiServer } from "./api/apiServer";
-import { validateSessionToken } from "./api/auth";
-import { hashIp, isBanned } from "./api/routes/private/ModerationRouter";
-import { Config } from "./config";
-import { ServerLogger } from "./utils/logger";
-import { getFindGamePlayerData } from "./utils/playerData";
+} from "../../shared/types/team.ts";
+import { assert, util } from "../../shared/utils/util.ts";
+import type { ApiServer } from "./api/apiServer.ts";
+import { validateSessionToken } from "./api/auth/index.ts";
+import { hashIp, isBanned } from "./api/routes/private/ModerationRouter.ts";
+import { Config } from "./config.ts";
+import { ServerLogger } from "./utils/logger.ts";
+import { getFindGamePlayerData } from "./utils/playerData.ts";
 import {
     getHonoIp,
     HTTPRateLimit,
@@ -28,8 +28,8 @@ import {
     validateUserName,
     verifyTurnsStile,
     WebSocketRateLimit,
-} from "./utils/serverHelpers";
-import type { FindGamePrivateBody } from "./utils/types";
+} from "./utils/serverHelpers.ts";
+import type { FindGamePrivateBody } from "./utils/types.ts";
 
 interface SocketData {
     rateLimit: Record<symbol, number>;

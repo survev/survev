@@ -1,23 +1,23 @@
 import * as PIXI from "pixi.js-legacy";
-import { GameObjectDefs } from "../../../shared/defs/gameObjectDefs";
-import { BulletDefs } from "../../../shared/defs/gameObjects/bulletDefs";
-import type { MeleeDef } from "../../../shared/defs/gameObjects/meleeDefs";
-import { MapObjectDefs } from "../../../shared/defs/mapObjectDefs";
-import type { ObstacleDef } from "../../../shared/defs/mapObjectsTyping";
-import { GameConfig } from "../../../shared/gameConfig";
-import type { Bullet } from "../../../shared/net/updateMsg";
-import { coldet } from "../../../shared/utils/coldet";
-import { collider } from "../../../shared/utils/collider";
-import { math } from "../../../shared/utils/math";
-import { util } from "../../../shared/utils/util";
-import { type Vec2, v2 } from "../../../shared/utils/v2";
-import type { AudioManager } from "../audioManager";
-import type { Camera } from "../camera";
-import type { Map } from "../map";
-import type { Renderer } from "../renderer";
-import type { FlareBarn } from "./flare";
-import type { ParticleBarn } from "./particles";
-import type { Player, PlayerBarn } from "./player";
+import { GameObjectDefs } from "../../../shared/defs/gameObjectDefs.ts";
+import { BulletDefs } from "../../../shared/defs/gameObjects/bulletDefs.ts";
+import type { MeleeDef } from "../../../shared/defs/gameObjects/meleeDefs.ts";
+import { MapObjectDefs } from "../../../shared/defs/mapObjectDefs.ts";
+import type { ObstacleDef } from "../../../shared/defs/mapObjectsTyping.ts";
+import { GameConfig } from "../../../shared/gameConfig.ts";
+import type { Bullet } from "../../../shared/net/updateMsg.ts";
+import { coldet } from "../../../shared/utils/coldet.ts";
+import { collider } from "../../../shared/utils/collider.ts";
+import { math } from "../../../shared/utils/math.ts";
+import { util } from "../../../shared/utils/util.ts";
+import { type Vec2, v2 } from "../../../shared/utils/v2.ts";
+import type { AudioManager } from "../audioManager.ts";
+import type { Camera } from "../camera.ts";
+import type { Map } from "../map.ts";
+import type { Renderer } from "../renderer.ts";
+import type { FlareBarn } from "./flare.ts";
+import type { ParticleBarn } from "./particles.ts";
+import type { Player, PlayerBarn } from "./player.ts";
 
 export function createBullet(
     bullet: Bullet,

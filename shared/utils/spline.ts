@@ -1,6 +1,6 @@
-import { math } from "./math";
-import { assert } from "./util";
-import { type Vec2, v2 } from "./v2";
+import { math } from "./math.ts";
+import { assert } from "./util.ts";
+import { type Vec2, v2 } from "./v2.ts";
 
 export function getControlPoints(t: number, points: Vec2[], looped: boolean) {
     const count = points.length;

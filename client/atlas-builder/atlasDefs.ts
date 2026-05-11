@@ -1,18 +1,18 @@
-import type { Atlas } from "../../shared/defs/mapDefs";
-import { BeachAtlas } from "./defs/beach";
-import { CobaltAtlas } from "./defs/cobalt";
-import { DesertAtlas } from "./defs/desert";
-import { FactionAtlas } from "./defs/faction";
-import { GradientAtlas } from "./defs/gradient";
-import { HalloweenAtlas } from "./defs/halloween";
-import { LoadoutAtlas } from "./defs/loadout";
-import { MainAtlas } from "./defs/main";
-import { PotatoAtlas } from "./defs/potato";
-import { SavannahAtlas } from "./defs/savannah";
-import { SharedAtlas } from "./defs/shared";
-import { SnowAtlas } from "./defs/snow";
-import { TurkeyAtlas } from "./defs/turkey";
-import { WoodsAtlas } from "./defs/woods";
+import type { Atlas } from "../../shared/defs/mapDefs.ts";
+import { BeachAtlas } from "./defs/beach.ts";
+import { CobaltAtlas } from "./defs/cobalt.ts";
+import { DesertAtlas } from "./defs/desert.ts";
+import { FactionAtlas } from "./defs/faction.ts";
+import { GradientAtlas } from "./defs/gradient.ts";
+import { HalloweenAtlas } from "./defs/halloween.ts";
+import { LoadoutAtlas } from "./defs/loadout.ts";
+import { MainAtlas } from "./defs/main.ts";
+import { PotatoAtlas } from "./defs/potato.ts";
+import { SavannahAtlas } from "./defs/savannah.ts";
+import { SharedAtlas } from "./defs/shared.ts";
+import { SnowAtlas } from "./defs/snow.ts";
+import { TurkeyAtlas } from "./defs/turkey.ts";
+import { WoodsAtlas } from "./defs/woods.ts";
 
 export interface AtlasDef {
     /**

@@ -1,10 +1,10 @@
 import $ from "jquery";
-import { MinGames } from "../../../../shared/constants";
-import type { LeaderboardRequest } from "../../../../shared/types/stats";
-import { api } from "../../api";
-import { device } from "../../device";
-import { helpers } from "../../helpers";
-import type { App } from "./app";
+import { MinGames } from "../../../../shared/constants.ts";
+import type { LeaderboardRequest } from "../../../../shared/types/stats.ts";
+import { api } from "../../api.ts";
+import { device } from "../../device.ts";
+import { helpers } from "../../helpers.ts";
+import type { App } from "./app.ts";
 import leaderboard from "./templates/leaderboard.ejs";
 import leaderboardError from "./templates/leaderboardError.ejs";
 import loading from "./templates/loading.ejs";

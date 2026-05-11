@@ -1,8 +1,8 @@
 import fs from "fs";
 import path from "path";
-import type { Game } from "./game";
-import type { DamageParams } from "./objects/gameObject";
-import type { Player } from "./objects/player";
+import type { Game } from "./game.ts";
+import type { DamageParams } from "./objects/gameObject.ts";
+import type { Player } from "./objects/player.ts";
 
 interface PlayerDamageEvent extends DamageParams {
     player: Player;

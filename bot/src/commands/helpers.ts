@@ -5,7 +5,7 @@ import {
     SlashCommandBuilder,
 } from "discord.js";
 import type z from "zod";
-import { botLogger, type Command, honoClient, isAdmin } from "../utils";
+import { botLogger, type Command, honoClient, isAdmin } from "../utils.ts";
 
 export function createCommand<T extends z.ZodSchema = z.ZodSchema>(config: {
     name: Command;

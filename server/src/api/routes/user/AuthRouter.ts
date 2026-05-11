@@ -1,11 +1,11 @@
 import { OAuth2RequestError } from "arctic";
 import { Hono } from "hono";
-import { Config } from "../../../config";
-import { server } from "../../apiServer";
-import { databaseEnabledMiddleware, rateLimitMiddleware } from "../../auth/middleware";
-import { DiscordRouter } from "./auth/discord";
-import { GoogleRouter } from "./auth/google";
-import { MockRouter } from "./auth/mock";
+import { Config } from "../../../config.ts";
+import { server } from "../../apiServer.ts";
+import { databaseEnabledMiddleware, rateLimitMiddleware } from "../../auth/middleware.ts";
+import { DiscordRouter } from "./auth/discord.ts";
+import { GoogleRouter } from "./auth/google.ts";
+import { MockRouter } from "./auth/mock.ts";
 
 export const AuthRouter = new Hono();
 

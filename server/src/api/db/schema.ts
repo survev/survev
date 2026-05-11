@@ -11,8 +11,8 @@ import {
     uniqueIndex,
     uuid,
 } from "drizzle-orm/pg-core";
-import { TeamMode } from "../../../../shared/gameConfig";
-import { ItemStatus, type Loadout, loadout } from "../../../../shared/utils/loadout";
+import { TeamMode } from "../../../../shared/gameConfig.ts";
+import { ItemStatus, type Loadout, loadout } from "../../../../shared/utils/loadout.ts";
 
 export const sessionTable = pgTable("session", {
     id: text("id").primaryKey(),

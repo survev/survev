@@ -1,11 +1,11 @@
-import { GameObjectDefs } from "../../../shared/defs/gameObjectDefs";
-import { type QuestDef, QuestDefs } from "../../../shared/defs/gameObjects/questDefs";
-import { MapObjectDefs } from "../../../shared/defs/mapObjectDefs";
-import type { ObstacleDef } from "../../../shared/defs/mapObjectsTyping";
-import { TeamModeToString } from "../../../shared/defs/types/misc";
-import { MsgType, UpdatePassMsg } from "../../../shared/net/net";
-import type { Game } from "./game";
-import type { Player } from "./objects/player";
+import { GameObjectDefs } from "../../../shared/defs/gameObjectDefs.ts";
+import { type QuestDef, QuestDefs } from "../../../shared/defs/gameObjects/questDefs.ts";
+import { MapObjectDefs } from "../../../shared/defs/mapObjectDefs.ts";
+import type { ObstacleDef } from "../../../shared/defs/mapObjectsTyping.ts";
+import { TeamModeToString } from "../../../shared/defs/types/misc.ts";
+import { MsgType, UpdatePassMsg } from "../../../shared/net/net.ts";
+import type { Game } from "./game.ts";
+import type { Player } from "./objects/player.ts";
 
 export class QuestManager {
     player: Player;
