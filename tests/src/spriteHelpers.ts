@@ -1,7 +1,6 @@
 import { Atlases } from "../../client/atlas-builder/atlasDefs.ts";
 import { type MapDef, MapDefs } from "../../shared/defs/mapDefs.ts";
-import { MapObjectDefs } from "../../shared/defs/mapObjectDefs.ts";
-import type { BuildingDef, ObstacleDef } from "../../shared/defs/mapObjectsTyping.ts";
+import { MapObjectDefs } from "../../shared/defs/register.ts";
 
 export function getAllAtlasSprites(map: keyof typeof MapDefs) {
     const def = MapDefs[map] as MapDef;
@@ -18,7 +17,7 @@ export function getAllAtlasSprites(map: keyof typeof MapDefs) {
 }
 
 function getObstacleSprites(type: string, sprites: Set<string>) {
-    const def = MapObjectDefs[type] as ObstacleDef;
+    const def = MapObjectDefs.typeToDef(type, "obstacle");
 
     if (def.img.sprite) {
         sprites.add(def.img.sprite);
@@ -44,7 +43,7 @@ function getObstacleSprites(type: string, sprites: Set<string>) {
 }
 
 function getBuildingSprites(type: string, sprites: Set<string>) {
-    const def = MapObjectDefs[type] as BuildingDef;
+    const def = MapObjectDefs.typeToDef(type, "building");
 
     for (const sprite of def.ceiling.imgs) {
         sprites.add(sprite.sprite);
@@ -72,7 +71,7 @@ function getBuildingSprites(type: string, sprites: Set<string>) {
 
 function getObjSprites(type: string, sprites: Set<string>) {
     if (!type) return;
-    const def = MapObjectDefs[type];
+    const def = MapObjectDefs.typeToDefSafe(type);
     if (!def) return;
 
     switch (def.type) {

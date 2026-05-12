@@ -1,7 +1,7 @@
 import { z } from "zod";
 
-import { GameObjectDefs } from "../defs/gameObjectDefs.ts";
 import { UnlockDefs } from "../defs/gameObjects/unlockDefs.ts";
+import { GameObjectDefs } from "../defs/register.ts";
 import { GameConfig } from "../gameConfig.ts";
 import { deepEqual } from "./deepEqual.js";
 
@@ -41,7 +41,7 @@ export const loadout = {
     ItemStatus,
     validate: (userLoadout: Loadout): Loadout => {
         const getGameType = (type: string, gameType: string, defaultValue: string) => {
-            const def = GameObjectDefs[gameType];
+            const def = GameObjectDefs.typeToDefSafe(gameType);
             if (def && def.type == type) {
                 return gameType;
             }
@@ -130,7 +130,7 @@ export const loadout = {
     getUserAvailableItems: (heroItems: Item[]) => {
         const items: typeof heroItems = [];
         // Add default items
-        const unlockDefaultDef = GameObjectDefs.unlock_default as unknown as (typeof UnlockDefs)["unlock_default"];
+        const unlockDefaultDef = GameObjectDefs.typeToDef("unlock_default", "unlock");
         for (let i = 0; i < unlockDefaultDef.unlocks.length; i++) {
             const unlock = unlockDefaultDef.unlocks[i];
             items.push({

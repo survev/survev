@@ -1,5 +1,5 @@
-import { MapObjectDefs } from "../defs/mapObjectDefs.ts";
-import type { BuildingDef } from "../defs/mapObjectsTyping.ts";
+import type { BuildingDef, StructureDef } from "../defs/mapObjectsTyping.ts";
+import { MapObjectDefs } from "../defs/register.ts";
 import { type AABB, coldet, type Collider } from "./coldet.ts";
 import { collider } from "./collider.ts";
 import { math } from "./math.ts";
@@ -10,7 +10,7 @@ import { v2, type Vec2 } from "./v2.ts";
 const cachedColliders: Record<string, Collider> = {};
 
 function computeBoundingCollider(type: string): Collider {
-    const def = MapObjectDefs[type];
+    const def = MapObjectDefs.typeToDef(type);
     if (def.type === "structure") {
         const aabbs: AABB[] = [];
         for (let i = 0; i < def.layers.length; i++) {
@@ -112,7 +112,7 @@ export const mapHelpers = {
     getBridgeOverlapCollider(type: string, pos: Vec2, rot: number, scale: number) {
         // Returns an expanded collider perpendicular to the bridge.
         // This determines how closely bridges can spawn to one another on a river.
-        const def = MapObjectDefs[type] as BuildingDef;
+        const def = MapObjectDefs.typeToDef(type) as BuildingDef | StructureDef;
         const dims = mapHelpers.getBridgeDims(type);
         const dir = v2.create(1.0, 0.0);
         const ext = v2.add(

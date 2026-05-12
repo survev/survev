@@ -1,8 +1,6 @@
-import { GameObjectDefs } from "../../../../shared/defs/gameObjectDefs.ts";
-import type { ThrowableDef } from "../../../../shared/defs/gameObjects/throwableDefs.ts";
 import type { MapDef } from "../../../../shared/defs/mapDefs.ts";
-import { MapObjectDefs } from "../../../../shared/defs/mapObjectDefs.ts";
-import type { ObstacleDef } from "../../../../shared/defs/mapObjectsTyping.ts";
+
+import { GameObjectDefs, MapObjectDefs } from "../../../../shared/defs/register.ts";
 import { GameConfig, type Plane as PlaneType } from "../../../../shared/gameConfig.ts";
 import { Constants } from "../../../../shared/net/net.ts";
 import { ObjectType } from "../../../../shared/net/objectSerializeFns.ts";
@@ -317,7 +315,7 @@ export class PlaneBarn {
 
         type ||= util.weightedRandom(this.game.map.mapDef.gameConfig.planes.crates).name;
 
-        const def = MapObjectDefs[type] as ObstacleDef;
+        const def = MapObjectDefs.typeToDef(type, "obstacle");
 
         let collided = true;
         let airdropPos = v2.copy(pos);
@@ -683,7 +681,7 @@ class AirStrikePlane extends Plane {
         if (this.bombCount >= config.bombCount) return;
 
         this.bombCount++;
-        const bombDef = GameObjectDefs["bomb_iron"] as ThrowableDef;
+        const bombDef = GameObjectDefs.typeToDef("bomb_iron", "throwable");
         this.game.projectileBarn.addProjectile(
             this.playerId ?? 0, // 0 means the projectile comes from the "game" itself not a player
             "bomb_iron",

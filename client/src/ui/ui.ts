@@ -1,9 +1,10 @@
 import $ from "jquery";
 import * as PIXI from "pixi.js-legacy";
-import { GameObjectDefs } from "../../../shared/defs/gameObjectDefs.ts";
+
 import { PingDefs } from "../../../shared/defs/gameObjects/pingDefs.ts";
-import { type RoleDef, RoleDefs } from "../../../shared/defs/gameObjects/roleDefs.ts";
+import type { RoleDef } from "../../../shared/defs/gameObjects/roleDefs.ts";
 import type { MapDef } from "../../../shared/defs/mapDefs.ts";
+import { GameObjectDefs } from "../../../shared/defs/register.ts";
 import { Action, GameConfig, GasMode, TeamMode } from "../../../shared/gameConfig.ts";
 import type { PlayerStatsMsg } from "../../../shared/net/playerStatsMsg.ts";
 import type { MapIndicator, PlayerStatus } from "../../../shared/net/updateMsg.ts";
@@ -711,12 +712,12 @@ export class UiManager {
             switch (player.m_action.type) {
                 case Action.Reload:
                 case Action.ReloadAlt:
-                    if (GameObjectDefs[player.m_action.item]) {
+                    if (GameObjectDefs.typeExists(player.m_action.item)) {
                         actionTxt1 = this.localization.translate("game-reloading");
                     }
                     break;
                 case Action.UseItem:
-                    if (GameObjectDefs[player.m_action.item]) {
+                    if (GameObjectDefs.typeExists(player.m_action.item)) {
                         actionTxt1 = this.localization.translate("game-using");
                         actionTxt2 = this.localization.translate(
                             `game-${player.m_action.item}`,
@@ -988,7 +989,7 @@ export class UiManager {
             if (playerId == activePlayerInfo.playerId) {
                 zOrder += 65535 * 2;
             }
-            const roleDef = RoleDefs[playerStatus.role];
+            const roleDef = GameObjectDefs.typeToDefSafe(playerStatus.role) as RoleDef | undefined;
             const customMapIcon = roleDef?.mapIcon;
             if (customMapIcon) {
                 zOrder += 65535;
@@ -2359,7 +2360,7 @@ export class UiManager {
 
         for (let a = 0; a < roles.length; a++) {
             const role = roles[a];
-            const roleDef = GameObjectDefs[role] as RoleDef;
+            const roleDef = GameObjectDefs.typeToDef(role, "role");
             const roleOption = $("<div/>", {
                 class: "ui-role-option",
                 "data-role": role,
@@ -2384,7 +2385,7 @@ export class UiManager {
     }
 
     setRoleMenuInfo(role: string) {
-        const roleDef = GameObjectDefs[role] as RoleDef;
+        const roleDef = GameObjectDefs.typeToDef(role, "role");
         $(".ui-role-option").css({
             "background-size": 132,
             opacity: 0.5,

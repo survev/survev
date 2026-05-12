@@ -1,12 +1,13 @@
 import $ from "jquery";
 import * as PIXI from "pixi.js-legacy";
-import { GameObjectDefs } from "../../shared/defs/gameObjectDefs.ts";
+
 import { EmotesDefs } from "../../shared/defs/gameObjects/emoteDefs.ts";
 import type { AmmoDef } from "../../shared/defs/gameObjects/gearDefs.ts";
 import type { GunDef } from "../../shared/defs/gameObjects/gunDefs.ts";
 import type { MeleeDef } from "../../shared/defs/gameObjects/meleeDefs.ts";
 import { PingDefs } from "../../shared/defs/gameObjects/pingDefs.ts";
 import type { ThrowableDef } from "../../shared/defs/gameObjects/throwableDefs.ts";
+import { GameObjectDefs } from "../../shared/defs/register.ts";
 import { EmoteSlot, GameConfig, Input, type TeamMode } from "../../shared/gameConfig.ts";
 import type { Emote } from "../../shared/net/updateMsg.ts";
 import { coldet } from "../../shared/utils/coldet.ts";
@@ -744,7 +745,7 @@ export class EmoteBarn {
 
             // Rotate if it's loot and rotation defined
             if (emote.type == "emote_loot") {
-                const lootDef = GameObjectDefs[emote.itemType] as
+                const lootDef = GameObjectDefs.typeToDefSafe(emote.itemType) as
                     | MeleeDef
                     | GunDef
                     | ThrowableDef;
@@ -752,7 +753,7 @@ export class EmoteBarn {
                     e.sprite.texture = PIXI.Texture.from(lootDef.lootImg.sprite);
 
                     // Colorize if defined
-                    const ammo = GameObjectDefs[(lootDef as GunDef).ammo] as AmmoDef;
+                    const ammo = GameObjectDefs.typeToDef((lootDef as GunDef).ammo) as AmmoDef;
                     e.circleOuter.tint = ammo ? ammo.lootImg.tintDark! : 0;
 
                     // Rotate if defined
@@ -953,7 +954,7 @@ export class EmoteBarn {
                         const distMinLength = 35;
 
                         const equippedWeapon = player.m_localData.m_weapons[player.m_localData.m_curWeapIdx];
-                        const weapDef = GameObjectDefs[equippedWeapon.type] as GunDef;
+                        const weapDef = GameObjectDefs.typeToDefSafe(equippedWeapon.type) as GunDef | undefined;
                         let ammoType = "";
                         if (weapDef && weapDef.ammo) {
                             ammoType = weapDef.ammo;

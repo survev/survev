@@ -1,8 +1,8 @@
-import { GameObjectDefs } from "../../../shared/defs/gameObjectDefs.ts";
 import type { GunDef } from "../../../shared/defs/gameObjects/gunDefs.ts";
 import type { MeleeDef } from "../../../shared/defs/gameObjects/meleeDefs.ts";
 import { PerkProperties } from "../../../shared/defs/gameObjects/perkDefs.ts";
 import { type ThrowableDef, ThrowableDefs } from "../../../shared/defs/gameObjects/throwableDefs.ts";
+import { GameObjectDefs } from "../../../shared/defs/register.ts";
 import { GameConfig, type InventoryItem, WeaponSlot } from "../../../shared/gameConfig.ts";
 import * as net from "../../../shared/net/net.ts";
 import { ObjectType } from "../../../shared/net/objectSerializeFns.ts";
@@ -101,7 +101,7 @@ export class WeaponManager {
         if (idx === this._curWeapIdx) return;
         if (this.weapons[idx].type === "") return;
 
-        const curWeaponDef = GameObjectDefs[this.activeWeapon] as
+        const curWeaponDef = GameObjectDefs.typeToDefSafe(this.activeWeapon) as
             | GunDef
             | MeleeDef
             | ThrowableDef;
@@ -134,7 +134,7 @@ export class WeaponManager {
 
         if (curWeapon.type && nextWeapon.type) {
             // ensure that player is still holding both weapons (didnt drop one)
-            const nextWeaponDef = GameObjectDefs[this.weapons[idx].type] as
+            const nextWeaponDef = GameObjectDefs.typeToDef(this.weapons[idx].type) as
                 | GunDef
                 | MeleeDef
                 | ThrowableDef;
@@ -218,15 +218,15 @@ export class WeaponManager {
     }
 
     setWeapon(idx: number, type: string, ammo: number) {
-        const weaponDef = GameObjectDefs[type];
+        const weaponDef = GameObjectDefs.typeToDefSafe(type);
         const isMelee = idx === WeaponSlot.Melee;
 
         // non melee weapons can be set to empty strings to clear the slot
         if (!isMelee && type !== "") {
             assert(
-                weaponDef.type === "gun"
-                    || weaponDef.type === "melee"
-                    || weaponDef.type === "throwable",
+                weaponDef!.type === "gun"
+                    || weaponDef!.type === "melee"
+                    || weaponDef!.type === "throwable",
             );
         }
 
@@ -237,7 +237,7 @@ export class WeaponManager {
         }
 
         const newPerk = weaponDef && "perk" in weaponDef ? weaponDef.perk : "";
-        const oldDef = GameObjectDefs[this.weapons[idx].type];
+        const oldDef = GameObjectDefs.typeToDefSafe(this.weapons[idx].type);
         const oldPerk = oldDef && "perk" in oldDef ? oldDef.perk : "";
 
         if (oldPerk && oldPerk !== newPerk) {
@@ -303,7 +303,7 @@ export class WeaponManager {
             this.tryReload();
         }
 
-        const itemDef = GameObjectDefs[this.activeWeapon];
+        const itemDef = GameObjectDefs.typeToDef(this.activeWeapon);
 
         switch (itemDef.type) {
             case "gun": {
@@ -345,7 +345,7 @@ export class WeaponManager {
     }
 
     gunUpdate(dt: number) {
-        const itemDef = GameObjectDefs[this.activeWeapon] as GunDef;
+        const itemDef = GameObjectDefs.typeToDef(this.activeWeapon, "gun");
         const player = this.player;
         const weapon = this.weapons[this.curWeapIdx];
 
@@ -389,7 +389,7 @@ export class WeaponManager {
     }
 
     meleeUpdate(dt: number) {
-        const itemDef = GameObjectDefs[this.activeWeapon] as MeleeDef;
+        const itemDef = GameObjectDefs.typeToDef(this.activeWeapon, "melee");
         const player = this.player;
         const attack = itemDef.attack;
         const weapon = this.weapons[this.curWeapIdx];
@@ -453,7 +453,7 @@ export class WeaponManager {
         ) {
             return;
         }
-        const weaponDef = GameObjectDefs[this.activeWeapon] as GunDef;
+        const weaponDef = GameObjectDefs.typeToDef(this.activeWeapon, "gun");
 
         if (
             this.player.actionType == GameConfig.Action.Revive
@@ -513,7 +513,7 @@ export class WeaponManager {
     reload(curWeapIdx = this.curWeapIdx, fullReload = false): void {
         if (!this.weapons[curWeapIdx].type) return; // prevent rare bug
         const weapon = this.weapons[curWeapIdx];
-        const weaponDef = GameObjectDefs[weapon.type] as GunDef;
+        const weaponDef = GameObjectDefs.typeToDef(weapon.type, "gun");
         const ammoStats = this.getAmmoStats(weaponDef);
         const activeWeaponAmmo = weapon.ammo;
 
@@ -562,7 +562,7 @@ export class WeaponManager {
     private _dropGun(weapIdx: number): void {
         const weap = this.weapons[weapIdx];
         if (!weap || !weap.type) return;
-        const weaponDef = GameObjectDefs[weap.type] as GunDef;
+        const weaponDef = GameObjectDefs.typeToDef(weap.type, "gun");
         if (!weaponDef) return;
         if (weaponDef.noDrop) return;
         const weaponAmmoType = weaponDef.ammo;
@@ -588,7 +588,7 @@ export class WeaponManager {
     }
 
     dropGun(weapIdx: number): void {
-        const def = GameObjectDefs[this.weapons[weapIdx].type] as GunDef | undefined;
+        const def = GameObjectDefs.typeToDefSafe(this.weapons[weapIdx].type) as GunDef | undefined;
         if (def?.noDrop) return;
 
         this._dropGun(weapIdx);
@@ -596,7 +596,7 @@ export class WeaponManager {
     }
 
     replaceGun(idx: number, type: string): void {
-        const oldDef = GameObjectDefs[this.weapons[idx].type] as GunDef | undefined;
+        const oldDef = GameObjectDefs.typeToDefSafe(this.weapons[idx].type) as GunDef | undefined;
         let ammo = 0;
 
         if (oldDef) {
@@ -623,7 +623,7 @@ export class WeaponManager {
      * @param weapIdx The slot index.
      */
     canDropFlare(weapIdx: number): boolean {
-        const def = GameObjectDefs[this.weapons[weapIdx].type] as GunDef;
+        const def = GameObjectDefs.typeToDefSafe(this.weapons[weapIdx].type) as GunDef;
         if (!def) return false;
 
         if (this.player.role !== "leader") return true;
@@ -637,7 +637,7 @@ export class WeaponManager {
     clampGunsAmmo() {
         for (let i = 0; i < this.weapons.length; i++) {
             const weap = this.weapons[i];
-            const def = GameObjectDefs[weap.type];
+            const def = GameObjectDefs.typeToDefSafe(weap.type);
             if (def?.type !== "gun") continue;
 
             const ammo = this.getAmmoStats(def);
@@ -679,7 +679,7 @@ export class WeaponManager {
     }
 
     fireWeapon(offHand: boolean, forceFire?: boolean) {
-        const itemDef = GameObjectDefs[this.activeWeapon] as GunDef;
+        const itemDef = GameObjectDefs.typeToDef(this.activeWeapon, "gun");
 
         const weapon = this.weapons[this.curWeapIdx];
         this.scheduledReload = weapon.ammo <= 1;
@@ -903,11 +903,7 @@ export class WeaponManager {
             // Shoot a projectile if defined
             let projectile: Projectile | undefined;
             if (itemDef.projType) {
-                const projDef = GameObjectDefs[itemDef.projType];
-                assert(
-                    projDef.type === "throwable",
-                    `Invalid projectile type: ${itemDef.projType}`,
-                );
+                const projDef = GameObjectDefs.typeToDef(itemDef.projType, "throwable");
 
                 const vel = v2.mul(shotDir, projDef.throwPhysics.speed);
                 projectile = this.player.game.projectileBarn.addProjectile(
@@ -981,7 +977,7 @@ export class WeaponManager {
     }
 
     getMeleeCollider() {
-        const meleeDef = GameObjectDefs[this.player.activeWeapon] as MeleeDef;
+        const meleeDef = GameObjectDefs.typeToDef(this.activeWeapon, "melee");
         const rot = Math.atan2(this.player.dir.y, this.player.dir.x);
 
         const pos = v2.add(
@@ -994,7 +990,7 @@ export class WeaponManager {
     }
 
     meleeDamage(): void {
-        const meleeDef = GameObjectDefs[this.activeWeapon] as MeleeDef;
+        const meleeDef = GameObjectDefs.typeToDef(this.activeWeapon, "melee");
 
         const coll = this.getMeleeCollider();
         const lineEnd = coll.rad + v2.length(v2.sub(this.player.pos, coll.pos));
@@ -1141,11 +1137,7 @@ export class WeaponManager {
         }
 
         this.player.cancelAction();
-        const itemDef = GameObjectDefs[this.activeWeapon];
-        assert(
-            itemDef.type === "throwable",
-            `Invalid projectile type: ${this.activeWeapon}`,
-        );
+        const itemDef = GameObjectDefs.typeToDef(this.activeWeapon, "throwable");
 
         this.cookTicker = 0;
 
@@ -1170,17 +1162,14 @@ export class WeaponManager {
         // used to manage inventory since snowball_heavy isnt stored in inventory, when it's thrown you decrement "snowball" from inv
 
         let throwableType = this.weapons[GameConfig.WeaponSlot.Throwable].type;
-        let throwableDef = GameObjectDefs[throwableType];
-
-        assert(throwableDef.type === "throwable");
+        let throwableDef = GameObjectDefs.typeToDef(throwableType, "throwable");
 
         if (throwableDef.heavyType && throwableDef.changeTime) {
             if (this.cookTicker >= throwableDef.changeTime) {
                 throwableType = throwableDef.heavyType;
-                throwableDef = GameObjectDefs[throwableType] as ThrowableDef;
+                throwableDef = GameObjectDefs.typeToDef(throwableType, "throwable");
             }
         }
-        assert(throwableDef.type === "throwable");
 
         const isAmped = this.player.hasPerk("amped_explosives");
 

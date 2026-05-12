@@ -1,8 +1,6 @@
 import * as PIXI from "pixi.js-legacy";
-import { GameObjectDefs } from "../../../shared/defs/gameObjectDefs.ts";
-import type { ThrowableDef } from "../../../shared/defs/gameObjects/throwableDefs.ts";
-import { MapObjectDefs } from "../../../shared/defs/mapObjectDefs.ts";
-import type { ObstacleDef } from "../../../shared/defs/mapObjectsTyping.ts";
+
+import { GameObjectDefs, MapObjectDefs } from "../../../shared/defs/register.ts";
 import { GameConfig } from "../../../shared/gameConfig.ts";
 import type { ObjectData, ObjectType } from "./../../../shared/net/objectSerializeFns.ts";
 import { collider } from "../../../shared/utils/collider.ts";
@@ -97,7 +95,7 @@ class Projectile implements AbstractObject {
     ) {
         // Copy data
         if (fullUpdate) {
-            const itemDef = GameObjectDefs[data.type] as ThrowableDef;
+            const itemDef = GameObjectDefs.typeToDef(data.type, "throwable");
             this.layer = data.layer;
             this.type = data.type;
             // Use a smaller visual radius for collision effects
@@ -115,7 +113,7 @@ class Projectile implements AbstractObject {
         this.dir = v2.copy(data.dir);
 
         if (isNew) {
-            const itemDef = GameObjectDefs[data.type] as ThrowableDef;
+            const itemDef = GameObjectDefs.typeToDef(data.type, "throwable");
             const imgDef = itemDef.worldImg;
             this.imgScale = imgDef.scale;
             this.rot = 0;
@@ -195,7 +193,7 @@ export class ProjectileBarn {
         for (let i = 0; i < projectiles.length; i++) {
             const p = projectiles[i];
             if (p.active) {
-                const itemDef = GameObjectDefs[p.type] as ThrowableDef;
+                const itemDef = GameObjectDefs.typeToDef(p.type, "throwable");
                 let rotDrag = p.rotDrag;
                 if (p.inWater) {
                     rotDrag *= 3;
@@ -247,7 +245,7 @@ export class ProjectileBarn {
                     && ((p.lastSoundObjId = wallCol.obj.__id), p.playHitSfx)
                 ) {
                     const dir = v2.mul(v2.normalizeSafe(vel, v2.create(1, 0)), -1);
-                    const mapDef = MapObjectDefs[wallCol.obj.type] as ObstacleDef;
+                    const mapDef = MapObjectDefs.typeToDef(wallCol.obj.type, "obstacle");
                     playHitFx(
                         mapDef.hitParticle,
                         mapDef.sound.bullet!,
@@ -291,7 +289,7 @@ export class ProjectileBarn {
                     if (groundCol.obj) {
                         if (p.lastSoundObjId != groundCol.obj.__id) {
                             p.lastSoundObjId = groundCol.obj.__id;
-                            const def = MapObjectDefs[groundCol.obj.type] as ObstacleDef;
+                            const def = MapObjectDefs.typeToDef(groundCol.obj.type, "obstacle");
                             sound.name = def.sound.bullet!;
                         }
                     } else {

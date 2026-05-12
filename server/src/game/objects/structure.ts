@@ -1,5 +1,4 @@
-import { MapObjectDefs } from "../../../../shared/defs/mapObjectDefs.ts";
-import type { StructureDef } from "../../../../shared/defs/mapObjectsTyping.ts";
+import { MapObjectDefs } from "../../../../shared/defs/register.ts";
 import { ObjectType } from "../../../../shared/net/objectSerializeFns.ts";
 import { type AABB, coldet } from "../../../../shared/utils/coldet.ts";
 import { collider } from "../../../../shared/utils/collider.ts";
@@ -52,7 +51,7 @@ export class Structure extends BaseGameObject {
             1,
         ) as AABB;
 
-        const def = MapObjectDefs[type] as StructureDef;
+        const def = MapObjectDefs.typeToDef(type, "structure");
 
         this.stairs = [];
         for (let i = 0; i < def.stairs.length; i++) {

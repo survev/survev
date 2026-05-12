@@ -2,9 +2,10 @@ import { and, eq, inArray } from "drizzle-orm";
 import { Hono } from "hono";
 import { z } from "zod";
 import { saveConfig } from "../../../../../config.ts";
-import { GameObjectDefs } from "../../../../../shared/defs/gameObjectDefs.ts";
+
 import { QuestDefs } from "../../../../../shared/defs/gameObjects/questDefs.ts";
 import { MapDefs } from "../../../../../shared/defs/mapDefs.ts";
+import { GameObjectDefs } from "../../../../../shared/defs/register.ts";
 import { TeamMode } from "../../../../../shared/gameConfig.ts";
 import { zGiveItemParams, zRemoveItemParams } from "../../../../../shared/types/moderation.ts";
 import { serverConfigPath } from "../../../config.ts";
@@ -225,7 +226,7 @@ export const PrivateRouter = new Hono<Context>()
         async (c) => {
             const { item, slug, source } = c.req.valid("json");
 
-            const def = GameObjectDefs[item];
+            const def = GameObjectDefs.typeToDefSafe(item);
 
             if (!def) {
                 return c.json({ message: "Invalid item type" }, 200);

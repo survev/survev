@@ -1,6 +1,5 @@
 import * as PIXI from "pixi.js-legacy";
-import { GameObjectDefs } from "../../shared/defs/gameObjectDefs.ts";
-import { RoleDefs } from "../../shared/defs/gameObjects/roleDefs.ts";
+
 import { GameConfig, Input, TeamMode, WeaponSlot } from "../../shared/gameConfig.ts";
 import * as net from "../../shared/net/net.ts";
 import { ObjectType } from "../../shared/net/objectSerializeFns.ts";
@@ -17,6 +16,7 @@ import { debugLines } from "./debug/debugLines.ts";
 import { Editor } from "./debug/editor.ts";
 /* STRIP_FROM_PROD_CLIENT:END */
 
+import { GameObjectDefs } from "../../shared/defs/register.ts";
 import { device } from "./device.ts";
 import { EmoteBarn } from "./emote.ts";
 import { errorLogManager } from "./errorLogs.ts";
@@ -1425,10 +1425,7 @@ export class Game {
             case net.MsgType.RoleAnnouncement: {
                 const msg = new net.RoleAnnouncementMsg();
                 msg.deserialize(stream);
-                const roleDef = RoleDefs[msg.role];
-                if (!roleDef) {
-                    break;
-                }
+                const roleDef = GameObjectDefs.typeToDef(msg.role, "role");
                 const playerInfo = this.m_playerBarn.getPlayerInfo(msg.playerId);
                 const nameText = helpers.htmlEscape(
                     this.m_playerBarn.getPlayerName(msg.playerId, this.m_activeId, true),
@@ -1580,7 +1577,7 @@ export class Game {
                         msg.item,
                         this.m_audioManager,
                     );
-                    const itemDef = GameObjectDefs[msg.item];
+                    const itemDef = GameObjectDefs.typeToDefSafe(msg.item);
                     if (itemDef && itemDef.type == "xp") {
                         this.m_ui2Manager.addRareLootMessage(msg.item, true);
                     }

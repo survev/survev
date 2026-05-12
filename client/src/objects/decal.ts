@@ -1,6 +1,7 @@
 import * as PIXI from "pixi.js-legacy";
-import { MapObjectDefs } from "../../../shared/defs/mapObjectDefs.ts";
+
 import type { DecalDef } from "../../../shared/defs/mapObjectsTyping.ts";
+import { MapObjectDefs } from "../../../shared/defs/register.ts";
 import type { ObjectData, ObjectType } from "../../../shared/net/objectSerializeFns.ts";
 import type { Collider } from "../../../shared/utils/coldet.ts";
 import { collider } from "../../../shared/utils/collider.ts";
@@ -59,7 +60,7 @@ class Decal implements AbstractObject {
         ctx: Ctx,
     ) {
         if (fullUpdate) {
-            const def = MapObjectDefs[data.type] as DecalDef;
+            const def = MapObjectDefs.typeToDef(data.type, "decal");
 
             // Copy data
             this.type = data.type;
@@ -90,7 +91,7 @@ class Decal implements AbstractObject {
 
     update(dt: number) {
         if (this.hasGore) {
-            const def = MapObjectDefs[this.type] as DecalDef;
+            const def = MapObjectDefs.typeToDef(this.type, "decal");
             let goreTarget = math.delerp(
                 this.goreKills,
                 def.gore?.fade.start!,
@@ -165,7 +166,7 @@ class DecalRender {
     }
 
     init(decal: Decal, map: Map) {
-        const def = MapObjectDefs[decal.type] as DecalDef;
+        const def = MapObjectDefs.typeToDef(decal.type, "decal");
 
         this.pos = v2.copy(decal.pos);
         this.rot = decal.rot;

@@ -1,6 +1,7 @@
 import * as PIXI from "pixi.js-legacy";
-import { GameObjectDefs } from "../../../shared/defs/gameObjectDefs.ts";
+
 import type { OutfitDef } from "../../../shared/defs/gameObjects/outfitDefs.ts";
+import { GameObjectDefs } from "../../../shared/defs/register.ts";
 import { type Action, type Anim, GameConfig } from "../../../shared/gameConfig.ts";
 import type { MapMsg } from "../../../shared/net/mapMsg.ts";
 import { type ObjectData, ObjectType } from "../../../shared/net/objectSerializeFns.ts";
@@ -429,7 +430,7 @@ export class LoadoutDisplay {
         const outfitDirty = this.loadout.outfit != this.outfitOld;
         this.outfitOld = this.loadout.outfit;
         if (hasFocus && outfitDirty) {
-            const itemDef = GameObjectDefs[this.loadout.outfit] as OutfitDef;
+            const itemDef = GameObjectDefs.typeToDefSafe(this.loadout.outfit) as OutfitDef;
             if (itemDef) {
                 this.audioManager.playSound(itemDef.sound.pickup, {
                     channel: "ui",

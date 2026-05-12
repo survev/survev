@@ -1,6 +1,7 @@
 import { type FolderApi, Pane, type TabPageApi } from "tweakpane";
 import { MapDefs } from "../../../shared/defs/mapDefs.ts";
-import { MapObjectDefs } from "../../../shared/defs/mapObjectDefs.ts";
+
+import { MapObjectDefs } from "../../../shared/defs/register.ts";
 import { math } from "../../../shared/utils/math.ts";
 import { v2 } from "../../../shared/utils/v2.ts";
 import {
@@ -166,8 +167,9 @@ export class EditorUi {
         }
 
         {
-            const avaliableObjects = Object.entries(MapObjectDefs)
-                .filter(([, def]) => {
+            const avaliableObjects = MapObjectDefs.getAllTypes()
+                .filter(([type]) => {
+                    const def = MapObjectDefs.typeToDef(type);
                     // we cant render loot spawner, also no point on spawning them individually
                     if (def.type === "loot_spawner") return false;
 
@@ -175,8 +177,7 @@ export class EditorUi {
                     if (def.type === "obstacle" && def.isWall) return false;
 
                     return true;
-                })
-                .map(([key]) => key);
+                });
 
             const bind = pane.addBinding(this.params, "object", {
                 label: "Type",
