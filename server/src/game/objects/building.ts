@@ -1,6 +1,5 @@
-import { MapObjectDefs } from "../../../../shared/defs/mapObjectDefs.ts";
-import type { BuildingDef, ObstacleDef, StructureDef } from "../../../../shared/defs/mapObjectsTyping.ts";
 import { Puzzles } from "../../../../shared/defs/puzzles.ts";
+import { MapObjectDefs } from "../../../../shared/defs/register.ts";
 import { DamageType } from "../../../../shared/gameConfig.ts";
 import { ObjectType } from "../../../../shared/net/objectSerializeFns.ts";
 import { type AABB, coldet, type Collider } from "../../../../shared/utils/coldet.ts";
@@ -89,6 +88,7 @@ export class Building extends BaseGameObject {
         } else if (parent?.__type === ObjectType.Structure) {
             this.parentStructure = parent;
         }
+
         if (
             this.parentBuilding
             && !this.parentStructure
@@ -97,7 +97,7 @@ export class Building extends BaseGameObject {
             this.parentStructure = this.parentBuilding.parentStructure;
         }
 
-        const def = MapObjectDefs[this.type] as BuildingDef;
+        const def = MapObjectDefs.typeToDef(this.type, "building");
 
         this.rot = math.oriToRad(ori);
 
@@ -191,7 +191,7 @@ export class Building extends BaseGameObject {
     }
 
     obstacleDestroyed(obstacle: Obstacle): void {
-        const def = MapObjectDefs[obstacle.type] as ObstacleDef;
+        const def = MapObjectDefs.typeToDef(obstacle.type, "obstacle");
 
         if (def.damageCeiling) {
             this.ceilingDamaged = true;
@@ -294,7 +294,7 @@ export class Building extends BaseGameObject {
 
         this.puzzleOrder.push(piece.puzzlePiece!);
 
-        const puzzleDef = (MapObjectDefs[this.type] as BuildingDef).puzzle!;
+        const puzzleDef = MapObjectDefs.typeToDef(this.type, "building").puzzle!;
 
         let puzzleName = puzzleDef.name;
         if (this.game.map.woodsMode && puzzleName === "bunker_eye_02") {
@@ -326,7 +326,7 @@ export class Building extends BaseGameObject {
             }
             this.puzzleSolved = true;
             if (this.parentStructure) {
-                const def = MapObjectDefs[this.parentStructure.type] as StructureDef;
+                const def = MapObjectDefs.typeToDef(this.parentStructure.type, "structure");
                 if (def.interiorSound?.puzzle === puzzleDef.name) {
                     this.parentStructure.interiorSoundAlt = true;
                     this.parentStructure.setDirty();

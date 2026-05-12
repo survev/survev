@@ -1,9 +1,11 @@
 import * as PIXI from "pixi.js-legacy";
-import { GameObjectDefs, type LootDef } from "../../../shared/defs/gameObjectDefs.ts";
+
+import type { LootDef } from "../../../shared/defs/gameObjectDefs.ts";
 import type { AmmoDef } from "../../../shared/defs/gameObjects/gearDefs.ts";
 import type { GunDef } from "../../../shared/defs/gameObjects/gunDefs.ts";
 import type { MeleeDef } from "../../../shared/defs/gameObjects/meleeDefs.ts";
 import type { XPDef } from "../../../shared/defs/gameObjects/xpDefs.ts";
+import { GameObjectDefs } from "../../../shared/defs/register.ts";
 import { GameConfig } from "../../../shared/gameConfig.ts";
 import type { ObjectData, ObjectType } from "../../../shared/net/objectSerializeFns.ts";
 import { math } from "../../../shared/utils/math.ts";
@@ -94,7 +96,7 @@ export class Loot implements AbstractObject {
         }
 
         if (isNew) {
-            const itemDef = GameObjectDefs[this.type] as LootDef;
+            const itemDef = GameObjectDefs.typeToDef(this.type) as LootDef;
             this.ticker = 0;
 
             // Don't play the pop-in effect if this is an old piece of loot
@@ -124,7 +126,7 @@ export class Loot implements AbstractObject {
             if (this.isPreloadedGun) {
                 this.container.texture = PIXI.Texture.from("loot-circle-outer-06.img");
             }
-            const ammo = GameObjectDefs[(itemDef as GunDef).ammo] as AmmoDef;
+            const ammo = GameObjectDefs.typeToDefSafe((itemDef as GunDef).ammo) as AmmoDef;
             if (ammo) {
                 this.container.tint = ammo.lootImg.tintDark!;
             } else if (itemDef.lootImg.borderTint) {
@@ -200,8 +202,8 @@ export class LootBarn {
                 if (loot.playDropSfx) {
                     map.lootDropSfxIds.push(loot.__id);
                     loot.playDropSfx = false;
-                    const itemDef = GameObjectDefs[loot.type];
-                    audioManager.playSound((itemDef as XPDef).sound?.drop, {
+                    const itemDef = GameObjectDefs.typeToDef(loot.type, "xp");
+                    audioManager.playSound(itemDef.sound?.drop, {
                         channel: "sfx",
                         soundPos: loot.pos,
                         layer: loot.layer,

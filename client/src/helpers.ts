@@ -1,8 +1,9 @@
 import $ from "jquery";
-import { GameObjectDefs } from "../../shared/defs/gameObjectDefs.ts";
+
 import type { MeleeDef } from "../../shared/defs/gameObjects/meleeDefs.ts";
 import type { OutfitDef } from "../../shared/defs/gameObjects/outfitDefs.ts";
 import { MapDefs } from "../../shared/defs/mapDefs.ts";
+import { GameObjectDefs } from "../../shared/defs/register.ts";
 import * as net from "../../shared/net/net.ts";
 import { device } from "./device.ts";
 
@@ -169,9 +170,10 @@ export const helpers = {
         return img && img.length > 4 ? `../img/emotes/${img.slice(0, -4)}.svg` : "";
     },
     getSvgFromGameType: function(gameType: string) {
-        const def = GameObjectDefs[gameType] as any;
-        const defType = def ? def.type : "";
-        switch (defType) {
+        const def = GameObjectDefs.typeToDefSafe(gameType);
+        if (!def) return "";
+
+        switch (def.type) {
             case "gun":
             case "melee":
             case "throwable":
@@ -212,7 +214,7 @@ export const helpers = {
         }
     },
     getCssTransformFromGameType: function(gameType: string) {
-        const def = GameObjectDefs[gameType] as MeleeDef;
+        const def = GameObjectDefs.typeToDefSafe(gameType) as MeleeDef;
         let transform = "";
         if (def?.lootImg) {
             transform = `rotate(${def.lootImg.rot || 0}rad) scaleX(${def.lootImg.mirror ? -1 : 1})`;

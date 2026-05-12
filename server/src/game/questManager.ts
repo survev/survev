@@ -1,7 +1,7 @@
-import { GameObjectDefs } from "../../../shared/defs/gameObjectDefs.ts";
 import { type QuestDef, QuestDefs } from "../../../shared/defs/gameObjects/questDefs.ts";
-import { MapObjectDefs } from "../../../shared/defs/mapObjectDefs.ts";
+
 import type { ObstacleDef } from "../../../shared/defs/mapObjectsTyping.ts";
+import { GameObjectDefs, MapObjectDefs } from "../../../shared/defs/register.ts";
 import { TeamModeToString } from "../../../shared/defs/types/misc.ts";
 import { MsgType, UpdatePassMsg } from "../../../shared/net/net.ts";
 import { assert } from "../../../shared/utils/util.ts";
@@ -149,7 +149,7 @@ export function questDelta<E extends keyof QuestEventPayloads>(
 
         case "damage": {
             const p = payload as QuestEventPayloads["damage"];
-            const weapDef = GameObjectDefs[p.weaponType];
+            const weapDef = GameObjectDefs.typeToDefSafe(p.weaponType);
             const ammo = weapDef?.type === "gun" ? weapDef.ammo : undefined;
 
             if (where?.ammo && ammo !== where.ammo) {
@@ -187,7 +187,7 @@ export function questDelta<E extends keyof QuestEventPayloads>(
 
         case "item_used": {
             const p = payload as QuestEventPayloads["item_used"];
-            const itemDef = GameObjectDefs[p.itemType];
+            const itemDef = GameObjectDefs.typeToDefSafe(p.itemType);
 
             if (where?.itemType && p.itemType !== where.itemType) {
                 return 0;
@@ -209,7 +209,7 @@ export function questDelta<E extends keyof QuestEventPayloads>(
                 return 0;
             }
 
-            const objectDef = MapObjectDefs[p.objectType] as ObstacleDef | undefined;
+            const objectDef = MapObjectDefs.typeToDefSafe(p.objectType) as ObstacleDef | undefined;
             if (objectDef?.obstacleType) {
                 value = objectDef.obstacleType === obstacleType ? 1 : 0;
                 break;

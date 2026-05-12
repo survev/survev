@@ -1,8 +1,9 @@
 import $ from "jquery";
-import { GameObjectDefs } from "../../../shared/defs/gameObjectDefs.ts";
+
 import type { EmoteDef } from "../../../shared/defs/gameObjects/emoteDefs.ts";
 import { PassDefs } from "../../../shared/defs/gameObjects/passDefs.ts";
 import { QuestDefs } from "../../../shared/defs/gameObjects/questDefs.ts";
+import { GameObjectDefs } from "../../../shared/defs/register.ts";
 import { math } from "../../../shared/utils/math.ts";
 import { passUtil } from "../../../shared/utils/passUtil.ts";
 import type { Account } from "../account.ts";
@@ -322,7 +323,7 @@ export class Pass {
     }
 
     setPassUnlockImage(item: string) {
-        const emoteDef = GameObjectDefs[item] as EmoteDef;
+        const emoteDef = GameObjectDefs.typeToDefSafe(item) as EmoteDef;
         const unlockImagePath = emoteDef
             ? helpers.getSvgFromGameType(item)
             : "img/emotes/surviv.svg";

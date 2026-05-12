@@ -1,7 +1,8 @@
 import { styleText } from "util";
 import { type MapDef, MapDefs } from "../../../shared/defs/mapDefs.ts";
-import { MapObjectDefs } from "../../../shared/defs/mapObjectDefs.ts";
+
 import type { BuildingDef, ObstacleDef, StructureDef } from "../../../shared/defs/mapObjectsTyping.ts";
+import { MapObjectDefs } from "../../../shared/defs/register.ts";
 import type { MapId } from "../../../shared/defs/types/misc.ts";
 import { GameConfig, TeamMode } from "../../../shared/gameConfig.ts";
 import * as net from "../../../shared/net/net.ts";
@@ -27,7 +28,7 @@ import { RiverCreator } from "./riverCreator.ts";
 // most of this logic is based on the `renderMapBuildingBounds` from client debugHelpers
 // which was found on BHA leak
 function getBuildingBounds(type: string, layer = 0, pos: Vec2, rot: number) {
-    const def = MapObjectDefs[type] as BuildingDef | StructureDef;
+    const def = MapObjectDefs.typeToDef(type) as BuildingDef | StructureDef;
 
     const bounds: Array<{ layer: number; collision: Collider }> = [];
 
@@ -68,10 +69,11 @@ function getBuildingBounds(type: string, layer = 0, pos: Vec2, rot: number) {
             if (typeof mt === "object") {
                 mt = util.weightedRandomObject(mt);
             }
+            if (!mt) continue;
 
-            const childDef = MapObjectDefs[mt];
+            const childDef = MapObjectDefs.typeToDef(mt);
             // only add child structures, not child buildings and obstacles
-            if (mt && childDef && childDef.type === "structure") {
+            if (childDef.type === "structure") {
                 const childRot = math.oriToRad(mapObj.ori);
                 const childPos = v2.add(pos, v2.rotate(mapObj.pos, childRot));
 
@@ -900,7 +902,7 @@ export class GameMap {
                     count = Math.random() < count.odds ? 1 : 0;
                 }
             }
-            const def = MapObjectDefs[type];
+            const def = MapObjectDefs.typeToDef(type);
 
             if (def.terrain?.bridge || mapGen.importantSpawns.includes(type)) {
                 objsToSpawn.stage1.push({
@@ -1058,7 +1060,7 @@ export class GameMap {
     }
 
     genDensitySpawn(type: string, density: number) {
-        const def = MapObjectDefs[type];
+        const def = MapObjectDefs.typeToDef(type);
 
         // for objects the spawn only on river shores
         // we need to do a density calculation for each river
@@ -1084,7 +1086,7 @@ export class GameMap {
 
     genFromMapDef(type: string, count: number): void {
         for (let i = 0; i < count; i++) {
-            const def = MapObjectDefs[type];
+            const def = MapObjectDefs.typeToDef(type);
 
             if (def.terrain?.waterEdge) {
                 this.genOnWaterEdge(type);
@@ -1115,16 +1117,12 @@ export class GameMap {
         ignoreMapSpawnReplacement?: boolean,
         hideFromMap?: boolean,
     ) {
-        const def = MapObjectDefs[type];
-
-        if (!def) {
-            this.game.logger.warn("Invalid map object:", type);
-            return;
-        }
+        let def = MapObjectDefs.typeToDef(type);
 
         const spawnReplacements = this.mapDef.mapGen.spawnReplacements[0];
         if (spawnReplacements[type] && !ignoreMapSpawnReplacement) {
             type = spawnReplacements[type];
+            def = MapObjectDefs.typeToDef(type);
         }
 
         this.clampToMapBounds(pos);
@@ -1206,7 +1204,7 @@ export class GameMap {
      * Checks if a map object can spawn at a given position, orientation and scale
      */
     canSpawn(type: string, pos: Vec2, ori: number, scale = 1): boolean {
-        const def = MapObjectDefs[type];
+        const def = MapObjectDefs.typeToDef(type);
 
         const rot = math.oriToRad(ori);
 
@@ -1402,7 +1400,7 @@ export class GameMap {
         let ori = 0;
         let scale = 1;
 
-        const def = MapObjectDefs[type];
+        const def = MapObjectDefs.typeToDef(type);
         if (def.type === "building" || def.type === "structure") {
             if ("oris" in def) {
                 ori = def.oris![util.randomInt(0, def.oris!.length - 1)];
@@ -1417,7 +1415,7 @@ export class GameMap {
     }
 
     genOnWaterEdge(type: string): void {
-        const def = MapObjectDefs[type] as BuildingDef | StructureDef;
+        const def = MapObjectDefs.typeToDef(type) as BuildingDef | StructureDef;
         // safety check + makes ts shut up about it being possibly undefined
         const waterEdge = def.terrain.waterEdge;
         if (!waterEdge) return;
@@ -1493,7 +1491,7 @@ export class GameMap {
 
     genOnGrass(type: string) {
         const bounds = collider.toAabb(mapHelpers.getBoundingCollider(type));
-        const def = MapObjectDefs[type];
+        const def = MapObjectDefs.typeToDef(type);
 
         const getSpawnAabb = (ori: number, scale: number) => {
             const rot = math.oriToRad(ori);
@@ -1690,7 +1688,7 @@ export class GameMap {
         }
         let { ori, scale } = this.getOriAndScale(type);
 
-        const def = MapObjectDefs[type];
+        const def = MapObjectDefs.typeToDef(type);
 
         let rivers = this.normalRivers;
         if (type === "bunker_structure_05") {
@@ -1760,7 +1758,7 @@ export class GameMap {
         this.trySpawn(type, () => {
             river = river ?? rivers[util.randomInt(0, rivers.length - 1)];
             const t = util.random(0, 1);
-            const def = MapObjectDefs[type];
+            const def = MapObjectDefs.typeToDef(type);
 
             let width = river.getWaterWidth(t);
             if (def.type === "obstacle") {
@@ -1825,7 +1823,7 @@ export class GameMap {
             v2.create(this.width - inset, this.height - inset),
         );
 
-        const def = MapObjectDefs[type] as BuildingDef;
+        const def = MapObjectDefs.typeToDef(type, "building");
 
         const bound = mapHelpers.getBoundingCollider(type) as AABB;
         const height = bound.max.y - bound.min.y / 2;
@@ -1901,7 +1899,7 @@ export class GameMap {
         puzzlePiece?: string,
         hideFromMap?: boolean,
     ): Obstacle {
-        const def = MapObjectDefs[type] as ObstacleDef;
+        const def = MapObjectDefs.typeToDef(type, "obstacle");
 
         scale = scale ?? util.random(def.scale.createMin, def.scale.createMax);
 
@@ -1931,7 +1929,7 @@ export class GameMap {
     }
 
     genOutfitObstacle(type: string, player: Player) {
-        const def = MapObjectDefs[type] as ObstacleDef;
+        const def = MapObjectDefs.typeToDef(type, "obstacle");
 
         const obstacle = new Obstacle(
             this.game,
@@ -1964,7 +1962,7 @@ export class GameMap {
         hideFromMap?: boolean,
         dontSpawnLoot?: boolean,
     ): Building {
-        const def = MapObjectDefs[type] as BuildingDef;
+        const def = MapObjectDefs.typeToDef(type, "building");
 
         if (ori === undefined) {
             ori = this.getOriAndScale(type).ori;
@@ -1999,7 +1997,7 @@ export class GameMap {
             }
             if (!partType) continue;
 
-            if (dontSpawnLoot && MapObjectDefs[partType].type == "loot_spawner") continue;
+            if (dontSpawnLoot && MapObjectDefs.typeToDef(partType).type == "loot_spawner") continue;
 
             let partOri: number;
             if (mapObject.inheritOri === false) partOri = mapObject.ori;
@@ -2046,7 +2044,7 @@ export class GameMap {
         ori?: number,
         parentId?: number,
     ): Structure {
-        const def = MapObjectDefs[type] as StructureDef;
+        const def = MapObjectDefs.typeToDef(type, "structure");
 
         ori = ori ?? def.ori ?? util.randomInt(0, 3);
 
@@ -2072,7 +2070,7 @@ export class GameMap {
     }
 
     addBounds(mapObj: Obstacle | Building | Structure, hasParent: boolean) {
-        const def = MapObjectDefs[mapObj.type] as
+        const def = MapObjectDefs.typeToDef(mapObj.type) as
             | BuildingDef
             | ObstacleDef
             | StructureDef;

@@ -1,5 +1,4 @@
-import { GameObjectDefs } from "../../../../shared/defs/gameObjectDefs.ts";
-import type { ThrowableDef } from "../../../../shared/defs/gameObjects/throwableDefs.ts";
+import { GameObjectDefs } from "../../../../shared/defs/register.ts";
 import { DamageType, GameConfig } from "../../../../shared/gameConfig.ts";
 import { ObjectType } from "../../../../shared/net/objectSerializeFns.ts";
 import { type AABB, coldet } from "../../../../shared/utils/coldet.ts";
@@ -72,7 +71,7 @@ export class ProjectileBarn {
         weaponSourceType?: string,
     ) {
         for (let i = 0; i < count; i++) {
-            const def = GameObjectDefs[type] as ThrowableDef;
+            const def = GameObjectDefs.typeToDef(type, "throwable");
 
             const vel = util.randomPointInCircle(maxVel);
             const velocity = v2.add(v2.mul(initialVel, 0.6), vel);
@@ -160,7 +159,7 @@ export class Projectile extends BaseGameObject {
         this.throwDir = throwDir ?? v2.copy(this.dir);
         this.weaponSourceType = weaponSourceType || this.type;
 
-        const def = GameObjectDefs[type] as ThrowableDef;
+        const def = GameObjectDefs.typeToDef(type, "throwable");
         this.velZ = def.throwPhysics.velZ;
         this.rad = def.rad * 0.5;
         this.bounds = collider.createAabbExtents(
@@ -215,7 +214,7 @@ export class Projectile extends BaseGameObject {
             this.updateStrobe(dt);
         }
 
-        const def = GameObjectDefs[this.type] as ThrowableDef;
+        const def = GameObjectDefs.typeToDef(this.type, "throwable");
         //
         // Velocity
         //
@@ -408,7 +407,7 @@ export class Projectile extends BaseGameObject {
     explode() {
         if (this.dead) return;
         this.dead = true;
-        const def = GameObjectDefs[this.type] as ThrowableDef;
+        const def = GameObjectDefs.typeToDef(this.type, "throwable");
 
         if (def.splitType && def.numSplit) {
             this.game.projectileBarn.addSplitProjectiles(

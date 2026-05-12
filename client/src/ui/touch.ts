@@ -1,9 +1,10 @@
 import $ from "jquery";
 import * as PIXI from "pixi.js-legacy";
-import { GameObjectDefs } from "../../../shared/defs/gameObjectDefs.ts";
+
 import { BulletDefs } from "../../../shared/defs/gameObjects/bulletDefs.ts";
 import type { GunDef } from "../../../shared/defs/gameObjects/gunDefs.ts";
 import type { ThrowableDef } from "../../../shared/defs/gameObjects/throwableDefs.ts";
+import { GameObjectDefs } from "../../../shared/defs/register.ts";
 import { GameConfig } from "../../../shared/gameConfig.ts";
 import { collider } from "../../../shared/utils/collider.ts";
 import { math } from "../../../shared/utils/math.ts";
@@ -590,7 +591,7 @@ class LineSprites {
 
         if (visible) {
             const curWeap = activePlayer.m_netData.m_activeWeapon;
-            const curWeapDef = GameObjectDefs[curWeap] as GunDef | ThrowableDef;
+            const curWeapDef = GameObjectDefs.typeToDef(curWeap) as GunDef | ThrowableDef;
 
             // Determine max range of the aim line
             let maxRange = 30;

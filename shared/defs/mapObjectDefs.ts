@@ -9979,7 +9979,7 @@ const MaterialDefs = {
     },
 };
 
-export const MapObjectDefs: Record<string, MapObjectDef> = {
+export const RawMapObjectDefs: Record<string, MapObjectDef> = {
     barrel_01: createBarrel({}),
     barrel_01b: createBarrel({
         img: { tint: 0xc9c9c9 },

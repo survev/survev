@@ -1,7 +1,8 @@
 import * as PIXI from "pixi.js-legacy";
 import { type MapDef, MapDefs } from "../../shared/defs/mapDefs.ts";
-import { MapObjectDefs } from "../../shared/defs/mapObjectDefs.ts";
+
 import type { BuildingDef, ObstacleDef } from "../../shared/defs/mapObjectsTyping.ts";
+import { MapObjectDefs } from "../../shared/defs/register.ts";
 import { GameConfig } from "../../shared/gameConfig.ts";
 import type { GroundPatch, MapMsg } from "../../shared/net/mapMsg.ts";
 import { type Circle, coldet, type Collider } from "../../shared/utils/coldet.ts";
@@ -459,7 +460,7 @@ export class Map {
     }
 
     getMinimapRender(obj: (typeof this.mapData.objects)[number]) {
-        const def = MapObjectDefs[obj.type] as ObstacleDef | BuildingDef;
+        const def = MapObjectDefs.typeToDef(obj.type) as ObstacleDef | BuildingDef;
         const zIdx = def.type == "building" ? 750 + (def.zIdx || 0) : def.img.zIdx || 0;
         let shapes: Array<{
             scale?: number;

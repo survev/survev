@@ -1,6 +1,7 @@
 import * as PIXI from "pixi.js-legacy";
-import { MapObjectDefs } from "../../../shared/defs/mapObjectDefs.ts";
+
 import type { BuildingDef } from "../../../shared/defs/mapObjectsTyping.ts";
+import { MapObjectDefs } from "../../../shared/defs/register.ts";
 import type { FloorImage } from "../../../shared/defs/types/building.ts";
 import type { ObjectData, ObjectType } from "../../../shared/net/objectSerializeFns.ts";
 import type { Collider } from "../../../shared/utils/coldet.ts";
@@ -187,7 +188,7 @@ export class Building implements AbstractObject {
             this.puzzleErrSeq = data.puzzleErrSeq;
         }
 
-        const def = MapObjectDefs[this.type] as BuildingDef;
+        const def = MapObjectDefs.typeToDef(this.type, "building");
 
         if (isNew) {
             this.isNew = true;
@@ -382,7 +383,7 @@ export class Building implements AbstractObject {
     ) {
         // Puzzle effects
         if (this.hasPuzzle) {
-            const def = MapObjectDefs[this.type] as BuildingDef;
+            const def = MapObjectDefs.typeToDef(this.type, "building");
             // Play puzzle error effects
             if (
                 this.puzzleErrSeqModified
@@ -439,7 +440,7 @@ export class Building implements AbstractObject {
 
         // Create residue if the ceiling has been destroyed
         if (this.ceilingDead && !this.residue) {
-            const def = MapObjectDefs[this.type] as BuildingDef;
+            const def = MapObjectDefs.typeToDef(this.type, "building");
             if (def.ceiling.destroy?.residue && def.ceiling.destroy.residue !== "none") {
                 const r = this.allocSprite();
                 r.texture = PIXI.Texture.from(def.ceiling.destroy.residue);
@@ -615,7 +616,7 @@ export class Building implements AbstractObject {
     }
 
     destroyCeilingFx(particleBarn: ParticleBarn, audioManager: AudioManager) {
-        const def = (MapObjectDefs[this.type] as BuildingDef).ceiling.destroy!;
+        const def = MapObjectDefs.typeToDef(this.type, "building").ceiling.destroy!;
 
         // Spawn particles at random points inside the first surface collision
         const surface = this.surfaces[0];

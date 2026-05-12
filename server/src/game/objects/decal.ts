@@ -1,5 +1,4 @@
-import { MapObjectDefs } from "../../../../shared/defs/mapObjectDefs.ts";
-import type { DecalDef } from "../../../../shared/defs/mapObjectsTyping.ts";
+import { MapObjectDefs } from "../../../../shared/defs/register.ts";
 import { ObjectType } from "../../../../shared/net/objectSerializeFns.ts";
 import type { AABB, Circle } from "../../../../shared/utils/coldet.ts";
 import { collider } from "../../../../shared/utils/collider.ts";
@@ -65,7 +64,7 @@ export class Decal extends BaseGameObject {
         this.ori = ori ?? 0;
         this.rot = math.oriToRad(this.ori);
 
-        const def = MapObjectDefs[type] as DecalDef;
+        const def = MapObjectDefs.typeToDef(type, "decal");
 
         this.collider = collider.transform(
             def.collision,

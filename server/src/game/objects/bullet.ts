@@ -1,8 +1,5 @@
-import { GameObjectDefs } from "../../../../shared/defs/gameObjectDefs.ts";
-import { type BulletDef, BulletDefs } from "../../../../shared/defs/gameObjects/bulletDefs.ts";
 import { PerkProperties } from "../../../../shared/defs/gameObjects/perkDefs.ts";
-import { MapObjectDefs } from "../../../../shared/defs/mapObjectDefs.ts";
-import type { ObstacleDef } from "../../../../shared/defs/mapObjectsTyping.ts";
+import { GameObjectDefs, MapObjectDefs } from "../../../../shared/defs/register.ts";
 import { type DamageType, GameConfig } from "../../../../shared/gameConfig.ts";
 import { Constants } from "../../../../shared/net/net.ts";
 import { ObjectType } from "../../../../shared/net/objectSerializeFns.ts";
@@ -116,7 +113,7 @@ export class BulletBarn {
 
         this.newBullets.push(bullet);
 
-        const bulletDef = GameObjectDefs[params.bulletType] as BulletDef;
+        const bulletDef = GameObjectDefs.typeToDef(params.bulletType, "bullet");
         if (bulletDef.addFlare) {
             this.game.planeBarn.addAirdrop(params.pos);
         }
@@ -166,6 +163,8 @@ export class Bullet {
     damageSelf!: boolean;
     damage!: number;
     damageMult!: number;
+    obstacleDamageMult!: number;
+    falloff!: number;
     hasModifier!: boolean;
     speedMult!: number;
     distanceMult!: number;
@@ -187,7 +186,7 @@ export class Bullet {
         this.sentToClient = false;
         // this.serialized = false; // TODO: cache bullet serialization?
 
-        const bulletDef = GameObjectDefs[params.bulletType] as BulletDef;
+        const bulletDef = GameObjectDefs.typeToDef(params.bulletType, "bullet");
 
         const variance = 1 + (params.varianceT ?? 1) * bulletDef.variance;
 
@@ -266,6 +265,8 @@ export class Bullet {
         this.damage = bulletDef.damage * this.damageMult;
         this.skipCollision = !!bulletDef.skipCollision;
         this.isShrapnel = bulletDef.shrapnel;
+        this.falloff = bulletDef.falloff;
+        this.obstacleDamageMult = bulletDef.obstacleDamage;
 
         this.damageSelf = this.reflectCount > 0 || this.isShrapnel;
         this.hasSpecialFx = this.shotAlt
@@ -375,7 +376,7 @@ export class Bullet {
         }
 
         if (!this.alive && !this.reflected && this.onHitFx) {
-            const def = GameObjectDefs[this.bulletType] as BulletDef;
+            const def = GameObjectDefs.typeToDef(this.bulletType, "bullet");
             // explosion_rounds_sg has lower volume and is used for shotguns
             // since they spawn a bunch of explosions at once
             if (this.onHitFx === "explosion_rounds" && def.useExplosiveRoundsAlt) {
@@ -573,9 +574,8 @@ export class Bullet {
         finalDamage *= 1 / (this.reflectCount + 1);
 
         if (GameConfig.bullet.falloff) {
-            const def = BulletDefs[this.bulletType];
             const distT = math.clamp(this.distanceTraveled / this.distance, 0, 1);
-            const falloff = math.remap(distT, 0, 1, 1, def.falloff);
+            const falloff = math.remap(distT, 0, 1, 1, this.falloff);
             finalDamage *= falloff;
         }
 
@@ -583,11 +583,10 @@ export class Bullet {
             const col = collisions[i];
 
             if (col.type == "obstacle") {
-                const mapDef = MapObjectDefs[col.obstacleType!] as ObstacleDef;
+                const mapDef = MapObjectDefs.typeToDef(col.obstacleType!, "obstacle");
 
-                const def = GameObjectDefs[this.bulletType] as BulletDef;
                 // AP Obstacle Multiplier Buff
-                let obstacleMult = def.obstacleDamage;
+                let obstacleMult = this.obstacleDamageMult;
                 if (this.apRounds) {
                     obstacleMult *= PerkProperties.ap_rounds.obstacleMult;
                 }

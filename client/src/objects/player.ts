@@ -1,20 +1,13 @@
 import * as PIXI from "pixi.js-legacy";
-import { GameObjectDefs, type LootDef } from "../../../shared/defs/gameObjectDefs.ts";
-import type { ExplosionDef } from "../../../shared/defs/gameObjects/explosionsDefs.ts";
-import type {
-    BackpackDef,
-    BoostDef,
-    ChestDef,
-    HealDef,
-    HelmetDef,
-} from "./../../../shared/defs/gameObjects/gearDefs.ts";
+
+import type { LootDef } from "../../../shared/defs/gameObjectDefs.ts";
+import type { BoostDef, HealDef } from "./../../../shared/defs/gameObjects/gearDefs.ts";
 import type { GunDef } from "../../../shared/defs/gameObjects/gunDefs.ts";
 import type { MeleeDef } from "../../../shared/defs/gameObjects/meleeDefs.ts";
-import type { OutfitDef } from "../../../shared/defs/gameObjects/outfitDefs.ts";
-import type { RoleDef } from "../../../shared/defs/gameObjects/roleDefs.ts";
 import type { ThrowableDef } from "../../../shared/defs/gameObjects/throwableDefs.ts";
-import { MapObjectDefs } from "../../../shared/defs/mapObjectDefs.ts";
+
 import type { ObstacleDef } from "../../../shared/defs/mapObjectsTyping.ts";
+import { GameObjectDefs, MapObjectDefs } from "../../../shared/defs/register.ts";
 import { Action, Anim, GameConfig, HasteType, Input, type WeaponSlot } from "../../../shared/gameConfig.ts";
 import type { ObjectData, ObjectType } from "../../../shared/net/objectSerializeFns.ts";
 import {
@@ -120,7 +113,7 @@ class Gun {
     }
 
     setType(type: string, t: number) {
-        const gunDef = GameObjectDefs[type] as GunDef;
+        const gunDef = GameObjectDefs.typeToDef(type, "gun");
         const imgDef = gunDef.worldImg;
         this.gunBarrel.texture = PIXI.Texture.from(imgDef.sprite);
         this.gunBarrel.anchor.set(0.5, 1);
@@ -667,24 +660,24 @@ export class Player implements AbstractObject {
 
     m_getHelmetLevel() {
         if (this.m_netData.m_helmet) {
-            return (GameObjectDefs[this.m_netData.m_helmet] as HelmetDef).level;
+            return GameObjectDefs.typeToDef(this.m_netData.m_helmet, "helmet").level;
         }
         return 0;
     }
 
     m_getChestLevel() {
         if (this.m_netData.m_chest) {
-            return (GameObjectDefs[this.m_netData.m_chest] as ChestDef).level;
+            return GameObjectDefs.typeToDef(this.m_netData.m_chest, "chest").level;
         }
         return 0;
     }
 
     m_getBagLevel() {
-        return (GameObjectDefs[this.m_netData.m_backpack] as BackpackDef).level;
+        return GameObjectDefs.typeToDef(this.m_netData.m_backpack, "backpack").level;
     }
 
     m_equippedWeaponType() {
-        return GameObjectDefs[this.m_netData.m_activeWeapon].type;
+        return GameObjectDefs.typeToDef(this.m_netData.m_activeWeapon).type;
     }
 
     m_hasWeaponInSlot(slot: WeaponSlot) {
@@ -692,7 +685,7 @@ export class Player implements AbstractObject {
     }
 
     getMeleeCollider() {
-        const meleeDef = GameObjectDefs[this.m_netData.m_activeWeapon] as MeleeDef;
+        const meleeDef = GameObjectDefs.typeToDef(this.m_netData.m_activeWeapon, "melee");
         const ang = Math.atan2(this.m_dir.y, this.m_dir.x);
         const off = v2.add(
             meleeDef.attack.offset,
@@ -712,7 +705,7 @@ export class Player implements AbstractObject {
 
     m_getPanSegment() {
         const panSurface = this.m_netData.m_wearingPan ? "unequipped" : "equipped";
-        let surface = (GameObjectDefs.pan as MeleeDef).reflectSurface![panSurface];
+        let surface = GameObjectDefs.typeToDef("pan", "melee").reflectSurface![panSurface];
 
         const scale = this.m_netData.m_scale;
 
@@ -818,7 +811,7 @@ export class Player implements AbstractObject {
         displayingStats: boolean,
         isSpectating: boolean,
     ) {
-        const curWeapDef = GameObjectDefs[this.m_netData.m_activeWeapon];
+        const curWeapDef = GameObjectDefs.typeToDef(this.m_netData.m_activeWeapon);
         const isActivePlayer = this.__id == activeId;
         const activePlayer = playerBarn.getPlayerById(activeId)!;
         this.m_posOld = v2.copy(this.m_pos);
@@ -936,7 +929,7 @@ export class Player implements AbstractObject {
             && this.lastInsideObstacleTime < 0
             && !this.isNew
         ) {
-            const obstacleDef = MapObjectDefs[this.insideObstacleType] as ObstacleDef;
+            const obstacleDef = MapObjectDefs.typeToDef(this.insideObstacleType, "obstacle");
             this.lastInsideObstacleTime = 0.2;
             audioManager.playSound(obstacleDef?.sound.enter!, {
                 channel: "sfx",
@@ -977,7 +970,7 @@ export class Player implements AbstractObject {
         if (this.isNearDoorError && !wasNearDoorError && this.doorErrorTicker <= 0) {
             this.doorErrorTicker = 0.5;
 
-            const doorDef = MapObjectDefs[doorErrorObstacle!.type] as ObstacleDef;
+            const doorDef = MapObjectDefs.typeToDef(doorErrorObstacle!.type, "obstacle");
             const doorSfx = doorDef.door?.sound.error!;
             audioManager.playSound(doorSfx, {
                 channel: "sfx",
@@ -1068,7 +1061,7 @@ export class Player implements AbstractObject {
         ) {
             const lastWeapIdx = this.lastSwapIdx;
             this.lastSwapIdx = this.m_localData.m_curWeapIdx;
-            const itemDef = GameObjectDefs[this.m_netData.m_activeWeapon] as
+            const itemDef = GameObjectDefs.typeToDef(this.m_netData.m_activeWeapon) as
                 | GunDef
                 | MeleeDef
                 | ThrowableDef;
@@ -1097,9 +1090,9 @@ export class Player implements AbstractObject {
                     && (this.lastSwapIdx == 0 || this.lastSwapIdx == 1)
                     && this.fireDelay > 0
                 ) {
-                    const lastWeapDef = GameObjectDefs[
-                        this.m_localData.m_weapons[lastWeapIdx].type
-                    ] as GunDef;
+                    const lastWeapDef = GameObjectDefs.typeToDefSafe(
+                        this.m_localData.m_weapons[lastWeapIdx].type,
+                    ) as GunDef | undefined;
                     if (
                         itemDef
                         && lastWeapDef
@@ -1216,7 +1209,7 @@ export class Player implements AbstractObject {
         }
 
         const adrenalineEmitterType = (
-            GameObjectDefs[playerInfo.loadout.boost] as BoostDef
+            GameObjectDefs.typeToDef(playerInfo.loadout.boost, "boost_effect")
         ).emitter;
         if (
             this.m_netData.m_adrenalineEffect
@@ -1243,7 +1236,7 @@ export class Player implements AbstractObject {
         if (isActivePlayer && !isSpectating) {
             const curWeapIdx = this.m_localData.m_curWeapIdx;
             const curWeap = this.m_localData.m_weapons[curWeapIdx];
-            const itemDef = GameObjectDefs[curWeap.type] as GunDef;
+            const itemDef = GameObjectDefs.typeToDef(curWeap.type) as GunDef;
 
             // Play dry fire sound when empty
             if (
@@ -1367,7 +1360,7 @@ export class Player implements AbstractObject {
         if (IS_DEV && debug.players) {
             debugLines.addCircle(this.m_pos, this.m_rad, 0xff0000, 0);
 
-            const weapDef = GameObjectDefs[this.m_netData.m_activeWeapon];
+            const weapDef = GameObjectDefs.typeToDef(this.m_netData.m_activeWeapon);
             const renderGun = (offHand: boolean) => {
                 if (weapDef.type !== "gun") return;
 
@@ -1489,7 +1482,7 @@ export class Player implements AbstractObject {
     }
 
     updateVisuals(playerBarn: PlayerBarn, map: Map) {
-        const outfitDef = GameObjectDefs[this.m_netData.m_outfit] as OutfitDef;
+        const outfitDef = GameObjectDefs.typeToDef(this.m_netData.m_outfit, "outfit");
         const outfitImg = outfitDef.skinImg;
         const bodyScale = this.m_bodyRad / GameConfig.player.radius;
 
@@ -1505,7 +1498,7 @@ export class Player implements AbstractObject {
             && this.updateFrozenImage
             && this.m_netData.m_frozenType
         ) {
-            const frozenDef = GameObjectDefs[this.m_netData.m_frozenType] as ExplosionDef;
+            const frozenDef = GameObjectDefs.typeToDef(this.m_netData.m_frozenType, "explosion");
             const frozenSprites = frozenDef.frozenSprites || [];
             if (frozenSprites.length > 0) {
                 const sprite = frozenSprites[Math.floor(Math.random() * frozenSprites.length)];
@@ -1594,7 +1587,7 @@ export class Player implements AbstractObject {
         if (this.m_netData.m_chest == "" || outfitDef.ghillie) {
             this.chestSprite.visible = false;
         } else {
-            const chestDef = GameObjectDefs[this.m_netData.m_chest] as ChestDef;
+            const chestDef = GameObjectDefs.typeToDef(this.m_netData.m_chest, "chest");
             const chestSkin = chestDef.skinImg;
             this.chestSprite.texture = PIXI.Texture.from(chestSkin.baseSprite);
             this.chestSprite.scale.set(0.25, 0.25);
@@ -1617,7 +1610,7 @@ export class Player implements AbstractObject {
         if (this.m_netData.m_helmet == "" || outfitDef.ghillie) {
             this.helmetSprite.visible = false;
         } else {
-            const helmetDef = GameObjectDefs[this.m_netData.m_helmet] as HelmetDef;
+            const helmetDef = GameObjectDefs.typeToDef(this.m_netData.m_helmet, "helmet");
             const helmetSkin = helmetDef.skinImg;
             const helmetOffset = (this.downed ? 1 : -1) * 3.33;
             this.helmetSprite.texture = PIXI.Texture.from(helmetSkin.baseSprite);
@@ -1662,7 +1655,7 @@ export class Player implements AbstractObject {
 
         // Hip
         if (this.m_netData.m_wearingPan) {
-            const imgDef = (GameObjectDefs.pan as MeleeDef).hipImg!;
+            const imgDef = GameObjectDefs.typeToDef("pan", "melee").hipImg!;
             this.hipSprite.texture = PIXI.Texture.from(imgDef.sprite);
             this.hipSprite.position.set(imgDef.pos.x, imgDef.pos.y);
             this.hipSprite.scale.set(imgDef.scale.x, imgDef.scale.y);
@@ -1673,7 +1666,7 @@ export class Player implements AbstractObject {
             this.hipSprite.visible = false;
         }
 
-        const R = GameObjectDefs[this.m_netData.m_activeWeapon] as
+        const R = GameObjectDefs.typeToDef(this.m_netData.m_activeWeapon) as
             | GunDef
             | MeleeDef
             | ThrowableDef;
@@ -1796,7 +1789,7 @@ export class Player implements AbstractObject {
             this.auraPulseDir = 1;
             this.auraCircle.visible = false;
         } else {
-            const actionItemDef = GameObjectDefs[this.m_action.item] as
+            const actionItemDef = GameObjectDefs.typeToDefSafe(this.m_action.item) as
                 | HealDef
                 | BoostDef;
             // Assume if there's no item defined, it's a revive circle
@@ -1818,11 +1811,11 @@ export class Player implements AbstractObject {
         // Class visors
         if (
             this.m_netData.m_role != ""
-            && (GameObjectDefs[this.m_netData.m_role] as RoleDef)?.visorImg
+            && GameObjectDefs.typeToDef(this.m_netData.m_role, "role").visorImg
             && this.m_netData.m_helmet != ""
             && !outfitDef.ghillie
         ) {
-            const roleDef = GameObjectDefs[this.m_netData.m_role] as RoleDef;
+            const roleDef = GameObjectDefs.typeToDef(this.m_netData.m_role, "role");
             const visorSkin = roleDef.visorImg!;
             if (visorSkin) {
                 const helmetOffset = (this.downed ? 1 : -1) * 3.33;
@@ -1888,7 +1881,7 @@ export class Player implements AbstractObject {
         e(this.handRContainer, this.bones[Bones.HandR]);
         e(this.footLContainer, this.bones[Bones.FootL]);
         e(this.footRContainer, this.bones[Bones.FootR]);
-        const t = GameObjectDefs[this.m_netData.m_activeWeapon] as GunDef;
+        const t = GameObjectDefs.typeToDef(this.m_netData.m_activeWeapon) as GunDef;
         if (!this.downed && this.currentAnim() != Anim.Revive && t.type == "gun") {
             if (t.worldImg.leftHandOffset) {
                 this.handLContainer.position.x += t.worldImg.leftHandOffset.x;
@@ -1931,7 +1924,7 @@ export class Player implements AbstractObject {
             case Action.Reload:
             case Action.ReloadAlt:
                 {
-                    const actionItemDef = GameObjectDefs[this.m_action.item] as GunDef;
+                    const actionItemDef = GameObjectDefs.typeToDef(this.m_action.item, "gun");
                     if (actionItemDef) {
                         actionSound = {
                             sound: this.m_action.type == Action.ReloadAlt
@@ -1943,7 +1936,7 @@ export class Player implements AbstractObject {
                 }
                 break;
             case Action.UseItem: {
-                const actionItemDef = GameObjectDefs[this.m_action.item] as
+                const actionItemDef = GameObjectDefs.typeToDef(this.m_action.item) as
                     | HealDef
                     | BoostDef;
                 if (actionItemDef) {
@@ -1972,7 +1965,7 @@ export class Player implements AbstractObject {
             this.m_action.type == Action.Reload
             || this.m_action.type == Action.ReloadAlt
         ) {
-            const actionItemDef = GameObjectDefs[this.m_action.item] as GunDef;
+            const actionItemDef = GameObjectDefs.typeToDef(this.m_action.item, "gun");
             if (actionItemDef && actionItemDef.caseTiming == "reload") {
                 for (let n = 0; n < actionItemDef.maxReload; n++) {
                     const shellDir = n % 2 == 0 ? -1 : 1;
@@ -2013,12 +2006,12 @@ export class Player implements AbstractObject {
 
         switch (this.m_action.type) {
             case Action.UseItem: {
-                const actionItemDef = GameObjectDefs[this.m_action.item];
+                const actionItemDef = GameObjectDefs.typeToDef(this.m_action.item);
                 const loadout = playerInfo.loadout;
                 if (actionItemDef.type == "heal") {
-                    emitterType = (GameObjectDefs[loadout.heal] as HealDef).emitter;
+                    emitterType = GameObjectDefs.typeToDef(loadout.heal, "heal_effect").emitter;
                 } else if (actionItemDef.type == "boost") {
-                    emitterType = (GameObjectDefs[loadout.boost] as BoostDef).emitter;
+                    emitterType = GameObjectDefs.typeToDef(loadout.boost, "boost_effect").emitter;
                 }
                 if (this.m_hasPerk("aoe_heal")) {
                     emitterProps.scale = 1.5;
@@ -2079,7 +2072,7 @@ export class Player implements AbstractObject {
     }
 
     playItemPickupSound(item: string, audioManager: AudioManager) {
-        const itemDef = GameObjectDefs[item] as LootDef;
+        const itemDef = GameObjectDefs.typeToDefSafe(item) as LootDef;
         if (itemDef) {
             audioManager.playSound(itemDef.sound?.pickup, {
                 channel: "ui",
@@ -2091,7 +2084,7 @@ export class Player implements AbstractObject {
     }
 
     selectIdlePose() {
-        const curWeapDef = GameObjectDefs[this.m_netData.m_activeWeapon] as
+        const curWeapDef = GameObjectDefs.typeToDefSafe(this.m_netData.m_activeWeapon) as
             | GunDef
             | MeleeDef
             | ThrowableDef;
@@ -2143,7 +2136,7 @@ export class Player implements AbstractObject {
             case Anim.CrawlBackward:
                 return t("crawl_backward", true);
             case Anim.Melee: {
-                const r = GameObjectDefs[this.m_netData.m_activeWeapon] as MeleeDef;
+                const r = GameObjectDefs.typeToDefSafe(this.m_netData.m_activeWeapon) as MeleeDef;
                 if (!r.anim?.attackAnims) {
                     return t("fists", true);
                 }
@@ -2240,7 +2233,7 @@ export class Player implements AbstractObject {
     }
 
     animPlaySound(animCtx: Partial<AnimCtx>, args: { sound: string }) {
-        const itemDef = GameObjectDefs[this.m_netData.m_activeWeapon] as MeleeDef;
+        const itemDef = GameObjectDefs.typeToDef(this.m_netData.m_activeWeapon) as MeleeDef;
         const sound = itemDef.sound[args.sound];
         if (sound) {
             animCtx.audioManager?.playSound(sound, {
@@ -2259,7 +2252,7 @@ export class Player implements AbstractObject {
 
     animThrowableParticles(animCtx: Partial<AnimCtx>, _args: unknown) {
         if (
-            (GameObjectDefs[this.m_netData.m_activeWeapon] as ThrowableDef)
+            GameObjectDefs.typeToDef(this.m_netData.m_activeWeapon, "throwable")
                 .useThrowParticles
         ) {
             // Pin
@@ -2295,7 +2288,7 @@ export class Player implements AbstractObject {
     }
 
     animMeleeCollision(animCtx: Partial<AnimCtx>, args: { playerHit?: string }) {
-        const meleeDef = GameObjectDefs[this.m_netData.m_activeWeapon] as MeleeDef;
+        const meleeDef = GameObjectDefs.typeToDef(this.m_netData.m_activeWeapon, "melee");
         if (meleeDef && meleeDef.type == "melee") {
             const meleeCol = this.getMeleeCollider();
             const meleeDist = meleeCol.rad + v2.length(v2.sub(this.m_pos, meleeCol.pos));
@@ -2340,7 +2333,7 @@ export class Player implements AbstractObject {
                         }
                     }
                     if (res) {
-                        const def = MapObjectDefs[obstacle.type] as ObstacleDef;
+                        const def = MapObjectDefs.typeToDef(obstacle.type, "obstacle") as ObstacleDef;
                         const closestPt = v2.add(
                             meleeCol.pos,
                             v2.mul(v2.neg(res.dir), meleeCol.rad - res.pen),

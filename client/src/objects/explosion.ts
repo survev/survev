@@ -1,5 +1,4 @@
-import { GameObjectDefs } from "../../../shared/defs/gameObjectDefs.ts";
-import { type ExplosionDef, ExplosionDefs } from "../../../shared/defs/gameObjects/explosionsDefs.ts";
+import { GameObjectDefs } from "../../../shared/defs/register.ts";
 import { collider } from "../../../shared/utils/collider.ts";
 import { math } from "../../../shared/utils/math.ts";
 import { util } from "../../../shared/utils/util.ts";
@@ -124,7 +123,7 @@ class Explosion {
     }
 
     init(type: string, pos: Vec2, layer: number) {
-        const expType = ExplosionDefs[type].explosionEffectType;
+        const expType = GameObjectDefs.typeToDef(type, "explosion").explosionEffectType;
         const def = ExplosionEffectDefs[expType];
         this.active = true;
         this.done = false;
@@ -149,7 +148,7 @@ class Explosion {
         map: Map,
         camera: Camera,
     ) {
-        const expType = ExplosionDefs[this.type].explosionEffectType;
+        const expType = GameObjectDefs.typeToDef(this.type, "explosion").explosionEffectType;
         const def = ExplosionEffectDefs[expType];
 
         if (this.ticker == 0) {
@@ -315,7 +314,7 @@ export class ExplosionBarn {
                 }
 
                 if (IS_DEV && debug.explosions) {
-                    const def = GameObjectDefs[e.type] as ExplosionDef;
+                    const def = GameObjectDefs.typeToDef(e.type, "explosion");
                     debugLines.addCircle(e.pos, def.rad.min, 0xff0000, 0);
                     debugLines.addCircle(e.pos, def.rad.max, 0xff9900, 0);
                 }

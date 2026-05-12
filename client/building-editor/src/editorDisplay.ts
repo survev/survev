@@ -1,11 +1,11 @@
 import * as PIXI from "pixi.js-legacy";
-import { MapObjectDefs } from "../../../shared/defs/mapObjectDefs.ts";
-import type { BuildingDef, StructureDef } from "../../../shared/defs/mapObjectsTyping.ts";
+
+import { MapObjectDefs } from "../../../shared/defs/register.ts";
 import { MapMsg } from "../../../shared/net/mapMsg.ts";
 import { type ObjectData, ObjectType } from "../../../shared/net/objectSerializeFns.ts";
 import type { LocalDataWithDirty } from "./../../../shared/net/updateMsg.ts";
 import { math } from "../../../shared/utils/math.ts";
-import { assert, util } from "../../../shared/utils/util.ts";
+import { util } from "../../../shared/utils/util.ts";
 import { v2, type Vec2 } from "../../../shared/utils/v2.ts";
 import type { Ambiance } from "../../src/ambiance.ts";
 import type { AudioManager } from "../../src/audioManager.ts";
@@ -254,9 +254,7 @@ export class EditorDisplay {
     }
 
     addStructure(type: string, pos: Vec2, ori: number) {
-        assert(MapObjectDefs[type]?.type === "structure");
-
-        const def = MapObjectDefs[type] as StructureDef;
+        const def = MapObjectDefs.typeToDef(type, "structure");
 
         const data: ObjectData<ObjectType.Structure> = {
             type,
@@ -287,8 +285,6 @@ export class EditorDisplay {
     }
 
     addBuilding(type: string, pos: Vec2, ori: number, layer: number) {
-        assert(MapObjectDefs[type]?.type === "building");
-
         const data: ObjectData<ObjectType.Building> = {
             type,
             pos,
@@ -307,7 +303,7 @@ export class EditorDisplay {
             data,
             this.getCtx(),
         );
-        const def = MapObjectDefs[type] as BuildingDef;
+        const def = MapObjectDefs.typeToDef(type, "building");
 
         for (const child of def.mapObjects) {
             let partType = child.type;
@@ -360,7 +356,7 @@ export class EditorDisplay {
         parentId?: number,
         puzzlePiece?: boolean,
     ) {
-        assert(MapObjectDefs[type]?.type === "obstacle");
+        MapObjectDefs.typeToDef(type, "obstacle");
 
         const data: ObjectData<ObjectType.Obstacle> = {
             type,
@@ -398,7 +394,7 @@ export class EditorDisplay {
     }
 
     addDecal(type: string, pos: Vec2, ori: number, scale: number, layer: number) {
-        assert(MapObjectDefs[type]?.type === "decal");
+        MapObjectDefs.typeToDef(type, "decal");
 
         const data: ObjectData<ObjectType.Decal> = {
             type,
@@ -427,11 +423,12 @@ export class EditorDisplay {
         puzzlePiece?: boolean,
         ignoreMapSpawnReplacement?: boolean,
     ) {
-        const def = MapObjectDefs[type];
+        let def = MapObjectDefs.typeToDef(type);
 
         const spawnReplacements = this.map.getMapDef().mapGen.spawnReplacements[0];
         if (spawnReplacements[type] && !ignoreMapSpawnReplacement) {
             type = spawnReplacements[type];
+            def = MapObjectDefs.typeToDef(type);
         }
 
         switch (def.type) {

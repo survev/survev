@@ -1,5 +1,4 @@
-import { GameObjectDefs } from "../../../shared/defs/gameObjectDefs.ts";
-import type { GunDef } from "../../../shared/defs/gameObjects/gunDefs.ts";
+import { GameObjectDefs } from "../../../shared/defs/register.ts";
 import { GameConfig } from "../../../shared/gameConfig.ts";
 import type { Bullet } from "../../../shared/net/updateMsg.ts";
 import { v2, type Vec2 } from "../../../shared/utils/v2.ts";
@@ -34,7 +33,7 @@ export function createCasingParticle(
     zOrd: number,
     particleBarn: ParticleBarn,
 ) {
-    const weapDef = GameObjectDefs[weapType] as GunDef;
+    const weapDef = GameObjectDefs.typeToDef(weapType, "gun");
     if (weapDef) {
         let shellDir = v2.rotate(dir, casingAngle);
         if (weapDef.particle.shellForward) {
@@ -81,7 +80,7 @@ export class ShotBarn {
         }
 
         const weaponType = bullet.shotSourceType;
-        const weaponDef = GameObjectDefs[weaponType] as GunDef;
+        const weaponDef = GameObjectDefs.typeToDef(weaponType, "gun");
 
         shot.active = true;
         shot.pos = v2.copy(bullet.pos);
@@ -109,7 +108,7 @@ export class ShotBarn {
         for (let i = 0; i < this.shots.length; i++) {
             const shot = this.shots[i];
             if (shot.active) {
-                const weaponDef = GameObjectDefs[shot.weaponType] as GunDef;
+                const weaponDef = GameObjectDefs.typeToDef(shot.weaponType, "gun");
 
                 // New shot
                 if (shot.ticker == 0) {

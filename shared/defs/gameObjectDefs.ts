@@ -91,7 +91,7 @@ export const WeaponTypeToDefs = {
     throwable: ThrowableDefs,
 } as const;
 
-export const GameObjectDefs: Record<string, GameObjectDef> = {};
+export const RawGameObjectDefs: Record<string, GameObjectDef> = {};
 
 // Merge all item defs in together into one object
 for (let i = 0; i < ObjectDefsList.length; i++) {
@@ -99,9 +99,9 @@ for (let i = 0; i < ObjectDefsList.length; i++) {
     const objectTypes = Object.keys(gameObjectDefs);
     for (let j = 0; j < objectTypes.length; j++) {
         const objectType = objectTypes[j];
-        if (GameObjectDefs[objectType] !== undefined) {
+        if (RawGameObjectDefs[objectType] !== undefined) {
             throw new Error(`GameObject ${objectType} is already defined`);
         }
-        GameObjectDefs[objectType] = gameObjectDefs[objectType];
+        RawGameObjectDefs[objectType] = gameObjectDefs[objectType];
     }
 }

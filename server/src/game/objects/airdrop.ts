@@ -1,5 +1,4 @@
-import { MapObjectDefs } from "../../../../shared/defs/mapObjectDefs.ts";
-import type { ObstacleDef } from "../../../../shared/defs/mapObjectsTyping.ts";
+import { MapObjectDefs } from "../../../../shared/defs/register.ts";
 import { GameConfig } from "../../../../shared/gameConfig.ts";
 import { ObjectType } from "../../../../shared/net/objectSerializeFns.ts";
 import { coldet, type Collider } from "../../../../shared/utils/coldet.ts";
@@ -62,7 +61,7 @@ export class Airdrop extends BaseGameObject {
     constructor(game: Game, pos: Vec2, obstacleType: string) {
         super(game, pos);
         this.obstacleType = obstacleType;
-        const def = MapObjectDefs[this.obstacleType] as ObstacleDef;
+        const def = MapObjectDefs.typeToDef(this.obstacleType, "obstacle");
         this.crateCollision = collider.transform(def.collision, this.pos, 0, 1);
     }
 

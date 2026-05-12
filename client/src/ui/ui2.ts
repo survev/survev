@@ -1,4 +1,4 @@
-import { GameObjectDefs, type LootDef } from "../../../shared/defs/gameObjectDefs.ts";
+import type { LootDef } from "../../../shared/defs/gameObjectDefs.ts";
 import {
     type AmmoDef,
     type BoostDef,
@@ -10,8 +10,9 @@ import {
 import type { GunDef } from "../../../shared/defs/gameObjects/gunDefs.ts";
 import type { MeleeDef } from "../../../shared/defs/gameObjects/meleeDefs.ts";
 import type { RoleDef } from "../../../shared/defs/gameObjects/roleDefs.ts";
-import { MapObjectDefs } from "../../../shared/defs/mapObjectDefs.ts";
+
 import type { ObstacleDef } from "../../../shared/defs/mapObjectsTyping.ts";
+import { GameObjectDefs, MapObjectDefs } from "../../../shared/defs/register.ts";
 import { Action, DamageType, GameConfig, Input, type InventoryItem } from "../../../shared/gameConfig.ts";
 import { PickupMsgType } from "../../../shared/net/net.ts";
 import { collider } from "../../../shared/utils/collider.ts";
@@ -97,11 +98,11 @@ function diff(a: any, b: any, all: boolean): any {
 }
 
 function m() {
-    const e = Object.keys(GameObjectDefs);
+    const e = GameObjectDefs.getAllTypes();
     const t = [];
     for (let r = 0; r < e.length; r++) {
         const a = e[r];
-        const i = GameObjectDefs[a] as AmmoDef | HealDef | BoostDef;
+        const i = GameObjectDefs.typeToDef(a) as AmmoDef | HealDef | BoostDef;
         if (
             !(i as AmmoDef).hideUi
             && (i.type == "heal" || i.type == "boost" || i.type == "ammo")
@@ -474,7 +475,7 @@ export class UiManager2 {
         }
         for (let i = 0; i < this.dom.loot.length; i++) {
             const loot = this.dom.loot[i];
-            const def = GameObjectDefs[loot.lootType];
+            const def = GameObjectDefs.typeToDef(loot.lootType);
             if (def.type == "heal" || def.type == "boost") {
                 addItemAction("use", "loot", loot.lootType, loot.div);
             }
@@ -729,7 +730,7 @@ export class UiManager2 {
             if (loot && !activePlayer.m_netData.m_downed) {
                 // Ignore if it's a gun and we have full guns w/ fists out...
                 // unless we're on a small screen
-                const itemDef = GameObjectDefs[loot.type] as LootDef;
+                const itemDef = GameObjectDefs.typeToDef(loot.type) as LootDef;
 
                 const X = activePlayer.m_hasWeaponInSlot(GameConfig.WeaponSlot.Primary);
                 const K = activePlayer.m_hasWeaponInSlot(GameConfig.WeaponSlot.Secondary);
@@ -868,7 +869,7 @@ export class UiManager2 {
             ne.bindStr = ue ? ue.toString() : "";
         }
         const ge = state.weapons[activePlayer.m_localData.m_curWeapIdx];
-        const weaponDef = GameObjectDefs[ge.type] as GunDef | MeleeDef;
+        const weaponDef = GameObjectDefs.typeToDef(ge.type) as GunDef | MeleeDef;
         const we = ge.ammo;
         const fe = weaponDef.type == "gun"
             ? weaponDef.ammoInfinite
@@ -994,7 +995,7 @@ export class UiManager2 {
         // Rare loot message
         if (patch.rareLootMessage.lootType) {
             const lootType = state.rareLootMessage.lootType;
-            const lootDef = GameObjectDefs[lootType] as LootDef;
+            const lootDef = GameObjectDefs.typeToDefSafe(lootType) as LootDef;
             if (lootDef && lootDef.type == "xp") {
                 const lootDesc = this.localization.translate("game-xp-drop-desc");
                 dom.rareLootMessage.desc.innerHTML = `+${lootDef.xp} ${lootDesc}`;
@@ -1160,7 +1161,7 @@ export class UiManager2 {
             if (B.type) {
                 let q = "";
                 let F = "";
-                const j = GameObjectDefs[L.type];
+                const j = GameObjectDefs.typeToDefSafe(L.type);
                 if (j) {
                     q = this.localization.translate(`game-hud-${L.type}`)
                         || this.localization.translate(`game-${L.type}`);
@@ -1247,7 +1248,7 @@ export class UiManager2 {
                 if (Z.count || Z.maximum) {
                     Y.count.innerHTML = String(J.count);
                     Y.div.style.opacity = String(
-                        (GameObjectDefs[Y.lootType] as AmmoDef).special && J.count == 0
+                        (GameObjectDefs.typeToDef(Y.lootType) as AmmoDef).special && J.count == 0
                             ? 0
                             : J.count > 0
                             ? 1
@@ -1274,7 +1275,7 @@ export class UiManager2 {
             const ae = state.gear[ee];
             if (te.item) {
                 // GearDef?
-                const ie = ae.item ? (GameObjectDefs[ae.item] as ChestDef) : null;
+                const ie = ae.item ? (GameObjectDefs.typeToDef(ae.item) as ChestDef) : null;
                 const oe = ie ? ie.level : 0;
                 re.div.style.display = ie ? "block" : "none";
                 re.level.innerHTML = this.localization.translate(`game-level-${oe}`);
@@ -1287,7 +1288,7 @@ export class UiManager2 {
             if (te.width) {
                 const se = 1 + ae.width * 0.33;
                 let ne = `scale(${se}, ${se})`;
-                const le = GameObjectDefs[ae.item] as MeleeDef;
+                const le = GameObjectDefs.typeToDefSafe(ae.item) as MeleeDef;
                 if (le?.lootImg.rot !== undefined) {
                     ne += ` rotate(${le.lootImg.rot}rad)`;
                 }
@@ -1373,7 +1374,7 @@ export class UiManager2 {
     }
 
     getRareLootMessageText(perk: string) {
-        if (GameObjectDefs[perk]) {
+        if (GameObjectDefs.typeExists(perk)) {
             return `Acquired perk: ${this.localization.translate(`game-${perk}`)}`;
         }
         return "";
@@ -1434,7 +1435,7 @@ export class UiManager2 {
                 return `${targetName} ${killTxt}`;
             }
             case DamageType.Airdrop: {
-                const mapObj = MapObjectDefs[sourceType] as ObstacleDef;
+                const mapObj = MapObjectDefs.typeToDefSafe(sourceType) as ObstacleDef;
                 const killName = this.localization.translate("game-the-air-drop");
                 const killTxt = downed
                     ? this.localization.translate("game-knocked-out")
@@ -1484,7 +1485,7 @@ export class UiManager2 {
     }
 
     getRoleKillFeedColor(role: string, teamId: number, playerBarn: PlayerBarn) {
-        const roleDef = GameObjectDefs[role] as RoleDef;
+        const roleDef = GameObjectDefs.typeToDefSafe(role) as RoleDef | undefined;
         if (roleDef?.killFeed?.color) {
             return roleDef.killFeed.color;
         }

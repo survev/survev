@@ -1,6 +1,6 @@
 import * as PIXI from "pixi.js-legacy";
-import { MapObjectDefs } from "../../../shared/defs/mapObjectDefs.ts";
-import type { ObstacleDef } from "../../../shared/defs/mapObjectsTyping.ts";
+
+import { MapObjectDefs } from "../../../shared/defs/register.ts";
 import type { ObjectData, ObjectType } from "../../../shared/net/objectSerializeFns.ts";
 import type { Collider } from "../../../shared/utils/coldet.ts";
 import { collider } from "../../../shared/utils/collider.ts";
@@ -148,7 +148,7 @@ export class Obstacle implements AbstractObject {
                 this.skinPlayerId = data.skinPlayerId!;
             }
         }
-        const def = MapObjectDefs[this.type] as ObstacleDef;
+        const def = MapObjectDefs.typeToDef(this.type, "obstacle");
 
         if (!v2.eq(data.pos, this.visualPosOld)) {
             this.visualPosOld = v2.copy(isNew ? data.pos : this.pos);
@@ -335,7 +335,7 @@ export class Obstacle implements AbstractObject {
         if (this.isButton) {
             const button = this.button;
             if (button.seq != button.seqOld) {
-                const def = MapObjectDefs[this.type] as ObstacleDef;
+                const def = MapObjectDefs.typeToDef(this.type, "obstacle");
                 if (def.button?.useParticle) {
                     const aabb = collider.toAabb(this.collider);
                     const extent = v2.mul(v2.sub(aabb.max, aabb.min), 0.5);
@@ -389,7 +389,7 @@ export class Obstacle implements AbstractObject {
 
             // Door begin state change sound
             if (door.seq != door.seqOld) {
-                const def = MapObjectDefs[this.type] as ObstacleDef;
+                const def = MapObjectDefs.typeToDef(this.type, "obstacle");
                 const sound = def.door?.sound.change || "";
                 if (sound != "") {
                     audioManager.playSound(sound, {
@@ -404,7 +404,7 @@ export class Obstacle implements AbstractObject {
 
             // Open/close sounds
             if (door.open != door.wasOpen) {
-                const C = MapObjectDefs[this.type] as ObstacleDef;
+                const C = MapObjectDefs.typeToDef(this.type, "obstacle");
                 const A = door.open ? C.door?.sound.open! : C.door?.sound.close!;
                 audioManager.playSound(A, {
                     channel: "sfx",
@@ -424,7 +424,7 @@ export class Obstacle implements AbstractObject {
             }
 
             if (!this.isNew) {
-                const def = MapObjectDefs[this.type] as ObstacleDef;
+                const def = MapObjectDefs.typeToDef(this.type, "obstacle");
 
                 // Destroy effect
                 const aabb = collider.toAabb(this.collider);
@@ -526,7 +526,7 @@ export class Obstacle implements AbstractObject {
         }
 
         if (IS_DEV && debug.obstacles && util.sameLayer(layer, this.layer)) {
-            const def = MapObjectDefs[this.type] as ObstacleDef;
+            const def = MapObjectDefs.typeToDef(this.type, "obstacle");
 
             const color = def.collidable ? 0xff0000 : 0xffff00;
             debugLines.addCollider(this.collider, color, 0.1);

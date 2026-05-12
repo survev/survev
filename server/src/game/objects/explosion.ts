@@ -1,11 +1,10 @@
-import { GameObjectDefs } from "../../../../shared/defs/gameObjectDefs.ts";
-import type { ExplosionDef } from "../../../../shared/defs/gameObjects/explosionsDefs.ts";
 import { PerkProperties } from "../../../../shared/defs/gameObjects/perkDefs.ts";
+import { GameObjectDefs } from "../../../../shared/defs/register.ts";
 import { ObjectType } from "../../../../shared/net/objectSerializeFns.ts";
 import { coldet } from "../../../../shared/utils/coldet.ts";
 import { collider } from "../../../../shared/utils/collider.ts";
 import { math } from "../../../../shared/utils/math.ts";
-import { assert, util } from "../../../../shared/utils/util.ts";
+import { util } from "../../../../shared/utils/util.ts";
 import { v2, type Vec2 } from "../../../../shared/utils/v2.ts";
 import type { Game } from "../game.ts";
 import type { DamageParams, GameObject } from "./gameObject.ts";
@@ -34,7 +33,7 @@ export class ExplosionBarn {
     }
 
     explode(explosion: Explosion) {
-        const def = GameObjectDefs[explosion.type] as ExplosionDef;
+        const def = GameObjectDefs.typeToDef(explosion.type, "explosion");
 
         if (def.decalType) {
             this.game.decalBarn.addDecal(
@@ -158,7 +157,7 @@ export class ExplosionBarn {
 
         const shrapnelCount = Math.ceil((def.shrapnelCount ?? 0) * shrapnelCountMult);
 
-        const bulletDef = GameObjectDefs[def.shrapnelType];
+        const bulletDef = GameObjectDefs.typeToDefSafe(def.shrapnelType);
         if (bulletDef && bulletDef.type === "bullet") {
             for (let i = 0, count = shrapnelCount; i < count; i++) {
                 this.game.bulletBarn.fireBullet({
@@ -183,7 +182,7 @@ export class ExplosionBarn {
     damageObject(explosion: Explosion, collision: LineCollision) {
         const dist = collision.distance;
         const obj = collision.obj;
-        const def = GameObjectDefs[explosion.type] as ExplosionDef;
+        const def = GameObjectDefs.typeToDef(explosion.type, "explosion");
 
         if (
             obj.__type !== ObjectType.Player
@@ -266,8 +265,7 @@ export class ExplosionBarn {
         layer: number,
         damageParams: Omit<DamageParams, "damage" | "dir">,
     ) {
-        const def = GameObjectDefs[type];
-        assert(def.type === "explosion", `Invalid explosion with type ${type}`);
+        const def = GameObjectDefs.typeToDef(type, "explosion");
 
         const explosion: Explosion = {
             rad: def.rad.max,

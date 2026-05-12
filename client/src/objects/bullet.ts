@@ -1,9 +1,6 @@
 import * as PIXI from "pixi.js-legacy";
-import { GameObjectDefs } from "../../../shared/defs/gameObjectDefs.ts";
-import { BulletDefs } from "../../../shared/defs/gameObjects/bulletDefs.ts";
-import type { MeleeDef } from "../../../shared/defs/gameObjects/meleeDefs.ts";
-import { MapObjectDefs } from "../../../shared/defs/mapObjectDefs.ts";
-import type { ObstacleDef } from "../../../shared/defs/mapObjectsTyping.ts";
+
+import { GameObjectDefs, MapObjectDefs } from "../../../shared/defs/register.ts";
 import { GameConfig } from "../../../shared/gameConfig.ts";
 import type { Bullet } from "../../../shared/net/updateMsg.ts";
 import { coldet } from "../../../shared/utils/coldet.ts";
@@ -26,7 +23,7 @@ export function createBullet(
     playerBarn: PlayerBarn,
     renderer: Renderer,
 ) {
-    if (BulletDefs[bullet.bulletType].addFlare) {
+    if (GameObjectDefs.typeToDef(bullet.bulletType, "bullet").addFlare) {
         flareBarn.addFlare(bullet, playerBarn);
     } else {
         bulletBarn.addBullet(bullet, playerBarn, renderer);
@@ -124,7 +121,7 @@ export class BulletBarn {
             this.bullets.push(b);
         }
 
-        const bulletDef = BulletDefs[bullet.bulletType];
+        const bulletDef = GameObjectDefs.typeToDef(bullet.bulletType, "bullet");
 
         const variance = 1 + bullet.varianceT * bulletDef.variance;
         const distAdj = math.remap(bullet.distAdjIdx, 0, 16, -1, 1);
@@ -410,7 +407,7 @@ export class BulletBarn {
                 for (let i = 0; i < colObjs.length; i++) {
                     const col = colObjs[i];
                     if (col.type == "obstacle") {
-                        const mapDef = MapObjectDefs[col.obstacleType!] as ObstacleDef;
+                        const mapDef = MapObjectDefs.typeToDef(col.obstacleType!, "obstacle");
                         playHitFx(
                             mapDef.hitParticle,
                             mapDef.sound.bullet!,
@@ -460,7 +457,7 @@ export class BulletBarn {
                     } else if (col.type == "pan") {
                         playHitFx(
                             "barrelChip",
-                            (GameObjectDefs.pan as MeleeDef).sound.bullet!,
+                            GameObjectDefs.typeToDef("pan", "melee").sound.bullet!,
                             col.point,
                             col.normal,
                             col.layer!,

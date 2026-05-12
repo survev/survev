@@ -1,6 +1,6 @@
-import { GameObjectDefs } from "../../../shared/defs/gameObjectDefs.ts";
-import { SCOPE_LEVELS, type ScopeDef } from "../../../shared/defs/gameObjects/gearDefs.ts";
+import { SCOPE_LEVELS } from "../../../shared/defs/gameObjects/gearDefs.ts";
 import { PerkProperties } from "../../../shared/defs/gameObjects/perkDefs.ts";
+import { GameObjectDefs } from "../../../shared/defs/register.ts";
 import { GameConfig, type InventoryItem } from "../../../shared/gameConfig.ts";
 import { math } from "../../../shared/utils/math.ts";
 import type { Player } from "./objects/player.ts";
@@ -181,7 +181,7 @@ export class InventoryManager {
      * Runs only when an item drops to 0
      */
     private _onItemRemoved(item: InventoryItem) {
-        const def = GameObjectDefs[item];
+        const def = GameObjectDefs.typeToDef(item);
 
         switch (def.type) {
             case "scope": {
@@ -210,12 +210,12 @@ export class InventoryManager {
      * Runs only when an item was 0 and now is not
      */
     private _onItemAdded(item: InventoryItem) {
-        const def = GameObjectDefs[item];
+        const def = GameObjectDefs.typeToDef(item);
 
         switch (def.type) {
             case "scope": {
                 // switch to scope if its higher than the equipped one
-                const currentScope = GameObjectDefs[this.player.scope] as ScopeDef;
+                const currentScope = GameObjectDefs.typeToDef(this.player.scope, "scope");
                 if (def.level > currentScope.level) {
                     this.player.scope = item;
                 }
@@ -237,7 +237,7 @@ export class InventoryManager {
             }
             case "ammo": {
                 // automatically reloads gun if inventory has 0 ammo and ammo is picked up
-                const weaponInfo = GameObjectDefs[this.player.activeWeapon];
+                const weaponInfo = GameObjectDefs.typeToDef(this.player.activeWeapon);
                 if (
                     weaponInfo.type === "gun"
                     && this.player.weapons[this.player.curWeapIdx].ammo <= 0

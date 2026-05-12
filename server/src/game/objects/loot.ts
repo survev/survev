@@ -1,5 +1,6 @@
-import { GameObjectDefs, type LootDef } from "../../../../shared/defs/gameObjectDefs.ts";
+import { type LootDef } from "../../../../shared/defs/gameObjectDefs.ts";
 import type { MapDef } from "../../../../shared/defs/mapDefs.ts";
+import { GameObjectDefs } from "../../../../shared/defs/register.ts";
 import { GameConfig } from "../../../../shared/gameConfig.ts";
 import { ObjectType } from "../../../../shared/net/objectSerializeFns.ts";
 import { type AABB, type Circle, coldet, type Collider } from "../../../../shared/utils/coldet.ts";
@@ -102,9 +103,9 @@ export class LootBarn {
             source,
             ownerId,
         } = options;
-        const def = GameObjectDefs[type];
+        const def = GameObjectDefs.typeToDef(type);
 
-        if (!def || !("lootImg" in def)) {
+        if (!("lootImg" in def)) {
             this.game.logger.warn("Invalid loot type:", type);
             return;
         }
@@ -132,7 +133,7 @@ export class LootBarn {
             loot.isPreloadedGun = true;
         }
 
-        if (def.type === "gun" && GameObjectDefs[def.ammo] && !loot.isPreloadedGun) {
+        if (def.type === "gun" && GameObjectDefs.typeExists(def.ammo) && !loot.isPreloadedGun) {
             const ammoCount = useCountForAmmo ? count : def.ammoSpawnCount;
             if (ammoCount <= 0) return;
             const halfAmmo = Math.ceil(ammoCount / 2);
@@ -276,7 +277,7 @@ export class Loot extends BaseGameObject {
     ) {
         super(game, pos);
 
-        const def = GameObjectDefs[type] as LootDef;
+        const def = GameObjectDefs.typeToDef(type) as LootDef;
         assert("lootImg" in def, `Invalid loot type ${type}`);
 
         this.layer = layer;

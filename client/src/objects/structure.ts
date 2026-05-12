@@ -1,5 +1,4 @@
-import { MapObjectDefs } from "../../../shared/defs/mapObjectDefs.ts";
-import type { StructureDef } from "../../../shared/defs/mapObjectsTyping.ts";
+import { MapObjectDefs } from "../../../shared/defs/register.ts";
 import type { ObjectData, ObjectType } from "./../../../shared/net/objectSerializeFns.ts";
 import { type AABB, coldet, type Collider } from "../../../shared/utils/coldet.ts";
 import { collider } from "../../../shared/utils/collider.ts";
@@ -89,7 +88,7 @@ export class Structure implements AbstractObject {
                 this.rot,
                 this.scale,
             );
-            const def = MapObjectDefs[this.type] as StructureDef;
+            const def = MapObjectDefs.typeToDef(this.type, "structure");
             this.layers = [];
             for (let i = 0; i < def.layers.length; i++) {
                 const layer = def.layers[i];
@@ -152,13 +151,13 @@ export class Structure implements AbstractObject {
     }
 
     update(dt: number, map: Map, activePlayer: Player, ambience: Ambiance) {
-        if ((MapObjectDefs[this.type] as StructureDef).interiorSound) {
+        if (MapObjectDefs.typeToDef(this.type, "structure").interiorSound) {
             this.updateInteriorSounds(dt, map, activePlayer, ambience);
         }
     }
 
     updateInteriorSounds(dt: number, map: Map, activePlayer: Player, ambience: Ambiance) {
-        const def = MapObjectDefs[this.type] as StructureDef;
+        const def = MapObjectDefs.typeToDef(this.type, "structure");
         assert(def.interiorSound);
 
         collider.createCircle(activePlayer.m_pos, 0.001);
