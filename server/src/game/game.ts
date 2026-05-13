@@ -529,14 +529,21 @@ export class Game {
         this.msgsToSend.serializeMsg(type, msg);
     }
 
-    sendQuestProgress(userId: string, progress: Array<{ id: string; delta: number }>) {
+    async sendQuestProgress(
+        userId: string,
+        progress: Array<{ id: string; delta: number }>,
+    ) {
         try {
-            apiPrivateRouter.quest_progress.$post({
+            const req = await apiPrivateRouter.quest_progress.$post({
                 json: {
                     userId,
                     progress,
                 },
             });
+            const res = await req.json();
+            if (!req.ok || !(res as { success: boolean }).success) {
+                this.logger.error(`Failed to save quest progress`, res);
+            }
         } catch (err) {
             this.logger.error(`Failed to save quest progress:`, err);
         }
