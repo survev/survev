@@ -136,11 +136,12 @@ async function rerollSlot(
     now: number,
     rerolled: boolean,
     loadedQuests: UserQuestTableSelect[],
+    transaction?: Parameters<Parameters<typeof db.transaction>[0]>[0],
 ) {
     const excludedTypes = new Set(loadedQuests.map((quest) => quest.questType));
     const questType = getRandomQuestType(excludedTypes);
 
-    await db
+    await (transaction ?? db)
         .update(userQuestTable)
         .set({
             questType,
@@ -236,32 +237,53 @@ PassRouter.post("/get_pass", validateParams(zGetPassRequest), async (c) => {
     );
 });
 
+/**
+ * Refreshing quests can have a race condition that may end up with the user getting duplicated quests
+ *
+ * Fix it by putting an "update" lock on the transaction
+ *
+ * The race condition happens like this:
+ *  - Client makes request to refresh quest IDX 0
+ *  - Server gets existing quests for request with IDX 0
+ *  - Client makes request to refresh quest IDX 1
+ *  - Server gets existing quests for request with IDX 1
+ *  - Server writes new quest for request with quest IDX 0
+ *  - The request with IDX 1 now has outdated quests and can end up choosing the same quest as IDX 0
+ */
+
 PassRouter.post("/refresh_quest", validateParams(zRefreshQuestRequest), async (c) => {
     const user = c.get("user")!;
     const { idx } = c.req.valid("json");
-    const now = Date.now();
 
-    const quests = await db.query.userQuestTable.findMany({
-        where: and(
-            eq(userQuestTable.userId, user.id),
-            inArray(userQuestTable.idx, questSlotIndexes),
-        ),
+    const success = await db.transaction(async (transaction) => {
+        const quests = await transaction
+            .select()
+            .from(userQuestTable)
+            .where(
+                and(
+                    eq(userQuestTable.userId, user.id),
+                    inArray(userQuestTable.idx, questSlotIndexes),
+                ),
+            )
+            .for("update");
+
+        const quest = quests.find((entry) => entry.idx === idx);
+
+        if (!quest) {
+            return false;
+        }
+
+        const now = Date.now();
+        const expired = quest.nextRefreshAt - now < 0;
+        const refreshEnabled = (!quest.rerolled && !quest.complete) || expired;
+        if (!refreshEnabled) {
+            return false;
+        }
+        await rerollSlot(user.id, idx, now, !expired, quests, transaction);
+        return true;
     });
 
-    const quest = quests.find((entry) => entry.idx === idx);
-
-    if (!quest) {
-        return c.json<RefreshQuestResponse>({ success: false }, 200);
-    }
-
-    const expired = quest.nextRefreshAt - now < 0;
-    const refreshEnabled = (!quest.rerolled && !quest.complete) || expired;
-    if (!refreshEnabled) {
-        return c.json<RefreshQuestResponse>({ success: false }, 200);
-    }
-
-    await rerollSlot(user.id, idx, now, !expired, quests);
-    return c.json<RefreshQuestResponse>({ success: true }, 200);
+    return c.json<RefreshQuestResponse>({ success }, 200);
 });
 
 PassRouter.post(
