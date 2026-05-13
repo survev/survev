@@ -654,8 +654,6 @@ export class Obstacle extends BaseGameObject {
             return;
         }
 
-        this.interactedBy = player;
-
         if (this.isDoor && this.door) {
             if (!this.door.canUse) return;
             if (this.door.autoOpen && !auto) return;
@@ -665,7 +663,7 @@ export class Obstacle extends BaseGameObject {
             if (this.door.openOnce) {
                 this.door.canUse = false;
             }
-
+            this.interactedBy = player;
             this.setDirty();
             if (this.door.openDelay > 0) {
                 this.delayedToggle(this.door.openDelay, player);
@@ -676,6 +674,7 @@ export class Obstacle extends BaseGameObject {
         }
 
         if (this.isButton && this.button.canUse) {
+            this.interactedBy = player;
             this.useButton(player);
         }
     }
