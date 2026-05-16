@@ -86,13 +86,11 @@ export class WeaponManager {
 
     /**
      * @param idx index being swapped to
-     * @param cancelAction cancels current action if true
      * @param forceSwitch true when no active weapon and switch to melee
      * @returns
      */
     setCurWeapIndex(
         idx: number,
-        cancelAction = true,
         forceSwitch = false,
     ): void {
         // if current slot is invalid and next too, switch to melee
@@ -176,9 +174,9 @@ export class WeaponManager {
 
         this.lastWeaponIdx = this._curWeapIdx;
         this._curWeapIdx = idx;
-        if (cancelAction) {
-            this.player.cancelAction();
-        }
+
+        this.player.cancelAction();
+        
 
         this.player.wearingPan = false;
         if (
@@ -279,7 +277,7 @@ export class WeaponManager {
         }
 
         if (!this.activeWeapon) {
-            this.setCurWeapIndex(WeaponSlot.Melee, undefined, true);
+            this.setCurWeapIndex(WeaponSlot.Melee, true);
         }
 
         this.player.weapsDirty = true;
