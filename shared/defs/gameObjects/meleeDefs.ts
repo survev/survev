@@ -25,6 +25,7 @@ export interface MeleeDef {
     anim: {
         idlePose: string;
         attackAnims: string[];
+        deploy?: string;
     };
     sound: Record<string, string>;
     //  {
@@ -69,6 +70,7 @@ export interface MeleeDef {
 export interface Img {
     sprite: string;
     pos: Vec2;
+    deployPos?: Vec2;
     rot: number;
     scale: Vec2;
     tint: number;
@@ -198,6 +200,7 @@ const BaseDefs: Record<string, MeleeDef> = {
         anim: {
             idlePose: "slash",
             attackAnims: ["slash", "fists"],
+            deploy: "spin",
         },
         sound: {
             pickup: "frag_pickup_01",
@@ -219,6 +222,10 @@ const BaseDefs: Record<string, MeleeDef> = {
             pos: {
                 x: 15.5,
                 y: -5,
+            },
+            deployPos: {
+                x: 32,
+                y: 0,
             },
             rot: 0.5 * Math.PI,
             scale: {
