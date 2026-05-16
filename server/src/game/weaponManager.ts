@@ -85,19 +85,15 @@ export class WeaponManager {
     }
 
     /**
-     *
      * @param idx index being swapped to
      * @param cancelAction cancels current action if true
-     * @param shouldReload will attempt automatic reload at 0 ammo if true
-     * @param changeCooldown Weather to change the weapons cooldown, used by SwapWeapSlots to keep them the same
+     * @param forceSwitch true when no active weapon and switch to melee
      * @returns
      */
     setCurWeapIndex(
         idx: number,
         cancelAction = true,
-        cancelSlowdown = true,
         forceSwitch = false,
-        changeCooldown = true,
     ): void {
         // if current slot is invalid and next too, switch to melee
         if (!this.activeWeapon && !this.weapons[idx].type) {
@@ -132,9 +128,7 @@ export class WeaponManager {
 
         this.player.cancelAnim();
 
-        if (cancelSlowdown) {
-            this.player.shotSlowdownTimer = 0;
-        }
+        this.player.shotSlowdownTimer = 0;
         this.bursts.length = 0;
         this.meleeAttacks.length = 0;
         this.scheduledReload = false;
@@ -145,7 +139,7 @@ export class WeaponManager {
         const nextWeapon = this.weapons[idx];
         let effectiveSwitchDelay = 0;
 
-        if (curWeapon.type && nextWeapon.type && changeCooldown) {
+        if (curWeapon.type && nextWeapon.type) {
             // ensure that player is still holding both weapons (didnt drop one)
             const nextWeaponDef = GameObjectDefs[this.weapons[idx].type] as
                 | GunDef
@@ -285,7 +279,7 @@ export class WeaponManager {
         }
 
         if (!this.activeWeapon) {
-            this.setCurWeapIndex(WeaponSlot.Melee, undefined, undefined, true);
+            this.setCurWeapIndex(WeaponSlot.Melee, undefined, true);
         }
 
         this.player.weapsDirty = true;
