@@ -106,6 +106,8 @@ export interface GunDef {
     burstSounds?: number;
     perk?: string;
     modifiedSound?: string;
+    bulletTypeExtra?: string;
+    extraBulletTrigger?: number;
 }
 
 function defineGunSkin(baseType: string, params: DeepPartial<GunDef>): GunDef {
@@ -521,6 +523,7 @@ export const BaseDefs: Record<string, GunDef> = {
         bulletCount: 1,
         burstCount: 3,
         bulletType: "bullet_famas",
+        upgraded: { gun: "modified_famas", cost: 5 },
         headshotMult: 1,
         speed: { equip: 0, attack: 0 },
         lootImg: {
@@ -813,6 +816,7 @@ export const BaseDefs: Record<string, GunDef> = {
         shotSpread: 4,
         bulletCount: 1,
         bulletType: "bullet_qbb97",
+        upgraded: { gun: "modified_qbb97", cost: 4 },
         headshotMult: 1,
         speed: { equip: 0, attack: 0 },
         lootImg: {
@@ -4197,6 +4201,27 @@ export const ModifiedGunDefs: Record<string, GunDef> = {
         upgraded: undefined,
         modifiedSound: "saiga_01",
         speed: { equip: -0.5, attack: -3 },
+        lootImg: {
+            border: "loot-circle-outer-modified-01.img",
+        },
+    }),
+    modified_qbb97: defineGunSkin("qbb97", {
+        name: "QBB-95 [+]",
+        bulletTypeExtra: "bullet_qbb97_modified",
+        extraBulletTrigger: 5,
+        upgraded: undefined,
+        modifiedSound: "qbb_01",
+        lootImg: {
+            border: "loot-circle-outer-modified-01.img",
+        },
+    }),
+    modified_famas: defineGunSkin("famas", {
+        name: "FAMAS [+]",
+        bulletTypeExtra: "bullet_famas_modified",
+        extraBulletTrigger: 3,
+        switchDelay: 0.15,
+        upgraded: undefined,
+        modifiedSound: "famas_01",
         lootImg: {
             border: "loot-circle-outer-modified-01.img",
         },

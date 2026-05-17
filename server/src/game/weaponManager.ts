@@ -52,6 +52,7 @@ export class WeaponManager {
         ammo: number;
         cooldown: number;
         recoilTime: number;
+        shotCount: number;
     }> = [];
 
     scheduledReload = false;
@@ -77,6 +78,7 @@ export class WeaponManager {
                 ammo: 0,
                 cooldown: 0,
                 recoilTime: Infinity,
+                shotCount: 0,
             });
         }
     }
@@ -870,6 +872,13 @@ export class WeaponManager {
         this.player.recoilTicker = 0.0;
 
         let bulletType = itemDef.bulletType;
+        if (itemDef.bulletTypeExtra && itemDef.extraBulletTrigger && itemDef.extraBulletTrigger > 0) {
+            const weapon = this.weapons[this.curWeapIdx];
+            weapon.shotCount = (weapon.shotCount + 1) % itemDef.extraBulletTrigger;
+            if (weapon.shotCount === 0) {
+                bulletType = itemDef.bulletTypeExtra;
+            }
+        }
 
         let speedMult = 1;
         let distanceMult = 1;
