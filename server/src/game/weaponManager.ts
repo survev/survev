@@ -89,10 +89,7 @@ export class WeaponManager {
      * @param forceSwitch true when no active weapon and switch to melee
      * @returns
      */
-    setCurWeapIndex(
-        idx: number,
-        forceSwitch = false,
-    ): void {
+    setCurWeapIndex(idx: number, forceSwitch = false): void {
         // if current slot is invalid and next too, switch to melee
         if (!this.activeWeapon && !this.weapons[idx].type) {
             idx = WeaponSlot.Melee;
@@ -176,7 +173,6 @@ export class WeaponManager {
         this._curWeapIdx = idx;
 
         this.player.cancelAction();
-        
 
         this.player.wearingPan = false;
         if (
