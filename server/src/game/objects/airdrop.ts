@@ -93,7 +93,7 @@ export class Airdrop extends BaseGameObject {
                     }
                     if (coldet.test(collider, this.crateCollision)) {
                         obj.damage({
-                            amount: obj.__type === ObjectType.Player ? 100 : 1e10,
+                            amount: 1e10,
                             damageType: GameConfig.DamageType.Airdrop,
                             dir: "dir" in obj ? obj.dir : v2.create(0, 0),
                         });
