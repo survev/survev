@@ -278,7 +278,7 @@ export const BaseDefs: Record<string, BulletDef> = {
         tracerLength: 0.5,
         projType: "mirv_mini",
         projCount: 1,
-        projSpeed: 35,
+        projSpeed: 25,
         projSpread: 0.25,
     },
     bullet_buckshot_mp: {
