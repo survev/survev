@@ -11,6 +11,7 @@ export interface BulletDef {
     tracerWidth: number;
     tracerLength: number;
     suppressed?: boolean;
+    suppressedOnDist?: boolean;
     flareColor?: number;
     addFlare?: boolean;
     addSupplyFlare?: boolean;
@@ -102,6 +103,20 @@ export const BaseDefs: Record<string, BulletDef> = {
         variance: 0,
         shrapnel: false,
         suppressed: true,
+        tracerColor: "762mm",
+        tracerWidth: 0.1,
+        tracerLength: 0.9,
+    },
+    bullet_grozas_modified: {
+        type: "bullet",
+        damage: 16,
+        obstacleDamage: 1,
+        falloff: 0.87,
+        distance: 185,
+        speed: 121,
+        variance: 0,
+        shrapnel: false,
+        suppressedOnDist: true,
         tracerColor: "762mm",
         tracerWidth: 0.1,
         tracerLength: 0.9,

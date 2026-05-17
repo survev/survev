@@ -4087,6 +4087,7 @@ export const ModifiedGunDefs: Record<string, GunDef> = {
         shotSpread: 2,
         upgraded: undefined,
         modifiedSound: "groza_01",
+        bulletType: "bullet_grozas_modified",
         lootImg: {
             border: "loot-circle-outer-modified-01.img",
         },

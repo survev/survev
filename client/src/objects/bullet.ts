@@ -76,6 +76,7 @@ export class BulletBarn {
         startPos: Vec2;
         tracerLength: number;
         suppressed: boolean;
+        suppressedOnDist: boolean;
         tracerAlphaRate: number;
         tracerAlphaMin: number;
     }> = [];
@@ -183,6 +184,7 @@ export class BulletBarn {
         b.tracerAlphaRate = tracerColors.alphaRate;
         b.tracerAlphaMin = tracerColors.alphaMin;
         b.bulletTrail.alpha = 1;
+        b.suppressedOnDist = !!bulletDef.suppressedOnDist;
         if (b.reflectCount > 0) {
             b.bulletTrail.alpha *= 0.5;
         }
@@ -231,7 +233,15 @@ export class BulletBarn {
                 }
 
                 // Trail alpha
-                if (b.tracerAlphaRate && b.suppressed) {
+                if (b.suppressedOnDist) {
+                    const travelDist = math.clamp(
+                        v2.length(v2.sub(b.pos, b.startPos)) / (b.distance || 1),
+                        0,
+                        1,
+                    );
+                    // Actuasl calculation for how fast a bullet fades when suppressedOnDist is true, with a minimum alpha of 0.1
+                    b.bulletTrail.alpha = math.max(0.08, 1 - 5 * travelDist); // to change strength Adjust x in: 0.1, 1 - x * travelDist
+                } else if (b.tracerAlphaRate && b.suppressed) {
                     const rate = b.tracerAlphaRate;
                     b.bulletTrail.alpha = math.max(
                         b.tracerAlphaMin,
