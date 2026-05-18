@@ -886,14 +886,15 @@ export class UiManager2 {
         }
         const ge = state.weapons[activePlayer.m_localData.m_curWeapIdx];
         const weaponDef = GameObjectDefs[ge.type] as GunDef | MeleeDef;
-        const we = ge.ammo;
-        const fe =
+        const we = weaponDef.type == "gun" ? weaponDef.backpackFed ? activePlayer.m_localData.m_inventory[weaponDef.ammo] : ge.ammo : ge.ammo;
+        let fe =
             weaponDef.type == "gun"
                 ? weaponDef.ammoInfinite ||
                   ((activePlayer.m_hasPerk("endless_ammo") || activePlayer.m_hasPerk("arena")) && !weaponDef.ignoreEndlessAmmo)
                     ? Number.MAX_VALUE
                     : activePlayer.m_localData.m_inventory[weaponDef.ammo]
                 : 0;
+        fe = weaponDef.type == "gun" ? weaponDef.backpackFed ? 0 : fe : 0;
         state.ammo.current = we;
         state.ammo.remaining = fe;
         state.ammo.displayCurrent = weaponDef.type != "melee";
