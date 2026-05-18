@@ -16,6 +16,7 @@ export interface GunDef {
     extendedClip: number;
     extendedReload: number;
     reloadTime: number;
+    backpackFed?: boolean;
     fireDelay: number;
     switchDelay: number;
     barrelLength: number;
@@ -4216,6 +4217,14 @@ export const ModifiedGunDefs: Record<string, GunDef> = {
         worldImg: {
             sprite: "gun-scout_elite-01.img",
             tint: 0xffffff,
+        },
+    }),
+    modified_m249: defineGunSkin("m249", {
+        name: "M249 [+]",
+        backpackFed: true,
+        upgraded: undefined,
+        lootImg: {
+            border: "loot-circle-outer-modified-01.img",
         },
     }),
 }
