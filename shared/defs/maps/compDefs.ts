@@ -113,10 +113,10 @@ export const Comp: MapDef = {
     lootTable: {
         tier_world: [
             { name: "tier_guns", count: 1, weight: 0.21995 }, // TODO get more data on this from original 30%
-            { name: "tier_scrap", count: 1, weight: 0.05 },
+            { name: "tier_scrap", count: 1, weight: 0.08 },
             { name: "tier_ammo", count: 1, weight: 0.2 }, // ? 30%
             { name: "tier_scopes", count: 1, weight: 0.25 }, // ? 20%
-            { name: "tier_armor", count: 1, weight: 0.18 }, // ? 20%
+            { name: "tier_armor", count: 1, weight: 0.15 }, // ? 20%
             { name: "tier_medical", count: 1, weight: 0.3 }, // ? 20%
             { name: "tier_throwables", count: 1, weight: 0.05 }, // ? 5%
             { name: "tier_packs", count: 1, weight: 0.15 }, // ? 9%
@@ -470,17 +470,17 @@ export const Comp: MapDef = {
             { name: "l86", count: 1, weight: 0.07 },
         ],
         tier_bank_vault_basic: [
-            { name: "famas", count: 1, weight: 0.15 }, 
+            { name: "famas", count: 1, weight: 0.13 }, 
             { name: "qbb97", count: 1, weight: 0.03 },
             { name: "dp28", count: 1, weight: 0.1 },
-            { name: "m870", count: 1, weight: 0.15 },
+            { name: "m870", count: 1, weight: 0.11 },
             { name: "origin", count: 1, weight: 0.03 },
-            { name: "hk416", count: 1, weight: 0.15 }, 
+            { name: "hk416", count: 1, weight: 0.13 }, 
             { name: "ak47", count: 1, weight: 0.1 },
             { name: "m93r_dual", count: 1, weight: 0.09 },
             { name: "mkg45", count: 1, weight: 0.04 },
-            { name: "m39", count: 1, weight: 0.05 }, 
-            { name: "mk12", count: 1, weight: 0.05 }, 
+            { name: "m39", count: 1, weight: 0.09 }, 
+            { name: "mk12", count: 1, weight: 0.09 }, 
             { name: "m4a1", count: 1, weight: 0.02 }, 
             { name: "scar", count: 1, weight: 0.01 },
             { name: "vector", count: 1, weight: 0.01 },
@@ -488,15 +488,15 @@ export const Comp: MapDef = {
             { name: "saiga", count: 1, weight: 0.02 },
         ],
         tier_bank_vault_gold: [
-            { name: "famas", count: 1, weight: 0.2 }, 
+            { name: "famas", count: 1, weight: 0.1 }, 
             { name: "qbb97", count: 1, weight: 0.13 },
             { name: "dp28", count: 1, weight: 0.06 },
             { name: "m870", count: 1, weight: 0.1 },
             { name: "origin", count: 1, weight: 0.06 },
             { name: "hk416", count: 1, weight: 0.05 },
-            { name: "mkg45", count: 1, weight: 0.1 },
-            { name: "m39", count: 1, weight: 0.05 }, 
-            { name: "mk12", count: 1, weight: 0.05 }, 
+            { name: "mkg45", count: 1, weight: 0.14 },
+            { name: "m39", count: 1, weight: 0.08 }, 
+            { name: "mk12", count: 1, weight: 0.08 }, 
             { name: "m93r_dual", count: 1, weight: 0.04 },
             { name: "m4a1", count: 1, weight: 0.1 }, 
             { name: "scar", count: 1, weight: 0.03 },

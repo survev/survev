@@ -68,6 +68,11 @@ export class BulletBarn {
         dir: Vec2;
         layer: number;
         speed: number;
+        baseSpeed: number;
+        speedMult: number;
+        speedVariance: number;
+        accelerating: number;
+        distanceTraveled: number;
         distance: number;
         damageSelf: boolean;
         reflectCount: number;
@@ -76,6 +81,7 @@ export class BulletBarn {
         startPos: Vec2;
         tracerLength: number;
         suppressed: boolean;
+        suppressedOnDist: boolean;
         tracerAlphaRate: number;
         tracerAlphaMin: number;
     }> = [];
@@ -141,7 +147,12 @@ export class BulletBarn {
         b.pos = v2.copy(bullet.pos);
         b.dir = v2.copy(bullet.dir);
         b.layer = bullet.layer;
-        b.speed = bulletDef.speed * bullet.speedMult * variance;
+        b.baseSpeed = bulletDef.speed;
+        b.speedMult = bullet.speedMult;
+        b.speedVariance = variance;
+        b.accelerating = bulletDef.accelerating ?? 0;
+        b.speed = b.baseSpeed * b.speedMult * b.speedVariance;
+        b.distanceTraveled = 0;
         b.distance = distance * bullet.distanceMult * variance + distAdj;
         b.damageSelf = bulletDef.shrapnel || bullet.reflectCount > 0;
         b.reflectCount = bullet.reflectCount;
@@ -183,6 +194,7 @@ export class BulletBarn {
         b.tracerAlphaRate = tracerColors.alphaRate;
         b.tracerAlphaMin = tracerColors.alphaMin;
         b.bulletTrail.alpha = 1;
+        b.suppressedOnDist = !!bulletDef.suppressedOnDist;
         if (b.reflectCount > 0) {
             b.bulletTrail.alpha *= 0.5;
         }
@@ -212,9 +224,17 @@ export class BulletBarn {
             }
             if (b.alive) {
                 const distLeft = b.distance - v2.length(v2.sub(b.startPos, b.pos));
+                if (b.accelerating !== 0) {
+                    b.speed =
+                        b.baseSpeed *
+                        b.speedMult *
+                        b.speedVariance *
+                        Math.exp(b.accelerating * b.distanceTraveled);
+                }
                 const distTravel = math.min(distLeft, dt * b.speed);
                 const posOld = v2.copy(b.pos);
                 b.pos = v2.add(b.pos, v2.mul(b.dir, distTravel));
+                b.distanceTraveled += distTravel;
 
                 if (
                     !activePlayer.m_netData.m_dead &&
@@ -231,7 +251,15 @@ export class BulletBarn {
                 }
 
                 // Trail alpha
-                if (b.tracerAlphaRate && b.suppressed) {
+                if (b.suppressedOnDist) {
+                    const travelDist = math.clamp(
+                        v2.length(v2.sub(b.pos, b.startPos)) / (b.distance || 1),
+                        0,
+                        1,
+                    );
+                    // Actuasl calculation for how fast a bullet fades when suppressedOnDist is true, with a minimum alpha of 0.1
+                    b.bulletTrail.alpha = math.max(0.08, 1 - 5 * travelDist); // to change strength Adjust x in: 0.1, 1 - x * travelDist
+                } else if (b.tracerAlphaRate && b.suppressed) {
                     const rate = b.tracerAlphaRate;
                     b.bulletTrail.alpha = math.max(
                         b.tracerAlphaMin,
@@ -260,7 +288,7 @@ export class BulletBarn {
                         !obstacle.dead &&
                         !!util.sameLayer(obstacle.layer, b.layer) &&
                         obstacle.height >= GameConfig.bullet.height &&
-                        (b.reflectCount <= 0 || obstacle.__id != b.reflectObjId)
+                        (b.reflectObjId === 0 || obstacle.__id !== b.reflectObjId)
                     ) {
                         const res = collider.intersectSegment(
                             obstacle.collider,

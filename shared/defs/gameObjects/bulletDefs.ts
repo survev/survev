@@ -11,6 +11,12 @@ export interface BulletDef {
     tracerWidth: number;
     tracerLength: number;
     suppressed?: boolean;
+    suppressedOnDist?: boolean;
+    accelerating?: number;
+    piercing?: boolean;
+    pierceDamageMult?: number;
+    pierceDistanceMult?: number;
+    maxPierce?: number;
     flareColor?: number;
     addFlare?: boolean;
     addSupplyFlare?: boolean;
@@ -102,6 +108,20 @@ export const BaseDefs: Record<string, BulletDef> = {
         variance: 0,
         shrapnel: false,
         suppressed: true,
+        tracerColor: "762mm",
+        tracerWidth: 0.1,
+        tracerLength: 0.9,
+    },
+    bullet_grozas_modified: {
+        type: "bullet",
+        damage: 16,
+        obstacleDamage: 1,
+        falloff: 0.87,
+        distance: 185,
+        speed: 121,
+        variance: 0,
+        shrapnel: false,
+        suppressedOnDist: true,
         tracerColor: "762mm",
         tracerWidth: 0.1,
         tracerLength: 0.9,
@@ -278,7 +298,7 @@ export const BaseDefs: Record<string, BulletDef> = {
         tracerLength: 0.5,
         projType: "mirv_mini",
         projCount: 1,
-        projSpeed: 35,
+        projSpeed: 25,
         projSpread: 0.25,
     },
     bullet_buckshot_mp: {
@@ -338,13 +358,14 @@ export const BaseDefs: Record<string, BulletDef> = {
         damage: 7.5,
         obstacleDamage: 0.2,
         falloff: 0.76,
-        speed: 125,
+        speed: 65,
         distance: 55,
         variance: 0,
         shrapnel: false,
         tracerColor: "12gauge",
         tracerWidth: 0.13,
         tracerLength: 0.6,
+        accelerating: 0.015,
     },
     bullet_hawk: {
         type: "bullet",
@@ -815,6 +836,19 @@ export const BaseDefs: Record<string, BulletDef> = {
         tracerWidth: 0.1,
         tracerLength: 0.9,
     },
+    bullet_famas_modified: {
+        type: "bullet",
+        damage: 36,
+        obstacleDamage: 3,
+        falloff: 0.8,
+        distance: 150,
+        speed: 145,
+        variance: 0,
+        shrapnel: false,
+        tracerColor: "556mm",
+        tracerWidth: 0.18,
+        tracerLength: 1.1,
+    },
     bullet_hk416: {
         type: "bullet",
         damage: 15.5,
@@ -868,6 +902,23 @@ export const BaseDefs: Record<string, BulletDef> = {
         tracerWidth: 0.1,
         tracerLength: 0.9,
     },
+    bullet_l86_modified: {
+        type: "bullet",
+        damage: 24,
+        obstacleDamage: 1,
+        falloff: 0.9,
+        distance: 425,
+        speed: 159,
+        variance: 0,
+        shrapnel: false,
+        tracerColor: "556mm",
+        tracerWidth: 0.12,
+        tracerLength: 1.1,
+        piercing: true,
+        pierceDamageMult: 0.5,
+        pierceDistanceMult: 0.5,
+        maxPierce: 2,
+    },
     bullet_m249: {
         type: "bullet",
         damage: 14,
@@ -892,6 +943,19 @@ export const BaseDefs: Record<string, BulletDef> = {
         shrapnel: false,
         tracerColor: "556mm",
         tracerWidth: 0.1,
+        tracerLength: 0.9,
+    },
+    bullet_qbb97_modified: {
+        type: "bullet",
+        damage: 27,
+        obstacleDamage: 5.5,
+        falloff: 0.96,
+        distance: 200,
+        speed: 148,
+        variance: 0,
+        shrapnel: false,
+        tracerColor: "556mm",
+        tracerWidth: 0.23,
         tracerLength: 0.9,
     },
     bullet_scout: {

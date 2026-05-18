@@ -107,6 +107,8 @@ export interface GunDef {
     burstSounds?: number;
     perk?: string;
     modifiedSound?: string;
+    bulletTypeExtra?: string;
+    extraBulletTrigger?: number;
 }
 
 function defineGunSkin(baseType: string, params: DeepPartial<GunDef>): GunDef {
@@ -522,6 +524,7 @@ export const BaseDefs: Record<string, GunDef> = {
         bulletCount: 1,
         burstCount: 3,
         bulletType: "bullet_famas",
+        upgraded: { gun: "modified_famas", cost: 3 },
         headshotMult: 1,
         speed: { equip: 0, attack: 0 },
         lootImg: {
@@ -665,7 +668,7 @@ export const BaseDefs: Record<string, GunDef> = {
         shotSpread: 1,
         bulletCount: 1,
         bulletType: "bullet_mk12",
-        upgraded: { gun: "modified_mk12", cost: 5 },
+        upgraded: { gun: "modified_mk12", cost: 4 },
         headshotMult: 1,
         speed: { equip: 0, attack: 0 },
         lootImg: {
@@ -713,6 +716,7 @@ export const BaseDefs: Record<string, GunDef> = {
         shotSpread: 1,
         bulletCount: 1,
         bulletType: "bullet_l86",
+        upgraded: { gun: "modified_l86", cost: 4 },
         headshotMult: 1,
         speed: { equip: 0, attack: 0 },
         lootImg: {
@@ -814,6 +818,7 @@ export const BaseDefs: Record<string, GunDef> = {
         shotSpread: 4,
         bulletCount: 1,
         bulletType: "bullet_qbb97",
+        upgraded: { gun: "modified_qbb97", cost: 4 },
         headshotMult: 1,
         speed: { equip: 0, attack: 0 },
         lootImg: {
@@ -1112,7 +1117,7 @@ export const BaseDefs: Record<string, GunDef> = {
         shotSpread: 4.5,
         bulletCount: 1,
         bulletType: "bullet_groza",
-        upgraded: { gun: "grozas", cost: 5 },
+        upgraded: { gun: "grozas", cost: 3 },
         headshotMult: 1,
         speed: { equip: 0, attack: 0 },
         lootImg: {
@@ -1263,7 +1268,7 @@ export const BaseDefs: Record<string, GunDef> = {
         shotSpread: 1.5,
         bulletCount: 1,
         bulletType: "bullet_bar",
-        upgraded: { gun: "modified_bar", cost: 5 },
+        upgraded: { gun: "modified_bar", cost: 4 },
         headshotMult: 1,
         speed: { equip: 0, attack: -1.5 },
         lootImg: {
@@ -1521,7 +1526,7 @@ export const BaseDefs: Record<string, GunDef> = {
         shotSpread: 1.5,
         bulletCount: 1,
         bulletType: "bullet_model94",
-        upgraded: { gun: "modified_model94", cost: 4 },
+        upgraded: { gun: "modified_model94", cost: 3 },
         headshotMult: 1,
         speed: { equip: 0, attack: 0 },
         lootImg: {
@@ -1830,7 +1835,7 @@ export const BaseDefs: Record<string, GunDef> = {
         bulletType: "bullet_m39",
         headshotMult: 1,
         speed: { equip: 0, attack: 0 },
-        upgraded: { gun: "modified_m39", cost: 4 },
+        upgraded: { gun: "modified_m39", cost: 3 },
         lootImg: {
             sprite: "loot-weapon-m39.img",
             tint: 65280,
@@ -2125,7 +2130,7 @@ export const BaseDefs: Record<string, GunDef> = {
         bulletCount: 9,
         jitter: 1,
         bulletType: "bullet_buckshot",
-        upgraded: { gun: "modified_saiga", cost: 6 },
+        upgraded: { gun: "modified_saiga", cost: 4 },
         headshotMult: 1,
         speed: { equip: 0, attack: 6 },
         lootImg: {
@@ -2271,7 +2276,7 @@ export const BaseDefs: Record<string, GunDef> = {
         bulletCount: 14,
         jitter: 1.4,
         bulletType: "bullet_origin",
-        upgraded: { gun: "modified_origin", cost: 10 },
+        upgraded: { gun: "modified_origin", cost: 6 },
         headshotMult: 1,
         speed: { equip: 0, attack: 1 },
         lootImg: {
@@ -2472,7 +2477,7 @@ export const BaseDefs: Record<string, GunDef> = {
         bulletCount: 1,
         jitter: 1,
         bulletType: "bullet_frag",
-        upgraded: { gun: "modified_usas", cost: 10 },
+        upgraded: { gun: "modified_usas", cost: 8 },
         noSplinter: true,
         headshotMult: 1,
         speed: { equip: 0, attack: -1 },
@@ -2523,7 +2528,7 @@ export const BaseDefs: Record<string, GunDef> = {
         shotSpread: 8,
         bulletCount: 1,
         bulletType: "bullet_m9",
-        upgraded: { gun: "m9_cursed", cost: 15 },
+        upgraded: { gun: "m9_cursed", cost: 1 },
         headshotMult: 1,
         speed: { equip: 0, attack: 0 },
         lootImg: {
@@ -2968,7 +2973,7 @@ export const BaseDefs: Record<string, GunDef> = {
         extendedReload: 5,
         reloadTime: 1.3,
         fireDelay: 0.4,
-        switchDelay: 0.3,
+        switchDelay: 0.15,
         barrelLength: 2.05,
         barrelOffset: 0,
         recoilTime: 1e10,
@@ -3472,8 +3477,8 @@ export const BaseDefs: Record<string, GunDef> = {
         barrelOffset: 0,
         dualOffset: 0.6,
         recoilTime: 0.5,
-        moveSpread: 6.5,
-        shotSpread: 3,
+        moveSpread: 5.5,
+        shotSpread: 2.5,
         bulletCount: 1,
         bulletType: "bullet_deagle",
         upgraded: { gun: "modified_deagle_dual", cost: 7 },
@@ -4053,7 +4058,7 @@ export const ModifiedGunDefs: Record<string, GunDef> = {
         bulletCount: 6,
         reloadTime: 0.65,
         burstCount: 2,
-        burstDelay: 0.1,
+        burstDelay: 0.06,
         fireMode: "burst",
         upgraded: undefined,
         modifiedSound: "spas12_01",
@@ -4089,6 +4094,7 @@ export const ModifiedGunDefs: Record<string, GunDef> = {
         shotSpread: 2,
         upgraded: undefined,
         modifiedSound: "groza_01",
+        bulletType: "bullet_grozas_modified",
         lootImg: {
             border: "loot-circle-outer-modified-01.img",
         },
@@ -4202,6 +4208,32 @@ export const ModifiedGunDefs: Record<string, GunDef> = {
             border: "loot-circle-outer-modified-01.img",
         },
     }),
+    modified_qbb97: defineGunSkin("qbb97", {
+        name: "QBB-95 [+]",
+        bulletTypeExtra: "bullet_qbb97_modified",
+        extraBulletTrigger: 5,
+        upgraded: undefined,
+        modifiedSound: "qbb_01",
+        lootImg: {
+            border: "loot-circle-outer-modified-01.img",
+        },
+    }),
+    modified_famas: defineGunSkin("famas", {
+        name: "FAMAS [+]",
+        bulletTypeExtra: "bullet_famas_modified",
+        extraBulletTrigger: 3,
+        switchDelay: 0.15,
+        upgraded: undefined,
+        modifiedSound: "famas_01",
+        lootImg: {
+            border: "loot-circle-outer-modified-01.img",
+        },
+    }),
+    modified_l86: defineGunSkin("l86", {
+        name: "L86 [+]",
+        bulletType: "bullet_l86_modified",
+        upgraded: undefined,
+        modifiedSound: "l86_01",
     modified_scout_elite: defineGunSkin("scout_elite",{
         name: "Scout Elite [+]",
         maxReload: 1,
