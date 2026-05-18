@@ -388,6 +388,9 @@ export class UpdateMsg implements AbstractMsg {
                 s.writeBoolean(bullet.reflectCount > 0);
                 if (bullet.reflectCount > 0) {
                     s.writeBits(bullet.reflectCount, 2);
+                }
+                s.writeBoolean(bullet.reflectObjId > 0);
+                if (bullet.reflectObjId > 0) {
                     s.writeUint16(bullet.reflectObjId);
                 }
                 s.writeBoolean(bullet.hasModifier);
@@ -607,6 +610,8 @@ export class UpdateMsg implements AbstractMsg {
                 bullet.reflectObjId = 0;
                 if (s.readBoolean()) {
                     bullet.reflectCount = s.readBits(2);
+                }
+                if (s.readBoolean()) {
                     bullet.reflectObjId = s.readUint16();
                 }
                 bullet.speedMult = 1;

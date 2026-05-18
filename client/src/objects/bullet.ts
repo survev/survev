@@ -288,7 +288,7 @@ export class BulletBarn {
                         !obstacle.dead &&
                         !!util.sameLayer(obstacle.layer, b.layer) &&
                         obstacle.height >= GameConfig.bullet.height &&
-                        (b.reflectCount <= 0 || obstacle.__id != b.reflectObjId)
+                        (b.reflectObjId === 0 || obstacle.__id !== b.reflectObjId)
                     ) {
                         const res = collider.intersectSegment(
                             obstacle.collider,

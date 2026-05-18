@@ -523,7 +523,7 @@ export const BaseDefs: Record<string, GunDef> = {
         bulletCount: 1,
         burstCount: 3,
         bulletType: "bullet_famas",
-        upgraded: { gun: "modified_famas", cost: 5 },
+        upgraded: { gun: "modified_famas", cost: 3 },
         headshotMult: 1,
         speed: { equip: 0, attack: 0 },
         lootImg: {
@@ -715,6 +715,7 @@ export const BaseDefs: Record<string, GunDef> = {
         shotSpread: 1,
         bulletCount: 1,
         bulletType: "bullet_l86",
+        upgraded: { gun: "modified_l86", cost: 4 },
         headshotMult: 1,
         speed: { equip: 0, attack: 0 },
         lootImg: {
@@ -4222,6 +4223,15 @@ export const ModifiedGunDefs: Record<string, GunDef> = {
         switchDelay: 0.15,
         upgraded: undefined,
         modifiedSound: "famas_01",
+        lootImg: {
+            border: "loot-circle-outer-modified-01.img",
+        },
+    }),
+    modified_l86: defineGunSkin("l86", {
+        name: "L86 [+]",
+        bulletType: "bullet_l86_modified",
+        upgraded: undefined,
+        modifiedSound: "l86_01",
         lootImg: {
             border: "loot-circle-outer-modified-01.img",
         },

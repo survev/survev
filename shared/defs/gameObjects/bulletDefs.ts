@@ -13,6 +13,10 @@ export interface BulletDef {
     suppressed?: boolean;
     suppressedOnDist?: boolean;
     accelerating?: number;
+    piercing?: boolean;
+    pierceDamageMult?: number;
+    pierceDistanceMult?: number;
+    maxPierce?: number;
     flareColor?: number;
     addFlare?: boolean;
     addSupplyFlare?: boolean;
@@ -897,6 +901,23 @@ export const BaseDefs: Record<string, BulletDef> = {
         tracerColor: "556mm",
         tracerWidth: 0.1,
         tracerLength: 0.9,
+    },
+    bullet_l86_modified: {
+        type: "bullet",
+        damage: 24,
+        obstacleDamage: 1,
+        falloff: 0.9,
+        distance: 425,
+        speed: 159,
+        variance: 0,
+        shrapnel: false,
+        tracerColor: "556mm",
+        tracerWidth: 0.12,
+        tracerLength: 1.1,
+        piercing: true,
+        pierceDamageMult: 0.5,
+        pierceDistanceMult: 0.5,
+        maxPierce: 2,
     },
     bullet_m249: {
         type: "bullet",

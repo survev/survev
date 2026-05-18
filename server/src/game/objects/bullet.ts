@@ -62,6 +62,8 @@ export interface BulletParams {
     onHitFx?: string;
     clipDistance?: boolean;
     distance?: number;
+    piercing?: boolean;
+    pierceCount?: number;
     hasModifier?: boolean;
     speedMult?: number;
     distanceMult?: number;
@@ -168,6 +170,8 @@ export class Bullet {
     apRounds!: boolean;
     highVelocity!: boolean;
     modified!: boolean;
+    piercing!: boolean;
+    pierceCount!: number;
     trailSaturated!: boolean;
     trailSmall!: boolean;
     trailThick!: boolean;
@@ -212,6 +216,7 @@ export class Bullet {
         this.reflected = false;
         this.lastShot = params.lastShot ?? false;
         this.speedMult = params.speedMult ?? 1;
+        this.distanceMult = params.distanceMult ?? 1;
         this.baseSpeed = bulletDef.speed;
         this.accelerating = bulletDef.accelerating ?? 0;
         this.speedVariance = variance;
@@ -264,6 +269,8 @@ export class Bullet {
         this.apRounds = params.apRounds ?? false;
         this.highVelocity = params.highVelocity ?? false;
         this.modified = params.modified ?? false;
+        this.piercing = params.piercing ?? bulletDef.piercing ?? false;
+        this.pierceCount = params.pierceCount ?? 0;
         this.trailSaturated = params.trailSaturated ?? false;
         this.trailSmall = params.trailSmall ?? false;
         this.trailThick = params.trailThick ?? false;
@@ -659,6 +666,7 @@ export class Bullet {
             const col = collisions[i];
 
             if (col.type == "obstacle") {
+                const obstacle = col.obj! as Obstacle;
                 const mapDef = MapObjectDefs[col.obstacleType!] as ObstacleDef;
 
                 const def = GameObjectDefs[this.bulletType] as BulletDef;
@@ -679,7 +687,50 @@ export class Bullet {
                     dir: this.dir,
                 });
 
-                if (mapDef.reflectBullets) {
+                if (this.piercing && obstacle.destructible && !mapDef.reflectBullets) {
+                    const def = GameObjectDefs[this.bulletType] as BulletDef;
+                    const pierceDamageMult = def.pierceDamageMult ?? 0.5;
+                    const pierceDistanceMult = def.pierceDistanceMult ?? 0.5;
+                    const remainingDistance = this.distance - this.distanceTraveled;
+                    const maxPierce = def.maxPierce ?? GameConfig.bullet.maxPierce;
+
+                    if (
+                        remainingDistance > 0 &&
+                        this.pierceCount < maxPierce
+                    ) {
+                        this.bulletManager.fireBullet({
+                            bulletType: this.bulletType,
+                            gameSourceType: this.shotSourceType,
+                            mapSourceType: this.mapSourceType,
+                            pos: col.point,
+                            dir: this.dir,
+                            layer: this.layer,
+                            damageType: this.damageType,
+                            playerId: this.playerId,
+                            damageMult: this.damageMult * pierceDamageMult,
+                            speedMult: this.speedMult,
+                            distanceMult: this.distanceMult,
+                            shotFx: false,
+                            shotOffhand: this.shotOffhand,
+                            shotAlt: false,
+                            splinter: false,
+                            apRounds: this.apRounds,
+                            highVelocity: this.highVelocity,
+                            modified: this.modified,
+                            piercing: this.piercing,
+                            pierceCount: this.pierceCount + 1,
+                            trailSaturated: this.trailSaturated,
+                            trailSmall: this.trailSmall,
+                            trailThick: this.trailThick,
+                            reflectCount: 0,
+                            reflectObjId: col.obj!.__id,
+                            onHitFx: this.onHitFx,
+                            varianceT: this.varianceT,
+                            clipDistance: true,
+                            distance: remainingDistance * pierceDistanceMult,
+                        });
+                    }
+                } else if (mapDef.reflectBullets) {
                     this.reflect(col.point, col.normal, col.obj!.__id);
                 }
 
