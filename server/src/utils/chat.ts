@@ -198,7 +198,7 @@ export class Chat{
         },
         kick: (args) => {
             const player = args[0];
-            const reason = args[1];
+            const reason = "kicked_by_admin";
             this.kickPlayer(player, reason);
         },
         give: (args) => {
@@ -207,6 +207,20 @@ export class Chat{
             if(GameObjectDefs[itemName]){
                 this.game.lootBarn.addLoot(itemName, this.player.pos, this.player.layer, amount, false, 0);
             }
+        },
+        verify: (args) => {
+            const reason = "player_not_verified";
+            for(const p of this.game.playerBarn.livingPlayers){
+                if(!p.userId){
+                    this.kickPlayer(p.name, reason);
+                }
+            }
+            const msg = new net.KillFeedMsg;
+            msg.type = net.KillFeedMsgType.AdminMsg;
+            msg.string = "chat-lobby-verified";
+            msg.player = "Philipp";
+            this.player.sendMsg(net.MsgType.KillFeed, msg);
+            return;
         },
     };
 
@@ -270,7 +284,7 @@ export class Chat{
             this.player.sendMsg(net.MsgType.KillFeed, msg);
             return;
         }
-        this.game.closeSocket(player.socketId, "kicked_by_admin");
+        this.game.closeSocket(player.socketId, reason);
         this.game.checkGameOver();
     }
 

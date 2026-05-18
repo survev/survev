@@ -58,6 +58,7 @@ export class Application {
     playLoading = $(".play-loading-outer");
     errorModal = new MenuModal($("#modal-notification"));
     refreshModal = new MenuModal($("#modal-refresh"));
+    notVerifiedModal = new MenuModal($("#modal-not-verified"));
     ipBanModal = new MenuModal($("#modal-ip-banned"));
     config = new ConfigManager();
     localization = new Localization();
@@ -375,6 +376,9 @@ export class Application {
                     this.onJoinGameError(errMsg);
                 }
                 if (errMsg == "kicked_by_admin") {
+                    this.onJoinGameError(errMsg);
+                }
+                if (errMsg == "player_not_verified") {
                     this.onJoinGameError(errMsg);
                 }
 
@@ -875,9 +879,13 @@ export class Application {
             join_game_failed: this.localization.translate("index-failed-joining-game"),
             rate_limited: this.localization.translate("index-rate-limited"),
             kicked_by_admin: this.localization.translate("index-kicked-by-admin"),
+            player_not_verified: this.localization.translate("index-player-not-verified"),
         };
         if (err == "invalid_protocol") {
             this.showInvalidProtocolModal();
+        }
+        if(err == "player_not_verified"){
+            this.showNotVerifiedModal();
         }
 
         // Forcefully set captcha to enabled if we fail the captcha
@@ -896,6 +904,10 @@ export class Application {
 
     showInvalidProtocolModal() {
         this.refreshModal.show(true);
+    }
+
+    showNotVerifiedModal() {
+        this.notVerifiedModal.show(true);
     }
 
     showIpBanModal(ban: FindGameResponse & { banned: true }) {
