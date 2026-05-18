@@ -764,6 +764,7 @@ export const BaseDefs: Record<string, GunDef> = {
         shotSpread: 1.5,
         bulletCount: 1,
         bulletType: "bullet_m249",
+        upgraded: { gun: "modified_m249", cost: 6 },
         headshotMult: 1,
         speed: { equip: 0, attack: -2 },
         lootImg: {
