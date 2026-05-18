@@ -4934,6 +4934,42 @@ input [type="image"]:focus {
   font-size: 18px;
 }
 
+#modal-not-verified {
+  background-color: #000;
+  background-color: rgba(0, 0, 0, 0.75);
+}
+
+#modal-not-verified a {
+  text-decoration: underline;
+  color: #000;
+  font-weight: 700;
+}
+
+#modal-not-verified .modal-content {
+  text-decoration: none;
+  left: 50%;
+  transform: translateX(-50%);
+  bottom: 50%;
+  animation-name: fadeIn;
+  animation-duration: 0.2s;
+}
+
+#modal-not-verified .modal-header {
+  background-color: #8a2be2;
+}
+
+#modal-not-verified .modal-body p {
+  font-size: 16px;
+}
+
+#modal-not-verified .modal-footer {
+  background-color: #8a2be2;
+}
+
+#modal-not-verified .modal-footer .close-footer {
+  font-size: 18px;
+}
+
 #modal-ip-banned {
   background-color: #000;
   background-color: rgba(0, 0, 0, 0.75);
@@ -6654,6 +6690,11 @@ input [type="image"]:focus {
     bottom: 65%;
   }
 
+  #modal-not-verified .modal-content {
+    top: 10%;
+    bottom: 65%;
+  }
+
   #settings-links {
     display: block;
   }
@@ -6997,6 +7038,12 @@ input [type="image"]:focus {
   }
 
   #modal-refresh .modal-content {
+    top: 20%;
+    bottom: 60%;
+    width: 85%;
+  }
+
+   #modal-not-verified .modal-content {
     top: 20%;
     bottom: 60%;
     width: 85%;

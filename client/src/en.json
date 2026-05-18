@@ -291,6 +291,7 @@
   "chat-player-not-found": "Wasn't able to find the player.",
   "chat-banned-until": "You are chat banned until:",
   "chat-banned": "You are chat banned.",
+  "chat-lobby-verified": "Lobby verification successful!",
   "game-waiting-for-players": "Waiting for players",
   "game-spectating": "Spectating",
   "game-red-zone-advances": "Red zone advances in",
