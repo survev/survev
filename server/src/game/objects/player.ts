@@ -4257,7 +4257,7 @@ export class Player extends BaseGameObject {
         if (
             this.actionType == GameConfig.Action.UseItem ||
             this.actionType == GameConfig.Action.Revive ||
-            this.weaponManager.cookingThrowable || this.actionType !== GameConfig.Action.Modify
+            this.weaponManager.cookingThrowable || this.actionType == GameConfig.Action.Modify
         ) {
             return;
         }
