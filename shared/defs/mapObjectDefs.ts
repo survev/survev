@@ -11308,10 +11308,12 @@ export const MapObjectDefs: Record<string, MapObjectDef> = {
         explodeParticle: "airdropCrate02x",
     } as unknown as Partial<ObstacleDef>),
     class_shell_01: createAirdrop({
+        obstacleType: undefined,
         terrain: {
             minDistanceFromSameType: 32,
         },
         collision: collider.createCircle(v2.create(0, 0), 2.25),
+        airdropCrate: false,
         button: {
             useImg: "map-class-shell-01b.img",
             useParticle: "classShell01a",
