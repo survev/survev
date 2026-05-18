@@ -37,6 +37,7 @@ export enum Action {
     Revive,
     Count,
     InstantRevive,
+    Modify,
 }
 
 export enum Rarity {

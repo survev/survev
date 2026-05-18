@@ -664,14 +664,9 @@ export class Obstacle extends BaseGameObject {
                     });
                 return;
             }
-            player.invManager.take("construction_item", cost);
-            player.weaponManager.setWeapon(playerCurWeapIdx, weapon.upgraded.gun, upgradedWeaponDef.maxClip);
-            
-            pickupMsg.type = net.PickupMsgType.WeaponUpgraded;
-            player.msgsToSend.push({
-                        type: net.MsgType.Pickup,
-                        msg: pickupMsg,
-                    });
+
+            player.doAction(weapon.upgraded.gun, GameConfig.Action.Modify, 3, 0, this.pos);
+
         } else
         if (this.button.useType && this.parentBuilding) {
             for (const obj of this.parentBuilding.childObjects) {

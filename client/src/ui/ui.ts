@@ -763,6 +763,10 @@ export class UiManager {
                     actionTxt2 = localPlayer.downed ? "" : targetName;
                     break;
                 }
+                case Action.Modify: {
+                    actionTxt1 = this.localization.translate("game-modifying");
+                    break;
+                }
             }
 
             if (actionTxt1 != "" || actionTxt2 != "") {
