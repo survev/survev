@@ -4234,6 +4234,10 @@ export const ModifiedGunDefs: Record<string, GunDef> = {
         bulletType: "bullet_l86_modified",
         upgraded: undefined,
         modifiedSound: "l86_01",
+        lootImg: {
+            border: "loot-circle-outer-modified-01.img",
+        },
+    }),
     modified_scout_elite: defineGunSkin("scout_elite",{
         name: "Scout Elite [+]",
         maxReload: 1,
@@ -4243,6 +4247,7 @@ export const ModifiedGunDefs: Record<string, GunDef> = {
         reloadTime: 0.8,
         reloadTimeAlt: 2.6,
         upgraded: undefined,
+        modifiedSound: "scout_01",
         lootImg: {
             border: "loot-circle-outer-modified-01.img",
         },
@@ -4250,11 +4255,15 @@ export const ModifiedGunDefs: Record<string, GunDef> = {
             sprite: "gun-scout_elite-01.img",
             tint: 0xffffff,
         },
+        sound: {
+            reloadAlt: "scout_reload_01",
+        },
     }),
     modified_m249: defineGunSkin("m249", {
         name: "M249 [+]",
         backpackFed: true,
         upgraded: undefined,
+        modifiedSound: "m249_01",
         lootImg: {
             border: "loot-circle-outer-modified-01.img",
         },

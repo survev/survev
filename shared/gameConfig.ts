@@ -343,6 +343,7 @@ export const GameConfig = {
     teamColors: [0xcc0000, 0x7eff],
     bullet: {
         maxReflect: 3,
+        maxPierce: 1,
         reflectDistDecay: 1.5,
         height: 0.25,
         falloff: true,
