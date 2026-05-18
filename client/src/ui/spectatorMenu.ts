@@ -66,6 +66,7 @@ export class SpectatorMenu{
         this.serverSelect.on("change", () => {
                 const t = this.serverSelect.find(":selected").val();
                 this.config.set("region", t as string);
+                this.gameInfo.fetchGameInfo(this.config.get("region")!);
             });
 
         this.gameSelect.change(() => {
@@ -118,8 +119,6 @@ export class SpectatorMenu{
                 const collapsed = $box.toggleClass('collapsed').hasClass('collapsed');
                 this.playersToggle.text(collapsed ? "Show" : "Hide");
             });
-
-            this.update();
 
     }
 
@@ -328,12 +327,10 @@ export class SpectatorMenu{
         this.refreshModal.show(true);
     }
 
-    update(){
-        //loop every  reloading the menu
-        /*
-        setInterval(() => {
-            this.gameInfo.fetchGameInfo(this.config.get("region")!);
-        }, 10000);*/
+    update(dt: number){
+        //hier iwie antwort auf api server wenn neues game um list upzudaten
+        
+
     }
 
     findGameWithId(selectedGameId: string, region: string, cb: (err?: string | null, matchData?: MatchData) => void,){

@@ -10,7 +10,7 @@ import {
     zGiveItemParams,
     zRemoveItemParams,
 } from "../../../../../shared/types/moderation";
-import { serverConfigPath } from "../../../config";
+import { Config, serverConfigPath } from "../../../config";
 import { isBehindProxy } from "../../../utils/serverHelpers";
 import {
     type SaveGameBody,
@@ -35,7 +35,7 @@ import {
     usersTable,
 } from "../../db/schema";
 import { MOCK_USER_ID } from "../user/auth/mock";
-import { isBanned, logPlayerIPs, ModerationRouter } from "./ModerationRouter";
+import { getActiveChatBan, isBanned, logPlayerIPs, ModerationRouter } from "./ModerationRouter";
 import { _allowedCrosshairs, _allowedEmotes, _allowedHealEffects, _allowedMeleeSkins, _allowedOutfits, UnlockDefs } from "../../../../../shared/defs/gameObjects/unlockDefs";
 import { PassDefs } from "../../../../../shared/defs/gameObjects/passDefs";
 import { level } from "winston";
@@ -338,6 +338,24 @@ export const PrivateRouter = new Hono<Context>()
         },
     )
     .post(
+        "/check_chat_ip",
+        validateParams(
+            z.object({
+                ip: z.string(),
+            }),
+        ),
+        async (c) => {
+            const { ip } = c.req.valid("json");
+
+            const banData = await getActiveChatBan(ip);
+            if (banData) {
+                return c.json({ banned: true, banData: banData, behindProxy: false });
+            }
+
+            return c.json({ banned: false, banData: undefined, behindProxy: false });
+        },
+    )
+    .post(
         "/test/insert_game",
         databaseEnabledMiddleware,
         validateParams(
@@ -365,6 +383,7 @@ export const PrivateRouter = new Hono<Context>()
                     rank: 3,
                     died: true,
                     kills: 5,
+                    assists: 5,
                     damageDealt: 1247,
                     damageTaken: 862,
                     killerId: 18765,
@@ -376,6 +395,13 @@ export const PrivateRouter = new Hono<Context>()
             await db.insert(matchDataTable).values(matchData);
             return c.json({ success: true }, 200);
         },
+    )
+    .post(
+        "/update_modes",
+        async (c) => {
+                server.refreshRegionModes();
+                return c.json({ success: true }, 200);
+        }
     );
 
     function getPassLevelXp(passType: string, level: number) {

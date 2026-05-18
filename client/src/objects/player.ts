@@ -7,7 +7,7 @@ import type {
     HealDef,
     HelmetDef,
 } from "./../../../shared/defs/gameObjects/gearDefs";
-import type { GunDef } from "../../../shared/defs/gameObjects/gunDefs";
+import { GunDefs, type GunDef } from "../../../shared/defs/gameObjects/gunDefs";
 import type { MeleeDef } from "../../../shared/defs/gameObjects/meleeDefs";
 import type { OutfitDef } from "../../../shared/defs/gameObjects/outfitDefs";
 import type { RoleDef } from "../../../shared/defs/gameObjects/roleDefs";
@@ -627,11 +627,21 @@ export class Player implements AbstractObject {
             this.m_localData.m_curWeapIdx = data.curWeapIdx;
             this.m_localData.m_weapons = [];
             for (let i = 0; i < GameConfig.WeaponSlot.Count; i++) {
-                const w = {
-                    type: data.weapons[i].type,
-                    ammo: data.weapons[i].ammo,
-                };
-                this.m_localData.m_weapons.push(w);
+                const weapon = GunDefs[data.weapons[i].type];
+                if (weapon && weapon.backpackFed) {
+                    const ammo = this.m_localData.m_inventory[weapon.ammo] || 0;
+                    const w = {
+                        type: data.weapons[i].type,
+                        ammo: data.weapons[i].ammo + ammo,
+                    };
+                    this.m_localData.m_weapons.push(w);
+                }else {
+                    const w = {
+                        type: data.weapons[i].type,
+                        ammo: data.weapons[i].ammo,
+                    };
+                    this.m_localData.m_weapons.push(w);
+                }
             }
         }
         if (data.spectatorCountDirty) {

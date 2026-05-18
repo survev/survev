@@ -763,6 +763,10 @@ export class UiManager {
                     actionTxt2 = localPlayer.downed ? "" : targetName;
                     break;
                 }
+                case Action.Modify: {
+                    actionTxt1 = this.localization.translate("game-modifying");
+                    break;
+                }
             }
 
             if (actionTxt1 != "" || actionTxt2 != "") {
@@ -1727,13 +1731,13 @@ export class UiManager {
                 const tableHeader = $("<div/>", {
                     class: "ui-stats-row header"
                 }).append([
+                    $("<div/>", { class: "ui-stats-col rank", text: "RANK" }),
                     $("<div/>", { class: "ui-stats-col player-tittle", text: "PLAYER" }),
                     $("<div/>", { class: "ui-stats-col", text: "KILLS" }),
                     $("<div/>", { class: "ui-stats-col", text: "ASSISTS" }),
                     $("<div/>", { class: "ui-stats-col", text: "DAMAGE DEALT" }),
                     $("<div/>", { class: "ui-stats-col", text: "DAMAGE TAKEN" }),
                     $("<div/>", { class: "ui-stats-col", text: "TIME" }),
-                    $("<div/>", { class: "ui-stats-col", text: "ELO GAINED" })
                 ]);
         
                 const sortedPlayerStats = playerStats.sort((a, b) => {
@@ -1769,10 +1773,14 @@ export class UiManager {
                             text: helpers.htmlEscape(playerInfo.name)
                         }),
                         $("<div/>", { class: "ui-stats-col", text: stats.kills }),
+                        $("<div/>", { class: "ui-stats-col", text: stats.assists }),
                         $("<div/>", { class: "ui-stats-col", text: stats.damageDealt }),
                         $("<div/>", { class: "ui-stats-col", text: stats.damageTaken }),
                         $("<div/>", { class: "ui-stats-col", text: timeAlive }),
                     ]);
+                    if (stats.playerId == this.game.m_localId) {
+                        playerRow.addClass("active-player");
+                    }
         
                     tableRowsContainer.append(playerRow);
                 }

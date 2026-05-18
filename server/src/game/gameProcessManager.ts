@@ -144,7 +144,6 @@ class GameProcess implements GameData {
         this.avaliableSlots--;
     }
     addJoinTokensAsSpectator(tokens: FindGamePrivateBody["playerData"], autoFill: boolean) {
-        console.log("Adding join tokens as spectator:", tokens, "autoFill:", autoFill);
         this.send({
             type: ProcessMsgType.AddJoinTokenAsSpectator,
             autoFill,

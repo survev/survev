@@ -350,6 +350,7 @@ export class Obstacle extends BaseGameObject {
         if (this.type === "saloon_door_secret" || this.type === "house_door_01") return;
         let newLayer = this.originalLayer;
         const def = MapObjectDefs[this.type] as ObstacleDef;
+        if(!def.door) return;
         const coll = collider.createCircle(this.pos, def.door!.interactionRad + 1);
         const objs = this.game.grid.intersectCollider(coll);
         for (const obj of objs) {
@@ -615,6 +616,7 @@ export class Obstacle extends BaseGameObject {
             const pickupMsg = new net.PickupMsg();
 
             const activeWeaponType = player.activeWeapon;
+            const playerCurWeapIdx = player.weaponManager.curWeapIdx;
             if (!activeWeaponType) {
                 pickupMsg.type = net.PickupMsgType.NoWeaponUpgrade;
                 player.msgsToSend.push({
@@ -662,14 +664,9 @@ export class Obstacle extends BaseGameObject {
                     });
                 return;
             }
-            player.invManager.take("construction_item", cost);
-            player.weaponManager.setWeapon(player.weaponManager.curWeapIdx, weapon.upgraded.gun, upgradedWeaponDef.maxClip);
-            
-            pickupMsg.type = net.PickupMsgType.WeaponUpgraded;
-            player.msgsToSend.push({
-                        type: net.MsgType.Pickup,
-                        msg: pickupMsg,
-                    });
+
+            player.doAction(weapon.upgraded.gun, GameConfig.Action.Modify, 3, 0, this.pos);
+
         } else
         if (this.button.useType && this.parentBuilding) {
             for (const obj of this.parentBuilding.childObjects) {

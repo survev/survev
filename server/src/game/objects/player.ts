@@ -1017,7 +1017,7 @@ export class Player extends BaseGameObject {
 
     actionType: Action = GameConfig.Action.None;
     actionSeq = 0;
-    action = { time: 0, duration: 0, targetId: 0 };
+    action = { time: 0, duration: 0, targetId: 0, targetPos: v2.create(0, 0) };
 
     timeUntilHidden = -1; // for showing on enemy minimap in 50v50
 
@@ -1381,40 +1381,12 @@ export class Player extends BaseGameObject {
             // Must be on the same layer (stairs / multi-layer buildings)
             if (!util.sameLayer(obj.layer, layer)) continue;
 
-            // 1) If the object has a collider, use it directly for point testing.
-            if (obj.collider) {
-                if (collider.intersectCircle(obj.collider, pos, 0.0001)) {
-                    return true;
-                }
-            }
+            //do not trigger on destroyed objects
+            if(obj.destructible && obj.health <=1) return false;
 
-            // 2) Buildings can provide cover via their floor surfaces / obstacle bounds.
-            if (obj.__type === ObjectType.Building) {
-                // Floor surfaces (used for stuff like grassy cover areas)
-                if (obj.surfaces) {
-                    for (let j = 0; j < obj.surfaces.length; j++) {
-                        const surface = obj.surfaces[j];
-                        for (let k = 0; k < surface.colliders.length; k++) {
-                            if (collider.intersectCircle(surface.colliders[k], pos, 0.0001)) {
-                                return true;
-                            }
-                        }
-                    }
-                }
+            const scale = obj.scale ?? 1;
 
-                // Some cover buildings define mapObstacleBounds rather than surfaces.
-                const def: any = MapObjectDefs[obj.type];
-                const bounds = def?.mapObstacleBounds as Array<any> | undefined;
-                if (bounds) {
-                    for (const b of bounds) {
-                        if (coldet.testPointAabb(pos, b.min, b.max)) {
-                            return true;
-                        }
-                    }
-                }
-            }
-
-            // 3) Fallback: check bounding box from definition (good for obstacles whose visual cover isn't the same
+            // 2) Fallback: check bounding box from definition (good for obstacles whose visual cover isn't the same
             //    as their collision collider, like trees).
             const def: any = MapObjectDefs[obj.type];
             if (def?.aabb) {
@@ -1422,9 +1394,12 @@ export class Player extends BaseGameObject {
 
                 // Some defs store AABBs as { min, max } (e.g. tree defs), others as { center, extents }.
                 if (def.aabb.min && def.aabb.max) {
+                    
+                
                     const min = v2.add(v2.mul(def.aabb.min, s), obj.pos);
                     const max = v2.add(v2.mul(def.aabb.max, s), obj.pos);
-                    if (coldet.testPointAabb(pos, min, max)) {
+                    const playerRadius = this.collider.rad;
+                    if (this.circleMostlyInsideAabb(pos, playerRadius, min, max, 0.8)) {
                         return true;
                     }
                 } else if (def.aabb.extents) {
@@ -1438,9 +1413,107 @@ export class Player extends BaseGameObject {
                     }
                 }
             }
+
+            // 3) If the object has a collider, use it directly for point testing.
+            if (obj.collider) {
+
+                const playerRadius = this.collider.rad;
+
+            if ( 
+                obj.collider.rad &&
+                this.circleMostlyInsideCircle(
+                    pos,
+                    playerRadius,
+                    obj.pos,
+                    obj.collider.rad,
+                    0.8
+                )
+            ) {
+                return true;
+            }else if(obj.collider.min && obj.collider.max){
+                if(this.circleMostlyInsideAabb(pos, playerRadius, obj.collider.min, obj.collider.max, 0.8)){
+                    return true;
+                }
+            }
+        }
         }
 
         return false;
+    }
+
+    private circleMostlyInsideAabb(
+        center: Vec2,
+        radius: number,
+        min: Vec2,
+        max: Vec2,
+        requiredRatio = 0.8
+    ): boolean {
+        let inside = 0;
+        let total = 0;
+
+        const samples = 7; // höher = genauer, aber teurer
+
+        for (let ix = 0; ix < samples; ix++) {
+            for (let iy = 0; iy < samples; iy++) {
+                const x = center.x - radius + (2 * radius * ix) / (samples - 1);
+                const y = center.y - radius + (2 * radius * iy) / (samples - 1);
+
+                const dx = x - center.x;
+                const dy = y - center.y;
+
+                // nur Punkte innerhalb des Player-Circles zählen
+                if (dx * dx + dy * dy <= radius * radius) {
+                    total++;
+
+                    if (
+                        x >= min.x &&
+                        x <= max.x &&
+                        y >= min.y &&
+                        y <= max.y
+                    ) {
+                        inside++;
+                    }
+                }
+            }
+        }
+
+        return total > 0 && inside / total >= requiredRatio;
+    }
+
+    private circleMostlyInsideCircle(
+        playerPos: Vec2,
+        playerRadius: number,
+        coverPos: Vec2,
+        coverRadius: number,
+        requiredRatio = 0.8
+    ): boolean {
+        let inside = 0;
+        let total = 0;
+
+        const samples = 9;
+
+        for (let ix = 0; ix < samples; ix++) {
+            for (let iy = 0; iy < samples; iy++) {
+                const x = playerPos.x - playerRadius + (2 * playerRadius * ix) / (samples - 1);
+                const y = playerPos.y - playerRadius + (2 * playerRadius * iy) / (samples - 1);
+
+                const dxPlayer = x - playerPos.x;
+                const dyPlayer = y - playerPos.y;
+
+                if (dxPlayer * dxPlayer + dyPlayer * dyPlayer <= playerRadius * playerRadius) {
+                    total++;
+
+                    const dxCover = x - coverPos.x;
+                    const dyCover = y - coverPos.y;
+
+                    if (dxCover * dxCover + dyCover * dyCover <= coverRadius * coverRadius) {
+                        inside++;
+                    }
+                }
+            }
+        }
+
+        return total > 0 && inside / total >= requiredRatio;
     }
 
     private isCoverType(type: string): boolean {
@@ -1687,6 +1760,7 @@ export class Player extends BaseGameObject {
 
     kills = 0;
     timeAlive = 0;
+    assists = 0;
 
     msgsToSend: Array<{ type: number; msg: net.Msg }> = [];
 
@@ -1914,6 +1988,7 @@ export class Player extends BaseGameObject {
             if (this.roleMenuTicker <= 0) {
                 this.roleMenuTicker = 0;
                 const roleChoices = this.game.map.mapDef.gameMode.perkModeRoles!;
+                if(roleChoices.length <= 0) return;
                 const randomRole = roleChoices[util.randomInt(0, roleChoices.length - 1)];
                 this.roleSelect(randomRole);
             }
@@ -2081,6 +2156,13 @@ export class Player extends BaseGameObject {
             }
         }
 
+        if (this.isModifying()){
+            //check if close to workbench
+            if(v2.distance(this.pos, this.action.targetPos) > 5){
+                this.cancelAction();
+            }
+        }
+
         if (this.downedDamageTicker > 0) {
             this.downedDamageTicker -= dt;
 
@@ -2164,7 +2246,7 @@ export class Player extends BaseGameObject {
             }
         }
 
-        if (this.reloadAgain && this.actionType !== GameConfig.Action.Revive) {
+        if (this.reloadAgain && this.actionType !== GameConfig.Action.Revive && this.actionType !== GameConfig.Action.Modify) {
             this.reloadAgain = false;
             this.weaponManager.scheduledReload = true;
         }
@@ -2237,6 +2319,8 @@ export class Player extends BaseGameObject {
                         target.setGroupStatuses();
                         this.game.pluginManager.emit("playerRevived", target);
                     });
+                } else if (this.actionType === GameConfig.Action.Modify) {
+                    this.weaponManager.upgradeCurrentWeapon();
                 }
 
                 // Prevent cancelAction from being called by revived players at the end of revive
@@ -2248,7 +2332,7 @@ export class Player extends BaseGameObject {
                     (this.curWeapIdx == GameConfig.WeaponSlot.Primary ||
                         this.curWeapIdx == GameConfig.WeaponSlot.Secondary) &&
                     this.weapons[this.curWeapIdx].ammo == 0 &&
-                    this.actionType !== GameConfig.Action.Revive
+                    this.actionType !== GameConfig.Action.Revive && this.actionType !== GameConfig.Action.Modify
                 ) {
                     this.weaponManager.scheduledReload = true;
                 }
@@ -3021,7 +3105,7 @@ export class Player extends BaseGameObject {
             updateMsg.playerStatusDirty = true;
         }
 
-        if (player.groupStatusDirty) {
+        if (player.groupStatusDirty && player.group) {
             const teamPlayers = player.group!.players;
 
             let statuses: GroupStatus[] = [];
@@ -3242,6 +3326,7 @@ export class Player extends BaseGameObject {
      * doesn't care about kill credit or anything, simply the last player to damage you (excludes yourself)
      */
     lastDamagedBy: Player | undefined;
+    damageHistory: { source: GameObject, name: string, amount: number, time: number }[] = [];
 
     damage(params: DamageParams) {
         if (this.debug.godMode) return;
@@ -3324,10 +3409,29 @@ export class Player extends BaseGameObject {
             if (playerSource.groupId !== this.groupId) {
                 playerSource.damageDealt += finalDamage;
             }
-            this.lastDamagedBy = playerSource;
+            if(playerSource.teamId !== this.teamId){
+                this.lastDamagedBy = playerSource;
+            }
         }
 
         this.health -= finalDamage;
+
+        //add to damage history
+        //if last dmg is from same source, add to that, otherwise push new entry
+        const last = this.damageHistory[this.damageHistory.length - 1];
+        if(last && last.source === params.source){
+            last.amount += finalDamage;
+        } else {
+            const source = params.source;
+            let name: string;
+            if(source instanceof Player){
+                name = source.name;
+            }else {
+                name = "GameDesign";
+            }
+            if(source)
+            this.damageHistory.push({ source: source, name: name, amount: finalDamage, time: this.game.startedTime });
+        }
 
         if (this.game.isTeamMode) {
             this.setGroupStatuses();
@@ -3358,6 +3462,7 @@ export class Player extends BaseGameObject {
                 rank: player.rank,
                 timeAlive: player.timeAlive,
                 kills: player.kills,
+                assists: player.assists,
                 dead: player.dead,
                 damageDealt: player.damageDealt,
                 damageTaken: player.damageTaken,
@@ -3378,6 +3483,10 @@ export class Player extends BaseGameObject {
             this.msgsToSend.push({
                 type: net.MsgType.GameOver,
                 msg: gameOverMsg,
+            },
+            {
+            type: net.MsgType.UpdatePass,
+            msg: new net.UpdatePassMsg(),
             });
         
             for (const spectator of this.spectators) {
@@ -3393,7 +3502,7 @@ export class Player extends BaseGameObject {
             if (this.game.modeManager.showStatsMsg(this)) {
                 const statsMsg = new net.PlayerStatsMsg();
                 statsMsg.playerStats = this;
-                this.msgsToSend.push({ type: net.MsgType.PlayerStats, msg: statsMsg });
+                this.msgsToSend.push({ type: net.MsgType.PlayerStats, msg: statsMsg },{type: net.MsgType.UpdatePass,msg: new net.UpdatePassMsg(),});
             } else {
                 const gameOverMsg = new net.GameOverMsg();
 
@@ -3406,7 +3515,7 @@ export class Player extends BaseGameObject {
                 gameOverMsg.gameOver = !!winningTeamId;
                 gameOverMsg.spectator = this.spectator;
                 gameOverMsg.betterStats = false;
-                this.msgsToSend.push({ type: net.MsgType.GameOver, msg: gameOverMsg });
+                this.msgsToSend.push({ type: net.MsgType.GameOver, msg: gameOverMsg },{type: net.MsgType.UpdatePass,msg: new net.UpdatePassMsg(),});
 
                 for (const spectator of this.spectators) {
                     spectator.msgsToSend.push({
@@ -3477,6 +3586,7 @@ export class Player extends BaseGameObject {
 
     killedBy: Player | undefined;
     killedIds: number[] = [];
+    assistedIds: number[] = [];
 
     kill(params: DamageParams): void {
         if (this.dead) return;
@@ -3672,6 +3782,49 @@ export class Player extends BaseGameObject {
         }
 
         this.game.broadcastMsg(net.MsgType.Kill, killMsg);
+
+        //assist logic
+        const lastDmg = this.damageHistory[this.damageHistory.length - 1];
+        let dealtDamage = lastDmg?.amount ?? 0;
+        if (dealtDamage <= 50){
+            //find assist (only if player dealt more than 50 damage)
+            //reversed for loop to find most recent assist
+            let assistPlayer: Player | undefined = undefined;
+            let dmgAmount = 0;
+            let damageToKillHistory: { source: GameObject, amount: number, time: number }[] = [];
+            for (let i = this.damageHistory.length - 2; i >= 0; i--) {
+                const dmg = this.damageHistory[i];
+                if(!dmg){
+                    break;
+                }
+                const sameSourceDmg = damageToKillHistory.find(d => d.source === dmg.source);
+                if(!sameSourceDmg){
+                    damageToKillHistory.push(dmg);
+                }else{
+                    sameSourceDmg.amount += dmg.amount;
+                }
+                if ((sameSourceDmg ? sameSourceDmg.amount : dmg.amount) >=50 && dmg.source.__type === ObjectType.Player && dmg.source !== params.killCreditSource && dmg.source !== this){
+                    assistPlayer = dmg.source as Player;
+                    assistPlayer.assistedIds.push(this.matchDataId);
+                    dmgAmount = sameSourceDmg ? sameSourceDmg.amount : dmg.amount;
+                    break;
+                }
+                
+                dealtDamage += dmg.amount;
+                if (dealtDamage > 100){
+                    break;
+                }
+            }
+            if (assistPlayer){
+                assistPlayer.assists++;
+                const assistMsg = new net.AssistMsg();
+                assistMsg.assisterId = assistPlayer.__id;
+                assistMsg.targetId = this.__id;
+                assistMsg.damageAmount = dmgAmount;
+                assistMsg.assists = assistPlayer.assists;
+                assistPlayer.sendMsg(net.MsgType.Assist, assistMsg);
+            }
+        }
 
         if (this.role) {
             const roleMsg = new net.RoleAnnouncementMsg();
@@ -3926,6 +4079,10 @@ export class Player extends BaseGameObject {
         return this.actionType == GameConfig.Action.Revive && !!this.action.targetId;
     }
 
+    isModifying() {
+        return this.actionType == GameConfig.Action.Modify;
+    }
+
     isBeingRevived() {
         if (!this.downed) return false;
 
@@ -4048,7 +4205,7 @@ export class Player extends BaseGameObject {
             (!hasAoeHeal && this.health == itemDef.maxHeal) ||
             this.actionType == GameConfig.Action.UseItem ||
             this.actionType == GameConfig.Action.Revive ||
-            this.weaponManager.cookingThrowable
+            this.weaponManager.cookingThrowable || this.actionType == GameConfig.Action.Modify
         ) {
             return;
         }
@@ -4100,7 +4257,7 @@ export class Player extends BaseGameObject {
         if (
             this.actionType == GameConfig.Action.UseItem ||
             this.actionType == GameConfig.Action.Revive ||
-            this.weaponManager.cookingThrowable
+            this.weaponManager.cookingThrowable || this.actionType == GameConfig.Action.Modify
         ) {
             return;
         }
@@ -4300,7 +4457,7 @@ export class Player extends BaseGameObject {
                     break;
                 }
                 case GameConfig.Input.Reload:
-                    if (this.actionType !== GameConfig.Action.Revive) {
+                    if (this.actionType !== GameConfig.Action.Revive && this.actionType !== GameConfig.Action.Modify) {
                         this.weaponManager.scheduledReload = true;
                     }
                     break;
@@ -4513,7 +4670,7 @@ export class Player extends BaseGameObject {
         const def = GameObjectDefs[obj.type];
         if (
             /*(this.actionType == GameConfig.Action.UseItem && def.type != "gun") ||*/
-            this.actionType == GameConfig.Action.Revive
+            this.actionType == GameConfig.Action.Revive || this.actionType == GameConfig.Action.Modify
         )
             return;
 
@@ -5267,7 +5424,7 @@ export class Player extends BaseGameObject {
         if (msg.promoteToRole) {
             if (msg.promoteToRoleType) {
                 const def = GameObjectDefs[msg.promoteToRoleType];
-                if (def.type === "role") {
+                if (def?.type === "role") {
                     this.promoteToRole(msg.promoteToRoleType);
                 }
             } else if (this.role) {
@@ -5287,6 +5444,7 @@ export class Player extends BaseGameObject {
         actionType: number,
         duration: number,
         targetId: number = 0,
+        targetPos: Vec2 = v2.create(0, 0),
     ) {
         if (this.actionDirty) {
             // action already in progress
@@ -5294,6 +5452,7 @@ export class Player extends BaseGameObject {
         }
 
         this.action.targetId = targetId;
+        this.action.targetPos = targetPos;
         this.action.duration = duration;
         this.action.time = 0;
 

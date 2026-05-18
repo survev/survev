@@ -326,6 +326,10 @@ export class GameModeManager {
 
     handlePlayerDeath(player: Player, params: DamageParams): void {
         if (this.isSolo) {
+            if(params.source === player && player.lastDamagedBy != undefined){
+                params.killCreditSource = player.lastDamagedBy;
+                params.damageType = DamageType.KillSteal;
+            }
             player.kill(params);
         } else {
             const group = this.mode === GameMode.Faction ? player.team! : player.group!;
@@ -362,6 +366,10 @@ export class GameModeManager {
                     group.killAllTeammates();
                 }
                 return;
+            }
+            if(params.source === player && player.lastDamagedBy != undefined){
+                params.killCreditSource = player.lastDamagedBy;
+                params.damageType = DamageType.KillSteal;
             }
 
             const allDeadOrDisconnected = group.checkAllDeadOrDisconnected(player);

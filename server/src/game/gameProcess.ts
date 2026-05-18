@@ -4,6 +4,7 @@ import { Config } from "../config";
 import { logErrorToWebhook } from "../utils/serverHelpers";
 import { type ProcessMsg, ProcessMsgType } from "../utils/types";
 import { Game } from "./game";
+import { gameLogger } from "../utils/betterLogger";
 
 let game: Game | undefined;
 
@@ -82,6 +83,7 @@ process.on("message", async (msg: ProcessMsg) => {
 setInterval(() => {
     if (Date.now() - lastMsgTime > 10000) {
         console.log("Game process has not received a message in 10 seconds, exiting");
+        gameLogger.warn("No messages received in 10 seconds, exiting");
         process.exit();
     }
 

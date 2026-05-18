@@ -143,6 +143,14 @@ class UiState {
         opacity: 0,
     };
 
+    assistMessage = {
+        text: "",
+        count: "",
+        ticker: 0,
+        duration: 0,
+        opacity: 0,
+    };
+
     killFeed = Array.from({ length: maxKillFeedLines }, () => ({
         text: "",
         color: "#000000",
@@ -251,6 +259,11 @@ export class UiManager2 {
             div: domElemById("ui-kills"),
             text: domElemById("ui-kill-text"),
             count: domElemById("ui-kill-count"),
+        },
+        assistMessage: {
+            div: domElemById("ui-assists"),
+            text: domElemById("ui-assist-text"),
+            count: domElemById("ui-assist-count"),
         },
         killFeed: {
             div: domElemById("ui-killfeed-contents"),
@@ -658,6 +671,13 @@ export class UiManager2 {
         state.killMessage.opacity =
             (1 - math.smoothstep(I, T - 0.2, T)) * (1 - state.rareLootMessage.opacity);
 
+        // Assist message
+        state.assistMessage.ticker += dt;
+        const A = state.assistMessage.ticker;
+        const D = state.assistMessage.duration;
+        state.assistMessage.opacity =
+            (1 - math.smoothstep(A, D - 0.2, D)) * (1 - state.rareLootMessage.opacity);
+
         // KillFeed
         let offset = 0;
         for (let i = 0; i < state.killFeed.length; i++) {
@@ -866,14 +886,15 @@ export class UiManager2 {
         }
         const ge = state.weapons[activePlayer.m_localData.m_curWeapIdx];
         const weaponDef = GameObjectDefs[ge.type] as GunDef | MeleeDef;
-        const we = ge.ammo;
-        const fe =
+        const we = weaponDef.type == "gun" ? weaponDef.backpackFed ? activePlayer.m_localData.m_inventory[weaponDef.ammo] : ge.ammo : ge.ammo;
+        let fe =
             weaponDef.type == "gun"
                 ? weaponDef.ammoInfinite ||
                   ((activePlayer.m_hasPerk("endless_ammo") || activePlayer.m_hasPerk("arena")) && !weaponDef.ignoreEndlessAmmo)
                     ? Number.MAX_VALUE
                     : activePlayer.m_localData.m_inventory[weaponDef.ammo]
                 : 0;
+        fe = weaponDef.type == "gun" ? weaponDef.backpackFed ? 0 : fe : 0;
         state.ammo.current = we;
         state.ammo.remaining = fe;
         state.ammo.displayCurrent = weaponDef.type != "melee";
@@ -972,6 +993,8 @@ export class UiManager2 {
     render(patch: UiState, state: UiState) {
         const dom = this.dom;
 
+
+
         // Touch
         if (patch.touch) {
             dom.interaction.key.style.backgroundImage = state.touch
@@ -1034,6 +1057,15 @@ export class UiManager2 {
         }
         if (patch.killMessage.opacity) {
             dom.killMessage.div.style.opacity = String(state.killMessage.opacity);
+        }
+
+        // Assist message
+        if (patch.assistMessage && (patch.assistMessage.text || patch.assistMessage.count)) {
+            dom.assistMessage.text.innerHTML = state.assistMessage.text;
+            dom.assistMessage.count.innerHTML = state.assistMessage.count;
+        }
+        if (patch.assistMessage && patch.assistMessage.opacity) {
+            dom.assistMessage.div.style.opacity = String(state.assistMessage.opacity);
         }
 
         // KillFeed
@@ -1356,6 +1388,21 @@ export class UiManager2 {
         this.newState.killMessage.ticker = math.max(
             this.newState.killMessage.ticker,
             this.newState.killMessage.duration - 0.2,
+        );
+    }
+
+    displayAssistMessage(text: string, count: string) {
+        const p = this.newState.assistMessage;
+        p.text = text;
+        p.count = count;
+        p.ticker = 0;
+        p.duration = 7;
+    }
+
+    hideAssistMessage() {
+        this.newState.assistMessage.ticker = math.max(
+            this.newState.assistMessage.ticker,
+            this.newState.assistMessage.duration - 0.2,
         );
     }
 

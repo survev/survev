@@ -12,7 +12,7 @@ import { SingleThreadGameManager } from "./game/gameManager";
 import { GameProcessManager } from "./game/gameProcessManager";
 import { GIT_VERSION } from "./utils/gitRevision";
 import { ServerLogger } from "./utils/logger";
-import { gameLogger } from "./utils/betterLogger";
+import { errorLogger, gameLogger } from "./utils/betterLogger";
 import {
     apiPrivateRouter,
     cors,
@@ -34,6 +34,8 @@ import {
 
 process.on("uncaughtException", async (err) => {
     console.error(err);
+    gameLogger.error("Uncaught Exception:", err);
+    errorLogger.error("Uncaught Exception:", err);
 
     await logErrorToWebhook("server", "Game server error:", err);
 
@@ -164,6 +166,18 @@ class GameServer {
             }
         }
     }
+    async updateApiModes(){
+        try {
+            const apiRes = await apiPrivateRouter.update_modes.$post({
+
+            });
+                if (apiRes.ok) {
+                    return true;
+                }
+        } catch (err) {
+            this.logger.error(`Failed to update API modes: `, err);
+        }
+    }
 }
 
 const server = new GameServer();
@@ -171,6 +185,8 @@ const server = new GameServer();
 if (process.env.NODE_ENV !== "production") {
     server.manager.newGame(Config.modes[0]);
 }
+
+server.updateApiModes();
 
 const app = Config.gameServer.ssl
     ? SSLApp({
@@ -232,10 +248,13 @@ app.post("/api/get_modes", (res, req) => {
                     return;
                 }
 
+                console.log("Returning modes for region", region, Config.modes);
+
                 returnJson(res, {
                     data: Config.modes,
                 });
             } catch (error) {
+                console.error("Error in /api/get_modes:", error);
                 server.logger.warn("API get_modes error: ", error);
             }
         },

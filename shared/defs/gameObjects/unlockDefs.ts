@@ -58,6 +58,7 @@ export const _allowedOutfits = [
     "outfitRed",
     "outfitWhite",
     "outfitOhNah",
+    "outfitParrotfish",
 ];
 export const _allowedEmotes = [
     "emote_thumbsup",
