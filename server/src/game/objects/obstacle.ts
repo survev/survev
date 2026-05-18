@@ -616,6 +616,7 @@ export class Obstacle extends BaseGameObject {
             const pickupMsg = new net.PickupMsg();
 
             const activeWeaponType = player.activeWeapon;
+            const playerCurWeapIdx = player.weaponManager.curWeapIdx;
             if (!activeWeaponType) {
                 pickupMsg.type = net.PickupMsgType.NoWeaponUpgrade;
                 player.msgsToSend.push({
@@ -664,7 +665,7 @@ export class Obstacle extends BaseGameObject {
                 return;
             }
             player.invManager.take("construction_item", cost);
-            player.weaponManager.setWeapon(player.weaponManager.curWeapIdx, weapon.upgraded.gun, upgradedWeaponDef.maxClip);
+            player.weaponManager.setWeapon(playerCurWeapIdx, weapon.upgraded.gun, upgradedWeaponDef.maxClip);
             
             pickupMsg.type = net.PickupMsgType.WeaponUpgraded;
             player.msgsToSend.push({

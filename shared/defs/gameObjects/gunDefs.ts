@@ -867,6 +867,7 @@ export const BaseDefs: Record<string, GunDef> = {
         shotSpread: 1,
         bulletCount: 1,
         bulletType: "bullet_scout",
+        upgraded: { gun: "modified_scout_elite", cost: 5 },
         headshotMult: 1,
         speed: { equip: 0, attack: 5 },
         lootImg: {
@@ -4198,6 +4199,22 @@ export const ModifiedGunDefs: Record<string, GunDef> = {
         speed: { equip: -0.5, attack: -3 },
         lootImg: {
             border: "loot-circle-outer-modified-01.img",
+        },
+    }),
+    modified_scout_elite: defineGunSkin("scout_elite",{
+        name: "Scout Elite [+]",
+        maxReload: 1,
+        maxReloadAlt: 5,
+        fireDelay: 0.8,
+        switchDelay: 0.8,
+        reloadTime: 0.8,
+        reloadTimeAlt: 2.6,
+        lootImg: {
+            border: "loot-circle-outer-modified-01.img",
+        },
+        worldImg: {
+            sprite: "gun-scout_elite-01.img",
+            tint: 0xffffff,
         },
     }),
 }
