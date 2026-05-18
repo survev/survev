@@ -1017,7 +1017,7 @@ export class Player extends BaseGameObject {
 
     actionType: Action = GameConfig.Action.None;
     actionSeq = 0;
-    action = { time: 0, duration: 0, targetId: 0 };
+    action = { time: 0, duration: 0, targetId: 0, targetPos: v2.create(0, 0) };
 
     timeUntilHidden = -1; // for showing on enemy minimap in 50v50
 
@@ -2156,6 +2156,13 @@ export class Player extends BaseGameObject {
             }
         }
 
+        if (this.isModifying()){
+            //check if close to workbench
+            if(v2.distance(this.pos, this.action.targetPos) > 5){
+                this.cancelAction();
+            }
+        }
+
         if (this.downedDamageTicker > 0) {
             this.downedDamageTicker -= dt;
 
@@ -2239,7 +2246,7 @@ export class Player extends BaseGameObject {
             }
         }
 
-        if (this.reloadAgain && this.actionType !== GameConfig.Action.Revive) {
+        if (this.reloadAgain && this.actionType !== GameConfig.Action.Revive && this.actionType !== GameConfig.Action.Modify) {
             this.reloadAgain = false;
             this.weaponManager.scheduledReload = true;
         }
@@ -2312,6 +2319,8 @@ export class Player extends BaseGameObject {
                         target.setGroupStatuses();
                         this.game.pluginManager.emit("playerRevived", target);
                     });
+                } else if (this.actionType === GameConfig.Action.Modify) {
+                    this.weaponManager.upgradeCurrentWeapon();
                 }
 
                 // Prevent cancelAction from being called by revived players at the end of revive
@@ -2323,7 +2332,7 @@ export class Player extends BaseGameObject {
                     (this.curWeapIdx == GameConfig.WeaponSlot.Primary ||
                         this.curWeapIdx == GameConfig.WeaponSlot.Secondary) &&
                     this.weapons[this.curWeapIdx].ammo == 0 &&
-                    this.actionType !== GameConfig.Action.Revive
+                    this.actionType !== GameConfig.Action.Revive && this.actionType !== GameConfig.Action.Modify
                 ) {
                     this.weaponManager.scheduledReload = true;
                 }
@@ -4070,6 +4079,10 @@ export class Player extends BaseGameObject {
         return this.actionType == GameConfig.Action.Revive && !!this.action.targetId;
     }
 
+    isModifying() {
+        return this.actionType == GameConfig.Action.Modify;
+    }
+
     isBeingRevived() {
         if (!this.downed) return false;
 
@@ -4192,7 +4205,7 @@ export class Player extends BaseGameObject {
             (!hasAoeHeal && this.health == itemDef.maxHeal) ||
             this.actionType == GameConfig.Action.UseItem ||
             this.actionType == GameConfig.Action.Revive ||
-            this.weaponManager.cookingThrowable
+            this.weaponManager.cookingThrowable || this.actionType == GameConfig.Action.Modify
         ) {
             return;
         }
@@ -4244,7 +4257,7 @@ export class Player extends BaseGameObject {
         if (
             this.actionType == GameConfig.Action.UseItem ||
             this.actionType == GameConfig.Action.Revive ||
-            this.weaponManager.cookingThrowable
+            this.weaponManager.cookingThrowable || this.actionType !== GameConfig.Action.Modify
         ) {
             return;
         }
@@ -4444,7 +4457,7 @@ export class Player extends BaseGameObject {
                     break;
                 }
                 case GameConfig.Input.Reload:
-                    if (this.actionType !== GameConfig.Action.Revive) {
+                    if (this.actionType !== GameConfig.Action.Revive && this.actionType !== GameConfig.Action.Modify) {
                         this.weaponManager.scheduledReload = true;
                     }
                     break;
@@ -4657,7 +4670,7 @@ export class Player extends BaseGameObject {
         const def = GameObjectDefs[obj.type];
         if (
             /*(this.actionType == GameConfig.Action.UseItem && def.type != "gun") ||*/
-            this.actionType == GameConfig.Action.Revive
+            this.actionType == GameConfig.Action.Revive || this.actionType == GameConfig.Action.Modify
         )
             return;
 
@@ -5431,6 +5444,7 @@ export class Player extends BaseGameObject {
         actionType: number,
         duration: number,
         targetId: number = 0,
+        targetPos: Vec2 = v2.create(0, 0),
     ) {
         if (this.actionDirty) {
             // action already in progress
@@ -5438,6 +5452,7 @@ export class Player extends BaseGameObject {
         }
 
         this.action.targetId = targetId;
+        this.action.targetPos = targetPos;
         this.action.duration = duration;
         this.action.time = 0;
 

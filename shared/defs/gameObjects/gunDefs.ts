@@ -4209,6 +4209,7 @@ export const ModifiedGunDefs: Record<string, GunDef> = {
         switchDelay: 0.8,
         reloadTime: 0.8,
         reloadTimeAlt: 2.6,
+        upgraded: undefined,
         lootImg: {
             border: "loot-circle-outer-modified-01.img",
         },

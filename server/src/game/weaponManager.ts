@@ -486,7 +486,7 @@ export class WeaponManager {
             this.player.actionType == GameConfig.Action.Revive ||
             this.player.actionType == GameConfig.Action.UseItem ||
             this.curWeapIdx == WeaponSlot.Melee ||
-            this.curWeapIdx == WeaponSlot.Throwable
+            this.curWeapIdx == WeaponSlot.Throwable || this.player.actionType == GameConfig.Action.Modify
         ) {
             return;
         }
@@ -1434,5 +1434,71 @@ export class WeaponManager {
         }
         this.setWeapon(this.curWeapIdx, newWeaponType, 0);
         this.tryReload();
+    }
+
+    upgradeCurrentWeapon(): void {
+        const pickupMsg = new net.PickupMsg();
+        
+        const activeWeaponType = this.player.activeWeapon;
+        const playerCurWeapIdx = this.player.weaponManager.curWeapIdx;
+        if (!activeWeaponType) {
+            pickupMsg.type = net.PickupMsgType.NoWeaponUpgrade;
+            this.player.msgsToSend.push({
+                    type: net.MsgType.Pickup,
+                    msg: pickupMsg,
+                });
+            return;
+        }
+        
+        const weapon = GunDefs[activeWeaponType];
+        if (!weapon) {
+            pickupMsg.type = net.PickupMsgType.NoWeaponUpgrade;
+            this.player.msgsToSend.push({
+                    type: net.MsgType.Pickup,
+                    msg: pickupMsg,
+                });
+            return;
+        }
+        
+        if (!weapon.upgraded) {
+            pickupMsg.type = net.PickupMsgType.NoWeaponUpgrade;
+            this.player.msgsToSend.push({
+                    type: net.MsgType.Pickup,
+                    msg: pickupMsg,
+                });
+            return;
+        }
+        
+        const upgradedWeaponDef = GunDefs[weapon.upgraded.gun];
+        if (!upgradedWeaponDef) {
+            pickupMsg.type = net.PickupMsgType.NoWeaponUpgrade;
+            this.player.msgsToSend.push({
+                    type: net.MsgType.Pickup,
+                    msg: pickupMsg,
+                });
+            return;
+        }
+        const cost = weapon.upgraded.cost;
+        if (this.player.invManager.get("construction_item") < cost) {
+            pickupMsg.type = net.PickupMsgType.NotEnoughResources;
+            pickupMsg.count = cost;
+            this.player.msgsToSend.push({
+                    type: net.MsgType.Pickup,
+                    msg: pickupMsg,
+                });
+            return;
+        }
+        
+                    
+        
+        
+        this.player.invManager.take("construction_item", cost);
+        this.player.weaponManager.setWeapon(playerCurWeapIdx, weapon.upgraded.gun, upgradedWeaponDef.maxClip);
+                    
+        pickupMsg.type = net.PickupMsgType.WeaponUpgraded;
+        this.player.msgsToSend.push({
+                    type: net.MsgType.Pickup,
+                    msg: pickupMsg,
+                });
     }
 }
