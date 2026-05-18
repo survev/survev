@@ -12,6 +12,7 @@ export interface BulletDef {
     tracerLength: number;
     suppressed?: boolean;
     suppressedOnDist?: boolean;
+    accelerating?: number;
     flareColor?: number;
     addFlare?: boolean;
     addSupplyFlare?: boolean;
@@ -353,13 +354,14 @@ export const BaseDefs: Record<string, BulletDef> = {
         damage: 7.5,
         obstacleDamage: 0.2,
         falloff: 0.76,
-        speed: 125,
+        speed: 65,
         distance: 55,
         variance: 0,
         shrapnel: false,
         tracerColor: "12gauge",
         tracerWidth: 0.13,
         tracerLength: 0.6,
+        accelerating: 0.015,
     },
     bullet_hawk: {
         type: "bullet",

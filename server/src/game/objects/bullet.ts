@@ -148,11 +148,14 @@ export class Bullet {
     bulletType!: string;
     layer!: number;
     varianceT!: number;
+    speedVariance!: number;
     distAdjIdx!: number;
     clipDistance!: boolean;
     distance!: number;
     maxDistance!: number;
     shotFx!: boolean;
+    baseSpeed!: number;
+    accelerating!: number;
     shotSourceType!: string;
     mapSourceType!: string;
     shotOffhand!: boolean;
@@ -209,8 +212,12 @@ export class Bullet {
         this.reflected = false;
         this.lastShot = params.lastShot ?? false;
         this.speedMult = params.speedMult ?? 1;
-        this.speed = bulletDef.speed * this.speedMult * variance;
-        this.hasModifier = this.speedMult !== 1 || this.distanceMult !== 1;
+        this.baseSpeed = bulletDef.speed;
+        this.accelerating = bulletDef.accelerating ?? 0;
+        this.speedVariance = variance;
+        this.speed = this.baseSpeed * this.speedMult * this.speedVariance;
+        this.hasModifier =
+            this.speedMult !== 1 || this.distanceMult !== 1 || this.accelerating !== 0;
         this.onHitFx = bulletDef.onHit ?? params.onHitFx;
         this.canReflect = this.onHitFx !== "explosion_rounds";
 
@@ -361,6 +368,13 @@ export class Bullet {
     update(dt: number): void {
         const posOld = v2.copy(this.pos);
         const distLeft = this.distance - v2.length(v2.sub(this.startPos, this.pos));
+        if (this.accelerating !== 0) {
+            this.speed =
+                this.baseSpeed *
+                this.speedMult *
+                this.speedVariance *
+                Math.exp(this.accelerating * this.distanceTraveled);
+        }
         const moveDist = math.min(distLeft, dt * this.speed);
         this.distanceTraveled += moveDist;
 

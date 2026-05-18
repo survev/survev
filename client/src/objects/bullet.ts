@@ -68,6 +68,11 @@ export class BulletBarn {
         dir: Vec2;
         layer: number;
         speed: number;
+        baseSpeed: number;
+        speedMult: number;
+        speedVariance: number;
+        accelerating: number;
+        distanceTraveled: number;
         distance: number;
         damageSelf: boolean;
         reflectCount: number;
@@ -142,7 +147,12 @@ export class BulletBarn {
         b.pos = v2.copy(bullet.pos);
         b.dir = v2.copy(bullet.dir);
         b.layer = bullet.layer;
-        b.speed = bulletDef.speed * bullet.speedMult * variance;
+        b.baseSpeed = bulletDef.speed;
+        b.speedMult = bullet.speedMult;
+        b.speedVariance = variance;
+        b.accelerating = bulletDef.accelerating ?? 0;
+        b.speed = b.baseSpeed * b.speedMult * b.speedVariance;
+        b.distanceTraveled = 0;
         b.distance = distance * bullet.distanceMult * variance + distAdj;
         b.damageSelf = bulletDef.shrapnel || bullet.reflectCount > 0;
         b.reflectCount = bullet.reflectCount;
@@ -214,9 +224,17 @@ export class BulletBarn {
             }
             if (b.alive) {
                 const distLeft = b.distance - v2.length(v2.sub(b.startPos, b.pos));
+                if (b.accelerating !== 0) {
+                    b.speed =
+                        b.baseSpeed *
+                        b.speedMult *
+                        b.speedVariance *
+                        Math.exp(b.accelerating * b.distanceTraveled);
+                }
                 const distTravel = math.min(distLeft, dt * b.speed);
                 const posOld = v2.copy(b.pos);
                 b.pos = v2.add(b.pos, v2.mul(b.dir, distTravel));
+                b.distanceTraveled += distTravel;
 
                 if (
                     !activePlayer.m_netData.m_dead &&
