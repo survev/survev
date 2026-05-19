@@ -4361,14 +4361,15 @@ export class Player extends BaseGameObject {
             // if obj you tried picking up can't be picked up and needs to be dropped, "noDrop" is irrelevant
             (obj.type == lootToAdd || !(lootToAddDef as ChestDef).noDrop)
         ) {
-            const dir = v2.neg(this.dir);
-            this.game.lootBarn.addLootWithoutAmmo(
+            this.game.lootBarn.addLoot(
                 lootToAdd,
-                v2.add(obj.pos, v2.mul(dir, 0.4)),
+                obj.pos,
                 obj.layer,
                 amountLeft,
                 undefined,
-                dir,
+                util.random(4, 4.5),
+                v2.neg(this.dir),
+                true,
             );
         }
 
@@ -4545,8 +4546,9 @@ export class Player extends BaseGameObject {
             this.layer,
             count,
             useCountForAmmo,
-            10,
+            util.random(7.5, 11),
             v2.neg(this.dir),
+            undefined,
             undefined,
             "player",
         );

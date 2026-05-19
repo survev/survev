@@ -12,17 +12,7 @@ import type { Game } from "../game";
 import { HashGrid } from "../grid";
 import { BaseGameObject } from "./gameObject";
 import type { MapIndicator } from "./mapIndicator";
-import type { Player } from "./player";
 import type { Structure } from "./structure";
-
-// velocity drag applied every tick
-const LOOT_DRAG = 4;
-// how much loot pushes each other every tick
-const LOOT_PUSH_FORCE = 4;
-// cant go faster than this
-const MAX_LOOT_VELOCITY = 40;
-// explosion push force multiplier
-export const EXPLOSION_LOOT_PUSH_FORCE = 4;
 
 const AMMO_OFFSET_X = 1;
 const AMMO_OFFSET_Y = -0.25;
@@ -60,9 +50,19 @@ export class LootBarn {
                 );
                 if (!res) return;
 
-                const force = math.max(res.pen, 0.1) * LOOT_PUSH_FORCE * dt;
-                a.vel = v2.sub(a.vel, v2.mul(res.dir, force));
-                b.vel = v2.add(b.vel, v2.mul(res.dir, force));
+                const forceFactor = 2.5;
+                const forceA = math.max(res.pen / a.lootRad, 0.1) * forceFactor * dt;
+                const forceB = math.max(res.pen / b.lootRad, 0.1) * forceFactor * dt;
+                a.pos = v2.sub(a.pos, v2.mul(res.dir, forceA));
+                b.pos = v2.add(b.pos, v2.mul(res.dir, forceB));
+                a.setPartDirty();
+                a.game.grid.updateObject(a);
+                a.mapIndicator?.updatePosition(a.pos);
+                a.game.map.clampToMapBounds(a.pos, a.rad);
+                b.setPartDirty();
+                b.game.grid.updateObject(b);
+                b.mapIndicator?.updatePosition(b.pos);
+                b.game.map.clampToMapBounds(b.pos, b.rad);
             },
         );
 
@@ -85,47 +85,6 @@ export class LootBarn {
         this.newLoots.length = 0;
     }
 
-    splitUpLoot(player: Player, item: string, amount: number, dir: Vec2) {
-        const dropCount = Math.floor(amount / 60);
-        for (let i = 0; i < dropCount; i++) {
-            this.addLoot(item, player.pos, player.layer, 60, undefined, -4, dir);
-        }
-        if (amount % 60 !== 0)
-            this.addLoot(item, player.pos, player.layer, amount % 60, undefined, -4, dir);
-    }
-
-    /**
-     * spawns loot without ammo attached, use addLoot() if you want the respective ammo to drop alongside the gun
-     */
-    addLootWithoutAmmo(
-        type: string,
-        pos: Vec2,
-        layer: number,
-        count: number,
-        pushSpeed?: number,
-        dir?: Vec2,
-        ownerId?: number,
-    ) {
-        const def = GameObjectDefs[type];
-
-        if (!def || !("lootImg" in def)) {
-            this.game.logger.warn("Invalid loot type:", type);
-            return;
-        }
-
-        const loot = new Loot(
-            this.game,
-            type,
-            pos,
-            layer,
-            count,
-            pushSpeed,
-            dir,
-            ownerId,
-        );
-        this._addLoot(loot);
-    }
-
     addLoot(
         type: string,
         pos: Vec2,
@@ -134,6 +93,7 @@ export class LootBarn {
         useCountForAmmo?: boolean,
         pushSpeed?: number,
         dir?: Vec2,
+        noSideAmmo?: boolean,
         preloadGun?: boolean,
         source?: "player" | "obstacle" | "map",
         ownerId?: number,
@@ -156,6 +116,8 @@ export class LootBarn {
             ownerId,
         );
         this._addLoot(loot);
+
+        if (noSideAmmo) return;
 
         if (
             def.type === "gun" &&
@@ -288,7 +250,7 @@ export class Loot extends BaseGameObject {
         pos: Vec2,
         layer: number,
         count: number,
-        pushSpeed = 4,
+        pushSpeed = 4.75,
         dir?: Vec2,
         ownerId?: number,
     ) {
@@ -324,7 +286,7 @@ export class Loot extends BaseGameObject {
             this.mapIndicator?.updatePosition(this.pos);
         }
 
-        this.push(dir ?? v2.randomUnit(), pushSpeed);
+        this.pushLoot(dir ?? v2.randomUnit(), pushSpeed);
     }
 
     updatePos(newPos: Vec2): void {
@@ -368,16 +330,17 @@ export class Loot extends BaseGameObject {
 
         this.oldPos = v2.copy(this.pos);
 
-        v2.set(this.pos, v2.add(this.pos, v2.mul(this.vel, dt)));
-        this.vel = v2.mul(this.vel, 1 / (1 + dt * LOOT_DRAG));
-
         // cap speed
         const sqrLen = v2.lengthSqr(this.vel);
-        if (sqrLen > MAX_LOOT_VELOCITY * MAX_LOOT_VELOCITY) {
+        const maxVel = 75;
+        if (sqrLen > maxVel * maxVel) {
             const len = Math.sqrt(sqrLen);
             const thisDir = v2.div(this.vel, len > 0.000001 ? len : 1);
-            this.vel = v2.mul(thisDir, MAX_LOOT_VELOCITY);
+            this.vel = v2.mul(thisDir, maxVel);
         }
+
+        this.vel = v2.mul(this.vel, 1 / (1 + dt * 2.5));
+        this.pos = v2.add(this.pos, v2.mul(this.vel, dt));
 
         const originalLayer = this.layer;
 
@@ -499,7 +462,7 @@ export class Loot extends BaseGameObject {
             const tangent = finalRiver.spline.getTangent(
                 finalRiver.spline.getClosestTtoPoint(this.pos),
             );
-            this.push(tangent, 0.5 * dt);
+            this.pushLoot(tangent, 0.5 * dt);
         }
 
         if (this.layer !== originalLayer) {
@@ -515,7 +478,7 @@ export class Loot extends BaseGameObject {
         this.game.map.clampToMapBounds(this.pos, this.rad);
     }
 
-    push(dir: Vec2, velocity: number): void {
+    pushLoot(dir: Vec2, velocity: number): void {
         this.vel = v2.add(this.vel, v2.mul(dir, velocity));
     }
 

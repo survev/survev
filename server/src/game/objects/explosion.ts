@@ -9,7 +9,7 @@ import { assert, util } from "../../../../shared/utils/util";
 import { type Vec2, v2 } from "../../../../shared/utils/v2";
 import type { Game } from "../game";
 import type { DamageParams, GameObject } from "./gameObject";
-import { EXPLOSION_LOOT_PUSH_FORCE, type Loot } from "./loot";
+import type { Loot } from "./loot";
 import type { Obstacle } from "./obstacle";
 import type { Player } from "./player";
 
@@ -185,24 +185,26 @@ export class ExplosionBarn {
         const obj = collision.obj;
         const def = GameObjectDefs[explosion.type] as ExplosionDef;
 
-        if (obj.__type === ObjectType.Loot) {
-            obj.push(
-                v2.normalize(v2.sub(obj.pos, explosion.pos)),
-                (def.rad.max - dist) * EXPLOSION_LOOT_PUSH_FORCE,
-            );
-            return;
-        }
-
-        if (obj.__type !== ObjectType.Player && obj.__type !== ObjectType.Obstacle) {
+        if (
+            obj.__type !== ObjectType.Player &&
+            obj.__type !== ObjectType.Obstacle &&
+            obj.__type !== ObjectType.Loot
+        ) {
             return;
         }
 
         let damage = def.damage;
-
         const coll = collider.createCircle(explosion.pos, def.rad.min);
 
         if (dist > def.rad.min && !coldet.test(coll, obj.collider)) {
             damage = math.remap(dist, 0, def.rad.max, damage, 0);
+        }
+
+        if (obj.__type === ObjectType.Loot) {
+            const pushForce = damage * util.random(0.15, 0.4);
+
+            obj.pushLoot(v2.normalize(v2.sub(obj.pos, explosion.pos)), pushForce);
+            return;
         }
 
         if (obj.__type == ObjectType.Player) {

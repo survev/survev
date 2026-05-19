@@ -592,6 +592,7 @@ export class Obstacle extends BaseGameObject {
                 undefined,
                 pushSpeed,
                 dir,
+                undefined,
                 item.preload,
                 "obstacle",
                 ownerId,

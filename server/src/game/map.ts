@@ -1168,6 +1168,7 @@ export class GameMap {
                         undefined,
                         0,
                         undefined,
+                        undefined,
                         item.preload === true,
                         "map",
                     );
