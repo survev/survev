@@ -2005,10 +2005,10 @@ export class Player extends BaseGameObject {
             }
         }
 
-        this.posOld = v2.copy(this.pos);
+        v2.set(this.posOld, v2.copy(this.pos));
 
-        this.vel = v2.mul(this.vel, 1 / (1 + dt * 4));
-        this.pos = v2.add(this.pos, v2.mul(this.vel, dt));
+        v2.set(this.vel, v2.mul(this.vel, 1 / (1 + dt * 4)));
+        v2.set(this.pos, v2.add(this.pos, v2.mul(this.vel, dt)));
 
         const hasTreeClimbing = this.hasPerk("tree_climbing");
 
@@ -2020,7 +2020,7 @@ export class Player extends BaseGameObject {
             this.speed = 0;
             steps = 1;
         }
-        this.moveVel = v2.mul(movement, this.speed);
+        v2.set(this.moveVel, v2.mul(movement, this.speed));
 
         const speedToAdd = (this.speed / steps) * dt;
 
@@ -3023,7 +3023,7 @@ export class Player extends BaseGameObject {
         this.boost = 0;
         this.health = 100;
 
-        this.vel = v2.mul(params.dir, 10);
+        v2.set(this.vel, v2.mul(params.dir, 10));
 
         if (this.game.gas.currentRad <= 0.1) {
             this.health = 50;

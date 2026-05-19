@@ -53,12 +53,14 @@ export class LootBarn {
                 const forceFactor = 2.5;
                 const forceA = math.max(res.pen / a.lootRad, 0.1) * forceFactor * dt;
                 const forceB = math.max(res.pen / b.lootRad, 0.1) * forceFactor * dt;
-                a.pos = v2.sub(a.pos, v2.mul(res.dir, forceA));
-                b.pos = v2.add(b.pos, v2.mul(res.dir, forceB));
+                v2.set(a.pos, v2.sub(a.pos, v2.mul(res.dir, forceA)));
+                v2.set(b.pos, v2.add(b.pos, v2.mul(res.dir, forceB)));
+
                 a.setPartDirty();
                 a.game.grid.updateObject(a);
                 a.mapIndicator?.updatePosition(a.pos);
                 a.game.map.clampToMapBounds(a.pos, a.rad);
+
                 b.setPartDirty();
                 b.game.grid.updateObject(b);
                 b.mapIndicator?.updatePosition(b.pos);
@@ -265,7 +267,7 @@ export class Loot extends BaseGameObject {
         this.ownerId = ownerId ?? 0;
 
         this.collider = collider.createCircle(pos, GameConfig.lootRadius[def.type]);
-        this.collider.pos = this.pos;
+        v2.set(this.collider.pos, this.pos);
 
         this.rad = this.collider.rad;
         // apparently original surviv loots had an extended hitbox
@@ -290,7 +292,7 @@ export class Loot extends BaseGameObject {
     }
 
     updatePos(newPos: Vec2): void {
-        this.pos = v2.copy(newPos);
+        v2.set(this.pos, v2.copy(newPos));
         this.game.map.clampToMapBounds(this.pos, this.rad);
         this.setPartDirty();
     }
@@ -328,7 +330,7 @@ export class Loot extends BaseGameObject {
         }
         this.forceUpdateTicker = 0;
 
-        this.oldPos = v2.copy(this.pos);
+        v2.set(this.oldPos, v2.copy(this.pos));
 
         // cap speed
         const sqrLen = v2.lengthSqr(this.vel);
@@ -339,8 +341,8 @@ export class Loot extends BaseGameObject {
             this.vel = v2.mul(thisDir, maxVel);
         }
 
-        this.vel = v2.mul(this.vel, 1 / (1 + dt * 2.5));
-        this.pos = v2.add(this.pos, v2.mul(this.vel, dt));
+        v2.set(this.vel, v2.mul(this.vel, 1 / (1 + dt * 2.5)));
+        v2.set(this.pos, v2.add(this.pos, v2.mul(this.vel, dt)));
 
         const originalLayer = this.layer;
 
@@ -479,7 +481,7 @@ export class Loot extends BaseGameObject {
     }
 
     pushLoot(dir: Vec2, velocity: number): void {
-        this.vel = v2.add(this.vel, v2.mul(dir, velocity));
+        v2.set(this.vel, v2.add(this.vel, v2.mul(dir, velocity)));
     }
 
     override destroy() {

@@ -155,8 +155,8 @@ export class Smoke extends BaseGameObject {
         this.rad = math.clamp(this.rad, 0, this.maxSize);
 
         const posOld = v2.copy(this.pos);
-        this.vel = v2.mul(this.vel, 1 / (1 + dt * this.drag));
-        this.pos = v2.add(this.pos, v2.mul(this.vel, dt));
+        v2.set(this.vel, v2.mul(this.vel, 1 / (1 + dt * this.drag)));
+        v2.set(this.pos, v2.add(this.pos, v2.mul(this.vel, dt)));
 
         if (!v2.eq(posOld, this.pos) || !math.eqAbs(radOld, this.rad)) {
             this.setPartDirty();
