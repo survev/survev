@@ -467,8 +467,10 @@ export class Obstacle extends BaseGameObject {
         }
 
         const lootPos = v2.copy(this.pos);
+        let pushSpeed = 4.75;
         if (def.lootSpawn) {
             v2.set(lootPos, v2.add(this.pos, v2.rotate(def.lootSpawn.offset, this.rot)));
+            pushSpeed *= def.lootSpawn.speedMult;
         }
 
         const lootTablesOrItems = [...def.loot];
@@ -550,39 +552,15 @@ export class Obstacle extends BaseGameObject {
             }
         }
 
-        const colliderRad =
-            def.collision.type === collider.Type.Aabb
-                ? coldet.aabbToCircle(def.collision.min, def.collision.max).rad / 2
-                : def.collision.rad;
+        let rad = 0;
 
-        // max items before it changes from pushing in hit direction to
-        // the direction between obstacle center and loot (so it spreads better)
-        const shouldSpreadItems = items.length > 3;
-
-        let rad: number;
-        let pushSpeed;
-
-        if (shouldSpreadItems) {
-            // calculate a radius based on amount of loot and obstacle size
-            rad = math.remap(items.length, 2, 10, 0, colliderRad);
-            pushSpeed = math.remap(items.length, 8, 20, 4, 14);
-        } else if (items.length === 1) {
-            // for exactly 1 loot we just spawn it in the perfect center with a high push speed
-            rad = 0;
-            pushSpeed = 7;
-        } else {
-            // for between 1 and the `shouldSpreadItems` threshold we just have a small radius
-            // and a smaller speed (because the loot will push eachother)
+        if (items.length > 1) {
             rad = 0.1;
-            pushSpeed = 4;
+            pushSpeed *= 1 / items.length;
         }
 
         for (const item of items) {
             const pos = v2.add(lootPos, util.randomPointInCircle(rad));
-
-            const dir = shouldSpreadItems
-                ? v2.normalize(v2.sub(pos, lootPos))
-                : params.dir;
 
             this.game.lootBarn.addLoot(
                 item.type,
@@ -591,7 +569,7 @@ export class Obstacle extends BaseGameObject {
                 item.count,
                 undefined,
                 pushSpeed,
-                dir,
+                params.dir,
                 undefined,
                 item.preload,
                 "obstacle",

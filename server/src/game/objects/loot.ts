@@ -14,8 +14,8 @@ import { BaseGameObject } from "./gameObject";
 import type { MapIndicator } from "./mapIndicator";
 import type { Structure } from "./structure";
 
-const AMMO_OFFSET_X = 1;
-const AMMO_OFFSET_Y = -0.25;
+const AMMO_OFFSET_X = 0.75;
+const AMMO_OFFSET_Y = -0.1;
 
 type LootTierItem = MapDef["lootTable"][string][number];
 
@@ -151,7 +151,7 @@ export class LootBarn {
                 const rightAmmo = new Loot(
                     this.game,
                     def.ammo,
-                    v2.add(pos, v2.create(AMMO_OFFSET_X - 0.001, AMMO_OFFSET_Y)),
+                    v2.add(pos, v2.create(AMMO_OFFSET_X, AMMO_OFFSET_Y)),
                     layer,
                     ammoCount - halfAmmo,
                     pushSpeed,
@@ -267,7 +267,7 @@ export class Loot extends BaseGameObject {
         this.ownerId = ownerId ?? 0;
 
         this.collider = collider.createCircle(pos, GameConfig.lootRadius[def.type]);
-        v2.set(this.collider.pos, this.pos);
+        this.collider.pos = this.pos;
 
         this.rad = this.collider.rad;
         // apparently original surviv loots had an extended hitbox
@@ -338,7 +338,7 @@ export class Loot extends BaseGameObject {
         if (sqrLen > maxVel * maxVel) {
             const len = Math.sqrt(sqrLen);
             const thisDir = v2.div(this.vel, len > 0.000001 ? len : 1);
-            this.vel = v2.mul(thisDir, maxVel);
+            v2.set(this.vel, v2.mul(thisDir, maxVel));
         }
 
         v2.set(this.vel, v2.mul(this.vel, 1 / (1 + dt * 2.5)));
