@@ -15,7 +15,6 @@ export default defineConfig(({ mode }) => {
     const Config = getConfig(!isDev, "");
 
     process.env.VITE_TURNSTILE_SCRIPT = "";
-    process.env.VITE_AD_PREFIX = Config.secrets.AD_PREFIX;
     if (Config.secrets.TURNSTILE_SITE_KEY) {
         process.env.VITE_TURNSTILE_SCRIPT = `<script src="https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit" defer></script>`;
     }

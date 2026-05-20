@@ -90,7 +90,7 @@ export class SDKManager implements BaseSDKManager {
     private readonly nitroSiteID = import.meta.env.VITE_NITROPAY_SITE_ID;
     private nitroLoadPromise: Promise<void> | null = null;
     private nitroDisabled = false;
-    private readonly nitroFooterPlacementHome = `${AD_PREFIX}_728x90`;
+    private readonly nitroFooterPlacementId = "survevio_728x90";
     private readonly nitroPlacements = {
         home: ["nitro-header", "nitro-home-vrec", "nitro-home-mrec"],
         death: ["nitro-died-mrec", "nitro-died-mrec-mobile"],
@@ -436,7 +436,7 @@ export class SDKManager implements BaseSDKManager {
             return;
         }
 
-        const element = document.getElementById(this.nitroFooterPlacementHome);
+        const element = document.getElementById(this.nitroFooterPlacementId);
         if (!element) {
             return;
         }
@@ -453,7 +453,7 @@ export class SDKManager implements BaseSDKManager {
 
         this.nitroFooterActive = true;
         this.ensureNitroReady()
-            .then(() => window.nitroAds?.createAd(this.nitroFooterPlacementHome, options))
+            .then(() => window.nitroAds?.createAd(this.nitroFooterPlacementId, options))
             .catch((error) => {
                 this.nitroFooterActive = false;
                 console.warn("NitroPay footer createAd failed", error);
@@ -463,7 +463,7 @@ export class SDKManager implements BaseSDKManager {
     private hideNitroFooter() {
         this.nitroFooterActive = false;
 
-        const element = document.getElementById(this.nitroFooterPlacementHome);
+        const element = document.getElementById(this.nitroFooterPlacementId);
         if (!element) {
             return;
         }
