@@ -1,5 +1,6 @@
 import * as PIXI from "pixi.js-legacy";
 import { GameObjectDefs } from "../../shared/defs/gameObjectDefs";
+import { PerkProperties } from "../../shared/defs/gameObjects/perkDefs";
 import { RoleDefs } from "../../shared/defs/gameObjects/roleDefs";
 import { GameConfig, Input, TeamMode, WeaponSlot } from "../../shared/gameConfig";
 import * as net from "../../shared/net/net";
@@ -551,9 +552,13 @@ export class Game {
                 }
                 inputMsg.touchMoveActive = true;
                 const aimLen = touchAimMovement.aimMovement.toAimLen;
+                const rangeMult = this.m_activePlayer.m_hasPerk("amped_explosives")
+                    ? PerkProperties.amped_explosives.throwableRangeMult
+                    : 1;
                 const toTouchLenAdjusted =
                     math.clamp(aimLen / this.m_touch.padPosRange, 0, 1) *
-                    GameConfig.player.throwableMaxMouseDist;
+                    GameConfig.player.throwableMaxMouseDist *
+                    rangeMult;
                 inputMsg.toMouseLen = toTouchLenAdjusted;
                 inputMsg.toMouseDir = aimDir;
             } else {
