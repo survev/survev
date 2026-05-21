@@ -422,7 +422,7 @@ export class GameMap {
         this.init(seed);
 
         for (const player of this.game.playerBarn.players) {
-            player.sendData(this.mapStream.getBuffer());
+            player.client.sendData(this.mapStream.getBuffer());
         }
     }
 

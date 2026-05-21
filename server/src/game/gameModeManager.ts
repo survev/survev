@@ -297,7 +297,7 @@ export class GameModeManager {
             }
 
             // Set remaining spectators to new player.
-            spectator.spectating = playerToSpec;
+            spectator.client.spectating = playerToSpec;
         }
     }
 

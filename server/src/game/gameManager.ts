@@ -166,13 +166,13 @@ export class SingleThreadGameManager implements GameManager {
     onMsg(socketId: string, msg: ArrayBuffer): void {
         const data = this.sockets.get(socketId)?.getUserData();
         if (!data) return;
-        this.gamesById.get(data.gameId)?.handleMsg(msg, socketId, data.ip);
+        this.gamesById.get(data.gameId)?.clientBarn.handleMsg(msg, socketId, data.ip);
     }
 
     onClose(socketId: string) {
         const data = this.sockets.get(socketId)?.getUserData();
         if (!data) return;
-        this.gamesById.get(data.gameId)?.handleSocketClose(socketId);
+        this.gamesById.get(data.gameId)?.clientBarn.handleSocketClose(socketId);
         this.sockets.delete(socketId);
     }
 }

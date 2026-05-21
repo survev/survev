@@ -68,10 +68,10 @@ process.on("message", async (msg: ProcessMsg) => {
             break;
         case ProcessMsgType.SocketMsg:
             const sMsg = msg.msgs[0];
-            game.handleMsg(sMsg.data as ArrayBuffer, sMsg.socketId, sMsg.ip);
+            game.clientBarn.handleMsg(sMsg.data as ArrayBuffer, sMsg.socketId, sMsg.ip);
             break;
         case ProcessMsgType.SocketClose:
-            game.handleSocketClose(msg.socketId);
+            game.clientBarn.handleSocketClose(msg.socketId);
             break;
     }
 });

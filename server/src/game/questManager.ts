@@ -38,7 +38,7 @@ export class QuestManager {
     }
 
     flushProgress(winningTeamId?: number) {
-        if (!this.player.userId || this.gameOverFlushed) return;
+        if (!this.player.client.userId || this.gameOverFlushed) return;
 
         this.trackGameOverQuests(winningTeamId);
 
@@ -54,17 +54,17 @@ export class QuestManager {
         if (progress.length === 0) return;
 
         if (!this.player.disconnected) {
-            this.player.sendMsg(MsgType.UpdatePass, new UpdatePassMsg());
+            this.player.client.sendMsg(MsgType.UpdatePass, new UpdatePassMsg());
         }
 
-        this.game.sendQuestProgress(this.player.userId, progress);
+        this.game.sendQuestProgress(this.player.client.userId, progress);
     }
 
     trackEvent<K extends keyof QuestEventPayloads>(
         payloadKey: K,
         payload: QuestEventPayloads[K],
     ): void {
-        if (!this.player.userId) return;
+        if (!this.player.client.userId) return;
         for (const quest of this.quests) {
             const def = QuestDefs[quest.id];
             if (!def || def.event !== payloadKey) continue;

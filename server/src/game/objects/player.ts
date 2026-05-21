@@ -1,7 +1,5 @@
-import { randomUUID } from "node:crypto";
-
 import { type GameObjectDef, type LootDef, WeaponTypeToDefs } from "../../../../shared/defs/gameObjectDefs.ts";
-import { type EmoteDef, EmotesDefs } from "../../../../shared/defs/gameObjects/emoteDefs.ts";
+import { EmotesDefs } from "../../../../shared/defs/gameObjects/emoteDefs.ts";
 import {
     type BackpackDef,
     type BoostDef,
@@ -29,7 +27,6 @@ import {
 } from "../../../../shared/gameConfig.ts";
 import * as net from "../../../../shared/net/net.ts";
 import { ObjectType } from "../../../../shared/net/objectSerializeFns.ts";
-import type { GroupStatus } from "../../../../shared/net/updateMsg.ts";
 import { type Circle, coldet } from "../../../../shared/utils/coldet.ts";
 import { collider } from "../../../../shared/utils/collider.ts";
 import { math } from "../../../../shared/utils/math.ts";
@@ -38,6 +35,7 @@ import { v2, type Vec2 } from "../../../../shared/utils/v2.ts";
 import { Config } from "../../config.ts";
 import { IDAllocator } from "../../utils/IDAllocator.ts";
 import { validateUserName } from "../../utils/serverHelpers.ts";
+import type { Client } from "../client.ts";
 import type { Game, JoinTokenData } from "../game.ts";
 import { Group, Team } from "../group.ts";
 import { InventoryManager } from "../inventoryManager.ts";
@@ -91,8 +89,6 @@ export class PlayerBarn {
     groupIdAllocator = new IDAllocator(8);
     aliveCountDirty = false;
 
-    socketIdToPlayer = new Map<string, Player>();
-
     emotes: Emote[] = [];
 
     killLeaderDirty = false;
@@ -144,31 +140,11 @@ export class PlayerBarn {
         return livingPlayers[util.randomInt(0, livingPlayers.length - 1)];
     }
 
-    addPlayer(socketId: string, joinMsg: net.JoinMsg, ip: string) {
-        const joinData = this.game.joinTokens.get(joinMsg.matchPriv);
-
-        if (!joinData || joinData.expiresAt < Date.now()) {
-            this.game.closeSocket(socketId);
-            if (joinData) {
-                this.game.joinTokens.delete(joinMsg.matchPriv);
-            }
-            return;
-        }
-        this.game.joinTokens.delete(joinMsg.matchPriv);
-
-        if (Config.rateLimitsEnabled) {
-            const count = this.livingPlayers.filter(
-                (p) =>
-                    p.ip === ip
-                    || p.findGameIp == joinData.findGameIp
-                    || (joinData.userId !== null && p.userId === joinData.userId),
-            );
-            if (count.length >= 5) {
-                this.game.closeSocket(socketId, "rate_limited");
-                return;
-            }
-        }
-
+    addPlayer(
+        client: Client,
+        joinMsg: net.JoinMsg,
+        joinData: JoinTokenData,
+    ) {
         const result = this.getGroupAndTeam(joinData);
         const group = result?.group;
         // solo 50v50 just chooses the smallest team everytime no matter what
@@ -197,7 +173,7 @@ export class PlayerBarn {
         if (Config.uniqueInGameNames) {
             let count = 0;
             const loggedOutPlayers = this.game.playerBarn.players.filter(
-                (p) => !p.userId,
+                (p) => !p.client.userId,
             );
             while (loggedOutPlayers.find((p) => p.name === finalName)) {
                 const postFix = `-${++count}`;
@@ -214,15 +190,10 @@ export class PlayerBarn {
             pos,
             layer,
             finalName,
-            socketId,
             joinMsg,
-            ip,
-            joinData.findGameIp,
-            joinData.userId,
+            client,
             joinData.quests,
         );
-
-        this.socketIdToPlayer.set(socketId, player);
 
         this.activatePlayer(player, group, team);
         player.setLoadout(
@@ -273,42 +244,38 @@ export class PlayerBarn {
         this.game.updateData();
     }
 
-    testPlayerCount = 0;
-    addTestPlayer(params: {
-        group?: Group;
-        team?: Team;
-        pos?: Vec2;
-        name?: string;
-    }): Player {
-        let group = params.group;
-        let team = params.team;
-
-        if (!group && this.game.isTeamMode) {
-            group = this.addGroup(false);
-        }
-
-        if (!team && this.game.map.factionMode) {
-            team = this.getSmallestTeam();
-        }
-
-        const socketId = randomUUID();
-
-        const player = new Player(
-            this.game,
-            params.pos ?? v2.create(this.game.map.width / 2, this.game.map.height / 2),
-            0,
-            params.name ?? `TEST-${this.testPlayerCount++}`,
-            socketId,
-            new net.JoinMsg(),
-            "",
-            "",
-            null,
-        );
-
-        this.activatePlayer(player, group, team);
-
-        return player;
-    }
+    //  = 0;
+    // addTestPlayer(params: {
+    //     group?: Group;
+    //     team?: Team;
+    //     pos?: Vec2;
+    //     name?: string;
+    // }): Player {
+    //     let group = params.group;
+    //     let team = params.team;
+    //
+    //     if (!group && this.game.isTeamMode) {
+    //         group = this.addGroup(false);
+    //     }
+    //
+    //     if (!team && this.game.map.factionMode) {
+    //         team = this.getSmallestTeam();
+    //     }
+    //
+    //     const socketId = randomUUID();
+    //
+    //     const player = new Player(
+    //         this.game,
+    //         params.pos ?? v2.create(this.game.map.width / 2, this.game.map.height / 2),
+    //         0,
+    //         params.name ?? `TEST-${this.testPlayerCount++}`,
+    //         new net.JoinMsg(),
+    //     );
+    //
+    //     this.activatePlayer(player, group, team);
+    //
+    //     return player;
+    // }
 
     update(dt: number) {
         let sendWinEmotes = false;
@@ -392,14 +359,6 @@ export class PlayerBarn {
 
         this.game.checkGameOver();
         this.game.updateData();
-    }
-
-    sendMsgs() {
-        for (let i = 0; i < this.players.length; i++) {
-            const player = this.players[i];
-            if (player.disconnected) continue;
-            player.sendMsgs();
-        }
     }
 
     flush() {
@@ -595,6 +554,8 @@ export class PlayerBarn {
 export class Player extends BaseGameObject {
     override readonly __type = ObjectType.Player;
 
+    client: Client;
+
     bounds = collider.createAabbExtents(
         v2.create(0, 0),
         v2.create(GameConfig.player.maxVisualRadius, GameConfig.player.maxVisualRadius),
@@ -706,8 +667,11 @@ export class Player extends BaseGameObject {
 
     private _zoom: number = 0;
     // zoom used for the area in which the server will send objects to the client
-    private _cullingZoom: number = 0;
+    _cullingZoom: number = 1;
     private _cullingZoomTicker = 0;
+    portrait = false;
+    _cullingPortrait = false;
+    private _cullingPortraitTicker = 0;
 
     get zoom(): number {
         return this._zoom;
@@ -748,22 +712,8 @@ export class Player extends BaseGameObject {
         return this.weaponManager.activeWeapon;
     }
 
-    private _disconnected = false;
-
-    get disconnected(): boolean {
-        return this._disconnected;
-    }
-
-    set disconnected(disconnected: boolean) {
-        if (this.disconnected === disconnected) return;
-
-        this._disconnected = disconnected;
-        this.setGroupStatuses();
-    }
-
-    disconnect(reason?: string) {
-        this.disconnected = true;
-        this.game.closeSocket(this.socketId, reason);
+    get disconnected() {
+        return this.client.disconnected;
     }
 
     private _spectatorCount = 0;
@@ -777,41 +727,6 @@ export class Player extends BaseGameObject {
     get spectatorCount(): number {
         return this._spectatorCount;
     }
-
-    /** true when player starts spectating new player, only stays true for that given tick */
-    startedSpectating: boolean = false;
-
-    private _spectating?: Player;
-
-    get spectating(): Player | undefined {
-        return this._spectating;
-    }
-
-    set spectating(player: Player | undefined) {
-        if (player === this) {
-            throw new Error(
-                `Player ${player.name} tried spectate themselves (how tf did this happen?)`,
-            );
-        }
-        if (this._spectating === player) return;
-
-        if (this._spectating) {
-            this._spectating.spectatorCount--;
-            this._spectating.spectators.delete(this);
-        }
-        if (player) {
-            player.spectatorCount++;
-            player.spectators.add(this);
-        }
-
-        this._spectating = player;
-        this.startedSpectating = true;
-    }
-
-    spectateCooldown = 0;
-    spectateCooldownCount = 0;
-    spectateMsgCount = 0;
-    spectateMsgTicker = 0;
 
     spectators = new Set<Player>();
 
@@ -969,7 +884,7 @@ export class Player extends BaseGameObject {
         msg.role = role;
         msg.assigned = true;
         msg.playerId = this.__id;
-        this.game.broadcastMsg(net.MsgType.RoleAnnouncement, msg);
+        this.game.clientBarn.broadcastMsg(net.MsgType.RoleAnnouncement, msg);
 
         switch (role) {
             case "leader":
@@ -1187,7 +1102,7 @@ export class Player extends BaseGameObject {
             msg.role = "kill_leader";
             msg.assigned = true;
             msg.playerId = this.__id;
-            this.game.broadcastMsg(net.MsgType.RoleAnnouncement, msg);
+            this.game.clientBarn.broadcastMsg(net.MsgType.RoleAnnouncement, msg);
         }
     }
 
@@ -1332,10 +1247,6 @@ export class Player extends BaseGameObject {
         return surface;
     }
 
-    socketId: string;
-
-    ack = 0;
-
     name: string;
     isMobile: boolean;
 
@@ -1390,8 +1301,6 @@ export class Player extends BaseGameObject {
     kills = 0;
     timeAlive = 0;
 
-    msgsToSend: Array<{ type: number; msg: net.Msg }> = [];
-
     weaponManager = new WeaponManager(this);
     recoilTicker = 0;
 
@@ -1407,22 +1316,13 @@ export class Player extends BaseGameObject {
      */
     matchDataId: number;
 
-    userId: string | null = null;
-    ip: string;
-    // see comment on server/src/api/schema.ts
-    // about logging find_game IP's
-    findGameIp: string;
-
     constructor(
         game: Game,
         pos: Vec2,
         layer: number,
         name: string,
-        socketId: string,
         joinMsg: net.JoinMsg,
-        ip: string,
-        findGameIp: string,
-        userId: string | null,
+        client: Client,
         questIds?: string[],
     ) {
         super(game, pos);
@@ -1430,12 +1330,8 @@ export class Player extends BaseGameObject {
         this.matchDataId = game.playerBarn.nextMatchDataId++;
 
         this.layer = layer;
-
         this.name = name;
-        this.socketId = socketId;
-        this.ip = ip;
-        this.findGameIp = findGameIp;
-        this.userId = userId;
+        this.client = client;
 
         this.questManager.quests = (questIds ?? []).map((id) => ({ id, delta: 0 }));
 
@@ -1510,16 +1406,6 @@ export class Player extends BaseGameObject {
 
     update(dt: number): void {
         if (this.dead) {
-            this.spectateCooldown -= dt;
-
-            if (this.spectateMsgCount > 0) {
-                this.spectateMsgTicker += dt;
-                if (this.spectateMsgTicker > 3) {
-                    this.spectateMsgCount--;
-                    this.spectateMsgTicker = 0;
-                }
-            }
-
             if (!this.sentDeathEmote) {
                 this.sendDeathEmoteTicker -= dt;
                 if (this.sendDeathEmoteTicker <= 0) {
@@ -1920,7 +1806,7 @@ export class Player extends BaseGameObject {
                         this.weaponManager.showNextThrowable();
                     }
 
-                    this.msgsToSend.push({ type: net.MsgType.Pickup, msg });
+                    this.client.bufferSendMsg(net.MsgType.Pickup, msg);
                 }
             }
 
@@ -2438,364 +2324,6 @@ export class Player extends BaseGameObject {
         }
     }
 
-    private _firstUpdate = true;
-    visibleObjects = new Set<GameObject>();
-    visibleMapIndicators = new Set<MapIndicator>();
-
-    msgStream = new net.MsgStream(new ArrayBuffer(65536));
-    sendMsgs(): void {
-        const msgStream = this.msgStream;
-        const game = this.game;
-        const playerBarn = game.playerBarn;
-        msgStream.stream.index = 0;
-
-        if (this._firstUpdate) {
-            const joinedMsg = new net.JoinedMsg();
-            joinedMsg.teamMode = this.game.teamMode;
-            joinedMsg.playerId = this.__id;
-            joinedMsg.started = game.started;
-            joinedMsg.teamMode = game.teamMode;
-            joinedMsg.emotes = this.loadout.emotes;
-            this.sendMsg(net.MsgType.Joined, joinedMsg);
-
-            const mapStream = game.map.mapStream.stream;
-
-            msgStream.stream.writeBytes(mapStream, 0, mapStream.byteIndex);
-        }
-
-        if (playerBarn.aliveCountDirty || this._firstUpdate) {
-            const aliveMsg = new net.AliveCountsMsg();
-            this.game.modeManager.updateAliveCounts(aliveMsg.teamAliveCounts);
-            msgStream.serializeMsg(net.MsgType.AliveCounts, aliveMsg);
-        }
-
-        const updateMsg = new net.UpdateMsg();
-
-        updateMsg.ack = this.ack;
-
-        if (game.gas.dirty || this._firstUpdate) {
-            updateMsg.gasDirty = true;
-            updateMsg.gasData = game.gas;
-        }
-
-        if (game.gas.timeDirty || this._firstUpdate) {
-            updateMsg.gasTDirty = true;
-            updateMsg.gasT = game.gas.gasT;
-        }
-
-        let player: Player;
-        if (this.spectating == undefined) {
-            // not spectating anyone
-            player = this;
-        } else if (this.spectating.dead) {
-            // was spectating someone but they died so find new player to spectate
-            player = this.spectating.killedBy && !this.spectating.killedBy.dead
-                ? this.spectating.killedBy
-                : playerBarn.randomPlayer();
-            if (player === this) {
-                player = playerBarn.randomPlayer();
-            }
-            this.spectating = player;
-        } else {
-            // spectating someone currently who is still alive
-            player = this.spectating;
-        }
-        // temporary guard while the spectating code is not fixed
-        if (!player) {
-            player = this;
-        }
-
-        const radius = player._cullingZoom + 4;
-        let width = player._cullingZoom + 4;
-        // client zoom tries to keep a 16/9 aspect ratio, mirror it here
-        let height = width / (16 / 9);
-        if (this._cullingPortrait) {
-            let tmp = width;
-            width = height;
-            height = tmp;
-        }
-        const rect = collider.createAabbExtents(player.pos, v2.create(width, height));
-
-        const newVisibleObjects = game.grid.intersectColliderSet(rect);
-        // client crashes if active player is not visible
-        // so make sure its always added to visible objects
-        newVisibleObjects.add(this);
-        newVisibleObjects.add(player);
-
-        for (const obj of this.visibleObjects) {
-            if (!newVisibleObjects.has(obj)) {
-                updateMsg.delObjIds.push(obj.__id);
-            }
-        }
-
-        for (const obj of newVisibleObjects) {
-            if (
-                !this.visibleObjects.has(obj)
-                || game.objectRegister.dirtyFull[obj.__id]
-            ) {
-                updateMsg.fullObjects.push(obj);
-            } else if (game.objectRegister.dirtyPart[obj.__id]) {
-                updateMsg.partObjects.push(obj);
-            }
-        }
-
-        this.visibleObjects = newVisibleObjects;
-
-        updateMsg.activePlayerId = player.__id;
-        if (this.startedSpectating) {
-            updateMsg.activePlayerIdDirty = true;
-
-            // build the active player data object manually
-            // To avoid setting the spectating player fields to dirty
-            updateMsg.activePlayerData = {
-                healthDirty: true,
-                health: player.health,
-                boostDirty: true,
-                boost: player.boost,
-                zoomDirty: true,
-                zoom: player.zoom,
-                actionDirty: true,
-                action: player.action,
-                inventoryDirty: true,
-                inventory: player.inventory,
-                scope: player.scope,
-                weapsDirty: true,
-                curWeapIdx: player.curWeapIdx,
-                weapons: player.weapons,
-                spectatorCountDirty: true,
-                spectatorCount: player.spectatorCount,
-            };
-            this.startedSpectating = false;
-        } else {
-            updateMsg.activePlayerIdDirty = player.activeIdDirty;
-            updateMsg.activePlayerData = player;
-        }
-
-        updateMsg.playerInfos = player._firstUpdate
-            ? playerBarn.players
-            : playerBarn.newPlayers;
-
-        updateMsg.deletedPlayerIds = playerBarn.deletedPlayers;
-
-        if (playerBarn.playerStatusTicker > playerBarn.playerStatusRate) {
-            let statuses = player.getPlayerStatus();
-            updateMsg.playerStatus = statuses;
-            updateMsg.playerStatusDirty = true;
-        }
-
-        if (player.groupStatusDirty) {
-            const teamPlayers = player.group!.players;
-
-            let statuses: GroupStatus[] = [];
-            for (const p of teamPlayers) {
-                statuses.push({
-                    health: p.health,
-                    disconnected: p.disconnected,
-                });
-            }
-            updateMsg.groupStatus = statuses;
-            updateMsg.groupStatusDirty = true;
-        }
-
-        const shouldSendEmote = (emote: Emote) => {
-            const emotePlayer = game.objectRegister.getById(emote.playerId) as
-                | Player
-                | undefined;
-
-            const emoteDef = GameObjectDefs.typeToDef(emote.type);
-
-            if (emotePlayer) {
-                if (!emote.isPing && !player.visibleObjects.has(emotePlayer)) {
-                    return false;
-                }
-
-                // regular emotes: always send if visible
-                if (!emote.isPing && !(emoteDef as EmoteDef).teamOnly) {
-                    return true;
-                }
-
-                // part of the same group
-                if (emotePlayer?.groupId === player.groupId) {
-                    return true;
-                }
-
-                // part of the same team
-                if (emotePlayer?.teamId === player.teamId && !emote.isPing) {
-                    return true;
-                }
-
-                // faction team leader
-                if (
-                    (emotePlayer.role === "leader" || emotePlayer.role === "captain")
-                    && emotePlayer.teamId === player.teamId
-                ) {
-                    return true;
-                }
-            }
-
-            // always send map events pings
-            if (emote.isPing && emoteDef.type === "ping" && emoteDef.mapEvent) {
-                return true;
-            }
-
-            return false;
-        };
-
-        for (let i = 0; i < playerBarn.emotes.length; i++) {
-            const emote = playerBarn.emotes[i];
-            if (shouldSendEmote(emote)) {
-                updateMsg.emotes.push(emote);
-            }
-        }
-
-        const extendedRadius = 1.1 * radius;
-        const radiusSquared = extendedRadius * extendedRadius;
-
-        const bullets = game.bulletBarn.newBullets;
-        for (let i = 0; i < bullets.length; i++) {
-            const bullet = bullets[i];
-            if (
-                v2.lengthSqr(v2.sub(bullet.pos, player.pos)) < radiusSquared
-                || v2.lengthSqr(v2.sub(bullet.clientEndPos, player.pos)) < radiusSquared
-                || coldet.intersectSegmentCircle(
-                    bullet.pos,
-                    bullet.clientEndPos,
-                    player.pos,
-                    extendedRadius,
-                )
-            ) {
-                updateMsg.bullets.push(bullet);
-            }
-        }
-
-        for (let i = 0; i < game.explosionBarn.newExplosions.length; i++) {
-            const explosion = game.explosionBarn.newExplosions[i];
-            const rad = explosion.rad + extendedRadius;
-            if (v2.lengthSqr(v2.sub(explosion.pos, player.pos)) < rad * rad) {
-                updateMsg.explosions.push(explosion);
-            }
-        }
-
-        const planes = this.game.planeBarn.planes;
-        for (let i = 0; i < planes.length; i++) {
-            const plane = planes[i];
-            if (
-                coldet.testCircleAabb(plane.pos, plane.rad, rect.min, rect.max)
-                && coldet.testPointAabb(
-                    plane.pos,
-                    this.game.planeBarn.planeBounds.min,
-                    this.game.planeBarn.planeBounds.max,
-                )
-            ) {
-                updateMsg.planes.push(plane);
-            }
-        }
-        const newAirstrikeZones = this.game.planeBarn.newAirstrikeZones;
-        for (let i = 0; i < newAirstrikeZones.length; i++) {
-            const zone = newAirstrikeZones[i];
-            updateMsg.airstrikeZones.push(zone);
-        }
-
-        const indicators = this.game.mapIndicatorBarn.mapIndicators;
-        for (let i = 0; i < indicators.length; i++) {
-            const indicator = indicators[i];
-            if (indicator.dirty || !this.visibleMapIndicators.has(indicator)) {
-                updateMsg.mapIndicators.push(indicator);
-                this.visibleMapIndicators.add(indicator);
-            }
-            if (indicator.dead) {
-                this.visibleMapIndicators.delete(indicator);
-            }
-        }
-
-        if (playerBarn.killLeaderDirty || this._firstUpdate) {
-            updateMsg.killLeaderDirty = true;
-            updateMsg.killLeaderId = playerBarn.killLeader?.__id ?? 0;
-            updateMsg.killLeaderKills = playerBarn.killLeader?.kills ?? 0;
-        }
-
-        msgStream.serializeMsg(net.MsgType.Update, updateMsg);
-
-        for (let i = 0; i < this.msgsToSend.length; i++) {
-            const msg = this.msgsToSend[i];
-            msgStream.serializeMsg(msg.type, msg.msg);
-        }
-
-        this.msgsToSend.length = 0;
-
-        const globalMsgStream = this.game.msgsToSend.stream;
-        msgStream.stream.writeBytes(globalMsgStream, 0, globalMsgStream.byteIndex);
-
-        this.sendData(msgStream.getBuffer());
-        this._firstUpdate = false;
-    }
-
-    spectate(spectateMsg: net.SpectateMsg): void {
-        if (!this.dead) return;
-
-        if (this.spectateCooldown >= 0.75) {
-            this.spectateCooldownCount++;
-
-            if (this.spectateCooldownCount > 10) {
-                this.disconnect();
-                this.game.logger.error(
-                    `Game ${this.game.id} - Player ${this.name} disconnected for spamming SpectateMsg (cooldown)`,
-                );
-            }
-            return;
-        }
-        this.spectateCooldown = 1;
-
-        this.spectateMsgCount++;
-
-        if (this.spectateMsgCount > 50) {
-            this.disconnect();
-            this.game.logger.error(
-                `Game ${this.game.id} - Player ${this.name} Player ${this.name} disconnected for spamming SpectateMsg (count)`,
-            );
-            return;
-        }
-
-        // livingPlayers is used here instead of a more "efficient" option because its sorted while other options are not
-        const spectatablePlayers = this.game.playerBarn.livingPlayers.filter(
-            (p) =>
-                this != p
-                && !p.disconnected
-                && (this.game.modeManager.getPlayerAlivePlayersContext(this).length === 0
-                    || p.teamId == this.teamId),
-        );
-
-        let playerToSpec: Player | undefined;
-        switch (true) {
-            case spectateMsg.specBegin:
-                const groupExistsOrAlive = this.game.isTeamMode && this.group!.livingPlayers.length > 0;
-                const teamExistsOrAlive = this.game.map.factionMode && this.team!.livingPlayers.length > 0;
-                const aliveKiller = this.getAliveKiller();
-                const shouldSpecRandom = groupExistsOrAlive || teamExistsOrAlive || !aliveKiller;
-
-                if (!shouldSpecRandom) {
-                    playerToSpec = aliveKiller;
-                    break;
-                }
-
-                const players = this.game.map.factionMode && groupExistsOrAlive
-                    ? this.group!.livingPlayers
-                    : spectatablePlayers;
-
-                playerToSpec = util.randomItem(players);
-                break;
-            case spectateMsg.specNext:
-            case spectateMsg.specPrev:
-                const nextOrPrev = +spectateMsg.specNext - +spectateMsg.specPrev;
-                playerToSpec = util.wrappedArrayIndex(
-                    spectatablePlayers,
-                    spectatablePlayers.indexOf(this.spectating!) + nextOrPrev,
-                );
-                break;
-        }
-        this.spectating = playerToSpec;
-    }
-
     /**
      * doesn't care about kill credit or anything, simply the last player to damage you (excludes yourself)
      */
@@ -2934,7 +2462,7 @@ export class Player extends BaseGameObject {
     }
 
     /**
-     * adds gameover message to "this.msgsToSend" for the player and all their spectators
+     * adds gameover message to the player and all their spectators
      */
     addGameOverMsg(winningTeamId: number = 0): void {
         this.questManager.flushProgress(winningTeamId);
@@ -2945,7 +2473,7 @@ export class Player extends BaseGameObject {
         if (this.game.modeManager.showStatsMsg(this)) {
             const statsMsg = new net.PlayerStatsMsg();
             statsMsg.playerStats = this;
-            this.msgsToSend.push({ type: net.MsgType.PlayerStats, msg: statsMsg });
+            this.client.bufferSendMsg(net.MsgType.PlayerStats, statsMsg);
         } else {
             const gameOverMsg = new net.GameOverMsg();
 
@@ -2955,13 +2483,14 @@ export class Player extends BaseGameObject {
             gameOverMsg.teamId = this.teamId;
             gameOverMsg.winningTeamId = winningTeamId;
             gameOverMsg.gameOver = !!winningTeamId;
-            this.msgsToSend.push({ type: net.MsgType.GameOver, msg: gameOverMsg });
+
+            this.client.bufferSendMsg(net.MsgType.GameOver, gameOverMsg);
 
             for (const spectator of this.spectators) {
-                spectator.msgsToSend.push({
-                    type: net.MsgType.GameOver,
-                    msg: gameOverMsg,
-                });
+                spectator.client.bufferSendMsg(
+                    net.MsgType.GameOver,
+                    gameOverMsg,
+                );
             }
         }
     }
@@ -3013,7 +2542,7 @@ export class Player extends BaseGameObject {
             downedMsg.killCreditId = params.source.__id;
         }
 
-        this.game.broadcastMsg(net.MsgType.Kill, downedMsg);
+        this.game.clientBarn.broadcastMsg(net.MsgType.Kill, downedMsg);
 
         // lone survivr can be given on knock or kill
         if (this.game.map.factionMode) {
@@ -3216,7 +2745,7 @@ export class Player extends BaseGameObject {
 
         this.questManager.flushProgress();
 
-        this.game.broadcastMsg(net.MsgType.Kill, killMsg);
+        this.game.clientBarn.broadcastMsg(net.MsgType.Kill, killMsg);
 
         if (this.role) {
             const roleMsg = new net.RoleAnnouncementMsg();
@@ -3225,7 +2754,7 @@ export class Player extends BaseGameObject {
             roleMsg.killed = true;
             roleMsg.playerId = this.__id;
             roleMsg.killerId = params.source?.__id ?? 0;
-            this.game.broadcastMsg(net.MsgType.RoleAnnouncement, roleMsg);
+            this.game.clientBarn.broadcastMsg(net.MsgType.RoleAnnouncement, roleMsg);
         }
 
         if (this.isKillLeader && this.role !== "the_hunted") {
@@ -3235,7 +2764,7 @@ export class Player extends BaseGameObject {
             roleMsg.killed = true;
             roleMsg.playerId = this.__id;
             roleMsg.killerId = params.source?.__id ?? 0;
-            this.game.broadcastMsg(net.MsgType.RoleAnnouncement, roleMsg);
+            this.game.clientBarn.broadcastMsg(net.MsgType.RoleAnnouncement, roleMsg);
         }
 
         if (this.game.map.mapDef.gameMode.killLeaderEnabled) {
@@ -3632,9 +3161,7 @@ export class Player extends BaseGameObject {
     moveDown = false;
     shootStart = false;
     shootHold = false;
-    portrait = false;
-    private _cullingPortrait = false;
-    private _cullingPortraitTicker = 0;
+
     touchMoveActive = false;
     touchMoveDir = v2.create(1, 0);
     touchMoveLen = 255;
@@ -3655,8 +3182,6 @@ export class Player extends BaseGameObject {
     }
 
     handleInput(msg: net.InputMsg): void {
-        this.ack = msg.seq;
-
         if (this.dead) return;
         if (this.game.map.perkMode && !this.role) return;
 
@@ -3667,17 +3192,18 @@ export class Player extends BaseGameObject {
         this.moveUp = msg.moveUp;
         this.moveDown = msg.moveDown;
 
-        // same logic for `_cullingZoom`, see comment on `set zoom`
-        if (this.portrait != msg.portrait) {
-            this._cullingPortraitTicker = 0.5;
-        }
-        this.portrait = msg.portrait;
         this.touchMoveActive = msg.touchMoveActive;
         this.touchMoveDir = v2.normalizeSafe(msg.touchMoveDir);
         this.touchMoveLen = msg.touchMoveLen;
         this.toMouseLen = msg.toMouseLen;
 
         this.shootHold = msg.shootHold;
+
+        // same logic for `_cullingZoom`, see comment on `set zoom`
+        if (this.portrait != msg.portrait) {
+            this._cullingPortraitTicker = 0.5;
+        }
+        this.portrait = msg.portrait;
 
         if (msg.shootStart) {
             this.shootStart = true;
@@ -4310,10 +3836,10 @@ export class Player extends BaseGameObject {
         }
 
         obj.destroy();
-        this.msgsToSend.push({
-            type: net.MsgType.Pickup,
-            msg: pickupMsg,
-        });
+        this.client.bufferSendMsg(
+            net.MsgType.Pickup,
+            pickupMsg,
+        );
     }
 
     // in original game, only called on snowball or potato collision
@@ -5085,15 +4611,5 @@ export class Player extends BaseGameObject {
         }
 
         this.speed = math.clamp(this.speed, 1, 10000);
-    }
-
-    sendMsg(type: net.MsgType, msg: net.AbstractMsg, bytes = 128): void {
-        const stream = new net.MsgStream(new ArrayBuffer(bytes));
-        stream.serializeMsg(type, msg);
-        this.sendData(stream.getBuffer());
-    }
-
-    sendData(buffer: Uint8Array): void {
-        this.game.sendSocketMsg(this.socketId, buffer);
     }
 }
