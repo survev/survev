@@ -698,21 +698,6 @@ export class Game {
             inputMsg.shootHold =
                 this.m_inputBinds.isBindDown(Input.Fire) || this.m_touch.shotDetected;
 
-                if (device.touch && inputMsg.shootStart) {
-                    const activePlayer = this.m_activePlayer;
-                    const curWeapIdx = activePlayer.m_localData.m_curWeapIdx;
-                    const curWeapon = activePlayer.m_localData.m_weapons[curWeapIdx];
-                    const weaponDef = GameObjectDefs[curWeapon?.type];
-
-                    if (
-                        weaponDef?.type === "gun" &&
-                        weaponDef.autoSwitch === true &&
-                        activePlayer.gunSwitchCooldown <= 0
-                    ) {
-                        this.m_pendingAutoSwitchSlot = true;
-                    }
-                }
-
 
             inputMsg.portrait =
                 this.m_camera.m_screenWidth < this.m_camera.m_screenHeight;
@@ -1290,7 +1275,26 @@ export class Game {
         }
         this.m_spectating = this.m_activeId != this.m_localId;
         this.m_activePlayer = this.m_playerBarn.getPlayerById(this.m_activeId)!;
+        const oldWeapIdx = this.m_activePlayer?.m_localData?.m_curWeapIdx;
+        const oldWeapon = this.m_activePlayer?.m_localData?.m_weapons?.[oldWeapIdx];
+        const oldAmmo = oldWeapon?.ammo ?? -1;
+        const oldWeaponType = oldWeapon?.type;
         this.m_activePlayer.m_setLocalData(msg.activePlayerData);
+        const newWeapon = this.m_activePlayer.m_localData.m_weapons[oldWeapIdx];
+        const newAmmo = newWeapon?.ammo ?? -1;
+
+        const weaponDef = GameObjectDefs[oldWeaponType];
+
+        if (
+            device.touch &&
+            weaponDef?.type === "gun" &&
+            weaponDef.autoSwitch === true &&
+            oldWeaponType === newWeapon?.type &&
+            oldAmmo > newAmmo
+        ) {
+            this.m_pendingAutoSwitchSlot = true;
+        }
+
         if (msg.activePlayerData.weapsDirty) {
             this.m_uiManager.weapsDirty = true;
         }
