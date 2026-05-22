@@ -48,6 +48,7 @@ import { UiManager } from "./ui/ui";
 import { UiManager2 } from "./ui/ui2";
 import { name } from "ejs";
 import { ChatUi } from "./ui/chat";
+import { GunDefs } from "../../shared/defs/gameObjects/gunDefs";
 
 export interface Ctx {
     audioManager: AudioManager;
@@ -605,8 +606,10 @@ export class Game {
                     this.m_camera,
                 );
                 let aimDir = v2.copy(touchAimMovement.aimMovement.toAimDir);
+                const weapon = this.m_activePlayer.m_netData.m_activeWeapon;
+                const weaponDef = GunDefs[weapon];
 
-                if(device.touch && touchAimMovement.touched && this.m_touch.shotDetected){
+                if(device.touch && touchAimMovement.touched && this.m_touch.shotDetected && weaponDef && weaponDef.aimAssist){
                     aimDir = this.getMobileAimAssistDir(aimDir);
                 }
 
@@ -1867,6 +1870,12 @@ export class Game {
 
     const bulletSpeed = 120;
     const predictionStrength = 0.55;
+    const recent = this.pings.slice(-5);
+
+    const pingMs =
+        recent.reduce((a, b) => a + b, 0) /
+        Math.max(recent.length, 1);
+    const latencyComp = Math.min((pingMs / 1000) * 0.5, 0.15);
 
     let bestDir: Vec2 | null = null;
     let bestScore = Infinity;
@@ -1884,7 +1893,9 @@ export class Game {
         const dist = v2.length(toTargetNow);
         if (dist <= 0.01 || dist > maxDist) continue;
 
-        const travelTime = dist / bulletSpeed;
+        
+
+        const travelTime = dist / bulletSpeed + latencyComp;
 
         const vel = p.m_netData.m_dir ?? v2.create(0, 0);
 
