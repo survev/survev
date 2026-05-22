@@ -5,7 +5,7 @@ import { GameConfig, Input, TeamMode, WeaponSlot } from "../../shared/gameConfig
 import * as net from "../../shared/net/net";
 import { ObjectType } from "../../shared/net/objectSerializeFns";
 import { math } from "../../shared/utils/math";
-import { v2 } from "../../shared/utils/v2";
+import { v2, Vec2 } from "../../shared/utils/v2";
 import type { Ambiance } from "./ambiance";
 import type { AudioManager } from "./audioManager";
 import { Camera } from "./camera";
@@ -605,6 +605,12 @@ export class Game {
                     this.m_camera,
                 );
                 let aimDir = v2.copy(touchAimMovement.aimMovement.toAimDir);
+
+                if(device.touch && touchAimMovement.touched && this.m_touch.shotDetected){
+                    aimDir = this.getMobileAimAssistDir(aimDir);
+                }
+
+
                 this.m_touch.turnDirTicker -= dt;
                 if (this.m_touch.moveDetected && !touchAimMovement.touched) {
                     // Keep looking in the old aimDir while waiting for the ticker
@@ -1848,4 +1854,67 @@ export class Game {
             }
         }
     }
+
+    //aim assist helper for mobile
+    private getMobileAimAssistDir(currentAimDir: Vec2): Vec2 {
+        const active = this.m_activePlayer;
+        const activeInfo = this.m_playerBarn.getPlayerInfo(this.m_activeId);
+        const players = this.m_playerBarn.playerPool.m_getPool();
+
+        const maxDist = 120;          
+        const maxAngleDeg = 180;      
+        const strength = 1;       
+
+        let bestDir: Vec2 | null = null;
+        let bestScore = Infinity;
+
+        for (const p of players) {
+            if (!p.active || p.__id === this.m_activeId) continue;
+            if (p.m_netData.m_dead || p.m_netData.m_downed) continue;
+            if (p.layer !== active.layer) continue;
+            if(!this.isWorldPosOnScreen(p.m_pos)) continue;
+
+            const info = this.m_playerBarn.getPlayerInfo(p.__id);
+            if (info?.teamId === activeInfo?.teamId) continue;
+
+            const toTarget = v2.sub(p.m_pos, active.m_pos);
+            const dist = v2.length(toTarget);
+            if (dist <= 0.01 || dist > maxDist) continue;
+
+            const targetDir = v2.div(toTarget, dist);
+            const dot = math.clamp(v2.dot(currentAimDir, targetDir), -1, 1);
+            const angleDeg = math.rad2deg(Math.acos(dot));
+
+            if (angleDeg > maxAngleDeg) continue;
+
+            // niedriger Score = besser
+            const score = angleDeg + dist * 0.05;
+
+            if (score < bestScore) {
+                bestScore = score;
+                bestDir = targetDir;
+            }
+        }
+
+        if (!bestDir) return currentAimDir;
+
+        return v2.normalizeSafe(
+            v2.add(
+                v2.mul(currentAimDir, 1 - strength),
+                v2.mul(bestDir, strength),
+            ),
+            currentAimDir,
+        );
+    }
+
+    private isWorldPosOnScreen(pos: Vec2): boolean {
+    const screenPos = this.m_camera.m_pointToScreen(pos);
+
+    return (
+        screenPos.x >= 0 &&
+        screenPos.y >= 0 &&
+        screenPos.x <= device.screenWidth &&
+        screenPos.y <= device.screenHeight
+    );
+}
 }
