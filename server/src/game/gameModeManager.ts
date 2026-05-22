@@ -320,9 +320,15 @@ export class GameModeManager {
                 const nonPlayerKill =
                     player.downedBy && params.damageType != GameConfig.DamageType.Player;
 
+                const teammateStoleKill =
+                    player.downedBy &&
+                    playerSource &&
+                    player.downedBy.__type === ObjectType.Player &&
+                    player.downedBy.teamId !== playerSource.teamId &&
+                    player.teamId === playerSource.teamId;
                 // give kill credit to the person that downed the player if it was killed by:
                 // a teammate, bleeding or non player source (airstrike, gas etc)
-                if (finishedByTeammate || nonPlayerKill) {
+                if (finishedByTeammate || nonPlayerKill || teammateStoleKill) {
                     params.killCreditSource = player.downedBy;
                 }
 
