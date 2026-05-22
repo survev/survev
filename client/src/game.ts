@@ -113,6 +113,8 @@ export class Game {
     m_debugZoom!: number;
     m_useDebugZoom!: boolean;
 
+    m_lastAutoSwitchSeq = -1;
+
     editor!: Editor;
     debugHUD!: DebugHUD;
     chatUi: ChatUi;
@@ -606,10 +608,14 @@ export class Game {
                     this.m_camera,
                 );
                 let aimDir = v2.copy(touchAimMovement.aimMovement.toAimDir);
-                const weapon = this.m_activePlayer.m_netData.m_activeWeapon;
-                const weaponDef = GunDefs[weapon];
+                
+                const activePlayer = this.m_activePlayer;
+                const curWeapIdx = activePlayer.m_localData.m_curWeapIdx;
+                const curWeapon = activePlayer.m_localData.m_weapons[curWeapIdx];
+                const weaponDef = GunDefs[curWeapon?.type];
 
-                if(device.touch && touchAimMovement.touched && this.m_touch.shotDetected && weaponDef && weaponDef.aimAssist){
+
+                if(device.touch && touchAimMovement.touched && this.m_touch.shotDetected && weaponDef?.aimAssist === true){
                     aimDir = this.getMobileAimAssistDir(aimDir);
                 }
 
@@ -685,6 +691,38 @@ export class Game {
                 this.m_inputBinds.isBindPressed(Input.Fire) || this.m_touch.shotDetected;
             inputMsg.shootHold =
                 this.m_inputBinds.isBindDown(Input.Fire) || this.m_touch.shotDetected;
+
+                //auto switch for mobiles
+                if (device.touch && inputMsg.shootStart) {
+                    const activePlayer = this.m_activePlayer;
+                    const curWeapIdx = activePlayer.m_localData.m_curWeapIdx;
+                    const curWeapon = activePlayer.m_localData.m_weapons[curWeapIdx];
+                    const weaponDef = GunDefs[curWeapon?.type];
+
+                    if (
+                        weaponDef?.autoSwitch === true &&
+                        this.m_lastAutoSwitchSeq !== inputMsg.seq
+                    ) {
+                        const otherGunSlot =
+                            curWeapIdx === WeaponSlot.Primary
+                                ? WeaponSlot.Secondary
+                                : WeaponSlot.Primary;
+
+                        const otherWeapon = activePlayer.m_localData.m_weapons[otherGunSlot];
+
+                        if (otherWeapon?.type) {
+                            inputMsg.addInput(
+                                otherGunSlot === WeaponSlot.Primary
+                                    ? Input.EquipPrimary
+                                    : Input.EquipSecondary,
+                            );
+
+                            this.m_lastAutoSwitchSeq = inputMsg.seq;
+                        }
+                    }
+                }
+
+
             inputMsg.portrait =
                 this.m_camera.m_screenWidth < this.m_camera.m_screenHeight;
             const checkInputs = [
@@ -1935,13 +1973,13 @@ export class Game {
 }
 
     private isWorldPosOnScreen(pos: Vec2): boolean {
-    const screenPos = this.m_camera.m_pointToScreen(pos);
+        const screenPos = this.m_camera.m_pointToScreen(pos);
 
-    return (
-        screenPos.x >= 0 &&
-        screenPos.y >= 0 &&
-        screenPos.x <= device.screenWidth &&
-        screenPos.y <= device.screenHeight
-    );
-}
+        return (
+            screenPos.x >= 0 &&
+            screenPos.y >= 0 &&
+            screenPos.x <= device.screenWidth &&
+            screenPos.y <= device.screenHeight
+        );
+    }
 }
