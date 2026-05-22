@@ -1898,8 +1898,8 @@ export class Game {
     const players = this.m_playerBarn.playerPool.m_getPool();
 
     const maxDist = 120;
-    const maxAngleDeg = 40;
-    const strength = 1;
+    const maxAngleDeg = 30;
+    const strength = 0.5;
 
     const bulletSpeed = 120;
     const predictionStrength = 0.55;
