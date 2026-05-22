@@ -114,6 +114,7 @@ export class Game {
     m_useDebugZoom!: boolean;
 
     m_lastAutoSwitchSeq = -1;
+    m_pendingAutoSwitchSlot: WeaponSlot | null = null;
 
     editor!: Editor;
     debugHUD!: DebugHUD;
@@ -612,10 +613,10 @@ export class Game {
                 const activePlayer = this.m_activePlayer;
                 const curWeapIdx = activePlayer.m_localData.m_curWeapIdx;
                 const curWeapon = activePlayer.m_localData.m_weapons[curWeapIdx];
-                const weaponDef = GunDefs[curWeapon?.type];
+                const weaponDef = GameObjectDefs[curWeapon?.type];
 
 
-                if(device.touch && touchAimMovement.touched && this.m_touch.shotDetected && weaponDef?.aimAssist === true){
+                if(device.touch && touchAimMovement.touched && this.m_touch.shotDetected && weaponDef?.type === "gun" && weaponDef.aimAssist === true){
                     aimDir = this.getMobileAimAssistDir(aimDir);
                 }
 
@@ -693,16 +694,22 @@ export class Game {
                 this.m_inputBinds.isBindDown(Input.Fire) || this.m_touch.shotDetected;
 
                 //auto switch for mobiles
+                if (device.touch && this.m_pendingAutoSwitchSlot !== null) {
+                    inputMsg.addInput(
+                        this.m_pendingAutoSwitchSlot === WeaponSlot.Primary
+                            ? Input.EquipPrimary
+                            : Input.EquipSecondary,
+                    );
+
+                    this.m_pendingAutoSwitchSlot = null;
+                }
                 if (device.touch && inputMsg.shootStart) {
                     const activePlayer = this.m_activePlayer;
                     const curWeapIdx = activePlayer.m_localData.m_curWeapIdx;
                     const curWeapon = activePlayer.m_localData.m_weapons[curWeapIdx];
-                    const weaponDef = GunDefs[curWeapon?.type];
+                    const weaponDef = GameObjectDefs[curWeapon?.type];
 
-                    if (
-                        weaponDef?.autoSwitch === true &&
-                        this.m_lastAutoSwitchSeq !== inputMsg.seq
-                    ) {
+                    if (weaponDef?.type === "gun" && weaponDef.autoSwitch === true) {
                         const otherGunSlot =
                             curWeapIdx === WeaponSlot.Primary
                                 ? WeaponSlot.Secondary
@@ -711,13 +718,7 @@ export class Game {
                         const otherWeapon = activePlayer.m_localData.m_weapons[otherGunSlot];
 
                         if (otherWeapon?.type) {
-                            inputMsg.addInput(
-                                otherGunSlot === WeaponSlot.Primary
-                                    ? Input.EquipPrimary
-                                    : Input.EquipSecondary,
-                            );
-
-                            this.m_lastAutoSwitchSeq = inputMsg.seq;
+                            this.m_pendingAutoSwitchSlot = otherGunSlot;
                         }
                     }
                 }
