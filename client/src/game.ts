@@ -625,18 +625,6 @@ export class Game {
                     aimDir = this.getMobileAimAssistDir(aimDir);
                 }
 
-                const actuallyShot =
-                    inputMsg.shootStart &&
-                    activePlayer.gunSwitchCooldown <= 0;
-
-                if (
-                    actuallyShot &&
-                    weaponDef?.type === "gun" &&
-                    weaponDef.autoSwitch === true
-                ) {
-                    this.m_pendingAutoSwitchSlot = true;
-                }
-
 
                 this.m_touch.turnDirTicker -= dt;
                 if (this.m_touch.moveDetected && !touchAimMovement.touched) {
@@ -709,6 +697,21 @@ export class Game {
                 this.m_inputBinds.isBindPressed(Input.Fire) || this.m_touch.shotDetected;
             inputMsg.shootHold =
                 this.m_inputBinds.isBindDown(Input.Fire) || this.m_touch.shotDetected;
+
+                if (device.touch && inputMsg.shootStart) {
+                    const activePlayer = this.m_activePlayer;
+                    const curWeapIdx = activePlayer.m_localData.m_curWeapIdx;
+                    const curWeapon = activePlayer.m_localData.m_weapons[curWeapIdx];
+                    const weaponDef = GameObjectDefs[curWeapon?.type];
+
+                    if (
+                        weaponDef?.type === "gun" &&
+                        weaponDef.autoSwitch === true &&
+                        activePlayer.gunSwitchCooldown <= 0
+                    ) {
+                        this.m_pendingAutoSwitchSlot = true;
+                    }
+                }
 
 
             inputMsg.portrait =
@@ -1891,7 +1894,7 @@ export class Game {
     const players = this.m_playerBarn.playerPool.m_getPool();
 
     const maxDist = 120;
-    const maxAngleDeg = 18;
+    const maxAngleDeg = 40;
     const strength = 1;
 
     const bulletSpeed = 120;
