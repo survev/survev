@@ -625,12 +625,15 @@ export class Game {
                     aimDir = this.getMobileAimAssistDir(aimDir);
                 }
 
+                const actuallyShot =
+                    inputMsg.shootStart &&
+                    activePlayer.gunSwitchCooldown <= 0;
+
                 if (
-                    this.m_touch.shotDetected &&
+                    actuallyShot &&
                     weaponDef?.type === "gun" &&
                     weaponDef.autoSwitch === true
                 ) {
-
                     this.m_pendingAutoSwitchSlot = true;
                 }
 
@@ -1888,7 +1891,7 @@ export class Game {
     const players = this.m_playerBarn.playerPool.m_getPool();
 
     const maxDist = 120;
-    const maxAngleDeg = 180;
+    const maxAngleDeg = 18;
     const strength = 1;
 
     const bulletSpeed = 120;
