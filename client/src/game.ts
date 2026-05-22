@@ -1899,7 +1899,7 @@ export class Game {
 
     const maxDist = 120;
     const maxAngleDeg = 30;
-    const strength = 0.5;
+    const strength = 0.7;
 
     const bulletSpeed = 120;
     const predictionStrength = 0.55;
