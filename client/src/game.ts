@@ -1857,55 +1857,71 @@ export class Game {
 
     //aim assist helper for mobile
     private getMobileAimAssistDir(currentAimDir: Vec2): Vec2 {
-        const active = this.m_activePlayer;
-        const activeInfo = this.m_playerBarn.getPlayerInfo(this.m_activeId);
-        const players = this.m_playerBarn.playerPool.m_getPool();
+    const active = this.m_activePlayer;
+    const activeInfo = this.m_playerBarn.getPlayerInfo(this.m_activeId);
+    const players = this.m_playerBarn.playerPool.m_getPool();
 
-        const maxDist = 120;          
-        const maxAngleDeg = 180;      
-        const strength = 1;       
+    const maxDist = 120;
+    const maxAngleDeg = 180;
+    const strength = 1;
 
-        let bestDir: Vec2 | null = null;
-        let bestScore = Infinity;
+    const bulletSpeed = 120;
+    const predictionStrength = 0.55;
 
-        for (const p of players) {
-            if (!p.active || p.__id === this.m_activeId) continue;
-            if (p.m_netData.m_dead || p.m_netData.m_downed) continue;
-            if (p.layer !== active.layer) continue;
-            if(!this.isWorldPosOnScreen(p.m_pos)) continue;
+    let bestDir: Vec2 | null = null;
+    let bestScore = Infinity;
 
-            const info = this.m_playerBarn.getPlayerInfo(p.__id);
-            if (info?.teamId === activeInfo?.teamId) continue;
+    for (const p of players) {
+        if (!p.active || p.__id === this.m_activeId) continue;
+        if (p.m_netData.m_dead || p.m_netData.m_downed) continue;
+        if (p.layer !== active.layer) continue;
+        if (!this.isWorldPosOnScreen(p.m_pos)) continue;
 
-            const toTarget = v2.sub(p.m_pos, active.m_pos);
-            const dist = v2.length(toTarget);
-            if (dist <= 0.01 || dist > maxDist) continue;
+        const info = this.m_playerBarn.getPlayerInfo(p.__id);
+        if (info?.teamId === activeInfo?.teamId) continue;
 
-            const targetDir = v2.div(toTarget, dist);
-            const dot = math.clamp(v2.dot(currentAimDir, targetDir), -1, 1);
-            const angleDeg = math.rad2deg(Math.acos(dot));
+        const toTargetNow = v2.sub(p.m_pos, active.m_pos);
+        const dist = v2.length(toTargetNow);
+        if (dist <= 0.01 || dist > maxDist) continue;
 
-            if (angleDeg > maxAngleDeg) continue;
+        const travelTime = dist / bulletSpeed;
 
-            // niedriger Score = besser
-            const score = angleDeg + dist * 0.05;
+        const vel = p.m_netData.m_dir ?? v2.create(0, 0);
 
-            if (score < bestScore) {
-                bestScore = score;
-                bestDir = targetDir;
-            }
-        }
-
-        if (!bestDir) return currentAimDir;
-
-        return v2.normalizeSafe(
-            v2.add(
-                v2.mul(currentAimDir, 1 - strength),
-                v2.mul(bestDir, strength),
-            ),
-            currentAimDir,
+        const predictedPos = v2.add(
+            p.m_pos,
+            v2.mul(vel, travelTime * predictionStrength),
         );
+
+        const toTarget = v2.sub(predictedPos, active.m_pos);
+        const targetDist = v2.length(toTarget);
+        if (targetDist <= 0.01) continue;
+
+        const targetDir = v2.div(toTarget, targetDist);
+
+        const dot = math.clamp(v2.dot(currentAimDir, targetDir), -1, 1);
+        const angleDeg = math.rad2deg(Math.acos(dot));
+
+        if (angleDeg > maxAngleDeg) continue;
+
+        const score = angleDeg + dist * 0.05;
+
+        if (score < bestScore) {
+            bestScore = score;
+            bestDir = targetDir;
+        }
     }
+
+    if (!bestDir) return currentAimDir;
+
+    return v2.normalizeSafe(
+        v2.add(
+            v2.mul(currentAimDir, 1 - strength),
+            v2.mul(bestDir, strength),
+        ),
+        currentAimDir,
+    );
+}
 
     private isWorldPosOnScreen(pos: Vec2): boolean {
     const screenPos = this.m_camera.m_pointToScreen(pos);
