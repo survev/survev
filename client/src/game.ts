@@ -114,7 +114,7 @@ export class Game {
     m_useDebugZoom!: boolean;
 
     m_lastAutoSwitchSeq = -1;
-    m_pendingAutoSwitchSlot: WeaponSlot | null = null;
+    m_pendingAutoSwitchSlot: boolean = false;
 
     editor!: Editor;
     debugHUD!: DebugHUD;
@@ -603,6 +603,10 @@ export class Game {
         inputMsg.seq = this.seq;
         if (!this.m_spectating) {
             if (device.touch) {
+                if(this.m_pendingAutoSwitchSlot){
+                    inputMsg.addInput(Input.EquipOtherGun);
+                    this.m_pendingAutoSwitchSlot = false;
+                }
                 const touchPlayerMovement = this.m_touch.getTouchMovement(this.m_camera);
                 const touchAimMovement = this.m_touch.getAimMovement(
                     this.m_activePlayer,
@@ -626,18 +630,8 @@ export class Game {
                     weaponDef?.type === "gun" &&
                     weaponDef.autoSwitch === true
                 ) {
-                    const otherGunSlot =
-                        curWeapIdx === WeaponSlot.Primary
-                            ? WeaponSlot.Secondary
-                            : WeaponSlot.Primary;
 
-                    const otherWeapon = activePlayer.m_localData.m_weapons[otherGunSlot];
-
-                    if (otherWeapon?.type) {
-                        inputMsg.addInput(
-                            Input.EquipOtherGun,
-                        );
-                    }
+                    this.m_pendingAutoSwitchSlot = true;
                 }
 
 
