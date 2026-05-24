@@ -5,6 +5,8 @@ export interface GunDef {
     readonly type: "gun";
     name: string;
     quality?: number;
+    aimAssist?:boolean;
+    autoSwitch?:boolean;
     fireMode: "auto" | "single" | "burst" | "dual";
     secondFireMode?: "auto" | "single" | "burst" | "dual";
     caseTiming: "shoot" | "reload";
@@ -764,6 +766,7 @@ export const BaseDefs: Record<string, GunDef> = {
         shotSpread: 1.5,
         bulletCount: 1,
         bulletType: "bullet_m249",
+        upgraded: { gun: "modified_m249", cost: 6 },
         headshotMult: 1,
         speed: { equip: 0, attack: -2 },
         lootImg: {
@@ -853,6 +856,8 @@ export const BaseDefs: Record<string, GunDef> = {
         name: "Scout Elite",
         type: "gun",
         quality: 0,
+        aimAssist: true,
+        autoSwitch: true,
         fireMode: "single",
         caseTiming: "shoot",
         ammo: "556mm",
@@ -1507,6 +1512,8 @@ export const BaseDefs: Record<string, GunDef> = {
         name: "Model 94",
         type: "gun",
         quality: 0,
+        aimAssist: true,
+        autoSwitch: true,
         fireMode: "single",
         caseTiming: "shoot",
         ammo: "45acp",
@@ -1605,6 +1612,8 @@ export const BaseDefs: Record<string, GunDef> = {
         name: "BLR 81",
         type: "gun",
         quality: 0,
+        aimAssist: true,
+        autoSwitch: true,
         fireMode: "single",
         caseTiming: "shoot",
         ammo: "762mm",
@@ -1655,6 +1664,8 @@ export const BaseDefs: Record<string, GunDef> = {
         name: "Mosin-Nagant",
         type: "gun",
         quality: 0,
+        aimAssist: true,
+        autoSwitch: true,
         fireMode: "single",
         caseTiming: "shoot",
         ammo: "762mm",
@@ -1710,6 +1721,8 @@ export const BaseDefs: Record<string, GunDef> = {
         name: "SV-98",
         type: "gun",
         quality: 1,
+        aimAssist: true,
+        autoSwitch: true,
         fireMode: "single",
         caseTiming: "shoot",
         ammo: "762mm",
@@ -1761,6 +1774,8 @@ export const BaseDefs: Record<string, GunDef> = {
         name: "AWM-S",
         type: "gun",
         quality: 1,
+        aimAssist: true,
+        autoSwitch: true,
         fireMode: "single",
         caseTiming: "shoot",
         ammo: "308sub",
@@ -1958,6 +1973,8 @@ export const BaseDefs: Record<string, GunDef> = {
         name: "M870",
         type: "gun",
         quality: 0,
+        aimAssist: true,
+        autoSwitch: true,
         fireMode: "single",
         caseTiming: "shoot",
         ammo: "12gauge",
@@ -2061,6 +2078,7 @@ export const BaseDefs: Record<string, GunDef> = {
         name: "MP220",
         type: "gun",
         quality: 0,
+        aimAssist: true,
         fireMode: "single",
         caseTiming: "reload",
         ammo: "12gauge",
@@ -2110,6 +2128,7 @@ export const BaseDefs: Record<string, GunDef> = {
         name: "Saiga-12",
         type: "gun",
         quality: 1,
+        aimAssist: true,
         fireMode: "auto",
         caseTiming: "shoot",
         ammo: "12gauge",
@@ -2161,6 +2180,8 @@ export const BaseDefs: Record<string, GunDef> = {
         name: "HAWK-12G",
         type: "gun",
         quality: 1,
+        aimAssist: true,
+        autoSwitch: true,
         fireMode: "single",
         caseTiming: "shoot",
         ammo: "12gauge",
@@ -2209,6 +2230,8 @@ export const BaseDefs: Record<string, GunDef> = {
         name: "HAWK-12G",
         type: "gun",
         quality: 1,
+        aimAssist: true,
+        autoSwitch: true,
         fireMode: "single",
         caseTiming: "shoot",
         ammo: "12gauge",
@@ -2306,6 +2329,8 @@ export const BaseDefs: Record<string, GunDef> = {
         name: "SPAS-12",
         type: "gun",
         quality: 0,
+        aimAssist: true,
+        autoSwitch: true,
         fireMode: "single",
         caseTiming: "shoot",
         ammo: "12gauge",
@@ -4234,6 +4259,10 @@ export const ModifiedGunDefs: Record<string, GunDef> = {
         bulletType: "bullet_l86_modified",
         upgraded: undefined,
         modifiedSound: "l86_01",
+        lootImg: {
+            border: "loot-circle-outer-modified-01.img",
+        },
+    }),
     modified_scout_elite: defineGunSkin("scout_elite",{
         name: "Scout Elite [+]",
         maxReload: 1,
@@ -4243,6 +4272,7 @@ export const ModifiedGunDefs: Record<string, GunDef> = {
         reloadTime: 0.8,
         reloadTimeAlt: 2.6,
         upgraded: undefined,
+        modifiedSound: "scout_01",
         lootImg: {
             border: "loot-circle-outer-modified-01.img",
         },
@@ -4250,11 +4280,15 @@ export const ModifiedGunDefs: Record<string, GunDef> = {
             sprite: "gun-scout_elite-01.img",
             tint: 0xffffff,
         },
+        sound: {
+            reloadAlt: "scout_reload_01",
+        },
     }),
     modified_m249: defineGunSkin("m249", {
         name: "M249 [+]",
         backpackFed: true,
         upgraded: undefined,
+        modifiedSound: "m249_01",
         lootImg: {
             border: "loot-circle-outer-modified-01.img",
         },
