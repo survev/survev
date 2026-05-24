@@ -302,11 +302,21 @@ export class GameModeManager {
     }
 
     handlePlayerDeath(player: Player, params: DamageParams): void {
+        const nonPlayerKill = params.damageType != GameConfig.DamageType.Player;
+        const suicide =
+            params.damageType == GameConfig.DamageType.Player && params.source == player;
+
+        const MAX_TIME_CREDIT_KILL = 20000;
+        // give kill credit to the person that damaged the player
+        if (nonPlayerKill || (suicide && player.lastDamagedBy)) {
+            if (this.game.now - player.lastDamagedByAt! < MAX_TIME_CREDIT_KILL) {
+                params.killCreditSource = player.lastDamagedBy;
+            }
+        }
         if (this.isSolo) {
             player.kill(params);
         } else {
             const group = this.mode === GameMode.Faction ? player.team! : player.group!;
-
             const playerSource =
                 params.source?.__type === ObjectType.Player
                     ? (params.source as Player)
@@ -317,12 +327,9 @@ export class GameModeManager {
                     playerSource &&
                     player.downedBy.teamId === playerSource.teamId;
 
-                const nonPlayerKill =
-                    player.downedBy && params.damageType != GameConfig.DamageType.Player;
-
                 // give kill credit to the person that downed the player if it was killed by:
                 // a teammate, bleeding or non player source (airstrike, gas etc)
-                if (finishedByTeammate || nonPlayerKill) {
+                if (finishedByTeammate || (nonPlayerKill && player.downedBy)) {
                     params.killCreditSource = player.downedBy;
                 }
 

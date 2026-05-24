@@ -1358,6 +1358,7 @@ export class Game {
                     msg.damageType == GameConfig.DamageType.Airdrop;
                 const targetInfo = this.m_playerBarn.getPlayerInfo(msg.targetId);
                 const killerInfo = this.m_playerBarn.getPlayerInfo(msg.killCreditId);
+                const creditInfo = this.m_playerBarn.getPlayerInfo(msg.killCreditId);
                 const killfeedKillerInfo = useKillerInfoInFeed
                     ? killerInfo
                     : this.m_playerBarn.getPlayerInfo(msg.killerId);
@@ -1371,6 +1372,11 @@ export class Game {
                     this.m_activeId,
                     true,
                 );
+                let creditName = this.m_playerBarn.getPlayerName(
+                    creditInfo.playerId,
+                    this.m_activeId,
+                    true,
+                );
                 let killfeedKillerName = this.m_playerBarn.getPlayerName(
                     killfeedKillerInfo.playerId,
                     this.m_activeId,
@@ -1378,12 +1384,15 @@ export class Game {
                 );
                 targetName = helpers.htmlEscape(targetName);
                 killerName = helpers.htmlEscape(killerName);
+                creditName = helpers.htmlEscape(creditName);
                 killfeedKillerName = helpers.htmlEscape(killfeedKillerName);
                 // Display the kill / downed notification for the active player
                 if (msg.killCreditId == this.m_activeId) {
                     const completeKill = msg.killerId == this.m_activeId;
                     const suicide =
-                        msg.killerId == msg.targetId || msg.killCreditId == msg.targetId;
+                        (msg.killCreditId == msg.killerId &&
+                            msg.killerId == msg.targetId) ||
+                        msg.killCreditId == msg.targetId;
                     const killText = this.m_ui2Manager.getKillText(
                         killerName,
                         targetName,
@@ -1415,14 +1424,16 @@ export class Game {
                 if (msg.killCreditId == this.m_localId && msg.killed) {
                     this.m_uiManager.setLocalKills(msg.killerKills);
                 }
-
+                const isCreditKill = msg.killerId != msg.killCreditId;
                 // Add killfeed entry for this kill
                 const killText = this.m_ui2Manager.getKillFeedText(
                     targetName,
                     killfeedKillerInfo.teamId ? killfeedKillerName : "",
+                    creditName,
                     sourceType,
                     msg.damageType,
                     msg.downed && !msg.killed,
+                    isCreditKill,
                 );
                 const killColor = this.m_ui2Manager.getKillFeedColor(
                     activeTeamId,

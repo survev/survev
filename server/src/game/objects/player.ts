@@ -2821,9 +2821,10 @@ export class Player extends BaseGameObject {
     }
 
     /**
-     * doesn't care about kill credit or anything, simply the last player to damage you (excludes yourself)
+     * the last player to damage you (excludes yourself)
      */
     lastDamagedBy: Player | undefined;
+    lastDamagedByAt: number | undefined;
 
     damage(params: DamageParams) {
         if (this.debug.godMode) return;
@@ -2942,6 +2943,7 @@ export class Player extends BaseGameObject {
                 });
             }
             this.lastDamagedBy = playerSource;
+            this.lastDamagedByAt = this.game.now;
         }
 
         this.health -= finalDamage;
