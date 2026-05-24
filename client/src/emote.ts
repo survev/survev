@@ -154,7 +154,7 @@ export class EmoteBarn {
     emoteButtonElem = $("#ui-emote-button");
 
     emoteWheels = $("#ui-emotes, #ui-team-pings");
-    teamEmotes = $(".ui-emote-bottom-left, .ui-emote-top-left");
+    teamEmotes = $(".ui-emote-bottom-left, .ui-emote-top-left, .ui-emote-left-bottom");
 
     // Emotes
     emoteWheel = $("#ui-emotes");
@@ -404,10 +404,17 @@ export class EmoteBarn {
                 ping: "ping_coming",
                 emote: "",
             },
-            bottom: {
-                parent: $("#ui-team-ping-bottom"),
-                vA: v2.create(1, -1),
+            "left-bottom": {
+                parent: $("#ui-team-ping-left-bottom"),
+                vA: v2.create(0, -1),
                 vC: v2.create(-1, -1),
+                ping: "",
+                emote: "emote_soda",
+            },
+            "right-bottom": {
+                parent: $("#ui-team-ping-right-bottom"),
+                vA: v2.create(1, -1),
+                vC: v2.create(0, -1),
                 ping: "ping_help",
                 emote: "",
             },

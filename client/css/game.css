@@ -1215,11 +1215,31 @@ img {
   background-image: url(/img/gui/ping-team-coming.svg);
 }
 
+.ui-emote-bottom .ui-emote-image {
+  margin-top: 78px;
+  background-image: url(/img/gui/ping-team-help.svg);
+}
+
 .ui-emote-bottom .ui-emote {
   transform: translate(-50%, -50%) rotate(180deg);
 }
 
-.ui-emote-bottom .ui-emote-image {
+.ui-emote-left-bottom .ui-emote {
+  transform: translate(-50%, -50%) rotate(-90deg);
+}
+
+.ui-emote-left-bottom .ui-emote-image {
+  margin-left: -30px;
+  margin-top: 78px;
+  background-image: url(/img/loot/loot-medical-soda.svg);
+}
+
+.ui-emote-right-bottom .ui-emote {
+  transform: translate(-50%, -50%) rotate(-135deg);
+}
+
+.ui-emote-right-bottom .ui-emote-image {
+  margin-left: 30px;
   margin-top: 78px;
   background-image: url(/img/gui/ping-team-help.svg);
 }
@@ -3593,6 +3613,14 @@ span.ui-stats-header-value {
 
   .ui-emote-bottom .ui-emote {
     transform: translate(-50%, -50%) rotate(180deg);
+  }
+
+  .ui-emote-left-bottom .ui-emote {
+    transform: translate(-50%, -50%) rotate(-90deg);
+  }
+
+  .ui-emote-right-bottom .ui-emote {
+    transform: translate(-50%, -50%) rotate(-135deg);
   }
 
   .ui-emote-bottom .ui-emote-image {
