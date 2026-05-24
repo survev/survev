@@ -51,20 +51,11 @@ export class LootBarn {
                 if (!res) return;
 
                 const forceFactor = 2.5;
-                const forceA = math.max(res.pen / a.lootRad, 0.1) * forceFactor * dt;
-                const forceB = math.max(res.pen / b.lootRad, 0.1) * forceFactor * dt;
-                v2.set(a.pos, v2.sub(a.pos, v2.mul(res.dir, forceA)));
-                v2.set(b.pos, v2.add(b.pos, v2.mul(res.dir, forceB)));
-
-                a.setPartDirty();
-                a.game.grid.updateObject(a);
-                a.mapIndicator?.updatePosition(a.pos);
-                a.game.map.clampToMapBounds(a.pos, a.rad);
-
-                b.setPartDirty();
-                b.game.grid.updateObject(b);
-                b.mapIndicator?.updatePosition(b.pos);
-                b.game.map.clampToMapBounds(b.pos, b.rad);
+                const minForce = 0.125;
+                const forceA = math.max(res.pen / a.lootRad, minForce) * forceFactor;
+                const forceB = math.max(res.pen / b.lootRad, minForce) * forceFactor;
+                v2.set(a.pushVel, v2.sub(a.pushVel, v2.mul(res.dir, forceA)));
+                v2.set(b.pushVel, v2.add(b.pushVel, v2.mul(res.dir, forceB)));
             },
         );
 
@@ -151,7 +142,7 @@ export class LootBarn {
                 const rightAmmo = new Loot(
                     this.game,
                     def.ammo,
-                    v2.add(pos, v2.create(AMMO_OFFSET_X, AMMO_OFFSET_Y)),
+                    v2.add(pos, v2.create(AMMO_OFFSET_X, AMMO_OFFSET_Y + 0.001)),
                     layer,
                     ammoCount - halfAmmo,
                     pushSpeed,
@@ -236,6 +227,7 @@ export class Loot extends BaseGameObject {
 
     vel = v2.create(0, 0);
     oldPos = v2.create(0, 0);
+    pushVel = v2.create(0, 0);
 
     collider: Circle;
     rad: number;
@@ -318,8 +310,7 @@ export class Loot extends BaseGameObject {
 
         const shouldUpdate =
             this.forceUpdateTicker > 0.3 ||
-            Math.abs(this.vel.x) > 0.001 ||
-            Math.abs(this.vel.y) > 0.001 ||
+            v2.length(v2.add(this.vel, this.pushVel)) > 0.01 ||
             !v2.eq(this.oldPos, this.pos);
 
         if (!shouldUpdate) {
@@ -332,7 +323,7 @@ export class Loot extends BaseGameObject {
 
         v2.set(this.oldPos, v2.copy(this.pos));
 
-        // cap speed
+        // cap velocity
         const sqrLen = v2.lengthSqr(this.vel);
         const maxVel = 75;
         if (sqrLen > maxVel * maxVel) {
@@ -342,7 +333,10 @@ export class Loot extends BaseGameObject {
         }
 
         v2.set(this.vel, v2.mul(this.vel, 1 / (1 + dt * 2.5)));
-        v2.set(this.pos, v2.add(this.pos, v2.mul(this.vel, dt)));
+        v2.set(this.pos, v2.add(this.pos, v2.mul(v2.add(this.vel, this.pushVel), dt)));
+
+        // Reset push velocity
+        v2.set(this.pushVel, v2.create(0, 0));
 
         const originalLayer = this.layer;
 
