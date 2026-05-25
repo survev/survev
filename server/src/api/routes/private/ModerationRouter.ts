@@ -11,6 +11,7 @@ import {
     zGiveXpParams,
     zLogoutFromGameParams,
     zResetPassParams,
+    zResetStatsParams,
     zSetAccountNameParams,
     zSetMatchDataNameParams,
     zUnbanAccountParams,
@@ -502,6 +503,32 @@ export const ModerationRouter = new Hono()
         return c.json(
             {
                 message: `Successfully logged out ${slug} from game ${game_id}.`,
+            },
+            200,
+        );
+    })
+    .post("reset_stats", validateParams(zResetStatsParams), async (c) => {
+        const { slug } = c.req.valid("json");
+
+        const user = await db.query.usersTable.findFirst({
+            where: eq(usersTable.slug, slug),
+            columns: {
+                id: true,
+            },
+        });
+
+        if (!user) {
+            return c.json({ message: "No user found with that slug." }, 404);
+        }
+
+        const result = await db
+            .update(matchDataTable)
+            .set({ userId: null })
+            .where(eq(matchDataTable.userId, user.id));
+
+        return c.json(
+            {
+                message: `Successfully reset stats for ${slug} (${result.rowCount} games affected).`,
             },
             200,
         );

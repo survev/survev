@@ -13,6 +13,7 @@ import {
     zLogoutFromGameParams,
     zRemoveItemParams,
     zResetPassParams,
+    zResetStatsParams,
     zSetAccountNameParams,
     zSetMatchDataNameParams,
     zUnbanAccountParams,
@@ -330,6 +331,19 @@ const commands = {
             {
                 name: "game_id",
                 description: "The UUID of the game",
+                required: true,
+                type: ApplicationCommandOptionType.String,
+            },
+        ],
+    }),
+    [Command.ResetStats]: createCommand({
+        name: Command.ResetStats,
+        description: "Resets the stats of a user by logging them out of all games.",
+        optionValidator: zResetStatsParams,
+        options: [
+            {
+                name: "slug",
+                description: "The user account slug",
                 required: true,
                 type: ApplicationCommandOptionType.String,
             },
