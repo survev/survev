@@ -293,6 +293,10 @@ export const Comp: MapDef = {
             { name: "model94", count: 1, weight: 0.6 },
             { name: "", count: 1, weight: 0.4 },
         ],
+        tier_spas_hut: [
+            { name: "spas12", count: 1, weight: 0.66 },
+            { name: "spas16", count: 1, weight: 0.33 },
+        ],
         tier_chrys_case: [
             { name: "", count: 1, weight: 5 }, // ?
             { name: "tier_katanas", count: 1, weight: 3 }, // ?
@@ -494,7 +498,7 @@ export const Comp: MapDef = {
             { name: "m870", count: 1, weight: 0.1 },
             { name: "origin", count: 1, weight: 0.06 },
             { name: "hk416", count: 1, weight: 0.05 },
-            { name: "mkg45", count: 1, weight: 0.14 },
+            { name: "mkg45", count: 1, weight: 0.13 },
             { name: "m39", count: 1, weight: 0.08 }, 
             { name: "mk12", count: 1, weight: 0.08 }, 
             { name: "m93r_dual", count: 1, weight: 0.04 },
@@ -503,6 +507,7 @@ export const Comp: MapDef = {
             { name: "vector", count: 1, weight: 0.03 },
             { name: "p90", count: 1, weight: 0.07 },
             { name: "saiga", count: 1, weight: 0.03 },
+            { name: "l86", count: 1, weight: 0.01 },
         ],
         tier_bank_vault_packs: [
             { name: "tier_packs", count: 1, weight: 0.66},
@@ -517,7 +522,7 @@ export const Comp: MapDef = {
             //{ name: "sv98", count: 1, weight: 0.0662 },   // 1.75%
             { name: "scout_elite", count: 1, weight: 0.3 },
             { name: "saiga", count: 1, weight: 0.35 },
-            { name: "blr", count: 1, weight: 0.45 },
+            { name: "blr", count: 1, weight: 0.35 },
             { name: "spas12", count: 1, weight: 0.7 },
             { name: "deagle", count: 1, weight: 0.2 },
             { name: "vector", count: 1, weight: 0.2 },
@@ -529,7 +534,7 @@ export const Comp: MapDef = {
             //{ name: "sv98", count: 1, weight: 0.0662 },   // 1.75%
             { name: "scout_elite", count: 1, weight: 0.5 },
             { name: "saiga", count: 1, weight: 0.3 },
-            { name: "blr", count: 1, weight: 0.45 },
+            { name: "blr", count: 1, weight: 0.35 },
             { name: "spas12", count: 1, weight: 1 },
             { name: "deagle", count: 1, weight: 0.15 },
             { name: "vector", count: 1, weight: 0.1 },
@@ -541,7 +546,7 @@ export const Comp: MapDef = {
             //{ name: "sv98", count: 1, weight: 0.0662 },   // 1.75%
             { name: "scout_elite", count: 1, weight: 0.5 },
             { name: "saiga", count: 1, weight: 0.3 },
-            { name: "blr", count: 1, weight: 0.45 },
+            { name: "blr", count: 1, weight: 0.35 },
             { name: "spas12", count: 1, weight: 1 },
             { name: "deagle", count: 1, weight: 0.15 },
             { name: "vector", count: 1, weight: 0.1 },
@@ -810,9 +815,8 @@ export const Comp: MapDef = {
             { name: "imbel", count: 1, weight: 1.5 },
             { name: "mosin", count: 1, weight: 1 },
             { name: "svd", count: 1, weight: 2.5 },
-            { name: "m1014", count: 1, weight: 1.5 },
+            { name: "m1014", count: 1, weight: 2 },
             { name: "spas16", count: 1, weight: 1.5 },
-            { name: "vector", count: 1, weight: 1 },
             { name: "scorpion", count: 1, weight: 1 },
             //{ name: "m9", count: 1, weight: 0.01 },
             { name: "tier_flare", count: 1, weight: 0.5 },
@@ -1165,7 +1169,7 @@ export const Comp: MapDef = {
                 barn_01: { small: 1, large: 4,}, //green houses
                 barn_02: { small: 1, large: 1,},
                 hut_01: 3, // huts
-                hut_02: 1, // spas hut
+                hut_02: 2, // spas hut
                 hut_03: 1, // scout hut
                 shack_03a: 3, // small river / sea cabins
                 shack_03b: { small: 2, large: 4,}, // small river / sea cabins

@@ -887,14 +887,30 @@ export class WeaponManager {
         }
         this.player.recoilTicker = 0.0;
 
+        const bulletCount = itemDef.bulletCount;
+
         let bulletType = itemDef.bulletType;
-        if (itemDef.bulletTypeExtra && itemDef.extraBulletTrigger && itemDef.extraBulletTrigger > 0) {
+        if (!itemDef.bulletTypeMix?.length && itemDef.bulletTypeExtra && itemDef.extraBulletTrigger && itemDef.extraBulletTrigger > 0) {
             const weapon = this.weapons[this.curWeapIdx];
             weapon.shotCount = (weapon.shotCount + 1) % itemDef.extraBulletTrigger;
             if (weapon.shotCount === 0) {
                 bulletType = itemDef.bulletTypeExtra;
             }
         }
+
+        const bulletTypeMix = itemDef.bulletTypeMix;
+        const shotBulletTypeByIndex = bulletTypeMix?.length
+            ? Array.from({ length: bulletCount }, (_, index) => {
+                  let remaining = index;
+                  for (const entry of bulletTypeMix) {
+                      if (remaining < entry.count) {
+                          return entry.bulletType;
+                      }
+                      remaining -= entry.count;
+                  }
+                  return itemDef.bulletType;
+              })
+            : undefined;
 
         let speedMult = 1;
         let distanceMult = 1;
@@ -909,7 +925,6 @@ export class WeaponManager {
             distanceMult *= PerkProperties.high_velocity.distanceMult;
         }
 
-        const bulletCount = itemDef.bulletCount;
         const jitter = itemDef.jitter ?? 0.25;
 
         for (let i = 0; i < bulletCount; i++) {
@@ -952,7 +967,7 @@ export class WeaponManager {
 
             const params: BulletParams = {
                 playerId: this.player.__id,
-                bulletType: bulletType,
+                bulletType: shotBulletTypeByIndex?.[i] ?? bulletType,
                 gameSourceType: this.activeWeapon,
                 damageType: GameConfig.DamageType.Player,
                 pos: shotPos,
