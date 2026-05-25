@@ -9,6 +9,7 @@ import {
     zFindDiscordUserSlugParams,
     zGetPlayerIpParams,
     zGiveXpParams,
+    zLogoutFromGameParams,
     zResetPassParams,
     zSetAccountNameParams,
     zSetMatchDataNameParams,
@@ -466,6 +467,44 @@ export const ModerationRouter = new Hono()
         });
 
         return c.json({ message: `Successfully gave ${xp} xp to ${slug}` }, 200);
+    })
+    .post("logout_from_game", validateParams(zLogoutFromGameParams), async (c) => {
+        const { slug, game_id } = c.req.valid("json");
+
+        const user = await db.query.usersTable.findFirst({
+            where: eq(usersTable.slug, slug),
+            columns: {
+                id: true,
+            },
+        });
+
+        if (!user) {
+            return c.json({ message: "No user found with that slug." }, 404);
+        }
+
+        const result = await db
+            .update(matchDataTable)
+            .set({ userId: null })
+            .where(
+                and(
+                    eq(matchDataTable.userId, user.id),
+                    eq(matchDataTable.gameId, game_id),
+                ),
+            );
+
+        if (!result.rowCount) {
+            return c.json(
+                { message: `User ${slug} was not found on game ${game_id}` },
+                404,
+            );
+        }
+
+        return c.json(
+            {
+                message: `Successfully logged out ${slug} from game ${game_id}.`,
+            },
+            200,
+        );
     });
 
 async function banAccount(userId: string, banReason: string, executorId: string) {
