@@ -1,7 +1,7 @@
 import { expect, test } from "vitest";
-import { GameConfig, TeamMode } from "../../shared/gameConfig";
-import { v2 } from "../../shared/utils/v2";
-import { createGame } from "./gameTestHelpers";
+import { GameConfig, TeamMode } from "../../shared/gameConfig.ts";
+import { v2 } from "../../shared/utils/v2.ts";
+import { createGame } from "./gameTestHelpers.ts";
 
 test("Killed by enemy", async () => {
     const game = await createGame(TeamMode.Solo, "test_normal");
