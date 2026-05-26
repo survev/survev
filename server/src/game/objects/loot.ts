@@ -340,8 +340,13 @@ export class Loot extends BaseGameObject {
 
     update(dt: number): void {
         if (this.hasOwner) {
+            const owner = this.game.objectRegister.getById(this.ownerId);
             this.removeOwnerTicker += dt;
-            if (this.removeOwnerTicker > 2) {
+            if (
+                this.removeOwnerTicker > 2 ||
+                !owner ||
+                (owner.__type === ObjectType.Player && (owner.dead || owner.disconnected))
+            ) {
                 this.ownerId = 0;
                 this.setDirty();
             }
