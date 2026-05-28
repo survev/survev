@@ -114,6 +114,10 @@ export class Smoke extends BaseGameObject {
     layer: number;
 
     rad = 0;
+
+    lastClientPos = v2.create(0, 0);
+    lastClientRad = 0;
+
     interior: number;
 
     maxSize = util.random(5.5, 6.5);
@@ -150,18 +154,22 @@ export class Smoke extends BaseGameObject {
     }
 
     update(dt: number) {
-        const radOld = this.rad;
         this.rad += (this.maxSize / this.growTime) * dt;
         this.rad = math.clamp(this.rad, 0, this.maxSize);
 
-        const posOld = v2.copy(this.pos);
         v2.set(this.vel, v2.mul(this.vel, 1 / (1 + dt * this.drag)));
         v2.set(this.pos, v2.add(this.pos, v2.mul(this.vel, dt)));
+        this.game.map.clampToMapBounds(this.pos, this.rad);
 
-        if (!v2.eq(posOld, this.pos) || !math.eqAbs(radOld, this.rad)) {
+        if (
+            !math.eqAbs(this.lastClientRad, this.rad, 0.05) ||
+            !v2.eq(this.lastClientPos, this.pos, 0.2)
+        ) {
             this.setPartDirty();
             this.game.grid.updateObject(this);
-            this.game.map.clampToMapBounds(this.pos, this.rad);
+
+            v2.set(this.lastClientPos, this.pos);
+            this.lastClientRad = this.rad;
         }
 
         if (!this.emitter.active) {
