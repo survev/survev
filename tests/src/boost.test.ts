@@ -1,6 +1,6 @@
 import { expect, test } from "vitest";
-import { GameConfig, TeamMode } from "../../shared/gameConfig";
-import { createGame } from "./gameTestHelpers";
+import { GameConfig, TeamMode } from "../../shared/gameConfig.ts";
+import { createGame } from "./gameTestHelpers.ts";
 
 // i kept fucking up the logic with less and greater than while refactoring boost logic
 // so decided to write a test

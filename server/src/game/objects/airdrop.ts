@@ -1,14 +1,13 @@
-import { MapObjectDefs } from "../../../../shared/defs/mapObjectDefs";
-import type { ObstacleDef } from "../../../../shared/defs/mapObjectsTyping";
-import { GameConfig } from "../../../../shared/gameConfig";
-import { ObjectType } from "../../../../shared/net/objectSerializeFns";
-import { type Collider, coldet } from "../../../../shared/utils/coldet";
-import { collider } from "../../../../shared/utils/collider";
-import { math } from "../../../../shared/utils/math";
-import { util } from "../../../../shared/utils/util";
-import { type Vec2, v2 } from "../../../../shared/utils/v2";
-import type { Game } from "../game";
-import { BaseGameObject } from "./gameObject";
+import { MapObjectDefs } from "../../../../shared/defs/register.ts";
+import { GameConfig } from "../../../../shared/gameConfig.ts";
+import { ObjectType } from "../../../../shared/net/objectSerializeFns.ts";
+import { coldet, type Collider } from "../../../../shared/utils/coldet.ts";
+import { collider } from "../../../../shared/utils/collider.ts";
+import { math } from "../../../../shared/utils/math.ts";
+import { util } from "../../../../shared/utils/util.ts";
+import { v2, type Vec2 } from "../../../../shared/utils/v2.ts";
+import type { Game } from "../game.ts";
+import { BaseGameObject } from "./gameObject.ts";
 
 export class AirdropBarn {
     airdrops: Airdrop[] = [];
@@ -62,7 +61,7 @@ export class Airdrop extends BaseGameObject {
     constructor(game: Game, pos: Vec2, obstacleType: string) {
         super(game, pos);
         this.obstacleType = obstacleType;
-        const def = MapObjectDefs[this.obstacleType] as ObstacleDef;
+        const def = MapObjectDefs.typeToDef(this.obstacleType, "obstacle");
         this.crateCollision = collider.transform(def.collision, this.pos, 0, 1);
     }
 
@@ -82,8 +81,8 @@ export class Airdrop extends BaseGameObject {
                 if (!util.sameLayer(obj.layer, this.layer)) continue;
 
                 if (
-                    obj.__type === ObjectType.Player ||
-                    obj.__type === ObjectType.Obstacle
+                    obj.__type === ObjectType.Player
+                    || obj.__type === ObjectType.Obstacle
                 ) {
                     let collider: Collider;
                     if (obj.__type === ObjectType.Player) {
@@ -99,9 +98,9 @@ export class Airdrop extends BaseGameObject {
                         });
                     }
                 } else if (
-                    obj.__type === ObjectType.Building &&
-                    !obj.ceilingDead &&
-                    obj.wallsToDestroy < Infinity
+                    obj.__type === ObjectType.Building
+                    && !obj.ceilingDead
+                    && obj.wallsToDestroy < Infinity
                 ) {
                     for (const zoomRegion of obj.zoomRegions) {
                         if (!zoomRegion.zoomIn) continue;

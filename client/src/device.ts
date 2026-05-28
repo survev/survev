@@ -1,5 +1,5 @@
 import { isMobile } from "pixi.js-legacy";
-import { getParameterByName } from "./helpers";
+import { getParameterByName } from "./helpers.ts";
 
 function detectMobile() {
     return isMobile.android.device || isMobile.apple.device || isIpad();
@@ -29,11 +29,11 @@ function detectEdge() {
 }
 function detectiPhoneX() {
     return (
-        detectiOS() &&
-        ((screen.width == 375 && screen.height == 812) ||
-            (screen.height == 375 && screen.width == 812) ||
-            (screen.width == 414 && screen.height == 896) ||
-            (screen.height == 414 && screen.width == 896))
+        detectiOS()
+        && ((screen.width == 375 && screen.height == 812)
+            || (screen.height == 375 && screen.width == 812)
+            || (screen.width == 414 && screen.height == 896)
+            || (screen.height == 414 && screen.width == 896))
     );
 }
 
@@ -100,17 +100,15 @@ class Device {
     }
 
     onResize() {
-        this.isLandscape =
-            window.innerWidth > window.innerHeight ||
-            window.orientation == 90 ||
-            window.orientation == -90;
+        this.isLandscape = window.innerWidth > window.innerHeight
+            || window.orientation == 90
+            || window.orientation == -90;
         this.screenWidth = window.innerWidth;
         this.screenHeight = window.innerHeight;
         const layoutDim = this.isLandscape ? this.screenWidth : this.screenHeight;
-        this.uiLayout =
-            this.mobile || layoutDim <= 850 || (layoutDim <= 900 && this.pixelRatio >= 3)
-                ? this.UiLayout.Sm
-                : this.UiLayout.Lg;
+        this.uiLayout = this.mobile || layoutDim <= 850 || (layoutDim <= 900 && this.pixelRatio >= 3)
+            ? this.UiLayout.Sm
+            : this.UiLayout.Lg;
     }
 }
 

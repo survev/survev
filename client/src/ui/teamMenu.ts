@@ -1,23 +1,23 @@
 import $ from "jquery";
-import { GameConfig } from "../../../shared/gameConfig";
-import * as net from "../../../shared/net/net";
-import type { FindGameMatchData } from "../../../shared/types/api";
+import { GameConfig } from "../../../shared/gameConfig.ts";
+import * as net from "../../../shared/net/net.ts";
+import type { FindGameMatchData } from "../../../shared/types/api.ts";
 import type {
     RoomData,
     ServerToClientTeamMsg,
     TeamMenuErrorType,
     TeamPlayGameMsg,
     TeamStateMsg,
-} from "../../../shared/types/team";
-import { api } from "../api";
-import type { AudioManager } from "../audioManager";
-import type { ConfigManager } from "../config";
-import { device } from "../device";
-import { helpers } from "../helpers";
-import type { PingTest } from "../pingTest";
-import { SDK } from "../sdk/sdk";
-import type { SiteInfo } from "../siteInfo";
-import type { Localization } from "./localization";
+} from "../../../shared/types/team.ts";
+import { api } from "../api.ts";
+import type { AudioManager } from "../audioManager.ts";
+import type { ConfigManager } from "../config.ts";
+import { device } from "../device.ts";
+import { helpers } from "../helpers.ts";
+import type { PingTest } from "../pingTest.ts";
+import { SDK } from "../sdk/sdk.ts";
+import type { SiteInfo } from "../siteInfo.ts";
+import type { Localization } from "./localization.ts";
 
 function errorTypeToString(type: string, localization: Localization) {
     const typeMap = {
@@ -127,8 +127,8 @@ export class TeamMenu {
                 {
                     queue: false,
                     duration: 300,
-                    complete: function () {
-                        $(this).fadeOut(250, function () {
+                    complete: function() {
+                        $(this).fadeOut(250, function() {
                             $(this).remove();
                         });
                     },
@@ -179,9 +179,7 @@ export class TeamMenu {
     connect(create: boolean, roomUrl: string) {
         if (!this.active || roomUrl !== this.roomData.roomUrl) {
             const roomHost = api.resolveRoomHost();
-            const url = `w${
-                window.location.protocol === "https:" ? "ss" : "s"
-            }://${roomHost}/team_v2`;
+            const url = `w${window.location.protocol === "https:" ? "ss" : "s"}://${roomHost}/team_v2`;
             this.active = true;
             this.joined = false;
             this.create = create;
@@ -205,7 +203,7 @@ export class TeamMenu {
             this.refreshUi();
 
             if (this.ws) {
-                this.ws.onclose = function () {};
+                this.ws.onclose = function() {};
                 this.ws.close();
                 this.ws = null;
             }
@@ -221,8 +219,8 @@ export class TeamMenu {
                         errMsg = this.joined
                             ? "lost_conn"
                             : this.create
-                              ? "create_failed"
-                              : "join_failed";
+                            ? "create_failed"
+                            : "join_failed";
                     }
                     this.leave(errMsg);
                 };
@@ -377,7 +375,7 @@ export class TeamMenu {
     }
 
     refreshUi() {
-        const setButtonState = function (
+        const setButtonState = function(
             el: JQuery<HTMLElement>,
             selected: boolean,
             enabled: boolean,
@@ -408,8 +406,8 @@ export class TeamMenu {
         this.serverWarning.html(errorTxt);
 
         if (
-            this.roomData.lastError == "find_game_invalid_protocol" &&
-            !this.displayedInvalidProtocolModal
+            this.roomData.lastError == "find_game_invalid_protocol"
+            && !this.displayedInvalidProtocolModal
         ) {
             $("#modal-refresh").fadeIn(200);
             this.displayedInvalidProtocolModal = true;
@@ -493,7 +491,7 @@ export class TeamMenu {
             // Play button
             this.playBtn.html(
                 this.roomData.findingGame || this.joiningGame
-                    ? '<div class="ui-spinner"></div>'
+                    ? "<div class=\"ui-spinner\"></div>"
                     : this.playBtn.attr("data-label")!,
             );
 
@@ -522,9 +520,11 @@ export class TeamMenu {
 
             if (this.isLeader) {
                 waitReason.html(
-                    `${this.localization.translate(
-                        "index-game-in-progress",
-                    )}<span> ...</span>`,
+                    `${
+                        this.localization.translate(
+                            "index-game-in-progress",
+                        )
+                    }<span> ...</span>`,
                 );
 
                 const showWaitMessage = playersInGame && !this.joiningGame;
@@ -533,21 +533,27 @@ export class TeamMenu {
             } else {
                 if (this.roomData.findingGame || this.joiningGame) {
                     waitReason.html(
-                        `<div class="ui-spinner" style="margin-right:16px"></div>${this.localization.translate(
-                            "index-joining-game",
-                        )}<span> ...</span>`,
+                        `<div class="ui-spinner" style="margin-right:16px"></div>${
+                            this.localization.translate(
+                                "index-joining-game",
+                            )
+                        }<span> ...</span>`,
                     );
                 } else if (playersInGame) {
                     waitReason.html(
-                        `${this.localization.translate(
-                            "index-game-in-progress",
-                        )}<span> ...</span>`,
+                        `${
+                            this.localization.translate(
+                                "index-game-in-progress",
+                            )
+                        }<span> ...</span>`,
                     );
                 } else {
                     waitReason.html(
-                        `${this.localization.translate(
-                            "index-waiting-for-leader",
-                        )}<span> ...</span>`,
+                        `${
+                            this.localization.translate(
+                                "index-waiting-for-leader",
+                            )
+                        }<span> ...</span>`,
                     );
                 }
                 waitReason.css("display", "block");
@@ -605,7 +611,7 @@ export class TeamMenu {
                     });
                     n.val(playerStatus.name);
                     const m = () => {
-                        const name = helpers.sanitizeNameInput(n?.val()!);
+                        const name = helpers.sanitizeNameInput(n!.val() as string);
                         playerStatus.name = name;
                         this.config.set("playerName", name);
                         this.sendMessage("changeName", {
@@ -682,10 +688,10 @@ export class TeamMenu {
             });
             const playJoinSound = localPlayer && !localPlayer.inGame;
             if (
-                !document.hasFocus() &&
-                this.prevPlayerCount < this.players.length &&
-                this.players.length > 1 &&
-                playJoinSound
+                !document.hasFocus()
+                && this.prevPlayerCount < this.players.length
+                && this.players.length > 1
+                && playJoinSound
             ) {
                 this.audioManager.playSound("notification_join_01", {
                     channel: "ui",

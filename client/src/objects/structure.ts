@@ -1,24 +1,24 @@
-import { MapObjectDefs } from "../../../shared/defs/mapObjectDefs";
-import type { StructureDef } from "../../../shared/defs/mapObjectsTyping";
-import type { ObjectData, ObjectType } from "./../../../shared/net/objectSerializeFns";
-import { type AABB, type Collider, coldet } from "../../../shared/utils/coldet";
-import { collider } from "../../../shared/utils/collider";
-import { mapHelpers } from "../../../shared/utils/mapHelpers";
-import { math } from "../../../shared/utils/math";
-import { type Vec2, v2 } from "../../../shared/utils/v2";
-import type { Ambiance } from "../ambiance";
-import type Camera from "../camera";
-import type { DebugRenderOpts } from "../config";
+import { MapObjectDefs } from "../../../shared/defs/register.ts";
+import type { ObjectData, ObjectType } from "./../../../shared/net/objectSerializeFns.ts";
+import { type AABB, coldet, type Collider } from "../../../shared/utils/coldet.ts";
+import { collider } from "../../../shared/utils/collider.ts";
+import { mapHelpers } from "../../../shared/utils/mapHelpers.ts";
+import { math } from "../../../shared/utils/math.ts";
+import { assert } from "../../../shared/utils/util.ts";
+import { v2, type Vec2 } from "../../../shared/utils/v2.ts";
+import type { Ambiance } from "../ambiance.ts";
+import type Camera from "../camera.ts";
+import type { DebugRenderOpts } from "../config.ts";
 import {
     renderBridge,
     renderMapBuildingBounds,
     renderMapObstacleBounds,
     renderWaterEdge,
-} from "../debug/debugHelpers";
-import { debugLines } from "../debug/debugLines";
-import type { Ctx } from "../game";
-import type { Map } from "../map";
-import type { AbstractObject, Player } from "./player";
+} from "../debug/debugHelpers.ts";
+import { debugLines } from "../debug/debugLines.ts";
+import type { Ctx } from "../game.ts";
+import type { Map } from "../map.ts";
+import type { AbstractObject, Player } from "./player.ts";
 
 interface Stair {
     collision: AABB;
@@ -88,15 +88,14 @@ export class Structure implements AbstractObject {
                 this.rot,
                 this.scale,
             );
-            const def = MapObjectDefs[this.type] as StructureDef;
+            const def = MapObjectDefs.typeToDef(this.type, "structure");
             this.layers = [];
             for (let i = 0; i < def.layers.length; i++) {
                 const layer = def.layers[i];
                 const objId = data.layerObjIds[i];
 
                 const inheritOri = layer?.inheritOri === undefined || layer.inheritOri;
-                const underground =
-                    layer.underground !== undefined ? layer.underground : i == 1;
+                const underground = layer.underground !== undefined ? layer.underground : i == 1;
                 const pos = v2.add(this.pos, layer.pos);
                 const rot = math.oriToRad(inheritOri ? data.ori + layer.ori : layer.ori);
                 const collision = collider.transform(
@@ -152,31 +151,28 @@ export class Structure implements AbstractObject {
     }
 
     update(dt: number, map: Map, activePlayer: Player, ambience: Ambiance) {
-        if ((MapObjectDefs[this.type] as StructureDef).interiorSound) {
+        if (MapObjectDefs.typeToDef(this.type, "structure").interiorSound) {
             this.updateInteriorSounds(dt, map, activePlayer, ambience);
         }
     }
 
     updateInteriorSounds(dt: number, map: Map, activePlayer: Player, ambience: Ambiance) {
-        const def = MapObjectDefs[this.type] as StructureDef;
+        const def = MapObjectDefs.typeToDef(this.type, "structure");
+        assert(def.interiorSound);
+
         collider.createCircle(activePlayer.m_pos, 0.001);
         map.m_buildingPool.m_getPool();
-        const building0 =
-            this.layers.length > 0 ? map.getBuildingById(this.layers[0].objId) : null;
-        const building1 =
-            this.layers.length > 1 ? map.getBuildingById(this.layers[1].objId) : null;
-        const maxDist =
-            def.interiorSound?.outsideMaxDist !== undefined
-                ? def.interiorSound.outsideMaxDist
-                : 10;
-        const outsideVol =
-            def.interiorSound?.outsideVolume !== undefined
-                ? def.interiorSound.outsideVolume
-                : 0;
-        const undergroundVol =
-            def.interiorSound?.undergroundVolume !== undefined
-                ? def.interiorSound.undergroundVolume
-                : 1;
+        const building0 = this.layers.length > 0 ? map.getBuildingById(this.layers[0].objId) : null;
+        const building1 = this.layers.length > 1 ? map.getBuildingById(this.layers[1].objId) : null;
+        const maxDist = def.interiorSound.outsideMaxDist !== undefined
+            ? def.interiorSound.outsideMaxDist
+            : 10;
+        const outsideVol = def.interiorSound.outsideVolume !== undefined
+            ? def.interiorSound.outsideVolume
+            : 0;
+        const undergroundVol = def.interiorSound.undergroundVolume !== undefined
+            ? def.interiorSound.undergroundVolume
+            : 1;
 
         // Compute weights for the normal (weight0) and filtered (weight1) tracks
         let weight0 = 0;
@@ -203,10 +199,9 @@ export class Structure implements AbstractObject {
         }
 
         // Transition between sound and soundAlt tracks
-        const transitionTime =
-            def.interiorSound?.transitionTime !== undefined
-                ? def.interiorSound.transitionTime
-                : 1;
+        const transitionTime = def.interiorSound.transitionTime !== undefined
+            ? def.interiorSound.transitionTime
+            : 1;
         if (this.interiorSoundAlt) {
             this.soundTransitionT = math.clamp(
                 this.soundTransitionT + dt / transitionTime,
@@ -222,10 +217,9 @@ export class Structure implements AbstractObject {
         }
 
         // Choose the actual track based on the state of the transition
-        const sound =
-            this.soundTransitionT > 0.5
-                ? def.interiorSound?.soundAlt
-                : def.interiorSound?.sound;
+        const sound = this.soundTransitionT > 0.5
+            ? def.interiorSound.soundAlt
+            : def.interiorSound.sound;
 
         // Set the track data
         const track0 = ambience.getTrack("interior_0");
@@ -235,7 +229,7 @@ export class Structure implements AbstractObject {
 
         const track1 = ambience.getTrack("interior_1");
         track1.sound = sound!;
-        track1.filter = def.interiorSound?.filter!;
+        track1.filter = def.interiorSound.filter || "";
         track1.weight = sound ? weight1 * transitionWeight * this.soundEnabledT : 0;
     }
 
@@ -264,7 +258,7 @@ export class Structure implements AbstractObject {
 
     insideStairs(collision: Collider) {
         for (let i = 0; i < this.stairs.length; i++) {
-            if (collider.intersect(this.stairs[i]?.collision!, collision)) {
+            if (collider.intersect(this.stairs[i]?.collision, collision)) {
                 return true;
             }
         }

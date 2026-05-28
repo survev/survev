@@ -1,11 +1,11 @@
-import type { MapDef } from "../../../shared/defs/mapDefs";
-import { coldet } from "../../../shared/utils/coldet";
-import { collider } from "../../../shared/utils/collider";
-import { math } from "../../../shared/utils/math";
-import { catmullRom, getControlPoints } from "../../../shared/utils/spline";
-import { util } from "../../../shared/utils/util";
-import { type Vec2, v2 } from "../../../shared/utils/v2";
-import type { GameMap } from "./map";
+import type { MapDef } from "../../../shared/defs/mapDefs.ts";
+import { coldet } from "../../../shared/utils/coldet.ts";
+import { collider } from "../../../shared/utils/collider.ts";
+import { math } from "../../../shared/utils/math.ts";
+import { catmullRom, getControlPoints } from "../../../shared/utils/spline.ts";
+import { util } from "../../../shared/utils/util.ts";
+import { v2, type Vec2 } from "../../../shared/utils/v2.ts";
+import type { GameMap } from "./map.ts";
 
 export class RiverCreator {
     randomGenerator: (min?: number, max?: number) => number;
@@ -14,8 +14,7 @@ export class RiverCreator {
         public map: GameMap,
         randomGenerator?: (min?: number, max?: number) => number,
     ) {
-        this.randomGenerator =
-            randomGenerator ?? ((min = 0, max = 1) => Math.random() * (max - min) + min);
+        this.randomGenerator = randomGenerator ?? ((min = 0, max = 1) => Math.random() * (max - min) + min);
     }
 
     private getStartPoint(isFactionRiver: boolean): Vec2 {
@@ -60,10 +59,11 @@ export class RiverCreator {
             if (v2.manhattanDistance(start, end) <= gridSize) continue;
             // if a river starts on corner, it can't end on a corner
             if (
-                isStartNearCorner &&
-                corners.some((c) => v2.manhattanDistance(c, end) < tileSize)
-            )
+                isStartNearCorner
+                && corners.some((c) => v2.manhattanDistance(c, end) < tileSize)
+            ) {
                 continue;
+            }
             return end;
         }
 

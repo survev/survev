@@ -1,29 +1,29 @@
 import * as PIXI from "pixi.js-legacy";
-import { MapObjectDefs } from "../../../shared/defs/mapObjectDefs";
-import type { BuildingDef, StructureDef } from "../../../shared/defs/mapObjectsTyping";
-import { MapMsg } from "../../../shared/net/mapMsg";
-import { type ObjectData, ObjectType } from "../../../shared/net/objectSerializeFns";
-import type { LocalDataWithDirty } from "./../../../shared/net/updateMsg";
-import { math } from "../../../shared/utils/math";
-import { assert, util } from "../../../shared/utils/util";
-import { type Vec2, v2 } from "../../../shared/utils/v2";
-import type { Ambiance } from "../../src/ambiance";
-import type { AudioManager } from "../../src/audioManager";
-import Camera from "../../src/camera";
-import type { ConfigManager, DebugRenderOpts } from "../../src/config";
-import { debugLines } from "../../src/debug/debugLines";
-import { device } from "../../src/device";
-import type { Game } from "../../src/game";
-import type { InputBinds } from "../../src/inputBinds";
-import { Map } from "../../src/map";
-import { DecalBarn } from "../../src/objects/decal";
-import { Creator } from "../../src/objects/objectPool";
-import { ParticleBarn } from "../../src/objects/particles";
-import { type Player, PlayerBarn } from "../../src/objects/player";
-import { SmokeBarn } from "../../src/objects/smoke";
-import { Renderer } from "../../src/renderer";
-import type { ResourceManager } from "../../src/resources";
-import type { UiManager2 } from "../../src/ui/ui2";
+
+import { MapObjectDefs } from "../../../shared/defs/register.ts";
+import { MapMsg } from "../../../shared/net/mapMsg.ts";
+import { type ObjectData, ObjectType } from "../../../shared/net/objectSerializeFns.ts";
+import type { LocalDataWithDirty } from "./../../../shared/net/updateMsg.ts";
+import { math } from "../../../shared/utils/math.ts";
+import { util } from "../../../shared/utils/util.ts";
+import { v2, type Vec2 } from "../../../shared/utils/v2.ts";
+import type { Ambiance } from "../../src/ambiance.ts";
+import type { AudioManager } from "../../src/audioManager.ts";
+import Camera from "../../src/camera.ts";
+import type { ConfigManager, DebugRenderOpts } from "../../src/config.ts";
+import { debugLines } from "../../src/debug/debugLines.ts";
+import { device } from "../../src/device.ts";
+import type { Game } from "../../src/game.ts";
+import type { InputBinds } from "../../src/inputBinds.ts";
+import { Map } from "../../src/map.ts";
+import { DecalBarn } from "../../src/objects/decal.ts";
+import { Creator } from "../../src/objects/objectPool.ts";
+import { ParticleBarn } from "../../src/objects/particles.ts";
+import { type Player, PlayerBarn } from "../../src/objects/player.ts";
+import { SmokeBarn } from "../../src/objects/smoke.ts";
+import { Renderer } from "../../src/renderer.ts";
+import type { ResourceManager } from "../../src/resources.ts";
+import type { UiManager2 } from "../../src/ui/ui2.ts";
 
 export class EditorDisplay {
     active = false;
@@ -254,9 +254,7 @@ export class EditorDisplay {
     }
 
     addStructure(type: string, pos: Vec2, ori: number) {
-        assert(MapObjectDefs[type]?.type === "structure");
-
-        const def = MapObjectDefs[type] as StructureDef;
+        const def = MapObjectDefs.typeToDef(type, "structure");
 
         const data: ObjectData<ObjectType.Structure> = {
             type,
@@ -287,8 +285,6 @@ export class EditorDisplay {
     }
 
     addBuilding(type: string, pos: Vec2, ori: number, layer: number) {
-        assert(MapObjectDefs[type]?.type === "building");
-
         const data: ObjectData<ObjectType.Building> = {
             type,
             pos,
@@ -307,7 +303,7 @@ export class EditorDisplay {
             data,
             this.getCtx(),
         );
-        const def = MapObjectDefs[type] as BuildingDef;
+        const def = MapObjectDefs.typeToDef(type, "building");
 
         for (const child of def.mapObjects) {
             let partType = child.type;
@@ -360,7 +356,7 @@ export class EditorDisplay {
         parentId?: number,
         puzzlePiece?: boolean,
     ) {
-        assert(MapObjectDefs[type]?.type === "obstacle");
+        MapObjectDefs.typeToDef(type, "obstacle");
 
         const data: ObjectData<ObjectType.Obstacle> = {
             type,
@@ -398,7 +394,7 @@ export class EditorDisplay {
     }
 
     addDecal(type: string, pos: Vec2, ori: number, scale: number, layer: number) {
-        assert(MapObjectDefs[type]?.type === "decal");
+        MapObjectDefs.typeToDef(type, "decal");
 
         const data: ObjectData<ObjectType.Decal> = {
             type,
@@ -427,11 +423,12 @@ export class EditorDisplay {
         puzzlePiece?: boolean,
         ignoreMapSpawnReplacement?: boolean,
     ) {
-        const def = MapObjectDefs[type];
+        let def = MapObjectDefs.typeToDef(type);
 
         const spawnReplacements = this.map.getMapDef().mapGen.spawnReplacements[0];
         if (spawnReplacements[type] && !ignoreMapSpawnReplacement) {
             type = spawnReplacements[type];
+            def = MapObjectDefs.typeToDef(type);
         }
 
         switch (def.type) {

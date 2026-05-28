@@ -1,16 +1,15 @@
-const _typeof =
-    typeof Symbol === "function" && typeof Symbol.iterator === "symbol"
-        ? function (obj) {
-              return typeof obj;
-          }
-        : function (obj) {
-              return obj &&
-                  typeof Symbol === "function" &&
-                  obj.constructor === Symbol &&
-                  obj !== Symbol.prototype
-                  ? "symbol"
-                  : typeof obj;
-          };
+const _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol"
+    ? function(obj) {
+        return typeof obj;
+    }
+    : function(obj) {
+        return obj
+                && typeof Symbol === "function"
+                && obj.constructor === Symbol
+                && obj !== Symbol.prototype
+            ? "symbol"
+            : typeof obj;
+    };
 
 //
 // Taken from https://github.com/substack/node-deep-equal
@@ -18,10 +17,9 @@ const _typeof =
 const pSlice = Array.prototype.slice;
 const objectKeys = Object.keys;
 
-const supportsArgumentsClass =
-    (function () {
-        return Object.prototype.toString.call(arguments);
-    })() == "[object Arguments]";
+const supportsArgumentsClass = (function() {
+    return Object.prototype.toString.call(arguments);
+})() == "[object Arguments]";
 
 function supported(object) {
     return Object.prototype.toString.call(object) == "[object Arguments]";
@@ -29,17 +27,17 @@ function supported(object) {
 
 function unsupported(object) {
     return (
-        (object &&
-            (typeof object === "undefined" ? "undefined" : _typeof(object)) == "object" &&
-            typeof object.length === "number" &&
-            Object.prototype.hasOwnProperty.call(object, "callee") &&
-            !Object.prototype.propertyIsEnumerable.call(object, "callee")) ||
-        false
+        (object
+            && (typeof object === "undefined" ? "undefined" : _typeof(object)) == "object"
+            && typeof object.length === "number"
+            && Object.prototype.hasOwnProperty.call(object, "callee")
+            && !Object.prototype.propertyIsEnumerable.call(object, "callee"))
+        || false
     );
 }
 const isArguments = supportsArgumentsClass ? supported : unsupported;
 
-export const deepEqual = function (actual, expected, opts) {
+export const deepEqual = function(actual, expected, opts) {
     if (!opts) opts = {};
     // 7.1. All identical values are equivalent, as determined by ===.
     if (actual === expected) {
@@ -52,11 +50,11 @@ export const deepEqual = function (actual, expected, opts) {
         // equivalence is determined by ==.
     }
     if (
-        !actual ||
-        !expected ||
-        ((typeof actual === "undefined" ? "undefined" : _typeof(actual)) != "object" &&
-            (typeof expected === "undefined" ? "undefined" : _typeof(expected)) !=
-                "object")
+        !actual
+        || !expected
+        || ((typeof actual === "undefined" ? "undefined" : _typeof(actual)) != "object"
+            && (typeof expected === "undefined" ? "undefined" : _typeof(expected))
+                != "object")
     ) {
         return opts.strict ? actual === expected : actual == expected;
 
@@ -76,11 +74,12 @@ function isUndefinedOrNull(value) {
 
 function isBuffer(x) {
     if (
-        !x ||
-        (typeof x === "undefined" ? "undefined" : _typeof(x)) !== "object" ||
-        typeof x.length !== "number"
-    )
+        !x
+        || (typeof x === "undefined" ? "undefined" : _typeof(x)) !== "object"
+        || typeof x.length !== "number"
+    ) {
         return false;
+    }
     if (typeof x.copy !== "function" || typeof x.slice !== "function") {
         return false;
     }
@@ -140,7 +139,7 @@ function objEquiv(a, b, opts) {
         if (!deepEqual(a[key], b[key], opts)) return false;
     }
     return (
-        (typeof a === "undefined" ? "undefined" : _typeof(a)) ===
-        (typeof b === "undefined" ? "undefined" : _typeof(b))
+        (typeof a === "undefined" ? "undefined" : _typeof(a))
+            === (typeof b === "undefined" ? "undefined" : _typeof(b))
     );
 }

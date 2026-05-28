@@ -1,20 +1,14 @@
-import type { HttpRequest, HttpResponse } from "uWebSockets.js";
 import type { Context } from "hono";
 import { hc } from "hono/client";
 import { isIP } from "net";
-import {
-    DataSet,
-    englishDataset,
-    englishRecommendedTransformers,
-    pattern,
-    RegExpMatcher,
-} from "obscenity";
+import { DataSet, englishDataset, englishRecommendedTransformers, pattern, RegExpMatcher } from "obscenity";
 import ProxyCheck, { type IPAddressInfo } from "proxycheck-ts";
-import { Constants } from "../../../shared/net/net";
-import { util } from "../../../shared/utils/util";
-import type { PrivateRouteApp } from "../api/routes/private/private";
-import { Config } from "../config";
-import { defaultLogger } from "./logger";
+import type { HttpRequest, HttpResponse } from "uWebSockets.js";
+import { Constants } from "../../../shared/net/net.ts";
+import { util } from "../../../shared/utils/util.ts";
+import type { PrivateRouteApp } from "../api/routes/private/private.ts";
+import { Config } from "../config.ts";
+import { defaultLogger } from "./logger.ts";
 
 /**
  * Apply CORS headers to a response.
@@ -64,7 +58,7 @@ const badWordsdataSet = new DataSet<{ originalWord: string }>()
     })
     .addPhrase((phrase) =>
         // https://github.com/jo3-l/obscenity/blob/9564653e9f8563e178cd0790ccf256dc2b610494/src/preset/english.ts#L269 only matches it without the "a"??
-        phrase.setMetadata({ originalWord: "faggot" }).addPattern(pattern`faggot`),
+        phrase.setMetadata({ originalWord: "faggot" }).addPattern(pattern`faggot`)
     )
     .addPhrase((phrase) =>
         phrase
@@ -72,7 +66,7 @@ const badWordsdataSet = new DataSet<{ originalWord: string }>()
             .addPattern(pattern`hitler`)
             .addPattern(pattern`hitla`)
             .addPattern(pattern`hit.ler`)
-            .addPattern(pattern`hitlr`),
+            .addPattern(pattern`hitlr`)
     )
     .addPhrase((phrase) =>
         phrase
@@ -80,7 +74,7 @@ const badWordsdataSet = new DataSet<{ originalWord: string }>()
             .addPattern(pattern`|kys|`)
             .addPattern(pattern`kill yourself`)
             .addPattern(pattern`hang yourself`)
-            .addPattern(pattern`unalive yourself`),
+            .addPattern(pattern`unalive yourself`)
     )
     .addPhrase((phrase) =>
         phrase
@@ -103,16 +97,14 @@ const badWordsdataSet = new DataSet<{ originalWord: string }>()
             .addPattern(pattern`chigga`)
             .addPattern(pattern`n199a`)
             .addPattern(pattern`n[i]ga`)
-            .addPattern(pattern`natehigg`),
+            .addPattern(pattern`natehigg`)
     )
-    .addPhrase((phrase) =>
-        phrase.setMetadata({ originalWord: "dick" }).addPattern(pattern`dlck`),
-    )
+    .addPhrase((phrase) => phrase.setMetadata({ originalWord: "dick" }).addPattern(pattern`dlck`))
     .addPhrase((phrase) =>
         phrase
             .setMetadata({ originalWord: "epstein" })
             .addPattern(pattern`epstein`)
-            .addPattern(pattern`epstine`),
+            .addPattern(pattern`epstine`)
     );
 
 const matcher = new RegExpMatcher({
@@ -124,8 +116,7 @@ export function checkForBadWords(name: string) {
     return matcher.hasMatch(name);
 }
 
-const allowedCharsRegex =
-    /[^A-Za-z 0-9 \.,\?""!@#\$%\^&\*\(\)-_=\+;:<>\/\\\|\}\{\[\]`~]*/g;
+const allowedCharsRegex = /[^A-Za-z 0-9 .,?""!@#$%^&*()-_=+;:<>/\\|}{[\]`~]*/g;
 
 export function validateUserName(name: string): {
     originalWasInvalid: boolean;
@@ -133,11 +124,12 @@ export function validateUserName(name: string): {
 } {
     const defaultName = "Player";
 
-    if (!name || typeof name !== "string")
+    if (!name || typeof name !== "string") {
         return {
             originalWasInvalid: true,
             validName: defaultName,
         };
+    }
 
     name = name
         .trim()
@@ -146,11 +138,12 @@ export function validateUserName(name: string): {
         .replace(allowedCharsRegex, "")
         .trim();
 
-    if (!name.length || checkForBadWords(name))
+    if (!name.length || checkForBadWords(name)) {
         return {
             originalWasInvalid: true,
             validName: defaultName,
         };
+    }
 
     return {
         originalWasInvalid: false,
@@ -307,8 +300,8 @@ export class HTTPRateLimit {
 
 const proxyCheck = Config.secrets.PROXYCHECK_KEY
     ? new ProxyCheck({
-          api_key: Config.secrets.PROXYCHECK_KEY,
-      })
+        api_key: Config.secrets.PROXYCHECK_KEY,
+    })
     : undefined;
 
 const proxyCheckCache = new Map<
@@ -421,8 +414,7 @@ export const apiPrivateRouter = hc<PrivateRouteApp>(
 );
 
 export async function logErrorToWebhook(from: "server" | "client", ...messages: any[]) {
-    const url =
-        from === "server" ? Config.errorLoggingWebhook : Config.clientErrorLoggingWebhook;
+    const url = from === "server" ? Config.errorLoggingWebhook : Config.clientErrorLoggingWebhook;
     if (!url) return;
 
     try {
@@ -431,7 +423,7 @@ export async function logErrorToWebhook(from: "server" | "client", ...messages: 
                 if (msg instanceof Error) {
                     return `\`\`\`${msg.cause}\n${msg.stack}\`\`\``;
                 }
-                if (typeof msg == "object") {
+                if (typeof msg === "object") {
                     return `\`\`\`json\n${JSON.stringify(msg, null, 2).replaceAll("`", "\\`")}\`\`\``;
                 }
                 return `${msg}`;

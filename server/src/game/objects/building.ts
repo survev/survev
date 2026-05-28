@@ -1,22 +1,17 @@
-import { MapObjectDefs } from "../../../../shared/defs/mapObjectDefs";
-import type {
-    BuildingDef,
-    ObstacleDef,
-    StructureDef,
-} from "../../../../shared/defs/mapObjectsTyping";
-import { Puzzles } from "../../../../shared/defs/puzzles";
-import { DamageType } from "../../../../shared/gameConfig";
-import { ObjectType } from "../../../../shared/net/objectSerializeFns";
-import { type AABB, type Collider, coldet } from "../../../../shared/utils/coldet";
-import { collider } from "../../../../shared/utils/collider";
-import { mapHelpers } from "../../../../shared/utils/mapHelpers";
-import { math } from "../../../../shared/utils/math";
-import { type Vec2, v2 } from "../../../../shared/utils/v2";
-import type { Game } from "../game";
-import type { Decal } from "./decal";
-import { BaseGameObject } from "./gameObject";
-import type { Obstacle } from "./obstacle";
-import type { Structure } from "./structure";
+import { Puzzles } from "../../../../shared/defs/puzzles.ts";
+import { MapObjectDefs } from "../../../../shared/defs/register.ts";
+import { DamageType } from "../../../../shared/gameConfig.ts";
+import { ObjectType } from "../../../../shared/net/objectSerializeFns.ts";
+import { type AABB, coldet, type Collider } from "../../../../shared/utils/coldet.ts";
+import { collider } from "../../../../shared/utils/collider.ts";
+import { mapHelpers } from "../../../../shared/utils/mapHelpers.ts";
+import { math } from "../../../../shared/utils/math.ts";
+import { v2, type Vec2 } from "../../../../shared/utils/v2.ts";
+import type { Game } from "../game.ts";
+import type { Decal } from "./decal.ts";
+import { BaseGameObject } from "./gameObject.ts";
+import type { Obstacle } from "./obstacle.ts";
+import type { Structure } from "./structure.ts";
 
 export class Building extends BaseGameObject {
     mapObstacleBounds: Collider[] = [];
@@ -89,7 +84,7 @@ export class Building extends BaseGameObject {
         if (parentStructure?.__type === ObjectType.Structure) {
             this.parentStructure = parentStructure;
         }
-        const def = MapObjectDefs[this.type] as BuildingDef;
+        const def = MapObjectDefs.typeToDef(this.type, "building");
 
         this.rot = math.oriToRad(ori);
 
@@ -147,11 +142,11 @@ export class Building extends BaseGameObject {
             const region = def.ceiling.zoomRegions[i];
             const zoomIn = region.zoomIn
                 ? (collider.transform(
-                      region.zoomIn,
-                      this.pos,
-                      this.rot,
-                      this.scale,
-                  ) as AABB)
+                    region.zoomIn,
+                    this.pos,
+                    this.rot,
+                    this.scale,
+                ) as AABB)
                 : undefined;
 
             if (zoomIn) {
@@ -162,19 +157,18 @@ export class Building extends BaseGameObject {
                 zoomIn,
                 zoomOut: region.zoomOut
                     ? (collider.transform(
-                          region.zoomOut,
-                          this.pos,
-                          this.rot,
-                          this.scale,
-                      ) as AABB)
+                        region.zoomOut,
+                        this.pos,
+                        this.rot,
+                        this.scale,
+                    ) as AABB)
                     : undefined,
                 zoom: region.zoom,
                 noZoom: region.noZoom,
             });
         }
 
-        this.hasOccupiedEmitters =
-            !!def.occupiedEmitters && def.occupiedEmitters.length > 0;
+        this.hasOccupiedEmitters = !!def.occupiedEmitters && def.occupiedEmitters.length > 0;
         const emitterBounds = coldet.boundingAabb(zoomInBounds);
         this.emitterBounds = collider.createAabb(emitterBounds.min, emitterBounds.max);
 
@@ -184,7 +178,7 @@ export class Building extends BaseGameObject {
     }
 
     obstacleDestroyed(obstacle: Obstacle): void {
-        const def = MapObjectDefs[obstacle.type] as ObstacleDef;
+        const def = MapObjectDefs.typeToDef(obstacle.type, "obstacle");
 
         if (def.damageCeiling) {
             this.ceilingDamaged = true;
@@ -287,7 +281,7 @@ export class Building extends BaseGameObject {
 
         this.puzzleOrder.push(piece.puzzlePiece!);
 
-        const puzzleDef = (MapObjectDefs[this.type] as BuildingDef).puzzle!;
+        const puzzleDef = MapObjectDefs.typeToDef(this.type, "building").puzzle!;
 
         let puzzleName = puzzleDef.name;
         if (this.game.map.woodsMode && puzzleName === "bunker_eye_02") {
@@ -299,8 +293,8 @@ export class Building extends BaseGameObject {
         if (this.puzzleOrder.join("-") === puzzleOrder.join("-")) {
             for (const obj of this.childObjects) {
                 if (
-                    obj.__type === ObjectType.Obstacle &&
-                    obj.type === puzzleDef.completeUseType
+                    obj.__type === ObjectType.Obstacle
+                    && obj.type === puzzleDef.completeUseType
                 ) {
                     setTimeout(() => {
                         if (obj.isDoor) {
@@ -319,7 +313,7 @@ export class Building extends BaseGameObject {
             }
             this.puzzleSolved = true;
             if (this.parentStructure) {
-                const def = MapObjectDefs[this.parentStructure.type] as StructureDef;
+                const def = MapObjectDefs.typeToDef(this.parentStructure.type, "structure");
                 if (def.interiorSound?.puzzle === puzzleDef.name) {
                     this.parentStructure.interiorSoundAlt = true;
                     this.parentStructure.setDirty();
@@ -360,9 +354,9 @@ export class Building extends BaseGameObject {
         this.puzzleOrder.length = 0;
         for (const piece of this.childObjects) {
             if (
-                piece.__type === ObjectType.Obstacle &&
-                piece.isButton &&
-                piece.puzzlePiece
+                piece.__type === ObjectType.Obstacle
+                && piece.isButton
+                && piece.puzzlePiece
             ) {
                 piece.button.canUse = !this.puzzleSolved;
                 piece.button.onOff = false;

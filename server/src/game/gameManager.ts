@@ -1,17 +1,12 @@
-import type { WebSocket } from "uWebSockets.js";
 import { randomUUID } from "crypto";
 import NanoTimer from "nanotimer";
 import { platform } from "os";
-import type { MapDefs } from "../../../shared/defs/mapDefs";
-import * as net from "../../../shared/net/net";
-import { Config } from "../config";
-import type {
-    FindGamePrivateBody,
-    GameData,
-    GameSocketData,
-    ServerGameConfig,
-} from "../utils/types";
-import { Game } from "./game";
+import type { WebSocket } from "uWebSockets.js";
+import type { MapDefs } from "../../../shared/defs/mapDefs.ts";
+import * as net from "../../../shared/net/net.ts";
+import { Config } from "../config.ts";
+import type { FindGamePrivateBody, GameData, GameSocketData, ServerGameConfig } from "../utils/types.ts";
+import { Game } from "./game.ts";
 
 export abstract class GameManager {
     abstract sockets: Map<string, WebSocket<GameSocketData>>;
@@ -91,8 +86,8 @@ export class SingleThreadGameManager implements GameManager {
     getPlayerCount(): number {
         return this.games.reduce((a, b) => {
             return (
-                a +
-                (b ? b.playerBarn.livingPlayers.filter((p) => !p.disconnected).length : 0)
+                a
+                + (b ? b.playerBarn.livingPlayers.filter((p) => !p.disconnected).length : 0)
             );
         }, 0);
     }
@@ -136,9 +131,9 @@ export class SingleThreadGameManager implements GameManager {
         let game = this.games
             .filter((game) => {
                 return (
-                    game.canJoin &&
-                    game.teamMode === body.teamMode &&
-                    game.mapName === body.mapName
+                    game.canJoin
+                    && game.teamMode === body.teamMode
+                    && game.mapName === body.mapName
                 );
             })
             .sort((a, b) => {
@@ -171,13 +166,13 @@ export class SingleThreadGameManager implements GameManager {
     onMsg(socketId: string, msg: ArrayBuffer): void {
         const data = this.sockets.get(socketId)?.getUserData();
         if (!data) return;
-        this.gamesById.get(data.gameId)?.handleMsg(msg, socketId, data.ip);
+        this.gamesById.get(data.gameId)?.clientBarn.handleMsg(msg, socketId, data.ip);
     }
 
     onClose(socketId: string) {
         const data = this.sockets.get(socketId)?.getUserData();
         if (!data) return;
-        this.gamesById.get(data.gameId)?.handleSocketClose(socketId);
+        this.gamesById.get(data.gameId)?.clientBarn.handleSocketClose(socketId);
         this.sockets.delete(socketId);
     }
 }

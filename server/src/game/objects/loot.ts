@@ -1,19 +1,20 @@
-import { GameObjectDefs, type LootDef } from "../../../../shared/defs/gameObjectDefs";
-import type { MapDef } from "../../../../shared/defs/mapDefs";
-import { GameConfig } from "../../../../shared/gameConfig";
-import { ObjectType } from "../../../../shared/net/objectSerializeFns";
-import { type AABB, type Circle, coldet } from "../../../../shared/utils/coldet";
-import { collider } from "../../../../shared/utils/collider";
-import { math } from "../../../../shared/utils/math";
-import type { River } from "../../../../shared/utils/river";
-import { assert, util } from "../../../../shared/utils/util";
-import { type Vec2, v2 } from "../../../../shared/utils/v2";
-import type { Game } from "../game";
-import { HashGrid } from "../grid";
-import { BaseGameObject } from "./gameObject";
-import type { MapIndicator } from "./mapIndicator";
-import type { Player } from "./player";
-import type { Structure } from "./structure";
+import type { LootDef } from "../../../../shared/defs/gameObjectDefs.ts";
+import type { MapDef } from "../../../../shared/defs/mapDefs.ts";
+import { GameObjectDefs } from "../../../../shared/defs/register.ts";
+import { GameConfig } from "../../../../shared/gameConfig.ts";
+import { ObjectType } from "../../../../shared/net/objectSerializeFns.ts";
+import { type AABB, type Circle, coldet } from "../../../../shared/utils/coldet.ts";
+import { collider } from "../../../../shared/utils/collider.ts";
+import { math } from "../../../../shared/utils/math.ts";
+import type { River } from "../../../../shared/utils/river.ts";
+import { assert, util } from "../../../../shared/utils/util.ts";
+import { v2, type Vec2 } from "../../../../shared/utils/v2.ts";
+import type { Game } from "../game.ts";
+import { HashGrid } from "../grid.ts";
+import { BaseGameObject } from "./gameObject.ts";
+import type { MapIndicator } from "./mapIndicator.ts";
+import type { Player } from "./player.ts";
+import type { Structure } from "./structure.ts";
 
 // velocity drag applied every tick
 const LOOT_DRAG = 4;
@@ -47,8 +48,8 @@ export class LootBarn {
             this.loots,
             (a, b) => {
                 return (
-                    (util.sameLayer(a.layer, b.layer) as boolean) &&
-                    coldet.testCircleCircle(a.pos, a.lootRad, b.pos, b.lootRad)
+                    (util.sameLayer(a.layer, b.layer) as boolean)
+                    && coldet.testCircleCircle(a.pos, a.lootRad, b.pos, b.lootRad)
                 );
             },
             (a, b) => {
@@ -90,8 +91,9 @@ export class LootBarn {
         for (let i = 0; i < dropCount; i++) {
             this.addLoot(item, player.pos, player.layer, 60, undefined, -4, dir);
         }
-        if (amount % 60 !== 0)
+        if (amount % 60 !== 0) {
             this.addLoot(item, player.pos, player.layer, amount % 60, undefined, -4, dir);
+        }
     }
 
     /**
@@ -106,9 +108,9 @@ export class LootBarn {
         dir?: Vec2,
         ownerId?: number,
     ) {
-        const def = GameObjectDefs[type];
+        const def = GameObjectDefs.typeToDef(type);
 
-        if (!def || !("lootImg" in def)) {
+        if (!("lootImg" in def)) {
             this.game.logger.warn("Invalid loot type:", type);
             return;
         }
@@ -138,9 +140,9 @@ export class LootBarn {
         source?: "player" | "obstacle" | "map",
         ownerId?: number,
     ) {
-        const def = GameObjectDefs[type];
+        const def = GameObjectDefs.typeToDef(type);
 
-        if (!def || !("lootImg" in def)) {
+        if (!("lootImg" in def)) {
             this.game.logger.warn("Invalid loot type:", type);
             return;
         }
@@ -158,15 +160,15 @@ export class LootBarn {
         this._addLoot(loot);
 
         if (
-            def.type === "gun" &&
-            preloadGun &&
-            !def.ammoInfinite &&
-            source !== "player"
+            def.type === "gun"
+            && preloadGun
+            && !def.ammoInfinite
+            && source !== "player"
         ) {
             loot.isPreloadedGun = true;
         }
 
-        if (def.type === "gun" && GameObjectDefs[def.ammo] && !loot.isPreloadedGun) {
+        if (def.type === "gun" && GameObjectDefs.typeToDefSafe(def.ammo) && !loot.isPreloadedGun) {
             const ammoCount = useCountForAmmo ? count : def.ammoSpawnCount;
             if (ammoCount <= 0) return;
             const halfAmmo = Math.ceil(ammoCount / 2);
@@ -294,7 +296,7 @@ export class Loot extends BaseGameObject {
     ) {
         super(game, pos);
 
-        const def = GameObjectDefs[type] as LootDef;
+        const def = GameObjectDefs.typeToDef(type) as LootDef;
         assert("lootImg" in def, `Invalid loot type ${type}`);
 
         this.layer = layer;
@@ -352,11 +354,10 @@ export class Loot extends BaseGameObject {
             }
         }
 
-        const shouldUpdate =
-            this.forceUpdateTicker > 0.3 ||
-            Math.abs(this.vel.x) > 0.001 ||
-            Math.abs(this.vel.y) > 0.001 ||
-            !v2.eq(this.oldPos, this.pos);
+        const shouldUpdate = this.forceUpdateTicker > 0.3
+            || Math.abs(this.vel.x) > 0.001
+            || Math.abs(this.vel.y) > 0.001
+            || !v2.eq(this.oldPos, this.pos);
 
         if (!shouldUpdate) {
             // force a loot update few ms to make sure if e.g an obstacle spawned on top of the loot (airdrop, potato respawning etc)
@@ -427,8 +428,8 @@ export class Loot extends BaseGameObject {
                     if (this.bellowBridge) continue;
                     // Prioritize layer0 building surfaces when on stairs
                     if (
-                        (obj.layer !== this.layer && !onStairs) ||
-                        (obj.layer === 1 && onStairs)
+                        (obj.layer !== this.layer && !onStairs)
+                        || (obj.layer === 1 && onStairs)
                     ) {
                         continue;
                     }
@@ -479,15 +480,15 @@ export class Loot extends BaseGameObject {
         // ignore rivers if we are in the ocean
         const beachAABB = this.game.map.beachBounds;
         if (
-            !surface.type &&
-            coldet.testPointAabb(this.pos, beachAABB.min, beachAABB.max)
+            !surface.type
+            && coldet.testPointAabb(this.pos, beachAABB.min, beachAABB.max)
         ) {
             const rivers = this.game.map.normalRivers;
             for (let i = 0; i < rivers.length; i++) {
                 const river = rivers[i];
                 if (
-                    coldet.testPointAabb(this.pos, river.aabb.min, river.aabb.max) &&
-                    math.pointInsidePolygon(this.pos, river.waterPoly)
+                    coldet.testPointAabb(this.pos, river.aabb.min, river.aabb.max)
+                    && math.pointInsidePolygon(this.pos, river.waterPoly)
                 ) {
                     finalRiver = river;
                     break;

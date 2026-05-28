@@ -309,7 +309,6 @@ export const BuildingSprites = {
         "map/map-bunker-eye-chamber-floor-01b.svg",
         "map/map-bunker-eye-compartment-ceiling-01.svg",
         "map/map-bunker-eye-compartment-floor-01.svg",
-
         // removed tree switches...
         // "map/map-tree-switch-01.svg",
         // "map/map-tree-switch-02.svg",

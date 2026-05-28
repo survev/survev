@@ -1,9 +1,9 @@
 import { z } from "zod";
-import type { MapDefs } from "../../../shared/defs/mapDefs";
-import { TeamMode } from "../../../shared/gameConfig";
-import type { FindGameError } from "../../../shared/types/api";
-import { loadoutSchema } from "../../../shared/utils/loadout";
-import type { MatchDataTable } from "../api/db/schema";
+import type { MapDefs } from "../../../shared/defs/mapDefs.ts";
+import { TeamMode } from "../../../shared/gameConfig.ts";
+import type { FindGameError } from "../../../shared/types/api.ts";
+import { loadoutSchema } from "../../../shared/utils/loadout.ts";
+import type { MatchDataTable } from "../api/db/schema.ts";
 
 export interface GameSocketData {
     gameId: string;
@@ -73,11 +73,11 @@ export type FindGamePrivateBody = z.infer<typeof zFindGamePrivateBody>;
 
 export type FindGamePrivateRes =
     | {
-          gameId: string;
-          useHttps: boolean;
-          hosts: string[];
-          addrs: string[];
-      }
+        gameId: string;
+        useHttps: boolean;
+        hosts: string[];
+        addrs: string[];
+    }
     | { error: FindGameError };
 
 export enum ProcessMsgType {

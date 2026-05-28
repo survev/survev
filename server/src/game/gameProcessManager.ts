@@ -1,11 +1,11 @@
-import type { WebSocket } from "uWebSockets.js";
 import { type ChildProcess, fork } from "child_process";
 import { randomUUID } from "crypto";
-import { type MapDef, MapDefs } from "../../../shared/defs/mapDefs";
-import type { TeamMode } from "../../../shared/gameConfig";
-import * as net from "../../../shared/net/net";
-import { util } from "../../../shared/utils/util";
-import { ServerLogger } from "../utils/logger";
+import type { WebSocket } from "uWebSockets.js";
+import { type MapDef, MapDefs } from "../../../shared/defs/mapDefs.ts";
+import type { TeamMode } from "../../../shared/gameConfig.ts";
+import * as net from "../../../shared/net/net.ts";
+import { util } from "../../../shared/utils/util.ts";
+import { ServerLogger } from "../utils/logger.ts";
 import {
     type FindGamePrivateBody,
     type GameData,
@@ -13,8 +13,8 @@ import {
     type ProcessMsg,
     ProcessMsgType,
     type ServerGameConfig,
-} from "../utils/types";
-import type { GameManager } from "./gameManager";
+} from "../utils/types.ts";
+import type { GameManager } from "./gameManager.ts";
 
 let path: string;
 if (process.env.NODE_ENV === "production") {
@@ -188,17 +188,21 @@ export class GameProcessManager implements GameManager {
 
                 if (Date.now() - gameProc.lastMsgTime > 10000) {
                     this.logger.warn(
-                        `Process ${gameProc.process.pid} - #${gameProc.id.substring(0, 4)} did not send a message in more 10 seconds, killing`,
+                        `Process ${gameProc.process.pid} - #${
+                            gameProc.id.substring(0, 4)
+                        } did not send a message in more 10 seconds, killing`,
                     );
                     // sigquit can dump a core of the process
                     // useful for debugging infinite loops
                     this.killProcess(gameProc, "SIGQUIT");
                 } else if (
-                    gameProc.stopped &&
-                    Date.now() - gameProc.stoppedTime > 60000
+                    gameProc.stopped
+                    && Date.now() - gameProc.stoppedTime > 60000
                 ) {
                     this.logger.warn(
-                        `Process ${gameProc.process.pid} - #${gameProc.id.substring(0, 4)} stopped more than a minute ago, killing`,
+                        `Process ${gameProc.process.pid} - #${
+                            gameProc.id.substring(0, 4)
+                        } stopped more than a minute ago, killing`,
                     );
                     this.killProcess(gameProc);
                 }
@@ -284,10 +288,10 @@ export class GameProcessManager implements GameManager {
         let game = this.processes
             .filter((proc) => {
                 return (
-                    (proc.canJoin || proc.creating) &&
-                    proc.avaliableSlots > 0 &&
-                    proc.teamMode === body.teamMode &&
-                    proc.mapName === body.mapName
+                    (proc.canJoin || proc.creating)
+                    && proc.avaliableSlots > 0
+                    && proc.teamMode === body.teamMode
+                    && proc.mapName === body.mapName
                 );
             })
             .sort((a, b) => {

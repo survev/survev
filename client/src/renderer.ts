@@ -1,10 +1,10 @@
 import * as PIXI from "pixi.js-legacy";
-import { Constants } from "../../shared/net/net";
-import { v2 } from "../../shared/utils/v2";
-import type { Camera } from "./camera";
-import { errorLogManager } from "./errorLogs";
-import type { Game } from "./game";
-import type { Map } from "./map";
+import { Constants } from "../../shared/net/net.ts";
+import { v2 } from "../../shared/utils/v2.ts";
+import type { Camera } from "./camera.ts";
+import { errorLogManager } from "./errorLogs.ts";
+import type { Game } from "./game.ts";
+import type { Map } from "./map.ts";
 
 //
 // Helpers
@@ -94,9 +94,9 @@ export class Renderer {
         }
 
         if (
-            obj.parent == this.layers[layerIdx] &&
-            obj.__zOrd == zOrd &&
-            (zIdx === undefined || obj.__zIdx == zIdx)
+            obj.parent == this.layers[layerIdx]
+            && obj.__zOrd == zOrd
+            && (zIdx === undefined || obj.__zIdx == zIdx)
         ) {
             return;
         }
@@ -273,9 +273,7 @@ class RenderGroup extends PIXI.Container {
 
     checkSort() {
         if (this.dirty) {
-            this.children.sort((a, b) =>
-                a.__zOrd == b.__zOrd ? a.__zIdx - b.__zIdx : a.__zOrd - b.__zOrd,
-            );
+            this.children.sort((a, b) => a.__zOrd == b.__zOrd ? a.__zIdx - b.__zIdx : a.__zOrd - b.__zOrd);
             this.dirty = false;
             return true;
         }

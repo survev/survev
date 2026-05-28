@@ -1,13 +1,7 @@
-import { collider } from "../utils/collider";
-import { util } from "../utils/util";
-import { v2 } from "../utils/v2";
-import type {
-    BuildingDef,
-    LootSpawnDef,
-    MapObjectDef,
-    ObstacleDef,
-    StructureDef,
-} from "./mapObjectsTyping";
+import { collider } from "../utils/collider.ts";
+import { util } from "../utils/util.ts";
+import { v2 } from "../utils/v2.ts";
+import type { BuildingDef, LootSpawnDef, MapObjectDef, ObstacleDef, StructureDef } from "./mapObjectsTyping.ts";
 
 // some errors could be fixed by this but opted to using Partial and casting instead to avoid choking the lsp server
 // type DeepPartial<T> = T extends object ? {
@@ -703,13 +697,13 @@ function createContainer(props: {
                     collision: [
                         props.open
                             ? collider.createAabbExtents(
-                                  v2.create(0, 0),
-                                  v2.create(2.5, 11),
-                              )
+                                v2.create(0, 0),
+                                v2.create(2.5, 11),
+                            )
                             : collider.createAabbExtents(
-                                  v2.create(0, 0),
-                                  v2.create(2.5, 8),
-                              ),
+                                v2.create(0, 0),
+                                v2.create(2.5, 8),
+                            ),
                     ],
                 },
             ],
@@ -729,19 +723,19 @@ function createContainer(props: {
                 {
                     zoomIn: props.open
                         ? collider.createAabbExtents(
-                              v2.create(0, 0),
-                              v2.create(2.5, 5.75),
-                          )
+                            v2.create(0, 0),
+                            v2.create(2.5, 5.75),
+                        )
                         : collider.createAabbExtents(
-                              v2.create(0, 2.25),
-                              v2.create(2.5, 5.5),
-                          ),
+                            v2.create(0, 2.25),
+                            v2.create(2.5, 5.5),
+                        ),
                     zoomOut: props.open
                         ? collider.createAabbExtents(v2.create(0, 0), v2.create(2.5, 11))
                         : collider.createAabbExtents(
-                              v2.create(0, -0.5),
-                              v2.create(2.5, 8.75),
-                          ),
+                            v2.create(0, -0.5),
+                            v2.create(2.5, 8.75),
+                        ),
                 },
             ],
             imgs: props.ceilingImgs! || [
@@ -3724,9 +3718,8 @@ function createCabin<T extends ExtendedBuildingDef>(e: Partial<T>): T {
                 ori: 2,
             },
             {
-                type:
-                    e.cabin_mount ||
-                    randomObstacleType({
+                type: e.cabin_mount
+                    || randomObstacleType({
                         gun_mount_01: 50,
                         gun_mount_05: 50,
                         gun_mount_04: 10,
@@ -6034,9 +6027,8 @@ function createMansion<T extends ExtendedBuildingDef>(e: Partial<T>): T {
                 ori: 0,
             },
             {
-                type:
-                    e.bush ||
-                    randomObstacleType({
+                type: e.bush
+                    || randomObstacleType({
                         bush_01: 25,
                         bush_03: 1,
                         "": e.bush_chance || 0,
@@ -6047,9 +6039,8 @@ function createMansion<T extends ExtendedBuildingDef>(e: Partial<T>): T {
                 ignoreMapSpawnReplacement: true,
             },
             {
-                type:
-                    e.bush ||
-                    randomObstacleType({
+                type: e.bush
+                    || randomObstacleType({
                         bush_01: 25,
                         bush_03: 1,
                         "": e.bush_chance || 0,
@@ -6060,9 +6051,8 @@ function createMansion<T extends ExtendedBuildingDef>(e: Partial<T>): T {
                 ignoreMapSpawnReplacement: true,
             },
             {
-                type:
-                    e.bush ||
-                    randomObstacleType({
+                type: e.bush
+                    || randomObstacleType({
                         bush_01: 25,
                         bush_03: 1,
                         "": e.bush_chance || 0,
@@ -6073,9 +6063,8 @@ function createMansion<T extends ExtendedBuildingDef>(e: Partial<T>): T {
                 ignoreMapSpawnReplacement: true,
             },
             {
-                type:
-                    e.bush ||
-                    randomObstacleType({
+                type: e.bush
+                    || randomObstacleType({
                         bush_01: 25,
                         bush_03: 1,
                         "": e.bush_chance || 0,
@@ -9990,7 +9979,7 @@ const MaterialDefs = {
     },
 };
 
-export const MapObjectDefs: Record<string, MapObjectDef> = {
+export const RawMapObjectDefs: Record<string, MapObjectDef> = {
     barrel_01: createBarrel({}),
     barrel_01b: createBarrel({
         img: { tint: 0xc9c9c9 },
@@ -12533,7 +12522,7 @@ export const MapObjectDefs: Record<string, MapObjectDef> = {
             zIdx: 60,
         },
     }),
-    tire_01: (function <T extends ObstacleDef>(e: Partial<T>): T {
+    tire_01: (function<T extends ObstacleDef>(e: Partial<T>): T {
         const t = {
             type: "obstacle",
             scale: {
@@ -13202,7 +13191,7 @@ export const MapObjectDefs: Record<string, MapObjectDef> = {
             },
         },
     },
-    vending_01: (function () {
+    vending_01: (function() {
         const t = {
             type: "obstacle",
             obstacleType: "vending",
@@ -18559,7 +18548,7 @@ export const MapObjectDefs: Record<string, MapObjectDef> = {
             ],
         },
     } as unknown as Partial<BuildingDef>),
-    shilo_01: (function <T extends BuildingDef>(e: Partial<T>): T {
+    shilo_01: (function<T extends BuildingDef>(e: Partial<T>): T {
         const t = {
             type: "building",
             map: { display: true, color: 0x317120, scale: 1 },
@@ -18912,7 +18901,7 @@ export const MapObjectDefs: Record<string, MapObjectDef> = {
         },
         obs: "toilet_02b",
     }),
-    perch_01: (function (e) {
+    perch_01: (function(e) {
         const t = {
             type: "building",
             map: { display: true, color: 0x1d3900, scale: 1 },
@@ -21975,7 +21964,7 @@ export const MapObjectDefs: Record<string, MapObjectDef> = {
         tree_small: "tree_01cb",
         tree_large: "tree_01cb",
     }),
-    savannah_patch_01: (function <T extends BuildingDef>(e: Partial<T>): T {
+    savannah_patch_01: (function<T extends BuildingDef>(e: Partial<T>): T {
         const t = {
             type: "building",
             map: { display: true, shapes: [] },
@@ -22073,7 +22062,7 @@ export const MapObjectDefs: Record<string, MapObjectDef> = {
         grass_color: 0xebc634,
         terrain: { grass: true, beach: false, spawnPriority: 1 },
     }),
-    kopje_patch_01: (function <T extends BuildingDef>(e: Partial<T>): T {
+    kopje_patch_01: (function<T extends BuildingDef>(e: Partial<T>): T {
         const t = {
             type: "building",
             map: { display: true, shapes: [] },
@@ -23222,7 +23211,7 @@ export const MapObjectDefs: Record<string, MapObjectDef> = {
         },
         img: { tint: 0x4b4b4b },
     } as unknown as Partial<ObstacleDef>),
-    club_01: (function (e) {
+    club_01: (function(e) {
         const t = {
             type: "building",
             map: {
@@ -24293,7 +24282,7 @@ export const MapObjectDefs: Record<string, MapObjectDef> = {
         };
         return util.mergeDeep(t, e || {});
     })({}),
-    bathhouse_01: (function (e) {
+    bathhouse_01: (function(e) {
         const t = {
             type: "building",
             map: { display: false },
@@ -24822,7 +24811,7 @@ export const MapObjectDefs: Record<string, MapObjectDef> = {
         };
         return util.mergeDeep(t, e || {});
     })({}),
-    bathhouse_sideroom_01: (function (e) {
+    bathhouse_sideroom_01: (function(e) {
         const t = {
             type: "building",
             map: { display: true, shapes: [] },
@@ -24941,7 +24930,7 @@ export const MapObjectDefs: Record<string, MapObjectDef> = {
         };
         return util.mergeDeep(t, e || {});
     })({}),
-    bathhouse_sideroom_02: (function (e) {
+    bathhouse_sideroom_02: (function(e) {
         const t = {
             type: "building",
             map: { display: true, shapes: [] },
@@ -31161,7 +31150,7 @@ export const MapObjectDefs: Record<string, MapObjectDef> = {
             zIdx: 10,
         },
     }),
-    bridge_xlg_01: (function (e) {
+    bridge_xlg_01: (function(e) {
         const t = {
             type: "building",
             map: {

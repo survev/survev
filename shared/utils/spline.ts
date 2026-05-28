@@ -1,6 +1,6 @@
-import { math } from "./math";
-import { assert } from "./util";
-import { type Vec2, v2 } from "./v2";
+import { math } from "./math.ts";
+import { assert } from "./util.ts";
+import { v2, type Vec2 } from "./v2.ts";
 
 export function getControlPoints(t: number, points: Vec2[], looped: boolean) {
     const count = points.length;
@@ -37,21 +37,21 @@ export function getControlPoints(t: number, points: Vec2[], looped: boolean) {
 // Taken from https://www.mvps.org/directx/articles/catmull/
 export function catmullRom(t: number, p0: number, p1: number, p2: number, p3: number) {
     return (
-        0.5 *
-        (2.0 * p1 +
-            t * (-p0 + p2) +
-            t * t * (2.0 * p0 - 5.0 * p1 + 4.0 * p2 - p3) +
-            t * t * t * (-p0 + 3.0 * p1 - 3.0 * p2 + p3))
+        0.5
+        * (2.0 * p1
+            + t * (-p0 + p2)
+            + t * t * (2.0 * p0 - 5.0 * p1 + 4.0 * p2 - p3)
+            + t * t * t * (-p0 + 3.0 * p1 - 3.0 * p2 + p3))
     );
 }
 
 function catmullRomDerivative(t: number, p0: number, p1: number, p2: number, p3: number) {
     return (
-        0.5 *
-        (-p0 +
-            p2 +
-            2.0 * t * (2.0 * p0 - 5.0 * p1 + 4.0 * p2 - p3) +
-            3.0 * t * t * (-p0 + 3.0 * p1 - 3.0 * p2 + p3))
+        0.5
+        * (-p0
+            + p2
+            + 2.0 * t * (2.0 * p0 - 5.0 * p1 + 4.0 * p2 - p3)
+            + 3.0 * t * t * (-p0 + 3.0 * p1 - 3.0 * p2 + p3))
     );
 }
 
@@ -153,8 +153,8 @@ export class Spline {
             const offset = v2.dot(tangent, v2.sub(pos, nearest)) / tanLen;
             const offsetT = nearestT + offset / (tanLen * len);
             if (
-                v2.lengthSqr(v2.sub(pos, this.getPos(offsetT))) <
-                v2.lengthSqr(v2.sub(pos, nearest))
+                v2.lengthSqr(v2.sub(pos, this.getPos(offsetT)))
+                    < v2.lengthSqr(v2.sub(pos, nearest))
             ) {
                 nearestT = offsetT;
             }

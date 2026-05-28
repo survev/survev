@@ -1,29 +1,31 @@
-export type ExplosionDef = {
-    readonly type: "explosion";
-    damage: number;
-    obstacleDamage: number;
-    rad: {
-        min: number;
-        max: number;
-    };
-    shrapnelCount: number;
-    shrapnelType: string;
-    explosionEffectType: string;
-    decalType: string;
-    teamDamage?: boolean;
-    dropRandomLoot?: number;
-    healTeam?: boolean;
-    healAmount?: number;
-} & (
-    | {
-          freezeDuration: number; // how long to slow down player on hit
-          frozenSprites: string[];
-      }
-    | {
-          freezeDuration?: undefined;
-          frozenSprites?: undefined;
-      }
-);
+export type ExplosionDef =
+    & {
+        readonly type: "explosion";
+        damage: number;
+        obstacleDamage: number;
+        rad: {
+            min: number;
+            max: number;
+        };
+        shrapnelCount: number;
+        shrapnelType: string;
+        explosionEffectType: string;
+        decalType: string;
+        teamDamage?: boolean;
+        dropRandomLoot?: number;
+        healTeam?: boolean;
+        healAmount?: number;
+    }
+    & (
+        | {
+            freezeDuration: number; // how long to slow down player on hit
+            frozenSprites: string[];
+        }
+        | {
+            freezeDuration?: undefined;
+            frozenSprites?: undefined;
+        }
+    );
 
 export const ExplosionDefs: Record<string, ExplosionDef> = {
     explosion_frag: {

@@ -1,11 +1,11 @@
 import $ from "jquery";
-import { type MapDef, MapDefs } from "../../shared/defs/mapDefs";
-import { TeamModeToString } from "../../shared/defs/types/misc";
-import type { SiteInfoRes } from "../../shared/types/api";
-import { api } from "./api";
-import type { ConfigManager } from "./config";
-import { device } from "./device";
-import type { Localization } from "./ui/localization";
+import { type MapDef, MapDefs } from "../../shared/defs/mapDefs.ts";
+import { TeamModeToString } from "../../shared/defs/types/misc.ts";
+import type { SiteInfoRes } from "../../shared/types/api.ts";
+import { api } from "./api.ts";
+import type { ConfigManager } from "./config.ts";
+import { device } from "./device.ts";
+import type { Localization } from "./ui/localization.ts";
 
 export class SiteInfo {
     info = {} as SiteInfoRes;
@@ -15,8 +15,6 @@ export class SiteInfo {
         public config: ConfigManager,
         public localization: Localization,
     ) {
-        this.config = config;
-        this.localization = localization;
     }
 
     load() {

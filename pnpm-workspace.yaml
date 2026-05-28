@@ -5,11 +5,13 @@ packages:
   - bot/
   - tests/
   - '!**dist/**'
+ignoreWorkspaceRootCheck: true
 
 onlyBuiltDependencies:
   - '@biomejs/biome'
   - '@taufik-nurrohman/color-picker'
   - better-sqlite3
   - canvas
+  - dprint
   - esbuild
   - sharp

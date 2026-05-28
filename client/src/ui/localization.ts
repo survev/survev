@@ -1,5 +1,5 @@
 import $ from "jquery";
-import { device } from "../device";
+import { device } from "../device.ts";
 import english from "../en.json";
 
 export function downloadFile(
@@ -82,10 +82,10 @@ export class Localization {
         // Also try spaces as dashes
         const spacedKey = key.replace(" ", "-");
         return (
-            this.translations[this.locale]?.[key] ||
-            this.translations[this.locale]?.[spacedKey] ||
-            this.translations["en"][key] ||
-            ""
+            this.translations[this.locale]?.[key]
+            || this.translations[this.locale]?.[spacedKey]
+            || this.translations["en"][key]
+            || ""
         );
     }
 

@@ -1,14 +1,15 @@
 import $ from "jquery";
-import { GameObjectDefs } from "../../../shared/defs/gameObjectDefs";
-import type { EmoteDef } from "../../../shared/defs/gameObjects/emoteDefs";
-import { PassDefs } from "../../../shared/defs/gameObjects/passDefs";
-import { QuestDefs } from "../../../shared/defs/gameObjects/questDefs";
-import { math } from "../../../shared/utils/math";
-import { passUtil } from "../../../shared/utils/passUtil";
-import type { Account } from "../account";
-import { helpers } from "../helpers";
-import type { LoadoutMenu } from "./loadoutMenu";
-import type { Localization } from "./localization";
+
+import type { EmoteDef } from "../../../shared/defs/gameObjects/emoteDefs.ts";
+import { PassDefs } from "../../../shared/defs/gameObjects/passDefs.ts";
+import { QuestDefs } from "../../../shared/defs/gameObjects/questDefs.ts";
+import { GameObjectDefs } from "../../../shared/defs/register.ts";
+import { math } from "../../../shared/utils/math.ts";
+import { passUtil } from "../../../shared/utils/passUtil.ts";
+import type { Account } from "../account.ts";
+import { helpers } from "../helpers.ts";
+import type { LoadoutMenu } from "./loadoutMenu.ts";
+import type { Localization } from "./localization.ts";
 
 function getNextPassUnlockItemId(passType: string, currentLevel: number) {
     const passDef = PassDefs[passType];
@@ -106,10 +107,6 @@ export class Pass {
         public loadoutMenu: LoadoutMenu,
         public localization: Localization,
     ) {
-        this.account = account;
-        this.loadoutMenu = loadoutMenu;
-        this.localization = localization;
-
         this.account.addEventListener("request", this.onRequest.bind(this));
         this.account.addEventListener("pass", this.onPass.bind(this));
         this.loadPlaceholders();
@@ -148,8 +145,8 @@ export class Pass {
             } as (typeof this.quests)[number];
             const curQuest = this.quests.find((existingQuest) => {
                 return (
-                    existingQuest.data.idx == quest.data.idx &&
-                    existingQuest.data.type == quest.data.type
+                    existingQuest.data.idx == quest.data.idx
+                    && existingQuest.data.type == quest.data.type
                 );
             });
 
@@ -196,8 +193,7 @@ export class Pass {
 
             // Initialize quest UI
             const questDef = QuestDefs[quest.data.type];
-            const title =
-                this.localization.translate(`${quest.data.type}`) || quest.data.type;
+            const title = this.localization.translate(`${quest.data.type}`) || quest.data.type;
             const pct = (quest.current / quest.data.target) * 100;
             quest.elems.main.css("display", "block");
             quest.elems.desc.html(title);
@@ -297,9 +293,8 @@ export class Pass {
     }
 
     setQuestRefreshEnabled(quest: (typeof this.quests)[number]) {
-        const shouldEnableRefresh =
-            (!quest.data.rerolled && !quest.data.complete) ||
-            quest.refreshTime - Date.now() < 0;
+        const shouldEnableRefresh = (!quest.data.rerolled && !quest.data.complete)
+            || quest.refreshTime - Date.now() < 0;
         if (shouldEnableRefresh != quest.refreshEnabled || !quest.refreshSet) {
             quest.refreshEnabled = shouldEnableRefresh;
             quest.refreshSet = true;
@@ -328,7 +323,7 @@ export class Pass {
     }
 
     setPassUnlockImage(item: string) {
-        const emoteDef = GameObjectDefs[item] as EmoteDef;
+        const emoteDef = GameObjectDefs.typeToDefSafe(item) as EmoteDef;
         const unlockImagePath = emoteDef
             ? helpers.getSvgFromGameType(item)
             : "img/emotes/surviv.svg";
@@ -343,10 +338,10 @@ export class Pass {
         });
         const unlockTypeTitle = emoteDef
             ? this.localization
-                  .translate(
-                      `loadout-title-${this.loadoutMenu.getCategory(emoteDef.type)!.loadoutType}`,
-                  )
-                  .toUpperCase()
+                .translate(
+                    `loadout-title-${this.loadoutMenu.getCategory(emoteDef.type)!.loadoutType}`,
+                )
+                .toUpperCase()
             : "";
         const tooltipElem = $("#pass-unlock-tooltip");
         tooltipElem.css("opacity", emoteDef ? 1 : 0);
@@ -493,22 +488,21 @@ export class Pass {
                 }
             }
             if (
-                fixedQuest.playCompleteAnim &&
-                !fixedQuest.completeAnimFinished &&
-                fixedQuest.ticker - fixedQuest.delay > 1.25
+                fixedQuest.playCompleteAnim
+                && !fixedQuest.completeAnimFinished
+                && fixedQuest.ticker - fixedQuest.delay > 1.25
             ) {
                 this.animateQuestComplete(fixedQuest);
                 fixedQuest.completeAnimFinished = true;
             }
-            const completionPhaseReady =
-                !fixedQuest.playCompleteAnim ||
-                (fixedQuest.completeAnimFinished &&
-                    fixedQuest.ticker - fixedQuest.delay > 4.25);
+            const completionPhaseReady = !fixedQuest.playCompleteAnim
+                || (fixedQuest.completeAnimFinished
+                    && fixedQuest.ticker - fixedQuest.delay > 4.25);
             if (
-                fixedQuest.data.complete &&
-                completionPhaseReady &&
-                fixedQuest.refreshEnabled &&
-                fixedQuest.shouldRequestRefresh
+                fixedQuest.data.complete
+                && completionPhaseReady
+                && fixedQuest.refreshEnabled
+                && fixedQuest.shouldRequestRefresh
             ) {
                 fixedQuest.shouldRequestRefresh = false;
                 this.account.refreshQuest(fixedQuest.data.idx);
@@ -523,8 +517,7 @@ export class Pass {
                     },
                     250,
                 );
-                const isRefreshPromptVisible =
-                    fixedQuest.elems.refreshPrompt.css("display") == "block";
+                const isRefreshPromptVisible = fixedQuest.elems.refreshPrompt.css("display") == "block";
                 fixedQuest.elems.info.css(
                     "display",
                     showRefreshTimer || isRefreshPromptVisible ? "none" : "block",

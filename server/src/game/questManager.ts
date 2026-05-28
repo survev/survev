@@ -1,11 +1,11 @@
-import { GameObjectDefs } from "../../../shared/defs/gameObjectDefs";
-import { type QuestDef, QuestDefs } from "../../../shared/defs/gameObjects/questDefs";
-import { MapObjectDefs } from "../../../shared/defs/mapObjectDefs";
-import type { ObstacleDef } from "../../../shared/defs/mapObjectsTyping";
-import { TeamModeToString } from "../../../shared/defs/types/misc";
-import { MsgType, UpdatePassMsg } from "../../../shared/net/net";
-import type { Game } from "./game";
-import type { Player } from "./objects/player";
+import { type QuestDef, QuestDefs } from "../../../shared/defs/gameObjects/questDefs.ts";
+
+import type { ObstacleDef } from "../../../shared/defs/mapObjectsTyping.ts";
+import { GameObjectDefs, MapObjectDefs } from "../../../shared/defs/register.ts";
+import { TeamModeToString } from "../../../shared/defs/types/misc.ts";
+import { MsgType, UpdatePassMsg } from "../../../shared/net/net.ts";
+import type { Game } from "./game.ts";
+import type { Player } from "./objects/player.ts";
 
 export class QuestManager {
     player: Player;
@@ -26,10 +26,9 @@ export class QuestManager {
         if (this.gameOverFlushed) return;
 
         const aliveCount = this.game.modeManager.aliveCount();
-        const teamRank =
-            winningTeamId !== undefined && winningTeamId == this.player.teamId
-                ? 1
-                : aliveCount + 1;
+        const teamRank = winningTeamId !== undefined && winningTeamId == this.player.teamId
+            ? 1
+            : aliveCount + 1;
 
         this.trackEvent("survived", { seconds: this.player.timeAlive });
         this.trackEvent("placement", {
@@ -39,7 +38,7 @@ export class QuestManager {
     }
 
     flushProgress(winningTeamId?: number) {
-        if (!this.player.userId || this.gameOverFlushed) return;
+        if (!this.player.client.userId || this.gameOverFlushed) return;
 
         this.trackGameOverQuests(winningTeamId);
 
@@ -55,17 +54,17 @@ export class QuestManager {
         if (progress.length === 0) return;
 
         if (!this.player.disconnected) {
-            this.player.sendMsg(MsgType.UpdatePass, new UpdatePassMsg());
+            this.player.client.sendMsg(MsgType.UpdatePass, new UpdatePassMsg());
         }
 
-        this.game.sendQuestProgress(this.player.userId, progress);
+        this.game.sendQuestProgress(this.player.client.userId, progress);
     }
 
     trackEvent<K extends keyof QuestEventPayloads>(
         payloadKey: K,
         payload: QuestEventPayloads[K],
     ): void {
-        if (!this.player.userId) return;
+        if (!this.player.client.userId) return;
         for (const quest of this.quests) {
             const def = QuestDefs[quest.id];
             if (!def || def.event !== payloadKey) continue;
@@ -111,7 +110,7 @@ export function questDelta<E extends keyof QuestEventPayloads>(
 
         case "damage": {
             const p = payload as QuestEventPayloads["damage"];
-            const weapDef = GameObjectDefs[p.weaponType];
+            const weapDef = GameObjectDefs.typeToDefSafe(p.weaponType);
             const ammo = weapDef?.type === "gun" ? weapDef.ammo : undefined;
 
             if (where?.ammo && ammo !== where.ammo) {
@@ -149,7 +148,7 @@ export function questDelta<E extends keyof QuestEventPayloads>(
 
         case "item_used": {
             const p = payload as QuestEventPayloads["item_used"];
-            const itemDef = GameObjectDefs[p.itemType];
+            const itemDef = GameObjectDefs.typeToDefSafe(p.itemType);
 
             if (where?.itemType && p.itemType !== where.itemType) {
                 return 0;
@@ -171,7 +170,7 @@ export function questDelta<E extends keyof QuestEventPayloads>(
                 return 0;
             }
 
-            const objectDef = MapObjectDefs[p.objectType] as ObstacleDef | undefined;
+            const objectDef = MapObjectDefs.typeToDefSafe(p.objectType) as ObstacleDef | undefined;
             if (objectDef?.obstacleType) {
                 value = objectDef.obstacleType === obstacleType ? 1 : 0;
                 break;

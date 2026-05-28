@@ -1,18 +1,18 @@
 import * as PIXI from "pixi.js-legacy";
-import { GameConfig, type Plane as PlaneType } from "../../../shared/gameConfig";
-import type { Plane as PlaneData, UpdateMsg } from "../../../shared/net/updateMsg";
-import { collider } from "../../../shared/utils/collider";
-import { math } from "../../../shared/utils/math";
-import { util } from "../../../shared/utils/util";
-import type { Vec2 } from "./../../../shared/utils/v2";
-import { v2 } from "../../../shared/utils/v2";
-import type { AudioManager } from "../audioManager";
-import type { Camera } from "../camera";
-import type { SoundHandle } from "../lib/createJS";
-import type { Map } from "../map";
-import type { Renderer } from "../renderer";
-import type { UiManager } from "../ui/ui";
-import type { Player } from "./player";
+import { GameConfig, type Plane as PlaneType } from "../../../shared/gameConfig.ts";
+import type { Plane as PlaneData, UpdateMsg } from "../../../shared/net/updateMsg.ts";
+import { collider } from "../../../shared/utils/collider.ts";
+import { math } from "../../../shared/utils/math.ts";
+import { util } from "../../../shared/utils/util.ts";
+import type { Vec2 } from "./../../../shared/utils/v2.ts";
+import { v2 } from "../../../shared/utils/v2.ts";
+import type { AudioManager } from "../audioManager.ts";
+import type { Camera } from "../camera.ts";
+import type { SoundHandle } from "../lib/createJS.ts";
+import type { Map } from "../map.ts";
+import type { Renderer } from "../renderer.ts";
+import type { UiManager } from "../ui/ui.ts";
+import type { Player } from "./player.ts";
 
 const planeElevateMult = 1.25;
 const planeAlpha = 0.75;
@@ -66,10 +66,9 @@ class Plane {
         this.spriteUpdateTime = 0;
 
         this.type = data.action;
-        this.config =
-            this.type == GameConfig.Plane.Airdrop
-                ? GameConfig.airdrop
-                : GameConfig.airstrike;
+        this.config = this.type == GameConfig.Plane.Airdrop
+            ? GameConfig.airdrop
+            : GameConfig.airstrike;
 
         this.rad = this.config.planeRad;
         switch (this.type) {
@@ -168,9 +167,8 @@ class AirstrikeZone {
             this.gfx.endFill();
         }
 
-        const alpha =
-            math.smoothstep(this.ticker, 0, 0.5) *
-            (1 - math.smoothstep(this.ticker, this.duration - 0.5, this.duration));
+        const alpha = math.smoothstep(this.ticker, 0, 0.5)
+            * (1 - math.smoothstep(this.ticker, this.duration - 0.5, this.duration));
         this.gfx.alpha = alpha;
     }
 }
@@ -263,10 +261,10 @@ export class PlaneBarn {
             if (p.active) {
                 let layer = 0;
                 if (
-                    (!!util.sameLayer(layer, activePlayer.layer) ||
-                        !!(activePlayer.layer & 2)) &&
-                    (!(activePlayer.layer & 2) ||
-                        !map.insideStructureMask(collider.createCircle(p.pos, 1)))
+                    (!!util.sameLayer(layer, activePlayer.layer)
+                        || !!(activePlayer.layer & 2))
+                    && (!(activePlayer.layer & 2)
+                        || !map.insideStructureMask(collider.createCircle(p.pos, 1)))
                 ) {
                     layer |= 2;
                 }
@@ -321,14 +319,13 @@ export class PlaneBarn {
                         const minDist = 150;
                         const maxSoundOffset = 2.25;
                         const distToCompare = math.max(minDist, distToPlane);
-                        offset =
-                            (1 -
-                                math.clamp(
-                                    math.max(0, distToCompare) / maxDistToOffset,
-                                    0,
-                                    1,
-                                )) *
-                            maxSoundOffset;
+                        offset = (1
+                            - math.clamp(
+                                math.max(0, distToCompare) / maxDistToOffset,
+                                0,
+                                1,
+                            ))
+                            * maxSoundOffset;
                     }
                     if (distToPlane < maxRange) {
                         p.soundInstance = this.audioManager.playSound(p.planeSound, {

@@ -1,15 +1,15 @@
 import * as PIXI from "pixi.js-legacy";
-import { math } from "../../../shared/utils/math";
-import { Ambiance } from "../../src/ambiance";
-import { AudioManager } from "../../src/audioManager";
-import { ConfigManager } from "../../src/config";
-import { device } from "../../src/device";
-import { InputHandler } from "../../src/input";
-import { InputBinds } from "../../src/inputBinds";
-import { ResourceManager } from "../../src/resources";
-import { Localization } from "../../src/ui/localization";
-import { EditorDisplay } from "./editorDisplay";
-import { EditorUi } from "./editorUi";
+import { math } from "../../../shared/utils/math.ts";
+import { Ambiance } from "../../src/ambiance.ts";
+import { AudioManager } from "../../src/audioManager.ts";
+import { ConfigManager } from "../../src/config.ts";
+import { device } from "../../src/device.ts";
+import { InputHandler } from "../../src/input.ts";
+import { InputBinds } from "../../src/inputBinds.ts";
+import { ResourceManager } from "../../src/resources.ts";
+import { Localization } from "../../src/ui/localization.ts";
+import { EditorDisplay } from "./editorDisplay.ts";
+import { EditorUi } from "./editorUi.ts";
 
 // we dont really need sounds
 // and loading them slows down page loading a lot
@@ -49,7 +49,7 @@ class Application {
     active = false;
     hasFocus = true;
 
-    contextListener = function (e: MouseEvent) {
+    contextListener = function(e: MouseEvent) {
         e.preventDefault();
     };
 
@@ -70,8 +70,7 @@ class Application {
     tryLoad() {
         if (this.domContentLoaded && this.configLoaded && !this.initialized) {
             this.initialized = true;
-            const language =
-                this.config.get("language") || this.localization.detectLocale();
+            const language = this.config.get("language") || this.localization.detectLocale();
             this.config.set("language", language);
             this.localization.setLocale(language);
             this.localization.populateLanguageSelect();

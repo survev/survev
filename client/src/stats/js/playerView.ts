@@ -1,7 +1,7 @@
 import $ from "jquery";
-import { EmotesDefs } from "../../../../shared/defs/gameObjects/emoteDefs";
-import { TeamModeToString } from "../../../../shared/defs/types/misc";
-import type { TeamMode } from "../../../../shared/gameConfig";
+import { EmotesDefs } from "../../../../shared/defs/gameObjects/emoteDefs.ts";
+import { TeamModeToString } from "../../../../shared/defs/types/misc.ts";
+import type { TeamMode } from "../../../../shared/gameConfig.ts";
 import {
     ALL_MAPS,
     ALL_TEAM_MODES,
@@ -14,11 +14,11 @@ import {
     type MatchHistoryResponse,
     type UserStatsRequest,
     type UserStatsResponse,
-} from "../../../../shared/types/stats";
-import { api } from "../../api";
-import { device } from "../../device";
-import { helpers } from "../../helpers";
-import type { App } from "./app";
+} from "../../../../shared/types/stats.ts";
+import { api } from "../../api.ts";
+import { device } from "../../device.ts";
+import { helpers } from "../../helpers.ts";
+import type { App } from "./app.ts";
 import loading from "./templates/loading.ejs";
 import matchData from "./templates/matchData.ejs";
 import matchHistory from "./templates/matchHistory.ejs";
@@ -64,8 +64,7 @@ function getPlayerCardData(
     let tmpSlug = userData.slug.toLowerCase();
     tmpSlug = tmpSlug.replace(userData.username.toLowerCase(), "");
 
-    const tmpslugToShow =
-        tmpSlug != "" ? `${userData.username}#${tmpSlug}` : userData.username;
+    const tmpslugToShow = tmpSlug != "" ? `${userData.username}#${tmpSlug}` : userData.username;
 
     const profile = {
         username: userData.username,
@@ -297,8 +296,7 @@ export class PlayerView {
 
                 for (let i = 0; i < games.length; i++) {
                     // @ts-expect-error string or number, IT STILL WORKS
-                    games[i].team_mode =
-                        TeamModeToString[games[i].team_mode as unknown as TeamMode];
+                    games[i].team_mode = TeamModeToString[games[i].team_mode as unknown as TeamMode];
 
                     const gameMode = gameModes.find((x) => x.mapId == games[i].map_id);
                     games[i].icon = gameMode ? gameMode.desc.icon : "";

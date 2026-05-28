@@ -1,19 +1,20 @@
 import * as PIXI from "pixi.js-legacy";
-import { MapObjectDefs } from "../../../shared/defs/mapObjectDefs";
-import type { DecalDef } from "../../../shared/defs/mapObjectsTyping";
-import type { ObjectData, ObjectType } from "../../../shared/net/objectSerializeFns";
-import type { Collider } from "../../../shared/utils/coldet";
-import { collider } from "../../../shared/utils/collider";
-import { math } from "../../../shared/utils/math";
-import { util } from "../../../shared/utils/util";
-import { type Vec2, v2 } from "../../../shared/utils/v2";
-import type { Camera } from "../camera";
-import type { DebugRenderOpts } from "../config";
-import type { Ctx } from "../game";
-import type { Map } from "../map";
-import type { Renderer } from "../renderer";
-import { Pool } from "./objectPool";
-import type { AbstractObject } from "./player";
+
+import type { DecalDef } from "../../../shared/defs/mapObjectsTyping.ts";
+import { MapObjectDefs } from "../../../shared/defs/register.ts";
+import type { ObjectData, ObjectType } from "../../../shared/net/objectSerializeFns.ts";
+import type { Collider } from "../../../shared/utils/coldet.ts";
+import { collider } from "../../../shared/utils/collider.ts";
+import { math } from "../../../shared/utils/math.ts";
+import { util } from "../../../shared/utils/util.ts";
+import { v2, type Vec2 } from "../../../shared/utils/v2.ts";
+import type { Camera } from "../camera.ts";
+import type { DebugRenderOpts } from "../config.ts";
+import type { Ctx } from "../game.ts";
+import type { Map } from "../map.ts";
+import type { Renderer } from "../renderer.ts";
+import { Pool } from "./objectPool.ts";
+import type { AbstractObject } from "./player.ts";
 
 function lerpColor(t: number, a: number, b: number) {
     // util.lerpColor is relatively expensive; avoid if it possible
@@ -59,7 +60,7 @@ class Decal implements AbstractObject {
         ctx: Ctx,
     ) {
         if (fullUpdate) {
-            const def = MapObjectDefs[data.type] as DecalDef;
+            const def = MapObjectDefs.typeToDef(data.type, "decal");
 
             // Copy data
             this.type = data.type;
@@ -90,7 +91,7 @@ class Decal implements AbstractObject {
 
     update(dt: number) {
         if (this.hasGore) {
-            const def = MapObjectDefs[this.type] as DecalDef;
+            const def = MapObjectDefs.typeToDef(this.type, "decal");
             let goreTarget = math.delerp(
                 this.goreKills,
                 def.gore?.fade.start!,
@@ -165,7 +166,7 @@ class DecalRender {
     }
 
     init(decal: Decal, map: Map) {
-        const def = MapObjectDefs[decal.type] as DecalDef;
+        const def = MapObjectDefs.typeToDef(decal.type, "decal");
 
         this.pos = v2.copy(decal.pos);
         this.rot = decal.rot;

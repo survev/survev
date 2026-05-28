@@ -1,17 +1,16 @@
-import { GameObjectDefs } from "../../../../shared/defs/gameObjectDefs";
-import type { ExplosionDef } from "../../../../shared/defs/gameObjects/explosionsDefs";
-import { PerkProperties } from "../../../../shared/defs/gameObjects/perkDefs";
-import { ObjectType } from "../../../../shared/net/objectSerializeFns";
-import { coldet } from "../../../../shared/utils/coldet";
-import { collider } from "../../../../shared/utils/collider";
-import { math } from "../../../../shared/utils/math";
-import { assert, util } from "../../../../shared/utils/util";
-import { type Vec2, v2 } from "../../../../shared/utils/v2";
-import type { Game } from "../game";
-import type { DamageParams, GameObject } from "./gameObject";
-import { EXPLOSION_LOOT_PUSH_FORCE, type Loot } from "./loot";
-import type { Obstacle } from "./obstacle";
-import type { Player } from "./player";
+import { PerkProperties } from "../../../../shared/defs/gameObjects/perkDefs.ts";
+import { GameObjectDefs } from "../../../../shared/defs/register.ts";
+import { ObjectType } from "../../../../shared/net/objectSerializeFns.ts";
+import { coldet } from "../../../../shared/utils/coldet.ts";
+import { collider } from "../../../../shared/utils/collider.ts";
+import { math } from "../../../../shared/utils/math.ts";
+import { util } from "../../../../shared/utils/util.ts";
+import { v2, type Vec2 } from "../../../../shared/utils/v2.ts";
+import type { Game } from "../game.ts";
+import type { DamageParams, GameObject } from "./gameObject.ts";
+import { EXPLOSION_LOOT_PUSH_FORCE, type Loot } from "./loot.ts";
+import type { Obstacle } from "./obstacle.ts";
+import type { Player } from "./player.ts";
 
 interface LineCollision {
     obj: GameObject;
@@ -34,7 +33,7 @@ export class ExplosionBarn {
     }
 
     explode(explosion: Explosion) {
-        const def = GameObjectDefs[explosion.type] as ExplosionDef;
+        const def = GameObjectDefs.typeToDef(explosion.type, "explosion");
 
         if (def.decalType) {
             this.game.decalBarn.addDecal(
@@ -62,9 +61,9 @@ export class ExplosionBarn {
             if ((obj as { dead?: boolean }).dead) return false;
             if (
                 !(
-                    obj.__type === ObjectType.Player ||
-                    obj.__type === ObjectType.Obstacle ||
-                    obj.__type === ObjectType.Loot
+                    obj.__type === ObjectType.Player
+                    || obj.__type === ObjectType.Obstacle
+                    || obj.__type === ObjectType.Loot
                 )
             ) {
                 return false;
@@ -130,19 +129,19 @@ export class ExplosionBarn {
                 }
 
                 if (
-                    obj.__type === ObjectType.Obstacle &&
-                    obj.collidable &&
-                    obj.height > 0.5
-                )
+                    obj.__type === ObjectType.Obstacle
+                    && obj.collidable
+                    && obj.height > 0.5
+                ) {
                     break;
+                }
             }
         }
 
-        const sourcePlayer =
-            explosion.damageParams.source &&
-            explosion.damageParams.source.__type === ObjectType.Player
-                ? explosion.damageParams.source
-                : undefined;
+        const sourcePlayer = explosion.damageParams.source
+                && explosion.damageParams.source.__type === ObjectType.Player
+            ? explosion.damageParams.source
+            : undefined;
 
         const hasAmped = sourcePlayer?.hasPerk?.("amped_explosives");
 
@@ -158,7 +157,7 @@ export class ExplosionBarn {
 
         const shrapnelCount = Math.ceil((def.shrapnelCount ?? 0) * shrapnelCountMult);
 
-        const bulletDef = GameObjectDefs[def.shrapnelType];
+        const bulletDef = GameObjectDefs.typeToDefSafe(def.shrapnelType);
         if (bulletDef && bulletDef.type === "bullet") {
             for (let i = 0, count = shrapnelCount; i < count; i++) {
                 this.game.bulletBarn.fireBullet({
@@ -183,7 +182,7 @@ export class ExplosionBarn {
     damageObject(explosion: Explosion, collision: LineCollision) {
         const dist = collision.distance;
         const obj = collision.obj;
-        const def = GameObjectDefs[explosion.type] as ExplosionDef;
+        const def = GameObjectDefs.typeToDef(explosion.type, "explosion");
 
         if (obj.__type === ObjectType.Loot) {
             obj.push(
@@ -206,10 +205,9 @@ export class ExplosionBarn {
         }
 
         if (obj.__type == ObjectType.Player) {
-            const isSourceTeammate =
-                explosion.damageParams.source &&
-                explosion.damageParams.source.__type == ObjectType.Player &&
-                explosion.damageParams.source.teamId == obj.teamId;
+            const isSourceTeammate = explosion.damageParams.source
+                && explosion.damageParams.source.__type == ObjectType.Player
+                && explosion.damageParams.source.teamId == obj.teamId;
 
             if (def.healTeam && isSourceTeammate) {
                 const healAmount = def.healAmount ?? 5; // default to 5 if healValue is not defined
@@ -223,8 +221,7 @@ export class ExplosionBarn {
                     const playerRot = Math.atan2(obj.dir.y, obj.dir.x);
                     const collRot = -Math.atan2(collision.dir.y, collision.dir.x);
 
-                    const ori =
-                        (math.radToOri(playerRot) + math.radToOri(collRot) + 2) % 4;
+                    const ori = (math.radToOri(playerRot) + math.radToOri(collRot) + 2) % 4;
 
                     obj.freeze(explosion.type, ori, def.freezeDuration);
                 }
@@ -266,8 +263,7 @@ export class ExplosionBarn {
         layer: number,
         damageParams: Omit<DamageParams, "damage" | "dir">,
     ) {
-        const def = GameObjectDefs[type];
-        assert(def.type === "explosion", `Invalid explosion with type ${type}`);
+        const def = GameObjectDefs.typeToDef(type, "explosion");
 
         const explosion: Explosion = {
             rad: def.rad.max,

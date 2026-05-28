@@ -1,8 +1,8 @@
-import { api } from "./api";
+import { api } from "./api.ts";
 
 class ErrorLog {
     private requests = 0;
-    private enabled = true || import.meta.env.PROD;
+    private enabled = true;
     private throttle = false;
     private throttleTimeout = 0;
     private errorLogCount = 0;

@@ -1,17 +1,10 @@
 import { asc, eq } from "drizzle-orm";
 import { Hono } from "hono";
-import {
-    type MatchDataResponse,
-    zMatchDataRequest,
-} from "../../../../../shared/types/stats";
-import type { Context } from "../..";
-import {
-    databaseEnabledMiddleware,
-    rateLimitMiddleware,
-    validateParams,
-} from "../../auth/middleware";
-import { db } from "../../db";
-import { matchDataTable, usersTable } from "../../db/schema";
+import { type MatchDataResponse, zMatchDataRequest } from "../../../../../shared/types/stats.ts";
+import { databaseEnabledMiddleware, rateLimitMiddleware, validateParams } from "../../auth/middleware.ts";
+import { db } from "../../db/index.ts";
+import { matchDataTable, usersTable } from "../../db/schema.ts";
+import type { Context } from "../../index.ts";
 
 export const matchDataRouter = new Hono<Context>();
 

@@ -1,6 +1,6 @@
-import { math } from "../../shared/utils/math";
-import type { AudioManager } from "./audioManager";
-import type { SoundHandle } from "./lib/createJS";
+import { math } from "../../shared/utils/math.ts";
+import type { AudioManager } from "./audioManager.ts";
+import type { SoundHandle } from "./lib/createJS.ts";
 
 export class Ambiance {
     introMusic = true;
@@ -88,9 +88,9 @@ export class Ambiance {
             // Start sound if it's loaded
 
             if (
-                !track.inst &&
-                track.sound &&
-                audioManager.isSoundLoaded(track.sound, track.channel)
+                !track.inst
+                && track.sound
+                && audioManager.isSoundLoaded(track.sound, track.channel)
             ) {
                 console.log("Start track", track.sound, track.channel);
                 track.inst = audioManager.playSound(track.sound, {
@@ -123,9 +123,9 @@ export class Ambiance {
             // Stop sound if it's no longer set and audible, or
             // of the track name has changed
             if (
-                track.inst &&
-                ((!track.sound && math.eqAbs(audioManager.getVolume(track.inst), 0)) ||
-                    (track.sound && track.sound != track.instSound))
+                track.inst
+                && ((!track.sound && math.eqAbs(audioManager.getVolume(track.inst), 0))
+                    || (track.sound && track.sound != track.instSound))
             ) {
                 console.log("Stop track", track.name, track.channel);
                 audioManager.stopSound(track.inst);

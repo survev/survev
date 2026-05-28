@@ -1,9 +1,9 @@
 import NanoTimer from "nanotimer";
 import { platform } from "os";
-import { Config } from "../config";
-import { logErrorToWebhook } from "../utils/serverHelpers";
-import { type ProcessMsg, ProcessMsgType } from "../utils/types";
-import { Game } from "./game";
+import { Config } from "../config.ts";
+import { logErrorToWebhook } from "../utils/serverHelpers.ts";
+import { type ProcessMsg, ProcessMsgType } from "../utils/types.ts";
+import { Game } from "./game.ts";
 
 let game: Game | undefined;
 
@@ -68,10 +68,10 @@ process.on("message", async (msg: ProcessMsg) => {
             break;
         case ProcessMsgType.SocketMsg:
             const sMsg = msg.msgs[0];
-            game.handleMsg(sMsg.data as ArrayBuffer, sMsg.socketId, sMsg.ip);
+            game.clientBarn.handleMsg(sMsg.data as ArrayBuffer, sMsg.socketId, sMsg.ip);
             break;
         case ProcessMsgType.SocketClose:
-            game.handleSocketClose(msg.socketId);
+            game.clientBarn.handleSocketClose(msg.socketId);
             break;
     }
 });

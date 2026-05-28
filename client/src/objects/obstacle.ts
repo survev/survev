@@ -1,21 +1,21 @@
 import * as PIXI from "pixi.js-legacy";
-import { MapObjectDefs } from "../../../shared/defs/mapObjectDefs";
-import type { ObstacleDef } from "../../../shared/defs/mapObjectsTyping";
-import type { ObjectData, ObjectType } from "../../../shared/net/objectSerializeFns";
-import type { Collider } from "../../../shared/utils/coldet";
-import { collider } from "../../../shared/utils/collider";
-import { math } from "../../../shared/utils/math";
-import { util } from "../../../shared/utils/util";
-import { type Vec2, v2 } from "../../../shared/utils/v2";
-import type { AudioManager } from "../audioManager";
-import type { Camera } from "../camera";
-import type { DebugRenderOpts } from "../config";
-import { debugLines } from "../debug/debugLines";
-import type { Ctx } from "../game";
-import type { Map } from "../map";
-import type { Renderer } from "../renderer";
-import type { Emitter, ParticleBarn } from "./particles";
-import type { AbstractObject, Player, PlayerBarn } from "./player";
+
+import { MapObjectDefs } from "../../../shared/defs/register.ts";
+import type { ObjectData, ObjectType } from "../../../shared/net/objectSerializeFns.ts";
+import type { Collider } from "../../../shared/utils/coldet.ts";
+import { collider } from "../../../shared/utils/collider.ts";
+import { math } from "../../../shared/utils/math.ts";
+import { assert, util } from "../../../shared/utils/util.ts";
+import { v2, type Vec2 } from "../../../shared/utils/v2.ts";
+import type { AudioManager } from "../audioManager.ts";
+import type { Camera } from "../camera.ts";
+import type { DebugRenderOpts } from "../config.ts";
+import { debugLines } from "../debug/debugLines.ts";
+import type { Ctx } from "../game.ts";
+import type { Map } from "../map.ts";
+import type { Renderer } from "../renderer.ts";
+import type { Emitter, ParticleBarn } from "./particles.ts";
+import type { AbstractObject, Player, PlayerBarn } from "./player.ts";
 
 interface ObstacleSprite extends PIXI.Sprite {
     zIdx: number;
@@ -148,7 +148,7 @@ export class Obstacle implements AbstractObject {
                 this.skinPlayerId = data.skinPlayerId!;
             }
         }
-        const def = MapObjectDefs[this.type] as ObstacleDef;
+        const def = MapObjectDefs.typeToDef(this.type, "obstacle");
 
         if (!v2.eq(data.pos, this.visualPosOld)) {
             this.visualPosOld = v2.copy(isNew ? data.pos : this.pos);
@@ -175,19 +175,20 @@ export class Obstacle implements AbstractObject {
             this.isBush = !!def.isBush;
             this.isDoor = def.door !== undefined;
             if (this.isDoor) {
+                assert(def.door && data.door);
                 this.door = {
-                    openOneWay: def.door?.openOneWay!,
+                    openOneWay: def.door.openOneWay,
                     closedPos: v2.copy(data.pos),
-                    autoOpen: def.door?.autoOpen!,
-                    interactionRad: def.door?.interactionRad!,
-                    interpSpeed: def.door?.openSpeed!,
+                    autoOpen: def.door.autoOpen,
+                    interactionRad: def.door.interactionRad,
+                    interpSpeed: def.door.openSpeed,
                     interpPos: v2.copy(data.pos),
                     interpRot: math.oriToRad(data.ori),
-                    seq: data.door?.seq!,
-                    seqOld: data.door?.seq!,
-                    open: data.door?.open!,
-                    wasOpen: data.door?.open!,
-                    locked: data.door?.locked!,
+                    seq: data.door.seq,
+                    seqOld: data.door.seq,
+                    open: data.door.open,
+                    wasOpen: data.door.open,
+                    locked: data.door.locked,
                     casingSprite: null,
                 };
                 const casingImgDef = def.door?.casingImg;
@@ -207,13 +208,14 @@ export class Obstacle implements AbstractObject {
             }
             this.isButton = def.button !== undefined;
             if (this.isButton) {
+                assert(def.button && data.button);
                 this.button = {
-                    interactionRad: def.button?.interactionRad!,
-                    interactionText: def.button?.interactionText || "game-use",
-                    seq: data.button?.seq!,
-                    seqOld: data.button?.seq!,
-                    roleToPromote: def.button?.roleToPromote,
-                    isVat: def.button?.isVat,
+                    interactionRad: def.button.interactionRad,
+                    interactionText: def.button.interactionText || "game-use",
+                    seq: data.button.seq,
+                    seqOld: data.button.seq,
+                    roleToPromote: def.button.roleToPromote,
+                    isVat: def.button.isVat,
                 };
             }
             this.isPuzzlePiece = data.isPuzzlePiece;
@@ -230,27 +232,29 @@ export class Obstacle implements AbstractObject {
             }
         }
         if (this.isDoor && fullUpdate) {
-            this.door.canUse = data.door?.canUse;
-            this.door.open = data.door?.open!;
-            this.door.seq = data.door?.seq!;
+            assert(data.door && def.door);
+            this.door.canUse = data.door.canUse;
+            this.door.open = data.door.open;
+            this.door.seq = data.door.seq;
             const u = v2.rotate(
-                v2.create(def.door?.slideOffset!, 0),
+                v2.create(def.door?.slideOffset, 0),
                 this.rot + Math.PI * 0.5,
             );
-            this.door.closedPos = data.door?.open
+            this.door.closedPos = data.door.open
                 ? v2.add(data.pos, u)
                 : v2.copy(data.pos);
         }
         if (this.isButton && fullUpdate) {
-            this.button.onOff = data.button?.onOff;
-            this.button.canUse = data.button?.canUse;
-            this.button.seq = data.button?.seq!;
+            assert(data.button);
+            this.button.onOff = data.button.onOff;
+            this.button.canUse = data.button.canUse;
+            this.button.seq = data.button.seq;
         }
         if (
-            def.explosion !== undefined &&
-            !this.smokeEmitter &&
-            data.healthT < 0.5 &&
-            !data.dead
+            def.explosion !== undefined
+            && !this.smokeEmitter
+            && data.healthT < 0.5
+            && !data.dead
         ) {
             const g = v2.normalize(v2.create(1, 1));
             this.smokeEmitter = ctx.particleBarn.addEmitter("smoke_barrel", {
@@ -269,15 +273,14 @@ export class Obstacle implements AbstractObject {
         if (w != this.img) {
             let f = v2.create(0.5, 0.5);
             if (this.isDoor) {
-                f = def.door?.spriteAnchor!;
+                f = def.door!.spriteAnchor;
             }
             const _ = w !== undefined;
             if (!_) {
                 this.sprite.parent?.removeChild(this.sprite);
             }
             if (_) {
-                this.sprite.texture =
-                    w == "none" || !w ? PIXI.Texture.EMPTY : PIXI.Texture.from(w);
+                this.sprite.texture = w == "none" || !w ? PIXI.Texture.EMPTY : PIXI.Texture.from(w);
                 this.sprite.anchor.set(f.x, f.y);
                 this.sprite.tint = def.img.tint!;
                 this.sprite.imgAlpha = this.dead ? 0.75 : def.img.alpha!;
@@ -298,8 +301,8 @@ export class Obstacle implements AbstractObject {
     getInteraction(player: Player) {
         if (this.isButton && this.button.canUse) {
             if (
-                this.button.roleToPromote &&
-                this.button.roleToPromote === player.m_netData.m_role
+                this.button.roleToPromote
+                && this.button.roleToPromote === player.m_netData.m_role
             ) {
                 return null;
             }
@@ -332,7 +335,7 @@ export class Obstacle implements AbstractObject {
         if (this.isButton) {
             const button = this.button;
             if (button.seq != button.seqOld) {
-                const def = MapObjectDefs[this.type] as ObstacleDef;
+                const def = MapObjectDefs.typeToDef(this.type, "obstacle");
                 if (def.button?.useParticle) {
                     const aabb = collider.toAabb(this.collider);
                     const extent = v2.mul(v2.sub(aabb.max, aabb.min), 0.5);
@@ -386,7 +389,7 @@ export class Obstacle implements AbstractObject {
 
             // Door begin state change sound
             if (door.seq != door.seqOld) {
-                const def = MapObjectDefs[this.type] as ObstacleDef;
+                const def = MapObjectDefs.typeToDef(this.type, "obstacle");
                 const sound = def.door?.sound.change || "";
                 if (sound != "") {
                     audioManager.playSound(sound, {
@@ -401,7 +404,7 @@ export class Obstacle implements AbstractObject {
 
             // Open/close sounds
             if (door.open != door.wasOpen) {
-                const C = MapObjectDefs[this.type] as ObstacleDef;
+                const C = MapObjectDefs.typeToDef(this.type, "obstacle");
                 const A = door.open ? C.door?.sound.open! : C.door?.sound.close!;
                 audioManager.playSound(A, {
                     channel: "sfx",
@@ -421,7 +424,7 @@ export class Obstacle implements AbstractObject {
             }
 
             if (!this.isNew) {
-                const def = MapObjectDefs[this.type] as ObstacleDef;
+                const def = MapObjectDefs.typeToDef(this.type, "obstacle");
 
                 // Destroy effect
                 const aabb = collider.toAabb(this.collider);
@@ -432,12 +435,12 @@ export class Obstacle implements AbstractObject {
                     const vel = v2.mul(v2.randomUnit(), util.random(5, 15));
                     const particle = Array.isArray(this.explodeParticle)
                         ? this.explodeParticle[
-                              Math.floor(Math.random() * this.explodeParticle.length)
-                          ]
+                            Math.floor(Math.random() * this.explodeParticle.length)
+                        ]
                         : this.explodeParticle;
                     particleBarn.addParticle(particle, this.layer, center, vel);
                 }
-                audioManager.playSound(def.sound?.explode!, {
+                audioManager.playSound(def.sound.explode!, {
                     channel: "sfx",
                     soundPos: center,
                     layer: this.layer,
@@ -523,7 +526,7 @@ export class Obstacle implements AbstractObject {
         }
 
         if (IS_DEV && debug.obstacles && util.sameLayer(layer, this.layer)) {
-            const def = MapObjectDefs[this.type] as ObstacleDef;
+            const def = MapObjectDefs.typeToDef(this.type, "obstacle");
 
             const color = def.collidable ? 0xff0000 : 0xffff00;
             debugLines.addCollider(this.collider, color, 0.1);

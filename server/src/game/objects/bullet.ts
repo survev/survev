@@ -1,23 +1,17 @@
-import { GameObjectDefs } from "../../../../shared/defs/gameObjectDefs";
-import {
-    type BulletDef,
-    BulletDefs,
-} from "../../../../shared/defs/gameObjects/bulletDefs";
-import { PerkProperties } from "../../../../shared/defs/gameObjects/perkDefs";
-import { MapObjectDefs } from "../../../../shared/defs/mapObjectDefs";
-import type { ObstacleDef } from "../../../../shared/defs/mapObjectsTyping";
-import { type DamageType, GameConfig } from "../../../../shared/gameConfig";
-import { Constants } from "../../../../shared/net/net";
-import { ObjectType } from "../../../../shared/net/objectSerializeFns";
-import { coldet } from "../../../../shared/utils/coldet";
-import { collider } from "../../../../shared/utils/collider";
-import { math } from "../../../../shared/utils/math";
-import { util } from "../../../../shared/utils/util";
-import { type Vec2, v2 } from "../../../../shared/utils/v2";
-import type { Game } from "../game";
-import type { DamageParams, GameObject } from "./gameObject";
-import type { Obstacle } from "./obstacle";
-import type { Player } from "./player";
+import { PerkProperties } from "../../../../shared/defs/gameObjects/perkDefs.ts";
+import { GameObjectDefs, MapObjectDefs } from "../../../../shared/defs/register.ts";
+import { type DamageType, GameConfig } from "../../../../shared/gameConfig.ts";
+import { Constants } from "../../../../shared/net/net.ts";
+import { ObjectType } from "../../../../shared/net/objectSerializeFns.ts";
+import { coldet } from "../../../../shared/utils/coldet.ts";
+import { collider } from "../../../../shared/utils/collider.ts";
+import { math } from "../../../../shared/utils/math.ts";
+import { util } from "../../../../shared/utils/util.ts";
+import { v2, type Vec2 } from "../../../../shared/utils/v2.ts";
+import type { Game } from "../game.ts";
+import type { DamageParams, GameObject } from "./gameObject.ts";
+import type { Obstacle } from "./obstacle.ts";
+import type { Player } from "./player.ts";
 
 // NOTE: most of this code was copied from surviv client and bit heroes arena client
 // to get bullet collision the most accurate possible
@@ -119,7 +113,7 @@ export class BulletBarn {
 
         this.newBullets.push(bullet);
 
-        const bulletDef = GameObjectDefs[params.bulletType] as BulletDef;
+        const bulletDef = GameObjectDefs.typeToDef(params.bulletType, "bullet");
         if (bulletDef.addFlare) {
             this.game.planeBarn.addAirdrop(params.pos);
         }
@@ -169,6 +163,8 @@ export class Bullet {
     damageSelf!: boolean;
     damage!: number;
     damageMult!: number;
+    obstacleDamageMult!: number;
+    falloff!: number;
     hasModifier!: boolean;
     speedMult!: number;
     distanceMult!: number;
@@ -190,7 +186,7 @@ export class Bullet {
         this.sentToClient = false;
         // this.serialized = false; // TODO: cache bullet serialization?
 
-        const bulletDef = GameObjectDefs[params.bulletType] as BulletDef;
+        const bulletDef = GameObjectDefs.typeToDef(params.bulletType, "bullet");
 
         const variance = 1 + (params.varianceT ?? 1) * bulletDef.variance;
 
@@ -230,9 +226,8 @@ export class Bullet {
             : distAdjIdxMax / 2;
         const distAdj = math.remap(distAdjIdx, 0, distAdjIdxMax, -1.0, 1.0);
 
-        let distance =
-            bulletDef.distance /
-            Math.pow(GameConfig.bullet.reflectDistDecay, this.reflectCount);
+        let distance = bulletDef.distance
+            / Math.pow(GameConfig.bullet.reflectDistDecay, this.reflectCount);
         if (params.clipDistance) {
             distance = math.min(
                 bulletDef.distance * (params.distanceMult ?? 1),
@@ -270,17 +265,18 @@ export class Bullet {
         this.damage = bulletDef.damage * this.damageMult;
         this.skipCollision = !!bulletDef.skipCollision;
         this.isShrapnel = bulletDef.shrapnel;
+        this.falloff = bulletDef.falloff;
+        this.obstacleDamageMult = bulletDef.obstacleDamage;
 
         this.damageSelf = this.reflectCount > 0 || this.isShrapnel;
-        this.hasSpecialFx =
-            this.shotAlt ||
-            this.splinter ||
-            this.apRounds ||
-            this.highVelocity ||
-            this.combatStims ||
-            this.trailSaturated ||
-            this.trailSmall ||
-            this.trailThick;
+        this.hasSpecialFx = this.shotAlt
+            || this.splinter
+            || this.apRounds
+            || this.highVelocity
+            || this.combatStims
+            || this.trailSaturated
+            || this.trailSmall
+            || this.trailThick;
 
         const nearbyObjs = this.bulletManager.game.grid.intersectLineSegment(
             this.pos,
@@ -297,11 +293,11 @@ export class Bullet {
             const obj = nearbyObjs[i] as Obstacle;
 
             if (
-                obj.__type !== ObjectType.Obstacle ||
-                obj.dead ||
-                obj.height < GameConfig.bullet.height ||
-                !util.sameLayer(obj.layer, this.layer) ||
-                obj.__id === this.reflectObjId
+                obj.__type !== ObjectType.Obstacle
+                || obj.dead
+                || obj.height < GameConfig.bullet.height
+                || !util.sameLayer(obj.layer, this.layer)
+                || obj.__id === this.reflectObjId
             ) {
                 continue;
             }
@@ -380,7 +376,7 @@ export class Bullet {
         }
 
         if (!this.alive && !this.reflected && this.onHitFx) {
-            const def = GameObjectDefs[this.bulletType] as BulletDef;
+            const def = GameObjectDefs.typeToDef(this.bulletType, "bullet");
             // explosion_rounds_sg has lower volume and is used for shotguns
             // since they spawn a bunch of explosions at once
             if (this.onHitFx === "explosion_rounds" && def.useExplosiveRoundsAlt) {
@@ -425,10 +421,10 @@ export class Bullet {
 
             if (obj.__type === ObjectType.Obstacle) {
                 if (
-                    obj.dead ||
-                    !util.sameLayer(obj.layer, this.layer) ||
-                    obj.height < GameConfig.bullet.height ||
-                    obj.__id === this.reflectObjId
+                    obj.dead
+                    || !util.sameLayer(obj.layer, this.layer)
+                    || obj.height < GameConfig.bullet.height
+                    || obj.__id === this.reflectObjId
                 ) {
                     continue;
                 }
@@ -448,20 +444,20 @@ export class Bullet {
             } else if (obj.__type === ObjectType.Player) {
                 if (
                     !(
-                        !obj.dead &&
-                        (util.sameLayer(obj.layer, this.layer) || 2 & obj.layer) &&
-                        (obj.__id !== this.playerId || this.damageSelf) &&
-                        obj.__id !== this.reflectObjId
+                        !obj.dead
+                        && (util.sameLayer(obj.layer, this.layer) || 2 & obj.layer)
+                        && (obj.__id !== this.playerId || this.damageSelf)
+                        && obj.__id !== this.reflectObjId
                     )
                 ) {
                     continue;
                 }
 
                 if (
-                    obj.hasPerk("windwalk") &&
-                    obj.hasteType != GameConfig.HasteType.Windwalk && // can't stack windwalk
-                    v2.distance(this.pos, obj.pos) <= 5 &&
-                    this.player?.teamId !== obj.teamId // bullet shooter or its teammates cant give the shooter winwalk
+                    obj.hasPerk("windwalk")
+                    && obj.hasteType != GameConfig.HasteType.Windwalk // can't stack windwalk
+                    && v2.distance(this.pos, obj.pos) <= 5
+                    && this.player?.teamId !== obj.teamId // bullet shooter or its teammates cant give the shooter winwalk
                 ) {
                     obj.giveHaste(GameConfig.HasteType.Windwalk, 3);
                 }
@@ -516,10 +512,10 @@ export class Bullet {
                     obj.rad,
                 );
                 if (
-                    collision &&
-                    (!panCollision ||
-                        v2.lengthSqr(v2.sub(collision.point, this.startPos)) <
-                            v2.lengthSqr(v2.sub(panCollision.point, this.startPos)))
+                    collision
+                    && (!panCollision
+                        || v2.lengthSqr(v2.sub(collision.point, this.startPos))
+                            < v2.lengthSqr(v2.sub(panCollision.point, this.startPos)))
                 ) {
                     collisions.push({
                         type: "player",
@@ -578,9 +574,8 @@ export class Bullet {
         finalDamage *= 1 / (this.reflectCount + 1);
 
         if (GameConfig.bullet.falloff) {
-            const def = BulletDefs[this.bulletType];
             const distT = math.clamp(this.distanceTraveled / this.distance, 0, 1);
-            const falloff = math.remap(distT, 0, 1, 1, def.falloff);
+            const falloff = math.remap(distT, 0, 1, 1, this.falloff);
             finalDamage *= falloff;
         }
 
@@ -588,11 +583,10 @@ export class Bullet {
             const col = collisions[i];
 
             if (col.type == "obstacle") {
-                const mapDef = MapObjectDefs[col.obstacleType!] as ObstacleDef;
+                const mapDef = MapObjectDefs.typeToDef(col.obstacleType!, "obstacle");
 
-                const def = GameObjectDefs[this.bulletType] as BulletDef;
                 // AP Obstacle Multiplier Buff
-                let obstacleMult = def.obstacleDamage;
+                let obstacleMult = this.obstacleDamageMult;
                 if (this.apRounds) {
                     obstacleMult *= PerkProperties.ap_rounds.obstacleMult;
                 }
@@ -616,8 +610,7 @@ export class Bullet {
                 hit = col.collidable;
             } else if (col.type == "player") {
                 if (!shooterDead) {
-                    const isHighValueTarget =
-                        this.player?.hasPerk("targeting") && col.player!.perks.length;
+                    const isHighValueTarget = this.player?.hasPerk("targeting") && col.player!.perks.length;
 
                     let multiplier = 1;
                     if (isHighValueTarget) {
@@ -663,9 +656,8 @@ export class Bullet {
 
         let distance = this.distance;
         if (this.clipDistance) {
-            distance =
-                math.max(1, this.distance - this.distanceTraveled) /
-                Math.pow(GameConfig.bullet.reflectDistDecay, this.reflectCount);
+            distance = math.max(1, this.distance - this.distanceTraveled)
+                / Math.pow(GameConfig.bullet.reflectDistDecay, this.reflectCount);
         }
 
         this.bulletManager.fireBullet({

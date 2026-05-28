@@ -1,7 +1,7 @@
-import type { MapDef } from "../defs/mapDefs";
-import type { MapRiverData } from "../utils/terrainGen";
-import type { Vec2 } from "../utils/v2";
-import { type AbstractMsg, type BitStream, Constants } from "./net";
+import type { MapDef } from "../defs/mapDefs.ts";
+import type { MapRiverData } from "../utils/terrainGen.ts";
+import type { Vec2 } from "../utils/v2.ts";
+import { type AbstractMsg, type BitStream, Constants } from "./net.ts";
 
 function serializeMapRiver(s: BitStream, data: MapRiverData) {
     s.writeUint8(data.width);

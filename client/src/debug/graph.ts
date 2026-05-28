@@ -1,5 +1,5 @@
 import * as PIXI from "pixi.js-legacy";
-import { util } from "../../../shared/utils/util";
+import { util } from "../../../shared/utils/util.ts";
 
 export const defaultLabelTextOptions: Partial<PIXI.ITextStyle> = {
     fontFamily: "monospace",

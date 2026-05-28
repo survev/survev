@@ -1,8 +1,8 @@
-import { util } from "../../utils/util";
-import { v2 } from "../../utils/v2";
-import type { MapDef } from "../mapDefs";
-import type { PartialMapDef } from "./baseDefs";
-import { Woods } from "./woodsDefs";
+import { util } from "../../utils/util.ts";
+import { v2 } from "../../utils/v2.ts";
+import type { MapDef } from "../mapDefs.ts";
+import type { PartialMapDef } from "./baseDefs.ts";
+import { Woods } from "./woodsDefs.ts";
 
 const mapDef: PartialMapDef = {
     desc: {

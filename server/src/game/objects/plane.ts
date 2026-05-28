@@ -1,18 +1,16 @@
-import { GameObjectDefs } from "../../../../shared/defs/gameObjectDefs";
-import type { ThrowableDef } from "../../../../shared/defs/gameObjects/throwableDefs";
-import type { MapDef } from "../../../../shared/defs/mapDefs";
-import { MapObjectDefs } from "../../../../shared/defs/mapObjectDefs";
-import type { ObstacleDef } from "../../../../shared/defs/mapObjectsTyping";
-import { GameConfig, type Plane as PlaneType } from "../../../../shared/gameConfig";
-import { Constants } from "../../../../shared/net/net";
-import { ObjectType } from "../../../../shared/net/objectSerializeFns";
-import { type AABB, type Collider, coldet } from "../../../../shared/utils/coldet";
-import { collider } from "../../../../shared/utils/collider";
-import { math } from "../../../../shared/utils/math";
-import { assert, util } from "../../../../shared/utils/util";
-import { type Vec2, v2 } from "../../../../shared/utils/v2";
-import type { Game } from "../game";
-import type { Player } from "./player";
+import type { MapDef } from "../../../../shared/defs/mapDefs.ts";
+
+import { GameObjectDefs, MapObjectDefs } from "../../../../shared/defs/register.ts";
+import { GameConfig, type Plane as PlaneType } from "../../../../shared/gameConfig.ts";
+import { Constants } from "../../../../shared/net/net.ts";
+import { ObjectType } from "../../../../shared/net/objectSerializeFns.ts";
+import { type AABB, coldet, type Collider } from "../../../../shared/utils/coldet.ts";
+import { collider } from "../../../../shared/utils/collider.ts";
+import { math } from "../../../../shared/utils/math.ts";
+import { assert, util } from "../../../../shared/utils/util.ts";
+import { v2, type Vec2 } from "../../../../shared/utils/v2.ts";
+import type { Game } from "../game.ts";
+import type { Player } from "./player.ts";
 
 interface ScheduledAirDrop {
     type: string;
@@ -67,8 +65,8 @@ export class PlaneBarn {
                     plane.pos,
                     this.planeBounds.min,
                     this.planeBounds.max,
-                ) &&
-                plane.actionComplete
+                )
+                && plane.actionComplete
             ) {
                 this.planes.splice(i, 1);
                 i--;
@@ -146,10 +144,10 @@ export class PlaneBarn {
                 .intersectCollider(collider.createCircle(testPos, rad))
                 .filter(
                     (obj): obj is Player =>
-                        obj.__type == ObjectType.Player &&
-                        !obj.dead &&
-                        obj.layer != 1 &&
-                        !obj.disconnected,
+                        obj.__type == ObjectType.Player
+                        && !obj.dead
+                        && obj.layer != 1
+                        && !obj.disconnected,
                 ).length;
 
             if (highestPlayerCount < playerPercentage) {
@@ -185,11 +183,10 @@ export class PlaneBarn {
     ) {
         const timeToDropZone = 2.5; // takes 2.5 seconds from when a plane is called to reach its drop zone
         const finishBuffer = 2.5; // 2.5 second buffer after all planes are done
-        const duration =
-            timeBeforeStart +
-            timeToDropZone +
-            planeCount * airstrikeInterval +
-            finishBuffer;
+        const duration = timeBeforeStart
+            + timeToDropZone
+            + planeCount * airstrikeInterval
+            + finishBuffer;
 
         assert(rad <= Constants.AirstrikeZoneMaxRad);
         assert(duration <= Constants.AirstrikeZoneMaxDuration);
@@ -229,8 +226,7 @@ export class PlaneBarn {
         const maxAliveCount = math.max(redAliveCount, blueAliveCount);
         const minAliveCount = math.min(redAliveCount, blueAliveCount);
 
-        const threshold =
-            (maxAliveCount - minAliveCount) / (maxAliveCount + minAliveCount);
+        const threshold = (maxAliveCount - minAliveCount) / (maxAliveCount + minAliveCount);
         const difference = maxAliveCount - minAliveCount;
         return threshold >= 0.1 || difference >= 5;
     }
@@ -242,12 +238,12 @@ export class PlaneBarn {
         const losingTeam = this.game.playerBarn.teams.reduce((losingTeam, team) =>
             losingTeam.livingPlayers.length < team.livingPlayers.length
                 ? losingTeam
-                : team,
+                : team
         );
         const winningTeam = this.game.playerBarn.teams.reduce((winningTeam, team) =>
             winningTeam.livingPlayers.length > team.livingPlayers.length
                 ? winningTeam
-                : team,
+                : team
         );
 
         const winningTeamMean = v2.create(0, 0);
@@ -267,8 +263,8 @@ export class PlaneBarn {
         if (!players.length) return;
 
         const furthestLosingTeamPlayer = players.reduce((furthest, current) => {
-            return v2.distance(winningTeamMean, furthest.pos) >
-                v2.distance(winningTeamMean, current.pos)
+            return v2.distance(winningTeamMean, furthest.pos)
+                    > v2.distance(winningTeamMean, current.pos)
                 ? furthest
                 : current;
         }, players[0]);
@@ -319,7 +315,7 @@ export class PlaneBarn {
 
         type ||= util.weightedRandom(this.game.map.mapDef.gameConfig.planes.crates).name;
 
-        const def = MapObjectDefs[type] as ObstacleDef;
+        const def = MapObjectDefs.typeToDef(type, "obstacle");
 
         let collided = true;
         let airdropPos = v2.copy(pos);
@@ -546,8 +542,8 @@ class AirstrikeZone {
 
                 // Test if its within the zone
                 if (
-                    connectedPlayers[i].layer != 1 &&
-                    v2.distance(this.pos, testPos) <= this.rad
+                    connectedPlayers[i].layer != 1
+                    && v2.distance(this.pos, testPos) <= this.rad
                 ) {
                     pos = testPos;
                     break;
@@ -626,10 +622,9 @@ abstract class Plane {
         this.targetPos = targetPos;
         this.id = id;
         this.planeDir = dir;
-        this.config =
-            this.action == GameConfig.Plane.Airdrop
-                ? GameConfig.airdrop
-                : GameConfig.airstrike;
+        this.config = this.action == GameConfig.Plane.Airdrop
+            ? GameConfig.airdrop
+            : GameConfig.airstrike;
 
         this.rad = this.config.planeRad;
     }
@@ -686,9 +681,9 @@ class AirStrikePlane extends Plane {
         if (this.bombCount >= config.bombCount) return;
 
         this.bombCount++;
-        const bombDef = GameObjectDefs["bomb_iron"] as ThrowableDef;
+        const bombDef = GameObjectDefs.typeToDef("bomb_iron", "throwable");
         this.game.projectileBarn.addProjectile(
-            this.playerId ?? 0, //0 means the projectile comes from the "game" itself not a player
+            this.playerId ?? 0, // 0 means the projectile comes from the "game" itself not a player
             "bomb_iron",
             pos,
             5,

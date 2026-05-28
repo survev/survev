@@ -1,38 +1,37 @@
 import fs from "node:fs";
 import path from "node:path";
-import { GameConfig, TeamMode } from "../../../shared/gameConfig";
-import * as net from "../../../shared/net/net";
-import type { Loadout } from "../../../shared/utils/loadout";
-import { math } from "../../../shared/utils/math";
-import { v2 } from "../../../shared/utils/v2";
-import { Config } from "../config";
-import { ServerLogger } from "../utils/logger";
-import { apiPrivateRouter } from "../utils/serverHelpers";
+import { TeamMode } from "../../../shared/gameConfig.ts";
+import type { Loadout } from "../../../shared/utils/loadout.ts";
+import { math } from "../../../shared/utils/math.ts";
+import { Config } from "../config.ts";
+import { ServerLogger } from "../utils/logger.ts";
+import { apiPrivateRouter } from "../utils/serverHelpers.ts";
 import {
     type FindGamePrivateBody,
     ProcessMsgType,
     type SaveGameBody,
     type ServerGameConfig,
     type UpdateDataMsg,
-} from "../utils/types";
-import { GameModeManager } from "./gameModeManager";
-import { Grid } from "./grid";
-import { GameMap } from "./map";
-import { AirdropBarn } from "./objects/airdrop";
-import { BulletBarn } from "./objects/bullet";
-import { DeadBodyBarn } from "./objects/deadBody";
-import { DecalBarn } from "./objects/decal";
-import { ExplosionBarn } from "./objects/explosion";
-import { type GameObject, ObjectRegister } from "./objects/gameObject";
-import { Gas } from "./objects/gas";
-import { LootBarn } from "./objects/loot";
-import { MapIndicatorBarn } from "./objects/mapIndicator";
-import { PlaneBarn } from "./objects/plane";
-import { PlayerBarn } from "./objects/player";
-import { ProjectileBarn } from "./objects/projectile";
-import { SmokeBarn } from "./objects/smoke";
-import { PluginManager } from "./pluginManager";
-import { Profiler } from "./profiler";
+} from "../utils/types.ts";
+import { ClientBarn } from "./client.ts";
+import { GameModeManager } from "./gameModeManager.ts";
+import { Grid } from "./grid.ts";
+import { GameMap } from "./map.ts";
+import { AirdropBarn } from "./objects/airdrop.ts";
+import { BulletBarn } from "./objects/bullet.ts";
+import { DeadBodyBarn } from "./objects/deadBody.ts";
+import { DecalBarn } from "./objects/decal.ts";
+import { ExplosionBarn } from "./objects/explosion.ts";
+import { type GameObject, ObjectRegister } from "./objects/gameObject.ts";
+import { Gas } from "./objects/gas.ts";
+import { LootBarn } from "./objects/loot.ts";
+import { MapIndicatorBarn } from "./objects/mapIndicator.ts";
+import { PlaneBarn } from "./objects/plane.ts";
+import { PlayerBarn } from "./objects/player.ts";
+import { ProjectileBarn } from "./objects/projectile.ts";
+import { SmokeBarn } from "./objects/smoke.ts";
+import { PluginManager } from "./pluginManager.ts";
+import { Profiler } from "./profiler.ts";
 
 export interface JoinTokenData {
     expiresAt: number;
@@ -83,12 +82,7 @@ export class Game {
         return this.playerBarn.livingPlayers.filter((p) => !p.disconnected).length;
     }
 
-    /**
-     * All msgs created this tick that will be sent to all players
-     * cached in a single stream
-     */
-    msgsToSend = new net.MsgStream(new ArrayBuffer(4096));
-
+    clientBarn: ClientBarn;
     playerBarn: PlayerBarn;
     lootBarn: LootBarn;
     deadBodyBarn: DeadBodyBarn;
@@ -139,6 +133,7 @@ export class Game {
         this.grid = new Grid(this.map.width, this.map.height);
         this.objectRegister = new ObjectRegister(this.grid);
 
+        this.clientBarn = new ClientBarn(this);
         this.playerBarn = new PlayerBarn(this);
         this.lootBarn = new LootBarn(this);
         this.deadBodyBarn = new DeadBodyBarn(this);
@@ -209,6 +204,10 @@ export class Game {
         //
         this.profiler.addSample("gas");
         this.gas.update(dt);
+        this.profiler.endSample();
+
+        this.profiler.addSample("clients");
+        this.clientBarn.update(dt);
         this.profiler.endSample();
 
         this.profiler.addSample("players");
@@ -285,8 +284,7 @@ export class Game {
             this.perfTicker += dt;
             if (this.perfTicker >= 15) {
                 this.perfTicker = 0;
-                const mspt =
-                    this.tickTimes.reduce((a, b) => a + b) / this.tickTimes.length;
+                const mspt = this.tickTimes.reduce((a, b) => a + b) / this.tickTimes.length;
 
                 this.logger.debug(
                     `Avg ms/tick: ${mspt.toFixed(2)} | Load: ${((mspt / (1000 / Config.gameTps)) * 100).toFixed(1)}%`,
@@ -303,11 +301,12 @@ export class Game {
 
         // serialize objects and send msgs
         this.objectRegister.serializeObjs();
-        this.playerBarn.sendMsgs();
+        this.clientBarn.sendMsgs();
 
         //
         // reset stuff
         //
+        this.clientBarn.flush();
         this.playerBarn.flush();
         this.lootBarn.flush();
         this.planeBarn.flush();
@@ -317,8 +316,6 @@ export class Game {
         this.explosionBarn.flush();
         this.gas.flush();
         this.mapIndicatorBarn.flush();
-
-        this.msgsToSend.stream.index = 0;
 
         const syncTime = performance.now() - start;
         if (syncTime > 1000) {
@@ -342,191 +339,10 @@ export class Game {
 
     get canJoin(): boolean {
         return (
-            this.aliveCount < this.map.mapDef.gameMode.maxPlayers &&
-            !this.over &&
-            this.startedTime < 60
+            this.aliveCount < this.map.mapDef.gameMode.maxPlayers
+            && !this.over
+            && this.startedTime < 60
         );
-    }
-
-    deserializeMsg(buff: ArrayBuffer): {
-        type: net.MsgType;
-        msg: net.AbstractMsg | undefined;
-        error?: string;
-    } {
-        const msgStream = new net.MsgStream(buff);
-        const stream = msgStream.stream;
-
-        const type = msgStream.deserializeMsgType();
-
-        let msg:
-            | net.JoinMsg
-            | net.InputMsg
-            | net.EmoteMsg
-            | net.DropItemMsg
-            | net.SpectateMsg
-            | net.PerkModeRoleSelectMsg
-            | net.EditMsg
-            | undefined = undefined;
-
-        switch (type) {
-            case net.MsgType.Join: {
-                // read protocol version outside of JoinMsg
-                // reason: if theres a protocol change in JoinMsg it will fail to deserialize the entire msg
-                // and won't give the proper invalid-protocol error
-                // so we read it before deserializing the msg to avoid it throwing and giving the wrong error
-
-                const oldIdx = stream.index;
-                const protocol = stream.readUint32();
-
-                if (protocol !== GameConfig.protocolVersion) {
-                    return {
-                        type: net.MsgType.Join,
-                        msg: undefined,
-                        error: "index-invalid-protocol",
-                    };
-                }
-                stream.index = oldIdx;
-
-                msg = new net.JoinMsg();
-                msg.deserialize(stream);
-                break;
-            }
-            case net.MsgType.Input: {
-                msg = new net.InputMsg();
-                msg.deserialize(stream);
-                break;
-            }
-            case net.MsgType.Emote:
-                msg = new net.EmoteMsg();
-                msg.deserialize(stream);
-                break;
-            case net.MsgType.DropItem:
-                msg = new net.DropItemMsg();
-                msg.deserialize(stream);
-                break;
-            case net.MsgType.Spectate:
-                msg = new net.SpectateMsg();
-                msg.deserialize(stream);
-                break;
-            case net.MsgType.PerkModeRoleSelect:
-                msg = new net.PerkModeRoleSelectMsg();
-                msg.deserialize(stream);
-                break;
-            case net.MsgType.Edit:
-                if (!Config.debug.allowEditMsg) break;
-                msg = new net.EditMsg();
-                msg.deserialize(stream);
-                break;
-        }
-
-        return {
-            type,
-            msg,
-        };
-    }
-
-    handleMsg(buff: ArrayBuffer | Buffer, socketId: string, ip: string) {
-        if (!(buff instanceof ArrayBuffer)) return;
-
-        const player = this.playerBarn.socketIdToPlayer.get(socketId);
-
-        let msg: net.AbstractMsg | undefined = undefined;
-        let type = net.MsgType.None;
-        let error: string | undefined;
-
-        try {
-            const deserialized = this.deserializeMsg(buff);
-            msg = deserialized.msg;
-            type = deserialized.type;
-            error = deserialized.error;
-        } catch (err) {
-            this.logger.error(
-                "Failed to deserialize msg: ",
-                err,
-                "msg buffer: ",
-                // JSON.stringify doesn't work on buffers, so need to convert to an Uint8Array first
-                // and then to a regular array... 😭
-                // the slice is to make sure it doesn't overflow the error webhook
-                JSON.stringify([...new Uint8Array(buff.slice(0, 255))]),
-            );
-            if (player) {
-                player.disconnect();
-            } else {
-                this.closeSocket(socketId);
-            }
-            return;
-        }
-
-        if (error) {
-            if (player) {
-                player.disconnect();
-            } else {
-                this.closeSocket(socketId);
-            }
-            return;
-        }
-
-        if (!msg) return;
-
-        if (type === net.MsgType.Join && !player) {
-            this.playerBarn.addPlayer(socketId, msg as net.JoinMsg, ip);
-            return;
-        }
-
-        if (!player) {
-            this.closeSocket(socketId);
-            return;
-        }
-
-        if (player.disconnected) {
-            return;
-        }
-
-        switch (type) {
-            case net.MsgType.Input: {
-                player.handleInput(msg as net.InputMsg);
-                break;
-            }
-            case net.MsgType.Emote: {
-                player.emoteFromMsg(msg as net.EmoteMsg);
-                break;
-            }
-            case net.MsgType.DropItem: {
-                player.dropItem(msg as net.DropItemMsg);
-                break;
-            }
-            case net.MsgType.Spectate: {
-                player.spectate(msg as net.SpectateMsg);
-                break;
-            }
-            case net.MsgType.PerkModeRoleSelect: {
-                player.roleSelect((msg as net.PerkModeRoleSelectMsg).role);
-                break;
-            }
-            case net.MsgType.Edit: {
-                player.processEditMsg(msg as net.EditMsg);
-                break;
-            }
-        }
-    }
-
-    handleSocketClose(socketId: string) {
-        const player = this.playerBarn.socketIdToPlayer.get(socketId);
-        if (!player) return;
-        this.logger.info(`"${player.name}" left`);
-        player.questManager.flushProgress();
-        player.disconnected = true;
-        player.group?.checkPlayers();
-        player.spectating = undefined;
-        player.dirNew = v2.create(1, 0);
-        player.setPartDirty();
-        if (player.canDespawn()) {
-            player.game.playerBarn.removePlayer(player);
-        }
-    }
-
-    broadcastMsg(type: net.MsgType, msg: net.Msg) {
-        this.msgsToSend.serializeMsg(type, msg);
     }
 
     async sendQuestProgress(
@@ -601,9 +417,9 @@ export class Game {
         if (this.stopped) return;
         this.stopped = true;
         this.allowJoin = false;
-        for (const player of this.playerBarn.players) {
-            if (!player.disconnected) {
-                player.disconnect();
+        for (const client of this.clientBarn.clients) {
+            if (!client.disconnected) {
+                client.disconnect();
             }
         }
         this.logger.info("Game Ended");
@@ -622,8 +438,7 @@ export class Game {
 
         const teamKills = players.reduce(
             (acc, curr) => {
-                acc[curr.player.teamId] =
-                    (acc[curr.player.teamId] ?? 0) + curr.player.kills;
+                acc[curr.player.teamId] = (acc[curr.player.teamId] ?? 0) + curr.player.kills;
                 return acc;
             },
             {} as Record<string, number>,
@@ -632,7 +447,7 @@ export class Game {
         const values: SaveGameBody["matchData"] = players.map(({ player, rank }) => {
             return {
                 // *NOTE: userId is optional; we save the game stats for non logged users too
-                userId: player.userId,
+                userId: player.client.userId,
                 region: Config.gameServer.thisRegion,
                 username: player.name,
                 playerId: player.matchDataId,
@@ -652,8 +467,8 @@ export class Game {
                 mapSeed: this.map.seed,
                 killedIds: player.killedIds,
                 rank: rank,
-                ip: player.ip,
-                findGameIp: player.findGameIp,
+                ip: player.client.ip,
+                findGameIp: player.client.findGameIp,
                 role: player.role,
             };
         });

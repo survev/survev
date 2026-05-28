@@ -1,11 +1,12 @@
 import { and, eq, sql } from "drizzle-orm";
-import { GameObjectDefs } from "../../../../../shared/defs/gameObjectDefs";
-import { PassDefs } from "../../../../../shared/defs/gameObjects/passDefs";
-import { passUtil } from "../../../../../shared/utils/passUtil";
-import { Config } from "../../../config";
-import { server } from "../../apiServer";
-import type { db } from "../../db";
-import { itemsTable, userPassTable } from "../../db/schema";
+
+import { PassDefs } from "../../../../../shared/defs/gameObjects/passDefs.ts";
+import { GameObjectDefs } from "../../../../../shared/defs/register.ts";
+import { passUtil } from "../../../../../shared/utils/passUtil.ts";
+import { Config } from "../../../config.ts";
+import { server } from "../../apiServer.ts";
+import type { db } from "../../db/index.ts";
+import { itemsTable, userPassTable } from "../../db/schema.ts";
 
 export async function incrementPassXp(
     transaction: Parameters<Parameters<typeof db.transaction>[0]>[0],
@@ -36,7 +37,7 @@ export async function incrementPassXp(
     const unlockedRewardItems = passDef.items
         .filter((reward) => reward.level > oldLevel && reward.level <= newLevel)
         .map((reward) => reward.item)
-        .filter((item) => !!GameObjectDefs[item]);
+        .filter((item) => GameObjectDefs.typeExists(item));
 
     let unlockedNewItems = false;
 

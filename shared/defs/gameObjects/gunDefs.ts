@@ -1,5 +1,5 @@
-import { type DeepPartial, util } from "../../utils/util";
-import type { Vec2 } from "../../utils/v2";
+import { type DeepPartial, util } from "../../utils/util.ts";
+import type { Vec2 } from "../../utils/v2.ts";
 
 export interface GunDef {
     readonly type: "gun";

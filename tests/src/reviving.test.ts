@@ -1,8 +1,8 @@
 import { expect, test } from "vitest";
-import { GameConfig, TeamMode } from "../../shared/gameConfig";
-import { InputMsg } from "../../shared/net/inputMsg";
-import { v2 } from "../../shared/utils/v2";
-import { createGame } from "./gameTestHelpers";
+import { GameConfig, TeamMode } from "../../shared/gameConfig.ts";
+import { InputMsg } from "../../shared/net/inputMsg.ts";
+import { v2 } from "../../shared/utils/v2.ts";
+import { createGame } from "./gameTestHelpers.ts";
 
 // + 0.1 to account for off by one tick on the timer system lol
 const reviveDur = GameConfig.player.reviveDuration + 0.1;

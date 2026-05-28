@@ -1,4 +1,4 @@
-import type { AtlasDef } from "../atlasDefs";
+import type { AtlasDef } from "../atlasDefs.ts";
 
 export const SavannahAtlas: AtlasDef = {
     compress: true,

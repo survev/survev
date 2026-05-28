@@ -3,7 +3,7 @@ import {
     type ChatInputCommandInteraction,
     type SlashCommandOptionsOnlyBuilder,
 } from "discord.js";
-import { zSetClientThemeBody, zSetGameModeBody } from "../../../server/src/utils/types";
+import { zSetClientThemeBody, zSetGameModeBody } from "../../../server/src/utils/types.ts";
 import {
     zBanAccountParams,
     zBanIpParams,
@@ -18,10 +18,10 @@ import {
     zSetMatchDataNameParams,
     zUnbanAccountParams,
     zUnbanIpParams,
-} from "../../../shared/types/moderation";
-import { Command } from "../utils";
-import { createCommand, createSlashCommand, genericExecute } from "./helpers";
-import { searchPlayersHandler } from "./search-player";
+} from "../../../shared/types/moderation.ts";
+import { Command } from "../utils.ts";
+import { createCommand, createSlashCommand, genericExecute } from "./helpers.ts";
+import { searchPlayersHandler } from "./search-player.ts";
 
 /**
  * for generic commands that only makes an api call and return it's meessage
@@ -129,8 +129,7 @@ const commands = {
     }),
     [Command.SetMatchDataName]: createCommand({
         name: Command.SetMatchDataName,
-        description:
-            "update the name of a player in a game, useful for purging bad names from leaderboards",
+        description: "update the name of a player in a game, useful for purging bad names from leaderboards",
         optionValidator: zSetMatchDataNameParams,
         options: [
             {
@@ -160,8 +159,7 @@ const commands = {
             },
             {
                 name: "new_name",
-                description:
-                    "The new name of the account (get randomized if not provided)",
+                description: "The new name of the account (get randomized if not provided)",
                 required: false,
                 type: ApplicationCommandOptionType.String,
             },

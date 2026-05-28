@@ -31,7 +31,6 @@ export class SDKManager {
         callback();
     }
 
-    // biome-ignore lint/suspicious/useAwait: no op
     async getPlayerName(): Promise<string | undefined> {
         return undefined;
     }
@@ -44,7 +43,6 @@ export class SDKManager {
         return false;
     }
 
-    // biome-ignore lint/suspicious/useAwait: no op
     async getInviteLink(_roomID: string): Promise<string | undefined> {
         return undefined;
     }

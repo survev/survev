@@ -6,31 +6,27 @@ import { Hono } from "hono";
 import { getCookie } from "hono/cookie";
 import { cors } from "hono/cors";
 import { HTTPException } from "hono/http-exception";
-import { version } from "../../../package.json";
-import {
-    type FindGameResponse,
-    type SiteInfoRes,
-    zFindGameBody,
-} from "../../../shared/types/api";
-import { Config } from "../config";
-import { GIT_VERSION } from "../utils/gitRevision";
-import { getFindGamePlayerData } from "../utils/playerData";
+import pkgJson from "../../../package.json" with { type: "json" };
+import { type FindGameResponse, type SiteInfoRes, zFindGameBody } from "../../../shared/types/api.ts";
+import { Config } from "../config.ts";
+import { GIT_VERSION } from "../utils/gitRevision.ts";
+import { getFindGamePlayerData } from "../utils/playerData.ts";
 import {
     getHonoIp,
     HTTPRateLimit,
     isBehindProxy,
     logErrorToWebhook,
     verifyTurnsStile,
-} from "../utils/serverHelpers";
-import { server } from "./apiServer";
-import { deleteExpiredSessions, validateSessionToken } from "./auth";
-import { rateLimitMiddleware, validateParams } from "./auth/middleware";
-import type { SessionTableSelect, UsersTableSelect } from "./db/schema";
-import { cleanupOldLogs, isBanned } from "./routes/private/ModerationRouter";
-import { PrivateRouter } from "./routes/private/private";
-import { StatsRouter } from "./routes/stats/StatsRouter";
-import { AuthRouter } from "./routes/user/AuthRouter";
-import { UserRouter } from "./routes/user/UserRouter";
+} from "../utils/serverHelpers.ts";
+import { server } from "./apiServer.ts";
+import { deleteExpiredSessions, validateSessionToken } from "./auth/index.ts";
+import { rateLimitMiddleware, validateParams } from "./auth/middleware.ts";
+import type { SessionTableSelect, UsersTableSelect } from "./db/schema.ts";
+import { cleanupOldLogs, isBanned } from "./routes/private/ModerationRouter.ts";
+import { PrivateRouter } from "./routes/private/private.ts";
+import { StatsRouter } from "./routes/stats/StatsRouter.ts";
+import { AuthRouter } from "./routes/user/AuthRouter.ts";
+import { UserRouter } from "./routes/user/UserRouter.ts";
 
 export type Context = {
     Variables: {
@@ -191,10 +187,10 @@ app.post("/api/report_error", rateLimitMiddleware(5, 60 * 1000), async (c) => {
 
     let stackTrace: string | undefined;
     if (
-        typeof content.data == "object" &&
-        "stacktrace" in content.data &&
-        typeof content.data.stacktrace == "string" &&
-        content.data.stacktrace
+        typeof content.data === "object"
+        && "stacktrace" in content.data
+        && typeof content.data.stacktrace === "string"
+        && content.data.stacktrace
     ) {
         stackTrace = `### Stacktrace:\n \`\`\`${content.data.stacktrace.replaceAll("`", "\\`")}\`\`\``;
         delete content.data.stacktrace;
@@ -238,6 +234,6 @@ new Cron("0 0 * * *", async () => {
     }
 });
 
-server.logger.info(`Survev API Server v${version} - GIT ${GIT_VERSION}`);
+server.logger.info(`Survev API Server v${pkgJson.version} - GIT ${GIT_VERSION}`);
 server.logger.info(`Listening on ${Config.apiServer.host}:${Config.apiServer.port}`);
 server.logger.info("Press Ctrl+C to exit.");

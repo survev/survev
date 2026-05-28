@@ -1,4 +1,4 @@
-import { HealEffectDefs } from "./healEffectDefs";
+import { HealEffectDefs } from "./healEffectDefs.ts";
 
 const _allowedHealEffects = Object.keys(HealEffectDefs);
 const _allowedMeleeSkins = [
@@ -375,7 +375,6 @@ export const UnlockDefs: Record<UnlockDefKey, UnlockDef> = {
             "emote_flagbosnia",
             "emote_logocloud",
             "emote_logotwins",
-
             /* use this to unlock everything :)
             ...new Set([
                 ...allowedOutfits,

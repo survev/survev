@@ -1,6 +1,6 @@
 import { and, eq, inArray } from "drizzle-orm";
 import { Hono } from "hono";
-import { QuestDefs } from "../../../../../shared/defs/gameObjects/questDefs";
+import { QuestDefs } from "../../../../../shared/defs/gameObjects/questDefs.ts";
 import {
     type GetPassResponse,
     type RefreshQuestResponse,
@@ -9,18 +9,13 @@ import {
     zRefreshQuestRequest,
     zSetPassUnlockRequest,
     zSetQuestRequest,
-} from "../../../../../shared/types/user";
-import { passUtil } from "../../../../../shared/utils/passUtil";
-import { Config } from "../../../config";
-import { validateParams } from "../../auth/middleware";
-import { db } from "../../db";
-import {
-    type UserPassTableSelect,
-    type UserQuestTableSelect,
-    userPassTable,
-    userQuestTable,
-} from "../../db/schema";
-import type { Context } from "../../index";
+} from "../../../../../shared/types/user.ts";
+import { passUtil } from "../../../../../shared/utils/passUtil.ts";
+import { Config } from "../../../config.ts";
+import { validateParams } from "../../auth/middleware.ts";
+import { db } from "../../db/index.ts";
+import { userPassTable, type UserPassTableSelect, userQuestTable, type UserQuestTableSelect } from "../../db/schema.ts";
+import type { Context } from "../../index.ts";
 
 // hardcoded for now
 export const questSlotIndexes = [0, 1];
@@ -55,9 +50,8 @@ async function getPassAndQuests(
         .filter((quest): quest is UserQuestTableSelect => quest !== null)
         .sort((a, b) => a.idx - b.idx);
 
-    const hasAllSlots =
-        existingQuests.length === questSlotIndexes.length &&
-        questSlotIndexes.every((slot, index) => existingQuests[index]?.idx === slot);
+    const hasAllSlots = existingQuests.length === questSlotIndexes.length
+        && questSlotIndexes.every((slot, index) => existingQuests[index]?.idx === slot);
 
     if (existingPass && hasAllSlots) {
         return {
@@ -183,16 +177,16 @@ PassRouter.post("/get_pass", validateParams(zGetPassRequest), async (c) => {
             activeQuests = activeQuests.map((current) =>
                 current.idx === quest.idx
                     ? {
-                          ...current,
-                          questType: newType,
-                          progress: 0,
-                          target: QuestDefs[newType]!.target,
-                          complete: false,
-                          rerolled: false,
-                          timeAcquired: now,
-                          nextRefreshAt: passUtil.getNextQuestRefreshAt(now),
-                      }
-                    : current,
+                        ...current,
+                        questType: newType,
+                        progress: 0,
+                        target: QuestDefs[newType]!.target,
+                        complete: false,
+                        rerolled: false,
+                        timeAcquired: now,
+                        nextRefreshAt: passUtil.getNextQuestRefreshAt(now),
+                    }
+                    : current
             );
         }
     }
@@ -289,7 +283,6 @@ PassRouter.post("/refresh_quest", validateParams(zRefreshQuestRequest), async (c
 PassRouter.post(
     "/set_quest",
     validateParams(zSetQuestRequest),
-    // biome-ignore lint/suspicious/useAwait: to please the client
     async (c) => {
         return c.json({ success: true }, 200);
     },

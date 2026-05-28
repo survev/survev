@@ -1,5 +1,5 @@
-import { Constants } from "../../../../shared/net/net";
-import { type Vec2, v2 } from "../../../../shared/utils/v2";
+import { Constants } from "../../../../shared/net/net.ts";
+import { v2, type Vec2 } from "../../../../shared/utils/v2.ts";
 
 export class MapIndicator {
     oldPosition = v2.create(0, 0);

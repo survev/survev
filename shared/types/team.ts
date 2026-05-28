@@ -1,7 +1,7 @@
 // /api/team_v2 websocket msgs typing
 
 import { z } from "zod";
-import type { FindGameMatchData } from "./api";
+import type { FindGameMatchData } from "./api.ts";
 
 export type TeamMenuErrorType =
     | "join_full"

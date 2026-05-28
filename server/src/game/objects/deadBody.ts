@@ -1,8 +1,8 @@
-import { ObjectType } from "../../../../shared/net/objectSerializeFns";
-import { collider } from "../../../../shared/utils/collider";
-import { type Vec2, v2 } from "../../../../shared/utils/v2";
-import type { Game } from "../game";
-import { BaseGameObject } from "./gameObject";
+import { ObjectType } from "../../../../shared/net/objectSerializeFns.ts";
+import { collider } from "../../../../shared/utils/collider.ts";
+import { v2, type Vec2 } from "../../../../shared/utils/v2.ts";
+import type { Game } from "../game.ts";
+import { BaseGameObject } from "./gameObject.ts";
 
 export class DeadBodyBarn {
     deadBodies: DeadBody[] = [];
@@ -43,10 +43,9 @@ export class DeadBody extends BaseGameObject {
     }
 
     update(dt: number): void {
-        const moving =
-            Math.abs(this.vel.x) > 0.001 ||
-            Math.abs(this.vel.y) > 0.001 ||
-            !v2.eq(this.oldPos, this.pos);
+        const moving = Math.abs(this.vel.x) > 0.001
+            || Math.abs(this.vel.y) > 0.001
+            || !v2.eq(this.oldPos, this.pos);
 
         if (!moving) return;
 

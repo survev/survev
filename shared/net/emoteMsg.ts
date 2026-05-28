@@ -1,5 +1,5 @@
-import { v2 } from "../utils/v2";
-import type { AbstractMsg, BitStream } from "./net";
+import { v2 } from "../utils/v2.ts";
+import type { AbstractMsg, BitStream } from "./net.ts";
 
 export class EmoteMsg implements AbstractMsg {
     pos = v2.create(0, 0);
