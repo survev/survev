@@ -1,0 +1,1448 @@
+# Introduction
+
+Hi! This is a ModAPI created for survev.io, designed to provide a stable and predictable way for mods to interact with the game.
+
+Mods interact with the game through event hooks (on*), read-only accessors (get*), and a small set of intentionally limited modification hooks (set*).
+
+# How Mods Work
+
+Mods register callbacks using on* hooks. These hooks fire in response to specific game events, allowing mods to react by running their own logic.
+
+(Yes, you *can* try to make a dancing chicken appear each time someone dies. No judgement here...)
+
+Mods can read certain pieces of game state using get* functions. All data returned by these functions is read-only and represents a snapshot of the current state.
+
+(Think of it like looking through your neighbors window, nice view but you can't take their TV.)
+
+In limited cases, mods may also modify certain aspects of the game using set* functions. These APIs are intentionally constrained to prevent instability or unintended side effects.
+
+(Alas you cannot replace textures that other players (without your mod) would see. So your dream of making the whole map completely filled with water will have to wait...)
+
+# History / Background
+
+Historically mods for survev.io (and even surviv.io) relied on either monkeypatching what was needed, or if more powerful hooks were needed then entire code patching. While this allowed practically any type of reasonable mod to be created, these hooks were often brittle and prone to breaking upon updates.
+
+The goal of this ModAPI project is to get rid of that brittleness, within reasonable boundaries, while still allowing mod authors plenty of creativity in their creations.
+
+(Or, if we really wanted to go back to the stone age, we could create stuff like [this](https://github.com/chickenpoo351/Survev-Bundle-Patcher). An extreme example of automated code replacement for modding the game...)
+
+# Table of Contents
+
+- [on* hooks](#on-hooks)
+  - [Introduction to on* hooks](#introduction-to-on-hooks)
+  - [Game state hooks](#game-state-hooks)
+    - [onGameStart](#ongamestart)
+    - [onGameEnd](#ongameend)
+  - [Player state hooks](#player-state-hooks)
+    - [onLocalPlayerDeath](#onLocalplayerdeath)
+    - [onPlayerShoot](#onplayershoot)
+    - [onLocalPlayerShoot](#onlocalplayershoot)
+    - [onLocalPlayerKill](#onlocalplayerkill)
+    - [onLocalPlayerHeal](#onlocalplayerheal)
+    - [onLocalPlayerDamage](#onlocalplayerdamage)
+    - [onLocalPlayerInventoryItemChange](#onlocalplayerinventoryitemchange)
+    - [onLocalPlayerHelmetChange](#onlocalplayerhelmetchange)
+    - [onLocalPlayerChestChange](#onlocalplayerchestchange)
+    - [onLocalPlayerBackpackChange](#onlocalplayerbackpackchange)
+    - [onLocalPlayerOutfitChange](#onlocalplayeroutfitchange)
+    - [onLocalPlayerGearChange](#onlocalplayergearchange)
+    - [onLocalPlayerEquippedWeaponChange](#onlocalplayerequippedweaponchange)
+    - [onLocalPlayerWeaponChange](#onlocalplayerweaponchange)
+    - [onLocalPlayerWeaponAmmoUse](#onlocalplayerweaponammouse)
+    - [onLocalPlayerWeaponAmmoGained](#onlocalplayerweaponammogained)
+    - [onLocalPlayerRemovedItem](#onlocalplayerremoveditem)
+    - [onLocalPlayerAddedItem](#onlocalplayeraddeditem)
+- [get* hooks](#get-hooks)
+  - [Introduction to get* hooks](#introduction-to-get-hooks)
+  - [Player info hooks](#player-info-hooks)
+    - [getLocalPlayerKills](#getlocalplayerkills)
+    - [getLocalPlayerHealth](#getlocalplayerhealth)
+    - [getLocalPlayerDamage](#getlocalplayerdamage)
+    - [getLocalPlayerHeal](#getlocalplayerheal)
+    - [getLocalPlayerHealRaw](#getlocalplayerhealraw)
+    - [getLocalPlayerRemovedItem](#getlocalplayerremoveditem)
+    - [getLocalPlayerAddedItem](#getlocalplayeraddeditem)
+    - [getLocalPlayerHelmet](#getlocalplayerhelmet)
+    - [getLocalPlayerChest](#getlocalplayerchest)
+    - [getLocalPlayerBackpack](#getlocalplayerbackpack)
+    - [getLocalPlayerOutfit](#getlocalplayeroutfit)
+    - [getLocalPlayerLastChangedGear](#getlocalplayerlastchangedgear)
+    - [getLocalPlayerGear](#getlocalplayergear)
+    - [getLocalPlayerCurrentEquippedWeapon](#getlocalplayercurrentequippedweapon)
+    - [getLocalPlayerLastChangedWeapon](#getlocalplayerlastchangedweapon)
+    - [getLocalPlayerWeaponAmmoUsed](#getlocalplayerweaponammoused)
+    - [getLocalPlayerWeaponAmmoGained](#getlocalplayerweaponammogained)
+    - [getLocalPlayerWeapons](#getlocalplayerweapons)
+- [Future of the API](#future-of-the-api)
+- [Credits](#credits)
+- [Changelog](#changelog)
+
+
+# on* hooks
+
+This section contains everything needed to know about on* type hooks.
+
+## Introduction to on* hooks
+
+on* hooks are quite simple once you get to know them, allow me to explain.
+
+These hooks follow quite simple rules first off practically all of these hooks are used like this. 
+
+    // onGameStart() hook used for example.
+    // As well modAPI will be the object that will equal window.survevModAPI just for simplicity of the example of course though, you can name this anything you want or just use the window object.
+
+    const modAPI = window.survevModAPI
+
+    modAPI.onGameStart(() => {
+      // Your logic here to run upon game start.
+    })
+
+As you can see it is really quite simple of course there are a few things you should know.
+
+- First off, hooks are **synchronous**.
+
+- Secondly, execution order **between multiple hooks** must not be relied upon.
+
+Now what do those exactly mean? Lets start with hooks being synchronous.
+
+What this means is if you have an example like this 
+
+    const modAPI = window.survevModAPI
+
+    modAPI.onGameStart(() => {
+      // perhaps you have logic here to play a sound
+    })
+
+    modAPI.onGameStart(() => {
+      // perhaps you have logic here to show an image
+    })
+
+These will *not* fire at the same time. Instead, each hook callback will execute only after the previous callback of the same type has finished executing.
+
+The callbacks are executed in the **order they were registered**. However, because mod load and registration order is not guaranteed, you should **not rely on a specific execution order between multiple hooks**.
+For this reason, it is generally recommended that you only use one on* hook of each type.
+
+**Note**: Execution order is only predictable within a single script. If a user installs additional mods that use the same hooks, the order in which each mods callbacks run may differ.
+
+## Game state hooks
+
+This section contains every on* hook related to game state.
+
+### onGameStart
+
+**When does this fire?**  
+Fires once at the start of a game round, after the game has initialized but before active gameplay begins.
+
+**How often does it fire?**  
+Once per game round.
+
+**Common use cases**
+- Initializing mod state
+- Setting up UI elements
+- Registering textures or assets
+- Playing intro sounds or animations
+
+**Example use**
+    
+    const modAPI = window.survevModAPI
+
+    modAPI.onGameStart(() => {
+      // logic to run upon game start
+    })
+
+**Notes**
+- This hook is synchronous.
+- Execution order between multiple mods is not guaranteed.
+
+---
+
+### onGameEnd
+
+**When does this fire?**  
+Fires once at the end of a game round, after active gameplay has ended.
+
+**How often does it fire?**  
+Once per game round.
+
+**Common use cases**
+- Preparing mod for menu interactions
+- Setting up UI elements
+- Registering textures or assets
+- Playing exit sounds or animations
+
+**Example use**
+    
+    const modAPI = window.survevModAPI
+
+    modAPI.onGameEnd(() => {
+      // logic to run upon game end
+    })
+
+**Notes**
+- This hook is synchronous.
+- Execution order between multiple mods is not guaranteed.
+
+---
+
+## Player state hooks
+
+This section contains every on* hook related to the player.
+
+### onLocalPlayerDeath
+
+**When does this fire?**  
+Fires once when the local player dies during a game round.
+
+**How often does it fire?**  
+Once per game round.
+
+**Common use cases**
+- Showing on screen effects
+- Setting up UI elements
+- Playing sound effects
+- Gathering data
+
+**Example use**
+    
+    const modAPI = window.survevModAPI
+
+    modAPI.onLocalPlayerDeath(() => {
+      // logic to run upon local player death
+    })
+
+**Notes**
+- This hook is synchronous.
+- Execution order between multiple mods is not guaranteed.
+
+---
+
+### onPlayerShoot
+
+**When does this fire?**  
+Fires once when *any* player owned bullet is on screen.
+
+**How often does it fire?**  
+Once per bullet spawned on screen.
+
+**Common use cases**
+- Playing sound effects
+- Bullet specific effects
+- Data gathering
+
+**Example use**
+    
+    const modAPI = window.survevModAPI
+
+    modAPI.onPlayerShoot(() => {
+      // logic to run upon any bullet on screen
+    })
+
+**Notes**
+- This hook is synchronous.
+- Execution order between multiple mods is not guaranteed.
+- This hook is for any bullet on screen. View the [onLocalPlayerShoot](#onlocalplayershoot) hook if you want only local bullets.
+- This hook can fire frequently during active combat. Keep logic lightweight to avoid performance issues.
+
+---
+
+### onLocalPlayerShoot
+
+**When does this fire?**  
+Fires once when any *local* player owned bullet is on screen.
+
+**How often does it fire?**  
+Once per local player owned bullet spawned on screen.
+
+**Common use cases**
+- Playing sound effects
+- Bullet specific effects
+- Data gathering
+
+**Example use**
+    
+    const modAPI = window.survevModAPI
+
+    modAPI.onLocalPlayerShoot(() => {
+      // logic to run upon any local player bullet on screen
+    })
+
+**Notes**
+- This hook is synchronous.
+- Execution order between multiple mods is not guaranteed.
+- This hook is for local player bullets on screen. View the [onPlayerShoot](#onplayershoot) hook if you want any bullets.
+- This hook can fire frequently during active combat. Keep logic lightweight to avoid performance issues.
+
+---
+
+### onLocalPlayerKill
+
+**When does this fire?**  
+Fires once when the local player is credited a kill.
+
+**How often does it fire?**  
+Once per credited local player kill.
+
+**Common use cases**
+- Updating UI elements
+- Playing sound effects / animations
+- Data gathering
+- Kill streak tracking
+
+**Example use**
+    
+    const modAPI = window.survevModAPI
+
+    modAPI.onLocalPlayerKill(() => {
+      // logic to run upon local player kill
+    })
+
+**Notes**
+- This hook is synchronous.
+- Execution order between multiple mods is not guaranteed.
+
+---
+
+### onLocalPlayerHeal
+
+**When does this fire?**  
+Fires once when the local player regains health, including healing items or regeneration.
+
+**How often does it fire?**  
+Once per tick of health regained.
+
+**Common use cases**
+- Updating UI elements
+- Playing sound effects / animations
+- Data gathering
+- Health tracking
+
+**Example use**
+    
+    const modAPI = window.survevModAPI
+
+    modAPI.onLocalPlayerHeal(() => {
+      // logic to run upon local player heal
+    })
+
+**Notes**
+- This hook is synchronous.
+- Execution order between multiple mods is not guaranteed.
+
+---
+
+
+### onLocalPlayerDamage
+
+**When does this fire?**  
+Fires once when the local player takes damage.
+
+**How often does it fire?**  
+Once per tick of health lost.
+
+**Common use cases**
+- Updating UI elements
+- Playing sound effects / animations
+- Data gathering
+- Health tracking
+
+**Example use**
+    
+    const modAPI = window.survevModAPI
+
+    modAPI.onLocalPlayerDamage(() => {
+      // logic to run upon local player damage
+    })
+
+**Notes**
+- This hook is synchronous.
+- Execution order between multiple mods is not guaranteed.
+
+---
+
+### onLocalPlayerInventoryItemChange
+
+**When does this fire?**  
+Fires once when an item in the inventory of the local player changes (added, removed, or updated).
+
+**How often does it fire?**  
+Once per inventory item changed.
+
+**Common use cases**
+- Updating UI elements
+- Playing sound effects / animations
+- Data gathering
+- Inventory tracking
+
+**Example use**
+    
+    const modAPI = window.survevModAPI
+
+    modAPI.onLocalPlayerInventoryItemChange(() => {
+      // logic to run upon local player inventory item change
+    })
+
+**Notes**
+- This hook is synchronous.
+- Execution order between multiple mods is not guaranteed.
+
+---
+
+### onLocalPlayerHelmetChange
+
+**When does this fire?**  
+Fires once when the local player's helmet changes (equipped, removed, or replaced).
+
+**How often does it fire?**  
+Once per helmet change.
+
+**Common use cases**
+- Updating UI elements
+- Playing sound effects / animations
+- Data gathering
+- Gear tracking
+
+**Example use**
+    
+    const modAPI = window.survevModAPI
+
+    modAPI.onLocalPlayerHelmetChange(() => {
+      // logic to run upon local player helmet change
+    })
+
+**Notes**
+- This hook is synchronous.
+- Execution order between multiple mods is not guaranteed.
+- This hook is for a single gear change. View the [onLocalPlayerGearChange](#onlocalplayergearchange) hook if you want any gear change
+
+---
+
+### onLocalPlayerChestChange
+
+**When does this fire?**  
+Fires once when the local player’s chest changes (equipped, removed, or replaced).
+
+**How often does it fire?**  
+Once per chest change.
+
+**Common use cases**
+- Updating UI elements
+- Playing sound effects or animations
+- Data gathering
+- Gear tracking
+
+**Example use**
+    
+    const modAPI = window.survevModAPI
+
+    modAPI.onLocalPlayerChestChange(() => {
+      // logic to run upon local player chest change
+    })
+
+**Notes**
+- This hook is synchronous.
+- Execution order between multiple mods is not guaranteed.
+- This hook is for a single gear change. View the [onLocalPlayerGearChange](#onlocalplayergearchange) hook if you want any gear change
+
+---
+
+### onLocalPlayerBackpackChange
+
+**When does this fire?**  
+Fires once when the local player’s backpack changes (equipped, removed, or replaced).
+
+**How often does it fire?**  
+Once per backpack change.
+
+**Common use cases**
+- Updating UI elements
+- Playing sound effects or animations
+- Data gathering
+- Gear tracking
+
+**Example use**
+    
+    const modAPI = window.survevModAPI
+
+    modAPI.onLocalPlayerBackpackChange(() => {
+      // logic to run upon local player backpack change
+    })
+
+**Notes**
+- This hook is synchronous.
+- Execution order between multiple mods is not guaranteed.
+- This hook is for a single gear change. View the [onLocalPlayerGearChange](#onlocalplayergearchange) hook if you want any gear change
+
+---
+
+### onLocalPlayerOutfitChange
+
+**When does this fire?**  
+Fires once when the local player’s outfit changes (equipped, removed, or replaced).
+
+**How often does it fire?**  
+Once per outfit change.
+
+**Common use cases**
+- Updating UI elements
+- Playing sound effects or animations
+- Data gathering
+- Gear tracking
+
+**Example use**
+    
+    const modAPI = window.survevModAPI
+
+    modAPI.onLocalPlayerOutfitChange(() => {
+      // logic to run upon local player outfit change
+    })
+
+**Notes**
+- This hook is synchronous.
+- Execution order between multiple mods is not guaranteed.
+- This hook is for a single gear change. View the [onLocalPlayerGearChange](#onlocalplayergearchange) hook if you want any gear change
+
+---
+
+### onLocalPlayerGearChange
+
+**When does this fire?**  
+Fires once when *any* of the local player’s gear changes (equipped, removed, or replaced).
+
+**How often does it fire?**  
+Once per gear change.
+
+**Common use cases**
+- Updating UI elements
+- Playing sound effects or animations
+- Data gathering
+- Gear tracking
+
+**Example use**
+    
+    const modAPI = window.survevModAPI
+
+    modAPI.onLocalPlayerGearChange(() => {
+      // logic to run upon local player gear change
+    })
+
+**Notes**
+- This hook is synchronous.
+- Execution order between multiple mods is not guaranteed.
+
+---
+
+### onLocalPlayerEquippedWeaponChange
+
+**When does this fire?**  
+Fires once when the local player’s equipped weapon changes (equipped, removed, or replaced).
+
+**How often does it fire?**  
+Once per equipped weapon change.
+
+**Common use cases**
+- Updating UI elements
+- Playing sound effects or animations
+- Data gathering
+- Weapon tracking
+
+**Example use**
+    
+    const modAPI = window.survevModAPI
+
+    modAPI.onLocalPlayerEquippedWeaponChange(() => {
+      // logic to run upon local player equipped weapon change
+    })
+
+**Notes**
+- This hook is synchronous.
+- Execution order between multiple mods is not guaranteed.
+- This hook is only for the equipped weapon. View the [onLocalPlayerWeaponChange](#onlocalplayerweaponchange) hook for any weapon change.
+
+---
+
+### onLocalPlayerWeaponChange
+
+**When does this fire?**  
+Fires once when the local player’s weapon changes (equipped, removed, or replaced).
+
+**How often does it fire?**  
+Once per weapon change.
+
+**Common use cases**
+- Updating UI elements
+- Playing sound effects or animations
+- Data gathering
+- Weapon tracking
+
+**Example use**
+    
+    const modAPI = window.survevModAPI
+
+    modAPI.onLocalPlayerWeaponChange(() => {
+      // logic to run upon local player weapon change
+    })
+
+**Notes**
+- This hook is synchronous.
+- Execution order between multiple mods is not guaranteed.
+- This hook is for any weapon change. View the [onLocalPlayerEquippedWeaponChange](#onlocalplayerequippedweaponchange) hook for the equipped weapon change.
+
+---
+
+### onLocalPlayerWeaponAmmoUse
+
+**When does this fire?**  
+Fires once when the local player’s weapon ammo is used.
+
+**How often does it fire?**  
+Once per weapon ammo change.
+
+**Common use cases**
+- Updating UI elements
+- Playing sound effects or animations
+- Data gathering
+- Weapon ammo tracking
+
+**Example use**
+    
+    const modAPI = window.survevModAPI
+
+    modAPI.onLocalPlayerWeaponAmmoUse(() => {
+      // logic to run upon local player weapon ammo use
+    })
+
+**Notes**
+- This hook is synchronous.
+- Execution order between multiple mods is not guaranteed.
+- This hook can fire frequently during active combat. Keep logic lightweight to avoid performance issues.
+
+---
+
+### onLocalPlayerWeaponAmmoGained
+
+**When does this fire?**  
+Fires once when the local player’s weapon gains ammo.
+
+**How often does it fire?**  
+Once per weapon ammo change.
+
+**Common use cases**
+- Updating UI elements
+- Playing sound effects or animations
+- Data gathering
+- Weapon ammo tracking
+
+**Example use**
+    
+    const modAPI = window.survevModAPI
+
+    modAPI.onLocalPlayerWeaponAmmoGained(() => {
+      // logic to run upon local player weapon ammo gained
+    })
+
+**Notes**
+- This hook is synchronous.
+- Execution order between multiple mods is not guaranteed.
+- This hook can fire frequently during active combat. Keep logic lightweight to avoid performance issues.
+
+---
+
+### onLocalPlayerRemovedItem
+
+**When does this fire?**  
+Fires once when an item in the local player's inventory is removed (dropped, used, etc).
+
+**How often does it fire?**  
+Once per item removed.
+
+**Common use cases**
+- Updating UI elements
+- Playing sound effects or animations
+- Data gathering
+- Inventory tracking
+
+**Example use**
+    
+    const modAPI = window.survevModAPI
+
+    modAPI.onLocalPlayerRemovedItem(() => {
+      // logic to run upon local player removed item
+    })
+
+**Notes**
+- This hook is synchronous.
+- Execution order between multiple mods is not guaranteed.
+
+---
+
+### onLocalPlayerAddedItem
+
+**When does this fire?**  
+Fires once when an item in the local player's inventory is added (picked up, given, etc).
+
+**How often does it fire?**  
+Once per item added.
+
+**Common use cases**
+- Updating UI elements
+- Playing sound effects or animations
+- Data gathering
+- Inventory tracking
+
+**Example use**
+    
+    const modAPI = window.survevModAPI
+
+    modAPI.onLocalPlayerAddedItem(() => {
+      // logic to run upon local player added item
+    })
+
+**Notes**
+- This hook is synchronous.
+- Execution order between multiple mods is not guaranteed.
+
+---
+
+# get* hooks
+
+This section contains everything needed to know about get* hooks.
+
+## Introduction to get* hooks
+
+get* hooks are the *read only* side of the ModAPI. They allow mods to **query the current game state at any time** without subscribing to events or modifying anything.
+
+Unlike on* hooks, get* hooks do not fire automatically. Instead they return a snapshot of the current state **at the moment you call them**.
+
+In other words:
+
+- on* hooks tell you *when something happened*
+- get* hooks tell you *what the state looks like right now*
+
+If on* hooks are notifications, get* hooks are questions.
+
+All get* hooks are simple function calls that immediantly return data as seen here.
+
+    // getLocalPlayerKills and getLocalPlayerHealth used as examples
+    const modAPI = window.survevModAPI
+
+    const kills = modAPI.getLocalPlayerKills();
+    const health = modAPI.getLocalPlayerHealth();
+
+There is no registration, no callbacks, and no lifecycle to manage. Call them whenever you need information.
+
+All values returned by get* hooks are read only. Modifying the returned data will not affect the game.
+
+This is 100% intentional.
+
+get* hooks return the current known state, not historical data.
+
+For example:
+
+- `getLocalPlayerHealth()` returns the *current* health value
+- it does **not** tell *when* or *why* that health changed
+
+If you need timing, historical data collection, or event context, combine get* hooks with on* hooks like so:
+
+    // onLocalPlayerDamage and getLocalPlayerHealth used as examples
+
+    const modAPI = window.survevModAPI
+
+    modAPI.onLocalPlayerDamage(() => {
+      const newHealth = modAPI.getLocalPlayerHealth();
+      // now do whatever you like with that info
+    })
+
+This pattern of using on* and get* hooks is the recommended way to build most mods.
+
+## Player info hooks
+
+This section contains every get* hook related to the player.
+
+### getLocalPlayerKills
+
+**What does this return?**  
+Returns the current kill count of the local player.
+
+**When is this updated?**  
+Updates automatically whenever the local player is credited a kill.
+
+**Return value**
+- `object`
+  - `totalKills` (`number`) - The local player’s current kill count
+
+**Common use cases**
+- Rendering kill counters or overlays
+- kill-based logic or alerts
+- Debugging or analytics
+
+**Example use**
+
+    const modAPI = window.survevModAPI
+
+    const kills = modAPI.getLocalPlayerKills()
+    console.log(kills.totalKills)
+
+**Notes**
+- This hook is synchronous.
+- Returned values are read-only.
+
+---
+
+### getLocalPlayerHealth
+
+**What does this return?**  
+Returns the current health of the local player.
+
+**When is this updated?**  
+Updates automatically whenever the local player's health changes.
+
+**Return value**
+- `object`
+  - `totalHealth` (`number`) - The local player’s current health
+
+**Common use cases**
+- Rendering health counters or overlays
+- health-based logic or alerts
+- Debugging or analytics
+
+**Example use**
+
+    const modAPI = window.survevModAPI
+
+    const health = modAPI.getLocalPlayerHealth()
+    console.log(health.totalHealth)
+
+**Notes**
+- This hook is synchronous.
+- Returned values are read-only.
+
+---
+
+### getLocalPlayerDamage
+
+**What does this return?**  
+Returns the last damage amount the local player took.
+
+**When is this updated?**  
+Updates automatically whenever the local player takes damage.
+
+**Return value**
+- `object`
+  - `totalDamage` (`number`) - Amount of damage from the most recent damage event
+
+**Common use cases**
+- Rendering health counters or overlays
+- health-based logic or alerts
+- Debugging or analytics
+
+**Example use**
+
+    const modAPI = window.survevModAPI
+
+    const damageTaken = modAPI.getLocalPlayerDamage()
+    console.log(damageTaken.totalDamage)
+
+**Notes**
+- This hook is synchronous.
+- Returned values are read-only.
+
+---
+
+### getLocalPlayerHeal
+
+**What does this return?**  
+Returns the last heal amount the local player took.
+
+**When is this updated?**  
+Updates automatically whenever the local player gains health.
+
+**Return value**
+- `object`
+  - `totalHeal` (`number`) - Amount of health gained from the most recent heal event
+  - `inferredSource`
+    - (`possiblyRegen`) or (`likelyItem`) - inferred healing source more info below
+
+**InferredHealSource**
+
+- `"possiblyRegen"` - healing likely came from regeneration (such as adrenaline)
+- `"likelyItem"` - healing likely came from an item (such as bandages)
+
+**Note**: inferred source should be treated as best guess not authoritative.
+
+**Common use cases**
+- Rendering health counters or overlays
+- health-based logic or alerts
+- Debugging or analytics
+
+**Example use**
+
+    const modAPI = window.survevModAPI
+
+    const heal = modAPI.getLocalPlayerHeal()
+    // example of filtering for item only heals
+    if (heal.inferredSource !== "possiblyRegen") {
+      console.log(heal.totalHeal)
+    }
+
+**Notes**
+- This hook is synchronous.
+- Returned values are read-only.
+- This hook uses inferred data sources. If you do not want those view the [getLocalPlayerHealRaw](#getlocalplayerhealraw) hook.
+
+---
+
+### getLocalPlayerHealRaw
+
+**What does this return?**  
+Returns the *raw* heal amount the local player took.
+
+**When is this updated?**  
+Updates automatically whenever the local player regains health.
+
+**Return value**
+- `object`
+  - `totalHealRaw` (`number`) - Amount of health from the most recent heal event
+
+**Common use cases**
+- Rendering health counters or overlays
+- health-based logic or alerts
+- Debugging or analytics
+
+**Example use**
+
+    const modAPI = window.survevModAPI
+
+    const healthRaw = modAPI.getLocalPlayerHealRaw()
+    console.log(healthRaw.totalHealRaw)
+
+**Notes**
+- This hook is synchronous.
+- Returned values are read-only.
+
+---
+
+### getLocalPlayerRemovedItem
+
+**What does this return?**  
+Returns the last removed item from the local player's inventory.
+
+**When is this updated?**  
+Updates automatically whenever the local player's inventory removes a item.
+
+**Return value**
+- `object`
+  - `removedItem` (`string`) - The name of the last removed item
+  - `removedItemAmount` (`number`) - The amount removed of the last item
+
+**Common use cases**
+- Rendering inventory counters or overlays
+- inventory-based logic or alerts
+- Debugging or analytics
+
+**Example use**
+
+    const modAPI = window.survevModAPI
+
+    const lastRemovedItem = modAPI.getLocalPlayerRemovedItem()
+    console.log(
+      lastRemovedItem.removedItem,
+      lastRemovedItem.removedItemAmount
+    )
+
+**Notes**
+- This hook is synchronous.
+- Returned values are read-only.
+
+---
+
+### getLocalPlayerAddedItem
+
+**What does this return?**  
+Returns the last added item from the local player's inventory.
+
+**When is this updated?**  
+Updates automatically whenever the local player's inventory adds a item.
+
+**Return value**
+- `object`
+  - `addedItem` (`string`) - The name of the last added item
+  - `addedItemAmount` (`number`) - The amount added of the last item
+
+**Common use cases**
+- Rendering inventory counters or overlays
+- inventory-based logic or alerts
+- Debugging or analytics
+
+**Example use**
+
+    const modAPI = window.survevModAPI
+
+    const lastAddedItem = modAPI.getLocalPlayerAddedItem()
+    console.log(
+      lastAddedItem.addedItem,
+      lastAddedItem.addedItemAmount
+    )
+
+**Notes**
+- This hook is synchronous.
+- Returned values are read-only.
+
+---
+
+### getLocalPlayerHelmet
+
+**What does this return?**  
+Returns the current local player helmet.
+
+**When is this updated?**  
+Updates automatically whenever the local player's helmet changes.
+
+**Return value**
+- `object`
+  - `newHelmet` (`string`) - The name of the current helmet
+
+**Common use cases**
+- Rendering gear counters or overlays
+- gear-based logic or alerts
+- Debugging or analytics
+
+**Example use**
+
+    const modAPI = window.survevModAPI
+
+    const helmet = modAPI.getLocalPlayerHelmet()
+    console.log(helmet.newHelmet)
+
+**Notes**
+- This hook is synchronous.
+- Returned values are read-only.
+
+---
+
+### getLocalPlayerChest
+
+**What does this return?**  
+Returns the current local player chest.
+
+**When is this updated?**  
+Updates automatically whenever the local player's chest changes.
+
+**Return value**
+- `object`
+  - `newChest` (`string`) - The name of the current chest
+
+**Common use cases**
+- Rendering gear counters or overlays
+- gear-based logic or alerts
+- Debugging or analytics
+
+**Example use**
+
+    const modAPI = window.survevModAPI
+
+    const chest = modAPI.getLocalPlayerChest()
+    console.log(chest.newChest)
+
+**Notes**
+- This hook is synchronous.
+- Returned values are read-only.
+
+---
+
+### getLocalPlayerBackpack
+
+**What does this return?**  
+Returns the current local player backpack.
+
+**When is this updated?**  
+Updates automatically whenever the local player's backpack changes.
+
+**Return value**
+- `object`
+  - `newBackpack` (`string`) - The name of the current backpack
+
+**Common use cases**
+- Rendering gear counters or overlays
+- gear-based logic or alerts
+- Debugging or analytics
+
+**Example use**
+
+    const modAPI = window.survevModAPI
+
+    const backpack = modAPI.getLocalPlayerBackpack()
+    console.log(backpack.newBackpack)
+
+**Notes**
+- This hook is synchronous.
+- Returned values are read-only.
+
+---
+
+### getLocalPlayerOutfit
+
+**What does this return?**  
+Returns the current local player outfit.
+
+**When is this updated?**  
+Updates automatically whenever the local player's outfit changes.
+
+**Return value**
+- `object`
+  - `newOutfit` (`string`) - The name of the current outfit
+
+**Common use cases**
+- Rendering gear counters or overlays
+- gear-based logic or alerts
+- Debugging or analytics
+
+**Example use**
+
+    const modAPI = window.survevModAPI
+
+    const outfit = modAPI.getLocalPlayerOutfit()
+    console.log(outfit.newOutfit)
+
+**Notes**
+- This hook is synchronous.
+- Returned values are read-only.
+
+---
+
+### getLocalPlayerLastChangedGear
+
+**What does this return?**  
+Returns the current local player last changed gear.
+
+**When is this updated?**  
+Updates automatically whenever the local player's gear changes.
+
+**Return value**
+- `object`
+  - `gearSlot` (`string`) - The gear type
+  - `oldGear` (`string`) - The old gear
+  - `newGear` (`string`) - the current gear
+
+**Common use cases**
+- Rendering gear counters or overlays
+- gear-based logic or alerts
+- Debugging or analytics
+
+**Example use**
+
+    const modAPI = window.survevModAPI
+
+    const lastChangedGear = modAPI.getLocalPlayerLastChangedGear()
+    console.log(
+      lastChangedGear.gearSlot,
+      lastChangedGear.oldGear,
+      lastChangedGear.newGear
+    )
+
+**Notes**
+- This hook is synchronous.
+- Returned values are read-only.
+
+---
+
+### getLocalPlayerGear
+
+**What does this return?**  
+Returns the current local player gear set.
+
+**When is this updated?**  
+Updates automatically whenever the local player's gear changes.
+
+**Return value**
+- `object`
+  - `helmet` (`string`) - The name of the current helmet
+  - `chest` (`string`) - The name of the current chest
+  - `backpack` (`string`) - The name of the current backpack
+  - `outfit` (`string`) - The name of the current outfit
+
+**Common use cases**
+- Rendering gear counters or overlays
+- gear-based logic or alerts
+- Debugging or analytics
+
+**Example use**
+
+    const modAPI = window.survevModAPI
+
+    const gearSet = modAPI.getLocalPlayerGear()
+    console.log(
+      gearSet.helmet,
+      gearSet.chest,
+      gearSet.backpack,
+      gearSet.outfit
+    )
+
+**Notes**
+- This hook is synchronous.
+- Returned values are read-only.
+
+---
+
+### getLocalPlayerCurrentEquippedWeapon
+
+**What does this return?**  
+Returns the current local player equipped weapon.
+
+**When is this updated?**  
+Updates automatically whenever the local player's equipped weapon changes.
+
+**Return value**
+- `object`
+  - `slot` (`number`) - The slot the weapon is in
+  - `weaponType` (`string`) - The weapon name
+  - `weaponAmmo` (`number`) - The amount of ammo in the weapon
+
+**slot**
+
+The number that the `slot` object returns corresponds like this:
+
+0: Primary weapon slot
+1: Secondary weapon slot
+2: Melee weapon slot
+3: Throwables
+
+**Common use cases**
+- Rendering weapon counters or overlays
+- weapon-based logic or alerts
+- Debugging or analytics
+
+**Example use**
+
+    const modAPI = window.survevModAPI
+
+    const currentWeapon = modAPI.getLocalPlayerCurrentEquippedWeapon()
+    console.log(
+      currentWeapon.slot,
+      currentWeapon.weaponType,
+      currentWeapon.weaponAmmo
+    )
+
+**Notes**
+- This hook is synchronous.
+- Returned values are read-only.
+
+---
+
+### getLocalPlayerLastChangedWeapon
+
+**What does this return?**  
+Returns the last changed local player weapon.
+
+**When is this updated?**  
+Updates automatically whenever the local player's weapon changes.
+
+**Return value**
+- `object`
+  - `slot` (`number`) - The slot the weapon is in
+  - `oldWeapon` (`string`) - The old weapon
+  - `newWeapon` (`number`) - The new replacement weapon
+
+**slot**
+
+The number that the `slot` object returns corresponds like this:
+
+0: Primary weapon slot
+1: Secondary weapon slot
+2: Melee weapon slot
+3: Throwables
+
+**Common use cases**
+- Rendering weapon counters or overlays
+- weapon-based logic or alerts
+- Debugging or analytics
+
+**Example use**
+
+    const modAPI = window.survevModAPI
+
+    const lastChangedWeapon = modAPI.getLocalPlayerLastChangedWeapon()
+    console.log(
+      lastChangedWeapon.slot,
+      lastChangedWeapon.oldWeapon,
+      lastChangedWeapon.newWeapon
+    )
+
+**Notes**
+- This hook is synchronous.
+- Returned values are read-only.
+
+---
+
+### getLocalPlayerWeaponAmmoUsed
+
+**What does this return?**  
+Returns the last ammo used delta of the local player weapon.
+
+**When is this updated?**  
+Updates automatically whenever the local player's weapon ammo delta changes.
+
+**Return value**
+- `object`
+  - `slot` (`number`) - The slot the weapon is in
+  - `weaponType` (`string`) - The weapon name
+  - `weaponAmmo` (`number`) - The amount of ammo in the weapon
+  - `ammoUsed` (`number`) - The delta of the amount of used ammo
+
+**slot**
+
+The number that the `slot` object returns corresponds like this:
+
+0: Primary weapon slot
+1: Secondary weapon slot
+2: Melee weapon slot
+3: Throwables
+
+**Common use cases**
+- Rendering weapon counters or overlays
+- weapon-based logic or alerts
+- Debugging or analytics
+
+**Example use**
+
+    const modAPI = window.survevModAPI
+
+    const weaponAmmoUsed = modAPI.getLocalPlayerWeaponAmmoUsed()
+    console.log(
+      weaponAmmoUsed.slot,
+      weaponAmmoUsed.weaponType,
+      weaponAmmoUsed.weaponAmmo,
+      weaponAmmoUsed.ammoUsed
+    )
+
+**Notes**
+- This hook is synchronous.
+- Returned values are read-only.
+
+---
+
+### getLocalPlayerWeaponAmmoGained
+
+**What does this return?**  
+Returns the last ammo gained delta of the local player weapon.
+
+**When is this updated?**  
+Updates automatically whenever the local player's equipped weapon ammo delta changes.
+
+**Return value**
+- `object`
+  - `slot` (`number`) - The slot the weapon is in
+  - `weaponType` (`string`) - The weapon name
+  - `weaponAmmo` (`number`) - The amount of ammo in the weapon
+  - `ammoGained` (`number`) - The delta of the amount of gained ammo
+
+**slot**
+
+The number that the `slot` object returns corresponds like this:
+
+0: Primary weapon slot
+1: Secondary weapon slot
+2: Melee weapon slot
+3: Throwables
+
+**Common use cases**
+- Rendering weapon counters or overlays
+- weapon-based logic or alerts
+- Debugging or analytics
+
+**Example use**
+
+    const modAPI = window.survevModAPI
+
+    const weaponAmmoGained = modAPI.getLocalPlayerWeaponAmmoGained()
+    console.log(
+      weaponAmmoGained.slot,
+      weaponAmmoGained.weaponType,
+      weaponAmmoGained.weaponAmmo,
+      weaponAmmoGained.ammoGained
+    )
+
+**Notes**
+- This hook is synchronous.
+- Returned values are read-only.
+
+---
+
+### getLocalPlayerWeapons
+
+**What does this return?**  
+Returns the weapon set of the local player.
+
+**When is this updated?**  
+Updates automatically whenever the local player's weapons change.
+
+**Return value**
+- `object`
+  - `primaryWeaponType` (`string`) - The primary weapon name
+  - `primaryWeaponAmmo` (`string`) - The primary weapon ammo
+  - `secondaryWeaponType` (`string`) - The secondary weapon name
+  - `secondaryWeaponAmmo` (`string`) - The secondary weapon ammo
+  - `meleeWeaponType` (`string`) - The melee weapon name
+  - `meleeWeaponAmmo` (`string`) - The melee weapon ammo
+  - `throwableWeaponType` (`string`) - The throwable weapon name
+  - `throwableWeaponAmmo` (`string`) - The throwable weapon ammo
+
+**Common use cases**
+- Rendering weapon counters or overlays
+- weapon-based logic or alerts
+- Debugging or analytics
+
+**Example use**
+
+    const modAPI = window.survevModAPI
+
+    const weaponSet = modAPI.getLocalPlayerWeapons()
+    console.log(
+      weaponSet.primaryWeaponType,
+      weaponSet.primaryWeaponAmmo,
+      weaponSet.secondaryWeaponType,
+      weaponSet.secondaryWeaponAmmo,
+      weaponSet.meleeWeaponType,
+      weaponSet.meleeWeaponAmmo,
+      weaponSet.throwableWeaponType,
+      weaponSet.throwableWeaponAmmo,
+    )
+
+**Notes**
+- This hook is synchronous.
+- Returned values are read-only.
+
+---
+
+# Future of the API
+
+This API is not final. It is meant to be shaped by *you* yes, *you*, the modder.
+
+If you find yourself thinking things like:
+
+- "There should really be an on* hook for this"
+- "This get* hook works, but it's akward to use"
+
+or anything else reasonable, please speak up.
+
+This API is intentionally conservative, but it can’t evolve in the right direction without feedback from the people actually building mods with it.
+
+# Credits
+
+- [chickenPoo](https://github.com/chickenpoo351)
+  - Original API system implementation
+  - Original API documentation
+
+More contributors to be added as the API evolves.
+
+# Changelog
+
+## survevModAPI V1.0
+
+### Features
+
+- Initial on* and get* hooks added
+- Initial documentation
+
+### Contributors
+
+- [chickenPoo](https://github.com/chickenpoo351)
