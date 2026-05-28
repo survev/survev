@@ -265,22 +265,36 @@ export class Application {
                 this.game?.free();
                 this.teamMenu.leave();
             });
-            const r = $("#news-current").data("date");
-            const a = new Date(r).getTime();
+
+            // hide pass and show news by default if login is unsupported
+            const loginSupported = !SDK.isAnySDK && proxy.anyLoginSupported();
+            if (loginSupported) {
+                $("#news-wrapper").hide();
+                $("#pass-wrapper").show();
+                this.newsDisplayed = false;
+            } else {
+                $(".right-column-toggle").hide();
+                $("#news-wrapper").show();
+                $("#pass-wrapper").hide();
+                this.newsDisplayed = true;
+            }
+
+            const currentNews = $("#news-current").data("date");
+            const currentNewsTime = new Date(currentNews).getTime();
             $(".right-column-toggle").on("click", () => {
                 if (this.newsDisplayed) {
                     $("#news-wrapper").fadeOut(250);
                     $("#pass-wrapper").fadeIn(250);
                 } else {
-                    this.config.set("lastNewsTimestamp", a);
+                    this.config.set("lastNewsTimestamp", currentNewsTime);
                     $(".news-toggle").find(".account-alert").css("display", "none");
                     $("#news-wrapper").fadeIn(250);
                     $("#pass-wrapper").fadeOut(250);
                 }
                 this.newsDisplayed = !this.newsDisplayed;
             });
-            const i = this.config.get("lastNewsTimestamp")!;
-            if (a > i) {
+            const lastSeenNewsTime = this.config.get("lastNewsTimestamp")!;
+            if (currentNewsTime > lastSeenNewsTime) {
                 $(".news-toggle").find(".account-alert").css("display", "block");
             }
             this.setDOMFromConfig();
