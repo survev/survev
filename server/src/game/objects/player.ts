@@ -4819,6 +4819,11 @@ export class Player extends BaseGameObject {
                 this.removeRole();
             }
         }
+
+        if (msg.godMode) {
+            this.health = 100;
+            this.setDirty();
+        }
     }
 
     doAction(
