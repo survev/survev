@@ -562,19 +562,13 @@ export class Obstacle extends BaseGameObject {
         for (const item of items) {
             const pos = v2.add(lootPos, util.randomPointInCircle(rad));
 
-            this.game.lootBarn.addLoot(
-                item.type,
-                pos,
-                this.layer,
-                item.count,
-                undefined,
+            this.game.lootBarn.addLoot(item.type, pos, this.layer, item.count, {
                 pushSpeed,
-                params.dir,
-                undefined,
-                item.preload,
-                "obstacle",
+                dir: params.dir,
+                preloadGun: item.preload,
+                source: "obstacle",
                 ownerId,
-            );
+            });
         }
 
         if (def.createSmoke) {

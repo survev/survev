@@ -83,14 +83,25 @@ export class LootBarn {
         pos: Vec2,
         layer: number,
         count: number,
-        useCountForAmmo?: boolean,
-        pushSpeed?: number,
-        dir?: Vec2,
-        noSideAmmo?: boolean,
-        preloadGun?: boolean,
-        source?: "player" | "obstacle" | "map",
-        ownerId?: number,
+        options: {
+            useCountForAmmo?: boolean;
+            pushSpeed?: number;
+            dir?: Vec2;
+            noSideAmmo?: boolean;
+            preloadGun?: boolean;
+            source?: "player" | "obstacle" | "map";
+            ownerId?: number;
+        },
     ) {
+        const {
+            useCountForAmmo,
+            pushSpeed,
+            dir,
+            noSideAmmo,
+            preloadGun,
+            source,
+            ownerId,
+        } = options;
         const def = GameObjectDefs[type];
 
         if (!def || !("lootImg" in def)) {

@@ -1160,18 +1160,11 @@ export class GameMap {
                     const item = this.game.lootBarn.getLootTable(tier.tier!);
                     if (!item) break;
 
-                    this.game.lootBarn.addLoot(
-                        item.name,
-                        pos,
-                        layer,
-                        item.count,
-                        undefined,
-                        0,
-                        undefined,
-                        undefined,
-                        item.preload === true,
-                        "map",
-                    );
+                    this.game.lootBarn.addLoot(item.name, pos, layer, item.count, {
+                        pushSpeed: 0,
+                        preloadGun: !!item.preload,
+                        source: "map",
+                    });
 
                     this.grid.addCollider({
                         collision: collider.createCircle(pos, 3),
