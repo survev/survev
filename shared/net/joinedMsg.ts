@@ -6,12 +6,14 @@ export class JoinedMsg implements AbstractMsg {
     playerId = 0;
     started = false;
     emotes: string[] = [];
+    isAdmin = false;
 
     serialize(s: BitStream) {
         /* STRIP_FROM_PROD_CLIENT:START */
         s.writeUint8(this.teamMode);
         s.writeUint16(this.playerId);
         s.writeBoolean(this.started);
+        s.writeBoolean(this.isAdmin);
 
         s.writeArray(this.emotes, 8, (emote) => {
             s.writeGameType(emote);
@@ -23,6 +25,7 @@ export class JoinedMsg implements AbstractMsg {
         this.teamMode = s.readUint8();
         this.playerId = s.readUint16();
         this.started = s.readBoolean();
+        this.isAdmin = s.readBoolean();
 
         this.emotes = s.readArray(8, () => {
             return s.readGameType();
