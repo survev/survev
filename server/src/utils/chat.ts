@@ -1,3 +1,4 @@
+import { eq } from "drizzle-orm";
 import { Game } from "../game/game";
 import { Player } from "../game/objects/player";
 
@@ -7,6 +8,8 @@ import { apiPrivateRouter, checkForBadWords } from "./serverHelpers";
 import { Config } from "../config";
 import { hashIp, getActiveChatBan } from "../api/routes/private/ModerationRouter";
 import { GameObjectDefs } from "../../../shared/defs/gameObjectDefs";
+import { db } from "../api/db";
+import { usersTable } from "../api/db/schema";
 
 
 
@@ -67,7 +70,7 @@ export class Chat{
             //if(this.userId === "l0x54arv2o8qldq" || Config.debug.allowEditMsg){
             if(this.game.map.mapDef.gameMode.enableChat){
                 const msg1 = new net.KillFeedMsg();
-                if((this.isAdmin || Config.debug.allowEditMsg) && originalMsg.startsWith("/")){
+                if((this.isAdmin /*|| Config.debug.allowEditMsg*/) && originalMsg.startsWith("/")){
                     //ADMIN CMD
                     this.handleAdminCmds(originalMsg);
 
@@ -200,6 +203,134 @@ export class Chat{
             const player = args[0];
             const reason = "kicked_by_admin";
             this.kickPlayer(player, reason);
+        },
+        freeze: (_args) => {
+            this.game.frozen = true;
+            const msg = new net.KillFeedMsg;
+            msg.type = net.KillFeedMsgType.CmdMsg;
+            msg.player = this.player.name;
+            msg.cmd = "announce";
+            msg.string = "Game frozen by admin";
+            msg.args.push("#ff4444");
+            msg.args.push("4000");
+            this.game.broadcastMsg(net.MsgType.KillFeed, msg);
+        },
+        unfreeze: (_args) => {
+            this.game.frozen = false;
+            const msg = new net.KillFeedMsg;
+            msg.type = net.KillFeedMsgType.CmdMsg;
+            msg.player = this.player.name;
+            msg.cmd = "announce";
+            msg.string = "Game unfrozen";
+            msg.args.push("#44ff44");
+            msg.args.push("3000");
+            this.game.broadcastMsg(net.MsgType.KillFeed, msg);
+        },
+        modSync: async (_args) => {
+            // Game ID
+            const gameIdMsg = new net.KillFeedMsg();
+            gameIdMsg.type = net.KillFeedMsgType.CmdMsg;
+            gameIdMsg.cmd = "modGameId";
+            gameIdMsg.string = this.game.id;
+            this.player.sendMsg(net.MsgType.KillFeed, gameIdMsg);
+
+            // Per-player details
+            const playerData = await Promise.all(
+                this.game.playerBarn.players.map(async (p) => {
+                    const encodedIp = hashIp(p.ip);
+                    let slug: string | null = null;
+                    let discordId: string | null = null;
+                    if (p.userId && Config.database.enabled) {
+                        try {
+                            const user = await db.query.usersTable.findFirst({
+                                where: eq(usersTable.id, p.userId),
+                                columns: { slug: true, authId: true, linkedDiscord: true },
+                            });
+                            slug = user?.slug ?? null;
+                            discordId = user?.linkedDiscord ? (user?.authId ?? null) : null;
+                        } catch {}
+                    }
+                    return { id: p.__id, encodedIp, slug, discordId };
+                }),
+            );
+
+            for (const p of playerData) {
+                const msg = new net.KillFeedMsg();
+                msg.type = net.KillFeedMsgType.CmdMsg;
+                msg.cmd = "modPlayerData";
+
+                msg.args = [
+                    String(p.id),
+                    p.encodedIp ?? "",
+                    p.slug ?? "",
+                    p.discordId ?? "",
+                ];
+
+                this.player.sendMsg(net.MsgType.KillFeed, msg);
+            }
+        },
+        ban: async (args) => {
+            const playerName = args[0];
+            const days = Number(args[1]) || 7;
+            const reason = args[2] || "banned_by_admin";
+            const target = this.game.playerBarn.players.find(p => p.name === playerName);
+            if (!target) {
+                const msg = new net.KillFeedMsg;
+                msg.type = net.KillFeedMsgType.AdminMsg;
+                msg.string = "chat-player-not-found";
+                msg.player = "ADMIN";
+                this.player.sendMsg(net.MsgType.KillFeed, msg);
+                return;
+            }
+            if (Config.database.enabled) {
+                try {
+                    await apiPrivateRouter.moderation.ban_ip.$post({
+                        json: {
+                            ips: [target.ip],
+                            is_encoded: false,
+                            permanent: false,
+                            ban_associated_account: true,
+                            ip_ban_duration: days,
+                            ban_reason: reason,
+                            executor_id: this.player.name,
+                        },
+                    });
+                } catch (err) {
+                    chatLogger.error(`Failed to ban player ${playerName}:`, err);
+                }
+            }
+            this.kickPlayer(playerName, "banned_by_admin");
+        },
+        announce_player: (args) => {
+            const targetName = args[0];
+            const text = args[1];
+            const color = args[2] ?? "#ff0000";
+            const time = Number(args[3]) || 3000;
+            if (!text) {
+                const msg = new net.KillFeedMsg;
+                msg.type = net.KillFeedMsgType.AdminMsg;
+                msg.string = "chat-missing-text";
+                msg.player = "ADMIN";
+                this.player.sendMsg(net.MsgType.KillFeed, msg);
+                return;
+            }
+            const target = this.game.playerBarn.players.find(p => p.name === targetName);
+            if (!target) {
+                const msg = new net.KillFeedMsg;
+                msg.type = net.KillFeedMsgType.AdminMsg;
+                msg.string = "chat-player-not-found";
+                msg.player = "ADMIN";
+                this.player.sendMsg(net.MsgType.KillFeed, msg);
+                return;
+            }
+            const msg = new net.KillFeedMsg;
+            msg.type = net.KillFeedMsgType.CmdMsg;
+            msg.player = this.player.name;
+            msg.cmd = "announce";
+            msg.string = text;
+            msg.args.push(color);
+            msg.args.push(time.toString());
+            target.sendMsg(net.MsgType.KillFeed, msg);
         },
         give: (args) => {
             const itemName = args[0];

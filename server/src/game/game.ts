@@ -53,6 +53,7 @@ export class Game {
     stopped = false;
     allowJoin = false;
     over = false;
+    frozen = false;
     startedTime = 0;
     stopTicker = 0;
     id: string;
@@ -577,7 +578,7 @@ export class Game {
                 source: player.downedBy,
             });
         }else
-        if (player.canDespawn() && this.map.mapDef.gameMode.canDespawn || !this.started) {
+        if (player.canDespawn() && this.map.mapDef.gameMode.canDespawn || !this.started && !player.spectator) {
             player.game.playerBarn.removePlayer(player);
             player.mapIndicator?.kill();
         }else {
@@ -587,6 +588,14 @@ export class Game {
                 source: player.lastDamagedBy,
             });
         }
+
+        // Notify clients so the mod UI can remove the player from its list
+        const leftMsg = new net.KillFeedMsg();
+        leftMsg.type = net.KillFeedMsgType.CmdMsg;
+        leftMsg.cmd = "playerLeft";
+        leftMsg.string = player.__id.toString();
+        leftMsg.player = player.name;
+        this.broadcastMsg(net.MsgType.KillFeed, leftMsg);
     }
 
     broadcastMsg(type: net.MsgType, msg: net.Msg) {
