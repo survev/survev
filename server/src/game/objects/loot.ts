@@ -2,7 +2,12 @@ import { GameObjectDefs, type LootDef } from "../../../../shared/defs/gameObject
 import type { MapDef } from "../../../../shared/defs/mapDefs";
 import { GameConfig } from "../../../../shared/gameConfig";
 import { ObjectType } from "../../../../shared/net/objectSerializeFns";
-import { type AABB, type Circle, coldet } from "../../../../shared/utils/coldet";
+import {
+    type AABB,
+    type Circle,
+    type Collider,
+    coldet,
+} from "../../../../shared/utils/coldet";
 import { collider } from "../../../../shared/utils/collider";
 import { math } from "../../../../shared/utils/math";
 import type { River } from "../../../../shared/utils/river";
@@ -15,7 +20,7 @@ import type { MapIndicator } from "./mapIndicator";
 import type { Structure } from "./structure";
 
 const AMMO_OFFSET_X = 0.75;
-const AMMO_OFFSET_Y = -0.1;
+const AMMO_OFFSET_Y = -0.075;
 
 type LootTierItem = MapDef["lootTable"][string][number];
 
@@ -54,8 +59,8 @@ export class LootBarn {
                 const minForce = 0.125;
                 const forceA = math.max(res.pen / a.lootRad, minForce) * forceFactor;
                 const forceB = math.max(res.pen / b.lootRad, minForce) * forceFactor;
-                v2.set(a.pushVel, v2.sub(a.pushVel, v2.mul(res.dir, forceA)));
-                v2.set(b.pushVel, v2.add(b.pushVel, v2.mul(res.dir, forceB)));
+                v2.set(a.pos, v2.sub(a.pos, v2.mul(res.dir, forceA * dt)));
+                v2.set(b.pos, v2.add(b.pos, v2.mul(res.dir, forceB * dt)));
             },
         );
 
@@ -153,7 +158,7 @@ export class LootBarn {
                 const rightAmmo = new Loot(
                     this.game,
                     def.ammo,
-                    v2.add(pos, v2.create(AMMO_OFFSET_X, AMMO_OFFSET_Y + 0.001)),
+                    v2.add(pos, v2.create(AMMO_OFFSET_X, AMMO_OFFSET_Y)),
                     layer,
                     ammoCount - halfAmmo,
                     pushSpeed,
@@ -161,6 +166,20 @@ export class LootBarn {
                     ownerId,
                 );
                 this._addLoot(rightAmmo);
+            }
+        }
+    }
+
+    /**
+     * Should be called in events of obstacles changing their collider, spawning, regrowing etc
+     * Be careful to not call it too often
+     */
+    forceLootUpdates(collider: Collider, layer: number) {
+        const loots = this.game.grid.intersectCollider(collider);
+        for (let i = 0; i < loots.length; i++) {
+            const obj = loots[i];
+            if (obj.__type === ObjectType.Loot && util.sameLayer(obj.layer, layer)) {
+                obj.forceUpdate = true;
             }
         }
     }
@@ -230,15 +249,16 @@ export class Loot extends BaseGameObject {
 
     isOld = false;
 
-    forceUpdateTicker = 1;
+    forceUpdate = true;
 
     layer: number;
     type: string;
     count: number;
 
     vel = v2.create(0, 0);
-    oldPos = v2.create(0, 0);
-    pushVel = v2.create(0, 0);
+    // last position sent to clients
+    // used to check when to set the loot to dirty
+    lastClientPos = v2.create(0, 0);
 
     collider: Circle;
     rad: number;
@@ -319,20 +339,17 @@ export class Loot extends BaseGameObject {
             }
         }
 
+        // make loots "sleep" if they are not moving
+        // `forceUpdate` is set when obstacles around the loot change their colliders
         const shouldUpdate =
-            this.forceUpdateTicker > 0.3 ||
-            v2.length(v2.add(this.vel, this.pushVel)) > 0.01 ||
-            !v2.eq(this.oldPos, this.pos);
+            this.forceUpdate ||
+            !v2.eq(this.vel, v2.create(0, 0), 0.01) ||
+            !v2.eq(this.lastClientPos, this.pos, 0.01);
 
         if (!shouldUpdate) {
-            // force a loot update few ms to make sure if e.g an obstacle spawned on top of the loot (airdrop, potato respawning etc)
-            // it will still resolve collision instead of sleeping forever
-            this.forceUpdateTicker += dt;
             return;
         }
-        this.forceUpdateTicker = 0;
-
-        v2.set(this.oldPos, v2.copy(this.pos));
+        this.forceUpdate = false;
 
         // cap velocity
         const sqrLen = v2.lengthSqr(this.vel);
@@ -344,10 +361,7 @@ export class Loot extends BaseGameObject {
         }
 
         v2.set(this.vel, v2.mul(this.vel, 1 / (1 + dt * 2.5)));
-        v2.set(this.pos, v2.add(this.pos, v2.mul(v2.add(this.vel, this.pushVel), dt)));
-
-        // Reset push velocity
-        v2.set(this.pushVel, v2.create(0, 0));
+        v2.set(this.pos, v2.add(this.pos, v2.mul(this.vel, dt)));
 
         const originalLayer = this.layer;
 
@@ -476,10 +490,11 @@ export class Loot extends BaseGameObject {
             this.setDirty();
         }
 
-        if (!v2.eq(this.oldPos, this.pos)) {
+        if (!v2.eq(this.lastClientPos, this.pos, 0.01)) {
             this.setPartDirty();
             this.game.grid.updateObject(this);
             this.mapIndicator?.updatePosition(this.pos);
+            v2.set(this.lastClientPos, v2.copy(this.pos));
         }
 
         this.game.map.clampToMapBounds(this.pos, this.rad);

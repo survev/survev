@@ -115,6 +115,7 @@ export class Airdrop extends BaseGameObject {
             }
 
             this.game.map.genObstacle(this.obstacleType, this.pos, 0);
+            this.game.lootBarn.forceLootUpdates(this.crateCollision, this.layer);
         } else {
             // airdrops parachute fallT only needs to be sent once to clients
             // but still need to be serialized for new clients that will get them into their FOV

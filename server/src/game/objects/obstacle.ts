@@ -339,6 +339,7 @@ export class Obstacle extends BaseGameObject {
         this.healthT = 1;
 
         this.updateCollider();
+        this.game.lootBarn.forceLootUpdates(this.collider, this.layer);
 
         this.setDirty();
     }
@@ -400,6 +401,7 @@ export class Obstacle extends BaseGameObject {
         if (this.minScale < 1) {
             this.scale = math.lerp(this.healthT, this.minScale, this.maxScale);
             this.updateCollider();
+            this.game.lootBarn.forceLootUpdates(this.collider, this.layer);
         }
 
         // need to send full object for obstacles with explosions
@@ -743,6 +745,7 @@ export class Obstacle extends BaseGameObject {
         this.rot = math.oriToRad(this.ori);
 
         this.updateCollider();
+        this.game.lootBarn.forceLootUpdates(this.collider, this.layer);
 
         this.checkLayer();
         this.setDirty();
