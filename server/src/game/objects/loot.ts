@@ -351,15 +351,6 @@ export class Loot extends BaseGameObject {
         }
         this.forceUpdate = false;
 
-        // cap velocity
-        const sqrLen = v2.lengthSqr(this.vel);
-        const maxVel = 75;
-        if (sqrLen > maxVel * maxVel) {
-            const len = Math.sqrt(sqrLen);
-            const thisDir = v2.div(this.vel, len > 0.000001 ? len : 1);
-            v2.set(this.vel, v2.mul(thisDir, maxVel));
-        }
-
         v2.set(this.vel, v2.mul(this.vel, 1 / (1 + dt * 2.5)));
         v2.set(this.pos, v2.add(this.pos, v2.mul(this.vel, dt)));
 
