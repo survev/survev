@@ -2005,7 +2005,7 @@ export class Player extends BaseGameObject {
             }
         }
 
-        v2.set(this.posOld, v2.copy(this.pos));
+        v2.set(this.posOld, this.pos);
 
         v2.set(this.vel, v2.mul(this.vel, 1 / (1 + dt * 4)));
         v2.set(this.pos, v2.add(this.pos, v2.mul(this.vel, dt)));

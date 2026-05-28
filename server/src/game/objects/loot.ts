@@ -315,7 +315,7 @@ export class Loot extends BaseGameObject {
     }
 
     updatePos(newPos: Vec2): void {
-        v2.set(this.pos, v2.copy(newPos));
+        v2.set(this.pos, newPos);
         this.game.map.clampToMapBounds(this.pos, this.rad);
         this.setPartDirty();
     }
@@ -485,7 +485,7 @@ export class Loot extends BaseGameObject {
             this.setPartDirty();
             this.game.grid.updateObject(this);
             this.mapIndicator?.updatePosition(this.pos);
-            v2.set(this.lastClientPos, v2.copy(this.pos));
+            v2.set(this.lastClientPos, this.pos);
         }
 
         this.game.map.clampToMapBounds(this.pos, this.rad);
