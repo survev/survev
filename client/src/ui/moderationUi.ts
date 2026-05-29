@@ -414,14 +414,14 @@ export class ModerationUi {
 
     private leftPlayerIds = new Set<number>();
     private gameId = "";
-    private playerExtraData = new Map<number, { encodedIp: string; slug: string | null; discordId: string | null }>();
+    private playerExtraData = new Map<number, { encodedIp: string; slug: string | null; discordId: string | null; spectator: boolean }>();
 
     setGameId(id: string) {
         this.gameId = id;
         this.broadcastSync();
     }
 
-    setPlayerExtraData(data: Array<{ id: number; encodedIp: string; slug: string | null; discordId: string | null }>) {
+    setPlayerExtraData(data: Array<{ id: number; encodedIp: string; slug: string | null; discordId: string | null; spectator: boolean }>) {
         this.playerExtraData.clear();
         for (const d of data) this.playerExtraData.set(d.id, d);
         this.broadcastSync();
@@ -432,6 +432,7 @@ export class ModerationUi {
         encodedIp: string;
         slug: string | null;
         discordId: string | null;
+        spectator: boolean;
     }) {
         this.playerExtraData.set(data.id, data);
         this.broadcastSync();
@@ -531,6 +532,7 @@ export class ModerationUi {
             .filter(p => !this.leftPlayerIds.has(p.playerId))
             .map(p => {
                 const extra = this.playerExtraData.get(p.playerId);
+                const dead = this.game.m_playerBarn.getPlayerById(p.playerId)?.m_netData.m_dead ?? false;
                 return {
                     id: p.playerId,
                     name: p.name,
@@ -538,6 +540,8 @@ export class ModerationUi {
                     encodedIp: extra?.encodedIp ?? null,
                     slug: extra?.slug ?? null,
                     discordId: extra?.discordId ?? null,
+                    spectator: extra?.spectator ?? false,
+                    dead,
                 };
             });
         this.channel.postMessage({ type: "sync", players, gameId: this.gameId });
@@ -553,6 +557,7 @@ export class ModerationUi {
             "mod-panel",
             "width=680,height=860,resizable=yes",
         );
+        this.toggle();
         // Send initial data once popup signals it's ready (via requestSync ping)
     }
 
