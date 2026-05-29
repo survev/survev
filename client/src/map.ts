@@ -598,7 +598,7 @@ export class Map {
             for (let i = 0; i < places.length; i++) {
                 const place = places[i];
                 const style = new PIXI.TextStyle({
-                    fontFamily: "Arial",
+                    fontFamily: "Roboto Condensed, Arial, sans-serif",
                     fontSize: device.mobile ? 20 : 22,
                     fontWeight: "bold",
                     fill: ["#ffffff"],
