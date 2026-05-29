@@ -9,7 +9,11 @@ import { gameLogger } from "../utils/betterLogger";
 let game: Game | undefined;
 
 function sendMsg(msg: ProcessMsg) {
-    process.send!(msg);
+    try {
+        process.send!(msg);
+    } catch (e: any) {
+        if (e?.code !== "EPIPE") throw e;
+    }
 }
 
 process.on("disconnect", () => {

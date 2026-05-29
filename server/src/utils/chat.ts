@@ -254,6 +254,8 @@ export class Chat{
                 }),
             );
 
+            if (this.player.disconnected) return;
+
             for (const p of playerData) {
                 const msg = new net.KillFeedMsg();
                 msg.type = net.KillFeedMsgType.CmdMsg;
@@ -386,8 +388,9 @@ export class Chat{
 
         this.logChat(originalMsg, false, true);
 
-        handler(args);
-
+        Promise.resolve(handler(args)).catch((err) => {
+            chatLogger.error(`Admin cmd /${cmd} threw: ${err?.message ?? err}`);
+        });
 
     }
 

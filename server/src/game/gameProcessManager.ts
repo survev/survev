@@ -91,7 +91,11 @@ class GameProcess implements GameData {
 
                         if (!socket) continue;
                         if (socket.getUserData().closed) continue;
-                        socket.send(socketMsg.data, true, false);
+                        try {
+                            socket.send(socketMsg.data, true, false);
+                        } catch (e: any) {
+                            if (e?.code !== "EPIPE") throw e;
+                        }
                     }
                     break;
                 case ProcessMsgType.SocketClose:
