@@ -113,9 +113,9 @@ export const Comp: MapDef = {
     lootTable: {
         tier_world: [
             { name: "tier_guns", count: 1, weight: 0.21995 }, // TODO get more data on this from original 30%
-            { name: "tier_scrap", count: 1, weight: 0.08 },
+            { name: "tier_scrap", count: 1, weight: 0.1 },
             { name: "tier_ammo", count: 1, weight: 0.2 }, // ? 30%
-            { name: "tier_scopes", count: 1, weight: 0.25 }, // ? 20%
+            { name: "tier_scopes", count: 1, weight: 0.23 }, // ? 20%
             { name: "tier_armor", count: 1, weight: 0.15 }, // ? 20%
             { name: "tier_medical", count: 1, weight: 0.3 }, // ? 20%
             { name: "tier_throwables", count: 1, weight: 0.05 }, // ? 5%
@@ -130,8 +130,8 @@ export const Comp: MapDef = {
             { name: "tier_packs", count: 1, weight: 0.11 }, // ? 14%
         ],
         tier_container: [
-            { name: "tier_guns", count: 1, weight: 0.22 }, // 27
-            { name: "tier_scrap", count: 1, weight: 0.05 }, // 4
+            { name: "tier_guns", count: 1, weight: 0.2 }, // 27
+            { name: "tier_scrap", count: 1, weight: 0.07 }, // 4
             { name: "tier_ammo", count: 1, weight: 0.04 }, // 4
             { name: "tier_scopes", count: 1, weight: 0.15 }, // 15
             { name: "tier_armor", count: 1, weight: 0.2 }, // 20

@@ -191,7 +191,7 @@ export const BaseDefs: Record<string, GunDef> = {
         shotSpread: 11,
         bulletCount: 1,
         bulletType: "bullet_mac10",
-        upgraded: { gun: "modified_mac10", cost: 3 },
+        upgraded: { gun: "modified_mac10", cost: 2 },
         headshotMult: 1,
         speed: { equip: 0, attack: 0 },
         lootImg: {
@@ -628,7 +628,7 @@ export const BaseDefs: Record<string, GunDef> = {
         upgraded: { gun: "modified_m4a1", cost: 6 },
         bulletType: "bullet_m4a1",
         headshotMult: 1,
-        speed: { equip: 50, attack: 0 },
+        speed: { equip: 0, attack: 0 },
         lootImg: {
             sprite: "loot-weapon-m4a1.img",
             tint: 65280,
@@ -1278,7 +1278,7 @@ export const BaseDefs: Record<string, GunDef> = {
         shotSpread: 1.5,
         bulletCount: 1,
         bulletType: "bullet_bar",
-        upgraded: { gun: "modified_bar", cost: 4 },
+        upgraded: { gun: "modified_bar", cost: 3 },
         headshotMult: 1,
         speed: { equip: 0, attack: -1.5 },
         lootImg: {
@@ -1940,7 +1940,7 @@ export const BaseDefs: Record<string, GunDef> = {
         extendedReload: 8,
         reloadTime: 2.1,
         fireDelay: 0.2,
-        switchDelay: 0.12,
+        switchDelay: 0.17,
         barrelLength: 3.6,
         barrelOffset: 0,
         recoilTime: 0.36,
@@ -2001,7 +2001,7 @@ export const BaseDefs: Record<string, GunDef> = {
         bulletCount: 9,
         jitter: 1,
         bulletType: "bullet_buckshot",
-        upgraded: { gun: "modified_m870", cost: 3 },
+        upgraded: { gun: "modified_m870", cost: 2 },
         headshotMult: 1,
         lootImg: {
             sprite: "loot-weapon-m870.img",
@@ -2911,7 +2911,7 @@ export const BaseDefs: Record<string, GunDef> = {
         shotSpread: 2,
         bulletCount: 1,
         bulletType: "bullet_p30l",
-        upgraded: { gun: "modified_p30l", cost: 3 },
+        upgraded: { gun: "modified_p30l", cost: 2 },
         headshotMult: 1,
         speed: { equip: 2.5, attack: 2 },
         lootImg: {
@@ -3983,6 +3983,9 @@ export const ModifiedGunDefs: Record<string, GunDef> = {
         lootImg: {
             border: "loot-circle-outer-modified-01.img",
         },
+        worldImg: {
+            sprite: "gun-mp220-modified-01.img",
+        },
     }),
     modified_p30l: defineGunSkin("p30l", {
         name: "P30L [+]",
@@ -4118,6 +4121,8 @@ export const ModifiedGunDefs: Record<string, GunDef> = {
         moveSpread: 1.5,
         shotSpread: 1.2,
         fireDelay: 0.16,
+        bulletTypeExtra: "bullet_bar_extra_modified",
+        extraBulletTrigger: 2,
         bulletType: "bullet_bar_modified",
         upgraded: undefined,
         modifiedSound: "bar_01",
@@ -4142,6 +4147,7 @@ export const ModifiedGunDefs: Record<string, GunDef> = {
         dualWieldType: "modified_deagle_dual",
         bulletType: "bullet_deagle_modified",
         fireDelay: 0.18,
+        switchDelay: 0.16,
         moveSpread: 1.8,
         shotSpread: 1,
         upgraded: undefined,
@@ -4202,7 +4208,7 @@ export const ModifiedGunDefs: Record<string, GunDef> = {
         burstDelay: 0.001,
         fireDelay: 0.35,
         fireMode: "burst",
-        moveSpread: 1.6,
+        moveSpread: 1.5,
         shotSpread: 1.2,
         switchDelay: 0.4,
         bulletType: "bullet_vss_modified",
@@ -4304,7 +4310,7 @@ export const ModifiedGunDefs: Record<string, GunDef> = {
         maxReloadAlt: 5,
         fireDelay: 0.8,
         switchDelay: 0.8,
-        reloadTime: 0.7,
+        reloadTime: 0.65,
         reloadTimeAlt: 2.6,
         upgraded: undefined,
         bulletType: "bullet_scout_modified",

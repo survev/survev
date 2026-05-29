@@ -89,6 +89,16 @@ export const ExplosionDefs: Record<string, ExplosionDef> = {
         explosionEffectType: "rounds",
         decalType: "decal_rounds_explosion",
     },
+    explosion_bar_modified: {
+        type: "explosion",
+        damage: 6,
+        obstacleDamage: 30,
+        rad: { min: 0.75, max: 1 },
+        shrapnelCount: 0,
+        shrapnelType: "shrapnel_usas",
+        explosionEffectType: "rounds",
+        decalType: "decal_rounds_explosion",
+    },
     explosion_rounds_sg: {
         type: "explosion",
         damage: 3,
