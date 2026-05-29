@@ -159,12 +159,16 @@ export class InputHandler {
 
     // Keyboard
     onKeyDown(event: KeyboardEvent) {
-        if(this.isTyping && event.keyCode !== Key.Enter && event.keyCode !== Key.Escape){
+        if(this.isTyping && event.keyCode !== Key.Enter && event.keyCode !== Key.Escape && event.keyCode !== Key.F4){
             return;
         }
         const keyCode = event.keyCode;
         // Prevent tab behavior
         if (keyCode == 9) {
+            event.preventDefault();
+        }
+        // Prevent browser F4 default behavior
+        if (keyCode == Key.F4) {
             event.preventDefault();
         }
         if (this.checkCaptureInput(event, InputType.Key, keyCode)) {

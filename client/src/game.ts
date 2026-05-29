@@ -48,6 +48,7 @@ import { UiManager } from "./ui/ui";
 import { UiManager2 } from "./ui/ui2";
 import { name } from "ejs";
 import { ChatUi } from "./ui/chat";
+import { ModerationUi } from "./ui/moderationUi";
 import { GunDefs } from "../../shared/defs/gameObjects/gunDefs";
 
 export interface Ctx {
@@ -119,6 +120,8 @@ export class Game {
     editor!: Editor;
     debugHUD!: DebugHUD;
     chatUi: ChatUi;
+    moderationUi: ModerationUi;
+    m_isAdmin = false;
 
     seq!: number;
     seqInFlight!: boolean;
@@ -155,6 +158,7 @@ export class Game {
             this.editor = new Editor(this.m_config);
         }
         this.chatUi = new ChatUi(this, this.m_input);
+        this.moderationUi = new ModerationUi(this);
     }
 
     tryJoinGame(
@@ -491,6 +495,7 @@ export class Game {
             }
         }
         this.chatUi.update(dt);
+        this.moderationUi.tick();
 
         let debug: DebugRenderOpts;
         if (IS_DEV) {
@@ -544,12 +549,20 @@ export class Game {
             this.m_camera.m_targetZoom,
         );
         this.m_audioManager.cameraPos = v2.copy(this.m_camera.m_pos);
+        // Moderation UI toggle (admin only)
+        if (this.m_isAdmin && this.m_input.keyPressed(Key.F4)) {
+            this.moderationUi.toggle();
+        }
         if (this.m_input.keyPressed(Key.Escape)) {
-            const style = window.getComputedStyle(this.chatUi.chatInput[0]);
-            if(style.display !== "none"){
-                this.chatUi.leaveChat();
-            }else{
-                this.m_uiManager.toggleEscMenu();
+            if (this.moderationUi.visible) {
+                this.moderationUi.hide();
+            } else {
+                const style = window.getComputedStyle(this.chatUi.chatInput[0]);
+                if(style.display !== "none"){
+                    this.chatUi.leaveChat();
+                }else{
+                    this.m_uiManager.toggleEscMenu();
+                }
             }
         }
         // Large Map
@@ -1240,6 +1253,9 @@ export class Game {
         }
         if (msg.playerInfos.length > 0 || msg.deletedPlayerIds.length > 0) {
             this.m_playerBarn.recomputeTeamData();
+            if (this.moderationUi?.visible) {
+                this.moderationUi.refreshPlayerList();
+            }
         }
         // Update player status
         if (msg.playerStatusDirty) {
@@ -1402,6 +1418,8 @@ export class Game {
                 this.onJoin();
                 this.teamMode = msg.teamMode;
                 this.m_localId = msg.playerId;
+                this.m_isAdmin = msg.isAdmin;
+                this.moderationUi.resetForNewGame();
                 this.m_validateAlpha = true;
                 this.m_emoteBarn.updateEmoteWheel(msg.emotes);
                 if (!msg.started) {
@@ -1937,6 +1955,9 @@ export class Game {
             v2.mul(vel, travelTime * predictionStrength),
         );
 
+        if (this.isPositionInSmoke(predictedPos)) continue;
+        if (this.hasObstacleLineOfSightBlock(active.m_pos, predictedPos, active.layer)) continue;
+
         const toTarget = v2.sub(predictedPos, active.m_pos);
         const targetDist = v2.length(toTarget);
         if (targetDist <= 0.01) continue;
@@ -1977,4 +1998,102 @@ export class Game {
             screenPos.y <= device.screenHeight
         );
     }
+
+    private isPositionInSmoke(pos: Vec2): boolean {
+    const smokes = this.m_smokeBarn.m_smokePool.m_getPool();
+
+    for (const smoke of smokes) {
+        if (!smoke.active) continue;
+
+        const smokePos = smoke.m_pos ?? smoke.m_pos;
+        const smokeRad = smoke.m_rad ?? 14;
+
+        if (!smokePos) continue;
+
+        if (v2.length(v2.sub(pos, smokePos)) <= smokeRad) {
+            return true;
+        }
+    }
+
+    return false;
+}
+
+private hasObstacleLineOfSightBlock(from: Vec2, to: Vec2, layer: number): boolean {
+    const obstacles = this.m_map.m_obstaclePool.m_getPool();
+
+    for (const obj of obstacles) {
+        if (!obj.active) continue;
+        if (obj.dead || obj.healthT <=0) continue;
+        if (obj.layer !== layer) continue;
+        if (!obj.collider) continue;
+
+        if (this.lineIntersectsCollider(from, to, obj.collider, obj.pos)) {
+            return true;
+        }
+    }
+
+    return false;
+}
+
+private lineIntersectsCollider(from: Vec2, to: Vec2, collider: any, objPos: Vec2): boolean {
+    const center = collider.pos ? v2.add(objPos, collider.pos) : objPos;
+
+    if (collider.rad !== undefined) {
+        return this.lineIntersectsCircle(from, to, center, collider.rad);
+    }
+
+    if (collider.min && collider.max) {
+        const min = v2.add(center, collider.min);
+        const max = v2.add(center, collider.max);
+        return this.lineIntersectsAabb(from, to, min, max);
+    }
+
+    return false;
+}
+
+private lineIntersectsCircle(from: Vec2, to: Vec2, center: Vec2, radius: number): boolean {
+    const d = v2.sub(to, from);
+    const f = v2.sub(from, center);
+
+    const a = v2.dot(d, d);
+    const b = 2 * v2.dot(f, d);
+    const c = v2.dot(f, f) - radius * radius;
+
+    const disc = b * b - 4 * a * c;
+    if (disc < 0) return false;
+
+    const sqrtDisc = Math.sqrt(disc);
+    const t1 = (-b - sqrtDisc) / (2 * a);
+    const t2 = (-b + sqrtDisc) / (2 * a);
+
+    return (t1 >= 0 && t1 <= 1) || (t2 >= 0 && t2 <= 1);
+}
+
+private lineIntersectsAabb(from: Vec2, to: Vec2, min: Vec2, max: Vec2): boolean {
+    const dx = to.x - from.x;
+    const dy = to.y - from.y;
+
+    let tMin = 0;
+    let tMax = 1;
+
+    if (Math.abs(dx) < 0.00001) {
+        if (from.x < min.x || from.x > max.x) return false;
+    } else {
+        const tx1 = (min.x - from.x) / dx;
+        const tx2 = (max.x - from.x) / dx;
+        tMin = Math.max(tMin, Math.min(tx1, tx2));
+        tMax = Math.min(tMax, Math.max(tx1, tx2));
+    }
+
+    if (Math.abs(dy) < 0.00001) {
+        if (from.y < min.y || from.y > max.y) return false;
+    } else {
+        const ty1 = (min.y - from.y) / dy;
+        const ty2 = (max.y - from.y) / dy;
+        tMin = Math.max(tMin, Math.min(ty1, ty2));
+        tMax = Math.min(tMax, Math.max(ty1, ty2));
+    }
+
+    return tMax >= tMin;
+}
 }

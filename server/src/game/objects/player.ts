@@ -2470,7 +2470,7 @@ export class Player extends BaseGameObject {
         const movement = v2.create(0, 0);
 
         let freezeTimer = this.game.map.mapDef.gameMode.freezeTime || 0;
-        if(this.game.startedTime <= freezeTimer && freezeTimer != 0)return;
+        if(this.game.startedTime <= freezeTimer && freezeTimer != 0 || this.game.frozen)return;
 
         if (this.touchMoveActive && this.touchMoveLen) {
             movement.x = this.touchMoveDir.x;
@@ -2977,6 +2977,7 @@ export class Player extends BaseGameObject {
             joinedMsg.started = game.started;
             joinedMsg.teamMode = game.teamMode;
             joinedMsg.emotes = this.loadout.emotes;
+            joinedMsg.isAdmin = this.isAdmin;
             this.sendMsg(net.MsgType.Joined, joinedMsg);
 
             const mapStream = game.map.mapStream.stream;
