@@ -220,12 +220,15 @@
       padding: 1px 5px;
     }
 
-    .player-meta {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 6px;
-      margin-top: 4px;
-      margin-left: 38px; /* align with name text past avatar */
+    .dead-badge {
+      font-size: 9px; font-weight: 600; letter-spacing: 1px;
+      color: #ff4466; background: #2a0a0a;
+      border: 1px solid #5a1a1a; border-radius: 4px; padding: 1px 5px;
+    }
+    .spec-badge {
+      font-size: 9px; font-weight: 600; letter-spacing: 1px;
+      color: #44aaff; background: #0a1a2a;
+      border: 1px solid #1a3a5a; border-radius: 4px; padding: 1px 5px;
     }
     .meta-chip {
       display: inline-flex;
@@ -238,11 +241,31 @@
       border: 1px solid var(--border);
       border-radius: 4px;
       padding: 2px 7px;
-      cursor: default;
-      transition: color 0.15s;
-      user-select: all;
+      cursor: pointer;
+      transition: color 0.15s, border-color 0.15s;
+      user-select: none;
     }
     .meta-chip:hover { color: var(--text-dim); border-color: var(--border2); }
+    .meta-chip.copied { color: #4caf50 !important; border-color: #2a5a2a !important; }
+    #copy-toast {
+      position: fixed;
+      bottom: 24px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: #1e3a1e;
+      border: 1px solid #2a5a2a;
+      color: #4caf50;
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: 0.5px;
+      padding: 6px 16px;
+      border-radius: 6px;
+      pointer-events: none;
+      opacity: 0;
+      transition: opacity 0.15s;
+      z-index: 9999;
+    }
+    #copy-toast.show { opacity: 1; }
     .meta-chip-icon { font-size: 9px; opacity: 0.5; }
 
     .row-btn {
@@ -371,6 +394,7 @@
 </head>
 <body>
 
+<div id="copy-toast">Copied!</div>
 <div id="overlay">
   <div id="overlay-gfx">⚡</div>
   <div id="overlay-title">Waiting for game…</div>
@@ -524,6 +548,32 @@
   /* ── Render ── */
   function avatarChar(name) { return (name || "?")[0].toUpperCase(); }
 
+  const copyToast = document.getElementById("copy-toast");
+  let toastTimer = null;
+  function showCopyToast() {
+    copyToast.classList.add("show");
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(() => copyToast.classList.remove("show"), 1200);
+  }
+  function copyToClipboard(text) {
+    if (navigator.clipboard && window.isSecureContext) {
+      navigator.clipboard.writeText(text).then(showCopyToast).catch(() => { fallbackCopy(text); showCopyToast(); });
+    } else {
+      fallbackCopy(text);
+      showCopyToast();
+    }
+  }
+  function fallbackCopy(text) {
+    const ta = document.createElement("textarea");
+    ta.value = text;
+    ta.style.cssText = "position:fixed;top:-9999px;left:-9999px;opacity:0";
+    document.body.appendChild(ta);
+    ta.focus();
+    ta.select();
+    try { document.execCommand("copy"); } catch {}
+    document.body.removeChild(ta);
+  }
+
   function mkBtn(text, cls, fn) {
     const b = document.createElement("button");
     b.className = "row-btn " + cls;
@@ -572,40 +622,39 @@
         badge.textContent = "YOU";
         nameDiv.appendChild(badge);
       }
-
-      // Meta row (IP, slug, discord)
-      const hasMeta = p.encodedIp || p.slug || p.discordId;
-      if (hasMeta) {
-        const meta = document.createElement("div");
-        meta.className = "player-meta";
-
-        function chip(icon, val) {
-          if (!val) return;
-          const c = document.createElement("span");
-          c.className = "meta-chip";
-          c.title = "Click to copy";
-          c.onclick = () => navigator.clipboard?.writeText(val).catch(() => {});
-          const ic = document.createElement("span");
-          ic.className = "meta-chip-icon";
-          ic.textContent = icon;
-          c.appendChild(ic);
-          c.appendChild(document.createTextNode(val));
-          meta.appendChild(c);
-        }
-
-        chip("🌐", p.encodedIp);
-        chip("👤", p.slug);
-        chip("💬", p.discordId);
-
-        nameDiv.style.flexWrap = "wrap";
-        nameDiv.style.alignItems = "flex-start";
-        const nameRow = document.createElement("div");
-        nameRow.style.cssText = "display:flex;align-items:center;gap:10px;width:100%";
-        while (nameDiv.firstChild) nameRow.appendChild(nameDiv.firstChild);
-        nameDiv.appendChild(nameRow);
-        nameDiv.appendChild(meta);
-        meta.style.marginLeft = "38px";
+      if (p.dead) {
+        const badge = document.createElement("span");
+        badge.className = "dead-badge";
+        badge.textContent = "DEAD";
+        nameDiv.appendChild(badge);
       }
+      if (p.spectator) {
+        const badge = document.createElement("span");
+        badge.className = "spec-badge";
+        badge.textContent = "SPEC";
+        nameDiv.appendChild(badge);
+      }
+
+      function chip(icon, val) {
+        if (!val) return;
+        const c = document.createElement("span");
+        c.className = "meta-chip";
+        c.title = "Click to copy";
+        c.onclick = () => {
+          copyToClipboard(val);
+          c.classList.add("copied");
+          setTimeout(() => c.classList.remove("copied"), 1000);
+        };
+        const ic = document.createElement("span");
+        ic.className = "meta-chip-icon";
+        ic.textContent = icon;
+        c.appendChild(ic);
+        c.appendChild(document.createTextNode(val));
+        nameDiv.appendChild(c);
+      }
+      chip("🌐", p.encodedIp);
+      chip("👤", p.slug);
+      chip("💬", p.discordId);
 
       nameTd.appendChild(nameDiv);
       tr.appendChild(nameTd);

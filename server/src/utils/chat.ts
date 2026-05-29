@@ -250,7 +250,7 @@ export class Chat{
                             discordId = user?.linkedDiscord ? (user?.authId ?? null) : null;
                         } catch {}
                     }
-                    return { id: p.__id, encodedIp, slug, discordId };
+                    return { id: p.__id, encodedIp, slug, discordId, spectator: p.spectator, dead: p.dead };
                 }),
             );
 
@@ -264,6 +264,8 @@ export class Chat{
                     p.encodedIp ?? "",
                     p.slug ?? "",
                     p.discordId ?? "",
+                    String(p.spectator),
+                    String(p.dead),
                 ];
 
                 this.player.sendMsg(net.MsgType.KillFeed, msg);

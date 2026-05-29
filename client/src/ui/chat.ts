@@ -122,13 +122,14 @@ export class ChatUi{
             this.game.moderationUi.setGameId(content);
         },
         modPlayerData: (_admin, _content, args) => {
-            const [id, encodedIp, slug, discordId] = args;
+            const [id, encodedIp, slug, discordId, spectator] = args;
 
             this.game.moderationUi.setSinglePlayerExtraData({
                 id: Number(id),
                 encodedIp,
                 slug: slug || null,
                 discordId: discordId || null,
+                spectator: spectator === "true",
             });
         },
     };
