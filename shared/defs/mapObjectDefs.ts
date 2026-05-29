@@ -11911,7 +11911,7 @@ export const MapObjectDefs: Record<string, MapObjectDef> = {
     }),
     pot_02: createBottle({
         img: { sprite: "map-pot-02.img" },
-        loot: [autoLoot("spas12", 1)],
+        loot: [tierLoot("tier_spas_hut", 1, 1)], // 66% spas12, 33% spas16
     }),
     pot_03: createBottle({ img: { sprite: "map-pot-03.img" } }),
     pot_03b: createBottle({
@@ -25033,7 +25033,7 @@ export const MapObjectDefs: Record<string, MapObjectDef> = {
                 ori: 1,
             },
         ],
-        group: { id: BuildingGroups.SVSpawns, minDistance: 300, noSpawnRadius: NoSpawnRadius.SniperSpawns },
+        // group: { id: BuildingGroups.SVSpawns, minDistance: 300, noSpawnRadius: NoSpawnRadius.SniperSpawns }, //removed to allow for consistent center spawns again
     },
     bunker_egg_01: {
         type: "building",

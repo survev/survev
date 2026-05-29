@@ -439,6 +439,44 @@ export class Bullet {
                 }
             }
 
+            if (def.spawnBulletType) {
+                const spawnDef = GameObjectDefs[def.spawnBulletType] as BulletDef;
+                assert(
+                    spawnDef.type === "bullet",
+                    `Invalid spawned bullet type: ${def.spawnBulletType}`,
+                );
+                const spawnCount = def.spawnBulletCount ?? 1;
+                const spawnSpread = def.spawnBulletSpread ?? 0;
+                const spawnSpeed = def.spawnBulletSpeed ?? spawnDef.speed;
+                const spawnSpeedMult = spawnSpeed / spawnDef.speed;
+
+                for (let i = 0; i < spawnCount; i++) {
+                    const spawnDir = v2.rotate(
+                        this.dir,
+                        util.random(-spawnSpread, spawnSpread),
+                    );
+                    this.bulletManager.fireBullet({
+                        playerId: this.playerId,
+                        bulletType: def.spawnBulletType,
+                        gameSourceType: this.shotSourceType,
+                        mapSourceType: this.mapSourceType,
+                        damageType: this.damageType,
+                        pos: v2.copy(this.pos),
+                        dir: spawnDir,
+                        layer: this.layer,
+                        damageMult: this.damageMult,
+                        speedMult: spawnSpeedMult,
+                        distanceMult: 1,
+                        shotFx: false,
+                        shotOffhand: this.shotOffhand,
+                        modified: this.modified,
+                        lastShot: false,
+                        reflectCount: 0,
+                        reflectObjId: 0,
+                    });
+                }
+            }
+
             // Spawn explosion if defined
             if (this.onHitFx) {
                 // explosion_rounds_sg has lower volume and is used for shotguns
