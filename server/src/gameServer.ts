@@ -602,6 +602,53 @@ app.post("/api/find_spectator_game", (res, req) => {
     );
 });
 
+// ---- Moderation Dashboard endpoints (called by API server) ----
+
+/** Returns the live player list for a specific game. */
+app.post("/api/dashboard/game_players", (res, req) => {
+    res.onAborted(() => { res.aborted = true; });
+
+    if (req.getHeader("survev-api-key") !== Config.secrets.SURVEV_API_KEY) {
+        forbidden(res);
+        return;
+    }
+
+    readPostedJSON(res, async (body: any) => {
+        if (res.aborted) return;
+        const { gameId } = body ?? {};
+        if (typeof gameId !== "string") { returnJson(res, { error: "missing gameId" }); return; }
+        const players = await server.manager.getGamePlayers(gameId);
+        returnJson(res, { players });
+    }, () => {
+        if (!res.aborted) returnJson(res, { error: "body error" });
+    });
+});
+
+/** Executes an admin command on a specific running game. */
+app.post("/api/dashboard/game_cmd", (res, req) => {
+    res.onAborted(() => { res.aborted = true; });
+
+    if (req.getHeader("survev-api-key") !== Config.secrets.SURVEV_API_KEY) {
+        forbidden(res);
+        return;
+    }
+
+    readPostedJSON(res, (body: any) => {
+        if (res.aborted) return;
+        const { gameId, cmd } = body ?? {};
+        if (typeof gameId !== "string" || typeof cmd?.action !== "string") {
+            returnJson(res, { error: "invalid body" });
+            return;
+        }
+        server.manager.sendAdminCmd(gameId, cmd);
+        returnJson(res, { ok: true });
+    }, () => {
+        if (!res.aborted) returnJson(res, { error: "body error" });
+    });
+});
+
+// ---------------------------------------------------------------
+
 const gameHTTPRateLimit = new HTTPRateLimit(5, 1000);
 const gameWsRateLimit = new WebSocketRateLimit(500, 1000, 5);
 

@@ -48,7 +48,6 @@ import { UiManager } from "./ui/ui";
 import { UiManager2 } from "./ui/ui2";
 import { name } from "ejs";
 import { ChatUi } from "./ui/chat";
-import { ModerationUi } from "./ui/moderationUi";
 import { GunDefs } from "../../shared/defs/gameObjects/gunDefs";
 
 export interface Ctx {
@@ -120,7 +119,6 @@ export class Game {
     editor!: Editor;
     debugHUD!: DebugHUD;
     chatUi: ChatUi;
-    moderationUi: ModerationUi;
     m_isAdmin = false;
 
     seq!: number;
@@ -158,7 +156,6 @@ export class Game {
             this.editor = new Editor(this.m_config);
         }
         this.chatUi = new ChatUi(this, this.m_input);
-        this.moderationUi = new ModerationUi(this);
     }
 
     tryJoinGame(
@@ -495,7 +492,6 @@ export class Game {
             }
         }
         this.chatUi.update(dt);
-        this.moderationUi.tick();
 
         let debug: DebugRenderOpts;
         if (IS_DEV) {
@@ -549,13 +545,8 @@ export class Game {
             this.m_camera.m_targetZoom,
         );
         this.m_audioManager.cameraPos = v2.copy(this.m_camera.m_pos);
-        // Moderation UI toggle (admin only)
-        if (this.m_isAdmin && this.m_input.keyPressed(Key.F4)) {
-            this.moderationUi.toggle();
-        }
         if (this.m_input.keyPressed(Key.Escape)) {
-            if (this.moderationUi.visible) {
-                this.moderationUi.hide();
+            if (false) {
             } else {
                 const style = window.getComputedStyle(this.chatUi.chatInput[0]);
                 if(style.display !== "none"){
@@ -1253,9 +1244,6 @@ export class Game {
         }
         if (msg.playerInfos.length > 0 || msg.deletedPlayerIds.length > 0) {
             this.m_playerBarn.recomputeTeamData();
-            if (this.moderationUi?.visible) {
-                this.moderationUi.refreshPlayerList();
-            }
         }
         // Update player status
         if (msg.playerStatusDirty) {
@@ -1419,7 +1407,6 @@ export class Game {
                 this.teamMode = msg.teamMode;
                 this.m_localId = msg.playerId;
                 this.m_isAdmin = msg.isAdmin;
-                this.moderationUi.resetForNewGame();
                 this.m_validateAlpha = true;
                 this.m_emoteBarn.updateEmoteWheel(msg.emotes);
                 if (!msg.started) {

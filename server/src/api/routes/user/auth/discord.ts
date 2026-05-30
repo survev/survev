@@ -22,6 +22,9 @@ DiscordRouter.use(async (c, next) => {
     await next();
 });
 
+/** Cookie that carries the post-login redirect target (e.g. "/moderation"). */
+const redirectCookieName = "oauth_redirect";
+
 DiscordRouter.get("/", (c) => {
     const state = generateState();
     const codeVerifier = generateCodeVerifier();
@@ -50,6 +53,19 @@ DiscordRouter.get("/", (c) => {
         sameSite: "Lax",
         domain: cookieDomain,
     });
+
+    // Persist the optional redirect target so the callback can use it
+    const redirectTarget = c.req.query("redirect");
+    if (redirectTarget) {
+        setCookie(c, redirectCookieName, redirectTarget, {
+            path: "/",
+            secure: false,
+            httpOnly: true,
+            maxAge: 60 * 10,
+            sameSite: "Lax",
+            domain: cookieDomain,
+        });
+    }
 
     url.searchParams.append("prompt", "none");
     return c.redirect(url);
@@ -89,5 +105,7 @@ DiscordRouter.get("/callback", async (c) => {
 
     await handleAuthUser(c, "discord", resData.id);
 
-    return c.redirect(Config.oauthBasePath);
+    // Redirect to the stored target (e.g. /moderation) or fall back to the default path
+    const redirectTarget = getCookie(c)[redirectCookieName];
+    return c.redirect(redirectTarget ?? Config.oauthBasePath);
 });

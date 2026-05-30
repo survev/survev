@@ -1,4 +1,5 @@
 import fs from "node:fs";
+import { createHash } from "node:crypto";
 import path from "node:path";
 import { DamageType, GameConfig, TeamMode } from "../../../shared/gameConfig";
 import * as net from "../../../shared/net/net";
@@ -9,6 +10,8 @@ import { Config } from "../config";
 import { ServerLogger } from "../utils/logger";
 import { apiPrivateRouter } from "../utils/serverHelpers";
 import {
+    type AdminCmdAction,
+    type DashboardPlayer,
     type FindGamePrivateBody,
     ProcessMsgType,
     type SaveGameBody,
@@ -589,13 +592,6 @@ export class Game {
             });
         }
 
-        // Notify clients so the mod UI can remove the player from its list
-        const leftMsg = new net.KillFeedMsg();
-        leftMsg.type = net.KillFeedMsgType.CmdMsg;
-        leftMsg.cmd = "playerLeft";
-        leftMsg.string = player.__id.toString();
-        leftMsg.player = player.name;
-        this.broadcastMsg(net.MsgType.KillFeed, leftMsg);
     }
 
     broadcastMsg(type: net.MsgType, msg: net.Msg) {
@@ -617,6 +613,92 @@ export class Game {
             this.updateData();
         }
     }
+
+    // --------------- Dashboard admin helpers ---------------
+
+    /** Hashes a raw IP using the same salt as ModerationRouter. */
+    private hashIp(ip: string): string {
+        return createHash("sha256").update(Config.secrets.SURVEV_IP_SECRET + ip).digest("hex");
+    }
+
+    /** Builds the live player list sent to the moderation dashboard. */
+    getPlayerDataForDashboard(): DashboardPlayer[] {
+        return this.playerBarn.players.map((p) => ({
+            username: p.name,
+            userId: p.userId ?? "",
+            encodedIp: this.hashIp(p.ip),
+            kills: p.kills,
+            assists: p.assists,
+            alive: !p.dead,
+            isSpectator: p.spectating !== undefined,
+            isAdmin: p.isAdmin,
+            disconnected: p.disconnected,
+        }));
+    }
+
+    /** Sends an announcement to all players in this game.
+     *  duration is in milliseconds (client default = 3000). */
+    private broadcastAnnounce(text: string, color = "#ffffff", sender = "moderator", duration = 3000) {
+        const msg = new net.KillFeedMsg();
+        msg.type = net.KillFeedMsgType.CmdMsg;
+        msg.player = sender;
+        msg.cmd = "announce";
+        msg.string = text;
+        msg.args.push(color, String(duration));
+        this.broadcastMsg(net.MsgType.KillFeed, msg);
+    }
+
+    /** Sends an announcement only to the named player (direct message).
+     *  duration is in milliseconds (client default = 3000). */
+    private announceToPlayer(targetName: string, text: string, color = "#ffffff", sender = "moderator", duration = 3000) {
+        const target = this.playerBarn.players.find((p) => p.name === targetName);
+        if (!target) return;
+        const msg = new net.KillFeedMsg();
+        msg.type = net.KillFeedMsgType.CmdMsg;
+        msg.player = sender;
+        msg.cmd = "announce";
+        msg.string = text;
+        msg.args.push(color, String(duration));
+        target.sendMsg(net.MsgType.KillFeed, msg);
+    }
+
+    /** Kicks a player by display name and calls checkGameOver. */
+    private kickPlayerByName(name: string, reason: string) {
+        const player = this.playerBarn.players.find((p) => p.name === name);
+        if (!player) return;
+        this.closeSocket(player.socketId, reason);
+        this.checkGameOver();
+    }
+
+    /** Executes an admin command sent from the moderation dashboard via IPC. */
+    executeAdminCmd(cmd: AdminCmdAction) {
+        switch (cmd.action) {
+            case "freeze":
+                this.frozen = true;
+                this.broadcastAnnounce("Game frozen by moderator", "#ff4444");
+                break;
+            case "unfreeze":
+                this.frozen = false;
+                this.broadcastAnnounce("Game unfrozen", "#44ff44");
+                break;
+            case "verify":
+                for (const p of this.playerBarn.livingPlayers) {
+                    if (!p.userId) this.kickPlayerByName(p.name, "player_not_verified");
+                }
+                break;
+            case "kick":
+                this.kickPlayerByName(cmd.target, "kicked_by_admin");
+                break;
+            case "announce":
+                this.broadcastAnnounce(cmd.text, cmd.color, cmd.sender);
+                break;
+            case "announce_player":
+                this.announceToPlayer(cmd.target, cmd.text, cmd.color, cmd.sender);
+                break;
+        }
+    }
+
+    // -------------------------------------------------------
 
     addJoinTokens(tokens: FindGamePrivateBody["playerData"], autoFill: boolean) {
         const groupData = {

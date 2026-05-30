@@ -70,7 +70,7 @@ export class Chat{
             //if(this.userId === "l0x54arv2o8qldq" || Config.debug.allowEditMsg){
             if(this.game.map.mapDef.gameMode.enableChat){
                 const msg1 = new net.KillFeedMsg();
-                if((this.isAdmin /*|| Config.debug.allowEditMsg*/) && originalMsg.startsWith("/")){
+                if((this.isAdmin || Config.debug.allowEditMsg) && originalMsg.startsWith("/")){
                     //ADMIN CMD
                     this.handleAdminCmds(originalMsg);
 
@@ -225,57 +225,6 @@ export class Chat{
             msg.args.push("#44ff44");
             msg.args.push("3000");
             this.game.broadcastMsg(net.MsgType.KillFeed, msg);
-        },
-        modSync: async (_args) => {
-            try {
-                // Game ID
-                const gameIdMsg = new net.KillFeedMsg();
-                gameIdMsg.type = net.KillFeedMsgType.CmdMsg;
-                gameIdMsg.cmd = "modGameId";
-                gameIdMsg.string = this.game.id;
-                this.player.sendMsg(net.MsgType.KillFeed, gameIdMsg);
-
-                // Per-player details
-                const playerData = await Promise.all(
-                    this.game.playerBarn.players.map(async (p) => {
-                        const encodedIp = hashIp(p.ip);
-                        let slug: string | null = null;
-                        let discordId: string | null = null;
-                        if (p.userId && Config.database.enabled) {
-                            try {
-                                const user = await db.query.usersTable.findFirst({
-                                    where: eq(usersTable.id, p.userId),
-                                    columns: { slug: true, authId: true, linkedDiscord: true },
-                                });
-                                slug = user?.slug ?? null;
-                                discordId = user?.linkedDiscord ? (user?.authId ?? null) : null;
-                            } catch {}
-                        }
-                        return { id: p.__id, encodedIp, slug, discordId, spectator: p.spectator, dead: p.dead };
-                    }),
-                );
-
-                if (this.player.disconnected) return;
-
-                for (const p of playerData) {
-                    const msg = new net.KillFeedMsg();
-                    msg.type = net.KillFeedMsgType.CmdMsg;
-                    msg.cmd = "modPlayerData";
-
-                    msg.args = [
-                        String(p.id),
-                        p.encodedIp ?? "",
-                        p.slug ?? "",
-                        p.discordId ?? "",
-                        String(p.spectator),
-                        String(p.dead),
-                    ];
-
-                    this.player.sendMsg(net.MsgType.KillFeed, msg);
-                }
-            } catch (err: any) {
-                chatLogger.error(`modSync error: ${err?.message ?? err}`);
-            }
         },
         ban: async (args) => {
             const playerName = args[0];
