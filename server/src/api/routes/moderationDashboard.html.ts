@@ -46,8 +46,9 @@ export const dashboardHtml = `<!DOCTYPE html>
 
     /* ── Main area ── */
     #main { flex: 1; min-height: 0; position: relative; }
-    .tab-pane { display: none; position: absolute; inset: 0; overflow-y: auto; padding: 20px 24px; flex-direction: column; gap: 14px; }
-    .tab-pane.active { display: flex; }
+    .tab-pane { display: none; position: absolute; inset: 0; overflow-y: auto; padding: 20px 24px; }
+    .tab-pane.active { display: block; }
+    .tab-pane > * + * { margin-top: 14px; }
 
     /* ── Toolbar row ── */
     .toolbar { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
@@ -464,7 +465,7 @@ function switchTab(name) {
   document.querySelectorAll('.tab-pane').forEach(p => {
     const active = p.id === 'tab-' + name;
     p.classList.toggle('active', active);
-    p.style.display = active ? 'flex' : 'none';
+    p.style.display = active ? 'block' : 'none';
   });
 
   if (name === 'servers') {
@@ -486,7 +487,7 @@ function switchTab(name) {
 document.querySelectorAll('.tab-btn').forEach(b => b.addEventListener('click', () => switchTab(b.dataset.tab)));
 
 // Initial tab visibility
-document.querySelectorAll('.tab-pane').forEach(p => { p.style.display = p.classList.contains('active') ? 'flex' : 'none'; });
+document.querySelectorAll('.tab-pane').forEach(p => { p.style.display = p.classList.contains('active') ? 'block' : 'none'; });
 
 // ── Sub-tab switching (inside Bans tab) ────────────────────────────────────
 
