@@ -712,7 +712,8 @@ app.ws<GameSocketData>("/play", {
 
         if (ipData?.banned) {
             disconnectReason = "ip_banned";
-        } else if (ipData?.behindProxy) {
+        } else if (ipData?.behindProxy && !server.manager.ipHasAccount(ip)) {
+            // Skip the proxy block if the player joined with a linked account
             disconnectReason = "behind_proxy";
         }
 
@@ -824,7 +825,7 @@ app.ws<GameSocketData & { spectator?: boolean }>("/spectate", {
         const ipData = await server.checkIp(ip);
         if (ipData?.banned) {
             disconnectReason = "ip_banned";
-        } else if (ipData?.behindProxy) {
+        } else if (ipData?.behindProxy && !server.manager.ipHasAccount(ip)) {
             disconnectReason = "behind_proxy";
         }
 
