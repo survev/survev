@@ -19,7 +19,7 @@ export const dashboardHtml = `<!DOCTYPE html>
       --red:      #aa1a1a; --red-t: #ff4444;   --red-dim: #1e0808;
       --yellow-t: #ffcc44;
     }
-    html, body { height: 100%; }
+    html, body { height: 100vh; overflow: hidden; }
     body { background: var(--bg); color: var(--text); font-family: 'Inter', system-ui, sans-serif; font-size: 13px; display: flex; flex-direction: column; }
 
     /* ── Top bar ── */
@@ -228,6 +228,19 @@ export const dashboardHtml = `<!DOCTYPE html>
 
   <!-- ════════════════ TAB 3: LIVE SERVERS ════════════════ -->
   <div id="tab-servers" class="tab-pane">
+    <!-- Global announcement (sent to ALL running games) -->
+    <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;">
+      <button class="btn btn-blue btn-sm" id="global-announce-open">📢 Announce to ALL games</button>
+    </div>
+    <div id="global-announce-panel" style="display:none;background:var(--surface3);border:1px solid var(--border2);border-radius:6px;padding:10px 12px;gap:8px;align-items:center;flex-wrap:wrap;">
+      <input id="global-announce-input" type="text" placeholder="Message to all players in all games…" maxlength="200"
+        style="flex:1;min-width:200px;background:var(--surface2);border:1px solid var(--border2);border-radius:5px;padding:6px 10px;color:var(--text);font-family:inherit;font-size:12px;outline:none;">
+      <input id="global-announce-color" type="color" value="#ffffff" title="Message color"
+        style="width:32px;height:26px;padding:1px;border-radius:4px;border:1px solid var(--border2);background:var(--surface2);cursor:pointer;">
+      <button class="btn btn-blue btn-sm" id="global-announce-send">SEND</button>
+      <button class="btn btn-gray btn-sm" id="global-announce-cancel">✕</button>
+    </div>
+
     <div id="server-list"><div class="loading">Connecting to stream…</div></div>
 
     <!-- Game detail panel (shown when a game is clicked) -->
@@ -576,7 +589,8 @@ function onBanTypeChange() {
 const banModal = document.getElementById('ban-modal');
 
 document.getElementById('ban-new-btn').addEventListener('click', () => {
-  // Reset form on open
+  // Reset form on open (no kick target)
+  delete banModal.dataset.kickTarget;
   document.getElementById('modal-ban-target').value = '';
   document.getElementById('modal-ban-reason').value = '';
   document.getElementById('modal-ban-days').value   = '7';
@@ -600,6 +614,15 @@ document.getElementById('modal-confirm-btn').addEventListener('click', async () 
     if (type === 'ip')      await post('/api/ban/ip',      { ip: target, reason, duration: days, permanent: perm });
     if (type === 'account') await post('/api/ban/account', { slug: target, reason });
     if (type === 'chat')    await post('/api/ban/chat',    { ip: target, reason, duration: days, permanent: perm });
+
+    // If opened from player list: also ban account + kick the player
+    const kickTarget = banModal.dataset.kickTarget;
+    if (kickTarget) {
+      delete banModal.dataset.kickTarget;
+      await post('/api/ban/account', { slug: kickTarget, reason });
+      await gameCmd({ action: 'kick', target: kickTarget });
+    }
+
     toast('Ban created ✓');
     banModal.style.display = 'none';
   } catch (e) { toast('Error: ' + e.message, true); }
@@ -707,11 +730,16 @@ function renderPlayerDetail(data, container) {
   \`;
 }
 
-async function quickBanIp(hash) {
-  const reason = prompt('Ban reason:');
-  if (reason === null) return;
-  try { await post('/api/ban/ip', { ip: hash, reason, duration: 7, permanent: false }); toast('IP banned ✓'); doLookup(hash); }
-  catch (e) { toast('Error', true); }
+function quickBanIp(hash) {
+  // Pre-fill the ban modal and open it
+  document.getElementById('modal-ban-type').value   = 'ip';
+  document.getElementById('modal-ban-target').value = hash;
+  document.getElementById('modal-ban-reason').value = '';
+  document.getElementById('modal-ban-days').value   = '7';
+  document.getElementById('modal-ban-days').disabled = false;
+  document.getElementById('modal-ban-perm').checked = false;
+  onBanTypeChange();
+  banModal.style.display = 'flex';
 }
 
 document.getElementById('lookup-btn').addEventListener('click', () => {
@@ -820,6 +848,28 @@ async function gameCmd(cmd) {
   } catch (e) { toast('Fehler: ' + e.message, true); }
 }
 
+// Global announce (all games across all regions)
+document.getElementById('global-announce-open').addEventListener('click', () => {
+  const panel = document.getElementById('global-announce-panel');
+  panel.style.display = panel.style.display === 'none' ? 'flex' : 'none';
+});
+document.getElementById('global-announce-cancel').addEventListener('click', () => {
+  document.getElementById('global-announce-panel').style.display = 'none';
+});
+async function sendGlobalAnnounce() {
+  const text  = document.getElementById('global-announce-input').value.trim();
+  const color = document.getElementById('global-announce-color').value;
+  if (!text) return;
+  try {
+    await post('/api/servers/announce', { text, color, sender: currentAdminSlug });
+    toast('Announcement sent to all games ✓');
+    document.getElementById('global-announce-input').value = '';
+    document.getElementById('global-announce-panel').style.display = 'none';
+  } catch (e) { toast('Error sending announcement', true); }
+}
+document.getElementById('global-announce-send').addEventListener('click', sendGlobalAnnounce);
+document.getElementById('global-announce-input').addEventListener('keydown', e => { if (e.key === 'Enter') sendGlobalAnnounce(); });
+
 document.getElementById('ga-verify').addEventListener('click',   () => gameCmd({ action: 'verify' }));
 document.getElementById('ga-freeze').addEventListener('click',   () => gameCmd({ action: 'freeze' }));
 document.getElementById('ga-unfreeze').addEventListener('click', () => gameCmd({ action: 'unfreeze' }));
@@ -830,14 +880,16 @@ document.getElementById('ga-announce-open').addEventListener('click', () => {
   document.getElementById('announce-panel').classList.toggle('open');
 });
 document.getElementById('ga-announce-cancel').addEventListener('click', closeAnnouncePanel);
-document.getElementById('ga-announce-send').addEventListener('click', async () => {
+async function sendAnnounce() {
   const text  = document.getElementById('announce-input').value.trim();
   const color = document.getElementById('announce-color').value;
   if (!text) return;
   await gameCmd({ action: 'announce', text, color, sender: currentAdminSlug });
   document.getElementById('announce-input').value = '';
   closeAnnouncePanel();
-});
+}
+document.getElementById('ga-announce-send').addEventListener('click', sendAnnounce);
+document.getElementById('announce-input').addEventListener('keydown', e => { if (e.key === 'Enter') sendAnnounce(); });
 
 function openMsg(playerName) {
   msgTargetName = playerName;
@@ -849,30 +901,29 @@ function openMsg(playerName) {
 }
 function closeMsgPanel() { document.getElementById('msg-panel').classList.remove('open'); }
 document.getElementById('msg-cancel-btn').addEventListener('click', closeMsgPanel);
-document.getElementById('msg-send-btn').addEventListener('click', async () => {
+async function sendMsg() {
   const text  = document.getElementById('msg-input').value.trim();
   const color = document.getElementById('msg-color').value;
   if (!text || !msgTargetName) return;
   await gameCmd({ action: 'announce_player', target: msgTargetName, text, color, sender: currentAdminSlug });
   document.getElementById('msg-input').value = '';
   closeMsgPanel();
-});
+}
+document.getElementById('msg-send-btn').addEventListener('click', sendMsg);
+document.getElementById('msg-input').addEventListener('keydown', e => { if (e.key === 'Enter') sendMsg(); });
 
-async function quickBanPlayer(name, hash) {
-  const reason = prompt('Ban reason for ' + name + ':');
-  if (reason === null) return; // user cancelled the prompt
-  const daysInput = prompt('Duration in days (leave empty for permanent):');
-  if (daysInput === null) return; // user cancelled
-  const permanent = daysInput.trim() === '';
-  const duration  = permanent ? 30 : (parseInt(daysInput) || 7);
-  try {
-    await Promise.all([
-      post('/api/ban/account', { slug: name, reason }),
-      post('/api/ban/ip', { ip: hash, reason, duration, permanent }),
-    ]);
-    await gameCmd({ action: 'kick', target: name });
-    toast(name + ' banned ✓');
-  } catch (e) { toast('Error', true); }
+/** Ban a player from the live game view: opens the modal pre-filled, kicks after confirm. */
+function quickBanPlayer(name, hash) {
+  document.getElementById('modal-ban-type').value   = 'ip';
+  document.getElementById('modal-ban-target').value = hash;
+  document.getElementById('modal-ban-reason').value = '';
+  document.getElementById('modal-ban-days').value   = '7';
+  document.getElementById('modal-ban-days').disabled = false;
+  document.getElementById('modal-ban-perm').checked = false;
+  onBanTypeChange();
+  // Store the player name so the confirm handler can also ban the account + kick
+  banModal.dataset.kickTarget = name;
+  banModal.style.display = 'flex';
 }
 
 document.getElementById('gd-close-btn').addEventListener('click', () => {
