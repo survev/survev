@@ -47,7 +47,7 @@ import type { Game, JoinTokenData } from "../game";
 import { Group, Team } from "../group";
 import { InventoryManager } from "../inventoryManager";
 import { QuestManager } from "../questManager";
-import { WeaponManager } from "../weaponManager";
+import { throwableList, WeaponManager } from "../weaponManager";
 import type { Building } from "./building";
 import { BaseGameObject, type DamageParams, type GameObject } from "./gameObject";
 import type { Loot } from "./loot";
@@ -3738,12 +3738,26 @@ export class Player extends BaseGameObject {
                     this.weaponManager.setCurWeapIndex(GameConfig.WeaponSlot.Secondary);
                     break;
                 case GameConfig.Input.EquipThrowable:
-                    if (this.curWeapIdx === GameConfig.WeaponSlot.Throwable) {
-                        this.weaponManager.throwThrowable(true);
-                        if (this.animType === GameConfig.Anim.Cook) {
-                            this.cancelAnim();
+                    if (
+                        this.curWeapIdx === GameConfig.WeaponSlot.Throwable &&
+                        this.weaponManager.cookingThrowable
+                    ) {
+                        const hasOtherThrowables = throwableList.some(
+                            (t) =>
+                                t !==
+                                    this.weapons[GameConfig.WeaponSlot.Throwable].type &&
+                                this.invManager.has(t as InventoryItem),
+                        );
+
+                        if (hasOtherThrowables) {
+                            this.weaponManager.throwThrowable(true);
+                            if (this.animType === GameConfig.Anim.Cook) {
+                                this.cancelAnim();
+                            }
+                            this.weaponManager.showNextThrowable();
+                        } else {
+                            break;
                         }
-                        this.weaponManager.showNextThrowable();
                     } else {
                         this.weaponManager.setCurWeapIndex(
                             GameConfig.WeaponSlot.Throwable,
