@@ -155,6 +155,12 @@ class GameProcess implements GameData {
     }
 
     addJoinTokens(tokens: FindGamePrivateBody["playerData"], autoFill: boolean) {
+        // Cache IPs of logged-in players so the WebSocket upgrade can skip the proxy check
+        for (const t of tokens) {
+            if (t.userId) {
+                this.manager.accountIpCache.set(t.ip, Date.now() + 2 * 60 * 1000);
+            }
+        }
         this.send({
             type: ProcessMsgType.AddJoinToken,
             autoFill,
@@ -194,6 +200,22 @@ class GameProcess implements GameData {
 
 export class GameProcessManager implements GameManager {
     readonly sockets = new Map<string, WebSocket<GameSocketData>>();
+
+    /**
+     * Short-lived cache: IP → has a linked account.
+     * Populated when AddJoinToken is called with a non-empty userId.
+     * Used during WebSocket upgrade to skip the proxy check for logged-in players.
+     * Entries expire after 2 minutes (more than enough to cover the join window).
+     */
+    readonly accountIpCache = new Map<string, number>();
+
+    /** Returns true if this IP recently joined with a linked account. */
+    ipHasAccount(ip: string): boolean {
+        const expires = this.accountIpCache.get(ip);
+        if (expires === undefined) return false;
+        if (expires < Date.now()) { this.accountIpCache.delete(ip); return false; }
+        return true;
+    }
 
     readonly processById = new Map<string, GameProcess>();
     readonly processes: GameProcess[] = [];

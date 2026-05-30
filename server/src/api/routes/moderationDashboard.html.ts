@@ -45,8 +45,8 @@ export const dashboardHtml = `<!DOCTYPE html>
     .tab-btn.active { color: var(--blue-t); border-bottom-color: var(--blue-t); }
 
     /* ── Main area ── */
-    #main { flex: 1; overflow: hidden; display: flex; flex-direction: column; }
-    .tab-pane { display: none; flex: 1; overflow: auto; padding: 20px 24px; }
+    #main { flex: 1; min-height: 0; display: flex; flex-direction: column; }
+    .tab-pane { display: none; flex: 1; min-height: 0; overflow-y: auto; padding: 20px 24px; }
     .tab-pane.active { display: flex; flex-direction: column; gap: 14px; }
 
     /* ── Toolbar row ── */

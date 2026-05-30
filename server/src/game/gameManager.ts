@@ -27,6 +27,9 @@ export abstract class GameManager {
     abstract findGameById(gameId: string, playerData: any[], autoFill: boolean): Promise<string>;
     abstract getGames(): Promise<GameData[]>;
 
+    /** Returns true if this IP recently used a join token with a linked account (skip proxy check). */
+    abstract ipHasAccount(ip: string): boolean;
+
     /** Returns live player data for a running game (for the moderation dashboard). */
     abstract getGamePlayers(gameId: string): Promise<DashboardPlayer[]>;
 
@@ -179,6 +182,11 @@ export class SingleThreadGameManager implements GameManager {
 
     async getGames(): Promise<GameData[]> {
         return this.games.map((game) => game);
+    }
+
+    ipHasAccount(_ip: string): boolean {
+        // SingleThread mode is dev-only; skip the check there
+        return false;
     }
 
     async getGamePlayers(gameId: string): Promise<DashboardPlayer[]> {
