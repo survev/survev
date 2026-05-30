@@ -112,26 +112,6 @@ export class ChatUi{
         announce: (admin, content, args) => {
             this.sendAnnouncementMsg(admin, content, args);
         },
-        playerLeft: (_admin, content, _args) => {
-            const playerId = Number(content);
-            if (!isNaN(playerId)) {
-                this.game.moderationUi.onPlayerLeft(playerId);
-            }
-        },
-        modGameId: (_admin, content, _args) => {
-            this.game.moderationUi.setGameId(content);
-        },
-        modPlayerData: (_admin, _content, args) => {
-            const [id, encodedIp, slug, discordId, spectator] = args;
-
-            this.game.moderationUi.setSinglePlayerExtraData({
-                id: Number(id),
-                encodedIp,
-                slug: slug || null,
-                discordId: discordId || null,
-                spectator: spectator === "true",
-            });
-        },
     };
 
     chatIsEnabled(): boolean {

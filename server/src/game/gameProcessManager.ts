@@ -7,6 +7,8 @@ import * as net from "../../../shared/net/net";
 import { util } from "../../../shared/utils/util";
 import { ServerLogger } from "../utils/logger";
 import {
+    type AdminCmdAction,
+    type DashboardPlayer,
     type FindGamePrivateBody,
     type GameData,
     type GameSocketData,
@@ -45,6 +47,9 @@ class GameProcess implements GameData {
     stoppedTime = Date.now();
 
     avaliableSlots = 0;
+
+    /** Pending GetPlayerData callbacks, keyed by requestId. */
+    readonly pendingPlayerDataRequests = new Map<string, (players: DashboardPlayer[]) => void>();
 
     constructor(manager: GameProcessManager, id: string, config: ServerGameConfig) {
         this.manager = manager;
@@ -112,6 +117,16 @@ class GameProcess implements GameData {
                         socket.close();
                     }
                     break;
+
+                // Dashboard: resolve the pending getGamePlayers() promise
+                case ProcessMsgType.PlayerDataResponse: {
+                    const resolve = this.pendingPlayerDataRequests.get(msg.requestId);
+                    if (resolve) {
+                        this.pendingPlayerDataRequests.delete(msg.requestId);
+                        resolve(msg.players);
+                    }
+                    break;
+                }
             }
         });
 
@@ -343,6 +358,36 @@ export class GameProcessManager implements GameManager {
 
     async getGames(): Promise<GameData[]> {
         return this.processes.map((game) => game);
+    }
+
+    /**
+     * Requests the live player list from a running game process.
+     * Resolves with an empty array if the game is not found or times out after 3 s.
+     */
+    async getGamePlayers(gameId: string): Promise<DashboardPlayer[]> {
+        const proc = this.processById.get(gameId);
+        if (!proc) return [];
+
+        const requestId = randomUUID();
+
+        return new Promise<DashboardPlayer[]>((resolve) => {
+            const timeout = setTimeout(() => {
+                proc.pendingPlayerDataRequests.delete(requestId);
+                resolve([]);
+            }, 3000);
+
+            proc.pendingPlayerDataRequests.set(requestId, (players) => {
+                clearTimeout(timeout);
+                resolve(players);
+            });
+
+            proc.send({ type: ProcessMsgType.GetPlayerData, requestId });
+        });
+    }
+
+    /** Sends an admin command to a running game process (fire-and-forget). */
+    sendAdminCmd(gameId: string, cmd: AdminCmdAction): void {
+        this.processById.get(gameId)?.send({ type: ProcessMsgType.AdminCmd, cmd });
     }
 
     onOpen(socketId: string, socket: WebSocket<GameSocketData>): void {

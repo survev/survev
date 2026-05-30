@@ -58,6 +58,18 @@ class Region {
     return data ?? { error: "find_spectator_game_failed" };
     }
 
+    /** Fetches live player list for a game from the game server (for the moderation dashboard). */
+    async getDashboardGamePlayers(gameId: string): Promise<any[]> {
+        const data = await this.fetch<{ players: any[] }>("api/dashboard/game_players", { gameId });
+        return data?.players ?? [];
+    }
+
+    /** Sends an admin command to a running game on this region's game server. */
+    async sendDashboardGameCmd(gameId: string, cmd: object): Promise<boolean> {
+        const data = await this.fetch<{ ok: boolean }>("api/dashboard/game_cmd", { gameId, cmd });
+        return data?.ok ?? false;
+    }
+
     async findGameById(gameId: string, admin: boolean,): Promise<any> {
     const data = await this.fetch<any>("api/find_game_by_id", { region: this.id, gameId, admin });
     return data ?? { error: "find_game_by_id_failed" };
@@ -156,6 +168,16 @@ export class ApiServer {
     const r = this.regions[region];
     if (!r) return { error: "Invalid Region" };
         return await r.findGameById(gameId, admin);
+    }
+
+    /** Returns live players for a game from the game server of the given region. */
+    async getDashboardGamePlayers(region: string, gameId: string): Promise<any[]> {
+        return (await this.regions[region]?.getDashboardGamePlayers(gameId)) ?? [];
+    }
+
+    /** Sends an admin command to a running game in the given region. */
+    async sendDashboardGameCmd(region: string, gameId: string, cmd: object): Promise<boolean> {
+        return (await this.regions[region]?.sendDashboardGameCmd(gameId, cmd)) ?? false;
     }
 
     async refreshRegionModes() {

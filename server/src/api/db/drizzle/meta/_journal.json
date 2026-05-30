@@ -57,6 +57,13 @@
       "when": 1774966739851,
       "tag": "0007_dizzy_swarm",
       "breakpoints": true
+    },
+    {
+      "idx": 8,
+      "version": "7",
+      "when": 1780174976950,
+      "tag": "0008_sweet_mole_man",
+      "breakpoints": true
     }
   ]
 }

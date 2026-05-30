@@ -468,7 +468,7 @@ export class TeamMenu {
                     }
                 }
 
-                if (!closeReason && (await isBehindProxy(ip!, userId ? 0 : 3))) {
+                if (!closeReason && !userId && (await isBehindProxy(ip!, 3))) {
                     closeReason = "behind_proxy";
                 }
 

@@ -81,6 +81,20 @@ process.on("message", async (msg: ProcessMsg) => {
         case ProcessMsgType.SocketClose:
             game.handleSocketClose(msg.socketId);
             break;
+
+        // Dashboard: return live player list
+        case ProcessMsgType.GetPlayerData:
+            sendMsg({
+                type: ProcessMsgType.PlayerDataResponse,
+                requestId: msg.requestId,
+                players: game.getPlayerDataForDashboard(),
+            });
+            break;
+
+        // Dashboard: execute an admin action (freeze/kick/announce/etc.)
+        case ProcessMsgType.AdminCmd:
+            game.executeAdminCmd(msg.cmd);
+            break;
     }
 });
 

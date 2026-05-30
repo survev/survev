@@ -27,6 +27,7 @@ import { deleteExpiredSessions, validateSessionToken } from "./auth";
 import { rateLimitMiddleware, validateParams } from "./auth/middleware";
 import type { SessionTableSelect, UsersTableSelect } from "./db/schema";
 import { cleanupOldLogs, isBanned } from "./routes/private/ModerationRouter";
+import { ModerationDashboardRouter } from "./routes/ModerationDashboardRouter";
 import { PrivateRouter } from "./routes/private/private";
 import { StatsRouter } from "./routes/stats/StatsRouter";
 import { AuthRouter } from "./routes/user/AuthRouter";
@@ -76,6 +77,7 @@ app.route("/api/user/", UserRouter);
 app.route("/api/auth/", AuthRouter);
 app.route("/api/", StatsRouter);
 app.route("/private/", PrivateRouter);
+app.route("/moderation", ModerationDashboardRouter);
 
 server.init(app, upgradeWebSocket);
 
@@ -126,7 +128,7 @@ app.post("/api/find_game", validateParams(zFindGameBody), async (c) => {
         }
     }
 
-    if (await isBehindProxy(ip, user ? 0 : 3)) {
+    if (!user && await isBehindProxy(ip, 3)) {
         return c.json<FindGameResponse>({ error: "behind_proxy" });
     }
 
@@ -259,7 +261,7 @@ app.post("/api/find_game_by_id", validateParams(zFindGameById), async (c) => {
         }
     }
 
-    if (await isBehindProxy(ip, user ? 0 : 3)) {
+    if (!user && await isBehindProxy(ip, 3)) {
         return c.json<FindGameResponse>({ error: "behind_proxy" });
     }
 

@@ -620,12 +620,30 @@ export async function getActiveChatBan(encodedIp: string) {
     return null;
 }
 
+/** Looks up the ISP for a given IP via ip-api.com (free, no key required). Returns "" on failure. */
+async function lookupIsp(ip: string): Promise<string> {
+    try {
+        const res = await fetch(`http://ip-api.com/json/${ip}?fields=isp`, { signal: AbortSignal.timeout(3000) });
+        const data = await res.json() as { isp?: string };
+        return data.isp ?? "";
+    } catch {
+        return "";
+    }
+}
+
 export async function logPlayerIPs(data: SaveGameBody["matchData"]) {
     try {
+        // Fetch ISP for each unique raw IP in parallel, then map to log rows
+        const uniqueIps = [...new Set(data.map((m) => m.ip))];
+        const ispMap = Object.fromEntries(
+            await Promise.all(uniqueIps.map(async (ip) => [ip, await lookupIsp(ip)])),
+        );
+
         const logsData = data.map((matchData) => ({
             ...matchData,
             encodedIp: hashIp(matchData.ip),
             findGameEncodedIp: hashIp(matchData.findGameIp),
+            isp: ispMap[matchData.ip] ?? "",
         }));
         await db.insert(ipLogsTable).values(logsData);
     } catch (err) {

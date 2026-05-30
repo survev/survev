@@ -89,6 +89,10 @@ export enum ProcessMsgType {
     AddJoinTokenAsSpectator,
     SocketMsg,
     SocketClose,
+    // Dashboard IPC messages
+    GetPlayerData,      // API server → game process: request live player list
+    PlayerDataResponse, // game process → API server: live player list response
+    AdminCmd,           // API server → game process: execute an admin action
 }
 
 export interface CreateGameMsg {
@@ -146,6 +150,45 @@ export interface SocketCloseMsg {
     reason?: string;
 }
 
+/** One player's live state, returned by GetPlayerData. */
+export interface DashboardPlayer {
+    username: string;
+    userId: string;
+    encodedIp: string;
+    kills: number;
+    assists: number;
+    alive: boolean;
+    isSpectator: boolean;
+    isAdmin: boolean;
+    disconnected: boolean;
+}
+
+export interface GetPlayerDataMsg {
+    type: ProcessMsgType.GetPlayerData;
+    /** Unique request id so the manager can match the response to its Promise. */
+    requestId: string;
+}
+
+export interface PlayerDataResponseMsg {
+    type: ProcessMsgType.PlayerDataResponse;
+    requestId: string;
+    players: DashboardPlayer[];
+}
+
+/** Actions the dashboard can trigger on a running game. */
+export type AdminCmdAction =
+    | { action: "freeze" }
+    | { action: "unfreeze" }
+    | { action: "verify" }
+    | { action: "kick";            target: string }
+    | { action: "announce";        text: string; color?: string; sender?: string }
+    | { action: "announce_player"; target: string; text: string; color?: string; sender?: string };
+
+export interface AdminCmdMsg {
+    type: ProcessMsgType.AdminCmd;
+    cmd: AdminCmdAction;
+}
+
 export type ProcessMsg =
     | CreateGameMsg
     | GameCreatedMsg
@@ -154,7 +197,10 @@ export type ProcessMsg =
     | AddJoinTokenMsg
     | AddJoinTokenAsSpectatorMsg
     | SocketMsgsMsg
-    | SocketCloseMsg;
+    | SocketCloseMsg
+    | GetPlayerDataMsg
+    | PlayerDataResponseMsg
+    | AdminCmdMsg;
 
     export interface GameInfo {
     id: string,

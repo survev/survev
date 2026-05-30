@@ -6,6 +6,8 @@ import type { MapDefs } from "../../../shared/defs/mapDefs";
 import * as net from "../../../shared/net/net";
 import { Config } from "../config";
 import type {
+    AdminCmdAction,
+    DashboardPlayer,
     FindGamePrivateBody,
     GameData,
     GameSocketData,
@@ -24,6 +26,12 @@ export abstract class GameManager {
 
     abstract findGameById(gameId: string, playerData: any[], autoFill: boolean): Promise<string>;
     abstract getGames(): Promise<GameData[]>;
+
+    /** Returns live player data for a running game (for the moderation dashboard). */
+    abstract getGamePlayers(gameId: string): Promise<DashboardPlayer[]>;
+
+    /** Sends an admin command to a running game (fire-and-forget). */
+    abstract sendAdminCmd(gameId: string, cmd: AdminCmdAction): void;
 
     abstract onOpen(socketId: string, socket: WebSocket<GameSocketData>): void;
 
@@ -171,6 +179,14 @@ export class SingleThreadGameManager implements GameManager {
 
     async getGames(): Promise<GameData[]> {
         return this.games.map((game) => game);
+    }
+
+    async getGamePlayers(gameId: string): Promise<DashboardPlayer[]> {
+        return this.gamesById.get(gameId)?.getPlayerDataForDashboard() ?? [];
+    }
+
+    sendAdminCmd(gameId: string, cmd: AdminCmdAction): void {
+        this.gamesById.get(gameId)?.executeAdminCmd(cmd);
     }
 
     onOpen(socketId: string, socket: WebSocket<GameSocketData>): void {
