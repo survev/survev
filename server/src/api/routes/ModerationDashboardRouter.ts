@@ -457,6 +457,34 @@ export const ModerationDashboardRouter = new Hono<Context>()
         return c.json(await fetchServers());
     })
 
+    /** Sends an announcement to every running game across all regions. */
+    .post(
+        "/api/servers/announce",
+        validateParams(z.object({
+            text: z.string(),
+            color: z.string().optional(),
+            sender: z.string().optional(),
+        })),
+        async (c) => {
+            const { text, color, sender } = c.req.valid("json");
+            const cmd = { action: "announce", text, color, sender };
+
+            await Promise.all(
+                Object.entries(server.regions).map(async ([regionId, region]) => {
+                    const infos = await region.collectGameInfos().catch(() => null);
+                    const games = Array.isArray(infos?.data) ? infos.data : [];
+                    await Promise.all(
+                        games
+                            .filter((g: any) => !g.stopped)
+                            .map((g: any) => server.sendDashboardGameCmd(regionId, g.id, cmd)),
+                    );
+                }),
+            );
+
+            return c.json({ ok: true });
+        },
+    )
+
     /**
      * Returns the live player list for a specific running game.
      * Calls the game server via HTTP, which uses IPC to query the game process.
