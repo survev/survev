@@ -98,6 +98,7 @@ export const matchDataTable = pgTable(
         killerId: integer("killer_id").notNull(),
         killedIds: integer("killed_ids").array().notNull(),
         assistedIds: integer("assisted_ids").array().notNull().default([]),
+        encodedIp: text("encoded_ip").notNull().default(""),
     },
     (table) => [
         index("idx_match_data_user_stats").on(
@@ -153,6 +154,27 @@ export const ipLogsTable = pgTable(
 );
 
 export type IpLogsTable = typeof ipLogsTable.$inferSelect;
+
+export const chatLogsTable = pgTable(
+    "chat_logs",
+    {
+        id: serial().primaryKey(),
+        createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+        gameId: text("game_id").notNull(),
+        username: text("username").notNull(),
+        userId: text("user_id").notNull().default(""),
+        encodedIp: text("encoded_ip").notNull(),
+        channel: integer("channel").notNull().default(0), // 0 = all, 1 = team
+        message: text("message").notNull(),
+    },
+    (table) => [
+        index("chat_logs_username_idx").on(table.username, table.createdAt),
+        index("chat_logs_ip_idx").on(table.encodedIp, table.createdAt),
+        index("chat_logs_user_id_idx").on(table.userId, table.createdAt),
+    ],
+);
+
+export type ChatLogsTable = typeof chatLogsTable.$inferSelect;
 
 export const bannedIpsTable = pgTable("banned_ips", {
     createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
