@@ -116,8 +116,8 @@ export const mapDef: PartialMapDef = {
     
     mapGen: {
         map: {
-            baseWidth: 190,
-            baseHeight: 190,
+            baseWidth: 210,
+            baseHeight: 210,
             scale: { small: 1, large: 1 },
             extension: 0,
             shoreInset: 3,
@@ -177,36 +177,36 @@ export const mapDef: PartialMapDef = {
         },
         densitySpawns: [
             {
-                stone_01: 7,
-                barrel_01: 3,
-                tree_01: 10,
+                stone_01: 25,
+                barrel_01: 5,
+                tree_01: 30,
             },
         ],
         fixedSpawns: [
             {
-                // small is spawn count for solos and duos, large is spawn count for squads
-                stone_01: 30,
-                barrel_01: 5,
+                stone_01: 45,
+                barrel_01: 6,
                 silo_01: 1,
-                tree_01: 40,
+                tree_01: 60,
                 container_01: 1,
-                container_02: 1,
+                container_02: 2,
                 container_03: 1,
-                container_04: 1,
+                container_04: 2,
                 outhouse_01: 3,
+                stone_01_indestructible: 1,
             },
         ],
         randomSpawns: [
             {
-                spawns: ["mansion_structure_01", "police_01", "club_complex_01", "warehouse_complex_01"],
+                spawns: ["logging_complex_01local", "mansion_structure_01", "police_01", "club_complex_01", "warehouse_complex_01", "workshop_complex_01", "logging_complex_01local", "kopje_patch_01", "river_town_02_local", "desert_town_02_local"],
                 choose: 1,
             },
             {
-                spawns: ["bank_01", "barn_01", "barn_02" ],
-                choose: 1,
+                spawns: ["bank_01", "greenhouse_01", "saloon_structure_01"],
+                choose: 2,
             },
             {
-                spawns: ["warehouse_01", "house_red_01", "house_red_02" ],
+                spawns: ["warehouse_01", "house_red_01", "house_red_02", "barn_01", "barn_02" ],
                 choose: 2,
             },
             {
@@ -215,7 +215,7 @@ export const mapDef: PartialMapDef = {
             }
         ],
         spawnReplacements: [{}],
-        importantSpawns: ["club_complex_01"],
+        importantSpawns: ["logging_complex_01local", "mansion_structure_01", "police_01", "club_complex_01", "warehouse_complex_01", "workshop_complex_01", "logging_complex_01local", "kopje_patch_01", "river_town_02_local", "desert_town_02_local"],
     },
     /* STRIP_FROM_PROD_CLIENT:END */
 };
