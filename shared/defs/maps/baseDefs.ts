@@ -24,8 +24,11 @@ export const Main: MapDef = {
             { name: "club_music_01", channel: "ambient" },
             { name: "club_music_02", channel: "ambient" },
             { name: "ambient_steam_01", channel: "ambient" },
+            { name: "log_05", channel: "sfx" },
             { name: "log_11", channel: "sfx" },
             { name: "log_12", channel: "sfx" },
+            { name: "vault_change_03", channel: "sfx" },
+            { name: "watering_01", channel: "sfx" },
         ],
         atlases: ["gradient", "loadout", "shared", "main"],
     },
@@ -193,11 +196,11 @@ export const Main: MapDef = {
         ],
         tier_chrys_01: [{ name: "outfitImperial", count: 1, weight: 1 }],
         tier_chrys_02: [{ name: "katana", count: 1, weight: 1 }],
+        // Note that the 15x Scope is ~3x as common here vs. tier_scopes
         tier_chrys_03: [
-            { name: "2xscope", count: 1, weight: 5 }, // ?
-            { name: "4xscope", count: 1, weight: 5 }, // ?
-            { name: "8xscope", count: 1, weight: 5 }, // ?
-            { name: "15xscope", count: 1, weight: 0.1 }, // ?
+            { name: "4xscope", count: 1, weight: 7.5 },
+            { name: "8xscope", count: 1, weight: 5 },
+            { name: "15xscope", count: 1, weight: 0.25 },
         ],
         tier_chrys_case: [
             { name: "", count: 1, weight: 5 }, // ?
