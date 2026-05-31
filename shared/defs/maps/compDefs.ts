@@ -1123,7 +1123,7 @@ export const Comp: MapDef = {
                 {
                     type: "workshop_complex_01",
                     pos: v2.create(0.5, 0.5),
-                    rad: 120,
+                    rad: 130,
                     retryOnFailure: true,
                 },
             ],
