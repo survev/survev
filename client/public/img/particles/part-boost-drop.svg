@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="128" height="128" viewBox="0 0 33.866666 33.866667">
+  <!-- Water drop particle shape -->
+  <path style="fill:#ffffff;fill-opacity:1;stroke:none"
+    d="M 16.933,1.5
+       C 16.933,1.5 5,15 5,21
+         C 5,27.627 10.373,32.366 16.933,32.366
+         C 23.493,32.366 28.866,27.627 28.866,21
+         C 28.866,15 16.933,1.5 16.933,1.5 Z" />
+</svg>

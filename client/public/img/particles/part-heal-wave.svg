@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="128" height="128" viewBox="0 0 33.866666 33.866667">
+  <!-- Wave / ripple shape particle -->
+  <path style="fill:#ffffff;fill-opacity:1;stroke:none"
+    d="M 0.5,13
+       Q 4,7 8.5,13
+       Q 13,19 16.933,13
+       Q 20.866,7 25.366,13
+       Q 29.5,19 33.366,13
+       L 33.366,21
+       Q 29.5,27 25.366,21
+       Q 20.866,15 16.933,21
+       Q 13,27 8.5,21
+       Q 4,15 0.5,21
+       Z"/>
+</svg>

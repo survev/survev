@@ -1,0 +1,20 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="128" height="128">
+  <!-- Trunk -->
+  <path d="M 56 122 Q 58 95 54 75 Q 57 58 64 42"
+        stroke="#8B6914" stroke-width="11" fill="none" stroke-linecap="round"/>
+  <!-- Trunk rings -->
+  <path d="M 52 106 Q 58 104 66 107" stroke="#6A5010" stroke-width="2" fill="none"/>
+  <path d="M 51 88 Q 57 86 65 89" stroke="#6A5010" stroke-width="2" fill="none"/>
+  <path d="M 50 70 Q 57 68 65 71" stroke="#6A5010" stroke-width="2" fill="none"/>
+  <!-- Leaves -->
+  <path d="M 64 42 Q 26 22 10 30 Q 28 36 50 50" fill="#2E7D20" stroke="#1A5C10" stroke-width="1"/>
+  <path d="M 64 42 Q 48 6 62 2 Q 64 18 68 44" fill="#2E7D20" stroke="#1A5C10" stroke-width="1"/>
+  <path d="M 64 42 Q 94 18 110 26 Q 92 34 72 48" fill="#2E7D20" stroke="#1A5C10" stroke-width="1"/>
+  <path d="M 64 42 Q 98 42 114 58 Q 94 52 74 56" fill="#2E7D20" stroke="#1A5C10" stroke-width="1"/>
+  <path d="M 64 42 Q 90 62 96 80 Q 78 62 68 58" fill="#2E7D20" stroke="#1A5C10" stroke-width="1"/>
+  <path d="M 64 42 Q 38 62 30 80 Q 46 62 58 56" fill="#2E7D20" stroke="#1A5C10" stroke-width="1"/>
+  <!-- Coconuts -->
+  <circle cx="62" cy="46" r="5.5" fill="#7A5C10"/>
+  <circle cx="70" cy="49" r="5" fill="#7A5C10"/>
+  <circle cx="64" cy="54" r="4.5" fill="#7A5C10"/>
+</svg>

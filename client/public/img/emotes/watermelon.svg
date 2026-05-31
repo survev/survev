@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="128" height="128">
+  <!-- Green rind (outer arc) -->
+  <path d="M 12 82 A 56 56 0 0 1 116 82 Z" fill="#2D8B22"/>
+  <!-- White inner rind -->
+  <path d="M 18 82 A 50 50 0 0 1 110 82 Z" fill="#AAFFAA"/>
+  <!-- Red flesh -->
+  <path d="M 24 82 A 44 44 0 0 1 104 82 Z" fill="#FF3333"/>
+  <!-- Seeds -->
+  <ellipse cx="45" cy="72" rx="3.5" ry="5.5" fill="#1A1A1A" transform="rotate(-12 45 72)"/>
+  <ellipse cx="64" cy="66" rx="3.5" ry="5.5" fill="#1A1A1A"/>
+  <ellipse cx="83" cy="72" rx="3.5" ry="5.5" fill="#1A1A1A" transform="rotate(12 83 72)"/>
+  <ellipse cx="54" cy="77" rx="3.5" ry="5.5" fill="#1A1A1A" transform="rotate(-6 54 77)"/>
+  <ellipse cx="74" cy="77" rx="3.5" ry="5.5" fill="#1A1A1A" transform="rotate(6 74 77)"/>
+  <!-- Flat bottom line -->
+  <line x1="12" y1="82" x2="116" y2="82" stroke="#1A6B14" stroke-width="3"/>
+</svg>

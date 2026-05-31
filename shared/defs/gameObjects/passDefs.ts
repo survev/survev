@@ -134,117 +134,35 @@ export const PassDefs: Record<string, PassDef> = {
             205,205,205,205,205,
             205,205,205,205,
             ],
-            //outfitWheat, outfitImperial, outfitWoodsCloak, outfitVerde, outfitPineapple, outfitSpetsnaz, outfitLumber
         items: [
-            {
-                level: 2,
-                item: "outfitWheat",
-            },
-            {
-                level: 4,
-                item: "heal_heart",
-            },
-            {
-                level: 5,
-                item: "emote_bandagedface",
-            },
-            {
-                level: 6,
-                item: "outfitWhite",
-            },
-            {
-                level: 8,
-                item: "boost_star",
-            },
-            {
-                level: 10,
-                item: "emote_ok",
-            },
-            {
-                level: 12,
-                item: "outfitRed",
-            },
-            {
-                level: 14,
-                item: "heal_moon",
-            },
-            {
-                level: 15,
-                item: "emote_pooface",
-            },
-            {
-                level: 16,
-                item: "knuckles_rusted",
-            },
-            {
-                level: 18,
-                item: "boost_naturalize",
-            },
-            {
-                level: 20,
-                item: "emote_ghost_base",
-            },
-            {
-                level: 22,
-                item: "outfitDarkGloves",
-            },
-            {
-                level: 24,
-                item: "heal_tomoe",
-            },
-            {
-                level: 25,
-                item: "emote_picassoface",
-            },
-            {
-                level: 26,
-                item: "outfitCarbonFiber",
-            },
-            {
-                level: 28,
-                item: "boost_shuriken",
-            },
-            {
-                level: 30,
-                item: "emote_rainbow",
-            },
-            {
-                level: 32,
-                item: "outfitParmaPrestige",
-            },
-            {
-                level: 34,
-                item: "knuckles_heroic",
-            },
-            {
-                level: 35,
-                item: "outfitTurkey",
-            },
-            {
-                level: 36,
-                item: "bayonet_rugged",
-            },
-            {
-                level: 38,
-                item: "bayonet_woodland",
-            },
-            {
-                level: 40,
-                item: "bayonet_woodland",
-            },
+            { level: 2,  item: "outfitWheat" },
+            { level: 4,  item: "emote_sun" },
+            { level: 5,  item: "heal_sun" },
+            { level: 6,  item: "emote_beachball" },
+            { level: 8,  item: "outfitSunrise" },
+            { level: 10, item: "boost_drop" },
+            { level: 12, item: "emote_flamingo" },
+            { level: 14, item: "outfitWave" },
+            { level: 15, item: "heal_wave" },
+            { level: 16, item: "outfitAqua" },
+            { level: 18, item: "emote_watermelon" },
+            { level: 20, item: "outfitTide" },
+            { level: 22, item: "outfitWaterElem" },
+            { level: 24, item: "boost_flame" },
+            { level: 25, item: "outfitRoyalFortune" },
+            { level: 26, item: "emote_surfboard" },
+            { level: 28, item: "outfitCobaltShell" },
+            { level: 30, item: "outfitTropicalStorm" },
+            { level: 32, item: "emote_palm" },
+            { level: 34, item: "outfitVerde" },
+            { level: 35, item: "huntsman_rugged" },
+            { level: 36, item: "outfitBeachCamo" },
+            { level: 38, item: "bowie_vintage" },
+            { level: 40, item: "outfitKhaki" },
             //bonus pass
-            {
-                level: 50,
-                item: "bayonet_woodland",
-            },
-            {
-                level: 75,
-                item: "bayonet_woodland",
-            },
-            {
-                level: 99,
-                item: "bayonet_woodland",
-            },
+            { level: 50, item: "bowie_frontier" },
+            { level: 75, item: "karambit_prismatic" },
+            { level: 99, item: "outfitSpetsnaz" },
         ],
     },
 };
