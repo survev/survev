@@ -145,13 +145,20 @@ const mapDef: PartialMapDef = {
             { name: "chest03", count: 1, weight: 1 },
             { name: "backpack03", count: 1, weight: 1 },
         ],
+        tier_hatchet: [
+            { name: "potato_lmg", count: 1, weight: 0.1 },
+            { name: "potato_cannon", count: 1, weight: 0.1 },
+            { name: "potato_smg", count: 1, weight: 0.1 },
+        ],
         tier_ring_case: [
             { name: "potato_cannon", count: 1, weight: 1 },
             { name: "potato_smg", count: 1, weight: 0.1 },
+            { name: "potato_lmg", count: 1, weight: 0.2 },
         ],
         tier_airdrop_rare: [
             { name: "potato_cannon", count: 1, weight: 1 },
-            { name: "potato_smg", count: 1, weight: 0.1 },
+            { name: "potato_smg", count: 1, weight: 1 },
+            { name: "potato_lmg", count: 1, weight: 1 },
         ],
     },
     mapGen: {
