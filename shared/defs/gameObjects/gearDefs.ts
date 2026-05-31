@@ -92,7 +92,7 @@ const ChestDefs: Record<string, ChestDef> = {
             baseSprite: "player-armor-base-01.img",
         },
         lootImg: {
-            sprite: "loot-chest-03.img",
+            sprite: "loot-chest-04.img",
             tint: 0xffffff,
             border: "loot-circle-outer-01.img",
             borderTint: 0,
