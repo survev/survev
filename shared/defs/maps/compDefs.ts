@@ -28,7 +28,7 @@ export const Comp: MapDef = {
             { name: "log_11", channel: "sfx" },
             { name: "log_12", channel: "sfx" },
         ],
-        atlases: ["gradient", "loadout", "shared", "main", "woods", "savannah", "beach"],
+        atlases: ["gradient", "loadout", "shared", "main", "woods", "savannah", "beach", "desert"],
     },
     biome: {
         colors: {
@@ -1039,12 +1039,22 @@ export const Comp: MapDef = {
             { name: "flare", count: 1, weight: 0.1 },
             { name: "45acp", count: 90, weight: 0.25 },
         ],
+        // cattle and cloud crate defs to not crash the game
+        tier_cattle_crate: [
+            { name: "", count: 1, weight: 1 },
+        ],
+        tier_cloud_02: [
+            { name: "", count: 1, weight: 1 },
+        ],
+        tier_perks: [
+            { name: "", count: 1, weight: 1 },
+        ],
     },
     mapGen: {
         map: {
             baseWidth: 512,
             baseHeight: 512,
-            scale: { small: 1.1875, large: 1.28125 },
+            scale: { small: 1.1875, large: 1.28125 }, 
             extension: 112,
             shoreInset: 48,
             grassInset: 18,
