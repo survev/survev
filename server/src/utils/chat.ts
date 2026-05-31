@@ -9,7 +9,7 @@ import { Config } from "../config";
 import { hashIp, getActiveChatBan } from "../api/routes/private/ModerationRouter";
 import { GameObjectDefs } from "../../../shared/defs/gameObjectDefs";
 import { db } from "../api/db";
-import { usersTable } from "../api/db/schema";
+import { chatLogsTable, usersTable } from "../api/db/schema";
 
 
 
@@ -104,7 +104,7 @@ export class Chat{
                     for(const s of spectators){
                         s.sendMsg(net.MsgType.KillFeed, msg1)
                     }
-                    this.logChat(originalMsg);
+                    this.logChat(originalMsg, false, false, undefined, 2);
                     this.player.chatCooldown = 3;
                     return;
                 }
@@ -114,10 +114,10 @@ export class Chat{
                 // 0 = ALL | 1 = TEAM
                 switch(chatType){
                     case(0):{
-                        
+
                         msg1.chatType = 0;
                         this.game.broadcastMsg(net.MsgType.KillFeed, msg1);
-                        this.logChat(originalMsg);
+                        this.logChat(originalMsg, false, false, undefined, 0);
                         this.player.chatCooldown = 3;
                         break;
                     }
@@ -126,7 +126,7 @@ export class Chat{
                             msg1.string = "chat-no-team";
                             msg1.player = "ADMIN";
                             msg1.type = net.KillFeedMsgType.AdminMsg;
-                            this.player.sendMsg(net.MsgType.KillFeed, msg1); 
+                            this.player.sendMsg(net.MsgType.KillFeed, msg1);
                             this.logChat(originalMsg, true, false, msg1.string);
                             break;
                         }
@@ -135,18 +135,18 @@ export class Chat{
                             msg1.string = "chat-no-team";
                             msg1.player = "ADMIN";
                             msg1.type = net.KillFeedMsgType.AdminMsg;
-                            this.player.sendMsg(net.MsgType.KillFeed, msg1);  
+                            this.player.sendMsg(net.MsgType.KillFeed, msg1);
                             this.logChat(originalMsg, true, false, msg1.string);
                             break;
                         }else{
-                            
+
                             msg1.chatType = 1;
                             for(const p of teamPlayers){
                                 p.sendMsg(net.MsgType.KillFeed, msg1);
                             }
-                            
+
                             this.player.sendMsg(net.MsgType.KillFeed, msg1);
-                            this.logChat(originalMsg);
+                            this.logChat(originalMsg, false, false, undefined, 1);
                             this.player.chatCooldown = 3;
                             break;
                         }
@@ -167,7 +167,7 @@ export class Chat{
             
     }
 
-    logChat(originalMsg: string, adminMsg?: boolean, cmd?: boolean, msg?: string,){
+    logChat(originalMsg: string, adminMsg?: boolean, cmd?: boolean, msg?: string, channel = 0){
         if(adminMsg){
             const log = `[CHAT-${this.game.id}] || [${this.player.name}]: ${originalMsg} => [Response]: ${msg}`;
             chatLogger.info(log);
@@ -180,6 +180,18 @@ export class Chat{
 
         const log = `[CHAT-${this.game.id}] || [${this.player.name}]: ${originalMsg}`;
         chatLogger.info(log);
+
+        // Persist real messages to DB for the moderation dashboard chat history
+        if(Config.database.enabled){
+            db.insert(chatLogsTable).values({
+                gameId: this.game.id,
+                username: this.player.name,
+                userId: this.player.userId ?? "",
+                encodedIp: hashIp(this.player.ip),
+                channel,
+                message: originalMsg,
+            }).catch(() => { /* non-critical, ignore errors */ });
+        }
     }
 
     adminCommands: Record<string, (args: string[]) => void> = {

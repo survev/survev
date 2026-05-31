@@ -678,26 +678,32 @@ function renderIpDetail(data, container) {
   const banInfo = data.banned
     ? \`<span class="badge badge-perm">BANNED</span> \${esc(data.banRecord?.reason || '')}\`
     : '<span class="badge badge-alive">Clean</span>';
-  const rows = (data.accounts || []).map(a => \`
-    <tr>
-      <td>\${esc(a.username)}</td>
-      <td>\${a.slug ? esc(a.slug) : '<span style="color:var(--text-muted)">No account</span>'}</td>
+  const rows = (data.accounts || []).map(a => {
+    const isHistorical = a.source === 'historical';
+    const sourceBadge = isHistorical
+      ? '<span class="badge" style="background:var(--surface3);color:var(--text-muted);border:1px solid var(--border2)">HISTORICAL</span>'
+      : '<span class="badge badge-alive">RECENT</span>';
+    return \`<tr>
+      <td>\${esc(a.username)} \${sourceBadge}</td>
+      <td>\${a.slug ? esc(a.slug) : '<span style="color:var(--text-muted)">–</span>'}</td>
       <td>\${esc(a.isp || '–')}</td>
       <td>\${esc(a.region || '–')}</td>
-      <td>\${fmtDate(a.createdAt)}</td>
-    </tr>
-  \`).join('');
+      <td>\${isHistorical ? '<span style="color:var(--text-muted)">via match history</span>' : fmtDate(a.createdAt)}</td>
+    </tr>\`;
+  }).join('');
   container.innerHTML = \`
     <div class="detail-card">
       <h3>IP Details</h3>
       <div class="kv-row"><span class="kv-key">Hash:</span><span class="kv-val">\${esc(data.hash)}</span></div>
       <div class="kv-row"><span class="kv-key">ISP:</span><span class="kv-val">\${esc(data.isp || 'Unknown')}</span></div>
       <div class="kv-row"><span class="kv-key">Ban status:</span><span>\${banInfo}</span></div>
-      <div style="margin-top:8px;display:flex;gap:6px;">
+      <div style="margin-top:8px;display:flex;gap:6px;flex-wrap:wrap;">
         \${data.banned
           ? \`<button class="btn btn-green btn-sm" onclick="unbanIp('\${esc(data.hash)}')">Unban</button>\`
           : \`<button class="btn btn-red btn-sm" onclick="quickBanIp('\${esc(data.hash)}')">Ban IP</button>\`}
+        <button class="btn btn-blue btn-sm" onclick="loadChatLog('\${esc(data.hash)}', 'ip', this)">💬 Chat History</button>
       </div>
+      <div id="chat-log-panel" style="display:none;margin-top:10px;"></div>
     </div>
     <div style="margin-top:12px;">
       <table class="data-table">
@@ -721,7 +727,11 @@ function renderPlayerDetail(data, container) {
     <div class="detail-card">
       <h3>Player: <strong>\${esc(data.name)}</strong></h3>
       <p style="font-size:12px;color:var(--text-dim);margin-top:4px;">Known IPs – click a hash to see full details.</p>
+      <div style="margin-top:8px;">
+        <button class="btn btn-blue btn-sm" onclick="loadChatLog('\${esc(data.name)}', 'name', this)">💬 Chat History</button>
+      </div>
     </div>
+    <div id="chat-log-panel" style="display:none;margin-top:12px;"></div>
     <div style="margin-top:12px;">
       <table class="data-table">
         <thead><tr><th>IP Hash</th><th>ISP</th><th>Region</th><th>Last seen</th></tr></thead>
@@ -729,6 +739,34 @@ function renderPlayerDetail(data, container) {
       </table>
     </div>
   \`;
+}
+
+const CHANNEL_LABELS = ['ALL', 'TEAM', 'SPEC'];
+const CHANNEL_COLORS = ['var(--text)', 'var(--green-t)', 'var(--text-dim)'];
+
+async function loadChatLog(query, by, btn) {
+  const panel = document.getElementById('chat-log-panel');
+  if (panel.style.display !== 'none') { panel.style.display = 'none'; if(btn) btn.textContent = '💬 Chat History'; return; }
+  panel.style.display = '';
+  if(btn) btn.textContent = '💬 Hide Chat History';
+  panel.innerHTML = '<div class="loading">Loading chat history…</div>';
+  try {
+    const data = await get('/api/chat/' + encodeURIComponent(query) + '?by=' + by);
+    const msgs = data.messages ?? [];
+    if (!msgs.length) { panel.innerHTML = '<div class="empty">No chat messages found.</div>'; return; }
+    panel.innerHTML = \`
+      <table class="data-table">
+        <thead><tr><th>Time</th><th>Name</th><th>Channel</th><th>Message</th><th>Game</th></tr></thead>
+        <tbody>\${msgs.map(m => \`<tr>
+          <td style="white-space:nowrap;font-size:11px;">\${fmtDate(m.createdAt)}</td>
+          <td>\${esc(m.username)}\${m.slug ? \` <span style="color:var(--text-muted);font-size:10px;">(\${esc(m.slug)})</span>\` : ''}</td>
+          <td><span style="font-size:10px;font-weight:600;color:\${CHANNEL_COLORS[m.channel] ?? 'var(--text)'};">\${CHANNEL_LABELS[m.channel] ?? m.channel}</span></td>
+          <td>\${esc(m.message)}</td>
+          <td style="font-family:monospace;font-size:10px;color:var(--text-muted);">\${esc((m.gameId||'').slice(0,8))}…</td>
+        </tr>\`).join('')}</tbody>
+      </table>
+    \`;
+  } catch { panel.innerHTML = '<div class="empty">Failed to load chat history.</div>'; }
 }
 
 function quickBanIp(hash) {
@@ -771,6 +809,9 @@ function renderServers() {
         <div class="gc-id">\${esc(g.id.slice(0,8))}…</div>
         <div class="gc-mode">Mode \${esc(String(g.teamMode || '?'))}</div>
         <div class="gc-count">\${g.playerCount ?? '?'} players</div>
+        <div style="margin-top:6px;">
+          <button class="btn btn-blue btn-sm" style="width:100%" onclick="event.stopPropagation();spectateGame('\${esc(region.regionId)}','\${esc(g.id)}')">👁 SPECTATE</button>
+        </div>
       </div>\`;
     }).join('') : '<div class="empty">No running games.</div>';
 
@@ -779,6 +820,18 @@ function renderServers() {
       <div class="game-cards">\${cardsHtml}</div>
     </div>\`;
   }).join('');
+}
+
+/** Opens the game client in a new tab and auto-spectates the given game. */
+async function spectateGame(region, gameId) {
+  try {
+    const data = await get('/api/game/' + encodeURIComponent(region) + '/' + encodeURIComponent(gameId) + '/spectate-token');
+    const matchData = data?.res?.[0];
+    if (!matchData) { toast('Could not get spectate token', true); return; }
+    sessionStorage.setItem('dashboardSpectate', JSON.stringify(matchData));
+    window.open('/', '_blank');
+    toast('Opening spectator view…');
+  } catch (e) { toast('Spectate failed', true); }
 }
 
 /** Selects a game and reconnects SSE with the gameId so player events start flowing. */
