@@ -92,7 +92,7 @@ export const ExplosionDefs: Record<string, ExplosionDef> = {
     explosion_bar_modified: {
         type: "explosion",
         damage: 6,
-        obstacleDamage: 30,
+        obstacleDamage: 15,
         rad: { min: 0.75, max: 1 },
         shrapnelCount: 0,
         shrapnelType: "shrapnel_usas",
