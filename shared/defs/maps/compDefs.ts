@@ -461,7 +461,7 @@ export const Comp: MapDef = {
             { name: "ot38", count: 1, weight: 0.3 },
         ],
         tier_ak_military_crate: [
-            { name: "groza", count: 1, weight: 0.15 }, 
+            { name: "groza", count: 1, weight: 0.1 }, 
             { name: "spas12", count: 1, weight: 0.1 },
             { name: "m870", count: 1, weight: 0.07 },
             { name: "mp220", count: 1, weight: 0.07 },
@@ -469,8 +469,8 @@ export const Comp: MapDef = {
             { name: "origin", count: 1, weight: 0.1 },
             { name: "ots38", count: 1, weight: 0.2 },
             { name: "saiga", count: 1, weight: 0.07 },
-            { name: "tier_hawk", count: 1, weight: 0.05 },
-            { name: "ak74", count: 1, weight: 0.05 }, 
+            { name: "tier_hawk", count: 1, weight: 0.03 },
+            { name: "ak74", count: 1, weight: 0.12 }, 
             { name: "l86", count: 1, weight: 0.07 },
         ],
         tier_bank_vault_basic: [
@@ -1111,7 +1111,7 @@ export const Comp: MapDef = {
                 {
                     type: "club_complex_01",
                     pos: v2.create(0.5, 0.5),
-                    rad: 220,
+                    rad: 80,
                     retryOnFailure: true,
                 },
                 {
@@ -1123,7 +1123,7 @@ export const Comp: MapDef = {
                 {
                     type: "workshop_complex_01",
                     pos: v2.create(0.5, 0.5),
-                    rad: 100,
+                    rad: 120,
                     retryOnFailure: true,
                 },
             ],
