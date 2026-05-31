@@ -192,7 +192,7 @@ export const GameConfig = {
     serverSettings:{
         currentPass: "pass_survivr2",
         passMaxLevel: 99,
-        seasonStart: "2026-05-31T00:00:00Z",
+        seasonStart: "2026-06-01T00:00:00Z",
     },
     player: {
         radius: 1,
