@@ -30,7 +30,7 @@ import { util } from "../../../../shared/utils/util";
 import { validateSessionToken } from "../auth";
 import { validateParams } from "../auth/middleware";
 import { db } from "../db";
-import { bannedIpsTable, chatBannedIpsTable, ipLogsTable, usersTable } from "../db/schema";
+import { bannedIpsTable, chatBannedIpsTable, chatLogsTable, ipLogsTable, matchDataTable, usersTable } from "../db/schema";
 import { server } from "../apiServer";
 import type { Context } from "..";
 import { z } from "zod";
@@ -313,44 +313,107 @@ export const ModerationDashboardRouter = new Hono<Context>()
     })
 
     /**
-     * Returns all accounts that ever used this encoded IP, plus the ISP.
+     * Returns all names + accounts that ever used this encoded IP, plus the ISP.
+     * Recent names (≤30 days) come directly from ip_logs.
+     * Historical names (>30 days) are recovered via match_data using the userId
+     * linked to the IP — so account-holders keep their full name history.
      * The real IP is never stored or returned here.
      */
     .get("/api/ip/:hash", async (c) => {
         const hash = c.req.param("hash");
 
-        const banRecord = await db.query.bannedIpsTable.findFirst({
-            where: eq(bannedIpsTable.encodedIp, hash),
-        });
+        const [banRecord, rows] = await Promise.all([
+            db.query.bannedIpsTable.findFirst({
+                where: eq(bannedIpsTable.encodedIp, hash),
+            }),
+            db
+                .select({
+                    username: ipLogsTable.username,
+                    userId: ipLogsTable.userId,
+                    slug: usersTable.slug,
+                    isp: ipLogsTable.isp,
+                    region: ipLogsTable.region,
+                    gameId: ipLogsTable.gameId,
+                    createdAt: ipLogsTable.createdAt,
+                })
+                .from(ipLogsTable)
+                .where(eq(ipLogsTable.encodedIp, hash))
+                .leftJoin(usersTable, eq(ipLogsTable.userId, usersTable.id))
+                .orderBy(desc(ipLogsTable.createdAt))
+                .limit(200),
+        ]);
 
-        const rows = await db
-            .select({
-                username: ipLogsTable.username,
-                userId: ipLogsTable.userId,
-                slug: usersTable.slug,
-                isp: ipLogsTable.isp,
-                region: ipLogsTable.region,
-                gameId: ipLogsTable.gameId,
-                createdAt: ipLogsTable.createdAt,
-            })
-            .from(ipLogsTable)
-            .where(eq(ipLogsTable.encodedIp, hash))
-            .leftJoin(usersTable, eq(ipLogsTable.userId, usersTable.id))
-            .orderBy(desc(ipLogsTable.createdAt))
-            .limit(100);
-
-        const seen = new Set<string>();
-        const accounts: typeof rows = [];
+        // Collect ISP and deduplicate recent names from ip_logs
+        const seenNames = new Set<string>();
+        const accounts: (typeof rows[number] & { source: "recent" | "historical" })[] = [];
         let isp = "";
+
         for (const row of rows) {
             if (!isp && row.isp) isp = row.isp;
-            if (!seen.has(row.username)) {
-                seen.add(row.username);
-                accounts.push(row);
+            if (!seenNames.has(row.username)) {
+                seenNames.add(row.username);
+                accounts.push({ ...row, source: "recent" });
+            }
+        }
+
+        // Query match_data directly by encoded IP — covers all players (incl. guests)
+        // with no time limit, since match_data is never deleted.
+        // Note: no ORDER BY with SELECT DISTINCT (Postgres requires ORDER BY cols to be in SELECT list)
+        const historical = await db
+            .selectDistinct({ username: matchDataTable.username, userId: matchDataTable.userId })
+            .from(matchDataTable)
+            .where(eq(matchDataTable.encodedIp, hash))
+            .limit(500);
+
+        for (const row of historical) {
+            if (!seenNames.has(row.username)) {
+                seenNames.add(row.username);
+                const knownSlug = rows.find((r) => r.userId === row.userId)?.slug ?? null;
+                accounts.push({
+                    username: row.username,
+                    userId: row.userId ?? "",
+                    slug: knownSlug,
+                    isp: "",
+                    region: "",
+                    gameId: "",
+                    createdAt: new Date(0),
+                    source: "historical",
+                });
             }
         }
 
         return c.json({ hash, isp, banned: !!banRecord, banRecord, accounts });
+    })
+
+    /**
+     * Returns chat history for a player, looked up by username or encoded IP.
+     * Query param: ?by=name (default) or ?by=ip
+     * Returns the 200 most recent messages, newest first.
+     */
+    .get("/api/chat/:query", async (c) => {
+        const query = c.req.param("query");
+        const by    = c.req.query("by") ?? "name";
+
+        const rows = await db
+            .select({
+                id:        chatLogsTable.id,
+                createdAt: chatLogsTable.createdAt,
+                gameId:    chatLogsTable.gameId,
+                username:  chatLogsTable.username,
+                channel:   chatLogsTable.channel,
+                message:   chatLogsTable.message,
+                slug:      usersTable.slug,
+            })
+            .from(chatLogsTable)
+            .where(by === "ip"
+                ? eq(chatLogsTable.encodedIp, query)
+                : eq(chatLogsTable.username, query),
+            )
+            .leftJoin(usersTable, eq(chatLogsTable.userId, usersTable.id))
+            .orderBy(desc(chatLogsTable.createdAt))
+            .limit(200);
+
+        return c.json({ messages: rows });
     })
 
     /**
@@ -484,6 +547,18 @@ export const ModerationDashboardRouter = new Hono<Context>()
             return c.json({ ok: true });
         },
     )
+
+    /**
+     * Returns a spectate token for a specific game so the dashboard can open the
+     * game client in spectator mode. Calls the game server via the existing
+     * find_game_by_id flow (same as the in-game spectate button).
+     */
+    .get("/api/game/:region/:id/spectate-token", async (c) => {
+        const regionId = c.req.param("region");
+        const gameId   = c.req.param("id");
+        const data = await server.findGameById(regionId, gameId, true /* admin */);
+        return c.json(data);
+    })
 
     /**
      * Returns the live player list for a specific running game.

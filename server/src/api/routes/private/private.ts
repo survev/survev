@@ -35,7 +35,7 @@ import {
     usersTable,
 } from "../../db/schema";
 import { MOCK_USER_ID } from "../user/auth/mock";
-import { getActiveChatBan, isBanned, logPlayerIPs, ModerationRouter } from "./ModerationRouter";
+import { getActiveChatBan, hashIp, isBanned, logPlayerIPs, ModerationRouter } from "./ModerationRouter";
 import { _allowedCrosshairs, _allowedEmotes, _allowedHealEffects, _allowedMeleeSkins, _allowedOutfits, UnlockDefs } from "../../../../../shared/defs/gameObjects/unlockDefs";
 import { PassDefs } from "../../../../../shared/defs/gameObjects/passDefs";
 import { level } from "winston";
@@ -145,7 +145,10 @@ export const PrivateRouter = new Hono<Context>()
 
         await leaderboardCache.invalidateCache(matchData);
 
-        await db.insert(matchDataTable).values(matchData);
+        // Hash each player's IP and store it alongside the match data for permanent IP history
+        await db.insert(matchDataTable).values(
+            matchData.map((d) => ({ ...d, encodedIp: hashIp(d.ip) })),
+        );
         await logPlayerIPs(matchData);
         server.logger.info(`Saved game data for ${matchData[0].gameId}`);
         return c.json({}, 200);

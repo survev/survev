@@ -416,6 +416,13 @@ export class Application {
             this.config.addModifiedListener(this.onConfigModified.bind(this));
             loadStaticDomImages();
 
+            // Auto-spectate a specific game if triggered from the moderation dashboard
+            const pendingSpectate = sessionStorage.getItem("dashboardSpectate");
+            if (pendingSpectate) {
+                sessionStorage.removeItem("dashboardSpectate");
+                this.joinGameAsSpectator(JSON.parse(pendingSpectate));
+            }
+
             SDK.gameLoadComplete();
         }
     }
