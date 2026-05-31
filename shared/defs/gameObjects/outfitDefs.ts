@@ -844,6 +844,26 @@ const SkinDefs: Record<string, OutfitDef> = {
             tint: 0xffffff,
         },
     }),
+    outfitOldMan: defineOutfitSkin("outfitBase", {
+        name: "The Old Man",
+        // noDropOnDeath: true,
+        rarity: Rarity.Mythic,
+        lore: "True Uncs struggle to find the right hex color",
+        skinImg: {
+            baseTint: 0x3B3A3A,
+            baseSprite: "player-base-01.img",
+            handTint: 0x080b04,
+            handSprite: "player-hands-01.img",
+            footTint: 0xbe7800,
+            footSprite: "player-feet-01.img",
+            backpackTint: 0x080b04,
+            backpackSprite: "player-circle-base-01.img",
+        },
+        lootImg: {
+            sprite: "loot-shirt-outfitDarkGloves.img",
+            tint: 0x453706,
+        },
+    }),
     outfitDarkShirt: defineOutfitSkin("outfitBase", {
         name: "The Semi-Pro",
         noDropOnDeath: true,

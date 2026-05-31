@@ -382,6 +382,7 @@ export const LoadoutAtlas: AtlasDef = {
         "loot/loot-melee-katana-rusted.svg",
         "loot/loot-melee-katana.svg",
         "loot/loot-melee-knuckles-heroic.svg",
+        "loot/loot-melee-knuckles-oldman.svg",
         "loot/loot-melee-knuckles-rusted.svg",
         "loot/loot-melee-kukri-sniper.svg",
         "loot/loot-melee-kukri-trad.svg",
