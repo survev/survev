@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="128" height="128">
+  <!-- Board shadow -->
+  <g transform="rotate(-22 64 64)">
+    <ellipse cx="66" cy="65" rx="17" ry="48" fill="#CC3300" opacity="0.5"/>
+  </g>
+  <!-- Main board -->
+  <g transform="rotate(-22 64 64)">
+    <ellipse cx="64" cy="64" rx="17" ry="48" fill="#FF5533"/>
+    <!-- Center stripe -->
+    <rect x="58" y="22" width="12" height="84" rx="6" fill="#FFFFFF" opacity="0.9"/>
+    <!-- Nose decoration -->
+    <ellipse cx="64" cy="20" rx="8" ry="5" fill="#FF8866"/>
+    <!-- Fin -->
+    <path d="M 70 100 L 58 120 L 80 115 Z" fill="#CC2200"/>
+  </g>
+  <!-- Wave -->
+  <path d="M 4 108 Q 22 98 40 108 Q 58 118 76 108 Q 94 98 112 108 Q 120 113 124 108"
+        stroke="#55AAFF" stroke-width="4" fill="none" stroke-linecap="round" opacity="0.9"/>
+</svg>

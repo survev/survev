@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="128" height="128">
+  <!-- Red quarter -->
+  <path d="M 64 8 A 56 56 0 0 1 120 64 L 64 64 Z" fill="#FF3333"/>
+  <!-- Blue quarter -->
+  <path d="M 120 64 A 56 56 0 0 1 64 120 L 64 64 Z" fill="#2255FF"/>
+  <!-- White quarter -->
+  <path d="M 64 120 A 56 56 0 0 1 8 64 L 64 64 Z" fill="#FFFFFF"/>
+  <!-- Yellow quarter -->
+  <path d="M 8 64 A 56 56 0 0 1 64 8 L 64 64 Z" fill="#FFD700"/>
+  <!-- Dividing lines -->
+  <line x1="64" y1="8" x2="64" y2="120" stroke="#BBBBBB" stroke-width="2"/>
+  <line x1="8" y1="64" x2="120" y2="64" stroke="#BBBBBB" stroke-width="2"/>
+  <!-- Outline -->
+  <circle cx="64" cy="64" r="56" fill="none" stroke="#888888" stroke-width="4"/>
+  <!-- Shine -->
+  <ellipse cx="44" cy="38" rx="13" ry="8" fill="white" opacity="0.45" transform="rotate(-30 44 38)"/>
+</svg>

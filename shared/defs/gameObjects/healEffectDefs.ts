@@ -65,4 +65,32 @@ export const HealEffectDefs: Record<string, HealEffectDef> = {
         texture: "part-boost-shuriken.img",
         emitter: "boost_shuriken",
     },
+    heal_sun: {
+        type: "heal_effect",
+        name: "Solar Flare",
+        rarity: Rarity.Common,
+        texture: "part-heal-sun.img",
+        emitter: "heal_sun",
+    },
+    boost_drop: {
+        type: "boost_effect",
+        name: "Ocean Drop",
+        rarity: Rarity.Uncommon,
+        texture: "part-boost-drop.img",
+        emitter: "boost_drop",
+    },
+    heal_wave: {
+        type: "heal_effect",
+        name: "Tidal Mend",
+        rarity: Rarity.Uncommon,
+        texture: "part-heal-wave.img",
+        emitter: "heal_wave",
+    },
+    boost_flame: {
+        type: "boost_effect",
+        name: "Bonfire Rush",
+        rarity: Rarity.Rare,
+        texture: "part-boost-flame.img",
+        emitter: "boost_flame",
+    },
 };

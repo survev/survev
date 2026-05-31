@@ -190,9 +190,9 @@ export const GameConfig = {
         grassVariation: 2,
     },
     serverSettings:{
-        currentPass: "pass_survivr1",
+        currentPass: "pass_survivr2",
         passMaxLevel: 99,
-        seasonStart: "2026-03-31T00:00:00Z",
+        seasonStart: "2026-05-31T00:00:00Z",
     },
     player: {
         radius: 1,
