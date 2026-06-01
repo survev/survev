@@ -1,0 +1,23 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="128" height="128">
+  <!-- Neck -->
+  <path d="M 58 56 Q 52 36 58 22 Q 62 12 68 14 Q 64 24 62 38 Q 60 48 64 56"
+        fill="#FF69B4" stroke="#E8569E" stroke-width="1.5"/>
+  <!-- Body -->
+  <ellipse cx="72" cy="70" rx="30" ry="23" fill="#FF69B4"/>
+  <!-- Wing highlight -->
+  <ellipse cx="80" cy="66" rx="19" ry="14" fill="#FF85C2" opacity="0.55"/>
+  <!-- Head -->
+  <circle cx="66" cy="13" r="11" fill="#FF69B4"/>
+  <!-- Beak upper -->
+  <path d="M 74 11 L 92 16 L 74 17 Z" fill="#CC6600"/>
+  <!-- Beak tip (black) -->
+  <path d="M 86 15 L 92 16 L 86 17 Z" fill="#222222"/>
+  <!-- Eye -->
+  <circle cx="70" cy="9" r="3" fill="#222222"/>
+  <circle cx="69" cy="8" r="1" fill="white"/>
+  <!-- Leg -->
+  <line x1="67" y1="91" x2="63" y2="118" stroke="#FF85C2" stroke-width="5" stroke-linecap="round"/>
+  <!-- Foot -->
+  <path d="M 57 117 L 50 123 M 63 118 L 63 125 M 69 117 L 74 123"
+        stroke="#FF85C2" stroke-width="3.5" stroke-linecap="round"/>
+</svg>

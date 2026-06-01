@@ -1,0 +1,107 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="140" height="140" viewBox="0 0 140 140" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <radialGradient id="gloss" cx="38%" cy="32%" r="55%">
+      <stop offset="0%" stop-color="white" stop-opacity="0.5"/>
+      <stop offset="100%" stop-color="white" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+
+  <!-- Outer aura glow ring -->
+  <circle cx="70" cy="70" r="62" fill="none" stroke-width="12" stroke-opacity="0.3">
+    <animate attributeName="stroke" dur="3s" repeatCount="indefinite"
+      values="#ff0000;#ff8800;#ffff00;#00ff00;#0088ff;#8800ff;#ff0000"/>
+    <animate attributeName="r" dur="2s" repeatCount="indefinite"
+      values="60;65;60"/>
+    <animate attributeName="stroke-opacity" dur="2s" repeatCount="indefinite"
+      values="0.3;0.7;0.3"/>
+  </circle>
+
+  <!-- Outer aura ring 2 -->
+  <circle cx="70" cy="70" r="68" fill="none" stroke-width="7" stroke-opacity="0.15">
+    <animate attributeName="stroke" dur="3s" repeatCount="indefinite" begin="1s"
+      values="#ff0000;#ff8800;#ffff00;#00ff00;#0088ff;#8800ff;#ff0000"/>
+    <animate attributeName="r" dur="2.5s" repeatCount="indefinite"
+      values="66;72;66"/>
+    <animate attributeName="stroke-opacity" dur="2.5s" repeatCount="indefinite"
+      values="0.15;0.4;0.15"/>
+  </circle>
+
+  <!-- Spinning dashed ring -->
+  <circle cx="70" cy="70" r="64" fill="none" stroke-width="1.8"
+    stroke-dasharray="12 8" stroke-linecap="round" opacity="0.75">
+    <animate attributeName="stroke" dur="3s" repeatCount="indefinite" begin="0.5s"
+      values="#ff0000;#ff8800;#ffff00;#00ff00;#0088ff;#8800ff;#ff0000"/>
+    <animateTransform attributeName="transform" type="rotate"
+      from="0 70 70" to="360 70 70" dur="8s" repeatCount="indefinite"/>
+  </circle>
+
+  <!-- Spinning dashed ring 2 reverse -->
+  <circle cx="70" cy="70" r="67" fill="none" stroke-width="1.2"
+    stroke-dasharray="6 14" stroke-linecap="round" opacity="0.5">
+    <animate attributeName="stroke" dur="3s" repeatCount="indefinite" begin="1.5s"
+      values="#ff0000;#ff8800;#ffff00;#00ff00;#0088ff;#8800ff;#ff0000"/>
+    <animateTransform attributeName="transform" type="rotate"
+      from="0 70 70" to="-360 70 70" dur="6s" repeatCount="indefinite"/>
+  </circle>
+
+  <!-- Main circle -->
+  <circle cx="70" cy="70" r="53">
+    <animate attributeName="fill" dur="3s" repeatCount="indefinite"
+      values="#ff0000;#ff8800;#ffff00;#00ff00;#0088ff;#8800ff;#ff0000"/>
+  </circle>
+
+  <!-- Gloss overlay -->
+  <ellipse cx="56" cy="50" rx="22" ry="16" fill="url(#gloss)"/>
+
+  <!-- Shimmer tint -->
+  <circle cx="70" cy="70" r="53" fill="#ffffff">
+    <animate attributeName="fill-opacity" dur="2.5s" repeatCount="indefinite"
+      values="0;0.12;0;0.08;0"/>
+  </circle>
+
+  <!-- Outline -->
+  <circle cx="70" cy="70" r="53" fill="none" stroke-width="2.5">
+    <animate attributeName="stroke" dur="3s" repeatCount="indefinite"
+      values="#ff0000;#ff8800;#ffff00;#00ff00;#0088ff;#8800ff;#ff0000"/>
+  </circle>
+
+  <!-- Orbit dots group -->
+  <g>
+    <animateTransform attributeName="transform" type="rotate"
+      from="0 70 70" to="360 70 70" dur="5s" repeatCount="indefinite"/>
+
+    <circle cx="70" cy="12" r="3.5">
+      <animate attributeName="fill" dur="3s" repeatCount="indefinite" begin="0.1s"
+        values="#ff0000;#ff8800;#ffff00;#00ff00;#0088ff;#8800ff;#ff0000"/>
+    </circle>
+    <circle cx="108" cy="27" r="2.8">
+      <animate attributeName="fill" dur="3s" repeatCount="indefinite" begin="0.5s"
+        values="#ff0000;#ff8800;#ffff00;#00ff00;#0088ff;#8800ff;#ff0000"/>
+    </circle>
+    <circle cx="128" cy="70" r="3.5">
+      <animate attributeName="fill" dur="3s" repeatCount="indefinite" begin="0.9s"
+        values="#ff0000;#ff8800;#ffff00;#00ff00;#0088ff;#8800ff;#ff0000"/>
+    </circle>
+    <circle cx="108" cy="113" r="2.8">
+      <animate attributeName="fill" dur="3s" repeatCount="indefinite" begin="1.3s"
+        values="#ff0000;#ff8800;#ffff00;#00ff00;#0088ff;#8800ff;#ff0000"/>
+    </circle>
+    <circle cx="70" cy="128" r="3.5">
+      <animate attributeName="fill" dur="3s" repeatCount="indefinite" begin="1.7s"
+        values="#ff0000;#ff8800;#ffff00;#00ff00;#0088ff;#8800ff;#ff0000"/>
+    </circle>
+    <circle cx="32" cy="113" r="2.8">
+      <animate attributeName="fill" dur="3s" repeatCount="indefinite" begin="2.1s"
+        values="#ff0000;#ff8800;#ffff00;#00ff00;#0088ff;#8800ff;#ff0000"/>
+    </circle>
+    <circle cx="12" cy="70" r="3.5">
+      <animate attributeName="fill" dur="3s" repeatCount="indefinite" begin="2.5s"
+        values="#ff0000;#ff8800;#ffff00;#00ff00;#0088ff;#8800ff;#ff0000"/>
+    </circle>
+    <circle cx="32" cy="27" r="2.8">
+      <animate attributeName="fill" dur="3s" repeatCount="indefinite" begin="2.9s"
+        values="#ff0000;#ff8800;#ffff00;#00ff00;#0088ff;#8800ff;#ff0000"/>
+    </circle>
+  </g>
+</svg>
