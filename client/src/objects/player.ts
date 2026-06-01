@@ -161,6 +161,7 @@ export abstract class AbstractObject {
     abstract __id: number;
     abstract __type: ObjectType;
     abstract active: boolean;
+    __poolIdx!: number;
 
     abstract m_init(): void;
     abstract m_free(): void;
@@ -176,6 +177,7 @@ export class Player implements AbstractObject {
     __id!: number;
     __type!: ObjectType.Player;
     active!: boolean;
+    __poolIdx!: number;
 
     bodySprite = createSprite();
     chestSprite = createSprite();

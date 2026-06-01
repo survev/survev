@@ -29,6 +29,7 @@ class Projectile implements AbstractObject {
     __id!: number;
     __type!: ObjectType.Projectile;
     active!: boolean;
+    __poolIdx!: number;
 
     isNew!: boolean;
 

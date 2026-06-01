@@ -30,6 +30,7 @@ export class Obstacle implements AbstractObject {
     __id!: number;
     __type!: ObjectType.Obstacle;
     active!: boolean;
+    __poolIdx!: number;
 
     sprite = new PIXI.Sprite() as ObstacleSprite;
 

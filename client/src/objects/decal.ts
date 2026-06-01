@@ -25,6 +25,7 @@ class Decal implements AbstractObject {
     __id!: number;
     __type!: ObjectType.Decal;
     active!: boolean;
+    __poolIdx!: number;
 
     decalRender: DecalRender | null = null;
 
