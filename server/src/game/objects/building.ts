@@ -45,6 +45,7 @@ export class Building extends BaseGameObject {
 
     childObjects: Array<Obstacle | Building | Structure | Decal> = [];
     parentStructure?: Structure;
+    parentBuilding?: Building;
 
     surfaces: Array<{
         type: string;
@@ -78,17 +79,28 @@ export class Building extends BaseGameObject {
         pos: Vec2,
         ori: number,
         layer: number,
-        parentStructureId?: number,
+        parentId?: number,
     ) {
         super(game, pos);
         this.layer = layer;
         this.ori = ori;
         this.type = type;
 
-        const parentStructure = this.game.objectRegister.getById(parentStructureId ?? 0);
-        if (parentStructure?.__type === ObjectType.Structure) {
-            this.parentStructure = parentStructure;
+        const parent = this.game.objectRegister.getById(parentId ?? 0);
+
+        if (parent?.__type === ObjectType.Building) {
+            this.parentBuilding = parent;
+        } else if (parent?.__type === ObjectType.Structure) {
+            this.parentStructure = parent;
         }
+        if (
+            this.parentBuilding &&
+            !this.parentStructure &&
+            this.parentBuilding.parentStructure
+        ) {
+            this.parentStructure = this.parentBuilding.parentStructure;
+        }
+
         const def = MapObjectDefs[this.type] as BuildingDef;
 
         this.rot = math.oriToRad(ori);
