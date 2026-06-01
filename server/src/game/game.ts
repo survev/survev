@@ -551,7 +551,8 @@ export class Game {
 
     checkGameOver() {
         if (this.over) return;
-        const didGameEnd: boolean = this.modeManager.handleGameEnd();
+
+        const didGameEnd = this.started && this.modeManager.aliveCount() <= 1;
 
         if (didGameEnd) {
             this.over = true;
@@ -561,6 +562,7 @@ export class Game {
             // stop game after 1.8s
             this.stopTicker = 1.8;
 
+            this.modeManager.sendGameOverMsgs();
             this.updateData();
         }
     }

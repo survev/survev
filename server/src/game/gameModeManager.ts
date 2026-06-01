@@ -117,28 +117,26 @@ export class GameModeManager {
         }
     }
 
-    /** true if game needs to end */
-    handleGameEnd(): boolean {
-        if (!this.game.started || this.aliveCount() > 1) return false;
+    sendGameOverMsgs() {
         switch (this.mode) {
             case GameMode.Solo: {
                 const winner = this.game.playerBarn.livingPlayers[0];
                 winner.addGameOverMsg(winner.teamId);
-                return true;
+                break;
             }
             case GameMode.Team: {
                 const winner = this.game.playerBarn.getAliveGroups()[0];
                 for (const player of winner.getAlivePlayers()) {
                     player.addGameOverMsg(winner.id);
                 }
-                return true;
+                break;
             }
             case GameMode.Faction: {
                 const winner = this.game.playerBarn.getAliveTeams()[0];
                 for (const player of winner.livingPlayers) {
                     player.addGameOverMsg(winner.id);
                 }
-                return true;
+                break;
             }
         }
     }

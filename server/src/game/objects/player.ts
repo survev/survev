@@ -310,6 +310,7 @@ export class PlayerBarn {
             "",
             null,
         );
+        this.socketIdToPlayer.set(socketId, player);
 
         this.activatePlayer(player, group, team);
 
@@ -1450,7 +1451,11 @@ export class Player extends BaseGameObject {
         this.findGameIp = findGameIp;
         this.userId = userId;
 
-        this.questManager.quests = (questIds ?? []).map((id) => ({ id, delta: 0 }));
+        this.questManager.quests = (questIds ?? []).map((id) => ({
+            id,
+            delta: 0,
+            totalDelta: 0,
+        }));
 
         this.isMobile = joinMsg.isMobile;
 
@@ -3243,8 +3248,6 @@ export class Player extends BaseGameObject {
             this.lastDamagedBy.randomWeaponSwap(params);
         }
 
-        this.questManager.flushProgress();
-
         this.game.broadcastMsg(net.MsgType.Kill, killMsg);
 
         if (this.role) {
@@ -3418,6 +3421,8 @@ export class Player extends BaseGameObject {
 
         // send data to parent process
         this.game.updateData();
+
+        this.questManager.flushProgress();
     }
 
     getAliveKiller(): Player | undefined {

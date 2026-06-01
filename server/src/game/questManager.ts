@@ -4,6 +4,7 @@ import { MapObjectDefs } from "../../../shared/defs/mapObjectDefs";
 import type { ObstacleDef } from "../../../shared/defs/mapObjectsTyping";
 import { TeamModeToString } from "../../../shared/defs/types/misc";
 import { MsgType, UpdatePassMsg } from "../../../shared/net/net";
+import { assert } from "../../../shared/utils/util";
 import type { Game } from "./game";
 import type { Player } from "./objects/player";
 
@@ -11,8 +12,16 @@ export class QuestManager {
     player: Player;
     game: Game;
 
-    quests: Array<{ id: string; delta: number }> = [];
+    quests: Array<{
+        id: string;
+        delta: number;
+        /**
+         * Should only be used for tests, because `delta` is reset after flushing
+         */
+        totalDelta: number;
+    }> = [];
     private gameOverFlushed = false;
+    private survivedFlushed = false;
 
     constructor(player: Player) {
         this.player = player;
@@ -22,8 +31,24 @@ export class QuestManager {
     /**
      * When winningTeamId is not known yet it falls for the rank
      */
-    private trackGameOverQuests(winningTeamId?: number) {
+    private trackPlacementQuests(winningTeamId?: number) {
         if (this.gameOverFlushed) return;
+        if (!this.game.started) return;
+
+        let playerOrGroupDead = false;
+        if (this.game.map.factionMode || this.game.isTeamMode) {
+            const group = this.player.team ?? this.player.group;
+            assert(group, "Player has no group on a team mode");
+
+            playerOrGroupDead = group.livingPlayers.length === 0;
+        } else if (this.player.dead) {
+            playerOrGroupDead = true;
+        }
+
+        const shouldTrack = playerOrGroupDead || this.game.over;
+        if (!shouldTrack) return;
+
+        this.gameOverFlushed = true;
 
         const aliveCount = this.game.modeManager.aliveCount();
         const teamRank =
@@ -31,19 +56,27 @@ export class QuestManager {
                 ? 1
                 : aliveCount + 1;
 
-        this.trackEvent("survived", { seconds: this.player.timeAlive });
         this.trackEvent("placement", {
             rank: teamRank,
             mode: TeamModeToString[this.game.teamMode],
         });
     }
 
+    private trackSurvivedQuest() {
+        if (this.survivedFlushed) return;
+
+        const shouldTrack = this.player.dead || this.game.over;
+        if (!shouldTrack) return;
+
+        this.survivedFlushed = true;
+        this.trackEvent("survived", { seconds: this.player.timeAlive });
+    }
+
     flushProgress(winningTeamId?: number) {
-        if (!this.player.userId || this.gameOverFlushed) return;
+        if (!this.player.userId) return;
 
-        this.trackGameOverQuests(winningTeamId);
-
-        this.gameOverFlushed = true;
+        this.trackSurvivedQuest();
+        this.trackPlacementQuests(winningTeamId);
 
         const progress = this.quests
             .map((quest) => ({
@@ -59,6 +92,11 @@ export class QuestManager {
         }
 
         this.game.sendQuestProgress(this.player.userId, progress);
+
+        // reset the deltas in case they get flushed again
+        for (const quest of this.quests) {
+            quest.delta = 0;
+        }
     }
 
     trackEvent<K extends keyof QuestEventPayloads>(
@@ -74,6 +112,7 @@ export class QuestManager {
             if (delta <= 0) continue;
 
             quest.delta += delta;
+            quest.totalDelta += delta;
         }
     }
 }
