@@ -26,10 +26,10 @@
     "codefend": "^3.2.0",
     "maxrects-packer": "^2.7.3",
     "sharp": "^0.34.5",
-    "tsx": "^4.22.1",
+    "tsx": "^4.22.3",
     "turnstile-types": "^1.2.3",
     "tweakpane": "^4.0.5",
-    "vite": "^8.0.13",
+    "vite": "^8.0.14",
     "vite-plugin-strip-block": "^1.1.1"
   }
 }
