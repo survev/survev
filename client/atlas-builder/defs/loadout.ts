@@ -129,6 +129,7 @@ export const LoadoutAtlas: AtlasDef = {
         "emotes/flag-gay.svg",
         "emotes/flag-asexual.svg",
         "emotes/flag-nonbinary.svg",
+        "emotes/flag-bisexual.svg",
         "emotes/flex.svg",
         "emotes/forest.svg",
         "emotes/gg.svg",

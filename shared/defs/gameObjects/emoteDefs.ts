@@ -1665,6 +1665,16 @@ export const EmotesDefs: Record<string, EmoteDef> = {
         teamOnly: false,
         category: EmoteCategory.Flags,
     },
+    emote_flagbisexual: {
+        type: "emote",
+        name: "Flag Bisexual",
+        rarity: Rarity.Common,
+        texture: "flag-bisexual.img",
+        sound: "emote_01",
+        channel: "ui",
+        teamOnly: false,
+        category: EmoteCategory.Flags,
+    },
     emote_logocloud: {
         type: "emote",
         name: "The Cloud",
