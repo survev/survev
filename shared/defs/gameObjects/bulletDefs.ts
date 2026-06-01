@@ -198,7 +198,7 @@ export const BaseDefs: Record<string, BulletDef> = {
     },
     bullet_awc_modded: {
         type: "bullet",
-        damage: 130,
+        damage: 150,
         obstacleDamage: 10,
         falloff: 0.94,
         distance: 100,
