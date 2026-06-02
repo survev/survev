@@ -37,7 +37,6 @@ export function getConfig(isProduction: boolean, dir: string) {
         passType: "pass_survivr1",
         gameTps: 100,
         netSyncTps: 33,
-        processMode: isDev ? "single" : "multi",
         logging: {
             logDate: true,
             infoLogs: true,

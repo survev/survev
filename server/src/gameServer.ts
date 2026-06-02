@@ -8,7 +8,6 @@ import pkgJson from "../../package.json" with { type: "json" };
 import { GameConfig } from "../../shared/gameConfig.ts";
 import * as net from "../../shared/net/net.ts";
 import { Config } from "./config.ts";
-import { SingleThreadGameManager } from "./game/gameManager.ts";
 import { GameProcessManager } from "./game/gameProcessManager.ts";
 import { GIT_VERSION } from "./utils/gitRevision.ts";
 import { ServerLogger } from "./utils/logger.ts";
@@ -44,9 +43,7 @@ class GameServer {
     readonly region = Config.regions[Config.gameServer.thisRegion];
     readonly regionId = Config.gameServer.thisRegion;
 
-    readonly manager = Config.processMode === "single"
-        ? new SingleThreadGameManager()
-        : new GameProcessManager();
+    readonly manager = new GameProcessManager();
 
     async findGame(body: FindGamePrivateBody): Promise<FindGamePrivateRes> {
         const parsed = zFindGamePrivateBody.safeParse(body);

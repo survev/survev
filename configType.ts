@@ -152,15 +152,6 @@ export interface ConfigType {
     netSyncTps: number;
 
     /**
-     * If games should all run in the same process.
-     * Or spawn a new process for each game.
-     *
-     * Defaults to single in development and multi in production.
-     * Single process mode has faster restarts for development but cant handle many players.
-     */
-    processMode: "single" | "multi";
-
-    /**
      * Server logger configuration
      */
     logging: {

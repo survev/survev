@@ -14,7 +14,6 @@ import {
     ProcessMsgType,
     type ServerGameConfig,
 } from "../utils/types.ts";
-import type { GameManager } from "./gameManager.ts";
 
 let path: string;
 if (process.env.NODE_ENV === "production") {
@@ -165,7 +164,7 @@ class GameProcess implements GameData {
     }
 }
 
-export class GameProcessManager implements GameManager {
+export class GameProcessManager {
     readonly sockets = new Map<string, WebSocket<GameSocketData>>();
 
     readonly processById = new Map<string, GameProcess>();
