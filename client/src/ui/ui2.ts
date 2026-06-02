@@ -1212,7 +1212,7 @@ export class UiManager2 {
                 if (fireModeEl) {
                     const gunDef = j as unknown as GunDef;
                     if (gunDef?.secondAmmo) {
-                        const modeName = this.localization.translate(`game-hud-switchfiremode`);
+                        const modeName = gunDef.fireMode === "auto" ? "Auto" : "Single";
                         const switchBind =
                             this.inputBinds.getBind(Input.SwitchAmmo)?.toString() || "B";
                         fireModeEl.textContent = `${modeName}  [${switchBind}]`;
