@@ -190,9 +190,65 @@ export const GameConfig = {
         grassVariation: 2,
     },
     serverSettings:{
-        currentPass: "pass_survivr2",
-        passMaxLevel: 99,
-        seasonStart: "2026-06-01T00:00:00Z",
+        passes: {
+            "pass_survivr2": {
+                passMaxLevel: 99,
+                seasonStart: "2026-05-31T22:00:00Z",
+                seasonEnd:   "2026-07-31T21:59:59Z",
+            },
+            "pass_survivr3": {
+                passMaxLevel: 99,
+                seasonStart: "2026-07-31T22:00:00Z",
+                seasonEnd:   "2026-10-31T22:59:59Z",
+            },
+        } as Record<string, { passMaxLevel: number; seasonStart: string; seasonEnd: string }>,
+        get currentPass(): string {
+            const now = Date.now();
+            for (const [id, cfg] of Object.entries(this.passes)) {
+                const start = new Date(cfg.seasonStart).getTime();
+                const end   = new Date(cfg.seasonEnd).getTime();
+                if (now >= start && now <= end) return id;
+            }
+            return Object.keys(this.passes).at(-1)!;
+        },
+        get seasonStart(): string  { return this.passes[this.currentPass].seasonStart; },
+        get seasonEnd(): string    { return this.passes[this.currentPass].seasonEnd; },
+        get passMaxLevel(): number { return this.passes[this.currentPass].passMaxLevel; },
+
+        xpBoostEvents: {
+            "pass_survivr2": {
+                "Happy New Pass!":{
+                    maps: ["local", "two_vs_two", "comp"],
+                    start: "2026-06-02T00:00:00Z",
+                    end:   "2026-06-02T23:59:59Z",
+                    boost: 2,
+                },
+                "Weekend 1": {
+                    maps: ["local"],
+                    start: "2026-06-05T00:00:00Z",
+                    end:   "2026-06-07T23:59:59Z",
+                    boost: 2,
+                },
+                "Weekend 2": {
+                    maps: ["comp"],
+                    start: "2026-06-12T00:00:00Z",
+                    end:   "2026-06-14T23:59:59Z",
+                    boost: 2,
+                },
+                "Weekend 3": {
+                    maps: ["local", "comp"],
+                    start: "2026-06-19T00:00:00Z",
+                    end:   "2026-06-21T23:59:59Z",
+                    boost: 2,
+                },
+                "Weekend 4": {
+                    maps: ["local", "comp"],
+                    start: "2026-06-26T00:00:00Z",
+                    end:   "2026-06-28T23:59:59Z",
+                    boost: 2,
+                },
+            },
+        } as Record<string, Record<string, { maps: string[]; start: string; end: string; boost: number }>>,
     },
     player: {
         radius: 1,

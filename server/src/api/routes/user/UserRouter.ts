@@ -266,6 +266,7 @@ UserRouter.post("/get_pass", validateParams(zGetPassRequest), async (c) => {
             timeAlive: sql<number>`max(${matchDataTable.timeAlive})`,
             rank: sql<number>`min(${matchDataTable.rank})`,
             mapId: sql<number>`max(${matchDataTable.mapId})`,
+            createdAt: sql<Date>`max(${matchDataTable.createdAt})`,
             entryCount: sql<number>`count(*)`,
         })
         .from(matchDataTable)
@@ -278,20 +279,46 @@ UserRouter.post("/get_pass", validateParams(zGetPassRequest), async (c) => {
         .groupBy(matchDataTable.gameId)
         .having(sql`count(*) = 1`);
 
+    // Build reverse lookup: MapId number → map type name string
+    const mapIdToName = Object.fromEntries(
+        Object.entries(MapDefs).map(([name, def]) => [def.mapId, name]),
+    ) as Record<number, string>;
+
+    // Returns the XP boost multiplier for a given pass/map/time, or 1 if none active
+    function getXpBoost(mapTypeName: string, matchTime: Date): number {
+        const boostEvents = GameConfig.serverSettings.xpBoostEvents?.[passType];
+        if (!boostEvents) return 1;
+        const t = matchTime instanceof Date ? matchTime.getTime() : new Date(matchTime).getTime();
+        for (const event of Object.values(boostEvents)) {
+            if (
+                t >= new Date(event.start).getTime() &&
+                t <= new Date(event.end).getTime() &&
+                event.maps.includes(mapTypeName)
+            ) {
+                return event.boost;
+            }
+        }
+        return 1;
+    }
+
     let totalXp = 0;
-    for (const stat of stats){
+    for (const stat of stats) {
         const mapDef = getMapDefById(stat.mapId);
         const xpMultiplier = mapDef?.gameMode?.xpMultiplier || {
             kill: 0,
-            damage: 0, 
+            damage: 0,
             win: 0,
-            timeSurvived: 0, 
+            timeSurvived: 0,
         };
-        totalXp += stat.kills * xpMultiplier.kill;
-        totalXp += stat.damage * xpMultiplier.damage;
-        totalXp += (stat.rank === 1 ? 1 : 0) * xpMultiplier.win;
-        totalXp += stat.timeAlive * xpMultiplier.timeSurvived;
+        const mapTypeName = mapIdToName[stat.mapId] ?? "";
+        const boost = getXpBoost(mapTypeName, stat.createdAt);
 
+        let matchXp = 0;
+        matchXp += stat.kills * xpMultiplier.kill;
+        matchXp += stat.damage * xpMultiplier.damage;
+        matchXp += (stat.rank === 1 ? 1 : 0) * xpMultiplier.win;
+        matchXp += stat.timeAlive * xpMultiplier.timeSurvived;
+        totalXp += Math.floor(matchXp * boost);
     }
     console.log(`User ${user.username} earned ${totalXp} XP from ${stats.length} matches since last update`);
 
