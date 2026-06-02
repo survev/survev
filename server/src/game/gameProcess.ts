@@ -4,6 +4,8 @@ import { Config } from "../config.ts";
 import { logErrorToWebhook } from "../utils/serverHelpers.ts";
 import { type ProcessMsg, ProcessMsgType } from "../utils/types.ts";
 import { Game } from "./game.ts";
+import type { Player } from "./objects/player.ts";
+import { ClientSocket } from "./socket.ts";
 
 let game: Game | undefined;
 
@@ -23,6 +25,52 @@ const socketMsgs: Array<{
 
 let lastMsgTime = Date.now();
 
+const socketIdToSocket = new Map<string, ProcessSocket<Player | undefined>>();
+class ProcessSocket<T> extends ClientSocket<T> {
+    private _id: string;
+    private _ip: string;
+    private _closed = false;
+    constructor(id: string, ip: string) {
+        super();
+        this._id = id;
+        this._ip = ip;
+    }
+
+    ip(): string {
+        return this._ip;
+    }
+
+    closed(): boolean {
+        return this._closed;
+    }
+
+    send(data: Uint8Array<ArrayBuffer>): void {
+        if (this.closed()) return;
+
+        socketMsgs.push({
+            socketId: this._id,
+            data,
+            ip: "",
+        });
+    }
+    close(): void {
+        this._closed = true;
+        sendMsg({
+            type: ProcessMsgType.SocketClose,
+            socketId: this._id,
+            reason: undefined,
+        });
+    }
+
+    closeWithReason(reason: string): void {
+        sendMsg({
+            type: ProcessMsgType.SocketClose,
+            socketId: this._id,
+            reason: reason,
+        });
+    }
+}
+
 process.on("message", async (msg: ProcessMsg) => {
     if (msg.type) {
         lastMsgTime = Date.now();
@@ -32,20 +80,6 @@ process.on("message", async (msg: ProcessMsg) => {
         game = new Game(
             msg.id,
             msg.config,
-            (id, data) => {
-                socketMsgs.push({
-                    socketId: id,
-                    data,
-                    ip: "",
-                });
-            },
-            (id, reason) => {
-                sendMsg({
-                    type: ProcessMsgType.SocketClose,
-                    socketId: id,
-                    reason,
-                });
-            },
             (msg) => {
                 sendMsg(msg);
                 if (msg.stopped) {
@@ -66,13 +100,24 @@ process.on("message", async (msg: ProcessMsg) => {
         case ProcessMsgType.AddJoinToken:
             game.addJoinTokens(msg.tokens, msg.autoFill);
             break;
-        case ProcessMsgType.SocketMsg:
+        case ProcessMsgType.SocketMsg: {
             const sMsg = msg.msgs[0];
-            game.handleMsg(sMsg.data as ArrayBuffer, sMsg.socketId, sMsg.ip);
+            let socket = socketIdToSocket.get(sMsg.socketId);
+            if (!socket) {
+                socket = new ProcessSocket(sMsg.socketId, sMsg.ip);
+                socketIdToSocket.set(sMsg.socketId, socket);
+            }
+            game.handleMsg(sMsg.data as ArrayBuffer, socket);
             break;
-        case ProcessMsgType.SocketClose:
-            game.handleSocketClose(msg.socketId);
+        }
+        case ProcessMsgType.SocketClose: {
+            const socket = socketIdToSocket.get(msg.socketId);
+            if (socket) {
+                game.handleSocketClose(socket);
+            }
+            socketIdToSocket.delete(msg.socketId);
             break;
+        }
     }
 });
 

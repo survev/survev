@@ -71,7 +71,7 @@ test("Players shouldn't get placement progress for just disconnecting", async ()
 
     expect(playerA.questManager.quests[0].delta).toBe(0);
 
-    game.handleSocketClose(playerA.socketId);
+    playerA.socket.close();
 
     // player leaving shouldn't count as progress
     expect(playerA.questManager.quests[0].totalDelta).toBe(0);

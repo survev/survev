@@ -28,11 +28,12 @@ import { Gas } from "./objects/gas.ts";
 import { LootBarn } from "./objects/loot.ts";
 import { MapIndicatorBarn } from "./objects/mapIndicator.ts";
 import { PlaneBarn } from "./objects/plane.ts";
-import { PlayerBarn } from "./objects/player.ts";
+import { Player, PlayerBarn } from "./objects/player.ts";
 import { ProjectileBarn } from "./objects/projectile.ts";
 import { SmokeBarn } from "./objects/smoke.ts";
 import { PluginManager } from "./pluginManager.ts";
 import { Profiler } from "./profiler.ts";
+import type { ClientSocket } from "./socket.ts";
 
 export interface JoinTokenData {
     expiresAt: number;
@@ -121,8 +122,6 @@ export class Game {
     constructor(
         id: string,
         config: ServerGameConfig,
-        readonly sendSocketMsg: (id: string, data: Uint8Array) => void,
-        readonly closeSocket: (id: string, reason?: string) => void,
         readonly sendData?: (data: UpdateDataMsg) => void,
     ) {
         this.id = id;
@@ -424,10 +423,10 @@ export class Game {
         };
     }
 
-    handleMsg(buff: ArrayBuffer | Buffer, socketId: string, ip: string) {
+    handleMsg(buff: ArrayBuffer | Buffer, socket: ClientSocket<Player | undefined>) {
         if (!(buff instanceof ArrayBuffer)) return;
 
-        const player = this.playerBarn.socketIdToPlayer.get(socketId);
+        const player = socket.getUserData();
 
         let msg: net.AbstractMsg | undefined = undefined;
         let type = net.MsgType.None;
@@ -451,7 +450,7 @@ export class Game {
             if (player) {
                 player.disconnect();
             } else {
-                this.closeSocket(socketId);
+                socket.close();
             }
             return;
         }
@@ -460,7 +459,7 @@ export class Game {
             if (player) {
                 player.disconnect();
             } else {
-                this.closeSocket(socketId);
+                socket.close();
             }
             return;
         }
@@ -468,12 +467,12 @@ export class Game {
         if (!msg) return;
 
         if (type === net.MsgType.Join && !player) {
-            this.playerBarn.addPlayer(socketId, msg as net.JoinMsg, ip);
+            this.playerBarn.addPlayer(socket, msg as net.JoinMsg);
             return;
         }
 
         if (!player) {
-            this.closeSocket(socketId);
+            socket.close();
             return;
         }
 
@@ -509,8 +508,8 @@ export class Game {
         }
     }
 
-    handleSocketClose(socketId: string) {
-        const player = this.playerBarn.socketIdToPlayer.get(socketId);
+    handleSocketClose(socket: ClientSocket<Player | undefined>) {
+        const player = socket.getUserData();
         if (!player) return;
         this.logger.info(`"${player.name}" left`);
         player.questManager.flushProgress();
