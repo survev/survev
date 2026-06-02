@@ -5087,6 +5087,14 @@ input [type="image"]:focus {
   animation-name: fadeIn;
   animation-duration: 0.2s;
   width: 860px;
+  max-height: calc(100vh - 80px);
+  display: flex;
+  flex-direction: column;
+}
+
+#modal-rules .modal-body {
+  overflow-y: auto;
+  flex: 1;
 }
 
 #modal-rules .modal-header {
