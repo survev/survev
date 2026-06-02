@@ -1,10 +1,9 @@
+import { GameConfig } from "../../../shared/gameConfig";
 import { PassDefs } from "../../../shared/defs/gameObjects/passDefs";
-
-const passMaxLevel = 99;
 
 export const passUtil = {
     getPassMaxLevel: function () {
-        return passMaxLevel;
+        return GameConfig.serverSettings.passMaxLevel;
     },
     getPassLevelXp: function (passType: string, level: number) {
         const passDef = PassDefs[passType];
@@ -17,7 +16,7 @@ export const passUtil = {
     getPassLevelAndXp: function (passType: string, passXp: number) {
         let xp = passXp;
         let level = 1;
-        while (level < passMaxLevel) {
+        while (level < GameConfig.serverSettings.passMaxLevel) {
             const levelXp = passUtil.getPassLevelXp(passType, level);
             if (xp < levelXp) {
                 break;

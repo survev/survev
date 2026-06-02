@@ -120,6 +120,13 @@ export class Application {
             this.errorModal,
         );
         this.siteInfo = new SiteInfo(this.config, this.localization);
+        this.siteInfo.onModesUpdated = () => {
+            const modes = this.siteInfo.getModesForSelectedRegion();
+            const names = modes.filter((m) => m.enabled).map((m) => m.mapName);
+            this.pass.buildXpInfo(names);
+            this.updateBoostBadges();
+        };
+        setInterval(() => { if (this.siteInfo.loaded) this.updateBoostBadges(); }, 1000);
         this.gameInfo = new GameInfo(this.config);
 
         this.teamMenu = new TeamMenu(
@@ -443,6 +450,36 @@ export class Application {
             this.loadoutDisplay.resize();
         }
         this.refreshUi();
+    }
+
+    updateBoostBadges() {
+        const loggedIn = this.account.loggedIn;
+        const passType = GameConfig.serverSettings.currentPass;
+        const events = (GameConfig.serverSettings.xpBoostEvents as any)?.[passType];
+        const now = Date.now();
+        let activeMaps: string[] = [];
+        if (events) {
+            for (const ev of Object.values(events) as any[]) {
+                if (now >= new Date(ev.start).getTime() && now <= new Date(ev.end).getTime()) {
+                    activeMaps = ev.maps;
+                    break;
+                }
+            }
+        }
+        $(".xp-boost-badge").remove();
+        if (!loggedIn || activeMaps.length === 0) return;
+
+        const modes = this.siteInfo.getModesForSelectedRegion();
+        for (let i = 0; i < 3; i++) {
+            const mode = modes[i];
+            if (!mode?.enabled || !activeMaps.includes(mode.mapName)) continue;
+            const btnEl = document.getElementById(`btn-start-mode-${i}`);
+            if (!btnEl) continue;
+            const r = btnEl.getBoundingClientRect();
+            $("body").append(
+                `<span class="xp-boost-badge" style="top:${r.top - 3}px;left:${r.right - 20}px;transform:translateX(-100%)">&#128293; 2&#xD7;</span>`
+            );
+        }
     }
 
     startPingTest() {

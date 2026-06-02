@@ -3,6 +3,7 @@ import { GameObjectDefs } from "../../../shared/defs/gameObjectDefs";
 import type { EmoteDef } from "../../../shared/defs/gameObjects/emoteDefs";
 import { PassDefs } from "../../../shared/defs/gameObjects/passDefs";
 import { QuestDefs } from "../../../shared/defs/gameObjects/questDefs";
+import { MapDefs } from "../../../shared/defs/mapDefs";
 import { math } from "../../../shared/utils/math";
 import type { Account } from "../account";
 import { helpers } from "../helpers";
@@ -100,6 +101,7 @@ export class Pass {
     lockDisplayed = false;
     updatePass = false;
     updatePassTicker = 0;
+    boostBannerTicker = 0;
 
     constructor(
         public account: Account,
@@ -113,6 +115,13 @@ export class Pass {
         this.account.addEventListener("request", this.onRequest.bind(this));
         this.account.addEventListener("pass", this.onPass.bind(this));
         this.loadPlaceholders();
+        this.updateBoostBanner();
+        $("#pass-xp-maps-toggle").on("click", () => {
+            const list = $("#pass-xp-maps-list");
+            const open = list.is(":visible");
+            list.css("display", open ? "none" : "block");
+            $("#pass-xp-maps-arrow").html(open ? "&#9658;" : "&#9660;");
+        });
         $("#pass-progress-unlock-wrapper")
             .on("mouseenter", () => {
                 $("#pass-unlock-tooltip").fadeIn(50);
@@ -120,6 +129,72 @@ export class Pass {
             .on("mouseleave", () => {
                 $("#pass-unlock-tooltip").fadeOut(50);
             });
+    }
+
+    buildXpInfo(enabledMapNames: string[]) {
+        const list = $("#pass-xp-maps-list");
+        list.empty();
+        const mapToL10nKey: Record<string, string> = {
+            local:      "index-play-1v1-solo",
+            comp:       "index-play-comp-squad",
+            two_vs_two: "index-play-2v2-duo",
+            scrims:     "index-play-scrims-solo",
+        };
+        const seen = new Set<string>();
+        for (const mapName of enabledMapNames) {
+            if (seen.has(mapName)) continue;
+            seen.add(mapName);
+            const def = MapDefs[mapName as keyof typeof MapDefs] as any;
+            const xp = def?.gameMode?.xpMultiplier;
+            if (!xp) continue;
+            const parts: string[] = [];
+            if (xp.kill > 0)         parts.push(`${xp.kill}/Kill`);
+            if (xp.damage > 0)       parts.push(`${+(xp.damage * 100).toFixed(2)}/100 Dmg`);
+            if (xp.win > 0)          parts.push(`${xp.win}/Win`);
+            if (xp.timeSurvived > 0) parts.push(`${+(xp.timeSurvived * 60).toFixed(2)}/Min`);
+            const l10nKey = mapToL10nKey[mapName];
+            const name = (l10nKey ? this.localization.translate(l10nKey) : null)
+                || def?.desc?.buttonText
+                || mapName;
+            list.append(
+                `<div class="pass-xp-map-row"><span class="pass-xp-map-name">${name}</span><span class="pass-xp-map-values">${parts.join(" · ")}</span></div>`
+            );
+        }
+    }
+
+    updateBoostBanner() {
+        const passType = GameConfig.serverSettings.currentPass;
+        const events = GameConfig.serverSettings.xpBoostEvents?.[passType];
+        const now = Date.now();
+        let activeEvent: { name: string; boost: number; maps: string[] } | null = null;
+        if (events) {
+            for (const [name, ev] of Object.entries(events)) {
+                if (now >= new Date(ev.start).getTime() && now <= new Date(ev.end).getTime()) {
+                    activeEvent = { name, boost: ev.boost, maps: ev.maps };
+                    break;
+                }
+            }
+        }
+        if (activeEvent) {
+            const mapToL10nKey: Record<string, string> = {
+                local:      "index-play-1v1-solo",
+                comp:       "index-play-comp-squad",
+                two_vs_two: "index-play-2v2-duo",
+                scrims:     "index-play-scrims-solo",
+            };
+            const mapNames = activeEvent.maps
+                .map((m) => {
+                    const l10nKey = mapToL10nKey[m];
+                    if (l10nKey) return this.localization.translate(l10nKey) || m;
+                    return (MapDefs[m as keyof typeof MapDefs] as any)?.desc?.buttonText ?? m;
+                })
+                .join(", ");
+            const onWord = this.localization.translate("pass-xp-boost-on") || "on";
+            $("#pass-xp-boost-text").text(`${activeEvent.name}: ${activeEvent.boost}× XP ${onWord} ${mapNames}`);
+            $("#pass-xp-boost").css("display", "block");
+        } else {
+            $("#pass-xp-boost").css("display", "none");
+        }
     }
 
     onPass(pass: any, quests: any[], resetRefresh: boolean) {
@@ -271,6 +346,7 @@ export class Pass {
         $("#pass-block").css("z-index", "1");
         $("#pass-locked").css("display", "none");
         $("#pass-loading").css("display", "none");
+        $("#pass-xp-info").css("display", "block");
         const b = i(this.pass.data.type, this.pass.currentLevel);
         this.setPassUnlockImage(b);
         const x = this.localization.translate(pass.type).toUpperCase();
@@ -445,6 +521,11 @@ export class Pass {
 
     update(dt: number) {
         this.updatePassTicker -= dt;
+        this.boostBannerTicker += dt;
+        if (this.boostBannerTicker >= 1) {
+            this.boostBannerTicker = 0;
+            this.updateBoostBanner();
+        }
 
         if (this.updatePass && this.updatePassTicker < 0) {
             this.updatePass = false;
@@ -546,6 +627,7 @@ export class Pass {
             $("#pass-block").css("z-index", "1");
             $("#pass-loading").css("display", "none");
             $("#pass-locked").css("display", "block");
+            $("#pass-xp-info").css("display", "none");
             this.lockDisplayed = true;
         }
     }
@@ -559,5 +641,6 @@ export class Pass {
         $("#pass-progress-xp-current").html(0);
         $("#pass-progress-xp-target").html(def.xp[0]);
         this.setPassUnlockImage(def.items[0].item);
+        $("#pass-xp-earn-text").text(this.localization.translate("pass-xp-earn") || "Earn XP");
     }
 }

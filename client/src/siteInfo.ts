@@ -10,6 +10,7 @@ import type { Localization } from "./ui/localization";
 export class SiteInfo {
     info = {} as SiteInfoRes;
     loaded = false;
+    onModesUpdated?: () => void;
 
     constructor(
         public config: ConfigManager,
@@ -189,5 +190,6 @@ export class SiteInfo {
                 }
             }
         }
+        this.onModesUpdated?.();
     }
 }
