@@ -458,10 +458,12 @@ export class Application {
         const events = (GameConfig.serverSettings.xpBoostEvents as any)?.[passType];
         const now = Date.now();
         let activeMaps: string[] = [];
+        let activeBoost = 2;
         if (events) {
             for (const ev of Object.values(events) as any[]) {
                 if (now >= new Date(ev.start).getTime() && now <= new Date(ev.end).getTime()) {
                     activeMaps = ev.maps;
+                    activeBoost = ev.boost;
                     break;
                 }
             }
@@ -477,7 +479,7 @@ export class Application {
             if (!btnEl) continue;
             const r = btnEl.getBoundingClientRect();
             $("body").append(
-                `<span class="xp-boost-badge" style="top:${r.top - 3}px;left:${r.right - 20}px;transform:translateX(-100%)">&#128293; 2&#xD7;</span>`
+                `<span class="xp-boost-badge" style="top:${r.top - 3}px;left:${r.right - 20}px;transform:translateX(-100%)">&#128293; ${activeBoost}&#xD7;</span>`
             );
         }
     }
