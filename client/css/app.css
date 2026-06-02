@@ -4459,7 +4459,7 @@ a:active {
   border-radius: 2px;
   white-space: nowrap;
   pointer-events: none;
-  z-index: 1000;
+  z-index: 10;
   transform-origin: top right;
   animation: xp-badge-pulse 0.85s ease-in-out infinite alternate;
 }
@@ -5071,6 +5071,58 @@ input [type="image"]:focus {
 #modal-ip-banned .modal-body {
   background: #000;
   color: #fff;
+}
+
+#modal-rules {
+  background-color: #000;
+  background-color: rgba(0, 0, 0, 0.75);
+  z-index: 9999;
+}
+
+#modal-rules .modal-content {
+  text-decoration: none;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  animation-name: fadeIn;
+  animation-duration: 0.2s;
+  width: 860px;
+}
+
+#modal-rules .modal-header {
+  background-color: #8a2be2;
+}
+
+#modal-rules .modal-body p {
+  font-size: 20px;
+  line-height: 1.8;
+}
+
+#modal-rules .modal-footer {
+  display: flex;
+  gap: 0;
+  padding: 0;
+}
+
+#modal-rules .modal-footer h3 {
+  flex: 1;
+  text-align: center;
+  font-size: 18px;
+  padding: 8px 0;
+  cursor: pointer;
+  margin: 0;
+}
+
+#modal-rules .modal-footer h3:hover {
+  background-color: rgba(255, 255, 255, 0.1);
+}
+
+#btn-rules-leave {
+  color: #ff6b6b;
+}
+
+#btn-rules-accept {
+  color: #83af50;
 }
 
 #modal-customize {

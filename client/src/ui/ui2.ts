@@ -384,6 +384,9 @@ export class UiManager2 {
                 ammo: weapon.getElementsByClassName(
                     "ui-weapon-ammo-counter",
                 )[0] as HTMLElement,
+                fireMode: weapon.getElementsByClassName(
+                    "ui-weapon-fire-mode",
+                )[0] as HTMLElement | undefined,
             };
             this.dom.weapons.push(weaponData);
         }
@@ -1204,6 +1207,20 @@ export class UiManager2 {
                 R.image.src = helpers.getSvgFromGameType(L.type);
                 R.image.style.display = j ? "inline" : "none";
                 R.image.style.transform = F;
+                // R may have an optional fireMode element not present on all builds of R's type
+                const fireModeEl = (R as any).fireMode as HTMLElement | undefined;
+                if (fireModeEl) {
+                    const gunDef = j as unknown as GunDef;
+                    if (gunDef?.secondAmmo) {
+                        const modeName = gunDef.fireMode === "auto" ? "Auto" : "Single";
+                        const switchBind =
+                            this.inputBinds.getBind(Input.SwitchAmmo)?.toString() || "B";
+                        fireModeEl.textContent = `${modeName}  [${switchBind}]`;
+                        fireModeEl.style.display = "block";
+                    } else {
+                        fireModeEl.style.display = "none";
+                    }
+                }
             }
             if (B.equipped) {
                 R.div.style.backgroundColor = L.equipped
