@@ -698,6 +698,7 @@
   "game-hud-coconut": "Coconut",
   "game-potato": "Potato",
   "game-hud-potato": "Potato",
+  "game-hud-switchfiremode": "Switch Mode",
   "game-potato_heavy": "Potato",
   "game-potato_cannon": "Potato Cannon",
   "game-potato_cannonball": "Potato Cannon",
@@ -1043,5 +1044,9 @@
   "game-emote_pooface": "Poo Face",
   "game-emote_ok": "Ok",
   "game-emote_rainbow": "Rainbow",
-  "game-emote_logotwins": "The Twins"
+  "game-emote_logotwins": "The Twins",
+  "index-rules-title": "Rules",
+  "index-rules-text": "Welcome to survev.de!<br><br>Survev.de is adjusted to competitive gameplay.<br>To ensure that everyone can enjoy the game, please read and accept the rules below.<br><br>1. No cheating or exploiting.<br>2. No inappropriate names or chat messages.<br>3. No harassment or insults toward other players.<br>4. No boosting or account sharing.<br>5. Moderator decisions are final.<br><br>Behaviour rules:<br><br>No 3rd Party in the 1v1 and 2v2 modes.<br>Do not play 4v4 against players you didn't arrange a matchup with.<br><br>BREAKING ONE OF THESE RULES MAY RESULT IN A TEMPORARY OR PERMANENT BAN.<br><br>Thank you for playing and have fun!",
+  "index-rules-accept": "Accept",
+  "index-rules-leave": "Leave Site"
 }

@@ -2971,6 +2971,18 @@ img {
   text-align: center;
 }
 
+.ui-weapon-fire-mode {
+  display: none;
+  position: absolute;
+  top: 3px;
+  right: 8px;
+  font-size: 14px;
+  font-weight: bold;
+  color: #ffd700;
+  text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.9);
+  white-space: nowrap;
+}
+
 .ui-weapon-number {
   position: absolute;
   font-size: 24px;

@@ -60,6 +60,7 @@ export class Application {
     refreshModal = new MenuModal($("#modal-refresh"));
     notVerifiedModal = new MenuModal($("#modal-not-verified"));
     ipBanModal = new MenuModal($("#modal-ip-banned"));
+    rulesModal = new MenuModal($("#modal-rules"));
     config = new ConfigManager();
     localization = new Localization();
 
@@ -185,6 +186,19 @@ export class Application {
             this.startPingTest();
             this.siteInfo.load();
             this.localization.localizeIndex();
+
+            if (!this.config.get("rulesAccepted")) {
+                this.rulesModal.show(true);
+            }
+            $("#btn-rules-accept").on("click", () => {
+                this.config.set("rulesAccepted", true);
+                this.config.store();
+                this.rulesModal.hide();
+            });
+            $("#btn-rules-leave").on("click", () => {
+                window.location.href = "https://www.google.com";
+            });
+
             this.account.init();
 
             this.nameInput.attr("maxLength", net.Constants.PlayerNameMaxLen);
@@ -704,6 +718,10 @@ export class Application {
     }
 
     tryQuickStartGame(gameModeIdx: number) {
+        if (!this.config.get("rulesAccepted")) {
+            this.rulesModal.show(true);
+            return;
+        }
         if (this.quickPlayPendingModeIdx === -1) {
             // Update UI to display a spinner on the play button
             this.errorMessage = "";
