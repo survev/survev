@@ -476,7 +476,7 @@ export class Application {
             const mode = modes[i];
             if (!mode?.enabled || !activeMaps.includes(mode.mapName)) continue;
             const btnEl = document.getElementById(`btn-start-mode-${i}`);
-            if (!btnEl) continue;
+            if (!btnEl || !$(btnEl).is(":visible")) continue;
             const r = btnEl.getBoundingClientRect();
             $("body").append(
                 `<span class="xp-boost-badge" style="top:${r.top - 3}px;left:${r.right - 20}px;transform:translateX(-100%)">&#128293; ${activeBoost}&#xD7;</span>`

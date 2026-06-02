@@ -3804,7 +3804,7 @@ export class Player extends BaseGameObject {
                 }else{
                     sameSourceDmg.amount += dmg.amount;
                 }
-                if ((sameSourceDmg ? sameSourceDmg.amount : dmg.amount) >=50 && dmg.source.__type === ObjectType.Player && dmg.source !== params.killCreditSource && dmg.source !== this){
+                if ((sameSourceDmg ? sameSourceDmg.amount : dmg.amount) >=50 && dmg.source.__type === ObjectType.Player && dmg.source !== params.killCreditSource && dmg.source !== lastDmg?.source && dmg.source !== this){
                     assistPlayer = dmg.source as Player;
                     assistPlayer.assistedIds.push(this.matchDataId);
                     dmgAmount = sameSourceDmg ? sameSourceDmg.amount : dmg.amount;
