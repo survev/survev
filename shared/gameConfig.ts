@@ -194,12 +194,12 @@ export const GameConfig = {
             "pass_survivr2": {
                 passMaxLevel: 99,
                 seasonStart: "2026-05-31T22:00:00Z",
-                seasonEnd:   "2026-07-31T21:59:59Z",
+                seasonEnd:   "2026-07-31T23:59:59",
             },
             "pass_survivr3": {
                 passMaxLevel: 99,
-                seasonStart: "2026-07-31T22:00:00Z",
-                seasonEnd:   "2026-10-31T22:59:59Z",
+                seasonStart: "2026-07-31T23:59:59",
+                seasonEnd:   "2026-10-31T23:59:59",
             },
         } as Record<string, { passMaxLevel: number; seasonStart: string; seasonEnd: string }>,
         get currentPass(): string {
