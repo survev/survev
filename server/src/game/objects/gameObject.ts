@@ -197,8 +197,11 @@ export abstract class BaseGameObject {
 
     init(): void {
         this.initialized = true;
-        this.partialStream = new BitStream(new ArrayBuffer(64));
-        this.fullStream = new BitStream(new ArrayBuffer(64));
+
+        const sFns = ObjectSerializeFns[this.__type];
+
+        this.partialStream = new BitStream(new ArrayBuffer(3 + sFns.serializedPartialSize));
+        this.fullStream = new BitStream(new ArrayBuffer(sFns.serializedFullSize));
         this.serializeFull();
     }
 
@@ -210,8 +213,11 @@ export abstract class BaseGameObject {
             return;
         }
         assert(this.__id !== 0 && this.__type !== 0, "Object not registered");
+
         this.partialStream.index = 0;
+        this.partialStream.writeUint8(this.__type);
         this.partialStream.writeUint16(this.__id);
+
         (
             ObjectSerializeFns[this.__type].serializePart as (
                 s: BitStream,
@@ -229,6 +235,7 @@ export abstract class BaseGameObject {
             return;
         }
         assert(this.__id !== 0 && this.__type !== 0, "Object not registered");
+
         this.serializePartial();
         this.fullStream.index = 0;
         (

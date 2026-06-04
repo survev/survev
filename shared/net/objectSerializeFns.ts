@@ -179,6 +179,8 @@ export interface ObjectsFullData {
 
 export const ObjectSerializeFns: {
     [K in ObjectType]: {
+        // in bytes not bits!
+        serializedPartialSize: number;
         serializedFullSize: number;
         serializePart: (s: BitStream, data: ObjectsPartialData[K]) => void;
         serializeFull: (s: BitStream, data: ObjectsFullData[K]) => void;
@@ -187,7 +189,8 @@ export const ObjectSerializeFns: {
     };
 } = {
     [ObjectType.Player]: {
-        serializedFullSize: 32,
+        serializedPartialSize: 6,
+        serializedFullSize: 32, // calculating this one is... yeah...
         /* STRIP_FROM_PROD_CLIENT:START */
         serializePart: (s, data) => {
             s.writeMapPos(data.pos);
@@ -324,7 +327,8 @@ export const ObjectSerializeFns: {
         },
     },
     [ObjectType.Obstacle]: {
-        serializedFullSize: 0,
+        serializedPartialSize: 6,
+        serializedFullSize: 16,
         /* STRIP_FROM_PROD_CLIENT:START */
         serializePart: (s, data) => {
             s.writeMapPos(data.pos);
@@ -404,7 +408,8 @@ export const ObjectSerializeFns: {
         },
     },
     [ObjectType.Building]: {
-        serializedFullSize: 0,
+        serializedPartialSize: 2,
+        serializedFullSize: 9,
         /* STRIP_FROM_PROD_CLIENT:START */
         serializePart: (s, data) => {
             s.writeBoolean(data.ceilingDead);
@@ -442,7 +447,8 @@ export const ObjectSerializeFns: {
         },
     },
     [ObjectType.Structure]: {
-        serializedFullSize: 0,
+        serializedPartialSize: 0,
+        serializedFullSize: 10,
         /* STRIP_FROM_PROD_CLIENT:START */
         serializePart: () => {},
         serializeFull: (s, data) => {
@@ -472,6 +478,7 @@ export const ObjectSerializeFns: {
         },
     },
     [ObjectType.LootSpawner]: {
+        serializedPartialSize: 8,
         serializedFullSize: 0,
         /* STRIP_FROM_PROD_CLIENT:START */
         serializePart: (s, data) => {
@@ -490,6 +497,7 @@ export const ObjectSerializeFns: {
         deserializeFull: () => {},
     },
     [ObjectType.Loot]: {
+        serializedPartialSize: 4,
         serializedFullSize: 5,
         /* STRIP_FROM_PROD_CLIENT:START */
         serializePart: (s, data) => {
@@ -524,7 +532,8 @@ export const ObjectSerializeFns: {
         },
     },
     [ObjectType.DeadBody]: {
-        serializedFullSize: 0,
+        serializedPartialSize: 4,
+        serializedFullSize: 3,
         /* STRIP_FROM_PROD_CLIENT:START */
         serializePart: (s, data) => {
             s.writeMapPos(data.pos);
@@ -544,7 +553,8 @@ export const ObjectSerializeFns: {
         },
     },
     [ObjectType.Decal]: {
-        serializedFullSize: 0,
+        serializedPartialSize: 0,
+        serializedFullSize: 8,
         /* STRIP_FROM_PROD_CLIENT:START */
         serializePart: () => {},
         serializeFull: (s, data) => {
@@ -577,7 +587,8 @@ export const ObjectSerializeFns: {
         },
     },
     [ObjectType.Projectile]: {
-        serializedFullSize: 0,
+        serializedPartialSize: 8,
+        serializedFullSize: 2,
         /* STRIP_FROM_PROD_CLIENT:START */
         serializePart: (s, data) => {
             s.writeMapPos(data.pos);
@@ -601,7 +612,8 @@ export const ObjectSerializeFns: {
         },
     },
     [ObjectType.Smoke]: {
-        serializedFullSize: 0,
+        serializedPartialSize: 5,
+        serializedFullSize: 1,
         /* STRIP_FROM_PROD_CLIENT:START */
         serializePart: (s, data) => {
             s.writeMapPos(data.pos);
@@ -623,7 +635,8 @@ export const ObjectSerializeFns: {
         },
     },
     [ObjectType.Airdrop]: {
-        serializedFullSize: 0,
+        serializedPartialSize: 1,
+        serializedFullSize: 4,
         /* STRIP_FROM_PROD_CLIENT:START */
         serializePart: (s, data) => {
             s.writeFloat(data.fallT, 0, 1, 7);
@@ -644,6 +657,7 @@ export const ObjectSerializeFns: {
     },
     // * to please ts
     [ObjectType.Invalid]: {
+        serializedPartialSize: 0,
         serializedFullSize: 0,
         deserializeFull: () => {},
         deserializePart: () => {},
