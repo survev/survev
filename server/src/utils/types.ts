@@ -24,7 +24,7 @@ export type UpdateRegionBody = z.infer<typeof zUpdateRegionBody>;
 
 export const zSetGameModeBody = z.object({
     index: z.number(),
-    team_mode: z.nativeEnum(TeamMode).optional(),
+    team_mode: z.enum(TeamMode).optional(),
     map_name: z.string().optional(),
     enabled: z.boolean().optional(),
 });

@@ -25,7 +25,7 @@ export async function getRedisClient() {
 export async function cleanupRedis() {
     if (redisClient) {
         await redisClient
-            .disconnect()
+            .close()
             .catch((err) =>
                 server.logger.info(
                     `CacheStore - Error while disconnecting from redis: ${
