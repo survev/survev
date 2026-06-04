@@ -2,14 +2,13 @@ import { and, eq, inArray } from "drizzle-orm";
 import { Hono } from "hono";
 import { z } from "zod";
 import { saveConfig } from "../../../../../config.ts";
-
 import { QuestDefs } from "../../../../../shared/defs/gameObjects/questDefs.ts";
 import { MapDefs } from "../../../../../shared/defs/mapDefs.ts";
 import { GameObjectDefs } from "../../../../../shared/defs/register.ts";
 import { TeamMode } from "../../../../../shared/gameConfig.ts";
 import { zGiveItemParams, zRemoveItemParams } from "../../../../../shared/types/moderation.ts";
 import { serverConfigPath } from "../../../config.ts";
-import { isBehindProxy } from "../../../utils/serverHelpers.ts";
+import { isBehindProxy } from "../../../utils/proxyCheck.ts";
 import { type SaveGameBody, zSetClientThemeBody, zSetGameModeBody, zUpdateRegionBody } from "../../../utils/types.ts";
 import { server } from "../../apiServer.ts";
 import { databaseEnabledMiddleware, privateMiddleware, validateParams } from "../../auth/middleware.ts";
@@ -326,30 +325,37 @@ export const PrivateRouter = new Hono<Context>()
             }),
         ),
         async (c) => {
+            if (process.env.NODE_ENV === "production") {
+                return c.json({}, 403);
+            }
+
             const data = c.req.valid("json");
             const matchData: MatchDataTable = {
-                ...{
-                    gameId: crypto.randomUUID(),
-                    userId: MOCK_USER_ID,
-                    createdAt: new Date(),
-                    region: "na",
-                    mapId: 0,
-                    mapSeed: 9834567801234,
-                    username: MOCK_USER_ID,
-                    playerId: 9834,
-                    teamMode: TeamMode.Solo,
-                    teamCount: 4,
-                    teamTotal: 25,
-                    teamId: 7,
-                    timeAlive: 842,
-                    rank: 3,
-                    died: true,
-                    kills: 5,
-                    damageDealt: 1247,
-                    damageTaken: 862,
-                    killerId: 18765,
-                    killedIds: [12543, 13587, 14298, 15321, 16754],
-                },
+                gameId: crypto.randomUUID(),
+                userId: MOCK_USER_ID,
+                createdAt: new Date(),
+                region: "na",
+                mapId: 0,
+                mapSeed: 9834567801234,
+                username: MOCK_USER_ID,
+                playerId: 9834,
+                teamMode: TeamMode.Solo,
+                teamCount: 4,
+                teamTotal: 25,
+                teamId: 7,
+                timeAlive: 842,
+                rank: 3,
+                died: true,
+                damageDealt: 1247,
+                damageTaken: 862,
+                killerId: 18765,
+                killedIds: [
+                    12543,
+                    13587,
+                    14298,
+                    15321,
+                    16754,
+                ],
                 ...data,
             };
             await leaderboardCache.invalidateCache([matchData]);

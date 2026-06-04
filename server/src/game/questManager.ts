@@ -1,5 +1,4 @@
 import { type QuestDef, QuestDefs } from "../../../shared/defs/gameObjects/questDefs.ts";
-
 import type { ObstacleDef } from "../../../shared/defs/mapObjectsTyping.ts";
 import { GameObjectDefs, MapObjectDefs } from "../../../shared/defs/register.ts";
 import { TeamModeToString } from "../../../shared/defs/types/misc.ts";

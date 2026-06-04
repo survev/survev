@@ -1,14 +1,10 @@
 import { expect, test } from "vitest";
-import { Game } from "../../server/src/game/game.ts";
 import { GameConfig, TeamMode } from "../../shared/gameConfig.ts";
 import { v2 } from "../../shared/utils/v2.ts";
 import { createGame } from "./gameTestHelpers.ts";
 
-// don't want the test making requests
-Game.prototype.sendQuestProgress = async () => {};
-
-test("Kill enemies inside building test", async () => {
-    const game = await createGame(TeamMode.Solo, "test_normal");
+test("Kill enemies inside building test", () => {
+    const game = createGame(TeamMode.Solo, "test_normal");
     game.map.genBuilding("club_complex_01", game.map.center, 0, 0);
 
     const playerA = game.playerBarn.addTestPlayer({});
@@ -56,8 +52,8 @@ test("Kill enemies inside building test", async () => {
     expect(playerA.questManager.quests[0].totalDelta).toBe(2);
 });
 
-test("Players shouldn't get placement progress for just disconnecting", async () => {
-    const game = await createGame(TeamMode.Solo, "test_normal");
+test("Players shouldn't get placement progress for just disconnecting", () => {
+    const game = createGame(TeamMode.Solo, "test_normal");
 
     const playerA = game.playerBarn.addTestPlayer({});
     playerA.userId = "meow";
@@ -71,14 +67,14 @@ test("Players shouldn't get placement progress for just disconnecting", async ()
 
     expect(playerA.questManager.quests[0].delta).toBe(0);
 
-    game.handleSocketClose(playerA.socketId);
+    playerA.socket.close();
 
     // player leaving shouldn't count as progress
     expect(playerA.questManager.quests[0].totalDelta).toBe(0);
 });
 
-test("Solo placement success on win", async () => {
-    const game = await createGame(TeamMode.Solo, "test_normal");
+test("Solo placement success on win", () => {
+    const game = createGame(TeamMode.Solo, "test_normal");
 
     const playerA = game.playerBarn.addTestPlayer({});
     playerA.userId = "meow";
@@ -110,8 +106,8 @@ test("Solo placement success on win", async () => {
     expect(playerA.questManager.quests[0].totalDelta).toBe(1);
 });
 
-test("Solo placement success on death", async () => {
-    const game = await createGame(TeamMode.Solo, "test_normal");
+test("Solo placement success on death", () => {
+    const game = createGame(TeamMode.Solo, "test_normal");
 
     const playerA = game.playerBarn.addTestPlayer({});
     playerA.userId = "meow";
@@ -142,8 +138,8 @@ test("Solo placement success on death", async () => {
 });
 
 // the same as above, but with one extra player so the rank doesn't fit the quest criteria
-test("Solo placement test fail on death", async () => {
-    const game = await createGame(TeamMode.Solo, "test_normal");
+test("Solo placement test fail on death", () => {
+    const game = createGame(TeamMode.Solo, "test_normal");
 
     const playerA = game.playerBarn.addTestPlayer({});
     playerA.userId = "meow";
@@ -173,8 +169,8 @@ test("Solo placement test fail on death", async () => {
     expect(playerA.questManager.quests[0].totalDelta).toBe(0);
 });
 
-test("Squad placement success on win", async () => {
-    const game = await createGame(TeamMode.Squad, "test_normal");
+test("Squad placement success on win", () => {
+    const game = createGame(TeamMode.Squad, "test_normal");
 
     const groupA = game.playerBarn.addGroup(false);
     const playerA = game.playerBarn.addTestPlayer({ group: groupA });
@@ -208,8 +204,8 @@ test("Squad placement success on win", async () => {
     expect(playerA.questManager.quests[0].totalDelta).toBe(1);
 });
 
-test("Squad placement success on death", async () => {
-    const game = await createGame(TeamMode.Squad, "test_normal");
+test("Squad placement success on death", () => {
+    const game = createGame(TeamMode.Squad, "test_normal");
 
     const groupA = game.playerBarn.addGroup(false);
     const playerA = game.playerBarn.addTestPlayer({ group: groupA });
@@ -251,8 +247,8 @@ test("Squad placement success on death", async () => {
 });
 
 // the same as above, but with one extra group so the rank doesn't fit the quest criteria
-test("Squad placement fail on death", async () => {
-    const game = await createGame(TeamMode.Squad, "test_normal");
+test("Squad placement fail on death", () => {
+    const game = createGame(TeamMode.Squad, "test_normal");
 
     const groupA = game.playerBarn.addGroup(false);
     const playerA = game.playerBarn.addTestPlayer({ group: groupA });
@@ -293,8 +289,8 @@ test("Squad placement fail on death", async () => {
     expect(playerA.questManager.quests[0].totalDelta).toBe(0);
 });
 
-test("Survived time on death", async () => {
-    const game = await createGame(TeamMode.Solo, "test_normal");
+test("Survived time on death", () => {
+    const game = createGame(TeamMode.Solo, "test_normal");
 
     const playerA = game.playerBarn.addTestPlayer({});
     playerA.userId = "meow";
@@ -318,8 +314,8 @@ test("Survived time on death", async () => {
     expect(playerA.questManager.quests[0].totalDelta).toBeCloseTo(10);
 });
 
-test("Survived time on win", async () => {
-    const game = await createGame(TeamMode.Solo, "test_normal");
+test("Survived time on win", () => {
+    const game = createGame(TeamMode.Solo, "test_normal");
 
     const playerA = game.playerBarn.addTestPlayer({});
     playerA.userId = "meow";

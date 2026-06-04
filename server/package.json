@@ -9,7 +9,7 @@
     "start:game": "node --enable-source-maps dist/gameServer.js",
     "dev": "concurrently \"pnpm run dev:api\" \"pnpm run dev:game\"",
     "dev:api": "tsx watch --clear-screen=false --include ../survev-config.hjson src/api/index.ts",
-    "dev:game": "tsx watch --clear-screen=false --include ../survev-config.hjson src/gameServer.ts",
+    "dev:game": "tsx watch --clear-screen=false --include ../survev-config.hjson --include ./src/game --include ../shared src/gameServer.ts",
     "db:generate": "drizzle-kit generate --config=src/api/drizzle.config.ts",
     "db:migrate": "drizzle-kit migrate --config=src/api/drizzle.config.ts",
     "db:seed": "tsx src/api/db/seed.ts",

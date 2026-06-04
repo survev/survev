@@ -298,11 +298,6 @@ export class WeaponManager {
             this.weapons[i].recoilTime -= dt;
         }
 
-        if (this.weapons[this.curWeapIdx].cooldown <= 0 && this.scheduledReload) {
-            this.scheduledReload = false;
-            this.tryReload();
-        }
-
         const itemDef = GameObjectDefs.typeToDef(this.activeWeapon);
 
         switch (itemDef.type) {
@@ -348,6 +343,11 @@ export class WeaponManager {
         const itemDef = GameObjectDefs.typeToDef(this.activeWeapon, "gun");
         const player = this.player;
         const weapon = this.weapons[this.curWeapIdx];
+
+        if (weapon.cooldown <= 0 && this.scheduledReload) {
+            this.scheduledReload = false;
+            this.tryReload();
+        }
 
         switch (itemDef.fireMode) {
             case "auto":

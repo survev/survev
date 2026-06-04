@@ -4,7 +4,8 @@
     "oxc",
     "eslint",
     "import",
-    "typescript"
+    "typescript",
+    "unicorn"
   ],
   "env": {
     "browser": true,
@@ -26,7 +27,9 @@
       {
         "ignorePackages": true
       }
-    ]
+    ],
+    "unicorn/prefer-node-protocol": "error",
+    "unicorn/no-new-array": "off"
   },
   "overrides": []
 }

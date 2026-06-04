@@ -18,28 +18,6 @@ async function importKeys(config: PartialConfig) {
         required: true,
     });
     config.secrets.SURVEV_API_KEY = apiKey.value;
-
-    const loadoutSecret = await prompt<{ value: string }>({
-        message: "Enter Loadout secret:",
-        name: "value",
-        type: "text",
-        required: true,
-        validate(value) {
-            try {
-                atob(value);
-            } catch {
-                return "Invalid base64 string";
-            }
-
-            const buff = Buffer.from(value, "base64");
-            if (buff.length < 32) {
-                return "Loadout secret should have more than 32 bytes!";
-            }
-            return true;
-        },
-    });
-
-    config.secrets.SURVEV_LOADOUT_SECRET = loadoutSecret.value;
 }
 
 async function setupGameServer(config: PartialConfig) {
@@ -415,7 +393,6 @@ async function setupConfig() {
     const config: PartialConfig = {
         secrets: {
             SURVEV_API_KEY: randomBytes(64).toString("base64"),
-            SURVEV_LOADOUT_SECRET: randomBytes(32).toString("base64"),
         },
     };
 

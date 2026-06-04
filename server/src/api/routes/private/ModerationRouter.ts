@@ -19,7 +19,7 @@ import {
 } from "../../../../../shared/types/moderation.ts";
 import { util } from "../../../../../shared/utils/util.ts";
 import { Config } from "../../../config.ts";
-import { validateUserName } from "../../../utils/serverHelpers.ts";
+import { validateUserName } from "../../../utils/badWords.ts";
 import type { SaveGameBody } from "../../../utils/types.ts";
 import { server } from "../../apiServer.ts";
 import { databaseEnabledMiddleware, validateParams } from "../../auth/middleware.ts";

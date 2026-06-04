@@ -1238,6 +1238,7 @@ export class Game {
         if (this.lastUpdateTime > 0) {
             const interval = now - this.lastUpdateTime;
             this.m_camera.m_interpInterval = interval / 1000;
+            this.debugHUD.updateIntervalGraph.addEntry(interval);
             this.updateIntervals.push(interval);
         }
         this.lastUpdateTime = now;
@@ -1388,16 +1389,16 @@ export class Game {
                 }
 
                 if (this.m_map.factionMode) {
-                    if (targetInfo.teamId == 1) {
-                        targetName = this.m_ui2Manager.colorKillFeedName(targetName, "#007EFF");
-                    } else {
-                        targetName = this.m_ui2Manager.colorKillFeedName(targetName, "#CC0000");
-                    }
-                    if (killerInfo.teamId == 1) {
-                        killfeedKillerName = this.m_ui2Manager.colorKillFeedName(killfeedKillerName, "#007EFF");
-                    } else {
-                        killfeedKillerName = this.m_ui2Manager.colorKillFeedName(killfeedKillerName, "#CC0000");
-                    }
+                    targetName = this.m_ui2Manager.colorKillFeedName(
+                        targetName,
+                        helpers.colorToHexString(GameConfig.teamColors[targetInfo.teamId - 1]),
+                    );
+                    targetName = this.m_ui2Manager.addKillFeedIcon(targetName, msg.targetRole);
+                    killfeedKillerName = this.m_ui2Manager.colorKillFeedName(
+                        killfeedKillerName,
+                        helpers.colorToHexString(GameConfig.teamColors[killerInfo.teamId - 1]),
+                    );
+                    killfeedKillerName = this.m_ui2Manager.addKillFeedIcon(killfeedKillerName, msg.killerRole);
                 }
 
                 // Add killfeed entry for this kill

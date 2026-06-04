@@ -1,5 +1,4 @@
 import type { MapDef } from "../../../../shared/defs/mapDefs.ts";
-
 import { GameObjectDefs, MapObjectDefs } from "../../../../shared/defs/register.ts";
 import { GameConfig, type Plane as PlaneType } from "../../../../shared/gameConfig.ts";
 import { Constants } from "../../../../shared/net/net.ts";

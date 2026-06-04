@@ -1,5 +1,3 @@
-import { randomUUID } from "node:crypto";
-
 import { type GameObjectDef, type LootDef, WeaponTypeToDefs } from "../../../../shared/defs/gameObjectDefs.ts";
 import { type EmoteDef, EmotesDefs } from "../../../../shared/defs/gameObjects/emoteDefs.ts";
 import {
@@ -36,12 +34,13 @@ import { math } from "../../../../shared/utils/math.ts";
 import { assert, util } from "../../../../shared/utils/util.ts";
 import { v2, type Vec2 } from "../../../../shared/utils/v2.ts";
 import { Config } from "../../config.ts";
+import { validateUserName } from "../../utils/badWords.ts";
 import { IDAllocator } from "../../utils/IDAllocator.ts";
-import { validateUserName } from "../../utils/serverHelpers.ts";
 import type { Game, JoinTokenData } from "../game.ts";
 import { Group, Team } from "../group.ts";
 import { InventoryManager } from "../inventoryManager.ts";
 import { QuestManager } from "../questManager.ts";
+import { type ClientSocket, NoOpSocket } from "../socket.ts";
 import { WeaponManager } from "../weaponManager.ts";
 import type { Building } from "./building.ts";
 import { BaseGameObject, type DamageParams, type GameObject } from "./gameObject.ts";
@@ -88,10 +87,8 @@ export class PlayerBarn {
     newPlayers: Player[] = [];
     deletedPlayers: number[] = [];
     killedPlayers: Player[] = [];
-    groupIdAllocator = new IDAllocator(8);
+    groupIdAllocator = new IDAllocator(255);
     aliveCountDirty = false;
-
-    socketIdToPlayer = new Map<string, Player>();
 
     emotes: Emote[] = [];
 
@@ -144,11 +141,11 @@ export class PlayerBarn {
         return livingPlayers[util.randomInt(0, livingPlayers.length - 1)];
     }
 
-    addPlayer(socketId: string, joinMsg: net.JoinMsg, ip: string) {
+    addPlayer(socket: ClientSocket<Player | undefined>, joinMsg: net.JoinMsg) {
         const joinData = this.game.joinTokens.get(joinMsg.matchPriv);
 
         if (!joinData || joinData.expiresAt < Date.now()) {
-            this.game.closeSocket(socketId);
+            socket.close();
             if (joinData) {
                 this.game.joinTokens.delete(joinMsg.matchPriv);
             }
@@ -159,12 +156,12 @@ export class PlayerBarn {
         if (Config.rateLimitsEnabled) {
             const count = this.livingPlayers.filter(
                 (p) =>
-                    p.ip === ip
+                    p.ip === socket.ip()
                     || p.findGameIp == joinData.findGameIp
                     || (joinData.userId !== null && p.userId === joinData.userId),
             );
             if (count.length >= 5) {
-                this.game.closeSocket(socketId, "rate_limited");
+                socket.closeWithReason("rate_limited");
                 return;
             }
         }
@@ -214,15 +211,12 @@ export class PlayerBarn {
             pos,
             layer,
             finalName,
-            socketId,
+            socket as ClientSocket<Player>,
             joinMsg,
-            ip,
             joinData.findGameIp,
             joinData.userId,
             joinData.quests,
         );
-
-        this.socketIdToPlayer.set(socketId, player);
 
         this.activatePlayer(player, group, team);
         player.setLoadout(
@@ -268,7 +262,6 @@ export class PlayerBarn {
             this.livingPlayers.sort((a, b) => a.teamId - b.teamId);
         }
         this.aliveCountDirty = true;
-        this.game.pluginManager.emit("playerJoin", player);
 
         this.game.updateData();
     }
@@ -291,20 +284,18 @@ export class PlayerBarn {
             team = this.getSmallestTeam();
         }
 
-        const socketId = randomUUID();
+        const socket = new NoOpSocket<Player>();
 
         const player = new Player(
             this.game,
             params.pos ?? v2.create(this.game.map.width / 2, this.game.map.height / 2),
             0,
             params.name ?? `TEST-${this.testPlayerCount++}`,
-            socketId,
+            socket,
             new net.JoinMsg(),
-            "",
             "",
             null,
         );
-        this.socketIdToPlayer.set(socketId, player);
 
         this.activatePlayer(player, group, team);
 
@@ -766,7 +757,11 @@ export class Player extends BaseGameObject {
 
     disconnect(reason?: string) {
         this.disconnected = true;
-        this.game.closeSocket(this.socketId, reason);
+        if (reason) {
+            this.socket.closeWithReason(reason);
+        } else {
+            this.socket.close();
+        }
     }
 
     private _spectatorCount = 0;
@@ -1337,7 +1332,7 @@ export class Player extends BaseGameObject {
         return surface;
     }
 
-    socketId: string;
+    socket: ClientSocket<Player>;
 
     ack = 0;
 
@@ -1423,9 +1418,8 @@ export class Player extends BaseGameObject {
         pos: Vec2,
         layer: number,
         name: string,
-        socketId: string,
+        socket: ClientSocket<Player>,
         joinMsg: net.JoinMsg,
-        ip: string,
         findGameIp: string,
         userId: string | null,
         questIds?: string[],
@@ -1437,8 +1431,9 @@ export class Player extends BaseGameObject {
         this.layer = layer;
 
         this.name = name;
-        this.socketId = socketId;
-        this.ip = ip;
+        this.socket = socket;
+        socket.setUserData(this);
+        this.ip = socket.ip();
         this.findGameIp = findGameIp;
         this.userId = userId;
 
@@ -1797,7 +1792,6 @@ export class Player extends BaseGameObject {
 
                         target.setDirty();
                         target.setGroupStatuses();
-                        this.game.pluginManager.emit("playerRevived", target);
                     });
                 }
 
@@ -2925,8 +2919,6 @@ export class Player extends BaseGameObject {
             }
         }
 
-        this.game.pluginManager.emit("playerDamage", { ...params, player: this });
-
         this.damageTaken += finalDamage;
         if (playerSource && params.source !== this) {
             if (playerSource.groupId !== this.groupId) {
@@ -3029,11 +3021,13 @@ export class Player extends BaseGameObject {
         downedMsg.mapSourceType = params.mapSourceType ?? "";
         downedMsg.targetId = this.__id;
         downedMsg.downed = true;
+        downedMsg.targetRole = this.role;
 
         if (params.source?.__type === ObjectType.Player) {
             this.downedBy = params.source;
             downedMsg.killerId = params.source.__id;
             downedMsg.killCreditId = params.source.__id;
+            downedMsg.killerRole = params.source.role;
         }
 
         this.game.broadcastMsg(net.MsgType.Kill, downedMsg);
@@ -3198,6 +3192,8 @@ export class Player extends BaseGameObject {
             }
             killMsg.killCreditId = killCreditSource.__id;
             killMsg.killerKills = killCreditSource.kills;
+            killMsg.killerRole = killCreditSource.role;
+            killMsg.targetRole = this.role;
         }
 
         if (params.source?.__type === ObjectType.Player) {
@@ -3301,8 +3297,6 @@ export class Player extends BaseGameObject {
                 this.removeRole();
             }
         }
-
-        this.game.pluginManager.emit("playerKill", { ...params, player: this });
 
         //
         // Give spectators someone new to spectate
@@ -5138,7 +5132,7 @@ export class Player extends BaseGameObject {
         this.sendData(stream.getBuffer());
     }
 
-    sendData(buffer: Uint8Array): void {
-        this.game.sendSocketMsg(this.socketId, buffer);
+    sendData(buffer: Uint8Array<ArrayBuffer>): void {
+        this.socket.send(buffer);
     }
 }

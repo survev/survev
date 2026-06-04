@@ -11,6 +11,8 @@ export class KillMsg implements AbstractMsg {
     killerKills = 0;
     downed = false;
     killed = false;
+    killerRole = "";
+    targetRole = "";
 
     serialize(s: BitStream) {
         /* STRIP_FROM_PROD_CLIENT:START */
@@ -23,6 +25,8 @@ export class KillMsg implements AbstractMsg {
         s.writeUint8(this.killerKills);
         s.writeBoolean(this.downed);
         s.writeBoolean(this.killed);
+        s.writeGameType(this.killerRole);
+        s.writeGameType(this.targetRole);
         /* STRIP_FROM_PROD_CLIENT:END */
     }
 
@@ -36,5 +40,7 @@ export class KillMsg implements AbstractMsg {
         this.killerKills = s.readUint8();
         this.downed = s.readBoolean();
         this.killed = s.readBoolean();
+        this.killerRole = s.readGameType();
+        this.targetRole = s.readGameType();
     }
 }

@@ -69,6 +69,14 @@ function getBuildingSprites(type: string, sprites: Set<string>) {
     }
 }
 
+function getStructureSprites(type: string, sprites: Set<string>) {
+    const def = MapObjectDefs.typeToDef(type, "structure");
+
+    for (const layer of def.layers) {
+        getBuildingSprites(layer.type, sprites);
+    }
+}
+
 function getObjSprites(type: string, sprites: Set<string>) {
     if (!type) return;
     const def = MapObjectDefs.typeToDefSafe(type);
@@ -82,6 +90,10 @@ function getObjSprites(type: string, sprites: Set<string>) {
             getBuildingSprites(type, sprites);
             break;
         case "structure":
+            getStructureSprites(type, sprites);
+            break;
+        case "decal":
+            sprites.add(def.img.sprite);
             break;
     }
 }

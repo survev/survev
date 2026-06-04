@@ -28,7 +28,7 @@ export interface GraphOptions {
     titleTextStyle: Partial<PIXI.ITextStyle>;
 }
 
-export type GraphKey = "fps" | "ping" | "netIn";
+export type GraphKey = "fps" | "ping" | "netIn" | "updateInterval";
 
 const defaultOptions: GraphOptions = {
     width: 350,

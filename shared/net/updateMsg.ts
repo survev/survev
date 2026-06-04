@@ -312,7 +312,6 @@ export class UpdateMsg implements AbstractMsg {
 
         if (this.fullObjects.length) {
             s.writeArray(this.fullObjects, 16, (obj) => {
-                s.writeUint8(obj.__type);
                 s.writeBytes(obj.partialStream, 0, obj.partialStream.byteIndex);
                 s.writeBytes(obj.fullStream, 0, obj.fullStream.byteIndex);
             });
@@ -321,7 +320,6 @@ export class UpdateMsg implements AbstractMsg {
         }
 
         s.writeArray(this.partObjects, 16, (obj) => {
-            s.writeUint8(obj.__type);
             s.writeBytes(obj.partialStream, 0, obj.partialStream.byteIndex);
         });
 

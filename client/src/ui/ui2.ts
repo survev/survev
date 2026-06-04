@@ -1395,6 +1395,15 @@ export class UiManager2 {
         return `<span style="color: ${color};">${name}</span>`;
     }
 
+    addKillFeedIcon(name: string, role: string) {
+        const roleDef = GameObjectDefs.typeToDefSafe(role) as RoleDef | undefined;
+        const icon = roleDef?.killFeed?.icon;
+        if (!icon) {
+            return name;
+        }
+        return `<img src="img/gui/${icon}" style="height: 1em;">${name}`;
+    }
+
     getKillFeedText(
         targetName: string,
         killerName: string,

@@ -45,6 +45,7 @@ export interface RoleDef {
         assign?: boolean;
         dead?: boolean;
         color?: string;
+        icon?: string;
     };
     sound: {
         assign?: string;
@@ -117,7 +118,7 @@ export const RoleDefs: Record<string, RoleDef> = {
     leader: {
         type: "role",
         announce: true,
-        killFeed: { assign: true, dead: true },
+        killFeed: { assign: true, dead: true, icon: "player-star.svg" },
         sound: {
             assign: "leader_assigned_01",
             dead: "leader_dead_01",
@@ -167,7 +168,7 @@ export const RoleDefs: Record<string, RoleDef> = {
     captain: {
         type: "role",
         announce: true,
-        killFeed: { assign: true },
+        killFeed: { assign: true, icon: "player-captain.svg" },
         sound: { assign: "captain_assigned_01" },
         mapIcon: {
             alive: "player-captain.img",
@@ -200,7 +201,7 @@ export const RoleDefs: Record<string, RoleDef> = {
     lieutenant: {
         type: "role",
         announce: true,
-        killFeed: { assign: true },
+        killFeed: { assign: true, icon: "player-lieutenant.svg" },
         sound: { assign: "lt_assigned_01" },
         perks: ["firepower"],
         defaultItems: createDefaultItems({
@@ -231,7 +232,7 @@ export const RoleDefs: Record<string, RoleDef> = {
     medic: {
         type: "role",
         announce: true,
-        killFeed: { assign: true },
+        killFeed: { assign: true, icon: "player-medic.svg" },
         sound: { assign: "medic_assigned_01" },
         mapIcon: {
             alive: "player-medic.img",
@@ -261,7 +262,7 @@ export const RoleDefs: Record<string, RoleDef> = {
     marksman: {
         type: "role",
         announce: true,
-        killFeed: { assign: true },
+        killFeed: { assign: true, icon: "player-marksman.svg" },
         sound: { assign: "marksman_assigned_01" },
         perks: ["targeting"],
         defaultItems: createDefaultItems({
@@ -296,7 +297,7 @@ export const RoleDefs: Record<string, RoleDef> = {
     recon: {
         type: "role",
         announce: true,
-        killFeed: { assign: true },
+        killFeed: { assign: true, icon: "player-recon.svg" },
         sound: { assign: "recon_assigned_01" },
         perks: ["small_arms"],
         defaultItems: createDefaultItems({
@@ -319,7 +320,7 @@ export const RoleDefs: Record<string, RoleDef> = {
     grenadier: {
         type: "role",
         announce: true,
-        killFeed: { assign: true },
+        killFeed: { assign: true, icon: "player-grenadier.svg" },
         sound: { assign: "grenadier_assigned_01" },
         perks: ["flak_jacket"],
         defaultItems: createDefaultItems({
@@ -343,7 +344,7 @@ export const RoleDefs: Record<string, RoleDef> = {
     bugler: {
         type: "role",
         announce: true,
-        killFeed: { assign: true },
+        killFeed: { assign: true, icon: "player-bugler.svg" },
         sound: { assign: "bugler_assigned_01" },
         perks: ["inspiration", "final_bugle"],
         defaultItems: createDefaultItems({
@@ -365,7 +366,7 @@ export const RoleDefs: Record<string, RoleDef> = {
     last_man: {
         type: "role",
         announce: true,
-        killFeed: { assign: true },
+        killFeed: { assign: true, icon: "player-last-man.svg" },
         sound: { assign: "last_man_assigned_01" },
         perks: [
             "steelskin",

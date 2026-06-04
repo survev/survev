@@ -22,6 +22,8 @@ export class DebugHUD {
     pingGraph: Graph;
     netInGraph: Graph;
 
+    updateIntervalGraph: Graph;
+
     linesContainer = new PIXI.Container();
     infoLines: PIXI.Text[] = [];
 
@@ -58,7 +60,7 @@ export class DebugHUD {
             const min = `${Math.round(g.minValue)}`.padEnd(textPadding);
             const max = `${Math.round(g.maxValue)}`.padEnd(textPadding);
             const avg = `${Math.round(g.averageValue)}`.padEnd(textPadding);
-            return `FPS:     Min: ${min} Max: ${max} Avg: ${avg}`;
+            return `FPS:      Min: ${min} Max: ${max} Avg: ${avg}`;
         });
 
         this.pingGraph = this.addGraph("ping", {
@@ -70,7 +72,7 @@ export class DebugHUD {
             const min = `${Math.round(g.minValue)}ms`.padEnd(textPadding);
             const max = `${Math.round(g.maxValue)}ms`.padEnd(textPadding);
             const avg = `${Math.round(g.averageValue)}ms`.padEnd(textPadding);
-            return `Ping:    Min: ${min} Max: ${max} Avg: ${avg}`;
+            return `Ping:     Min: ${min} Max: ${max} Avg: ${avg}`;
         });
 
         this.netInGraph = this.addGraph("netIn", {
@@ -86,7 +88,18 @@ export class DebugHUD {
             const min = formatBytes(g.minValue);
             const max = formatBytes(g.maxValue);
             const avg = formatBytes(g.averageValue);
-            return `Net In:  Min: ${min} Max: ${max} Avg: ${avg}`;
+            return `Net In:   Min: ${min} Max: ${max} Avg: ${avg}`;
+        });
+
+        this.updateIntervalGraph = this.addGraph("updateInterval", {
+            fill: "rgba(0, 0, 255, 0.2)",
+            stroke: "blue",
+        });
+        this.updateIntervalGraph.addLabel((g) => {
+            const min = `${Math.round(g.minValue)}ms`.padEnd(textPadding);
+            const max = `${Math.round(g.maxValue)}ms`.padEnd(textPadding);
+            const avg = `${Math.round(g.averageValue)}ms`.padEnd(textPadding);
+            return `Interval: Min: ${min} Max: ${max} Avg: ${avg}`;
         });
 
         this.onConfigModified();
