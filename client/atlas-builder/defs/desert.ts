@@ -32,5 +32,9 @@ export const DesertAtlas: AtlasDef = {
 
         "map/map-tree-05c.svg",
         "map/map-tree-06.svg",
+        "map/map-tree-13.svg",
+        "map/map-tree-14.svg",
+
+        "map/map-barrel-05.svg",
     ],
 };

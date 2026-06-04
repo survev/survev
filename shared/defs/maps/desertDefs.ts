@@ -18,6 +18,7 @@ const mapDef: PartialMapDef = {
             { name: "piano_02", channel: "sfx" },
             { name: "log_03", channel: "sfx" },
             { name: "log_04", channel: "sfx" },
+            { name: "coconut_01", channel: "sfx" },
             { name: "piano_music_01", channel: "ambient" },
         ],
         atlases: ["gradient", "loadout", "shared", "desert"],
@@ -29,6 +30,9 @@ const mapDef: PartialMapDef = {
             waterRipple: 0xd1e685,
             beach: 0xc9843a,
             riverbank: 0xb25e24,
+            lakeWater: 0x42b0ba,
+            lakeWaterRipple: 0xb3f0ff,
+            lakeRiverbank: 0x916e27,
             grass: 0xdfa757,
             underground: 0x3d0d03,
             playerSubmerge: 0x4e9b8f,
@@ -141,11 +145,7 @@ const mapDef: PartialMapDef = {
             { name: "", count: 1, weight: 20 },
             { name: "outfitMeteor", count: 1, weight: 5 },
             { name: "outfitHeaven", count: 1, weight: 1 },
-            {
-                name: "outfitGhillie",
-                count: 1,
-                weight: 0.5,
-            },
+            { name: "outfitGhillie", count: 1, weight: 0.5 },
         ],
         tier_airdrop_melee: [
             { name: "", count: 1, weight: 19 },
@@ -208,6 +208,19 @@ const mapDef: PartialMapDef = {
             shoreInset: 8,
             grassInset: 12,
             rivers: {
+                lakes: [
+                    {
+                        odds: 1,
+                        innerRad: 10,
+                        outerRad: 20,
+                        centerObj: "oasis_01",
+                        riverMaskRad: 64,
+                        spawnBound: {
+                            pos: v2.create(0.5, 0.5),
+                            rad: 200,
+                        },
+                    },
+                ],
                 weights: [
                     { weight: 0.1, widths: [4] },
                     { weight: 0.15, widths: [8] },
