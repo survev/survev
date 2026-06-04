@@ -398,17 +398,29 @@ export class Map {
         }
 
         // River shore
-        groundGfx.beginFill(mapColors.riverbank);
 
         // groundGfx.lineStyle(2, 0xff0000);
 
         for (let i = 0; i < terrain.rivers.length; i++) {
-            tracePath(groundGfx, terrain.rivers[i].shorePoly);
+            if (!terrain.rivers[i].looped) {
+                groundGfx.beginFill(mapColors.riverbank);
+                tracePath(groundGfx, terrain.rivers[i].shorePoly);
+            } else {
+                groundGfx.beginFill(mapColors.lakeRiverbank ?? mapColors.riverbank);
+                tracePath(groundGfx, terrain.rivers[i].shorePoly);
+            }
         }
         groundGfx.endFill();
-        groundGfx.beginFill(mapColors.water);
+
+        // River water
         for (let b = 0; b < terrain.rivers.length; b++) {
-            tracePath(groundGfx, terrain.rivers[b].waterPoly);
+            if (!terrain.rivers[b].looped) {
+                groundGfx.beginFill(mapColors.water);
+                tracePath(groundGfx, terrain.rivers[b].waterPoly);
+            } else {
+                groundGfx.beginFill(mapColors.lakeWater ?? mapColors.water);
+                tracePath(groundGfx, terrain.rivers[b].waterPoly);
+            }
         }
         groundGfx.endFill();
 
@@ -680,9 +692,16 @@ export class Map {
         const groundSurface = (type: string, data: Record<string, any> = {}) => {
             if (type == "water") {
                 const mapColors = this.getMapDef().biome.colors;
-                data.waterColor = data.waterColor !== undefined ? data.waterColor : mapColors.water;
+                const isLake = data.river?.looped ?? false;
+                data.waterColor = data.waterColor !== undefined
+                    ? data.waterColor
+                    : isLake
+                    ? (mapColors.lakeWater ?? mapColors.water)
+                    : mapColors.water;
                 data.rippleColor = data.rippleColor !== undefined
                     ? data.rippleColor
+                    : isLake
+                    ? (mapColors.lakeWaterRipple ?? mapColors.waterRipple)
                     : mapColors.waterRipple;
             }
             return {

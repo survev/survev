@@ -651,6 +651,12 @@ export class GameMap {
 
                 this.riverDescs.push(lake);
                 this.lakeObjs.push(lakeDef.centerObj ?? "");
+                if (lakeDef.riverMaskRad) {
+                    this.riverMasks.push({
+                        pos: lake.center,
+                        rad: lakeDef.riverMaskRad,
+                    });
+                }
                 return true;
             });
         }
