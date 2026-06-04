@@ -55,6 +55,25 @@ export function generateJaggedAabbPoints(
     return points;
 }
 
+export function generateJaggedCirclePoints(
+    center: Vec2,
+    radius: number,
+    divisions: number,
+    variation: number,
+    rand: (typeof util)["random"],
+) {
+    const points: Vec2[] = [];
+    for (let i = 0; i < divisions; i++) {
+        const angle = (i / divisions) * Math.PI * 2;
+        const r = radius + rand(-variation, variation);
+        points.push(v2.create(
+            center.x + Math.cos(angle) * r,
+            center.y + Math.sin(angle) * r,
+        ));
+    }
+    return points;
+}
+
 export function generateTerrain(
     width: number,
     height: number,

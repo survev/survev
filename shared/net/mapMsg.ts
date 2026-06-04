@@ -1,4 +1,5 @@
 import type { MapDef, MapDefKey } from "../defs/mapDefs.ts";
+import type { Collider } from "../utils/coldet.ts";
 import type { MapRiverData } from "../utils/terrainGen.ts";
 import type { Vec2 } from "../utils/v2.ts";
 import { type AbstractMsg, type BitStream, Constants } from "./net.ts";
@@ -35,18 +36,16 @@ function deserializeMapPlaces(s: BitStream): Place {
 }
 
 export interface GroundPatch {
+    bound: Collider;
     color: number;
     roughness: number;
     offsetDist: number;
     order?: number;
     useAsMapShape?: boolean;
-    min: Vec2;
-    max: Vec2;
 }
 
 function serializeMapGroundPatch(s: BitStream, patch: GroundPatch) {
-    s.writeMapPos(patch.min);
-    s.writeMapPos(patch.max);
+    s.writeCollider(patch.bound);
     s.writeUint32(patch.color);
     s.writeFloat32(patch.roughness);
     s.writeFloat32(patch.offsetDist);
@@ -56,8 +55,7 @@ function serializeMapGroundPatch(s: BitStream, patch: GroundPatch) {
 
 function deserializeMapGroundPatch(s: BitStream): GroundPatch {
     return {
-        min: s.readMapPos(),
-        max: s.readMapPos(),
+        bound: s.readCollider(),
         color: s.readUint32(),
         roughness: s.readFloat32(),
         offsetDist: s.readFloat32(),

@@ -100,7 +100,7 @@ export interface BuildingDef {
     botRightObs?: string;
     ignoreMapSpawnReplacement?: boolean;
     mapGroundPatches?: Array<{
-        bound: AABB;
+        bound: Collider;
         color: number;
         order?: number;
         roughness?: number;

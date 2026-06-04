@@ -5,6 +5,7 @@ import { MapObjectDefs } from "../../../shared/defs/register.ts";
 import { MapMsg } from "../../../shared/net/mapMsg.ts";
 import { type ObjectData, ObjectType } from "../../../shared/net/objectSerializeFns.ts";
 import type { LocalDataWithDirty } from "./../../../shared/net/updateMsg.ts";
+import { collider } from "../../../shared/utils/collider.ts";
 import { math } from "../../../shared/utils/math.ts";
 import { util } from "../../../shared/utils/util.ts";
 import { v2, type Vec2 } from "../../../shared/utils/v2.ts";
@@ -333,15 +334,29 @@ export class EditorDisplay {
 
         if (def.mapGroundPatches) {
             for (const patch of def.mapGroundPatches) {
-                this.mapMsg.groundPatches.push({
-                    min: math.addAdjust(pos, patch.bound.min, ori),
-                    max: math.addAdjust(pos, patch.bound.max, ori),
-                    color: patch.color,
-                    roughness: patch.roughness ?? 0,
-                    offsetDist: patch.offsetDist ?? 0,
-                    order: patch.order ?? 0,
-                    useAsMapShape: patch.useAsMapShape ?? true,
-                });
+                if (patch.bound.type === collider.Type.Circle) {
+                    const worldCenter = math.addAdjust(pos, patch.bound.pos, ori);
+                    this.mapMsg.groundPatches.push({
+                        bound: collider.createCircle(worldCenter, patch.bound.rad),
+                        color: patch.color,
+                        roughness: patch.roughness ?? 0,
+                        offsetDist: patch.offsetDist ?? 0,
+                        order: patch.order ?? 0,
+                        useAsMapShape: patch.useAsMapShape ?? true,
+                    });
+                } else {
+                    this.mapMsg.groundPatches.push({
+                        bound: collider.createAabb(
+                            math.addAdjust(pos, patch.bound.min, ori),
+                            math.addAdjust(pos, patch.bound.max, ori),
+                        ),
+                        color: patch.color,
+                        roughness: patch.roughness ?? 0,
+                        offsetDist: patch.offsetDist ?? 0,
+                        order: patch.order ?? 0,
+                        useAsMapShape: patch.useAsMapShape ?? true,
+                    });
+                }
             }
         }
 

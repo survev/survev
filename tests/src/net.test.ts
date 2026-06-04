@@ -3,6 +3,8 @@ import { Main } from "../../shared/defs/maps/baseDefs.ts";
 import { GameConfig, GasMode } from "../../shared/gameConfig.ts";
 import * as net from "../../shared/net/net.ts";
 import { ObjectType } from "../../shared/net/objectSerializeFns.ts";
+import type { AABB, Circle } from "../../shared/utils/coldet.ts";
+import { collider } from "../../shared/utils/collider.ts";
 import { util } from "../../shared/utils/util.ts";
 import { v2 } from "../../shared/utils/v2.ts";
 
@@ -56,13 +58,14 @@ test("Map Msg", () => {
 
     inMsg.groundPatches = Array.from({ length: 100 }, () => {
         return {
+            bound: Math.random() > 0.5
+                ? collider.createCircle(randomPos(), Math.random() * 100)
+                : collider.createAabb(randomPos(), randomPos()),
             color: util.randomInt(0, 1 << 24),
             roughness: Math.random(),
             offsetDist: Math.random(),
             order: util.randomInt(0, (1 << 7) - 1),
             useAsMapShape: false,
-            min: randomPos(),
-            max: randomPos(),
         };
     });
 
@@ -132,15 +135,24 @@ test("Map Msg", () => {
         const a = outMsg.groundPatches[i];
         const b = inMsg.groundPatches[i];
 
+        expect(a.bound.type).toBe(b.bound.type);
+
+        if (a.bound.type === collider.Type.Circle) {
+            const bc = b.bound as Circle;
+            expect(a.bound.pos.x).toBeCloseTo(bc.pos.x, 1);
+            expect(a.bound.pos.y).toBeCloseTo(bc.pos.y, 1);
+            expect(a.bound.rad).toBeCloseTo(bc.rad, 1);
+        } else if (a.bound.type === collider.Type.Aabb) {
+            const ba = b.bound as AABB;
+            expect(a.bound.min.x).toBeCloseTo(ba.min.x, 1);
+            expect(a.bound.max.x).toBeCloseTo(ba.max.x, 1);
+            expect(a.bound.min.y).toBeCloseTo(ba.min.y, 1);
+            expect(a.bound.max.y).toBeCloseTo(ba.max.y, 1);
+        }
+
         expect(a).toStrictEqual({
-            min: {
-                x: expect.closeTo(b.min.x, 1),
-                y: expect.closeTo(b.min.y, 1),
-            },
-            max: {
-                x: expect.closeTo(b.max.x, 1),
-                y: expect.closeTo(b.max.y, 1),
-            },
+            // i THINK you can do this, because it's already being checked to be equal
+            bound: a.bound,
             color: b.color,
             roughness: expect.closeTo(b.roughness, 5),
             offsetDist: expect.closeTo(b.offsetDist, 5),

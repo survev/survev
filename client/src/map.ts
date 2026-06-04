@@ -9,7 +9,11 @@ import { collider } from "../../shared/utils/collider.ts";
 import { mapHelpers } from "../../shared/utils/mapHelpers.ts";
 import { math } from "../../shared/utils/math.ts";
 import type { River } from "../../shared/utils/river.ts";
-import { generateJaggedAabbPoints, generateTerrain } from "../../shared/utils/terrainGen.ts";
+import {
+    generateJaggedAabbPoints,
+    generateJaggedCirclePoints,
+    generateTerrain,
+} from "../../shared/utils/terrainGen.ts";
 import { util } from "../../shared/utils/util.ts";
 import { v2, type Vec2 } from "../../shared/utils/v2.ts";
 import type { Ambiance } from "./ambiance.ts";
@@ -45,20 +49,36 @@ function tracePath(canvas: PIXI.Graphics, path: Vec2[]) {
     canvas.closePath();
 }
 function traceGroundPatch(canvas: PIXI.Graphics, patch: GroundPatch, seed: number) {
-    const width = patch.max.x - patch.min.x;
-    const height = patch.max.y - patch.min.y;
-
     const offset = math.max(patch.offsetDist, 0.001);
     const roughness = patch.roughness;
-
-    const divisionsX = Math.round((width * roughness) / offset);
-    const divisionsY = Math.round((height * roughness) / offset);
-
     const seededRand = util.seededRand(seed);
-    tracePath(
-        canvas,
-        generateJaggedAabbPoints(patch, divisionsX, divisionsY, offset, seededRand),
-    );
+
+    if (patch.bound.type === collider.Type.Circle) {
+        const divisions = Math.round(
+            (2 * Math.PI * patch.bound.rad * roughness) / offset,
+        );
+
+        tracePath(
+            canvas,
+            generateJaggedCirclePoints(
+                patch.bound.pos,
+                patch.bound.rad,
+                divisions,
+                offset,
+                seededRand,
+            ),
+        );
+    } else {
+        const width = patch.bound.max.x - patch.bound.min.x;
+        const height = patch.bound.max.y - patch.bound.min.y;
+        const divisionsX = Math.round((width * roughness) / offset);
+        const divisionsY = Math.round((height * roughness) / offset);
+
+        tracePath(
+            canvas,
+            generateJaggedAabbPoints(patch.bound, divisionsX, divisionsY, offset, seededRand),
+        );
+    }
 }
 
 function renderRiverDebug(river: River, playerPos: Vec2) {

@@ -2020,15 +2020,29 @@ export class GameMap {
         }
 
         for (const patch of def.mapGroundPatches ?? []) {
-            this.msg.groundPatches.push({
-                min: math.addAdjust(pos, patch.bound.min, ori),
-                max: math.addAdjust(pos, patch.bound.max, ori),
-                color: patch.color,
-                roughness: patch.roughness ?? 0,
-                offsetDist: patch.offsetDist ?? 0,
-                order: patch.order ?? 0,
-                useAsMapShape: patch.useAsMapShape ?? true,
-            });
+            if (patch.bound.type === collider.Type.Circle) {
+                const worldCenter = math.addAdjust(pos, patch.bound.pos, ori);
+                this.msg.groundPatches.push({
+                    bound: collider.createCircle(worldCenter, patch.bound.rad),
+                    color: patch.color,
+                    roughness: patch.roughness ?? 0,
+                    offsetDist: patch.offsetDist ?? 0,
+                    order: patch.order ?? 0,
+                    useAsMapShape: patch.useAsMapShape ?? true,
+                });
+            } else {
+                this.msg.groundPatches.push({
+                    bound: collider.createAabb(
+                        math.addAdjust(pos, patch.bound.min, ori),
+                        math.addAdjust(pos, patch.bound.max, ori),
+                    ),
+                    color: patch.color,
+                    roughness: patch.roughness ?? 0,
+                    offsetDist: patch.offsetDist ?? 0,
+                    order: patch.order ?? 0,
+                    useAsMapShape: patch.useAsMapShape ?? true,
+                });
+            }
         }
 
         this.addBounds(building, !!parentId);
