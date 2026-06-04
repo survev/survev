@@ -71,7 +71,7 @@ class ProcessSocket<T> extends ClientSocket<T> {
     }
 }
 
-process.on("message", async (msg: ProcessMsg) => {
+process.on("message", (msg: ProcessMsg) => {
     if (msg.type) {
         lastMsgTime = Date.now();
     }
@@ -88,7 +88,6 @@ process.on("message", async (msg: ProcessMsg) => {
             },
         );
 
-        await game.init();
         sendMsg({
             type: ProcessMsgType.Created,
         });

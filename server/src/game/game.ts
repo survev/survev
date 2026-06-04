@@ -31,7 +31,6 @@ import { PlaneBarn } from "./objects/plane.ts";
 import { Player, PlayerBarn } from "./objects/player.ts";
 import { ProjectileBarn } from "./objects/projectile.ts";
 import { SmokeBarn } from "./objects/smoke.ts";
-import { PluginManager } from "./pluginManager.ts";
 import { Profiler } from "./profiler.ts";
 import type { ClientSocket } from "./socket.ts";
 
@@ -62,7 +61,6 @@ export class Game {
     mapName: string;
     isTeamMode: boolean;
     config: ServerGameConfig;
-    pluginManager = new PluginManager(this);
     modeManager: GameModeManager;
 
     tickTimeWarnThreshold = (1000 / Config.gameTps) * 4;
@@ -161,12 +159,8 @@ export class Game {
                 this.playerBarn.addTeam(i);
             }
         }
-    }
 
-    async init() {
-        await this.pluginManager.loadPlugins();
         this.map.init();
-        this.pluginManager.emit("gameCreated", this);
 
         this.allowJoin = true;
         this.logger.info(`Created in ${Date.now() - this.start} ms`);

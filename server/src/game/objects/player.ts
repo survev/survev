@@ -262,7 +262,6 @@ export class PlayerBarn {
             this.livingPlayers.sort((a, b) => a.teamId - b.teamId);
         }
         this.aliveCountDirty = true;
-        this.game.pluginManager.emit("playerJoin", player);
 
         this.game.updateData();
     }
@@ -1793,7 +1792,6 @@ export class Player extends BaseGameObject {
 
                         target.setDirty();
                         target.setGroupStatuses();
-                        this.game.pluginManager.emit("playerRevived", target);
                     });
                 }
 
@@ -2921,8 +2919,6 @@ export class Player extends BaseGameObject {
             }
         }
 
-        this.game.pluginManager.emit("playerDamage", { ...params, player: this });
-
         this.damageTaken += finalDamage;
         if (playerSource && params.source !== this) {
             if (playerSource.groupId !== this.groupId) {
@@ -3297,8 +3293,6 @@ export class Player extends BaseGameObject {
                 this.removeRole();
             }
         }
-
-        this.game.pluginManager.emit("playerKill", { ...params, player: this });
 
         //
         // Give spectators someone new to spectate
