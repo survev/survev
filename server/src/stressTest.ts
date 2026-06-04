@@ -1,4 +1,4 @@
-import assert from "assert";
+import assert from "node:assert";
 import { EmotesDefs } from "../../shared/defs/gameObjects/emoteDefs.ts";
 import { MeleeDefs } from "../../shared/defs/gameObjects/meleeDefs.ts";
 import { OutfitDefs } from "../../shared/defs/gameObjects/outfitDefs.ts";

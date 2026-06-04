@@ -1,11 +1,11 @@
 import { serve } from "@hono/node-server";
 import { createNodeWebSocket } from "@hono/node-ws";
 import { Cron } from "croner";
-import { randomUUID } from "crypto";
 import { Hono } from "hono";
 import { getCookie } from "hono/cookie";
 import { cors } from "hono/cors";
 import { HTTPException } from "hono/http-exception";
+import { randomUUID } from "node:crypto";
 import pkgJson from "../../../package.json" with { type: "json" };
 import { type FindGameResponse, type SiteInfoRes, zFindGameBody } from "../../../shared/types/api.ts";
 import { Config } from "../config.ts";

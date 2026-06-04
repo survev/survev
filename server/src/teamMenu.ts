@@ -1,7 +1,7 @@
-import { randomUUID } from "crypto";
 import type { Hono } from "hono";
 import { getCookie } from "hono/cookie";
 import type { UpgradeWebSocket, WSContext } from "hono/ws";
+import { randomUUID } from "node:crypto";
 import type { FindGameError } from "../../shared/types/api.ts";
 import {
     type ClientRoomData,

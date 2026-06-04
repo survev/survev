@@ -55,16 +55,14 @@ export const loadout = {
             return val;
         };
         const mergedLoadout = {
-            ...{
-                crosshair: {
-                    type: "",
-                    color: 0xffffff,
-                    size: 1,
-                    stroke: 0,
-                },
-                emotes: [],
+            crosshair: {
+                type: "",
+                color: 0xffffff,
+                size: 1,
+                stroke: 0,
             },
-            ...userLoadout,
+            emotes: [],
+            ...userLoadout as Partial<Loadout>,
         } as Loadout;
         const validatedLoadout: Loadout = {
             outfit: getGameType("outfit", mergedLoadout.outfit, "outfitBase"),
@@ -106,13 +104,16 @@ export const loadout = {
             }
             return "";
         };
-        const newLoadout: Loadout = {
-            ...{
-                crosshair: {},
-                emotes: [],
+        const newLoadout = {
+            crosshair: {
+                type: "",
+                color: 0xffffff,
+                size: 1,
+                stroke: 0,
             },
-            ...userLoadout,
-        };
+            emotes: [],
+            ...userLoadout as Partial<Loadout>,
+        } as Loadout;
         const itemsToCheck = ["outfit", "melee", "heal", "boost", "player_icon"] as const;
 
         itemsToCheck.forEach((item) => {

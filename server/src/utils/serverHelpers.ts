@@ -1,6 +1,6 @@
 import type { Context } from "hono";
 import { hc } from "hono/client";
-import { isIP } from "net";
+import { isIP } from "node:net";
 import { DataSet, englishDataset, englishRecommendedTransformers, pattern, RegExpMatcher } from "obscenity";
 import ProxyCheck, { type IPAddressInfo } from "proxycheck-ts";
 import type { HttpRequest, HttpResponse } from "uWebSockets.js";

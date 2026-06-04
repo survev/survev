@@ -1,5 +1,5 @@
-import { type ChildProcess, fork } from "child_process";
-import { randomUUID } from "crypto";
+import { type ChildProcess, fork } from "node:child_process";
+import { randomUUID } from "node:crypto";
 import type { WebSocket } from "uWebSockets.js";
 import { type MapDef, MapDefs } from "../../../shared/defs/mapDefs.ts";
 import type { TeamMode } from "../../../shared/gameConfig.ts";

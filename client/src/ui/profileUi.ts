@@ -397,10 +397,8 @@ export class ProfileUi {
 
     showLoginMenu(opts: { modal?: boolean; link?: boolean }) {
         opts = {
-            ...{
-                modal: false,
-                link: false,
-            },
+            modal: false,
+            link: false,
             ...opts,
         };
 

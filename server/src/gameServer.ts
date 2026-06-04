@@ -1,5 +1,5 @@
 import { Cron } from "croner";
-import { randomUUID } from "crypto";
+import { randomUUID } from "node:crypto";
 import { existsSync } from "node:fs";
 import fs from "node:fs/promises";
 import path from "node:path";

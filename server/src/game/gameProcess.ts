@@ -1,5 +1,5 @@
 import NanoTimer from "nanotimer";
-import { platform } from "os";
+import { platform } from "node:os";
 import { Config } from "../config.ts";
 import { logErrorToWebhook } from "../utils/serverHelpers.ts";
 import { type ProcessMsg, ProcessMsgType } from "../utils/types.ts";
