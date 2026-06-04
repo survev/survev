@@ -1387,6 +1387,19 @@ export class Game {
                     this.m_uiManager.setLocalKills(msg.killerKills);
                 }
 
+                if (this.m_map.factionMode) {
+                    if (targetInfo.teamId == 1) {
+                        targetName = this.m_ui2Manager.colorKillFeedName(targetName, "#007EFF");
+                    } else {
+                        targetName = this.m_ui2Manager.colorKillFeedName(targetName, "#CC0000");
+                    }
+                    if (killerInfo.teamId == 1) {
+                        killfeedKillerName = this.m_ui2Manager.colorKillFeedName(killfeedKillerName, "#007EFF");
+                    } else {
+                        killfeedKillerName = this.m_ui2Manager.colorKillFeedName(killfeedKillerName, "#CC0000");
+                    }
+                }
+
                 // Add killfeed entry for this kill
                 const killText = this.m_ui2Manager.getKillFeedText(
                     targetName,

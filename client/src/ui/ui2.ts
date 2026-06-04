@@ -1380,15 +1380,19 @@ export class UiManager2 {
         return "";
     }
 
-    addKillFeedMessage(text: string, color: string) {
+    addKillFeedMessage(html: string, color: string) {
         const killFeed = this.newState.killFeed;
         const oldest = killFeed[killFeed.length - 1];
-        oldest.text = text;
+        oldest.text = html;
         oldest.color = color;
         oldest.ticker = 0;
         killFeed.sort((a, b) => {
             return a.ticker - b.ticker;
         });
+    }
+
+    colorKillFeedName(name: string, color: string) {
+        return `<span style="color: ${color};">${name}</span>`;
     }
 
     getKillFeedText(
