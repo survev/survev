@@ -83,7 +83,7 @@ class GameProcess implements GameData {
                         this.created = false;
                     }
                     break;
-                case ProcessMsgType.SocketMsg:
+                case ProcessMsgType.ServerSocketMsg:
                     for (let i = 0; i < msg.msgs.length; i++) {
                         const socketMsg = msg.msgs[i];
                         const socket = this.manager.sockets.get(socketMsg.socketId);
@@ -143,16 +143,19 @@ class GameProcess implements GameData {
         this.avaliableSlots--;
     }
 
-    handleMsg(data: ArrayBuffer, socketId: string, ip: string) {
+    handleSocketOpen(socketId: string, ip: string) {
         this.send({
-            type: ProcessMsgType.SocketMsg,
-            msgs: [
-                {
-                    socketId,
-                    data,
-                    ip,
-                },
-            ],
+            type: ProcessMsgType.SocketOpen,
+            socketId,
+            ip,
+        });
+    }
+
+    handleMsg(data: ArrayBuffer, socketId: string) {
+        this.send({
+            type: ProcessMsgType.ClientSocketMsg,
+            socketId,
+            data,
         });
     }
 
@@ -329,12 +332,13 @@ export class GameProcessManager {
             return;
         }
         this.sockets.set(socketId, socket);
+        this.processById.get(data.gameId)?.handleSocketOpen(socketId, data.ip);
     }
 
     onMsg(socketId: string, msg: ArrayBuffer): void {
         const data = this.sockets.get(socketId)?.getUserData();
         if (!data) return;
-        this.processById.get(data.gameId)?.handleMsg(msg, socketId, data.ip);
+        this.processById.get(data.gameId)?.handleMsg(msg, socketId);
     }
 
     onClose(socketId: string) {

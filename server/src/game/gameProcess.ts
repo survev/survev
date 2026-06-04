@@ -99,21 +99,19 @@ process.on("message", (msg: ProcessMsg) => {
         case ProcessMsgType.AddJoinToken:
             game.addJoinTokens(msg.tokens, msg.autoFill);
             break;
-        case ProcessMsgType.SocketMsg: {
-            const sMsg = msg.msgs[0];
-            let socket = socketIdToSocket.get(sMsg.socketId);
-            if (!socket) {
-                socket = new ProcessSocket(sMsg.socketId, sMsg.ip);
-                socketIdToSocket.set(sMsg.socketId, socket);
-            }
-            game.handleMsg(sMsg.data as ArrayBuffer, socket);
+        case ProcessMsgType.SocketOpen: {
+            const socket = new ProcessSocket<Player | undefined>(msg.socketId, msg.ip);
+            socketIdToSocket.set(msg.socketId, socket);
+            break;
+        }
+        case ProcessMsgType.ClientSocketMsg: {
+            let socket = socketIdToSocket.get(msg.socketId)!;
+            game.handleMsg(msg.data as ArrayBuffer, socket);
             break;
         }
         case ProcessMsgType.SocketClose: {
-            const socket = socketIdToSocket.get(msg.socketId);
-            if (socket) {
-                game.handleSocketClose(socket);
-            }
+            const socket = socketIdToSocket.get(msg.socketId)!;
+            game.handleSocketClose(socket);
             socketIdToSocket.delete(msg.socketId);
             break;
         }
@@ -150,7 +148,7 @@ if (platform() === "win32") {
         () => {
             game?.netSync();
             sendMsg({
-                type: ProcessMsgType.SocketMsg,
+                type: ProcessMsgType.ServerSocketMsg,
                 msgs: socketMsgs,
             });
             socketMsgs.length = 0;
@@ -166,7 +164,7 @@ if (platform() === "win32") {
     setInterval(() => {
         game?.netSync();
         sendMsg({
-            type: ProcessMsgType.SocketMsg,
+            type: ProcessMsgType.ServerSocketMsg,
             msgs: socketMsgs,
         });
         socketMsgs.length = 0;
