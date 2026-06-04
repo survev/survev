@@ -52,7 +52,6 @@ export class Game {
     stopped = false;
     // for debug
     preventStart = false;
-    allowJoin = false;
     over = false;
     startedTime = 0;
     stopTicker = 0;
@@ -162,14 +161,13 @@ export class Game {
 
         this.map.init();
 
-        this.allowJoin = true;
         this.logger.info(`Created in ${Date.now() - this.start} ms`);
 
         this.updateData();
     }
 
     update(dt?: number) {
-        if (!this.allowJoin) return;
+        if (this.stopped) return;
         this.profiler.flush();
 
         const now = performance.now();
@@ -289,7 +287,7 @@ export class Game {
     }
 
     netSync() {
-        if (!this.allowJoin) return;
+        if (this.stopped) return;
 
         const start = performance.now();
 
@@ -594,7 +592,6 @@ export class Game {
     stop() {
         if (this.stopped) return;
         this.stopped = true;
-        this.allowJoin = false;
         for (const player of this.playerBarn.players) {
             if (!player.disconnected) {
                 player.disconnect();
