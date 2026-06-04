@@ -239,14 +239,6 @@ export interface ConfigType {
         SURVEV_API_KEY: string;
 
         /**
-         * Used to encrypt the loadout before sending it to the client, So the game server can read it back.
-         *
-         * Should be 32 bytes base64 string, a default one can be generated when running the setup script.
-         * Can also run `openssl rand -base64 32` to generate one
-         */
-        SURVEV_LOADOUT_SECRET: string;
-
-        /**
          * Used to encode IP addresses on the database
          */
         SURVEV_IP_SECRET: string;

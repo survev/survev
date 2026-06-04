@@ -56,7 +56,6 @@ export function getConfig(isProduction: boolean, dir: string) {
         oauthBasePath: "/",
         secrets: {
             SURVEV_API_KEY: "",
-            SURVEV_LOADOUT_SECRET: "",
             SURVEV_IP_SECRET: "",
         },
         captchaEnabled: false,
@@ -88,7 +87,6 @@ export function getConfig(isProduction: boolean, dir: string) {
             // always specify default random keys..
             secrets: {
                 SURVEV_API_KEY: randomBytes(64).toString("base64"),
-                SURVEV_LOADOUT_SECRET: randomBytes(32).toString("base64"),
                 SURVEV_IP_SECRET: randomBytes(32).toString("base64"),
             },
         };
