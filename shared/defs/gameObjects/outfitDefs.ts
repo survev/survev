@@ -1166,6 +1166,25 @@ const SkinDefs: Record<string, OutfitDef> = {
             tint: 0xffffff,
         },
     }),
+    outfitNordCode: defineOutfitSkin("outfitBase", { //philipp and g0dak special DO NOT USE FOR PASS
+        name: "Nord Code",
+        rarity: Rarity.Mythic,
+        lore: "This duo never died.",
+        skinImg: {
+            baseTint: 0xffffff,
+            baseSprite: "player-base-outfitNordCode.img",
+            handTint: 0x7D7C7C,
+            handSprite: "player-hands-02.img",
+            footTint: 0x7D7C7C,
+            footSprite: "player-feet-02.img",
+            backpackTint: 0x672f0a,
+            backpackSprite: "player-circle-base-01.img",
+        },
+        lootImg: {
+            sprite: "loot-shirt-outfitNordCode.img",
+            tint: 0xffffff,
+        },
+    }),
 
 
     // Obstacle costumes

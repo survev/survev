@@ -67,6 +67,7 @@ export const _allowedOutfits = [
     "outfitBeachCamo",
     "outfitWave",
     "outfitCoconut",
+    "outfitNordCode",
 ];
 export const _allowedEmotes = [
     "emote_thumbsup",
