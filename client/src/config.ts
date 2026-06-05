@@ -87,6 +87,7 @@ const defaultConfig = {
     localRotation: false,
     screenShake: true,
     anonPlayerNames: false,
+    autoDownloadStats: false,
     touchMoveStyle: "anywhere" as "locked" | "anywhere",
     touchAimStyle: "anywhere" as "locked" | "anywhere",
     touchAimLine: true,
