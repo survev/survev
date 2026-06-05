@@ -1170,6 +1170,7 @@ const SkinDefs: Record<string, OutfitDef> = {
         name: "Nord Code",
         rarity: Rarity.Mythic,
         lore: "This duo never died.",
+        noDropOnDeath: true,
         skinImg: {
             baseTint: 0xffffff,
             baseSprite: "player-base-outfitNordCode.img",
