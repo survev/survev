@@ -15,102 +15,106 @@ import {
     type ServerGameConfig,
 } from "../utils/types.ts";
 
-let path: string;
+let procFile: string;
 if (process.env.NODE_ENV === "production") {
-    path = "dist/gameProcess.js";
+    procFile = "dist/gameProcess.js";
 } else {
-    path = "src/game/gameProcess.ts";
+    procFile = "src/game/gameProcess.ts";
 }
 
-class GameProcess implements GameData {
+enum ProcState {
+    Idle,
+    CreatingGame,
+    Running,
+}
+
+class GameProcess {
     process: ChildProcess;
 
-    canJoin = true;
-    creating = false;
-    teamMode: TeamMode = 1;
-    mapName = "";
-    id = "";
-    aliveCount = 0;
-    startedTime = 0;
-    stopped = true;
-    created = false;
+    gameData: GameData = {
+        id: "",
+        teamMode: 0 as TeamMode,
+        mapName: "",
+        canJoin: false,
+        aliveCount: 0,
+        startedTime: 0,
+        stopped: false,
+    };
+
+    state = ProcState.Idle;
+
+    stoppedTime = Date.now();
+    lastMsgTime = Date.now();
 
     manager: GameProcessManager;
 
     onCreatedCbs: Array<(_proc: typeof this) => void> = [];
 
-    lastMsgTime = Date.now();
-
-    stoppedTime = Date.now();
-
     avaliableSlots = 0;
 
     constructor(manager: GameProcessManager, id: string, config: ServerGameConfig) {
         this.manager = manager;
-        this.process = fork(path, [], {
+        this.process = fork(procFile, [], {
             serialization: "advanced",
         });
 
         this.process.on("message", (msg: ProcessMsg) => {
-            if (msg.type) {
-                this.lastMsgTime = Date.now();
-            }
-
-            switch (msg.type) {
-                case ProcessMsgType.Created:
-                    this.created = true;
-                    this.stopped = false;
-                    this.creating = false;
-                    for (const cb of this.onCreatedCbs) {
-                        cb(this);
-                    }
-                    this.onCreatedCbs.length = 0;
-                    break;
-                case ProcessMsgType.UpdateData:
-                    this.canJoin = msg.canJoin;
-                    this.teamMode = msg.teamMode;
-                    this.mapName = msg.mapName;
-                    if (this.id !== msg.id) {
-                        this.manager.processById.delete(this.id);
-                        this.id = msg.id;
-                        this.manager.processById.set(this.id, this);
-                    }
-                    this.aliveCount = msg.aliveCount;
-                    this.startedTime = msg.startedTime;
-                    this.stopped = msg.stopped;
-                    if (this.stopped) {
-                        this.stoppedTime = Date.now();
-                        this.created = false;
-                    }
-                    break;
-                case ProcessMsgType.ServerSocketMsg:
-                    for (let i = 0; i < msg.msgs.length; i++) {
-                        const socketMsg = msg.msgs[i];
-                        const socket = this.manager.sockets.get(socketMsg.socketId);
-
-                        if (!socket) continue;
-                        if (socket.getUserData().closed) continue;
-                        socket.send(socketMsg.data, true, false);
-                    }
-                    break;
-                case ProcessMsgType.SocketClose:
-                    const socket = this.manager.sockets.get(msg.socketId);
-                    if (socket && !socket.getUserData().closed) {
-                        if (msg.reason) {
-                            const disconnectMsg = new net.DisconnectMsg();
-                            disconnectMsg.reason = msg.reason;
-                            const stream = new net.MsgStream(new ArrayBuffer(128));
-                            stream.serializeMsg(net.MsgType.Disconnect, disconnectMsg);
-                            socket.send(stream.getBuffer(), true, false);
-                        }
-
-                        socket.close();
-                    }
-                    break;
-            }
+            this._onProcessMsg(msg);
         });
 
         this.create(id, config);
+    }
+
+    private _onProcessMsg(msg: ProcessMsg) {
+        if (msg.type) {
+            this.lastMsgTime = Date.now();
+        }
+
+        switch (msg.type) {
+            case ProcessMsgType.Created:
+                this.state = ProcState.Running;
+                for (const cb of this.onCreatedCbs) {
+                    cb(this);
+                }
+                this.onCreatedCbs.length = 0;
+                break;
+            case ProcessMsgType.UpdateData:
+                if (this.gameData.id !== msg.id) {
+                    this.manager.processById.delete(this.gameData.id);
+                    this.gameData.id = msg.id;
+                    this.manager.processById.set(this.gameData.id, this);
+                }
+                this.gameData = msg;
+                if (this.gameData.stopped) {
+                    this.stoppedTime = Date.now();
+                    this.state = ProcState.Idle;
+                }
+                break;
+            case ProcessMsgType.ServerSocketMsg:
+                for (let i = 0; i < msg.msgs.length; i++) {
+                    const socketMsg = msg.msgs[i];
+                    const socket = this.manager.sockets.get(socketMsg.socketId);
+
+                    if (!socket) continue;
+                    if (socket.getUserData().closed) continue;
+                    socket.send(socketMsg.data, true, false);
+                }
+                break;
+            case ProcessMsgType.SocketClose:
+                const socket = this.manager.sockets.get(msg.socketId);
+                if (socket && !socket.getUserData().closed) {
+                    if (msg.reason) {
+                        const disconnectMsg = new net.DisconnectMsg();
+                        disconnectMsg.reason = msg.reason;
+                        const stream = new net.MsgStream(new ArrayBuffer(128));
+                        stream.serializeMsg(net.MsgType.Disconnect, disconnectMsg);
+                        socket.send(stream.getBuffer(), true, false);
+                    }
+
+                    socket.close();
+                }
+                break;
+        }
     }
 
     send(msg: ProcessMsg) {
@@ -124,13 +128,13 @@ class GameProcess implements GameData {
             id,
             config,
         });
-        this.id = id;
-        this.teamMode = config.teamMode;
-        this.mapName = config.mapName;
-        this.stopped = false;
-        this.creating = true;
+        this.gameData.id = id;
+        this.gameData.teamMode = config.teamMode;
+        this.gameData.mapName = config.mapName;
+        this.gameData.stopped = false;
+        this.state = ProcState.CreatingGame;
 
-        const mapDef = MapDefs[this.mapName as keyof typeof MapDefs] as MapDef;
+        const mapDef = MapDefs[this.gameData.mapName as keyof typeof MapDefs] as MapDef;
         this.avaliableSlots = mapDef.gameMode.maxPlayers;
     }
 
@@ -191,19 +195,19 @@ export class GameProcessManager {
                 if (Date.now() - gameProc.lastMsgTime > 10000) {
                     this.logger.warn(
                         `Process ${gameProc.process.pid} - #${
-                            gameProc.id.substring(0, 4)
+                            gameProc.gameData.id.substring(0, 4)
                         } did not send a message in more 10 seconds, killing`,
                     );
                     // sigquit can dump a core of the process
                     // useful for debugging infinite loops
                     this.killProcess(gameProc, "SIGQUIT");
                 } else if (
-                    gameProc.stopped
+                    gameProc.gameData.stopped
                     && Date.now() - gameProc.stoppedTime > 60000
                 ) {
                     this.logger.warn(
                         `Process ${gameProc.process.pid} - #${
-                            gameProc.id.substring(0, 4)
+                            gameProc.gameData.id.substring(0, 4)
                         } stopped more than a minute ago, killing`,
                     );
                     this.killProcess(gameProc);
@@ -214,7 +218,7 @@ export class GameProcessManager {
 
     getPlayerCount(): number {
         return this.processes.reduce((a, b) => {
-            return a + b.aliveCount;
+            return a + b.gameData.aliveCount;
         }, 0);
     }
 
@@ -223,7 +227,7 @@ export class GameProcessManager {
 
         for (let i = 0; i < this.processes.length; i++) {
             const p = this.processes[i];
-            if (p.stopped) {
+            if (p.gameData.stopped) {
                 gameProc = p;
                 break;
             }
@@ -246,7 +250,7 @@ export class GameProcessManager {
             });
             this.logger.info("Created new process with PID", gameProc.process.pid);
         } else {
-            this.processById.delete(gameProc.id);
+            this.processById.delete(gameProc.gameData.id);
             gameProc.create(id, config);
         }
 
@@ -255,18 +259,11 @@ export class GameProcessManager {
         return gameProc;
     }
 
-    commitProcessGenocide() {
-        for (const proc of this.processes) {
-            this.killProcess(proc);
-        }
-    }
-
     killProcess(gameProc: GameProcess, signal: NodeJS.Signals = "SIGTERM"): void {
         for (const [, socket] of this.sockets) {
             const data = socket.getUserData();
             if (data.closed) continue;
-            if (data.gameId !== gameProc.id) continue;
-            this.logger.warn(`Closing socket for ${gameProc.id}`);
+            if (data.gameId !== gameProc.gameData.id) continue;
             socket.close();
         }
 
@@ -279,29 +276,30 @@ export class GameProcessManager {
         }, 5000);
 
         util.removeFrom(this.processes, gameProc);
-        this.processById.delete(gameProc.id);
+        this.processById.delete(gameProc.gameData.id);
     }
 
-    getById(id: string): GameData | undefined {
+    getById(id: string): GameProcess | undefined {
         return this.processById.get(id);
     }
 
-    async findGame(body: FindGamePrivateBody): Promise<string> {
-        let game = this.processes
+    async findGame(body: FindGamePrivateBody): Promise<GameProcess> {
+        let proc = this.processes
             .filter((proc) => {
+                const game = proc.gameData;
                 return (
-                    (proc.canJoin || proc.creating)
+                    (game.canJoin || proc.state === ProcState.CreatingGame)
                     && proc.avaliableSlots > 0
-                    && proc.teamMode === body.teamMode
-                    && proc.mapName === body.mapName
+                    && game.teamMode === body.teamMode
+                    && game.mapName === body.mapName
                 );
             })
             .sort((a, b) => {
-                return a.startedTime - b.startedTime;
+                return a.gameData.startedTime - b.gameData.startedTime;
             })[0];
 
-        if (!game) {
-            game = this.newGame({
+        if (!proc) {
+            proc = this.newGame({
                 teamMode: body.teamMode,
                 mapName: body.mapName as keyof typeof MapDefs,
             });
@@ -309,18 +307,18 @@ export class GameProcessManager {
 
         // if the game has not finished creating
         // wait for it to be created to send the find game response
-        if (!game.created) {
+        if (proc.state !== ProcState.Running) {
             return await new Promise((resolve) => {
-                game.onCreatedCbs.push((game) => {
-                    game.addJoinTokens(body.playerData, body.autoFill);
-                    resolve(game.id);
+                proc.onCreatedCbs.push((proc) => {
+                    proc.addJoinTokens(body.playerData, body.autoFill);
+                    resolve(proc);
                 });
             });
         }
 
-        game.addJoinTokens(body.playerData, body.autoFill);
+        proc.addJoinTokens(body.playerData, body.autoFill);
 
-        return game.id;
+        return proc;
     }
 
     onOpen(socketId: string, socket: WebSocket<GameSocketData>): void {

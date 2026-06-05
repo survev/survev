@@ -68,7 +68,7 @@ class GameServer {
             };
         }
 
-        const gameId = await this.manager.findGame({
+        const game = await this.manager.findGame({
             region: data.region,
             version: data.version,
             autoFill: data.autoFill,
@@ -78,7 +78,7 @@ class GameServer {
         });
 
         return {
-            gameId,
+            gameId: game.gameData.id,
             useHttps: this.region.https,
             hosts: [this.region.address],
             addrs: [this.region.address],
@@ -272,15 +272,15 @@ app.ws<GameSocketData>("/play", {
             forbidden(res);
             return;
         }
-        const gameData = server.manager.getById(gameId);
+        const proc = server.manager.getById(gameId);
 
-        if (!gameData) {
+        if (!proc) {
             server.logger.warn("invalid_game_id");
             forbidden(res);
             return;
         }
 
-        if (!gameData.canJoin) {
+        if (!proc.gameData.canJoin) {
             server.logger.warn("game_started");
             forbidden(res);
             return;
