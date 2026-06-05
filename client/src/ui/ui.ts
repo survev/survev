@@ -255,6 +255,7 @@ export class UiManager {
     muteOnImg = "audio-on.img";
 
     displayingStats = false;
+    statsDownloaded = false;
     teamMemberHealthBarWidth!: number;
 
     teamMemberHeight = 48;
@@ -400,6 +401,11 @@ export class UiManager {
             e.stopPropagation();
         });
         $("#btn-game-quit").on("click", () => {
+            if (this.displayingStats && !this.statsDownloaded && this.game.m_config.get("autoDownloadStats")) {
+                if (!confirm("The game is still ongoing – leave anyway? Stats will be incomplete.")) {
+                    return;
+                }
+            }
             this.game.m_updatePass = true;
             this.game.m_updatePassDelay = 1;
             this.quitGame();
@@ -1452,11 +1458,31 @@ export class UiManager {
         ui2: UiManager2,
     ) {
 
-        if(spectator) {
+        if(spectator && !gameOver) {
             console.log("Player is spectating");
             this.beginSpectating();
             return;
         }
+
+        this.statsDownloaded = false;
+        const doDownload = () => {
+            const headers = "Name,Rank,Kills,Damage Dealt,Damage Taken,Time Alive,Elo Gained\n";
+            const statsData = headers + playerStats.map(stats => {
+                const playerInfo = playerBarn.getPlayerInfo(stats.playerId);
+                return `${playerInfo.name},${stats.rank},${stats.kills},${stats.damageDealt},${stats.damageTaken},${humanizeTime(stats.timeAlive)}`;
+            }).join("\n");
+            const now = new Date();
+            const fileName = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, "0")}-${String(now.getDate()).padStart(2, "0")}-${String(now.getHours()).padStart(2, "0")}-${String(now.getMinutes()).padStart(2, "0")}-${String(now.getSeconds()).padStart(2, "0")}_stats.csv`;
+            const blob = new Blob([statsData], { type: "text/csv;charset=utf-8" });
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement("a");
+            a.href = url;
+            a.download = fileName;
+            a.click();
+            window.URL.revokeObjectURL(url);
+            this.statsDownloaded = true;
+        };
+
         console.log("BetterStats:", betterStats);
         // If we're spectating a team that's not our own, and the game isn't over yet,
         // don't display the stats screen again.
@@ -1611,6 +1637,11 @@ export class UiManager {
                     html: this.localization.translate("game-play-new-game"),
                 });
                 restartButton.on("click", () => {
+                    if (!gameOver && !this.statsDownloaded && this.game.m_config.get("autoDownloadStats")) {
+                        if (!confirm("The game is still ongoing – leave anyway? Stats will be incomplete.")) {
+                            return;
+                        }
+                    }
                     SDK.requestFullscreenAd(() => {
                         this.quitGame();
                     });
@@ -1791,12 +1822,17 @@ export class UiManager {
                 const statsOptions = $("<div/>", {
                     id: "ui-stats-options",
                 });
-        
+
                 const restartButton = $("<a/>", {
                     class: "ui-stats-restart btn-green btn-darken menu-option",
                     html: this.localization.translate("game-play-new-game"),
                 });
                 restartButton.on("click", () => {
+                    if (!gameOver && !this.statsDownloaded && this.game.m_config.get("autoDownloadStats")) {
+                        if (!confirm("The game is still ongoing – leave anyway? Stats will be incomplete.")) {
+                            return;
+                        }
+                    }
                     this.quitGame();
                 });
         
@@ -1863,35 +1899,12 @@ export class UiManager {
                 });
                 
                 
-                downloadButton.on("click", () => {
-
-                    const headers = "Name,Rank,Kills,Damage Dealt,Damage Taken,Time Alive,Elo Gained\n";
-
-                    const statsData = headers + playerStats.map(stats => {
-                        const playerInfo = playerBarn.getPlayerInfo(stats.playerId);
-                        return `${playerInfo.name},${stats.rank},${stats.kills},${stats.damageDealt},${stats.damageTaken},${humanizeTime(stats.timeAlive)}`;
-                    }).join("\n");
-
-                    const now = new Date();
-                    const year = now.getFullYear();
-                    const month = String(now.getMonth() + 1).padStart(2, '0'); // Months are zero-based
-                    const day = String(now.getDate()).padStart(2, '0');
-                    const hours = String(now.getHours()).padStart(2, '0');
-                    const minutes = String(now.getMinutes()).padStart(2, '0');
-                    const seconds = String(now.getSeconds()).padStart(2, '0');
-
-                    // Format the file name
-                    const fileName = `${year}-${month}-${day}-${hours}-${minutes}-${seconds}_stats.csv`;
-
-                    const blob = new Blob([statsData], { type: "text/csv;charset=utf-8" });
-                    const url = window.URL.createObjectURL(blob);
-                    const a = document.createElement("a");
-                    a.href = url;
-                    a.download = fileName;
-                    a.click();
-                    window.URL.revokeObjectURL(url);
-                });
+                downloadButton.on("click", () => doDownload());
                 statsOptions.append(downloadButton);
+
+                if (gameOver && this.game.m_config.get("autoDownloadStats")) {
+                    doDownload();
+                }
         
                 statsOptions.append(restartButton);
                 tableContainer.append(statsOptions);
