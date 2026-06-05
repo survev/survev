@@ -10,6 +10,7 @@ import type { FindGamePrivateBody, FindGamePrivateRes } from "../utils/types";
 class Region {
     data: (typeof Config)["regions"][string];
     playerCount = 0;
+    verifiedOnly = false;
 
     lastUpdateTime = Date.now();
 
@@ -68,6 +69,12 @@ class Region {
     async sendDashboardGameCmd(gameId: string, cmd: object): Promise<boolean> {
         const data = await this.fetch<{ ok: boolean }>("api/dashboard/game_cmd", { gameId, cmd });
         return data?.ok ?? false;
+    }
+
+    /** Sets verified-only mode on all games (running + future) on this region's game server. */
+    async setServerVerified(state: boolean): Promise<void> {
+        this.verifiedOnly = state;
+        await this.fetch("api/dashboard/set_server_verified", { state });
     }
 
     async findGameById(gameId: string, admin: boolean,): Promise<any> {
@@ -178,6 +185,11 @@ export class ApiServer {
     /** Sends an admin command to a running game in the given region. */
     async sendDashboardGameCmd(region: string, gameId: string, cmd: object): Promise<boolean> {
         return (await this.regions[region]?.sendDashboardGameCmd(gameId, cmd)) ?? false;
+    }
+
+    /** Sets verified-only mode on all games (running + future) in the given region. */
+    async setServerVerified(region: string, state: boolean): Promise<void> {
+        await this.regions[region]?.setServerVerified(state);
     }
 
     async refreshRegionModes() {

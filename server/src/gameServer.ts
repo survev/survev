@@ -85,6 +85,10 @@ class GameServer {
             playerData: data.playerData,
         });
 
+        if (gameId === "player_not_verified") {
+            return { error: "player_not_verified" };
+        }
+
         return {
             gameId,
             useHttps: this.region.https,
@@ -474,6 +478,7 @@ app.post("/api/game_infos", async (res, req) => {
                     playerNames: "",
                     runtime: g.startedTime,
                     stopped: g.stopped ?? false,
+                    verifiedOnly: g.verifiedOnly ?? false,
                 })).filter((g: any) => g.id);
 
                 returnJson(res, { data });
@@ -641,6 +646,24 @@ app.post("/api/dashboard/game_cmd", (res, req) => {
             return;
         }
         server.manager.sendAdminCmd(gameId, cmd);
+        returnJson(res, { ok: true });
+    }, () => {
+        if (!res.aborted) returnJson(res, { error: "body error" });
+    });
+});
+
+/** Sets verified-only mode on all running games and all future games on this server. */
+app.post("/api/dashboard/set_server_verified", (res, req) => {
+    res.onAborted(() => { res.aborted = true; });
+
+    if (req.getHeader("survev-api-key") !== Config.secrets.SURVEV_API_KEY) {
+        forbidden(res);
+        return;
+    }
+
+    readPostedJSON(res, (body: any) => {
+        if (res.aborted) return;
+        server.manager.setServerVerified(!!body?.state);
         returnJson(res, { ok: true });
     }, () => {
         if (!res.aborted) returnJson(res, { error: "body error" });

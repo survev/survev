@@ -255,6 +255,7 @@ export const dashboardHtml = `<!DOCTYPE html>
       <!-- Game-level action buttons -->
       <div id="game-actions">
         <button class="btn btn-green  btn-sm" id="ga-verify">VERIFY LOBBY</button>
+        <button class="btn btn-red    btn-sm" id="ga-unverify">UNVERIFY LOBBY</button>
         <button class="btn btn-orange btn-sm" id="ga-freeze">FREEZE</button>
         <button class="btn btn-gray   btn-sm" id="ga-unfreeze">UNFREEZE</button>
         <button class="btn btn-blue   btn-sm" id="ga-announce-open">ANNOUNCEMENT</button>
@@ -358,6 +359,7 @@ let currentAdminId   = '';    // own userId (for "YOU" badge + hide self-buttons
 let currentAdminSlug = '';    // own slug (shown as sender in announcements)
 let activeGameRegion = '';    // region of the selected game
 let activeGameId     = '';    // id of the selected game
+let activeGameVerified = false; // verified-only state of the selected game
 let msgTargetName    = '';    // player being DM'd
 let bansData = { ipBans: [], accountBans: [], chatBans: [] };
 let serverData = { regions: [] };
@@ -815,8 +817,11 @@ function renderServers() {
       </div>\`;
     }).join('') : '<div class="empty">No running games.</div>';
 
+    const verifyBtn = region.verifiedOnly
+      ? \`<button class="btn btn-red btn-sm" style="margin-left:auto" onclick="setServerVerified('\${esc(region.regionId)}', false)">UNVERIFY SERVER</button>\`
+      : \`<button class="btn btn-green btn-sm" style="margin-left:auto" onclick="setServerVerified('\${esc(region.regionId)}', true)">VERIFY SERVER</button>\`;
     return \`<div class="region-block">
-      <div class="region-header">Region: \${esc(region.regionId)}</div>
+      <div class="region-header" style="display:flex;align-items:center;">Region: \${esc(region.regionId)}\${verifyBtn}</div>
       <div class="game-cards">\${cardsHtml}</div>
     </div>\`;
   }).join('');
@@ -842,6 +847,8 @@ function selectGame(region, gameId) {
   document.getElementById('game-detail').style.display = '';
   closeAnnouncePanel();
   closeMsgPanel();
+  const gameData = serverData.regions.find(r => r.regionId === region)?.games?.find(g => g.id === gameId);
+  updateVerifyButtons(gameData?.verifiedOnly ?? false);
   currentPlayers = [];
   document.getElementById('player-tbody').innerHTML = '<tr><td colspan="6" class="loading">Lade…</td></tr>';
 
@@ -924,9 +931,29 @@ async function sendGlobalAnnounce() {
 document.getElementById('global-announce-send').addEventListener('click', sendGlobalAnnounce);
 document.getElementById('global-announce-input').addEventListener('keydown', e => { if (e.key === 'Enter') sendGlobalAnnounce(); });
 
-document.getElementById('ga-verify').addEventListener('click',   () => gameCmd({ action: 'verify' }));
+function updateVerifyButtons(isVerified) {
+  activeGameVerified = isVerified;
+  document.getElementById('ga-verify').style.display   = isVerified ? 'none' : '';
+  document.getElementById('ga-unverify').style.display = isVerified ? '' : 'none';
+}
+
+document.getElementById('ga-verify').addEventListener('click', async () => {
+  await gameCmd({ action: 'verify' });
+  updateVerifyButtons(true);
+});
+document.getElementById('ga-unverify').addEventListener('click', async () => {
+  await gameCmd({ action: 'unverify' });
+  updateVerifyButtons(false);
+});
 document.getElementById('ga-freeze').addEventListener('click',   () => gameCmd({ action: 'freeze' }));
 document.getElementById('ga-unfreeze').addEventListener('click', () => gameCmd({ action: 'unfreeze' }));
+
+async function setServerVerified(region, state) {
+  try {
+    await post('/api/servers/' + encodeURIComponent(region) + (state ? '/verify' : '/unverify'), {});
+    toast(state ? 'Server verified ✓' : 'Server unverified ✓');
+  } catch (e) { toast('Error: ' + e.message, true); }
+}
 
 function closeAnnouncePanel() { document.getElementById('announce-panel').classList.remove('open'); }
 document.getElementById('ga-announce-open').addEventListener('click', () => {

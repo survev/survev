@@ -155,6 +155,10 @@ app.post("/api/find_game", validateParams(zFindGameBody), async (c) => {
         return c.json<FindGameResponse>({ error: "full" });
     }
 
+    if (server.regions[body.region]?.verifiedOnly && !user) {
+        return c.json<FindGameResponse>({ error: "player_not_verified" });
+    }
+
     const data = await server.findGame({
         region: body.region,
         version: body.version,

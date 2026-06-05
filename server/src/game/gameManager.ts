@@ -36,6 +36,9 @@ export abstract class GameManager {
     /** Sends an admin command to a running game (fire-and-forget). */
     abstract sendAdminCmd(gameId: string, cmd: AdminCmdAction): void;
 
+    /** Sets verified-only mode on all running games and all future games. */
+    abstract setServerVerified(state: boolean): void;
+
     abstract onOpen(socketId: string, socket: WebSocket<GameSocketData>): void;
 
     abstract onMsg(socketId: string, msg: ArrayBuffer): void;
@@ -52,6 +55,8 @@ export class SingleThreadGameManager implements GameManager {
 
     readonly gamesById = new Map<string, Game>();
     readonly games: Game[] = [];
+
+    serverVerifiedOnly = false;
 
     constructor() {
         // setInterval on windows sucks
@@ -134,6 +139,7 @@ export class SingleThreadGameManager implements GameManager {
             },
         );
         await game.init();
+        game.verifiedOnly = this.serverVerifiedOnly;
         this.games.push(game);
         this.gamesById.set(id, game);
         return game;
@@ -161,6 +167,10 @@ export class SingleThreadGameManager implements GameManager {
                 teamMode: body.teamMode,
                 mapName: body.mapName as keyof typeof MapDefs,
             });
+        }
+
+        if (game.verifiedOnly && body.playerData.some((p) => !p.userId)) {
+            return "player_not_verified";
         }
 
         game.addJoinTokens(body.playerData, body.autoFill);
@@ -195,6 +205,14 @@ export class SingleThreadGameManager implements GameManager {
 
     sendAdminCmd(gameId: string, cmd: AdminCmdAction): void {
         this.gamesById.get(gameId)?.executeAdminCmd(cmd);
+    }
+
+    setServerVerified(state: boolean): void {
+        this.serverVerifiedOnly = state;
+        const cmd: AdminCmdAction = { action: state ? "verify" : "unverify" };
+        for (const game of this.games) {
+            game.executeAdminCmd(cmd);
+        }
     }
 
     onOpen(socketId: string, socket: WebSocket<GameSocketData>): void {
