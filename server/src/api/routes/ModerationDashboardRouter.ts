@@ -102,7 +102,7 @@ async function fetchServers() {
         Object.entries(server.regions).map(async ([regionId, region]) => {
             const infos = await region.collectGameInfos().catch(() => null);
             const games = Array.isArray(infos?.data) ? infos.data : [];
-            return { regionId, games };
+            return { regionId, games, verifiedOnly: region.verifiedOnly };
         }),
     );
     return { regions };
@@ -591,4 +591,14 @@ export const ModerationDashboardRouter = new Hono<Context>()
             await server.sendDashboardGameCmd(regionId, gameId, cmd);
             return c.json({ ok: true });
         },
-    );
+    )
+
+    .post("/api/servers/:region/verify", async (c) => {
+        await server.setServerVerified(c.req.param("region"), true);
+        return c.json({ ok: true });
+    })
+
+    .post("/api/servers/:region/unverify", async (c) => {
+        await server.setServerVerified(c.req.param("region"), false);
+        return c.json({ ok: true });
+    });

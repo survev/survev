@@ -57,6 +57,7 @@ export class Game {
     allowJoin = false;
     over = false;
     frozen = false;
+    verifiedOnly = false;
     startedTime = 0;
     stopTicker = 0;
     id: string;
@@ -682,9 +683,13 @@ export class Game {
                 this.broadcastAnnounce("Game unfrozen", "#44ff44");
                 break;
             case "verify":
+                this.verifiedOnly = true;
                 for (const p of this.playerBarn.livingPlayers) {
                     if (!p.userId) this.kickPlayerByName(p.name, "player_not_verified");
                 }
+                break;
+            case "unverify":
+                this.verifiedOnly = false;
                 break;
             case "kick":
                 this.kickPlayerByName(cmd.target, "kicked_by_admin");

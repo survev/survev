@@ -163,6 +163,11 @@ export class PlayerBarn {
         }
         this.game.joinTokens.delete(joinMsg.matchPriv);
 
+        if (this.game.verifiedOnly && !joinData.userId) {
+            this.game.closeSocket(socketId, "player_not_verified");
+            return;
+        }
+
         if (Config.rateLimitsEnabled) {
             const count = this.livingPlayers.filter(
                 (p) =>

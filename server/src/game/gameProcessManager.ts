@@ -220,6 +220,8 @@ export class GameProcessManager implements GameManager {
     readonly processById = new Map<string, GameProcess>();
     readonly processes: GameProcess[] = [];
 
+    serverVerifiedOnly = false;
+
     readonly logger = new ServerLogger("Game Process Manager");
 
     constructor() {
@@ -295,6 +297,10 @@ export class GameProcessManager implements GameManager {
 
         this.processById.set(id, gameProc);
 
+        if (this.serverVerifiedOnly) {
+            gameProc.send({ type: ProcessMsgType.AdminCmd, cmd: { action: "verify" } });
+        }
+
         return gameProc;
     }
 
@@ -355,10 +361,18 @@ export class GameProcessManager implements GameManager {
         if (!game.created) {
             return await new Promise((resolve) => {
                 game.onCreatedCbs.push((game) => {
+                    if (this.serverVerifiedOnly && body.playerData.some((p) => !p.userId)) {
+                        resolve("player_not_verified");
+                        return;
+                    }
                     game.addJoinTokens(body.playerData, body.autoFill);
                     resolve(game.id);
                 });
             });
+        }
+
+        if (this.serverVerifiedOnly && body.playerData.some((p) => !p.userId)) {
+            return "player_not_verified";
         }
 
         game.addJoinTokens(body.playerData, body.autoFill);
@@ -410,6 +424,16 @@ export class GameProcessManager implements GameManager {
     /** Sends an admin command to a running game process (fire-and-forget). */
     sendAdminCmd(gameId: string, cmd: AdminCmdAction): void {
         this.processById.get(gameId)?.send({ type: ProcessMsgType.AdminCmd, cmd });
+    }
+
+    setServerVerified(state: boolean): void {
+        this.serverVerifiedOnly = state;
+        const cmd: AdminCmdAction = { action: state ? "verify" : "unverify" };
+        for (const proc of this.processes) {
+            if (!proc.stopped) {
+                proc.send({ type: ProcessMsgType.AdminCmd, cmd });
+            }
+        }
     }
 
     onOpen(socketId: string, socket: WebSocket<GameSocketData>): void {

@@ -180,6 +180,7 @@ export type AdminCmdAction =
     | { action: "freeze" }
     | { action: "unfreeze" }
     | { action: "verify" }
+    | { action: "unverify" }
     | { action: "kick";            target: string }
     | { action: "announce";        text: string; color?: string; sender?: string }
     | { action: "announce_player"; target: string; text: string; color?: string; sender?: string };
