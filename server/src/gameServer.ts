@@ -179,6 +179,28 @@ app.get("/health", (res) => {
     res.end();
 });
 
+app.get("/private/status", (res, req) => {
+    if (req.getHeader("survev-api-key") !== Config.secrets.SURVEV_API_KEY) {
+        forbidden(res);
+        return;
+    }
+
+    returnJson(res, {
+        socketCount: server.manager.sockets.size,
+        gameCount: server.manager.processes.length,
+        games: server.manager.processes.map(p => {
+            return {
+                id: p.gameData.id,
+                aliveCount: p.gameData.aliveCount,
+                map: p.gameData.mapName,
+                teamMode: p.gameData.teamMode,
+                stopped: p.gameData.stopped,
+                canJoin: p.gameData.canJoin,
+            };
+        }),
+    });
+});
+
 app.options("/api/find_game", (res) => {
     cors(res);
     res.end();
