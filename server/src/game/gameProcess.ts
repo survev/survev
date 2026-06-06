@@ -1,9 +1,9 @@
 import NanoTimer from "nanotimer";
 import { platform } from "node:os";
 import { Config } from "../config.ts";
-import { logErrorToWebhook } from "../utils/serverHelpers.ts";
-import { type ProcessMsg, ProcessMsgType } from "../utils/types.ts";
+import { logErrorToWebhook } from "../utils/logger.ts";
 import { Game } from "./game.ts";
+import { type ProcessMsg, ProcessMsgType } from "./ipcTypes.ts";
 import type { Player } from "./objects/player.ts";
 import { ClientSocket } from "./socket.ts";
 

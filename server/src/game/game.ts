@@ -6,17 +6,12 @@ import type { Loadout } from "../../../shared/utils/loadout.ts";
 import { math } from "../../../shared/utils/math.ts";
 import { v2 } from "../../../shared/utils/v2.ts";
 import { Config } from "../config.ts";
+import { apiPrivateRouter } from "../utils/apiRouter.ts";
 import { ServerLogger } from "../utils/logger.ts";
-import { apiPrivateRouter } from "../utils/serverHelpers.ts";
-import {
-    type FindGamePrivateBody,
-    ProcessMsgType,
-    type SaveGameBody,
-    type ServerGameConfig,
-    type UpdateDataMsg,
-} from "../utils/types.ts";
+import { type FindGamePrivateBody, type SaveGameBody, type ServerGameConfig } from "../utils/types.ts";
 import { GameModeManager } from "./gameModeManager.ts";
 import { Grid } from "./grid.ts";
+import { ProcessMsgType, type UpdateDataMsg } from "./ipcTypes.ts";
 import { GameMap } from "./map.ts";
 import { AirdropBarn } from "./objects/airdrop.ts";
 import { BulletBarn } from "./objects/bullet.ts";

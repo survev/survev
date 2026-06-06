@@ -15,20 +15,15 @@ import {
     zTeamClientMsg,
 } from "../../shared/types/team.ts";
 import { assert, util } from "../../shared/utils/util.ts";
+import { getFindGamePlayerData, getHonoIp, verifyTurnsStile } from "./api/apiHelpers.ts";
 import type { ApiServer } from "./api/apiServer.ts";
 import { validateSessionToken } from "./api/auth/index.ts";
 import { hashIp, isBanned } from "./api/routes/private/ModerationRouter.ts";
 import { Config } from "./config.ts";
+import { validateUserName } from "./utils/badWords.ts";
 import { ServerLogger } from "./utils/logger.ts";
-import { getFindGamePlayerData } from "./utils/playerData.ts";
-import {
-    getHonoIp,
-    HTTPRateLimit,
-    isBehindProxy,
-    validateUserName,
-    verifyTurnsStile,
-    WebSocketRateLimit,
-} from "./utils/serverHelpers.ts";
+import { isBehindProxy } from "./utils/proxyCheck.ts";
+import { HTTPRateLimit, WebSocketRateLimit } from "./utils/rateLimit.ts";
 import type { FindGamePrivateBody } from "./utils/types.ts";
 
 interface SocketData {

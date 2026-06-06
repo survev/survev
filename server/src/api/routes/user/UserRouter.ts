@@ -10,7 +10,7 @@ import {
     zUsernameRequest,
 } from "../../../../../shared/types/user.ts";
 import loadout from "../../../../../shared/utils/loadout.ts";
-import { validateUserName } from "../../../utils/serverHelpers.ts";
+import { validateUserName } from "../../../utils/badWords.ts";
 import { server } from "../../apiServer.ts";
 import {
     authMiddleware,

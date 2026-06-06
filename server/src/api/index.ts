@@ -10,14 +10,11 @@ import pkgJson from "../../../package.json" with { type: "json" };
 import { type FindGameResponse, type SiteInfoRes, zFindGameBody } from "../../../shared/types/api.ts";
 import { Config } from "../config.ts";
 import { GIT_VERSION } from "../utils/gitRevision.ts";
-import { getFindGamePlayerData } from "../utils/playerData.ts";
-import {
-    getHonoIp,
-    HTTPRateLimit,
-    isBehindProxy,
-    logErrorToWebhook,
-    verifyTurnsStile,
-} from "../utils/serverHelpers.ts";
+import { logErrorToWebhook } from "../utils/logger.ts";
+import { isBehindProxy } from "../utils/proxyCheck.ts";
+import { HTTPRateLimit } from "../utils/rateLimit.ts";
+import { getFindGamePlayerData } from "./apiHelpers.ts";
+import { getHonoIp, verifyTurnsStile } from "./apiHelpers.ts";
 import { server } from "./apiServer.ts";
 import { deleteExpiredSessions, validateSessionToken } from "./auth/index.ts";
 import { rateLimitMiddleware, validateParams } from "./auth/middleware.ts";

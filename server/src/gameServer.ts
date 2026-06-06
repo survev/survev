@@ -8,26 +8,18 @@ import pkgJson from "../../package.json" with { type: "json" };
 import { GameConfig } from "../../shared/gameConfig.ts";
 import * as net from "../../shared/net/net.ts";
 import { Config } from "./config.ts";
-import { GameProcessManager } from "./game/gameProcessManager.ts";
+import { GameProcessManager, type GameSocketData } from "./game/gameProcessManager.ts";
+import { apiPrivateRouter } from "./utils/apiRouter.ts";
 import { GIT_VERSION } from "./utils/gitRevision.ts";
-import { ServerLogger } from "./utils/logger.ts";
-import {
-    apiPrivateRouter,
-    cors,
-    forbidden,
-    getIp,
-    HTTPRateLimit,
-    logErrorToWebhook,
-    returnJson,
-    WebSocketRateLimit,
-} from "./utils/serverHelpers.ts";
+import { logErrorToWebhook, ServerLogger } from "./utils/logger.ts";
+import { HTTPRateLimit, WebSocketRateLimit } from "./utils/rateLimit.ts";
 import {
     type FindGamePrivateBody,
     type FindGamePrivateRes,
-    type GameSocketData,
     type SaveGameBody,
     zFindGamePrivateBody,
 } from "./utils/types.ts";
+import { uwsHelpers } from "./utils/uwsHelpers.ts";
 
 process.on("uncaughtException", async (err) => {
     console.error(err);
@@ -181,11 +173,11 @@ app.get("/health", (res) => {
 
 app.get("/private/status", (res, req) => {
     if (req.getHeader("survev-api-key") !== Config.secrets.SURVEV_API_KEY) {
-        forbidden(res);
+        uwsHelpers.forbidden(res);
         return;
     }
 
-    returnJson(res, {
+    uwsHelpers.returnJson(res, {
         socketCount: server.manager.sockets.size,
         gameCount: server.manager.processes.length,
         games: server.manager.processes.map(p => {
@@ -202,7 +194,7 @@ app.get("/private/status", (res, req) => {
 });
 
 app.options("/api/find_game", (res) => {
-    cors(res);
+    uwsHelpers.cors(res);
     res.end();
 });
 
@@ -212,7 +204,7 @@ app.post("/api/find_game", (res, req) => {
     });
 
     if (req.getHeader("survev-api-key") !== Config.secrets.SURVEV_API_KEY) {
-        forbidden(res);
+        uwsHelpers.forbidden(res);
         return;
     }
 
@@ -243,11 +235,11 @@ app.post("/api/find_game", (res, req) => {
 
             const parsed = zFindGamePrivateBody.safeParse(body);
             if (!parsed.success) {
-                returnJson(res, { error: "failed_to_parse_body" });
+                uwsHelpers.returnJson(res, { error: "failed_to_parse_body" });
                 return;
             }
 
-            returnJson(res, await server.findGame(parsed.data));
+            uwsHelpers.returnJson(res, await server.findGame(parsed.data));
         } catch (error) {
             server.logger.warn("API find_game error: ", error);
         }
@@ -269,7 +261,7 @@ app.ws<GameSocketData>("/play", {
         const wsProtocol = req.getHeader("sec-websocket-protocol");
         const wsExtensions = req.getHeader("sec-websocket-extensions");
 
-        const ip = getIp(res, req, Config.gameServer.proxyIPHeader);
+        const ip = uwsHelpers.getIp(res, req, Config.gameServer.proxyIPHeader);
 
         if (!ip) {
             server.logger.warn(`Invalid IP Found`);
@@ -291,20 +283,20 @@ app.ws<GameSocketData>("/play", {
 
         if (!gameId) {
             server.logger.warn("game_id_missing");
-            forbidden(res);
+            uwsHelpers.forbidden(res);
             return;
         }
         const proc = server.manager.getById(gameId);
 
         if (!proc) {
             server.logger.warn("invalid_game_id");
-            forbidden(res);
+            uwsHelpers.forbidden(res);
             return;
         }
 
         if (!proc.gameData.canJoin) {
             server.logger.warn("game_started");
-            forbidden(res);
+            uwsHelpers.forbidden(res);
             return;
         }
 
@@ -390,7 +382,7 @@ app.ws<pingSocketData>("/ptc", {
     upgrade(res, req, context) {
         res.onAborted((): void => {});
 
-        const ip = getIp(res, req, Config.gameServer.proxyIPHeader);
+        const ip = uwsHelpers.getIp(res, req, Config.gameServer.proxyIPHeader);
 
         if (!ip) {
             server.logger.warn(`Invalid IP Found`);

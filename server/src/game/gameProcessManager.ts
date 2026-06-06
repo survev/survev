@@ -6,14 +6,8 @@ import type { TeamMode } from "../../../shared/gameConfig.ts";
 import * as net from "../../../shared/net/net.ts";
 import { util } from "../../../shared/utils/util.ts";
 import { ServerLogger } from "../utils/logger.ts";
-import {
-    type FindGamePrivateBody,
-    type GameData,
-    type GameSocketData,
-    type ProcessMsg,
-    ProcessMsgType,
-    type ServerGameConfig,
-} from "../utils/types.ts";
+import { type FindGamePrivateBody, type ServerGameConfig } from "../utils/types.ts";
+import { type GameData, type ProcessMsg, ProcessMsgType } from "./ipcTypes.ts";
 
 let procFile: string;
 if (process.env.NODE_ENV === "production") {
@@ -169,6 +163,15 @@ class GameProcess {
             socketId,
         });
     }
+}
+
+export interface GameSocketData {
+    gameId: string;
+    id: string;
+    closed: boolean;
+    rateLimit: Record<symbol, number>;
+    ip: string;
+    disconnectReason: string;
 }
 
 export class GameProcessManager {

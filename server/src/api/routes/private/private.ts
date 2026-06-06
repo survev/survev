@@ -2,14 +2,13 @@ import { and, eq, inArray } from "drizzle-orm";
 import { Hono } from "hono";
 import { z } from "zod";
 import { saveConfig } from "../../../../../config.ts";
-
 import { QuestDefs } from "../../../../../shared/defs/gameObjects/questDefs.ts";
 import { MapDefs } from "../../../../../shared/defs/mapDefs.ts";
 import { GameObjectDefs } from "../../../../../shared/defs/register.ts";
 import { TeamMode } from "../../../../../shared/gameConfig.ts";
 import { zGiveItemParams, zRemoveItemParams } from "../../../../../shared/types/moderation.ts";
 import { serverConfigPath } from "../../../config.ts";
-import { isBehindProxy } from "../../../utils/serverHelpers.ts";
+import { isBehindProxy } from "../../../utils/proxyCheck.ts";
 import { type SaveGameBody, zSetClientThemeBody, zSetGameModeBody, zUpdateRegionBody } from "../../../utils/types.ts";
 import { server } from "../../apiServer.ts";
 import { databaseEnabledMiddleware, privateMiddleware, validateParams } from "../../auth/middleware.ts";
