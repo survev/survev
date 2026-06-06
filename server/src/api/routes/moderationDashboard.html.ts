@@ -140,6 +140,10 @@ export const dashboardHtml = `<!DOCTYPE html>
     #msg-input { flex: 1; min-width: 200px; background: var(--surface2); border: 1px solid var(--border2); border-radius: 5px; padding: 6px 10px; color: var(--text); font-family: inherit; font-size: 12px; outline: none; }
     #msg-input:focus { border-color: var(--blue); }
 
+    /* ── Sortable table headers ── */
+    .sortable { cursor: pointer; user-select: none; }
+    .sortable:hover { color: var(--text); }
+
     /* ── Empty / loading states ── */
     .empty { color: var(--text-muted); font-size: 12px; padding: 24px; text-align: center; }
     .loading { color: var(--text-dim); font-size: 12px; padding: 12px; text-align: center; }
@@ -163,6 +167,7 @@ export const dashboardHtml = `<!DOCTYPE html>
   <button class="tab-btn active" data-tab="bans">Bans</button>
   <button class="tab-btn"        data-tab="lookup">IP / Player</button>
   <button class="tab-btn"        data-tab="servers">Live Servers</button>
+  <button class="tab-btn"        data-tab="accounts">Accounts</button>
 </div>
 
 <div id="main">
@@ -225,6 +230,27 @@ export const dashboardHtml = `<!DOCTYPE html>
         <tbody id="recent-tbody"><tr><td colspan="6" class="loading">Loading…</td></tr></tbody>
       </table>
     </div>
+  </div>
+
+  <!-- ════════════════ TAB 4: ACCOUNTS ════════════════ -->
+  <div id="tab-accounts" class="tab-pane">
+    <div class="toolbar">
+      <input type="text" id="accounts-search" placeholder="Search by username or slug…">
+      <button class="btn btn-orange" id="reconcile-btn">⚡ Reconcile Pass XP</button>
+      <span id="reconcile-result" style="font-size:11px;color:var(--text-dim);"></span>
+    </div>
+    <table class="data-table" id="accounts-table">
+      <thead><tr>
+        <th>#</th>
+        <th class="sortable" data-col="username">Username</th>
+        <th>Slug</th>
+        <th class="sortable" data-col="level">Level</th>
+        <th class="sortable" data-col="xp">XP ▼</th>
+        <th class="sortable" data-col="lastUpdated">Last Updated</th>
+        <th>Flags</th>
+      </tr></thead>
+      <tbody id="accounts-tbody"><tr><td colspan="7" class="loading">Loading…</td></tr></tbody>
+    </table>
   </div>
 
   <!-- ════════════════ TAB 3: LIVE SERVERS ════════════════ -->
@@ -481,6 +507,9 @@ function switchTab(name) {
     document.getElementById('recent-block').style.display = '';
     document.getElementById('lookup-input').value = '';
     loadRecent();
+  } else if (name === 'accounts') {
+    closeSSE();
+    loadAccounts();
   } else {
     closeSSE();
   }
@@ -1013,6 +1042,105 @@ document.getElementById('gd-close-btn').addEventListener('click', () => {
   // Revert to server-only SSE (no player stream)
   connectSSE(null, null);
   renderServers();
+});
+
+// ═══════════════════════════════════════════════════════════════════════════
+// TAB 4 – ACCOUNTS + XP
+// ═══════════════════════════════════════════════════════════════════════════
+
+let accountsData = [];
+let accountsPassType = '';
+let accountsSortCol = 'xp';
+let accountsSortDir = -1; // -1 = desc, 1 = asc
+
+async function loadAccounts() {
+  document.getElementById('accounts-tbody').innerHTML = '<tr><td colspan="7" class="loading">Loading…</td></tr>';
+  try {
+    const data = await get('/api/accounts');
+    accountsData = data.accounts ?? [];
+    accountsPassType = data.passType ?? '';
+    renderAccounts();
+  } catch (e) { document.getElementById('accounts-tbody').innerHTML = '<tr><td colspan="7" class="empty">Failed to load accounts.</td></tr>'; }
+}
+
+function renderAccounts() {
+  const q = document.getElementById('accounts-search').value.toLowerCase();
+  let rows = accountsData.filter(a =>
+    !q || (a.username||'').toLowerCase().includes(q) || (a.slug||'').toLowerCase().includes(q)
+  );
+
+  // Sort
+  rows = [...rows].sort((a, b) => {
+    let av = a[accountsSortCol], bv = b[accountsSortCol];
+    if (accountsSortCol === 'xp' || accountsSortCol === 'level') {
+      av = Number(av ?? -1); bv = Number(bv ?? -1);
+    } else if (accountsSortCol === 'lastUpdated') {
+      av = av ? new Date(av).getTime() : -1; bv = bv ? new Date(bv).getTime() : -1;
+    } else {
+      av = (av ?? '').toString().toLowerCase(); bv = (bv ?? '').toString().toLowerCase();
+    }
+    if (av < bv) return -accountsSortDir;
+    if (av > bv) return  accountsSortDir;
+    return 0;
+  });
+
+  // Update header arrows
+  document.querySelectorAll('#accounts-table .sortable').forEach(th => {
+    const col = th.dataset.col;
+    const base = th.textContent.replace(/ [▲▼]$/, '');
+    th.textContent = col === accountsSortCol ? base + (accountsSortDir === 1 ? ' ▲' : ' ▼') : base;
+  });
+
+  const tbody = document.getElementById('accounts-tbody');
+  tbody.innerHTML = rows.length ? rows.map((a, i) => \`
+    <tr>
+      <td style="color:var(--text-muted);font-size:11px;">\${i+1}</td>
+      <td><span style="color:var(--blue-t)">\${esc(a.username||'–')}</span></td>
+      <td style="font-size:11px;color:var(--text-dim);">\${esc(a.slug||'–')}</td>
+      <td style="font-weight:600;">\${a.level ?? '–'}</td>
+      <td style="font-family:monospace;">\${a.xp != null ? Number(a.xp).toLocaleString() : '–'}</td>
+      <td style="font-size:11px;color:var(--text-muted);">\${fmtDate(a.lastUpdated)}</td>
+      <td>
+        \${a.admin ? '<span class="badge badge-admin">ADMIN</span>' : ''}
+        \${a.banned ? '<span class="badge badge-perm">BANNED</span>' : ''}
+      </td>
+    </tr>
+  \`).join('') : '<tr><td colspan="7" class="empty">No accounts found.</td></tr>';
+}
+
+document.getElementById('accounts-search').addEventListener('input', renderAccounts);
+
+document.getElementById('accounts-table').addEventListener('click', (e) => {
+  const th = e.target.closest('th.sortable');
+  if (!th) return;
+  const col = th.dataset.col;
+  if (accountsSortCol === col) {
+    accountsSortDir *= -1;
+  } else {
+    accountsSortCol = col;
+    accountsSortDir = col === 'xp' || col === 'level' || col === 'lastUpdated' ? -1 : 1;
+  }
+  renderAccounts();
+});
+
+document.getElementById('reconcile-btn').addEventListener('click', async () => {
+  const btn = document.getElementById('reconcile-btn');
+  const result = document.getElementById('reconcile-result');
+  btn.disabled = true;
+  btn.textContent = '⏳ Running…';
+  result.textContent = '';
+  try {
+    const data = await post('/api/reconcile_pass_xp', {});
+    result.textContent = \`Done: \${data.usersReconciled} users fixed, +\${data.totalXpAdded} XP total\`;
+    result.style.color = 'var(--green-t)';
+    await loadAccounts();
+  } catch (e) {
+    result.textContent = 'Error: ' + e.message;
+    result.style.color = 'var(--red-t)';
+  } finally {
+    btn.disabled = false;
+    btn.textContent = '⚡ Reconcile Pass XP';
+  }
 });
 
 // ═══════════════════════════════════════════════════════════════════════════
