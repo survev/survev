@@ -45,11 +45,10 @@ export interface JoinTokenData {
 export class Game {
     started = false;
     stopped = false;
-    // for debug
-    preventStart = false;
     over = false;
     startedTime = 0;
     stopTicker = 0;
+
     id: string;
     teamMode: TeamMode;
     mapName: string;
@@ -57,14 +56,16 @@ export class Game {
     config: ServerGameConfig;
     modeManager: GameModeManager;
 
+    now!: number;
+    profiler = new Profiler();
+    perfTicker = 0;
+    tickTimes: number[] = [];
+
     tickTimeWarnThreshold = (1000 / Config.gameTps) * 4;
     gameTickWarnings = 0;
 
     netSyncWarnThreshold = (1000 / Config.netSyncTps) * 4;
     netSyncWarnings = 0;
-
-    grid: Grid<GameObject>;
-    objectRegister: ObjectRegister;
 
     joinTokens = new Map<string, JoinTokenData>();
 
@@ -82,6 +83,11 @@ export class Game {
      */
     msgsToSend = new net.MsgStream(new ArrayBuffer(4096));
 
+    grid: Grid<GameObject>;
+    map: GameMap;
+    gas: Gas;
+    objectRegister: ObjectRegister;
+
     playerBarn: PlayerBarn;
     lootBarn: LootBarn;
     deadBodyBarn: DeadBodyBarn;
@@ -90,25 +96,14 @@ export class Game {
     bulletBarn: BulletBarn;
     smokeBarn: SmokeBarn;
     airdropBarn: AirdropBarn;
-
     explosionBarn: ExplosionBarn;
     planeBarn: PlaneBarn;
     mapIndicatorBarn: MapIndicatorBarn;
 
-    map: GameMap;
-    gas: Gas;
-
-    now!: number;
-
-    perfTicker = 0;
-    tickTimes: number[] = [];
-
     logger: ServerLogger;
 
-    start = Date.now();
-
-    profiler = new Profiler();
-
+    // for debug
+    preventStart = false;
     debugSpeedMulti = 1;
 
     constructor(
@@ -116,6 +111,7 @@ export class Game {
         config: ServerGameConfig,
         readonly sendData?: (data: UpdateDataMsg) => void,
     ) {
+        const start = Date.now();
         this.id = id;
         this.logger = new ServerLogger(`Game #${this.id.substring(0, 4)}`);
         this.logger.info("Creating");
@@ -156,7 +152,7 @@ export class Game {
 
         this.map.init();
 
-        this.logger.info(`Created in ${Date.now() - this.start} ms`);
+        this.logger.info(`Created in ${Date.now() - start} ms`);
 
         this.updateData();
     }
