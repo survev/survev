@@ -214,7 +214,6 @@ export function questDelta<E extends keyof QuestEventPayloads>(
                 break;
             }
 
-            value = p.objectType.startsWith(obstacleType) ? 1 : 0;
             break;
         }
     }
