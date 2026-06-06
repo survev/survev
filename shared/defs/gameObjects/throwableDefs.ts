@@ -920,6 +920,7 @@ export const ThrowableDefs: Record<string, ThrowableDef> = {
         changeTime: 1,
         inventoryOrder: 0,
         cookable: true,
+        noPotatoSwap: true,
         forceMaxThrowDistance: true,
         explodeOnImpact: true,
         playerCollision: true,
