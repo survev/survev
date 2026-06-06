@@ -22,7 +22,7 @@
  *   POST /moderation/api/game/:region/:id/cmd      → execute admin command on a game
  */
 
-import { desc, eq, ne, inArray } from "drizzle-orm";
+import { and, desc, eq, gte, inArray, sql } from "drizzle-orm";
 import { Hono } from "hono";
 import { getCookie } from "hono/cookie";
 import { streamSSE, type SSEStreamingApi } from "hono/streaming";
@@ -30,11 +30,14 @@ import { util } from "../../../../shared/utils/util";
 import { validateSessionToken } from "../auth";
 import { validateParams } from "../auth/middleware";
 import { db } from "../db";
-import { bannedIpsTable, chatBannedIpsTable, chatLogsTable, ipLogsTable, matchDataTable, usersTable } from "../db/schema";
+import { bannedIpsTable, chatBannedIpsTable, chatLogsTable, ipLogsTable, matchDataTable, usersTable, userXpTable } from "../db/schema";
 import { server } from "../apiServer";
 import type { Context } from "..";
 import { z } from "zod";
 import { dashboardHtml } from "./moderationDashboard.html";
+import { getMapDefById, MapDefs } from "../../../../shared/defs/mapDefs";
+import { GameConfig } from "../../../../shared/gameConfig";
+import { PassDefs } from "../../../../shared/defs/gameObjects/passDefs";
 
 // ─── Admin guard middleware ────────────────────────────────────────────────────
 
@@ -601,4 +604,135 @@ export const ModerationDashboardRouter = new Hono<Context>()
     .post("/api/servers/:region/unverify", async (c) => {
         await server.setServerVerified(c.req.param("region"), false);
         return c.json({ ok: true });
+    })
+
+    /** Returns all registered accounts with their current pass XP and level. */
+    .get("/api/accounts", async (c) => {
+        const passType = GameConfig.serverSettings.currentPass;
+        const rows = await db
+            .select({
+                id: usersTable.id,
+                username: usersTable.username,
+                slug: usersTable.slug,
+                banned: usersTable.banned,
+                admin: usersTable.admin,
+                xp: userXpTable.xp,
+                level: userXpTable.level,
+                lastUpdated: userXpTable.lastUpdated,
+            })
+            .from(usersTable)
+            .leftJoin(
+                userXpTable,
+                and(eq(userXpTable.userId, usersTable.id), eq(userXpTable.passType, passType)),
+            )
+            .orderBy(desc(userXpTable.xp));
+        return c.json({ accounts: rows, passType });
+    })
+
+    /** Reconciles pass XP for all users: recalculates from seasonStart and adds missing XP. */
+    .post("/api/reconcile_pass_xp", async (c) => {
+        const passType = GameConfig.serverSettings.currentPass;
+        const seasonStart = new Date(GameConfig.serverSettings.seasonStart);
+
+        const allUserXp = await db
+            .select()
+            .from(userXpTable)
+            .where(eq(userXpTable.passType, passType));
+
+        const mapIdToName = Object.fromEntries(
+            Object.entries(MapDefs).map(([name, def]) => [def.mapId, name]),
+        ) as Record<number, string>;
+
+        let usersReconciled = 0;
+        let totalXpAdded = 0;
+
+        for (const record of allUserXp) {
+            const currentXp = Number(record.xp);
+
+            const stats = await db
+                .select({
+                    gameId: matchDataTable.gameId,
+                    kills: sql<number>`max(${matchDataTable.kills})`,
+                    damage: sql<number>`max(${matchDataTable.damageDealt})`,
+                    timeAlive: sql<number>`max(${matchDataTable.timeAlive})`,
+                    rank: sql<number>`min(${matchDataTable.rank})`,
+                    mapId: sql<number>`max(${matchDataTable.mapId})`,
+                    createdAt: sql<Date>`max(${matchDataTable.createdAt})`,
+                })
+                .from(matchDataTable)
+                .where(
+                    and(
+                        eq(matchDataTable.userId, record.userId),
+                        gte(matchDataTable.createdAt, seasonStart),
+                    ),
+                )
+                .groupBy(matchDataTable.gameId)
+                .having(sql`count(*) = 1`);
+
+            let correctXp = 0;
+            for (const stat of stats) {
+                const mapDef = getMapDefById(stat.mapId);
+                const xpMultiplier = mapDef?.gameMode?.xpMultiplier || {
+                    kill: 0, damage: 0, win: 0, timeSurvived: 0,
+                };
+                const mapTypeName = mapIdToName[stat.mapId] ?? "";
+                const boostEvents = GameConfig.serverSettings.xpBoostEvents?.[passType];
+                let boost = 1;
+                if (boostEvents) {
+                    const t = stat.createdAt instanceof Date
+                        ? stat.createdAt.getTime()
+                        : new Date(stat.createdAt).getTime();
+                    for (const event of Object.values(boostEvents)) {
+                        if (
+                            t >= new Date(event.start).getTime() &&
+                            t <= new Date(event.end).getTime() &&
+                            event.maps.includes(mapTypeName)
+                        ) { boost = event.boost; break; }
+                    }
+                }
+                let matchXp = 0;
+                matchXp += stat.kills * xpMultiplier.kill;
+                matchXp += stat.damage * xpMultiplier.damage;
+                matchXp += (stat.rank === 1 ? 1 : 0) * xpMultiplier.win;
+                matchXp += stat.timeAlive * xpMultiplier.timeSurvived;
+                correctXp += matchXp * boost;
+            }
+            correctXp = Math.floor(correctXp);
+
+            if (correctXp > currentXp) {
+                const { level } = getPassLevelAndXp(passType, correctXp);
+                await db
+                    .update(userXpTable)
+                    .set({ xp: String(correctXp), level, lastUpdated: new Date() })
+                    .where(
+                        and(
+                            eq(userXpTable.userId, record.userId),
+                            eq(userXpTable.passType, passType),
+                        ),
+                    );
+                usersReconciled++;
+                totalXpAdded += correctXp - currentXp;
+            }
+        }
+
+        return c.json({ ok: true, usersReconciled, totalXpAdded });
     });
+
+function getPassLevelXp(passType: string, level: number): number {
+    const passDef = PassDefs[passType as keyof typeof PassDefs];
+    const levelIdx = level - 1;
+    return levelIdx < passDef.xp.length ? passDef.xp[levelIdx] : passDef.xp[passDef.xp.length - 1];
+}
+
+function getPassLevelAndXp(passType: string, passXp: number) {
+    const maxLevel = GameConfig.serverSettings.passMaxLevel;
+    let xp = passXp;
+    let level = 1;
+    while (level < maxLevel) {
+        const levelXp = getPassLevelXp(passType, level);
+        if (xp < levelXp) break;
+        xp -= levelXp;
+        level++;
+    }
+    return { level, xp };
+}
