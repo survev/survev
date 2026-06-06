@@ -1,11 +1,7 @@
 import { expect, test } from "vitest";
-import { Game } from "../../server/src/game/game.ts";
 import { GameConfig, TeamMode } from "../../shared/gameConfig.ts";
 import { v2 } from "../../shared/utils/v2.ts";
 import { createGame } from "./gameTestHelpers.ts";
-
-// don't want the test making requests
-Game.prototype.sendQuestProgress = async () => {};
 
 test("Kill enemies inside building test", () => {
     const game = createGame(TeamMode.Solo, "test_normal");

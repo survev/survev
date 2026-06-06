@@ -11,13 +11,6 @@ export function createGame(teamMode: TeamMode, mapName: keyof typeof MapDefs) {
     Config.logging.warnLogs = true;
     Config.logging.errorLogs = true;
 
-    const game = new Game(
-        "test",
-        {
-            mapName,
-            teamMode,
-        },
-        () => {},
-    );
+    const game = new Game("test", { mapName, teamMode });
     return game;
 }

@@ -1,17 +1,13 @@
-import fs from "node:fs";
-import path from "node:path";
 import { GameConfig, TeamMode } from "../../../shared/gameConfig.ts";
 import * as net from "../../../shared/net/net.ts";
 import type { Loadout } from "../../../shared/utils/loadout.ts";
 import { math } from "../../../shared/utils/math.ts";
 import { v2 } from "../../../shared/utils/v2.ts";
 import { Config } from "../config.ts";
-import { apiPrivateRouter } from "../utils/apiRouter.ts";
 import { ServerLogger } from "../utils/logger.ts";
-import { type FindGamePrivateBody, type SaveGameBody, type ServerGameConfig } from "../utils/types.ts";
+import { type FindGamePrivateBody, type ServerGameConfig } from "../utils/types.ts";
 import { GameModeManager } from "./gameModeManager.ts";
 import { Grid } from "./grid.ts";
-import { ProcessMsgType, type UpdateDataMsg } from "./ipcTypes.ts";
 import { GameMap } from "./map.ts";
 import { AirdropBarn } from "./objects/airdrop.ts";
 import { BulletBarn } from "./objects/bullet.ts";
@@ -106,11 +102,7 @@ export class Game {
     preventStart = false;
     debugSpeedMulti = 1;
 
-    constructor(
-        id: string,
-        config: ServerGameConfig,
-        readonly sendData?: (data: UpdateDataMsg) => void,
-    ) {
+    constructor(id: string, config: ServerGameConfig) {
         const start = Date.now();
         this.id = id;
         this.logger = new ServerLogger(`Game #${this.id.substring(0, 4)}`);
@@ -510,26 +502,6 @@ export class Game {
         this.msgsToSend.serializeMsg(type, msg);
     }
 
-    async sendQuestProgress(
-        userId: string,
-        progress: Array<{ id: string; delta: number }>,
-    ) {
-        try {
-            const req = await apiPrivateRouter.quest_progress.$post({
-                json: {
-                    userId,
-                    progress,
-                },
-            });
-            const res = await req.json();
-            if (!req.ok || !(res as { success: boolean }).success) {
-                this.logger.error(`Failed to save quest progress`, res);
-            }
-        } catch (err) {
-            this.logger.error(`Failed to save quest progress:`, err);
-        }
-    }
-
     checkGameOver() {
         if (this.over) return;
 
@@ -567,19 +539,6 @@ export class Game {
         }
     }
 
-    updateData() {
-        this.sendData?.({
-            type: ProcessMsgType.UpdateData,
-            id: this.id,
-            teamMode: this.teamMode,
-            mapName: this.mapName,
-            canJoin: this.canJoin,
-            aliveCount: this.aliveCount,
-            startedTime: this.startedTime,
-            stopped: this.stopped,
-        });
-    }
-
     stop() {
         if (this.stopped) return;
         this.stopped = true;
@@ -593,87 +552,13 @@ export class Game {
         this._saveGameToDatabase();
     }
 
-    private async _saveGameToDatabase() {
-        const players = this.modeManager.getPlayersSortedByRank();
-        /**
-         * teamTotal is for total teams that started the match, i hope?
-         *
-         * it also seems to be unused by the client so we could also remove it?
-         */
-        const teamTotal = new Set(players.map(({ player }) => player.teamId)).size;
+    // implementation of those is on gameProcess.ts
+    // this keeps the base Game class free of nodejs imports and the ability to make network requests
+    // to make offline mode and unit tests easier to maintain
 
-        const teamKills = players.reduce(
-            (acc, curr) => {
-                acc[curr.player.teamId] = (acc[curr.player.teamId] ?? 0) + curr.player.kills;
-                return acc;
-            },
-            {} as Record<string, number>,
-        );
-
-        const values: SaveGameBody["matchData"] = players.map(({ player, rank }) => {
-            return {
-                // *NOTE: userId is optional; we save the game stats for non logged users too
-                userId: player.userId,
-                region: Config.gameServer.thisRegion,
-                username: player.name,
-                playerId: player.matchDataId,
-                teamMode: this.teamMode,
-                teamCount: player.group?.players.length ?? 1,
-                teamTotal: teamTotal,
-                teamId: player.teamId,
-                timeAlive: Math.round(player.timeAlive),
-                died: player.dead,
-                kills: player.kills,
-                team_kills: teamKills[player.groupId] ?? 0,
-                damageDealt: Math.round(player.damageDealt),
-                damageTaken: Math.round(player.damageTaken),
-                killerId: player.killedBy?.matchDataId || 0,
-                gameId: this.id,
-                mapId: this.map.mapId,
-                mapSeed: this.map.seed,
-                killedIds: player.killedIds,
-                rank: rank,
-                ip: player.ip,
-                findGameIp: player.findGameIp,
-                role: player.role,
-            };
-        });
-
-        // only save the game if it has more than 2 players lol
-        if (values.length < 2) return;
-
-        // FIXME: maybe move this to the parent game server process?
-        // to avoid blocking the game from being GC'd until this request is done
-        // and opening a database in each process if it fails
-        // etc
-        let res: Response | undefined = undefined;
-        try {
-            res = await apiPrivateRouter.save_game.$post({
-                json: {
-                    matchData: values,
-                },
-            });
-        } catch (err) {
-            this.logger.error(`Failed to fetch API save game:`, err);
-        }
-
-        if (!res || !res.ok) {
-            const region = Config.gameServer.thisRegion.toUpperCase();
-            this.logger.error(
-                `[${region}] Failed to save game data, saving locally instead`,
-            );
-
-            const dir = path.resolve("lost_game_data");
-            if (!fs.existsSync(dir)) {
-                fs.mkdirSync(dir);
-            }
-            fs.writeFileSync(
-                path.join(dir, `${this.id}.json`),
-                JSON.stringify(values),
-                "utf8",
-            );
-        }
-    }
+    updateData() {}
+    protected async _saveGameToDatabase() {}
+    async sendQuestProgress(_userId: string, _progress: Array<{ id: string; delta: number }>) {}
 
     /**
      * Steps the game X seconds in the future
