@@ -40,6 +40,10 @@ export interface SaveGameBody {
 export interface ServerGameConfig {
     readonly mapName: keyof typeof MapDefs;
     readonly teamMode: TeamMode;
+    /** Isolated match created from a private lobby: hidden from public matchmaking (see `Game.canJoin`). */
+    readonly isPrivate?: boolean;
+    /** Arena-mode role pool the private lobby leader narrowed down to; restricts `Game.arenaRoles` when set. */
+    readonly arenaRoles?: string[];
 }
 
 export interface GameData {
@@ -47,6 +51,8 @@ export interface GameData {
     teamMode: TeamMode;
     mapName: string;
     canJoin: boolean;
+    /** Isolated match created from a private lobby; joined via tokens, not public matchmaking (see `canJoin`). */
+    isPrivate: boolean;
     aliveCount: number;
     startedTime: number;
     stopped: boolean;
@@ -71,6 +77,27 @@ export const zFindGamePrivateBody = z.object({
 
 export type FindGamePrivateBody = z.infer<typeof zFindGamePrivateBody>;
 
+const zPrivateLobbyPlayerData = z.object({
+    token: z.string(),
+    userId: z.string().nullable(),
+    ip: z.string(),
+    admin: z.boolean(),
+    loadout: loadoutSchema.optional(),
+});
+
+/** Body for spinning up a fully isolated match from a private lobby; `teams` groups players that should land in the same in-game Group. */
+export const zFindPrivateLobbyGameBody = z.object({
+    region: z.string(),
+    version: z.number(),
+    mapName: z.string(),
+    teamMode: z.number(),
+    teams: z.array(z.array(zPrivateLobbyPlayerData)),
+    /** Arena-mode role pool the lobby leader narrowed down to (see `RoomData.enabledArenaRoles`). */
+    arenaRoles: z.array(z.string()).optional(),
+});
+
+export type FindPrivateLobbyGameBody = z.infer<typeof zFindPrivateLobbyGameBody>;
+
 export type FindGamePrivateRes =
     | {
           gameId: string;
@@ -87,6 +114,7 @@ export enum ProcessMsgType {
     UpdateData,
     AddJoinToken,
     AddJoinTokenAsSpectator,
+    AddGroupedJoinTokens,
     SocketMsg,
     SocketClose,
     // Dashboard IPC messages
@@ -123,6 +151,12 @@ export interface AddJoinTokenAsSpectatorMsg {
     type: ProcessMsgType.AddJoinTokenAsSpectator;
     autoFill: boolean;
     tokens: FindGamePrivateBody["playerData"];
+}
+
+/** Used for private lobbies: each entry is a team's player batch, registered as its own join group. */
+export interface AddGroupedJoinTokensMsg {
+    type: ProcessMsgType.AddGroupedJoinTokens;
+    teams: FindGamePrivateBody["playerData"][];
 }
 
 /**
@@ -197,6 +231,7 @@ export type ProcessMsg =
     | UpdateDataMsg
     | AddJoinTokenMsg
     | AddJoinTokenAsSpectatorMsg
+    | AddGroupedJoinTokensMsg
     | SocketMsgsMsg
     | SocketCloseMsg
     | GetPlayerDataMsg

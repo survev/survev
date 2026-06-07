@@ -88,6 +88,42 @@ function setupModals(inputBinds: InputBinds, inputBindUi: InputBindUi) {
         }
     });
 
+    const privateLobbyMobileLink = $("#private-lobby-mobile-link");
+    const privateLobbyMobileLinkDesc = $("#private-lobby-mobile-link-desc");
+    const privateLobbyMobileLinkWarning = $("#private-lobby-mobile-link-warning");
+    const privateLobbyMobileLinkInput = $("#private-lobby-link-input");
+
+    // Private lobby mobile link
+    $("#btn-join-private-lobby").on("click", () => {
+        $("#server-warning").css("display", "none");
+        privateLobbyMobileLinkInput.val("");
+        privateLobbyMobileLink.css("display", "block");
+        privateLobbyMobileLinkDesc.css("display", "block");
+        privateLobbyMobileLinkWarning.css("display", "none");
+        startMenuWrapper.css("display", "none");
+        newsBlock.css("display", "none");
+        socialShareBlock.css("display", "none");
+        $("#right-column").css("display", "none");
+        return false;
+    });
+    $("#btn-private-lobby-mobile-link-leave").on("click", () => {
+        privateLobbyMobileLink.css("display", "none");
+        privateLobbyMobileLinkInput.val("");
+        startMenuWrapper.css("display", "block");
+        newsBlock.css("display", "block");
+        socialShareBlock.css("display", "block");
+        $("#right-column").css("display", "block");
+        return false;
+    });
+
+    // Auto submit link or code on enter
+    $("#private-lobby-link-input").on("keypress", (e) => {
+        if (e.key === "Enter") {
+            $("#btn-private-lobby-mobile-link-join").trigger("click");
+            e.target.blur();
+        }
+    });
+
     // Blur name input on enter
     $("#player-name-input-solo").on("keypress", (e) => {
         if (e.key === "Enter") {

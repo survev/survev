@@ -27,6 +27,7 @@ export class SiteInfo {
         const mainSelector = $("#server-opts");
         const teamSelector = $("#team-server-opts");
         const spectatorSelector = $("#spectate-server-opts");
+        const privateLobbySelector = $("#private-lobby-server-opts");
 
         for (const region in GAME_REGIONS) {
             const data = GAME_REGIONS[region];
@@ -35,6 +36,7 @@ export class SiteInfo {
             mainSelector.append(elm);
             teamSelector.append(elm);
             spectatorSelector.append(elm);
+            privateLobbySelector.append(elm);
         }
 
         $.ajax(siteInfoUrl).done((data: SiteInfoRes) => {
@@ -49,9 +51,11 @@ export class SiteInfo {
         return this.info.modesByRegion?.[region] || this.info.modes || [];
     }
 
-    getGameModeStyles() {
+    getGameModeStyles(region?: string) {
         const availableModes = [];
-        const modes = this.getModesForSelectedRegion();
+        const modes = region
+            ? this.info.modesByRegion?.[region] || this.info.modes || []
+            : this.getModesForSelectedRegion();
         console.log("Available modes for region", this.config.get("region"), modes);
         for (let i = 0; i < modes.length; i++) {
             const mode = modes[i];
@@ -129,6 +133,9 @@ export class SiteInfo {
             const selectedModes = this.getModesForSelectedRegion();
             const supportsTeam = selectedModes.some((s) => s.enabled && s.teamMode > 1);
             $("#btn-join-team, #btn-create-team").toggle(supportsTeam);
+
+            const supportsPrivateLobby = selectedModes.some((s) => s.enabled);
+            $("#btn-join-private-lobby, #btn-create-private-lobby").toggle(supportsPrivateLobby);
 
             // Region pops
             const pops = this.info.pops;

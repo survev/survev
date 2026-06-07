@@ -9,6 +9,7 @@ import type {
     AdminCmdAction,
     DashboardPlayer,
     FindGamePrivateBody,
+    FindPrivateLobbyGameBody,
     GameData,
     GameSocketData,
     ServerGameConfig,
@@ -23,6 +24,9 @@ export abstract class GameManager {
     abstract getById(id: string): GameData | undefined;
 
     abstract findGame(body: FindGamePrivateBody): Promise<string>;
+
+    /** Spins up a fresh isolated game from a private lobby and registers each team's players as its own join group. */
+    abstract createPrivateGame(body: FindPrivateLobbyGameBody): Promise<string>;
 
     abstract findGameById(gameId: string, playerData: any[], autoFill: boolean): Promise<string>;
     abstract getGames(): Promise<GameData[]>;
@@ -174,6 +178,19 @@ export class SingleThreadGameManager implements GameManager {
         }
 
         game.addJoinTokens(body.playerData, body.autoFill);
+
+        return game.id;
+    }
+
+    async createPrivateGame(body: FindPrivateLobbyGameBody): Promise<string> {
+        const game = await this.newGame({
+            teamMode: body.teamMode,
+            mapName: body.mapName as keyof typeof MapDefs,
+            isPrivate: true,
+            arenaRoles: body.arenaRoles,
+        });
+
+        game.addGroupedJoinTokens(body.teams);
 
         return game.id;
     }

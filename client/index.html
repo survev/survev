@@ -898,6 +898,10 @@
                   <a class="btn-darken menu-option btn-team-option" id="btn-join-team" data-l10n="index-join-team">Join Team</a>
                   <a class="btn-darken menu-option btn-team-option" id="btn-create-team" data-l10n="index-create-team">Create Team</a>
                 </div>
+                <div class="btns-double-row">
+                  <a class="btn-darken menu-option btn-team-option" id="btn-join-private-lobby" data-l10n="index-join-private-lobby">Join Lobby</a>
+                  <a class="btn-darken menu-option btn-team-option" id="btn-create-private-lobby" data-l10n="index-create-private-lobby">Create Lobby</a>
+                </div>
                 <!--<div id="btn-help" class="menu-option btn-darken" data-l10n="index-how-to-play">How to Play</div>-->
 
                 <a class="btn-green btn-darken menu-option" id="btn-spectator-menu">Spectate</a>
@@ -969,9 +973,59 @@
                         <a class="btn-hollow btn-hollow-selected btn-darken team-menu-option btn-team-fill" id="btn-team-fill-auto" data-l10n="index-auto-fill">Auto Fill</a>
                         <a class="btn-hollow btn-darken team-menu-option btn-team-fill" id="btn-team-fill-none" data-l10n="index-no-fill">No Fill</a>
                       </div>
+                      <div class="team-menu-options-buttons" id="team-join-lobby-row">
+                        <input type="text" class="menu-option" contenteditable="false" tabindex="0" placeholder="Lobby link or code" id="team-join-lobby-input" />
+                        <a class="btn-hollow btn-hollow-selected btn-darken team-menu-option" id="btn-team-join-lobby" data-l10n="index-join-private-lobby">Join Lobby</a>
+                      </div>
                       <div id="team-menu-options-start">
                         <a class="btn-green btn-darken menu-option" id="btn-start-team" data-label="Play" data-l10n="index-play">Play</a>
                         <div id="msg-wait-reason"></div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div id="private-lobby-menu" class="menu-column menu-block">
+              <div class="play-loading-outer">
+                <div class="play-loading-inner">
+                  <div class="play-loading-spinner"></div>
+                </div>
+              </div>
+              <div class="play-button-container">
+                <a class="btn-darken menu-option" id="btn-private-lobby-leave" data-l10n="index-leave-private-lobby">Leave Lobby</a>
+                <div id="private-lobby-menu-connecting">
+                  <div class="ui-spinner"></div>
+                  <div class="team-menu-connecting-text" id="private-lobby-menu-joining-text"><span data-l10n="index-joining-private-lobby">Joining lobby</span> ...</div>
+                  <div class="team-menu-connecting-text" id="private-lobby-menu-creating-text"><span data-l10n="index-creating-private-lobby">Creating lobby</span> ...</div>
+                </div>
+                <div id="private-lobby-menu-contents">
+                  <div id="private-lobby-desc">
+                    <div id="private-lobby-desc-text"><span id="private-lobby-invite-link-text" data-l10n="index-invite-link">Invite link</span>: <span id="private-lobby-url"></span>
+                    </div>
+                    <a id="private-lobby-copy-url" class="copy-item btn-darken"></a>
+                    <a id="private-lobby-hide-url" class="hide-item btn-darken"></a>
+                    <div id="private-lobby-code-text"><span id="private-lobby-invite-code-text" data-l10n="index-invite-code">Invite code</span>: <span id="private-lobby-code"></span></div>
+                  </div>
+                  <div id="private-lobby-menu-columns">
+                    <div id="private-lobby-menu-members" class="team-menu-block">
+                      <a class="btn-team-option btn-darken menu-option" id="btn-private-lobby-create-team" data-l10n="index-create-team">Create Team</a>
+                      <div id="private-lobby-menu-team-grid"></div>
+                    </div>
+                    <div id="private-lobby-menu-options" class="team-menu-block">
+                      <select id="private-lobby-server-select" class="btn-hollow btn-hollow-selected server-select menu-option">
+                        <optgroup id="private-lobby-server-opts" label="Region">
+                        </optgroup>
+                      </select>
+                      <div class="team-menu-options-buttons" id="private-lobby-menu-modes">
+                      </div>
+                      <div id="private-lobby-menu-options-start">
+                        <a class="btn-green btn-darken menu-option" id="btn-start-private-lobby" data-label="Play" data-l10n="index-play">Play</a>
+                        <div id="msg-private-lobby-wait-reason"></div>
+                      </div>
+                      <div id="private-lobby-menu-settings">
+                        <div id="private-lobby-settings-tabs"></div>
+                        <div id="private-lobby-settings-content"></div>
                       </div>
                     </div>
                   </div>
@@ -1029,6 +1083,13 @@
               <input type="text" class="menu-option" contenteditable="false" tabindex="0" autofocus placeholder="Paste team link or enter code here" id="team-link-input" />
               <a class="btn-darken menu-option btn-team-option" id="btn-team-mobile-link-join" data-l10n="index-join-team">Join Team</a>
               <a class="btn-darken menu-option" id="btn-team-mobile-link-leave" data-l10n="index-back-to-main">Back to Main Menu</a>
+            </div>
+            <div id="private-lobby-mobile-link" class="menu-column menu-block">
+              <div id="private-lobby-mobile-link-desc" class="team-mobile-link-text" data-l10n="index-join-private-lobby-help">Got a lobby link or code? Paste it here:</div>
+              <div id="private-lobby-mobile-link-warning" class="team-mobile-link-text">Invalid link!</div>
+              <input type="text" class="menu-option" contenteditable="false" tabindex="0" autofocus placeholder="Paste lobby link or enter code here" id="private-lobby-link-input" />
+              <a class="btn-darken menu-option btn-team-option" id="btn-private-lobby-mobile-link-join" data-l10n="index-join-private-lobby">Join Lobby</a>
+              <a class="btn-darken menu-option" id="btn-private-lobby-mobile-link-leave" data-l10n="index-back-to-main">Back to Main Menu</a>
             </div>
             <div id="right-column" class="menu-column">
               <div id="pass-wrapper" style="display: block!important;">

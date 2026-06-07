@@ -7,6 +7,7 @@ import type {
     ServerToClientTeamMsg,
     TeamMenuErrorType,
     TeamPlayGameMsg,
+    TeamPrivateLobbyRedirectMsg,
     TeamStateMsg,
 } from "../../../shared/types/team";
 import { api } from "../api";
@@ -52,6 +53,10 @@ export class TeamMenu {
     fillAuto = $("#btn-team-fill-auto");
     fillNone = $("#btn-team-fill-none");
 
+    joinLobbyRow = $("#team-join-lobby-row");
+    joinLobbyInput = $("#team-join-lobby-input");
+    joinLobbyBtn = $("#btn-team-join-lobby");
+
     active = false;
     joined = false;
     create = false;
@@ -85,6 +90,7 @@ export class TeamMenu {
         public audioManager: AudioManager,
         public joinGameCb: (data: FindGameMatchData) => void,
         public leaveCb: (err: string) => void,
+        public privateLobbyRedirectCb: (lobbyCode: string, importGroupId: string) => void,
     ) {
         // Listen for ui modifications
         this.serverSelect.on("change", () => {
@@ -104,6 +110,18 @@ export class TeamMenu {
         });
         this.fillNone.on("click", () => {
             this.setRoomProperty("autoFill", false);
+        });
+        this.joinLobbyBtn.on("click", () => {
+            if (!this.isLeader) return;
+            let code = (this.joinLobbyInput.val() as string)?.trim() ?? "";
+            const r = code.indexOf("#");
+            if (r >= 0) {
+                code = code.slice(r + 1);
+            }
+            if (code.length > 0) {
+                this.sendMessage("joinPrivateLobby", { lobbyCode: code });
+                this.joinLobbyInput.val("");
+            }
         });
         this.playBtn.on("click", () => {
             SDK.requestMidGameAd(() => {
@@ -318,6 +336,12 @@ export class TeamMenu {
                 this.joiningGame = true;
                 this.joinGameCb(data as FindGameMatchData);
                 break;
+            case "privateLobbyRedirect": {
+                const redirectData = data as TeamPrivateLobbyRedirectMsg["data"];
+                this.joiningGame = true;
+                this.privateLobbyRedirectCb(redirectData.lobbyCode, redirectData.importGroupId);
+                break;
+            }
             case "keepAlive":
                 break;
             case "kicked":
@@ -464,6 +488,9 @@ export class TeamMenu {
             setButtonState(this.fillAuto, this.roomData.autoFill, this.isLeader);
             setButtonState(this.fillNone, !this.roomData.autoFill, this.isLeader);
             this.serverSelect.prop("disabled", !this.isLeader);
+
+            // Leader-only: join an existing private lobby together as a group
+            this.joinLobbyRow.toggle(this.isLeader);
 
             // Invite link
             if (this.roomData.roomUrl) {

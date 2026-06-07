@@ -3,18 +3,19 @@ import { inArray } from "drizzle-orm";
 import type { Hono } from "hono";
 import { getCookie } from "hono/cookie";
 import type { UpgradeWebSocket, WSContext } from "hono/ws";
+import { type MapDef, MapDefs } from "../../shared/defs/mapDefs";
 import type { FindGameError } from "../../shared/types/api";
 import {
     type ClientRoomData,
-    type ClientToServerTeamMsg,
+    type ClientToServerPrivateLobbyMsg,
+    type PrivateLobbyErrorMsg,
+    type PrivateLobbyErrorType,
+    type PrivateLobbyMenuPlayer,
+    type PrivateLobbyPlayGameMsg,
     type RoomData,
-    type ServerToClientTeamMsg,
-    type TeamErrorMsg,
-    type TeamMenuErrorType,
-    type TeamMenuPlayer,
-    type TeamPlayGameMsg,
-    zTeamClientMsg,
-} from "../../shared/types/team";
+    type ServerToClientPrivateLobbyMsg,
+    zPrivateLobbyClientMsg,
+} from "../../shared/types/privateLobby";
 import type { Loadout } from "../../shared/utils/loadout";
 import { assert, util } from "../../shared/utils/util";
 import type { ApiServer } from "./api/apiServer";
@@ -29,7 +30,6 @@ import {
     HTTPRateLimit,
     isBehindProxy,
     validateUserName,
-    verifyTurnsStile,
     WebSocketRateLimit,
 } from "./utils/serverHelpers";
 import type { FindGamePrivateBody } from "./utils/types";
@@ -47,6 +47,9 @@ class Player {
 
     inGame = false;
 
+    /** Lobby-local team slot index. Reassigned by the leader via `assignTeam`. */
+    teamId = 0;
+
     get isLeader() {
         // first player is always leader
         return !!this.room && this.room.players[0] == this;
@@ -56,12 +59,13 @@ class Player {
         return this.room ? this.room.players.indexOf(this) : -1;
     }
 
-    get data(): TeamMenuPlayer {
+    get data(): PrivateLobbyMenuPlayer {
         return {
             name: this.name,
             inGame: this.inGame,
             isLeader: this.isLeader,
             playerId: this.playerId,
+            teamId: this.teamId,
         };
     }
 
@@ -74,7 +78,7 @@ class Player {
 
     constructor(
         public socket: WSContext<SocketData>,
-        public teamMenu: TeamMenu,
+        public privateLobbyMenu: PrivateLobbyMenu,
         public userId: string | null,
         public ip: string,
         admin = false,
@@ -93,9 +97,9 @@ class Player {
         this.name = validateUserName(name).validName;
     }
 
-    send<T extends ServerToClientTeamMsg["type"]>(
+    send<T extends ServerToClientPrivateLobbyMsg["type"]>(
         type: T,
-        data: (ServerToClientTeamMsg & { type: T })["data"],
+        data: (ServerToClientPrivateLobbyMsg & { type: T })["data"],
     ) {
         this.socket.send(
             JSON.stringify({
@@ -114,26 +118,38 @@ class Room {
         findingGame: false,
         lastError: "",
         region: "",
-        autoFill: true,
         enabledGameModeIdxs: [],
-        gameModeIdx: 1,
-        maxPlayers: 4,
-        captchaEnabled: false,
+        gameModeIdx: 0,
+        maxPlayers: 1,
+        teamSize: 1,
+        teamCount: 1,
+        enabledArenaRoles: [],
     };
 
     constructor(
-        public teamMenu: TeamMenu,
+        public privateLobbyMenu: PrivateLobbyMenu,
         public id: string,
         initialData: ClientRoomData,
     ) {
         this.data.roomUrl = `#${id}`;
-        this.data.enabledGameModeIdxs = teamMenu.allowedGameModeIdxs(initialData.region);
-        this.data.captchaEnabled = teamMenu.server.captchaEnabled;
+        this.data.enabledGameModeIdxs = privateLobbyMenu.allowedGameModeIdxs(
+            initialData.region,
+        );
 
         this.setProps(initialData);
     }
 
-    addPlayer(player: Player) {
+    /**
+     * Pre-formed "Create Team" groups handed off via `importGroupId`, keyed by that id.
+     * Held in a grace window so all members land in the same team slot together
+     * instead of being scattered one-by-one (see `queueImportedPlayer`/`finalizeImportGroup`).
+     */
+    pendingImports = new Map<
+        string,
+        { players: Player[]; timeout: ReturnType<typeof setTimeout> }
+    >();
+
+    addPlayer(player: Player, importGroupId?: string) {
         if (this.players.length >= this.data.maxPlayers) return;
 
         this.players.push(player);
@@ -141,10 +157,74 @@ class Room {
 
         clearTimeout(player.disconnectTimeout);
 
+        if (importGroupId) {
+            // placement deferred until the whole group has had a chance to join
+            player.teamId = -1;
+            this.queueImportedPlayer(importGroupId, player);
+        } else {
+            player.teamId = this.firstOpenTeamSlot();
+        }
+
         this.sendState();
     }
 
-    onMsg(player: Player, msg: ClientToServerTeamMsg) {
+    /** Returns the lowest-index team slot that still has room for another player. */
+    firstOpenTeamSlot(): number {
+        const counts = new Array(this.data.teamCount).fill(0);
+        for (const p of this.players) {
+            if (p.teamId >= 0 && p.teamId < counts.length) counts[p.teamId]++;
+        }
+        for (let i = 0; i < counts.length; i++) {
+            if (counts[i] < this.data.teamSize) return i;
+        }
+        return 0;
+    }
+
+    /** Returns the lowest-index team slot with enough free space for `size` players together, or -1 if none fits. */
+    findTeamSlotForGroup(size: number): number {
+        const counts = new Array(this.data.teamCount).fill(0);
+        for (const p of this.players) {
+            if (p.teamId >= 0 && p.teamId < counts.length) counts[p.teamId]++;
+        }
+        for (let i = 0; i < counts.length; i++) {
+            if (this.data.teamSize - counts[i] >= size) return i;
+        }
+        return -1;
+    }
+
+    queueImportedPlayer(importGroupId: string, player: Player) {
+        let pending = this.pendingImports.get(importGroupId);
+        if (!pending) {
+            pending = {
+                players: [],
+                timeout: setTimeout(() => this.finalizeImportGroup(importGroupId), 3000),
+            };
+            this.pendingImports.set(importGroupId, pending);
+        }
+        pending.players.push(player);
+    }
+
+    /** Places every member of an imported group into one team slot, falling back to individual placement if none fits. */
+    finalizeImportGroup(importGroupId: string) {
+        const pending = this.pendingImports.get(importGroupId);
+        if (!pending) return;
+        this.pendingImports.delete(importGroupId);
+        clearTimeout(pending.timeout);
+
+        // drop members that disconnected/left during the grace window
+        const players = pending.players.filter((p) => p.room === this);
+        if (!players.length) return;
+
+        const teamId = this.findTeamSlotForGroup(players.length);
+
+        for (const player of players) {
+            player.teamId = teamId >= 0 ? teamId : this.firstOpenTeamSlot();
+        }
+
+        this.sendState();
+    }
+
+    onMsg(player: Player, msg: ClientToServerPrivateLobbyMsg) {
         if (player.room !== this) return;
 
         player.lastMsgTime = Date.now();
@@ -173,39 +253,55 @@ class Room {
                 this.kick(msg.data.playerId);
                 break;
             }
+            case "assignTeam": {
+                if (!player.isLeader) break;
+                this.assignTeam(msg.data.playerId, msg.data.teamId);
+                break;
+            }
+            case "swapTeam": {
+                if (!player.isLeader) break;
+                this.swapTeam(msg.data.playerId, msg.data.targetPlayerId);
+                break;
+            }
             case "playGame": {
                 if (!player.isLeader) break;
                 this.findGame(msg.data);
                 break;
             }
-            case "joinPrivateLobby": {
-                if (!player.isLeader) break;
-                this.joinPrivateLobby(msg.data.lobbyCode);
-                break;
-            }
         }
     }
 
-    /**
-     * Leader requests that the whole team join an existing private lobby together.
-     * Each member gets redirected with a shared `importGroupId` so the lobby can
-     * place the whole group into a single team slot (see `PrivateLobbyMenu.Room.addPlayer`).
-     */
-    joinPrivateLobby(lobbyCode: string) {
-        if (this.data.findingGame) return;
-        if (this.players.some((p) => p.inGame)) return;
+    /** Leader-only: moves a player into a different (non-full) team slot. */
+    assignTeam(playerId: number, teamId: number) {
+        const player = this.players[playerId];
+        if (!player) return;
+        // Lobbies allow custom layouts beyond the mode's nominal team count
+        // (e.g. splitting a squad lobby into more, smaller teams), so any slot
+        // index up to maxPlayers is valid — there just can't be more useful
+        // team slots than there are players to fill them.
+        if (teamId < 0 || teamId >= this.data.maxPlayers) return;
+        if (player.teamId === teamId) return;
 
-        const lobbyRoom = this.teamMenu.server.privateLobbyMenu.rooms.get(lobbyCode);
-        if (!lobbyRoom) {
-            this.data.lastError = "join_not_found";
-            this.sendState();
-            return;
-        }
+        const teamSize = this.players.filter(
+            (p) => p !== player && p.teamId === teamId,
+        ).length;
+        if (teamSize >= this.data.teamSize) return;
 
-        const importGroupId = randomUUID();
-        for (const player of this.players) {
-            player.send("privateLobbyRedirect", { lobbyCode, importGroupId });
-        }
+        player.teamId = teamId;
+        this.sendState();
+    }
+
+    /** Leader-only: swaps two players' team slots. */
+    swapTeam(playerId: number, targetPlayerId: number) {
+        const player = this.players[playerId];
+        const target = this.players[targetPlayerId];
+        if (!player || !target || player === target) return;
+
+        const teamId = player.teamId;
+        player.teamId = target.teamId;
+        target.teamId = teamId;
+
+        this.sendState();
     }
 
     setProps(props: ClientRoomData) {
@@ -217,22 +313,69 @@ class Room {
 
         let gameModeIdx = props.gameModeIdx;
 
-        const modes = this.teamMenu.server.modesByRegion[this.data.region] ?? [];
+        const modes = this.privateLobbyMenu.server.modesByRegion[this.data.region] ?? [];
 
         if (!this.data.enabledGameModeIdxs.includes(gameModeIdx)) {
-            // we don't allow creating teams if there's no valid team mode
+            // we don't allow creating lobbies if there's no valid mode
             // so this will never be -1
-            gameModeIdx = modes.findIndex((mode) => mode.enabled && mode.teamMode > 1);
+            gameModeIdx = this.data.enabledGameModeIdxs[0];
         }
 
         this.data.gameModeIdx = gameModeIdx;
 
-        this.data.maxPlayers = modes[gameModeIdx].teamMode;
-        this.data.autoFill = props.autoFill;
+        const mode = modes[gameModeIdx];
+        const mapDef = MapDefs[mode.mapName as keyof typeof MapDefs] as MapDef;
+
+        this.data.maxPlayers = mapDef.gameMode.maxPlayers;
+        this.data.teamSize = mode.teamMode;
+        this.data.teamCount = Math.max(
+            1,
+            Math.floor(this.data.maxPlayers / this.data.teamSize),
+        );
+
+        // Arena-mode maps describe a pool of selectable roles (e.g. Sniper/Medic);
+        // the leader can narrow that pool down to the ones they want played.
+        // Keep only roles that are still valid for the (possibly new) mode, and
+        // fall back to the full pool whenever nothing valid was selected — this
+        // also covers initial room creation and mode switches that change the pool.
+        const arenaRoles = mapDef.gameMode.arenaMode ? (mapDef.gameMode.arenaModeRoles ?? []) : [];
+        let enabledArenaRoles = (props.enabledArenaRoles ?? []).filter((role) =>
+            arenaRoles.includes(role),
+        );
+        if (!enabledArenaRoles.length) {
+            enabledArenaRoles = [...arenaRoles];
+        }
+        this.data.enabledArenaRoles = enabledArenaRoles;
 
         // kick players that don't fit on the new max players
         while (this.players.length > this.data.maxPlayers) {
             this.kick(this.players.length - 1);
+        }
+
+        // re-bucket players that fell outside the new team layout, or that now
+        // overflow their team's capacity (e.g. switching from 2v2 to 1v1 while
+        // doubled up) — players keep their slot if it still fits, otherwise they
+        // move to the first team with room (or become unassigned if none fits)
+        const teamCounts = new Array(this.data.teamCount).fill(0);
+        for (const player of this.players) {
+            if (
+                player.teamId >= 0 &&
+                player.teamId < this.data.teamCount &&
+                teamCounts[player.teamId] < this.data.teamSize
+            ) {
+                teamCounts[player.teamId]++;
+                continue;
+            }
+
+            let slot = -1;
+            for (let i = 0; i < this.data.teamCount; i++) {
+                if (teamCounts[i] < this.data.teamSize) {
+                    slot = i;
+                    break;
+                }
+            }
+            player.teamId = slot;
+            if (slot >= 0) teamCounts[slot]++;
         }
 
         this.sendState();
@@ -258,15 +401,16 @@ class Room {
         this.sendState();
 
         if (!this.players.length) {
-            this.teamMenu.removeRoom(this);
+            this.privateLobbyMenu.removeRoom(this);
         }
     }
 
     findGameCooldown = 0;
 
-    async findGame(data: TeamPlayGameMsg["data"]) {
+    async findGame(data: PrivateLobbyPlayGameMsg["data"]) {
         if (this.data.findingGame) return;
         if (this.players.some((p) => p.inGame)) return;
+        if (!this.players.length) return;
         const roomLeader = this.players[0];
         if (!roomLeader) return;
 
@@ -294,60 +438,57 @@ class Room {
                 .where(inArray(usersTable.id, userIds));
         }
 
-        const playerData = this.players.map((p) => {
-            const token = randomUUID();
-            tokenMap.set(p, token);
-            return {
-                token,
-                userId: p.userId,
-                ip: p.ip,
-                admin: p.admin,
-                loadout: loadouts.find((l) => l.userId == p.userId)?.loadout,
-            } satisfies FindGamePrivateBody["playerData"][0];
-        });
-
-        const regionModes = this.teamMenu.server.modesByRegion[region] ?? [];
+        const regionModes = this.privateLobbyMenu.server.modesByRegion[region] ?? [];
         const mode = regionModes[this.data.gameModeIdx];
         if (!mode || !mode.enabled) {
+            this.data.findingGame = false;
+            this.data.lastError = "mode_disabled";
+            this.sendState();
             return;
         }
 
-        if (this.data.captchaEnabled) {
-            if (!data.turnstileToken) {
-                this.data.lastError = "find_game_invalid_captcha";
-                this.sendState();
-                return;
+        // group players by their assigned team slot, preserving join order within each team;
+        // each bucket lands in its own in-game Group (see Game.addGroupedJoinTokens)
+        const teamBuckets = new Map<number, Player[]>();
+        for (const player of this.players) {
+            let bucket = teamBuckets.get(player.teamId);
+            if (!bucket) {
+                bucket = [];
+                teamBuckets.set(player.teamId, bucket);
             }
-
-            try {
-                if (!(await verifyTurnsStile(data.turnstileToken, roomLeader.ip))) {
-                    this.data.lastError = "find_game_invalid_captcha";
-                    this.sendState();
-                    return;
-                }
-            } catch (err) {
-                this.teamMenu.logger.error("Failed verifying turnstile:", err);
-                this.data.lastError = "find_game_error";
-                this.sendState();
-                return;
-            }
+            bucket.push(player);
         }
 
-        const res = await this.teamMenu.server.findGame({
+        const teams = [...teamBuckets.values()].map((bucket) =>
+            bucket.map((p) => {
+                const token = randomUUID();
+                tokenMap.set(p, token);
+                return {
+                    token,
+                    userId: p.userId,
+                    ip: p.ip,
+                    admin: p.admin,
+                    loadout: loadouts.find((l) => l.userId == p.userId)?.loadout,
+                } satisfies FindGamePrivateBody["playerData"][0];
+            }),
+        );
+
+        const res = await this.privateLobbyMenu.server.createPrivateGame({
             mapName: mode.mapName,
             teamMode: mode.teamMode,
-            autoFill: this.data.autoFill,
-            region: region,
+            region,
             version: data.version,
-            playerData,
+            teams,
+            arenaRoles: this.data.enabledArenaRoles,
         });
 
         if ("error" in res) {
-            const errMap: Partial<Record<FindGameError, TeamMenuErrorType>> = {
+            const errMap: Partial<Record<FindGameError, PrivateLobbyErrorType>> = {
                 full: "find_game_full",
                 invalid_protocol: "find_game_invalid_protocol",
             };
 
+            this.data.findingGame = false;
             this.data.lastError = errMap[res.error] || "find_game_error";
             this.sendState();
             // 1 second cooldown on error
@@ -357,9 +498,6 @@ class Room {
 
         this.findGameCooldown = Date.now() + 5000;
 
-        const joinData = res;
-        if (!joinData) return;
-
         this.data.lastError = "";
 
         for (const player of this.players) {
@@ -367,7 +505,9 @@ class Room {
             const token = tokenMap.get(player);
 
             if (!token) {
-                this.teamMenu.logger.warn(`Missing token for player ${player.name}`);
+                this.privateLobbyMenu.logger.warn(
+                    `Missing token for player ${player.name}`,
+                );
                 continue;
             }
 
@@ -386,9 +526,6 @@ class Room {
 
     sendState() {
         const players = this.players.map((p) => p.data);
-        // all players must be logged in to disable it
-        this.data.captchaEnabled =
-            this.teamMenu.server.captchaEnabled && !this.players.every((p) => !!p.userId);
         for (const player of this.players) {
             player.send("state", {
                 localPlayerId: player.playerId,
@@ -399,21 +536,23 @@ class Room {
     }
 }
 
-const teamCodeCharacters = "ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz123456789";
-function generateTeamCode(): string {
+const lobbyCodeCharacters = "ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz123456789";
+// 6 chars (vs. 4 for team codes) so lobby codes/links can be told apart from
+// team codes/links — keep PRIVATE_LOBBY_CODE_LENGTH in client/src/main.ts in sync
+function generateLobbyCode(): string {
     let str = "";
-    for (let i = 0; i < 4; i++) {
-        str += teamCodeCharacters.charAt(
-            Math.floor(Math.random() * teamCodeCharacters.length),
+    for (let i = 0; i < 6; i++) {
+        str += lobbyCodeCharacters.charAt(
+            Math.floor(Math.random() * lobbyCodeCharacters.length),
         );
     }
     return `${str}`;
 }
 
-export class TeamMenu {
+export class PrivateLobbyMenu {
     rooms = new Map<string, Room>();
 
-    logger = new ServerLogger("TeamMenu");
+    logger = new ServerLogger("PrivateLobbyMenu");
 
     playersByIp = new Map<string, Set<Player>>();
 
@@ -442,27 +581,28 @@ export class TeamMenu {
         }, 1000);
     }
 
+    /** Any enabled mode is allowed in private lobbies, including Solo (unlike teams). */
     allowedGameModeIdxs(region: string) {
         const regionModes = this.server.modesByRegion[region] ?? [];
 
         return regionModes
             .map((mode, i) => ({ mode, i }))
-            .filter(({ mode }) => mode.enabled && mode.teamMode > 1)
+            .filter(({ mode }) => mode.enabled)
             .map(({ i }) => i);
     }
 
     init(app: Hono, upgradeWebSocket: UpgradeWebSocket) {
-        const teamMenu = this;
+        const privateLobbyMenu = this;
 
         const httpRateLimit = new HTTPRateLimit(5, 2000);
         const wsRateLimit = new WebSocketRateLimit(50, 1000, 5);
 
         app.get(
-            "/team_v2",
+            "/private_lobby_v2",
             upgradeWebSocket(async (c) => {
                 const ip = getHonoIp(c, Config.apiServer.proxyIPHeader);
 
-                let closeReason: TeamMenuErrorType | undefined;
+                let closeReason: PrivateLobbyErrorType | undefined;
                 if (
                     !ip ||
                     httpRateLimit.isRateLimited(ip) ||
@@ -499,7 +639,7 @@ export class TeamMenu {
                     closeReason = "behind_proxy";
                 }
 
-                if(!closeReason && ip) wsRateLimit.ipConnected(ip!);
+                if (!closeReason && ip) wsRateLimit.ipConnected(ip!);
 
                 return {
                     onOpen(_event, ws) {
@@ -514,39 +654,49 @@ export class TeamMenu {
                                 JSON.stringify({
                                     type: "error",
                                     data: {
-                                        type: closeReason as TeamMenuErrorType,
+                                        type: closeReason as PrivateLobbyErrorType,
                                     },
-                                } satisfies TeamErrorMsg),
+                                } satisfies PrivateLobbyErrorMsg),
                             );
-                            teamMenu.logger.warn(`closed socket for ${closeReason}`);
+                            privateLobbyMenu.logger.warn(
+                                `closed socket for ${closeReason}`,
+                            );
                             ws.close();
                             return;
                         }
-                        teamMenu.onOpen(ws as WSContext<SocketData>, userId, ip!, admin);
+                        privateLobbyMenu.onOpen(
+                            ws as WSContext<SocketData>,
+                            userId,
+                            ip!,
+                            admin,
+                        );
                     },
 
                     onMessage(event, ws) {
                         const data = ws.raw! as SocketData;
 
                         if (wsRateLimit.isRateLimited(data.rateLimit)) {
-                            teamMenu.logger.warn("Rate limited, closing socket.");
+                            privateLobbyMenu.logger.warn("Rate limited, closing socket.");
                             ws.close();
                             return;
                         }
 
                         try {
-                            teamMenu.onMsg(
+                            privateLobbyMenu.onMsg(
                                 ws as WSContext<SocketData>,
                                 event.data as string,
                             );
                         } catch (err) {
-                            teamMenu.logger.error("Error processing message:", err);
+                            privateLobbyMenu.logger.error(
+                                "Error processing message:",
+                                err,
+                            );
                             ws.close();
                         }
                     },
 
                     onClose(_event, ws) {
-                        teamMenu.onClose(ws as WSContext<SocketData>);
+                        privateLobbyMenu.onClose(ws as WSContext<SocketData>);
 
                         const data = ws.raw! as SocketData;
                         wsRateLimit.ipDisconnected(data.ip);
@@ -569,11 +719,11 @@ export class TeamMenu {
     }
 
     onMsg(ws: WSContext<SocketData>, data: string) {
-        let msg: ClientToServerTeamMsg;
+        let msg: ClientToServerPrivateLobbyMsg;
         try {
             assert(data.length < 1024);
             msg = JSON.parse(data);
-            zTeamClientMsg.parse(msg);
+            zPrivateLobbyClientMsg.parse(msg);
         } catch {
             this.logger.warn("Failed to parse message, closing socket.");
             ws.close();
@@ -593,7 +743,13 @@ export class TeamMenu {
         if (!player.room) {
             switch (msg.type) {
                 case "create": {
-                    // don't allow creating a team if there's no team mode enabled
+                    // creating a private lobby requires an account; joining one doesn't
+                    if (!player.userId) {
+                        player.send("error", { type: "login_required" });
+                        break;
+                    }
+
+                    // don't allow creating a lobby if there's no mode enabled
                     if (!this.allowedGameModeIdxs(msg.data.roomData.region).length) {
                         player.send("error", { type: "create_failed" });
                         break;
@@ -619,7 +775,7 @@ export class TeamMenu {
                     }
                     player.setName(msg.data.playerData.name);
 
-                    room.addPlayer(player);
+                    room.addPlayer(player, msg.data.importGroupId);
                 }
             }
         }
@@ -664,9 +820,9 @@ export class TeamMenu {
     }
 
     createRoom(data: ClientRoomData) {
-        let roomUrl = generateTeamCode();
+        let roomUrl = generateLobbyCode();
         while (this.rooms.has(roomUrl)) {
-            roomUrl = generateTeamCode();
+            roomUrl = generateLobbyCode();
         }
 
         const room = new Room(this, roomUrl, data);

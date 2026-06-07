@@ -64,6 +64,12 @@ export default defineConfig(({ mode }) => {
                 secure: false,
                 ws: true,
             },
+            "/private_lobby_v2": {
+                target: `http://${Config.apiServer.host}:${Config.apiServer.port}`,
+                changeOrigin: true,
+                secure: false,
+                ws: true,
+            },
         },
     };
 

@@ -31,12 +31,18 @@ import Menu from "./ui/menu";
 import { MenuModal } from "./ui/menuModal";
 import { LoadoutDisplay } from "./ui/opponentDisplay";
 import { Pass } from "./ui/pass";
+import { PrivateLobbyMenu } from "./ui/privateLobby";
 import { ProfileUi } from "./ui/profileUi";
 import { TeamMenu } from "./ui/teamMenu";
 import { loadStaticDomImages } from "./ui/ui2";
 import { MatchData, SpectatorMenu } from "./ui/spectatorMenu";
 import { GameInfo } from "./gameInfo";
 import { ChatUi } from "./ui/chat";
+
+// Private lobby codes are 6 chars (vs. 4 for team codes) so codes/links
+// pasted or loaded from the URL hash can be told apart — keep in sync with
+// generateLobbyCode() in server/src/privateLobby.ts
+const PRIVATE_LOBBY_CODE_LENGTH = 6;
 
 export class Application {
     nameInput = $("#player-name-input-solo");
@@ -75,6 +81,7 @@ export class Application {
 
     siteInfo!: SiteInfo;
     teamMenu!: TeamMenu;
+    privateLobbyMenu!: PrivateLobbyMenu;
     gameInfo!: GameInfo;
     spectatorMenu!: SpectatorMenu;
 
@@ -138,6 +145,17 @@ export class Application {
             this.audioManager,
             this.onTeamMenuJoinGame.bind(this),
             this.onTeamMenuLeave.bind(this),
+            this.onTeamPrivateLobbyRedirect.bind(this),
+        );
+
+        this.privateLobbyMenu = new PrivateLobbyMenu(
+            this.config,
+            this.pingTest,
+            this.siteInfo,
+            this.localization,
+            this.audioManager,
+            this.onTeamMenuJoinGame.bind(this),
+            this.onPrivateLobbyMenuLeave.bind(this),
         );
 
         const onLoadComplete = () => {
@@ -149,12 +167,12 @@ export class Application {
         this.loadBrowserDeps(onLoadComplete);
         // Fix: initialize spectatorMenu to avoid undefined error
         this.spectatorMenu = new SpectatorMenu(
-            this.config, 
-            this.pingTest, 
+            this.config,
+            this.pingTest,
             this.siteInfo,
-            this.gameInfo, 
-            this.localization, 
-            this.account, 
+            this.gameInfo,
+            this.localization,
+            this.account,
             this.joinGameAsSpectator.bind(this)
         );
     }
@@ -307,6 +325,31 @@ export class Application {
                 this.game?.free();
                 this.teamMenu.leave();
             });
+            $("#btn-create-private-lobby").on("click", () => {
+                this.tryJoinPrivateLobby(true);
+            });
+            $("#btn-private-lobby-mobile-link-join").on("click", () => {
+                let t = $<HTMLInputElement>("#private-lobby-link-input").val()?.trim()!;
+                const r = t.indexOf("#");
+                if (r >= 0) {
+                    t = t.slice(r + 1);
+                }
+                if (t.length > 0) {
+                    $("#private-lobby-mobile-link").css("display", "none");
+                    this.tryJoinPrivateLobby(false, t);
+                } else {
+                    $("#private-lobby-mobile-link-desc").css("display", "none");
+                    $("#private-lobby-mobile-link-warning").css("display", "none").fadeIn(100);
+                }
+            });
+            $("#btn-private-lobby-leave").on("click", () => {
+                if (window.history) {
+                    window.history.replaceState("", "", "/");
+                }
+                $("#news-block").css("display", "block");
+                this.game?.free();
+                this.privateLobbyMenu.leave();
+            });
             const r = $("#news-current").data("date");
             const a = new Date(r).getTime();
             $(".right-column-toggle").on("click", () => {
@@ -387,6 +430,7 @@ export class Application {
                 this.game!.free();
                 this.errorMessage = this.localization.translate(errMsg || "");
                 this.teamMenu.onGameComplete();
+                this.privateLobbyMenu.onGameComplete();
                 this.ambience.onGameComplete(this.audioManager);
                 this.setAppActive(true);
                 this.setPlayLockout(false);
@@ -450,6 +494,7 @@ export class Application {
 
     onUnload() {
         this.teamMenu.leave();
+        this.privateLobbyMenu.leave();
     }
 
     onResize() {
@@ -565,6 +610,29 @@ export class Application {
         this.refreshUi();
     }
 
+    onPrivateLobbyMenuLeave(errTxt = "") {
+        if (errTxt && errTxt != "" && window.history) {
+            window.history.replaceState("", "", "/");
+        }
+        this.showErrorModal(errTxt);
+
+        this.errorMessage = errTxt;
+        this.setDOMFromConfig();
+        this.refreshUi();
+    }
+
+    /**
+     * The team leader requested that the whole group join a private lobby together.
+     * Each member independently leaves the team and connects to the lobby with the
+     * shared `importGroupId` so the lobby places the group into a single team slot.
+     */
+    onTeamPrivateLobbyRedirect(lobbyCode: string, importGroupId: string) {
+        this.teamMenu.leave();
+        this.setConfigFromDOM();
+        this.privateLobbyMenu.connect(false, lobbyCode, importGroupId);
+        this.refreshUi();
+    }
+
     // Config
     setConfigFromDOM() {
         const playerName = helpers.sanitizeNameInput(this.nameInput.val() as string);
@@ -652,7 +720,9 @@ export class Application {
         // Hide the left section if on mobile, oriented portrait, and viewing create team
         $("#ad-block-left").css(
             "display",
-            !device.isLandscape && this.teamMenu.active ? "none" : "block",
+            !device.isLandscape && (this.teamMenu.active || this.privateLobbyMenu.active)
+                ? "none"
+                : "block",
         );
 
         // Warning
@@ -705,6 +775,15 @@ export class Application {
                 create = false;
             }
 
+            // Team and lobby codes/links can end up here (e.g. from the URL
+            // hash on page load, or pasted into the team join field) — lobby
+            // codes are a different length, so reroute those to the lobby
+            // menu instead of trying (and failing) to join a team with them.
+            if (!create && roomUrl.length === PRIVATE_LOBBY_CODE_LENGTH) {
+                this.tryJoinPrivateLobby(false, roomUrl);
+                return;
+            }
+
             if (create || roomUrl != "") {
                 // The main menu and squad menus have separate
                 // DOM elements for input, such as player name and
@@ -712,6 +791,31 @@ export class Application {
                 // into the config so the team menu can read them.
                 this.setConfigFromDOM();
                 this.teamMenu.connect(create, roomUrl);
+                this.refreshUi();
+            }
+        }
+    }
+
+    tryJoinPrivateLobby(create: boolean, url?: string) {
+        if (this.active && this.quickPlayPendingModeIdx === -1) {
+            // Unlike teams, lobby links don't read the URL hash themselves —
+            // tryJoinTeam() inspects it first and forwards lobby-shaped codes
+            // here (see PRIVATE_LOBBY_CODE_LENGTH), so `url` is always provided
+            // when joining via a hash/pasted code.
+            const roomUrl = url || "";
+
+            if (create || roomUrl != "") {
+                // Only creating a lobby requires an account; joining one (e.g. via link) doesn't
+                if (create && !this.account.loggedIn) {
+                    this.errorMessage = this.localization.translate(
+                        "index-private-lobby-login-required",
+                    );
+                    this.refreshUi();
+                    return;
+                }
+
+                this.setConfigFromDOM();
+                this.privateLobbyMenu.connect(create, roomUrl);
                 this.refreshUi();
             }
         }
@@ -963,6 +1067,7 @@ export class Application {
         this.errorMessage = errMap[err] || errMap.full!;
         this.quickPlayPendingModeIdx = -1;
         this.teamMenu.leave("join_game_failed");
+        this.privateLobbyMenu.leave("join_game_failed");
         this.refreshUi();
     }
 
@@ -1000,6 +1105,7 @@ export class Application {
 
         this.quickPlayPendingModeIdx = -1;
         this.teamMenu.leave("banned");
+        this.privateLobbyMenu.leave("banned");
         this.refreshUi();
     }
 

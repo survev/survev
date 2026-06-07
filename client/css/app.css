@@ -176,8 +176,8 @@ a:active {
   background-position: center;
   height: 300px;
   margin: auto;
-  margin-top: 75px;
-  margin-bottom: 0px;
+  margin-top: 20px;
+  margin-bottom: 65px;
   position: relative;
   /* In case of logo change, update this value to width divided by 2 ceiled  */
   width: 500px;
@@ -206,11 +206,11 @@ a:active {
   color: red;
   font-size: 18px;
   font-weight: 700;
-  height: 30px;
   left: 0;
-  line-height: 30px;
+  line-height: 1.3;
   margin: auto;
   opacity: 0;
+  padding: 5px 10px;
   position: absolute;
   right: 0;
   text-align: center;
@@ -220,8 +220,7 @@ a:active {
 @media (max-width: 850px), (max-width: 900px) and (min-resolution: 3dppx) {
   #server-warning {
     font-size: 12px;
-    height: 18px;
-    line-height: 20px;
+    line-height: 1.3;
     position: relative;
     top: 82px;
     width: 200px;
@@ -273,7 +272,6 @@ a:active {
   border-radius: 5px;
   box-sizing: border-box;
   display: block;
-  max-height: 325px;
 }
 
 @media (max-width: 850px), (max-width: 900px) and (min-resolution: 3dppx) {
@@ -499,6 +497,7 @@ a:active {
 }
 
 #start-menu {
+  max-height: 412px;
   padding: 20px;
   width: 300px;
 }
@@ -1163,7 +1162,8 @@ a:active {
   }
 }
 
-#btn-team-leave {
+#btn-team-leave,
+#btn-private-lobby-leave {
   background: #7a7a7a;
   border-bottom: 2px solid #3e3e3e;
   bottom: -32px;
@@ -1385,7 +1385,8 @@ a:active {
 
 
 @media (max-height: 800px) {
-  #btn-team-leave {
+  #btn-team-leave,
+  #btn-private-lobby-leave {
     font-size: 16px;
     right: 14px;
     top: 20px;
@@ -1396,7 +1397,8 @@ a:active {
 }
 
 @media (max-width: 850px), (max-width: 900px) and (min-resolution: 3dppx) {
-  #btn-team-leave {
+  #btn-team-leave,
+  #btn-private-lobby-leave {
     box-shadow: none;
     font-size: 14px;
     line-height: 28px;
@@ -1408,7 +1410,6 @@ a:active {
 
 #team-menu {
   display: none;
-  height: 325px;
   padding: 12px;
   position: relative;
   width: 625px;
@@ -1645,6 +1646,342 @@ a:active {
   }
 }
 
+#private-lobby-menu {
+  display: none;
+  height: 560px;
+  /* Escape .menu-block's 325px clamp. The header/donate column are hidden
+     while the lobby is open (see privateLobby.ts), which frees enough
+     vertical space for this box to fit without scrolling or overflowing. */
+  max-height: none !important;
+  padding: 12px;
+  position: relative;
+  width: 1000px;
+}
+
+@media (max-width: 850px), (max-width: 900px) and (min-resolution: 3dppx) {
+  #private-lobby-menu {
+    height: 300px;
+    width: 418px;
+  }
+}
+
+#private-lobby-menu-columns {
+  height: 460px;
+}
+
+@media (max-width: 850px), (max-width: 900px) and (min-resolution: 3dppx) {
+  #private-lobby-menu-columns {
+    height: 300px;
+    margin-top: -4px;
+  }
+}
+
+#private-lobby-menu-connecting {
+  display: none;
+  margin-top: 120px;
+  text-align: center;
+  width: 100%;
+}
+
+@media (max-width: 850px), (max-width: 900px) and (min-resolution: 3dppx) {
+  #private-lobby-menu-connecting {
+    margin-top: 64px;
+  }
+}
+
+#private-lobby-menu-members {
+  display: flex;
+  flex-direction: column;
+  float: left;
+  height: 100%;
+  padding: 12px 0;
+  width: 420px;
+}
+
+#btn-private-lobby-create-team {
+  flex-shrink: 0;
+}
+
+@media (max-width: 850px), (max-width: 900px) and (min-resolution: 3dppx) {
+  #private-lobby-menu-members {
+    width: 240px;
+  }
+}
+
+#private-lobby-menu-team-grid {
+  flex: 1;
+  /* Lets the grid shrink below its content size so it scrolls internally
+     instead of pushing the "Create Team" button out of the members box. */
+  min-height: 0;
+  overflow-y: auto;
+  padding-right: 4px;
+}
+
+.private-lobby-team {
+  background-color: rgba(255, 255, 255, 0.05);
+  border-radius: 5px;
+  margin-bottom: 8px;
+  padding: 6px;
+}
+
+.private-lobby-team-header {
+  color: #fff;
+  font-size: 14px;
+  font-weight: 700;
+  margin-bottom: 4px;
+  padding: 0 4px;
+}
+
+.private-lobby-team-slot {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.private-lobby-player {
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+.private-lobby-player-selected {
+  background-color: rgba(124, 252, 0, 0.15);
+  outline: 2px solid #7cfc00;
+}
+
+.private-lobby-player-empty {
+  background-color: rgba(255, 255, 255, 0.03);
+  border: 1px dashed rgba(255, 255, 255, 0.15);
+  border-radius: 5px;
+  height: 40px;
+}
+
+.private-lobby-team-unassigned {
+  background-color: rgba(255, 255, 255, 0.02);
+}
+
+#private-lobby-menu-options {
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  float: right;
+  height: 100%;
+  padding: 12px;
+  width: 520px;
+}
+
+/* .btn-hollow sets flex: 1, which would stretch this select to fill the column
+   (and resize whenever the settings panel below it appears/disappears) */
+#private-lobby-server-select {
+  flex: 0 0 auto;
+}
+
+@media (max-width: 850px), (max-width: 900px) and (min-resolution: 3dppx) {
+  #private-lobby-menu-options {
+    float: right;
+    padding: 12px 0;
+    width: 170px;
+  }
+}
+
+#private-lobby-menu-settings {
+  display: none;
+  flex: 1;
+  flex-direction: column;
+  margin-top: 8px;
+  min-height: 0;
+}
+
+#private-lobby-settings-tabs {
+  display: flex;
+  flex-shrink: 0;
+  gap: 4px;
+  margin-bottom: 8px;
+}
+
+.private-lobby-settings-tab {
+  background-color: rgba(255, 255, 255, 0.05);
+  border-radius: 5px;
+  color: #fff;
+  cursor: pointer;
+  flex: 0 1 auto;
+  font-size: 14px;
+  font-weight: 700;
+  padding: 8px 14px;
+  text-align: center;
+}
+
+.private-lobby-settings-tab:hover {
+  background-color: rgba(255, 255, 255, 0.1);
+}
+
+.private-lobby-settings-tab-active {
+  background-color: rgba(255, 255, 255, 0.15);
+  outline: 2px solid #7cfc00;
+}
+
+#private-lobby-settings-content {
+  flex: 1;
+  min-height: 0;
+  padding-right: 4px;
+}
+
+.private-lobby-arena-roles {
+  display: flex;
+  gap: 8px;
+}
+
+.private-lobby-arena-role {
+  align-items: center;
+  background-color: rgba(255, 255, 255, 0.05);
+  border-radius: 5px;
+  cursor: pointer;
+  display: flex;
+  flex: 0 1 calc(50% - 4px);
+  gap: 10px;
+  padding: 8px;
+}
+
+.private-lobby-arena-role:hover {
+  background-color: rgba(255, 255, 255, 0.1);
+}
+
+.private-lobby-arena-role-enabled {
+  background-color: rgba(124, 252, 0, 0.15);
+  outline: 2px solid #7cfc00;
+}
+
+.private-lobby-arena-role-readonly {
+  cursor: default;
+}
+
+.private-lobby-arena-role-icon {
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: contain;
+  flex-shrink: 0;
+  height: 36px;
+  width: 36px;
+}
+
+.private-lobby-arena-role-name {
+  color: #fff;
+  font-size: 14px;
+  font-weight: 700;
+}
+
+@media (max-width: 850px), (max-width: 900px) and (min-resolution: 3dppx) {
+  .private-lobby-settings-tab,
+  .private-lobby-arena-role-name {
+    font-size: 11px;
+  }
+
+  .private-lobby-arena-role {
+    flex: 0 1 100%;
+  }
+
+  .private-lobby-arena-role-icon {
+    height: 28px;
+    width: 28px;
+  }
+}
+
+#private-lobby-menu-modes {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+}
+
+#private-lobby-menu-modes > a {
+  flex: 0 1 calc(50% - 2px);
+  margin-right: 0;
+}
+
+#private-lobby-menu-modes .btn-custom-mode-select {
+  background-position: 8px center;
+  background-size: 22px;
+  text-indent: 15px;
+}
+
+#btn-start-private-lobby {
+  display: block;
+}
+
+#private-lobby-desc {
+  font-size: 14px;
+  display: inline-block;
+  margin-bottom: 10px;
+  text-align: center;
+  width: 85%;
+}
+
+#private-lobby-desc-text {
+  display: inline;
+  font-size: 16px;
+  cursor: pointer;
+}
+
+#private-lobby-desc-text span#private-lobby-invite-link-text {
+  color: #fff;
+  font-size: 16px;
+  font-weight: 400;
+}
+
+#private-lobby-desc-text span {
+  color: #fff;
+  font-size: 18px;
+  font-weight: 700;
+}
+
+#private-lobby-code-text {
+  display: block;
+  font-size: 18px;
+  margin: 2px auto 0;
+  color: #fff;
+  font-weight: 700;
+  width: 60%;
+}
+
+@media (max-width: 850px), (max-width: 900px) and (min-resolution: 3dppx) {
+  #private-lobby-code-text {
+    font-size: 12px;
+    margin-top: initial;
+  }
+}
+
+#private-lobby-invite-code-text {
+  color: #fff;
+  font-size: 16px;
+  font-weight: 400;
+}
+
+#msg-private-lobby-wait-reason {
+  animation: msgStartWaitingPulse 3s ease-out infinite;
+  display: none;
+  font-size: 14px;
+  margin: auto;
+  margin-top: 8px;
+  text-align: center;
+}
+
+@media (max-width: 850px), (max-width: 900px) and (min-resolution: 3dppx) {
+  #msg-private-lobby-wait-reason {
+    margin-top: 0;
+  }
+}
+
+#team-join-lobby-input {
+  background-color: rgba(255, 255, 255, 0.1);
+  border: none;
+  border-radius: 5px;
+  box-sizing: border-box;
+  color: #fff;
+  flex: 1;
+  font-size: 14px;
+  margin-right: 4px;
+  min-width: 0;
+  padding: 0 8px;
+}
+
 #team-mobile-link {
   display: none;
   height: 250px;
@@ -1682,6 +2019,31 @@ a:active {
 }
 
 #team-mobile-link-warning {
+  display: none;
+  color: red;
+  font-weight: 700;
+}
+
+#private-lobby-mobile-link {
+  display: none;
+  height: 250px;
+  padding: 12px;
+  width: 625px;
+}
+
+@media (max-width: 850px), (max-width: 900px) and (min-resolution: 3dppx) {
+  #private-lobby-mobile-link {
+    width: 418px;
+    height: 186px;
+    padding: 12px;
+  }
+}
+
+#private-lobby-mobile-link-desc {
+  display: block;
+}
+
+#private-lobby-mobile-link-warning {
   display: none;
   color: red;
   font-weight: 700;
@@ -7306,7 +7668,8 @@ input [type="image"]:focus {
     transform: translateX(-50%);
   }
 
-  #btn-team-leave {
+  #btn-team-leave,
+  #btn-private-lobby-leave {
     bottom: initial;
     top: 400px;
   }

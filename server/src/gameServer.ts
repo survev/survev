@@ -27,9 +27,11 @@ import {
 import {
     type FindGamePrivateBody,
     type FindGamePrivateRes,
+    type FindPrivateLobbyGameBody,
     type GameSocketData,
     type SaveGameBody,
     zFindGamePrivateBody,
+    zFindPrivateLobbyGameBody,
 } from "./utils/types";
 
 process.on("uncaughtException", async (err) => {
@@ -88,6 +90,46 @@ class GameServer {
         if (gameId === "player_not_verified") {
             return { error: "player_not_verified" };
         }
+
+        return {
+            gameId,
+            useHttps: this.region.https,
+            hosts: [this.region.address],
+            addrs: [this.region.address],
+        };
+    }
+
+    async createPrivateGame(body: FindPrivateLobbyGameBody): Promise<FindGamePrivateRes> {
+        const parsed = zFindPrivateLobbyGameBody.safeParse(body);
+
+        if (!parsed.success || !parsed.data) {
+            this.logger.warn("/api/find_private_game: Invalid body");
+            return {
+                error: "failed_to_parse_body",
+            };
+        }
+        const data = parsed.data;
+
+        if (data.version !== GameConfig.protocolVersion) {
+            return {
+                error: "invalid_protocol",
+            };
+        }
+
+        if (data.region !== this.regionId) {
+            return {
+                error: "invalid_region",
+            };
+        }
+
+        const gameId = await this.manager.createPrivateGame({
+            region: data.region,
+            version: data.version,
+            mapName: data.mapName,
+            teamMode: data.teamMode,
+            teams: data.teams,
+            arenaRoles: data.arenaRoles,
+        });
 
         return {
             gameId,
@@ -311,6 +353,46 @@ app.post("/api/find_game", (res, req) => {
                 res.end();
             });
             server.logger.warn("/api/find_game: Error retrieving body");
+        },
+    );
+});
+
+app.post("/api/find_private_game", (res, req) => {
+    res.onAborted(() => {
+        res.aborted = true;
+    });
+
+    if (req.getHeader("survev-api-key") !== Config.secrets.SURVEV_API_KEY) {
+        forbidden(res);
+        return;
+    }
+
+    readPostedJSON(
+        res,
+        async (body: FindPrivateLobbyGameBody) => {
+            try {
+                if (res.aborted) return;
+
+                const parsed = zFindPrivateLobbyGameBody.safeParse(body);
+                if (!parsed.success || !parsed.data) {
+                    returnJson(res, { error: "failed_to_parse_body" });
+                    return;
+                }
+
+                returnJson(res, await server.createPrivateGame(parsed.data));
+            } catch (error) {
+                server.logger.warn("API find_private_game error: ", error);
+            }
+        },
+        () => {
+            if (res.aborted) return;
+            res.cork(() => {
+                if (res.aborted) return;
+                res.writeStatus("500 Internal Server Error");
+                res.write("500 Internal Server Error");
+                res.end();
+            });
+            server.logger.warn("/api/find_private_game: Error retrieving body");
         },
     );
 });
@@ -720,7 +802,10 @@ app.ws<GameSocketData>("/play", {
             return;
         }
 
-        if (!gameData.canJoin) {
+        // private lobby games are always excluded from `canJoin` (it's the public
+        // matchmaking eligibility check) — players join them via pre-issued tokens
+        // instead, validated later in the handshake, so skip this gate for them
+        if (!gameData.isPrivate && !gameData.canJoin) {
             server.logger.warn("game_started");
             forbidden(res);
             return;

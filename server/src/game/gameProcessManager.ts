@@ -10,6 +10,7 @@ import {
     type AdminCmdAction,
     type DashboardPlayer,
     type FindGamePrivateBody,
+    type FindPrivateLobbyGameBody,
     type GameData,
     type GameSocketData,
     type ProcessMsg,
@@ -29,6 +30,7 @@ class GameProcess implements GameData {
     process: ChildProcess;
 
     canJoin = true;
+    isPrivate = false;
     creating = false;
     teamMode: TeamMode = 1;
     mapName = "";
@@ -74,6 +76,7 @@ class GameProcess implements GameData {
                     break;
                 case ProcessMsgType.UpdateData:
                     this.canJoin = msg.canJoin;
+                    this.isPrivate = msg.isPrivate;
                     this.teamMode = msg.teamMode;
                     this.mapName = msg.mapName;
                     if (this.id !== msg.id) {
@@ -165,6 +168,20 @@ class GameProcess implements GameData {
             type: ProcessMsgType.AddJoinToken,
             autoFill,
             tokens,
+        });
+        this.avaliableSlots--;
+    }
+    addGroupedJoinTokens(teams: FindGamePrivateBody["playerData"][]) {
+        for (const tokens of teams) {
+            for (const t of tokens) {
+                if (t.userId) {
+                    this.manager.accountIpCache.set(t.ip, Date.now() + 2 * 60 * 1000);
+                }
+            }
+        }
+        this.send({
+            type: ProcessMsgType.AddGroupedJoinTokens,
+            teams,
         });
         this.avaliableSlots--;
     }
@@ -376,6 +393,30 @@ export class GameProcessManager implements GameManager {
         }
 
         game.addJoinTokens(body.playerData, body.autoFill);
+
+        return game.id;
+    }
+
+    async createPrivateGame(body: FindPrivateLobbyGameBody): Promise<string> {
+        const game = this.newGame({
+            teamMode: body.teamMode,
+            mapName: body.mapName as keyof typeof MapDefs,
+            isPrivate: true,
+            arenaRoles: body.arenaRoles,
+        });
+
+        // if the game has not finished creating
+        // wait for it to be created before registering the join groups
+        if (!game.created) {
+            return await new Promise((resolve) => {
+                game.onCreatedCbs.push((game) => {
+                    game.addGroupedJoinTokens(body.teams);
+                    resolve(game.id);
+                });
+            });
+        }
+
+        game.addGroupedJoinTokens(body.teams);
 
         return game.id;
     }

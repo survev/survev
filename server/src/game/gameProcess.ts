@@ -71,6 +71,9 @@ process.on("message", async (msg: ProcessMsg) => {
         case ProcessMsgType.AddJoinToken:
             game.addJoinTokens(msg.tokens, msg.autoFill);
             break;
+        case ProcessMsgType.AddGroupedJoinTokens:
+            game.addGroupedJoinTokens(msg.teams);
+            break;
         case ProcessMsgType.AddJoinTokenAsSpectator:
             game.addJoinTokensAsSpectator(msg.tokens, false);
             break;

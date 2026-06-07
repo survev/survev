@@ -77,12 +77,27 @@ export interface TeamErrorMsg {
     };
 }
 
+/**
+ * Sent by the server to every team member when the leader requests to join a
+ * private lobby as a pre-formed group. Each client independently connects to
+ * the private lobby socket and sends `join` with the same `importGroupId` so
+ * the lobby can place the whole team together in a single team slot.
+ */
+export interface TeamPrivateLobbyRedirectMsg {
+    readonly type: "privateLobbyRedirect";
+    data: {
+        lobbyCode: string;
+        importGroupId: string;
+    };
+}
+
 export type ServerToClientTeamMsg =
     | TeamJoinGameMsg
     | TeamStateMsg
     | TeamKeepAliveMsg
     | TeamKickedMsg
-    | TeamErrorMsg;
+    | TeamErrorMsg
+    | TeamPrivateLobbyRedirectMsg;
 
 //
 // Team Msgs that the client sends to the server
@@ -165,6 +180,16 @@ export const zTeamPlayGameMsg = z.object({
 
 export type TeamPlayGameMsg = z.infer<typeof zTeamPlayGameMsg>;
 
+/** Leader-only: requests that the whole team join an existing private lobby together. */
+export const zTeamJoinPrivateLobbyMsg = z.object({
+    type: z.literal("joinPrivateLobby"),
+    data: z.object({
+        lobbyCode: z.string(),
+    }),
+});
+
+export type TeamJoinPrivateLobbyMsg = z.infer<typeof zTeamJoinPrivateLobbyMsg>;
+
 export const zGameCompleteMsg = z.object({
     type: z.literal("gameComplete"),
     data: z.object({}).optional(),
@@ -179,6 +204,7 @@ export const zTeamClientMsg = z.discriminatedUnion("type", [
     zTeamPlayGameMsg,
     zTeamKickMsg,
     zTeamChangeNameMsg,
+    zTeamJoinPrivateLobbyMsg,
     zGameCompleteMsg,
     zKeepAliveMsg,
 ]);
@@ -191,4 +217,5 @@ export type ClientToServerTeamMsg =
     | TeamCreateMsg
     | TeamKickMsg
     | TeamGameCompleteMsg
+    | TeamJoinPrivateLobbyMsg
     | TeamPlayGameMsg;

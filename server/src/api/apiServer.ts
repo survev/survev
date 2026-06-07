@@ -2,10 +2,15 @@ import type { Hono } from "hono";
 import type { UpgradeWebSocket } from "hono/ws";
 import type { SiteInfoRes } from "../../../shared/types/api";
 import { Config } from "../config";
+import { PrivateLobbyMenu } from "../privateLobby";
 import { TeamMenu } from "../teamMenu";
 import { GIT_VERSION } from "../utils/gitRevision";
 import { defaultLogger, ServerLogger } from "../utils/logger";
-import type { FindGamePrivateBody, FindGamePrivateRes } from "../utils/types";
+import type {
+    FindGamePrivateBody,
+    FindGamePrivateRes,
+    FindPrivateLobbyGameBody,
+} from "../utils/types";
 
 class Region {
     data: (typeof Config)["regions"][string];
@@ -42,6 +47,14 @@ class Region {
 
     async findGame(body: FindGamePrivateBody): Promise<FindGamePrivateRes> {
         const data = await this.fetch<FindGamePrivateRes>("api/find_game", body);
+        if (!data) {
+            return { error: "find_game_failed" };
+        }
+        return data;
+    }
+
+    async createPrivateGame(body: FindPrivateLobbyGameBody): Promise<FindGamePrivateRes> {
+        const data = await this.fetch<FindGamePrivateRes>("api/find_private_game", body);
         if (!data) {
             return { error: "find_game_failed" };
         }
@@ -97,6 +110,7 @@ export class ApiServer {
     readonly logger = new ServerLogger("Server");
 
     teamMenu = new TeamMenu(this);
+    privateLobbyMenu = new PrivateLobbyMenu(this);
 
     regions: Record<string, Region> = {};
 
@@ -115,6 +129,7 @@ export class ApiServer {
 
     init(app: Hono, upgradeWebSocket: UpgradeWebSocket) {
         this.teamMenu.init(app, upgradeWebSocket);
+        this.privateLobbyMenu.init(app, upgradeWebSocket);
     }
 
     getSiteInfo(region?: string): SiteInfoRes {
@@ -155,6 +170,13 @@ export class ApiServer {
     async findGame(body: FindGamePrivateBody): Promise<FindGamePrivateRes> {
         if (body.region in this.regions) {
             return await this.regions[body.region].findGame(body);
+        }
+        return { error: "find_game_failed" };
+    }
+
+    async createPrivateGame(body: FindPrivateLobbyGameBody): Promise<FindGamePrivateRes> {
+        if (body.region in this.regions) {
+            return await this.regions[body.region].createPrivateGame(body);
         }
         return { error: "find_game_failed" };
     }
