@@ -52,6 +52,18 @@ export interface ConfigType {
          * Should be a valid key from the `regions` object.
          */
         thisRegion: string;
+
+        /**
+         * First port used by games, each game gets its own port.
+         *
+         * The last port will be `firstGamePort` + `maxGames`.
+         */
+        firstGamePort: number;
+
+        /**
+         * Maximum amount of games the server can run.
+         */
+        maxGames: number;
     };
 
     /**

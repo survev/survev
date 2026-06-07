@@ -9,7 +9,7 @@ import { GameConfig } from "../../shared/gameConfig.ts";
 import * as net from "../../shared/net/net.ts";
 import { Config } from "./config.ts";
 import { GameProcessManager, type GameSocketData, ProcState } from "./game/gameProcessManager.ts";
-import { apiPrivateRouter } from "./utils/apiRouter.ts";
+import { apiPrivateRouter, checkIp } from "./utils/apiRouter.ts";
 import { GIT_VERSION } from "./utils/gitRevision.ts";
 import { logErrorToWebhook, ServerLogger } from "./utils/logger.ts";
 import { HTTPRateLimit, WebSocketRateLimit } from "./utils/rateLimit.ts";
@@ -69,11 +69,21 @@ class GameServer {
             playerData: data.playerData,
         });
 
+        if (!game) {
+            return {
+                error: "full",
+            };
+        }
+
+        // TODO: better way to handle this
+        let address = this.region.address.split(":");
+        address[1] = game.port.toString();
+
         return {
             gameId: game.gameData.id,
             useHttps: this.region.https,
-            hosts: [this.region.address],
-            addrs: [this.region.address],
+            hosts: [address.join(":")],
+            addrs: [address.join(":")],
         };
     }
 
@@ -90,25 +100,6 @@ class GameServer {
         } catch (err) {
             this.logger.error(`Failed to update region: `, err);
         }
-    }
-
-    async checkIp(ip: string) {
-        try {
-            const apiRes = await apiPrivateRouter.check_ip.$post({
-                json: {
-                    ip,
-                },
-            });
-
-            if (apiRes.ok) {
-                const body = await apiRes.json();
-                return body;
-            }
-        } catch (err) {
-            this.logger.error(`Failed request API fetch_ip: `, err);
-        }
-
-        return undefined;
     }
 
     async tryToSaveLostGames() {
@@ -184,6 +175,7 @@ app.get("/private/status", (res, req) => {
             return {
                 state: ProcState[p.state],
                 reusedCount: p.reusedCount,
+                port: p.port,
                 gameData: p.gameData,
             };
         }),
@@ -298,7 +290,7 @@ app.ws<GameSocketData>("/play", {
         const socketId = randomUUID();
         let disconnectReason = "";
 
-        const ipData = await server.checkIp(ip);
+        const ipData = await checkIp(ip);
 
         if (ipData?.banned) {
             disconnectReason = "ip_banned";
