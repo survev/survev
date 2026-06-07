@@ -5,6 +5,7 @@ import { type MapDefKey, MapDefs } from "../../../shared/defs/mapDefs.ts";
 import type { TeamMode } from "../../../shared/gameConfig.ts";
 import type { GameWsDisconnectReason } from "../../../shared/types/api.ts";
 import { util } from "../../../shared/utils/util.ts";
+import { Config } from "../config.ts";
 import { ServerLogger } from "../utils/logger.ts";
 import { type FindGamePrivateBody, type ServerGameConfig } from "../utils/types.ts";
 import { type GameData, type ProcessMsg, ProcessMsgType } from "./ipcTypes.ts";
@@ -28,6 +29,7 @@ export enum ProcState {
 
 class GameProcess {
     process: ChildProcess;
+    port: number;
 
     gameData: GameData = {
         id: "",
@@ -55,9 +57,16 @@ class GameProcess {
 
     reusedCount = 0;
 
-    constructor(manager: GameProcessManager, id: string, config: ServerGameConfig) {
+    constructor(
+        manager: GameProcessManager,
+        id: string,
+        config: ServerGameConfig,
+        port: number,
+    ) {
         this.manager = manager;
-        this.process = fork(procFile, [], {
+        this.port = port;
+
+        this.process = fork(procFile, [port.toString()], {
             serialization: "advanced",
             execArgv: procArgv,
         });
@@ -192,17 +201,23 @@ export class GameProcessManager {
 
     readonly logger = new ServerLogger("Game Process Manager");
 
+    private readonly _freePorts: number[] = [];
+
+    getNextPort() {
+        return this._freePorts.shift();
+    }
+
     constructor() {
         process.on("exit", () => {
             for (const socket of this.sockets.values()) {
                 if (socket.getUserData().closed) continue;
                 socket.end(3000, "server_restart");
             }
-
-            for (const gameProc of this.processes) {
-                gameProc.process.kill();
-            }
         });
+
+        for (let i = 0; i < Config.gameServer.maxGames; i++) {
+            this._freePorts.push(Config.gameServer.firstGamePort + i);
+        }
 
         // always keep some processes running even if theres no active games on them
         // creating a new proc is more expensive than reusing one
@@ -252,7 +267,7 @@ export class GameProcessManager {
         }, 0);
     }
 
-    newGame(config: ServerGameConfig): GameProcess {
+    newGame(config: ServerGameConfig): GameProcess | undefined {
         let gameProc: GameProcess | undefined;
 
         for (let i = 0; i < this.processes.length; i++) {
@@ -265,13 +280,21 @@ export class GameProcessManager {
 
         const id = randomUUID();
         if (!gameProc) {
-            gameProc = new GameProcess(this, id, config);
+            const port = this.getNextPort();
+            if (port === undefined) {
+                return undefined;
+            }
+            gameProc = new GameProcess(this, id, config, port);
 
             this.processes.push(gameProc);
 
             gameProc.process.on("exit", () => {
                 this.killProcess(gameProc!);
+                if (!this._freePorts.includes(gameProc!.port)) {
+                    this._freePorts.push(gameProc!.port);
+                }
             });
+
             gameProc.process.on("close", () => {
                 this.killProcess(gameProc!);
             });
@@ -313,8 +336,8 @@ export class GameProcessManager {
         return this.processById.get(id);
     }
 
-    async findGame(body: FindGamePrivateBody): Promise<GameProcess> {
-        let proc = this.processes
+    async findGame(body: FindGamePrivateBody): Promise<GameProcess | undefined> {
+        let proc: GameProcess | undefined = this.processes
             .filter((proc) => {
                 const game = proc.gameData;
                 return (
@@ -333,6 +356,10 @@ export class GameProcessManager {
                 teamMode: body.teamMode,
                 mapName: body.mapName as MapDefKey,
             });
+        }
+
+        if (!proc) {
+            return undefined;
         }
 
         // if the game has not finished creating
