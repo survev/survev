@@ -9,8 +9,8 @@ export class IDAllocator {
      */
     private readonly _freeList: number[] = [];
 
-    constructor(bits: number) {
-        this.maxId = 2 ** bits;
+    constructor(maxId: number) {
+        this.maxId = maxId;
     }
 
     /**

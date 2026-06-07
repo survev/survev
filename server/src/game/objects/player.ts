@@ -87,7 +87,7 @@ export class PlayerBarn {
     newPlayers: Player[] = [];
     deletedPlayers: number[] = [];
     killedPlayers: Player[] = [];
-    groupIdAllocator = new IDAllocator(8);
+    groupIdAllocator = new IDAllocator(255);
     aliveCountDirty = false;
 
     emotes: Emote[] = [];
