@@ -325,6 +325,10 @@ export const PrivateRouter = new Hono<Context>()
             }),
         ),
         async (c) => {
+            if (process.env.NODE_ENV === "production") {
+                return c.json({}, 403);
+            }
+
             const data = c.req.valid("json");
             const matchData: MatchDataTable = {
                 gameId: crypto.randomUUID(),
