@@ -1,4 +1,3 @@
-import NanoTimer from "nanotimer";
 import fs from "node:fs";
 import { platform } from "node:os";
 import path from "node:path";
@@ -248,43 +247,28 @@ setInterval(() => {
     }
 }, 5000);
 
-// setInterval on windows sucks
-// and doesn't give accurate timings
+let setGameInterval: (cb: () => void, time: number) => void = setInterval;
 if (platform() === "win32") {
-    new NanoTimer().setInterval(
-        () => {
-            game?.update();
-        },
-        "",
-        `${1000 / Config.gameTps}m`,
-    );
-
-    new NanoTimer().setInterval(
-        () => {
-            game?.netSync();
-            sendMsg({
-                type: ProcessMsgType.ServerSocketMsg,
-                msgs: socketMsgs,
-            });
-            socketMsgs.length = 0;
-        },
-        "",
-        `${1000 / Config.netSyncTps}m`,
-    );
-} else {
-    setInterval(() => {
-        game?.update();
-    }, 1000 / Config.gameTps);
-
-    setInterval(() => {
-        game?.netSync();
-        sendMsg({
-            type: ProcessMsgType.ServerSocketMsg,
-            msgs: socketMsgs,
-        });
-        socketMsgs.length = 0;
-    }, 1000 / Config.netSyncTps);
+    const NanoTimer = (await import("nanotimer")).default;
+    // setInterval on windows sucks
+    // and doesn't give accurate timings
+    setGameInterval = (cb: () => void, time: number) => {
+        new NanoTimer().setInterval(cb, [], `${time}m`);
+    };
 }
+
+setGameInterval(() => {
+    game?.update();
+}, 1000 / Config.gameTps);
+
+setGameInterval(() => {
+    game?.netSync();
+    sendMsg({
+        type: ProcessMsgType.ServerSocketMsg,
+        msgs: socketMsgs,
+    });
+    socketMsgs.length = 0;
+}, 1000 / Config.netSyncTps);
 
 process.on("uncaughtException", async (err) => {
     console.error(err);
