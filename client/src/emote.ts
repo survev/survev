@@ -753,7 +753,7 @@ export class EmoteBarn {
                     e.sprite.texture = PIXI.Texture.from(lootDef.lootImg.sprite);
 
                     // Colorize if defined
-                    const ammo = GameObjectDefs.typeToDef((lootDef as GunDef).ammo) as AmmoDef;
+                    const ammo = GameObjectDefs.typeToDefSafe((lootDef as GunDef).ammo) as AmmoDef;
                     e.circleOuter.tint = ammo ? ammo.lootImg.tintDark! : 0;
 
                     // Rotate if defined
