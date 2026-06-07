@@ -429,7 +429,10 @@ setInterval(() => {
     server.sendData();
 }, 20 * 1000);
 
-app.listen(Config.gameServer.host, Config.gameServer.port, () => {
+app.listen(Config.gameServer.host, Config.gameServer.port, 1, (socket) => {
+    if (!socket) {
+        throw new Error(`Port ${Config.gameServer.port} is already in use`);
+    }
     server.logger.info(`Survev Game Server v${pkgJson.version} - GIT ${GIT_VERSION}`);
     server.logger.info(
         `Listening on ${Config.gameServer.host}:${Config.gameServer.port}`,
