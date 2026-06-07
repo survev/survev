@@ -1238,6 +1238,7 @@ export class Game {
         if (this.lastUpdateTime > 0) {
             const interval = now - this.lastUpdateTime;
             this.m_camera.m_interpInterval = interval / 1000;
+            this.debugHUD.updateIntervalGraph.addEntry(interval);
             this.updateIntervals.push(interval);
         }
         this.lastUpdateTime = now;

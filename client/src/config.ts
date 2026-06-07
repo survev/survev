@@ -69,6 +69,10 @@ export const debugHUDConfig = {
         show: false,
         showGraph: false,
     },
+    updateInterval: {
+        show: false,
+        showGraph: false,
+    },
 };
 
 export type DebugRenderOpts = typeof debugRenderConfig;
