@@ -83,6 +83,7 @@ export const BuildingSprites = {
         "map/map-planter-05.svg",
         "map/map-planter-07.svg",
         "map/map-planter-res-01.svg",
+        "map/map-planter-res-03.svg",
     ],
 
     greenhouse_aged: [
