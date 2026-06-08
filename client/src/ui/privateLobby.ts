@@ -38,6 +38,8 @@ function errorTypeToString(type: string, localization: Localization) {
         behind_proxy: "behind_proxy", // this will get passed to the main app to show a modal
         login_required: localization.translate("index-private-lobby-login-required"),
         mode_disabled: localization.translate("index-private-lobby-mode-disabled"),
+        team_full: localization.translate("index-private-lobby-team-full"),
+        host_left: localization.translate("index-private-lobby-host-left"),
     } as Record<PrivateLobbyErrorType, string>;
     return typeMap[type as keyof typeof typeMap] || typeMap.lost_conn;
 }
@@ -45,6 +47,11 @@ function errorTypeToString(type: string, localization: Localization) {
 export class PrivateLobbyMenu {
     // Jquery elems
     playBtn = $("#btn-start-private-lobby");
+    stopGameBtn = $("#btn-stop-private-lobby-game");
+    afkBtn = $("#btn-private-lobby-afk");
+    afkConfirmContainer = $("#private-lobby-afk-confirm");
+    startAnywayBtn = $("#btn-private-lobby-start-anyway");
+    cancelStartBtn = $("#btn-private-lobby-cancel-start");
     serverWarning = $("#server-warning");
     serverSelect = $("#private-lobby-server-select");
     modesContainer = $("#private-lobby-menu-modes");
@@ -58,6 +65,7 @@ export class PrivateLobbyMenu {
     joined = false;
     create = false;
     joiningGame = false;
+    afkConfirmPending = false;
     ws: WebSocket | null = null;
 
     // Ui state
@@ -77,6 +85,8 @@ export class PrivateLobbyMenu {
     extraEmptyTeamId: number | null = null;
     /** Set when joining as part of a "Create Team" handoff so the lobby groups us with our teammates. */
     importGroupId: string | undefined;
+    /** Set when joining via a team-specific invite link/code (e.g. "ABC123-2") so the lobby places us directly into that team slot. */
+    teamId: number | undefined;
     /** Id of the currently selected settings tab (e.g. "arenaRoles"); reset to the first available tab whenever it stops applying. */
     activeSettingsTab: string | null = null;
 
@@ -90,6 +100,7 @@ export class PrivateLobbyMenu {
         public audioManager: AudioManager,
         public joinGameCb: (data: FindGameMatchData) => void,
         public leaveCb: (err: string) => void,
+        public forceQuitCb: () => void,
     ) {
         // Listen for ui modifications
         this.serverSelect.on("change", () => {
@@ -102,6 +113,22 @@ export class PrivateLobbyMenu {
             SDK.requestMidGameAd(() => {
                 this.tryStartGame();
             });
+        });
+        this.stopGameBtn.on("click", () => {
+            this.tryEndGame();
+        });
+        this.startAnywayBtn.on("click", () => {
+            this.tryStartGame();
+        });
+        this.cancelStartBtn.on("click", () => {
+            this.afkConfirmPending = false;
+            this.refreshUi();
+        });
+        this.afkBtn.on("click", () => {
+            const localPlayer = this.getPlayerById(this.localPlayerId);
+            if (localPlayer) {
+                this.sendMessage("setAfk", { afk: !localPlayer.afk });
+            }
         });
         $("#private-lobby-copy-url, #private-lobby-desc-text").on("click", (e) => {
             const t = $("<div/>", {
@@ -209,7 +236,7 @@ export class PrivateLobbyMenu {
         });
     }
 
-    connect(create: boolean, roomUrl: string, importGroupId?: string) {
+    connect(create: boolean, roomUrl: string, importGroupId?: string, teamId?: number) {
         if (!this.active || roomUrl !== this.roomData.roomUrl) {
             const roomHost = api.resolveRoomHost();
             const url = `w${
@@ -223,6 +250,7 @@ export class PrivateLobbyMenu {
             this.selectedPlayerId = -1;
             this.extraEmptyTeamId = null;
             this.importGroupId = importGroupId;
+            this.teamId = teamId;
 
             // Load properties from config
             this.playerData = {
@@ -272,6 +300,7 @@ export class PrivateLobbyMenu {
                             roomUrl: this.roomData.roomUrl,
                             playerData: this.playerData,
                             importGroupId: this.importGroupId,
+                            teamId: this.teamId,
                         });
                     }
                 };
@@ -294,8 +323,10 @@ export class PrivateLobbyMenu {
             this.active = false;
             this.joined = false;
             this.joiningGame = false;
+            this.afkConfirmPending = false;
             this.selectedPlayerId = -1;
             this.importGroupId = undefined;
+            this.teamId = undefined;
             this.refreshUi();
 
             // Save state to config for the menu
@@ -357,6 +388,12 @@ export class PrivateLobbyMenu {
             case "kicked":
                 this.leave("kicked");
                 break;
+            case "forceQuit":
+                // the leader pulled the lobby out of the match early; force-disconnect
+                // from the active game (if we're in one) and head back to the lobby
+                this.joiningGame = false;
+                this.forceQuitCb();
+                break;
             case "error":
                 this.leave((data as { type: string }).type);
         }
@@ -384,7 +421,15 @@ export class PrivateLobbyMenu {
     }
 
     tryStartGame() {
-        if (this.isLeader && !this.roomData.findingGame) {
+        if (!this.isLeader || this.roomData.findingGame) return;
+        const afkPlayers = this.players.filter((p) => p.afk);
+        if (afkPlayers.length > 0 && !this.afkConfirmPending) {
+            this.afkConfirmPending = true;
+            this.refreshUi();
+            return;
+        }
+        this.afkConfirmPending = false;
+        {
             const version = GameConfig.protocolVersion;
             let region = this.roomData.region;
             const paramRegion = helpers.getParameterByName("region");
@@ -402,34 +447,60 @@ export class PrivateLobbyMenu {
         }
     }
 
+    /** Leader-only: pulls every in-game lobby member back to the lobby mid-match. */
+    tryEndGame() {
+        if (this.isLeader && this.players.some((p) => p.inGame)) {
+            this.sendMessage("leaveGame");
+        }
+    }
+
     /** Renders a single player entry; reused for every team slot in the grid. */
     renderPlayerEntry(player: PrivateLobbyMenuPlayer) {
         const self = player.playerId == this.localPlayerId;
         const member = $("<div/>", {
             class: `team-menu-member private-lobby-player${
                 player.playerId == this.selectedPlayerId ? " private-lobby-player-selected" : ""
-            }`,
+            }${player.afk ? " private-lobby-player-afk" : ""}`,
             "data-playerid": player.playerId,
         });
 
-        let iconClass = "";
         if (player.isLeader) {
-            iconClass = " icon-leader";
+            member.append(
+                $("<div/>", {
+                    class: "icon icon-leader",
+                    "data-playerid": player.playerId,
+                }),
+            );
         } else if (this.isLeader && !self) {
-            iconClass = " icon-kick";
-        }
+            // Leader-only actions on another member: hand them ownership, or remove them
+            const promoteIcon = $("<div/>", {
+                class: "icon icon-promote",
+                "data-playerid": player.playerId,
+                title: this.localization.translate("index-private-lobby-promote"),
+            });
+            promoteIcon.on("click", (e) => {
+                e.stopPropagation();
+                this.sendMessage("promote", { playerId: player.playerId });
+            });
+            member.append(promoteIcon);
 
-        const icon = $("<div/>", {
-            class: `icon${iconClass}`,
-            "data-playerid": player.playerId,
-        });
-        if (iconClass == " icon-kick") {
-            icon.on("click", (e) => {
+            const kickIcon = $("<div/>", {
+                class: "icon icon-kick",
+                "data-playerid": player.playerId,
+            });
+            kickIcon.on("click", (e) => {
                 e.stopPropagation();
                 this.sendMessage("kick", { playerId: player.playerId });
             });
+            member.append(kickIcon);
+        } else {
+            member.append(
+                $("<div/>", {
+                    class: "icon",
+                    "data-playerid": player.playerId,
+                }),
+            );
         }
-        member.append(icon);
 
         if (this.editingName && self) {
             const n: JQuery<HTMLInputElement> = $("<input/>", {
@@ -577,12 +648,25 @@ export class PrivateLobbyMenu {
                 class: "private-lobby-team",
                 "data-teamid": t,
             });
-            team.append(
-                $("<div/>", {
-                    class: "private-lobby-team-header",
+            const header = $("<div/>", { class: "private-lobby-team-header" });
+            header.append(
+                $("<span/>", {
                     html: `${teamLabel} ${t + 1} (${members.length}/${teamSize})`,
                 }),
             );
+            // Lets anyone grab a link/code that drops a joiner straight into
+            // this team slot (e.g. "ABC123-2"); not leader-gated since sharing
+            // it doesn't change lobby state, only where the joiner lands.
+            const copyLinkBtn = $("<a/>", {
+                class: "private-lobby-team-copy-link",
+                title: this.localization.translate("index-private-lobby-copy-team-link"),
+            });
+            copyLinkBtn.on("click", (e) => {
+                e.stopPropagation();
+                this.copyTeamInviteCode(t, e);
+            });
+            header.append(copyLinkBtn);
+            team.append(header);
             const slot = $("<div/>", { class: "private-lobby-team-slot" });
             for (const player of members) {
                 slot.append(this.renderPlayerEntry(player));
@@ -620,6 +704,57 @@ export class PrivateLobbyMenu {
         this.createTeamBtn.removeClass("btn-darken btn-disabled btn-opaque");
         this.createTeamBtn.addClass(canCreateTeam ? "btn-darken" : "btn-disabled btn-opaque");
         this.createTeamBtn.prop("disabled", !canCreateTeam);
+
+        const localPlayer = this.getPlayerById(this.localPlayerId);
+        this.afkBtn.css("display", this.isLeader ? "none" : "block");
+        this.afkBtn.toggleClass("afk-active", !!localPlayer?.afk);
+    }
+
+    /**
+     * Copies a shareable code/link that joins this lobby and places the
+     * joiner directly into `teamId` (e.g. lobby code "ABC123" -> "ABC123-2").
+     * Mirrors the lobby-wide invite copy handler wired up in the constructor.
+     */
+    copyTeamInviteCode(teamId: number, e: JQuery.TriggeredEvent) {
+        if (!this.roomData.roomUrl) return;
+
+        const toast = $("<div/>", {
+            class: "copy-toast",
+            html: "Copied!",
+        });
+        $("#start-menu-wrapper").append(toast);
+        toast.css({
+            left: (e.pageX ?? 0) - parseInt(toast.css("width")) / 2,
+            top: $(e.currentTarget).offset()!.top,
+        });
+        toast.animate(
+            {
+                top: "-=20",
+                opacity: 1,
+            },
+            {
+                queue: false,
+                duration: 300,
+                complete: function () {
+                    $(this).fadeOut(250, function () {
+                        $(this).remove();
+                    });
+                },
+            },
+        );
+
+        const roomCode = this.roomData.roomUrl.substring(1);
+        const teamCode = `${roomCode}-${teamId}`;
+
+        let codeToCopy = teamCode;
+        // if running on an iframe, fall back to the bare code like the lobby-wide copy does
+        if (window === window.top) {
+            const url = new URL(window.location.href);
+            url.search = "";
+            url.hash = `${this.roomData.roomUrl}-${teamId}`;
+            codeToCopy = url.toString();
+        }
+        helpers.copyTextToClipboard(codeToCopy);
     }
 
     /** The map driving the currently selected mode, or undefined while mode lists haven't loaded yet. */
@@ -887,8 +1022,30 @@ export class PrivateLobbyMenu {
 
                 const showWaitMessage = playersInGame && !this.joiningGame;
                 waitReason.css("display", showWaitMessage ? "block" : "none");
-                this.playBtn.css("display", showWaitMessage ? "none" : "block");
+                this.stopGameBtn.css("display", showWaitMessage ? "block" : "none");
+
+                // Auto-reset if no more AFK players while dialog is open
+                if (this.afkConfirmPending && !this.players.some((p) => p.afk)) {
+                    this.afkConfirmPending = false;
+                }
+
+                const showAfkConfirm = this.afkConfirmPending && !showWaitMessage;
+                if (showAfkConfirm) {
+                    const afkNames = this.players
+                        .filter((p) => p.afk)
+                        .map((p) => helpers.htmlEscape(p.name))
+                        .join(", ");
+                    this.afkConfirmContainer
+                        .find("#private-lobby-afk-confirm-text")
+                        .html(
+                            `${afkNames} ${this.localization.translate("index-private-lobby-afk-warning")}`,
+                        );
+                }
+                this.afkConfirmContainer.css("display", showAfkConfirm ? "block" : "none");
+                this.playBtn.css("display", showWaitMessage || showAfkConfirm ? "none" : "block");
             } else {
+                this.afkConfirmContainer.css("display", "none");
+                this.stopGameBtn.css("display", "none");
                 if (this.roomData.findingGame || this.joiningGame) {
                     waitReason.html(
                         `<div class="ui-spinner" style="margin-right:16px"></div>${this.localization.translate(

@@ -18,7 +18,9 @@ export type PrivateLobbyErrorType =
     | "behind_proxy"
     | "rate_limited"
     | "login_required"
-    | "mode_disabled";
+    | "mode_disabled"
+    | "team_full"
+    | "host_left";
 
 export interface RoomData {
     roomUrl: string;
@@ -56,6 +58,8 @@ export interface PrivateLobbyMenuPlayer {
     inGame: boolean;
     /** Lobby-local team slot index this player is currently assigned to. */
     teamId: number;
+    /** True when the player has self-marked as AFK. Cleared automatically when a match starts. */
+    afk: boolean;
 }
 
 /**
@@ -78,6 +82,16 @@ export interface PrivateLobbyKickedMsg {
     data: {};
 }
 
+/**
+ * Sent by the server to every in-game member of the lobby when the leader
+ * pulls the whole lobby out of an active match early (see Room#forceQuitGame).
+ * The client force-disconnects from its current match and returns to the lobby.
+ */
+export interface PrivateLobbyForceQuitMsg {
+    readonly type: "forceQuit";
+    data: {};
+}
+
 export interface PrivateLobbyErrorMsg {
     readonly type: "error";
     data: {
@@ -90,6 +104,7 @@ export type ServerToClientPrivateLobbyMsg =
     | PrivateLobbyStateMsg
     | PrivateLobbyKeepAliveMsg
     | PrivateLobbyKickedMsg
+    | PrivateLobbyForceQuitMsg
     | PrivateLobbyErrorMsg;
 
 //
@@ -126,6 +141,12 @@ export const zPrivateLobbyJoinMsg = z.object({
          * into the same team slot (see section 5 of the private lobby plan).
          */
         importGroupId: z.string().optional(),
+        /**
+         * Set when joining via a team-specific invite link/code (e.g. "ABC123-2").
+         * Places the player directly into that team slot, or rejects the join
+         * with a "team_full" error if it has no room (see Room.addPlayer).
+         */
+        teamId: z.number().optional(),
     }),
 });
 export type PrivateLobbyJoinMsg = z.infer<typeof zPrivateLobbyJoinMsg>;
@@ -167,6 +188,16 @@ export const zPrivateLobbyKickMsg = z.object({
 
 export type PrivateLobbyKickMsg = z.infer<typeof zPrivateLobbyKickMsg>;
 
+/** Leader-only: hands lobby ownership over to another player. */
+export const zPrivateLobbyPromoteMsg = z.object({
+    type: z.literal("promote"),
+    data: z.object({
+        playerId: z.number(),
+    }),
+});
+
+export type PrivateLobbyPromoteMsg = z.infer<typeof zPrivateLobbyPromoteMsg>;
+
 /** Leader-only: moves a player into a different team slot. */
 export const zPrivateLobbyAssignTeamMsg = z.object({
     type: z.literal("assignTeam"),
@@ -188,6 +219,22 @@ export const zPrivateLobbySwapTeamMsg = z.object({
 });
 
 export type PrivateLobbySwapTeamMsg = z.infer<typeof zPrivateLobbySwapTeamMsg>;
+
+/** Any player: toggles their own AFK state. */
+export const zPrivateLobbySetAfkMsg = z.object({
+    type: z.literal("setAfk"),
+    data: z.object({ afk: z.boolean() }),
+});
+
+export type PrivateLobbySetAfkMsg = z.infer<typeof zPrivateLobbySetAfkMsg>;
+
+/** Leader-only: pulls the whole lobby out of an active match back to the lobby. */
+export const zPrivateLobbyLeaveGameMsg = z.object({
+    type: z.literal("leaveGame"),
+    data: z.object({}).optional(),
+});
+
+export type PrivateLobbyLeaveGameMsg = z.infer<typeof zPrivateLobbyLeaveGameMsg>;
 
 export const zPrivateLobbyPlayGameMsg = z.object({
     type: z.literal("playGame"),
@@ -211,7 +258,10 @@ export const zPrivateLobbyClientMsg = z.discriminatedUnion("type", [
     zPrivateLobbySetRoomPropsMsg,
     zPrivateLobbyJoinMsg,
     zPrivateLobbyPlayGameMsg,
+    zPrivateLobbyLeaveGameMsg,
+    zPrivateLobbySetAfkMsg,
     zPrivateLobbyKickMsg,
+    zPrivateLobbyPromoteMsg,
     zPrivateLobbyAssignTeamMsg,
     zPrivateLobbySwapTeamMsg,
     zPrivateLobbyChangeNameMsg,
@@ -226,7 +276,10 @@ export type ClientToServerPrivateLobbyMsg =
     | PrivateLobbySetRoomPropsMsg
     | PrivateLobbyCreateMsg
     | PrivateLobbyKickMsg
+    | PrivateLobbyPromoteMsg
     | PrivateLobbyAssignTeamMsg
     | PrivateLobbySwapTeamMsg
     | PrivateLobbyGameCompleteMsg
-    | PrivateLobbyPlayGameMsg;
+    | PrivateLobbyPlayGameMsg
+    | PrivateLobbyLeaveGameMsg
+    | PrivateLobbySetAfkMsg;

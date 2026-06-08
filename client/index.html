@@ -1010,6 +1010,7 @@
                   <div id="private-lobby-menu-columns">
                     <div id="private-lobby-menu-members" class="team-menu-block">
                       <a class="btn-team-option btn-darken menu-option" id="btn-private-lobby-create-team" data-l10n="index-create-team">Create Team</a>
+                      <a class="btn-team-option btn-darken menu-option" id="btn-private-lobby-afk" data-l10n="index-private-lobby-afk" style="display:none">AFK</a>
                       <div id="private-lobby-menu-team-grid"></div>
                     </div>
                     <div id="private-lobby-menu-options" class="team-menu-block">
@@ -1021,7 +1022,13 @@
                       </div>
                       <div id="private-lobby-menu-options-start">
                         <a class="btn-green btn-darken menu-option" id="btn-start-private-lobby" data-label="Play" data-l10n="index-play">Play</a>
+                        <div id="private-lobby-afk-confirm" style="display:none">
+                          <div id="private-lobby-afk-confirm-text"></div>
+                          <a class="btn-darken menu-option" id="btn-private-lobby-start-anyway" data-l10n="index-private-lobby-start-anyway">Start Anyway</a>
+                          <a class="btn-darken menu-option" id="btn-private-lobby-cancel-start" data-l10n="index-private-lobby-cancel">Cancel</a>
+                        </div>
                         <div id="msg-private-lobby-wait-reason"></div>
+                        <a class="btn-darken menu-option" id="btn-stop-private-lobby-game" data-l10n="index-private-lobby-end-game">End Game</a>
                       </div>
                       <div id="private-lobby-menu-settings">
                         <div id="private-lobby-settings-tabs"></div>

@@ -44,6 +44,13 @@ import { ChatUi } from "./ui/chat";
 // generateLobbyCode() in server/src/privateLobby.ts
 const PRIVATE_LOBBY_CODE_LENGTH = 6;
 
+// Matches lobby codes, optionally suffixed with "-<teamId>" for team-specific
+// invite links/codes (e.g. "ABC123-2"); group 2 captures the team slot index
+// when present. See Room.addPlayer in server/src/privateLobby.ts.
+const PRIVATE_LOBBY_CODE_REGEX = new RegExp(
+    `^([0-9a-zA-Z]{${PRIVATE_LOBBY_CODE_LENGTH}})(?:-(\\d+))?$`,
+);
+
 export class Application {
     nameInput = $("#player-name-input-solo");
     serverSelect = $("#server-select-main");
@@ -156,6 +163,7 @@ export class Application {
             this.audioManager,
             this.onTeamMenuJoinGame.bind(this),
             this.onPrivateLobbyMenuLeave.bind(this),
+            this.forceQuitGame.bind(this),
         );
 
         const onLoadComplete = () => {
@@ -622,6 +630,30 @@ export class Application {
     }
 
     /**
+     * The lobby leader pulled the whole lobby out of an active match early.
+     * Handles all game states: actively playing (closes WS → onQuit), on the
+     * stats/death screen, still connecting, and not in a game at all.
+     */
+    forceQuitGame() {
+        if (!this.game) {
+            this.setAppActive(true);
+            this.setPlayLockout(false);
+            return;
+        }
+        if (this.game.connected && !this.game.m_gameOver) {
+            // Mid-game: set the disconnect reason and close the WS.
+            // `game.m_ws.onclose` → `onQuit` → `privateLobbyMenu.onGameComplete`
+            // + `setAppActive(true)` — let that path handle cleanup.
+            this.game.m_disconnectMsg = "index-private-lobby-game-ended";
+            this.game.m_ws?.close();
+            return;
+        }
+        // Stats/death screen, still connecting, or game over:
+        // call onQuit directly — it frees the game and returns to the lobby.
+        this.game.onQuit();
+    }
+
+    /**
      * The team leader requested that the whole group join a private lobby together.
      * Each member independently leaves the team and connects to the lobby with the
      * shared `importGroupId` so the lobby places the group into a single team slot.
@@ -777,9 +809,10 @@ export class Application {
 
             // Team and lobby codes/links can end up here (e.g. from the URL
             // hash on page load, or pasted into the team join field) — lobby
-            // codes are a different length, so reroute those to the lobby
-            // menu instead of trying (and failing) to join a team with them.
-            if (!create && roomUrl.length === PRIVATE_LOBBY_CODE_LENGTH) {
+            // codes (optionally with a "-<teamId>" suffix) have a shape that
+            // team codes can't match, so reroute those to the lobby menu
+            // instead of trying (and failing) to join a team with them.
+            if (!create && PRIVATE_LOBBY_CODE_REGEX.test(roomUrl)) {
                 this.tryJoinPrivateLobby(false, roomUrl);
                 return;
             }
@@ -800,9 +833,16 @@ export class Application {
         if (this.active && this.quickPlayPendingModeIdx === -1) {
             // Unlike teams, lobby links don't read the URL hash themselves —
             // tryJoinTeam() inspects it first and forwards lobby-shaped codes
-            // here (see PRIVATE_LOBBY_CODE_LENGTH), so `url` is always provided
+            // here (see PRIVATE_LOBBY_CODE_REGEX), so `url` is always provided
             // when joining via a hash/pasted code.
-            const roomUrl = url || "";
+            const raw = url || "";
+
+            // Team-specific invite codes/links carry the team slot as a
+            // "-<teamId>" suffix (e.g. "ABC123-2"); split it off so we join
+            // the lobby itself but land directly in that team.
+            const match = !create ? raw.match(PRIVATE_LOBBY_CODE_REGEX) : null;
+            const roomUrl = match ? match[1] : raw;
+            const teamId = match?.[2] !== undefined ? Number(match[2]) : undefined;
 
             if (create || roomUrl != "") {
                 // Only creating a lobby requires an account; joining one (e.g. via link) doesn't
@@ -815,7 +855,7 @@ export class Application {
                 }
 
                 this.setConfigFromDOM();
-                this.privateLobbyMenu.connect(create, roomUrl);
+                this.privateLobbyMenu.connect(create, roomUrl, undefined, teamId);
                 this.refreshUi();
             }
         }

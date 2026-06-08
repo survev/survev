@@ -46,13 +46,15 @@ class Player {
     name = "Player";
 
     inGame = false;
+    afk = false;
 
     /** Lobby-local team slot index. Reassigned by the leader via `assignTeam`. */
     teamId = 0;
 
     get isLeader() {
-        // first player is always leader
-        return !!this.room && this.room.players[0] == this;
+        // ownership is explicit (see Room#leader) — the room's creator starts
+        // as leader, and it only changes via Room#promote, not by player order
+        return !!this.room && this.room.leader === this;
     }
 
     get playerId() {
@@ -66,6 +68,7 @@ class Player {
             isLeader: this.isLeader,
             playerId: this.playerId,
             teamId: this.teamId,
+            afk: this.afk,
         };
     }
 
@@ -113,6 +116,14 @@ class Player {
 class Room {
     players: Player[] = [];
 
+    /**
+     * Explicit lobby ownership — set to the room's creator on first join, and
+     * only changes via `promote`. Unlike player order, this never shifts on
+     * its own: if the leader disconnects, the lobby closes (see `removePlayer`)
+     * rather than handing control to whoever's left.
+     */
+    leader?: Player;
+
     data: RoomData = {
         roomUrl: "",
         findingGame: false,
@@ -149,15 +160,20 @@ class Room {
         { players: Player[]; timeout: ReturnType<typeof setTimeout> }
     >();
 
-    addPlayer(player: Player, importGroupId?: string) {
+    addPlayer(player: Player, importGroupId?: string, teamId?: number) {
         if (this.players.length >= this.data.maxPlayers) return;
 
         this.players.push(player);
         player.room = this;
+        if (!this.leader) this.leader = player;
 
         clearTimeout(player.disconnectTimeout);
 
-        if (importGroupId) {
+        if (teamId !== undefined) {
+            // joined via a team-specific invite link/code; onMsg already
+            // checked the slot has room before we got here
+            player.teamId = teamId;
+        } else if (importGroupId) {
             // placement deferred until the whole group has had a chance to join
             player.teamId = -1;
             this.queueImportedPlayer(importGroupId, player);
@@ -178,6 +194,13 @@ class Room {
             if (counts[i] < this.data.teamSize) return i;
         }
         return 0;
+    }
+
+    /** True if `teamId` is a valid slot index that still has room for another player. */
+    teamSlotHasRoom(teamId: number): boolean {
+        if (teamId < 0 || teamId >= this.data.maxPlayers) return false;
+        const count = this.players.filter((p) => p.teamId === teamId).length;
+        return count < this.data.teamSize;
     }
 
     /** Returns the lowest-index team slot with enough free space for `size` players together, or -1 if none fits. */
@@ -253,6 +276,11 @@ class Room {
                 this.kick(msg.data.playerId);
                 break;
             }
+            case "promote": {
+                if (!player.isLeader) break;
+                this.promote(msg.data.playerId);
+                break;
+            }
             case "assignTeam": {
                 if (!player.isLeader) break;
                 this.assignTeam(msg.data.playerId, msg.data.teamId);
@@ -266,6 +294,16 @@ class Room {
             case "playGame": {
                 if (!player.isLeader) break;
                 this.findGame(msg.data);
+                break;
+            }
+            case "leaveGame": {
+                if (!player.isLeader) break;
+                this.forceQuitGame();
+                break;
+            }
+            case "setAfk": {
+                player.afk = msg.data.afk;
+                this.sendState();
                 break;
             }
         }
@@ -301,6 +339,15 @@ class Room {
         player.teamId = target.teamId;
         target.teamId = teamId;
 
+        this.sendState();
+    }
+
+    /** Leader-only: hands lobby ownership over to another player. */
+    promote(playerId: number) {
+        const player = this.players[playerId];
+        if (!player || player === this.leader) return;
+
+        this.leader = player;
         this.sendState();
     }
 
@@ -347,9 +394,16 @@ class Room {
         }
         this.data.enabledArenaRoles = enabledArenaRoles;
 
-        // kick players that don't fit on the new max players
+        // kick players that don't fit on the new max players — but never the
+        // leader (who's the only one able to trigger this): since ownership no
+        // longer follows player order, they could otherwise end up anywhere in
+        // the list and kick themselves, closing the lobby mid-update (see
+        // removePlayer/close)
         while (this.players.length > this.data.maxPlayers) {
-            this.kick(this.players.length - 1);
+            let idx = this.players.length - 1;
+            while (idx >= 0 && this.players[idx] === this.leader) idx--;
+            if (idx < 0) break;
+            this.kick(idx);
         }
 
         // re-bucket players that fell outside the new team layout, or that now
@@ -398,11 +452,47 @@ class Room {
         player.room = undefined;
         player.socket.close();
 
+        // Ownership doesn't shift to whoever's left — if the leader goes,
+        // the lobby goes with them.
+        if (player === this.leader) {
+            this.close("host_left");
+            return;
+        }
+
         this.sendState();
 
         if (!this.players.length) {
             this.privateLobbyMenu.removeRoom(this);
         }
+    }
+
+    /** Disconnects every remaining member (e.g. after the leader leaves) and removes the room. */
+    close(reason: PrivateLobbyErrorType) {
+        for (const player of this.players) {
+            player.send("error", { type: reason });
+            player.room = undefined;
+            player.socket.close();
+        }
+        this.players = [];
+
+        this.privateLobbyMenu.removeRoom(this);
+    }
+
+    /**
+     * Leader-only: pulls every in-game member of the lobby out of the active
+     * match and back to the lobby. The actual match keeps running on the game
+     * server — this just tells each client to disconnect from it early, the
+     * same way a normal early-exit/disconnect does.
+     */
+    forceQuitGame() {
+        let pulledAnyone = false;
+        for (const player of this.players) {
+            if (!player.inGame) continue;
+            player.inGame = false;
+            player.send("forceQuit", {});
+            pulledAnyone = true;
+        }
+        if (pulledAnyone) this.sendState();
     }
 
     findGameCooldown = 0;
@@ -502,6 +592,7 @@ class Room {
 
         for (const player of this.players) {
             player.inGame = true;
+            player.afk = false; // clear AFK when the match begins
             const token = tokenMap.get(player);
 
             if (!token) {
@@ -773,9 +864,16 @@ export class PrivateLobbyMenu {
                         player.send("error", { type: "join_full" });
                         break;
                     }
+
+                    const teamId = msg.data.teamId;
+                    if (teamId !== undefined && !room.teamSlotHasRoom(teamId)) {
+                        player.send("error", { type: "team_full" });
+                        break;
+                    }
+
                     player.setName(msg.data.playerData.name);
 
-                    room.addPlayer(player, msg.data.importGroupId);
+                    room.addPlayer(player, msg.data.importGroupId, teamId);
                 }
             }
         }

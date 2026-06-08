@@ -1511,6 +1511,19 @@ a:active {
   filter: brightness(60%);
 }
 
+.team-menu-member > .icon-promote {
+  background-image: url(/img/gui/star.svg);
+  background-position: 49%;
+  background-size: 60%;
+  opacity: 1;
+  cursor: pointer;
+}
+
+.team-menu-member > .icon-promote:hover {
+  color: inherit;
+  filter: brightness(60%);
+}
+
 .team-menu-member > .icon-in-game {
   background-image: url(/img/gui/player-gui.svg);
   background-size: 85%;
@@ -1522,6 +1535,7 @@ a:active {
   background-size: 75%;
   cursor: pointer;
 }
+
 
 .team-menu-member > .icon-submit-name-change:hover {
   color: inherit;
@@ -1698,8 +1712,17 @@ a:active {
   width: 420px;
 }
 
-#btn-private-lobby-create-team {
+#btn-private-lobby-create-team,
+#btn-private-lobby-afk {
   flex-shrink: 0;
+}
+
+#btn-private-lobby-afk.afk-active {
+  background: #b94a3a;
+  border-bottom: 2px solid #8a362b;
+  box-shadow: inset 0 -2px #8a362b;
+  color: #fff;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.25);
 }
 
 @media (max-width: 850px), (max-width: 900px) and (min-resolution: 3dppx) {
@@ -1725,11 +1748,27 @@ a:active {
 }
 
 .private-lobby-team-header {
+  align-items: center;
   color: #fff;
+  display: flex;
   font-size: 14px;
   font-weight: 700;
+  justify-content: space-between;
   margin-bottom: 4px;
   padding: 0 4px;
+}
+
+.private-lobby-team-copy-link {
+  background-color: transparent;
+  background-image: url(/img/gui/copy.svg);
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: 16px;
+  border: none;
+  cursor: pointer;
+  flex: 0 0 auto;
+  height: 22px;
+  width: 22px;
 }
 
 .private-lobby-team-slot {
@@ -1746,6 +1785,11 @@ a:active {
 .private-lobby-player-selected {
   background-color: rgba(124, 252, 0, 0.15);
   outline: 2px solid #7cfc00;
+}
+
+.private-lobby-player-afk {
+  background-color: rgba(231, 76, 60, 0.1);
+  outline: 2px solid #e74c3c;
 }
 
 .private-lobby-player-empty {
@@ -1904,6 +1948,43 @@ a:active {
 
 #btn-start-private-lobby {
   display: block;
+}
+
+#btn-stop-private-lobby-game {
+  display: none;
+  background: #b94a3a;
+  border-bottom: 2px solid #8a362b;
+  box-shadow: inset 0 -2px #8a362b;
+  color: #fff;
+  font-size: 16px;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.25);
+  margin-top: 6px;
+}
+
+#private-lobby-afk-confirm {
+  margin-top: 4px;
+  text-align: center;
+}
+
+#private-lobby-afk-confirm-text {
+  color: #e74c3c;
+  font-size: 13px;
+  margin-bottom: 6px;
+}
+
+#btn-private-lobby-start-anyway {
+  background: #b94a3a;
+  border-bottom: 2px solid #8a362b;
+  box-shadow: inset 0 -2px #8a362b;
+  color: #fff;
+  display: block;
+  font-size: 16px;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.25);
+}
+
+#btn-private-lobby-cancel-start {
+  display: block;
+  margin-top: 4px;
 }
 
 #private-lobby-desc {
