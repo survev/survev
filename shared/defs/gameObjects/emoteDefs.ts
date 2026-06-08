@@ -1115,16 +1115,6 @@ export const EmotesDefs: Record<string, EmoteDef> = {
         teamOnly: false,
         category: EmoteCategory.Flags,
     },
-    emote_flagisrael: {
-        type: "emote",
-        name: "Flag Israel",
-        rarity: Rarity.Common,
-        texture: "flag-israel.img",
-        sound: "emote_01",
-        channel: "ui",
-        teamOnly: false,
-        category: EmoteCategory.Flags,
-    },
     emote_flaggeorgia: {
         type: "emote",
         name: "Flag Georgia",

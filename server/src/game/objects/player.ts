@@ -4447,7 +4447,7 @@ export class Player extends BaseGameObject {
             }
         }
 
-        const slotDef = GameObjectDefs.typeToDef(this.weapons[index].type) as
+        const slotDef = GameObjectDefs.typeToDefSafe(this.weapons[index].type) as
             | GunDef
             | MeleeDef
             | ThrowableDef;
@@ -4605,11 +4605,10 @@ export class Player extends BaseGameObject {
     }
 
     dropInventoryItem(item: InventoryItem) {
-        const itemDef = GameObjectDefs.typeToDef(item);
-
         if (!this.invManager.has(item)) return;
         const inventoryCount = this.invManager.get(item);
 
+        const itemDef = GameObjectDefs.typeToDef(item);
         switch (itemDef.type) {
             case "ammo": {
                 let amountToDrop = math.max(1, Math.floor(inventoryCount / 2));
@@ -4658,7 +4657,7 @@ export class Player extends BaseGameObject {
         const isItemInLoadout = (item: string, category: string) => {
             if (useDefaultUnlocks && !defaltUnlocks.includes(item)) return false;
 
-            const def = GameObjectDefs.typeToDef(item);
+            const def = GameObjectDefs.typeToDefSafe(item);
             if (!def || def.type !== category) return false;
 
             return true;

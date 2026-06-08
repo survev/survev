@@ -513,7 +513,7 @@ export class LoadoutMenu {
         const ackItemTypes = [];
         for (let i = 0; i < this.items.length; i++) {
             const item = this.items[i];
-            const objDef = GameObjectDefs.typeToDef(item.type);
+            const objDef = GameObjectDefs.typeToDefSafe(item.type);
             if (
                 objDef
                 && objDef.type == category.gameType

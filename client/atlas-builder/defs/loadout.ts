@@ -84,7 +84,6 @@ export const LoadoutAtlas: AtlasDef = {
         "emotes/flag-hungary.svg",
         "emotes/flag-india.svg",
         "emotes/flag-indonesia.svg",
-        "emotes/flag-israel.svg",
         "emotes/flag-italy.svg",
         "emotes/flag-japan.svg",
         "emotes/flag-kazakhstan.svg",
