@@ -18,7 +18,7 @@ if (URL.canParse(Config.oauthBasePath)) {
 export const cookieDomain = oauthBaseURL?.hostname;
 
 const random = {
-    read(bytes: Uint8Array) {
+    read(bytes: Uint8Array<ArrayBuffer>) {
         crypto.getRandomValues(bytes);
     },
 };

@@ -6,5 +6,8 @@
     "../shared",
     "../config.ts",
     "../server/src/api/routes/private/private.ts"
-  ]
+  ],
+  "compilerOptions": {
+    "types": ["node"]
+  }
 }
