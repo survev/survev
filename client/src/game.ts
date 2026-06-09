@@ -1073,6 +1073,26 @@ export class Game {
     }
 
     m_processGameUpdate(msg: net.UpdateMsg) {
+        // Latency determination
+        // calculate this before the rest of this function
+        // so client-side lag caused by the rest of the code wont count
+        // on the server latency and update interval measurements
+        const now = Date.now();
+        this.m_updateRecvCount++;
+        if (msg.ack == this.seq && this.seqInFlight) {
+            this.seqInFlight = false;
+            const ping = now - this.seqSendTime;
+            this.debugHUD.pingGraph.addEntry(ping);
+            this.pings.push(ping);
+        }
+        if (this.lastUpdateTime > 0) {
+            const interval = now - this.lastUpdateTime;
+            this.m_camera.m_interpInterval = interval / 1000;
+            this.debugHUD.updateIntervalGraph.addEntry(interval);
+            this.updateIntervals.push(interval);
+        }
+        this.lastUpdateTime = now;
+
         const ctx: Ctx = {
             audioManager: this.m_audioManager,
             renderer: this.m_renderer,
@@ -1225,23 +1245,6 @@ export class Game {
                 this.m_map.getMapDef().gameMode,
             );
         }
-
-        // Latency determination
-        const now = Date.now();
-        this.m_updateRecvCount++;
-        if (msg.ack == this.seq && this.seqInFlight) {
-            this.seqInFlight = false;
-            const ping = now - this.seqSendTime;
-            this.debugHUD.pingGraph.addEntry(ping);
-            this.pings.push(ping);
-        }
-        if (this.lastUpdateTime > 0) {
-            const interval = now - this.lastUpdateTime;
-            this.m_camera.m_interpInterval = interval / 1000;
-            this.debugHUD.updateIntervalGraph.addEntry(interval);
-            this.updateIntervals.push(interval);
-        }
-        this.lastUpdateTime = now;
     }
 
     // Socket functions
