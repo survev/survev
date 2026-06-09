@@ -1,5 +1,5 @@
 import * as PIXI from "pixi.js-legacy";
-import { type MapDef, MapDefs } from "../../shared/defs/mapDefs.ts";
+import { type MapDef, type MapDefKey, MapDefs } from "../../shared/defs/mapDefs.ts";
 import type { BuildingDef, ObstacleDef } from "../../shared/defs/mapObjectsTyping.ts";
 import { MapObjectDefs } from "../../shared/defs/register.ts";
 import { GameConfig } from "../../shared/gameConfig.ts";
@@ -104,7 +104,7 @@ export class Map {
         ground: new PIXI.Graphics(),
     };
 
-    mapName = "";
+    mapName = "" as MapDefKey;
     mapDef = {} as MapDef;
     factionMode = false;
     potatoMode = false;
@@ -179,7 +179,7 @@ export class Map {
     ) {
         this.mapName = mapMsg.mapName;
         // Clone the source mapDef
-        const mapDef = MapDefs[this.mapName as keyof typeof MapDefs];
+        const mapDef = MapDefs[this.mapName];
         if (!mapDef) {
             throw new Error(`Failed loading mapDef ${this.mapName}`);
         }

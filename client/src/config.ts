@@ -1,4 +1,4 @@
-import type { MapDefs } from "../../shared/defs/mapDefs.ts";
+import type { MapDefKey } from "../../shared/defs/mapDefs.ts";
 import { GameConfig } from "../../shared/gameConfig.ts";
 import loadout from "../../shared/utils/loadout.ts";
 import { util } from "../../shared/utils/util.ts";
@@ -81,7 +81,7 @@ export const BuildingEditorConfig = {
     zoom: 1,
     pos: v2.create(0, 0),
     object: "house_red_01",
-    map: "main" as keyof typeof MapDefs,
+    map: "main" as MapDefKey,
     grid: true,
 };
 

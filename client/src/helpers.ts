@@ -2,7 +2,7 @@ import $ from "jquery";
 
 import type { MeleeDef } from "../../shared/defs/gameObjects/meleeDefs.ts";
 import type { OutfitDef } from "../../shared/defs/gameObjects/outfitDefs.ts";
-import { MapDefs } from "../../shared/defs/mapDefs.ts";
+import { type MapDefKey, MapDefs } from "../../shared/defs/mapDefs.ts";
 import { GameObjectDefs } from "../../shared/defs/register.ts";
 import * as net from "../../shared/net/net.ts";
 import { device } from "./device.ts";
@@ -47,7 +47,7 @@ export const helpers = {
         const mapKeys = Object.keys(MapDefs);
         for (let i = 0; i < mapKeys.length; i++) {
             const mapKey = mapKeys[i];
-            const mapDef = MapDefs[mapKey as keyof typeof MapDefs];
+            const mapDef = MapDefs[mapKey as MapDefKey];
             if (
                 !gameModes.find((x) => {
                     return x.mapId == mapDef.mapId;

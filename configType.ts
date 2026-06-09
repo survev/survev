@@ -1,4 +1,4 @@
-import type { MapDefs } from "./shared/defs/mapDefs.ts";
+import type { MapDefKey } from "./shared/defs/mapDefs.ts";
 import type { TeamMode } from "./shared/gameConfig.ts";
 import type { ProxyDef } from "./shared/types/api.ts";
 import type { DeepPartial } from "./shared/utils/util.ts";
@@ -115,7 +115,7 @@ export interface ConfigType {
         /**
          * The ID of the map this mode will be running
          */
-        mapName: keyof typeof MapDefs;
+        mapName: MapDefKey;
         /**
          * The team mode, "Solo", "Duo" or "Squad" are the only supported values
          */
@@ -131,7 +131,7 @@ export interface ConfigType {
      *
      * NOTE: Required at build time, unlike modes it wont update by fetching from the server!
      */
-    clientTheme: keyof typeof MapDefs;
+    clientTheme: MapDefKey;
 
     /**
      * The battle pass, set to an empty string to disable it

@@ -1,5 +1,5 @@
 import { z } from "zod";
-import type { MapDefs } from "../defs/mapDefs.ts";
+import type { MapDefKey } from "../defs/mapDefs.ts";
 import type { TeamMode } from "../gameConfig.ts";
 
 export const zFindGameBody = z.object({
@@ -69,7 +69,7 @@ export interface SiteInfoRes {
         teamMode: TeamMode;
         enabled: boolean;
     }>;
-    clientTheme: keyof typeof MapDefs;
+    clientTheme: MapDefKey;
     pops: Record<
         string,
         {

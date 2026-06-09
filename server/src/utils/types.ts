@@ -1,5 +1,5 @@
 import { z } from "zod";
-import type { MapDefs } from "../../../shared/defs/mapDefs.ts";
+import type { MapDefKey } from "../../../shared/defs/mapDefs.ts";
 import { TeamMode } from "../../../shared/gameConfig.ts";
 import type { FindGameError } from "../../../shared/types/api.ts";
 import { loadoutSchema } from "../../../shared/utils/loadout.ts";
@@ -29,7 +29,7 @@ export interface SaveGameBody {
 }
 
 export interface ServerGameConfig {
-    readonly mapName: keyof typeof MapDefs;
+    readonly mapName: MapDefKey;
     readonly teamMode: TeamMode;
 }
 

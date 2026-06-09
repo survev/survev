@@ -1,7 +1,7 @@
 import { type ChildProcess, fork } from "node:child_process";
 import { randomUUID } from "node:crypto";
 import type { WebSocket } from "uWebSockets.js";
-import { type MapDef, MapDefs } from "../../../shared/defs/mapDefs.ts";
+import { type MapDef, type MapDefKey, MapDefs } from "../../../shared/defs/mapDefs.ts";
 import type { TeamMode } from "../../../shared/gameConfig.ts";
 import * as net from "../../../shared/net/net.ts";
 import { util } from "../../../shared/utils/util.ts";
@@ -128,7 +128,7 @@ class GameProcess {
         this.gameData.stopped = false;
         this.state = ProcState.CreatingGame;
 
-        const mapDef = MapDefs[this.gameData.mapName as keyof typeof MapDefs] as MapDef;
+        const mapDef = MapDefs[this.gameData.mapName as MapDefKey];
         this.avaliableSlots = mapDef.gameMode.maxPlayers;
     }
 
@@ -304,7 +304,7 @@ export class GameProcessManager {
         if (!proc) {
             proc = this.newGame({
                 teamMode: body.teamMode,
-                mapName: body.mapName as keyof typeof MapDefs,
+                mapName: body.mapName as MapDefKey,
             });
         }
 

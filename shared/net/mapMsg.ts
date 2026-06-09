@@ -1,4 +1,4 @@
-import type { MapDef } from "../defs/mapDefs.ts";
+import type { MapDef, MapDefKey } from "../defs/mapDefs.ts";
 import type { MapRiverData } from "../utils/terrainGen.ts";
 import type { Vec2 } from "../utils/v2.ts";
 import { type AbstractMsg, type BitStream, Constants } from "./net.ts";
@@ -95,7 +95,7 @@ function deserializeMapObj(s: BitStream): MapObj {
 }
 
 export class MapMsg implements AbstractMsg {
-    mapName = "";
+    mapName = "" as MapDefKey;
     seed = 0;
     width = 0;
     height = 0;
@@ -134,7 +134,7 @@ export class MapMsg implements AbstractMsg {
     }
 
     deserialize(s: BitStream) {
-        this.mapName = s.readString(Constants.MapNameMaxLen);
+        this.mapName = s.readString(Constants.MapNameMaxLen) as MapDefKey;
         this.seed = s.readUint32();
         this.width = s.readUint16();
         this.height = s.readUint16();

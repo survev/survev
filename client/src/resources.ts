@@ -1,7 +1,7 @@
 import * as PIXI from "pixi.js-legacy";
 import highResAtlasDefs from "virtual-atlases-high";
 import lowResAtlasDefs from "virtual-atlases-low";
-import { type Atlas, MapDefs } from "../../shared/defs/mapDefs.ts";
+import { type Atlas, type MapDefKey, MapDefs } from "../../shared/defs/mapDefs.ts";
 import type { AudioManager } from "./audioManager.ts";
 import type { ConfigManager } from "./config.ts";
 import { device } from "./device.ts";
@@ -174,7 +174,7 @@ export class ResourceManager {
     loadMapAssets(mapName: string) {
         console.log("Load map", mapName);
 
-        const mapDef = MapDefs[mapName as keyof typeof MapDefs];
+        const mapDef = MapDefs[mapName as MapDefKey];
         if (!mapDef) {
             throw new Error(`Failed loading mapDef ${this.mapName}`);
         }

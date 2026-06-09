@@ -38,7 +38,7 @@ export type Atlas =
     | "turkey"
     | "beach";
 
-export const MapDefs = {
+const _MapDefs = {
     main: Main,
     main_spring: MainSpring,
     main_summer: MainSummer,
@@ -64,6 +64,10 @@ export const MapDefs = {
     test_faction: testFaction,
     /* STRIP_FROM_PROD_CLIENT:END */
 } satisfies Record<string, MapDef>;
+
+export type MapDefKey = keyof typeof _MapDefs;
+
+export const MapDefs = _MapDefs as Record<MapDefKey, MapDef>;
 
 export interface MapDef {
     mapId: MapId;

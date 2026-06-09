@@ -3,7 +3,7 @@ import { Hono } from "hono";
 import { z } from "zod";
 import { saveConfig } from "../../../../../config.ts";
 import { QuestDefs } from "../../../../../shared/defs/gameObjects/questDefs.ts";
-import { MapDefs } from "../../../../../shared/defs/mapDefs.ts";
+import { type MapDefKey, MapDefs } from "../../../../../shared/defs/mapDefs.ts";
 import { GameObjectDefs } from "../../../../../shared/defs/register.ts";
 import { TeamMode } from "../../../../../shared/gameConfig.ts";
 import { zGiveItemParams, zRemoveItemParams } from "../../../../../shared/types/moderation.ts";
@@ -38,7 +38,7 @@ export const PrivateRouter = new Hono<Context>()
             enabled,
         } = c.req.valid("json");
 
-        if (!MapDefs[mapName as keyof typeof MapDefs]) {
+        if (!MapDefs[mapName as MapDefKey]) {
             return c.json({ error: "Invalid map name" }, 400);
         }
 
@@ -47,7 +47,7 @@ export const PrivateRouter = new Hono<Context>()
         }
 
         server.modes[index] = {
-            mapName: (mapName ?? server.modes[index].mapName) as keyof typeof MapDefs,
+            mapName: (mapName ?? server.modes[index].mapName) as MapDefKey,
             teamMode: teamMode ?? server.modes[index].teamMode,
             enabled: enabled ?? server.modes[index].enabled,
         };
@@ -64,11 +64,11 @@ export const PrivateRouter = new Hono<Context>()
     .post("/set_client_theme", validateParams(zSetClientThemeBody), (c) => {
         const { theme } = c.req.valid("json");
 
-        if (!MapDefs[theme as keyof typeof MapDefs]) {
+        if (!MapDefs[theme as MapDefKey]) {
             return c.json({ error: "Invalid map name" }, 400);
         }
 
-        server.clientTheme = theme as keyof typeof MapDefs;
+        server.clientTheme = theme as MapDefKey;
 
         saveConfig(serverConfigPath, {
             clientTheme: server.clientTheme,

@@ -1,5 +1,5 @@
 import $ from "jquery";
-import { type MapDef, MapDefs } from "../../shared/defs/mapDefs.ts";
+import { type MapDef, type MapDefKey, MapDefs } from "../../shared/defs/mapDefs.ts";
 import { TeamModeToString } from "../../shared/defs/types/misc.ts";
 import type { SiteInfoRes } from "../../shared/types/api.ts";
 import { api } from "./api.ts";
@@ -44,7 +44,7 @@ export class SiteInfo {
         const modes = this.info.modes || [];
         for (let i = 0; i < modes.length; i++) {
             const mode = modes[i];
-            const mapDef = (MapDefs[mode.mapName as keyof typeof MapDefs] || MapDefs.main)
+            const mapDef = (MapDefs[mode.mapName as MapDefKey] || MapDefs.main)
                 .desc;
             const buttonText = mapDef.buttonText
                 ? mapDef.buttonText
@@ -148,7 +148,7 @@ export class SiteInfo {
             }
             featuredYoutuberElem.css("display", displayYoutuber ? "block" : "none");
 
-            const mapDef = MapDefs[this.info.clientTheme] as MapDef;
+            const mapDef = MapDefs[this.info.clientTheme];
             if (mapDef) {
                 this.config.set("cachedBgImg", mapDef.desc.backgroundImg);
                 const bg = document.getElementById("background");
