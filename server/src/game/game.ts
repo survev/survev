@@ -126,6 +126,14 @@ export class Game {
     arenaRoles: string[] = [];
     choosenArenaRoles: string[] = [];
 
+    /** In-memory kill event buffer for the live moderation dashboard (capped at 200). */
+    recentKills: import("../utils/types").KillFeedEntry[] = [];
+
+    logKillFeedEntry(entry: import("../utils/types").KillFeedEntry) {
+        this.recentKills.push(entry);
+        if (this.recentKills.length > 200) this.recentKills.shift();
+    }
+
     constructor(
         id: string,
         config: ServerGameConfig,
@@ -707,6 +715,15 @@ export class Game {
             case "announce_player":
                 this.announceToPlayer(cmd.target, cmd.text, cmd.color, cmd.sender);
                 break;
+            case "chat": {
+                const chatMsg = new net.KillFeedMsg();
+                chatMsg.type = net.KillFeedMsgType.ChatMsg;
+                chatMsg.player = cmd.sender ?? "ADMIN";
+                chatMsg.string = cmd.text;
+                chatMsg.chatType = 0;
+                this.broadcastMsg(net.MsgType.KillFeed, chatMsg);
+                break;
+            }
         }
     }
 

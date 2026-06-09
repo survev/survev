@@ -3658,6 +3658,14 @@ export class Player extends BaseGameObject {
             if (killCreditSource !== this && killCreditSource.teamId !== this.teamId) {
                 killCreditSource.killedIds.push(this.matchDataId);
                 killCreditSource.kills++;
+                this.game.logKillFeedEntry({
+                    ts: Date.now(),
+                    killerName: killCreditSource.name,
+                    killerUserId: killCreditSource.userId ?? "",
+                    victimName: this.name,
+                    victimUserId: this.userId ?? "",
+                    weapon: params.gameSourceType ?? params.mapSourceType ?? "unknown",
+                });
 
                 if (killCreditSource.isKillLeader) {
                     this.game.playerBarn.killLeaderDirty = true;

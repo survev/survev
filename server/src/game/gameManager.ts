@@ -37,6 +37,9 @@ export abstract class GameManager {
     /** Returns live player data for a running game (for the moderation dashboard). */
     abstract getGamePlayers(gameId: string): Promise<DashboardPlayer[]>;
 
+    /** Returns the recent kill-feed buffer for a running game (for the moderation dashboard). */
+    abstract getGameFeed(gameId: string): Promise<import("../utils/types").KillFeedEntry[]>;
+
     /** Sends an admin command to a running game (fire-and-forget). */
     abstract sendAdminCmd(gameId: string, cmd: AdminCmdAction): void;
 
@@ -218,6 +221,10 @@ export class SingleThreadGameManager implements GameManager {
 
     async getGamePlayers(gameId: string): Promise<DashboardPlayer[]> {
         return this.gamesById.get(gameId)?.getPlayerDataForDashboard() ?? [];
+    }
+
+    async getGameFeed(gameId: string): Promise<import("../utils/types").KillFeedEntry[]> {
+        return this.gamesById.get(gameId)?.recentKills ?? [];
     }
 
     sendAdminCmd(gameId: string, cmd: AdminCmdAction): void {

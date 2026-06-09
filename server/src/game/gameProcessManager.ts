@@ -13,6 +13,7 @@ import {
     type FindPrivateLobbyGameBody,
     type GameData,
     type GameSocketData,
+    type KillFeedEntry,
     type ProcessMsg,
     ProcessMsgType,
     type ServerGameConfig,
@@ -52,6 +53,8 @@ class GameProcess implements GameData {
 
     /** Pending GetPlayerData callbacks, keyed by requestId. */
     readonly pendingPlayerDataRequests = new Map<string, (players: DashboardPlayer[]) => void>();
+    /** Pending GetGameFeed callbacks, keyed by requestId. */
+    readonly pendingGameFeedRequests = new Map<string, (entries: KillFeedEntry[]) => void>();
 
     constructor(manager: GameProcessManager, id: string, config: ServerGameConfig) {
         this.manager = manager;
@@ -127,6 +130,16 @@ class GameProcess implements GameData {
                     if (resolve) {
                         this.pendingPlayerDataRequests.delete(msg.requestId);
                         resolve(msg.players);
+                    }
+                    break;
+                }
+
+                // Dashboard: resolve the pending getGameFeed() promise
+                case ProcessMsgType.GameFeedResponse: {
+                    const resolve = this.pendingGameFeedRequests.get(msg.requestId);
+                    if (resolve) {
+                        this.pendingGameFeedRequests.delete(msg.requestId);
+                        resolve(msg.entries);
                     }
                     break;
                 }
@@ -459,6 +472,31 @@ export class GameProcessManager implements GameManager {
             });
 
             proc.send({ type: ProcessMsgType.GetPlayerData, requestId });
+        });
+    }
+
+    /**
+     * Requests the recent kill feed buffer from a running game process.
+     * Resolves with an empty array if the game is not found or times out after 3 s.
+     */
+    async getGameFeed(gameId: string): Promise<KillFeedEntry[]> {
+        const proc = this.processById.get(gameId);
+        if (!proc) return [];
+
+        const requestId = randomUUID();
+
+        return new Promise<KillFeedEntry[]>((resolve) => {
+            const timeout = setTimeout(() => {
+                proc.pendingGameFeedRequests.delete(requestId);
+                resolve([]);
+            }, 3000);
+
+            proc.pendingGameFeedRequests.set(requestId, (entries) => {
+                clearTimeout(timeout);
+                resolve(entries);
+            });
+
+            proc.send({ type: ProcessMsgType.GetGameFeed, requestId });
         });
     }
 

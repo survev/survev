@@ -98,6 +98,15 @@ process.on("message", async (msg: ProcessMsg) => {
         case ProcessMsgType.AdminCmd:
             game.executeAdminCmd(msg.cmd);
             break;
+
+        // Dashboard: return recent kill feed buffer
+        case ProcessMsgType.GetGameFeed:
+            sendMsg({
+                type: ProcessMsgType.GameFeedResponse,
+                requestId: msg.requestId,
+                entries: game.recentKills,
+            });
+            break;
     }
 });
 

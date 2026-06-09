@@ -711,6 +711,26 @@ app.post("/api/dashboard/game_players", (res, req) => {
     });
 });
 
+/** Returns the recent kill feed buffer for a specific running game. */
+app.post("/api/dashboard/game_feed", (res, req) => {
+    res.onAborted(() => { res.aborted = true; });
+
+    if (req.getHeader("survev-api-key") !== Config.secrets.SURVEV_API_KEY) {
+        forbidden(res);
+        return;
+    }
+
+    readPostedJSON(res, async (body: any) => {
+        if (res.aborted) return;
+        const { gameId } = body ?? {};
+        if (typeof gameId !== "string") { returnJson(res, { error: "missing gameId" }); return; }
+        const entries = await server.manager.getGameFeed(gameId);
+        returnJson(res, { entries });
+    }, () => {
+        if (!res.aborted) returnJson(res, { error: "body error" });
+    });
+});
+
 /** Executes an admin command on a specific running game. */
 app.post("/api/dashboard/game_cmd", (res, req) => {
     res.onAborted(() => { res.aborted = true; });

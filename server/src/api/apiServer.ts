@@ -78,6 +78,12 @@ class Region {
         return data?.players ?? [];
     }
 
+    /** Fetches the recent kill feed buffer for a game from the game server (for the moderation dashboard). */
+    async getDashboardGameFeed(gameId: string): Promise<any[]> {
+        const data = await this.fetch<{ entries: any[] }>("api/dashboard/game_feed", { gameId });
+        return data?.entries ?? [];
+    }
+
     /** Sends an admin command to a running game on this region's game server. */
     async sendDashboardGameCmd(gameId: string, cmd: object): Promise<boolean> {
         const data = await this.fetch<{ ok: boolean }>("api/dashboard/game_cmd", { gameId, cmd });
@@ -202,6 +208,11 @@ export class ApiServer {
     /** Returns live players for a game from the game server of the given region. */
     async getDashboardGamePlayers(region: string, gameId: string): Promise<any[]> {
         return (await this.regions[region]?.getDashboardGamePlayers(gameId)) ?? [];
+    }
+
+    /** Returns recent kill feed entries for a game from the game server of the given region. */
+    async getDashboardGameFeed(region: string, gameId: string): Promise<any[]> {
+        return (await this.regions[region]?.getDashboardGameFeed(gameId)) ?? [];
     }
 
     /** Sends an admin command to a running game in the given region. */

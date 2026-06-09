@@ -121,6 +121,8 @@ export enum ProcessMsgType {
     GetPlayerData,      // API server → game process: request live player list
     PlayerDataResponse, // game process → API server: live player list response
     AdminCmd,           // API server → game process: execute an admin action
+    GetGameFeed,        // API server → game process: request recent kill feed
+    GameFeedResponse,   // game process → API server: recent kill feed response
 }
 
 export interface CreateGameMsg {
@@ -209,6 +211,27 @@ export interface PlayerDataResponseMsg {
     players: DashboardPlayer[];
 }
 
+/** One kill event, buffered in-memory by Game for the live dashboard. */
+export interface KillFeedEntry {
+    ts: number;
+    killerName: string;
+    killerUserId: string;
+    victimName: string;
+    victimUserId: string;
+    weapon: string;
+}
+
+export interface GetGameFeedMsg {
+    type: ProcessMsgType.GetGameFeed;
+    requestId: string;
+}
+
+export interface GameFeedResponseMsg {
+    type: ProcessMsgType.GameFeedResponse;
+    requestId: string;
+    entries: KillFeedEntry[];
+}
+
 /** Actions the dashboard can trigger on a running game. */
 export type AdminCmdAction =
     | { action: "freeze" }
@@ -217,7 +240,8 @@ export type AdminCmdAction =
     | { action: "unverify" }
     | { action: "kick";            target: string }
     | { action: "announce";        text: string; color?: string; sender?: string }
-    | { action: "announce_player"; target: string; text: string; color?: string; sender?: string };
+    | { action: "announce_player"; target: string; text: string; color?: string; sender?: string }
+    | { action: "chat";            text: string; sender?: string };
 
 export interface AdminCmdMsg {
     type: ProcessMsgType.AdminCmd;
@@ -236,7 +260,9 @@ export type ProcessMsg =
     | SocketCloseMsg
     | GetPlayerDataMsg
     | PlayerDataResponseMsg
-    | AdminCmdMsg;
+    | AdminCmdMsg
+    | GetGameFeedMsg
+    | GameFeedResponseMsg;
 
     export interface GameInfo {
     id: string,

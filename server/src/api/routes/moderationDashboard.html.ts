@@ -236,20 +236,20 @@ export const dashboardHtml = `<!DOCTYPE html>
   <div id="tab-accounts" class="tab-pane">
     <div class="toolbar">
       <input type="text" id="accounts-search" placeholder="Search by username or slug…">
-      <button class="btn btn-orange" id="reconcile-btn">⚡ Reconcile Pass XP</button>
+      <button class="btn btn-orange" id="reconcile-btn">⚡ Reconcile All Passes + Unlocks</button>
       <span id="reconcile-result" style="font-size:11px;color:var(--text-dim);"></span>
     </div>
     <table class="data-table" id="accounts-table">
-      <thead><tr>
+      <thead><tr id="accounts-thead-row">
         <th>#</th>
         <th class="sortable" data-col="username">Username</th>
         <th>Slug</th>
-        <th class="sortable" data-col="level">Level</th>
-        <th class="sortable" data-col="xp">XP ▼</th>
-        <th class="sortable" data-col="lastUpdated">Last Updated</th>
+        <th style="white-space:nowrap">Created</th>
+        <th>Last IP</th>
         <th>Flags</th>
+        <!-- pass-level columns injected by renderAccountsHeader() -->
       </tr></thead>
-      <tbody id="accounts-tbody"><tr><td colspan="7" class="loading">Loading…</td></tr></tbody>
+      <tbody id="accounts-tbody"><tr><td colspan="6" class="loading">Loading…</td></tr></tbody>
     </table>
   </div>
 
@@ -317,6 +317,17 @@ export const dashboardHtml = `<!DOCTYPE html>
           </tr></thead>
           <tbody id="player-tbody"><tr><td colspan="6" class="loading">Loading…</td></tr></tbody>
         </table>
+      </div>
+
+      <!-- Live chat + kill feed panel -->
+      <div id="game-feed-panel" style="margin:10px 14px 0;border:1px solid var(--border2);border-radius:6px;overflow:hidden;">
+        <div style="background:var(--surface2);padding:6px 12px;font-size:11px;font-weight:700;color:var(--text-dim);letter-spacing:.5px;">LIVE CHAT &amp; KILL FEED</div>
+        <div id="game-feed-list" style="max-height:200px;overflow-y:auto;padding:6px 10px;display:flex;flex-direction:column;gap:3px;font-size:12px;"></div>
+        <div style="display:flex;gap:6px;padding:6px 10px;border-top:1px solid var(--border);">
+          <input id="chat-send-input" type="text" maxlength="150" placeholder="Send message to game chat…"
+            style="flex:1;background:var(--surface);border:1px solid var(--border2);border-radius:4px;padding:5px 8px;color:var(--text);font-family:inherit;font-size:12px;outline:none;">
+          <button class="btn btn-blue btn-sm" id="chat-send-btn">SEND</button>
+        </div>
       </div>
     </div>
   </div>
@@ -472,6 +483,23 @@ function connectSSE(region, gameId) {
   evtSource.addEventListener('players', (e) => {
     currentPlayers = JSON.parse(e.data).players ?? [];
     renderPlayers();
+  });
+
+  evtSource.addEventListener('feed', (e) => {
+    const { chat = [], kills = [] } = JSON.parse(e.data);
+    const list = document.getElementById('game-feed-list');
+    if (!list) return;
+    const entries = [
+      ...chat.map(m => \`<div class="feed-chat" style="color:var(--blue-t)">💬 <b>\${esc(m.username||'?')}</b>: \${esc(m.message||'')}</div>\`),
+      ...kills.map(k => \`<div class="feed-kill" style="color:var(--red-t)">💀 <b>\${esc(k.killerName||'?')}</b> killed <b>\${esc(k.victimName||'?')}</b> [\${esc(k.weapon||'')}]</div>\`),
+    ];
+    for (const html of entries) {
+      const div = document.createElement('div');
+      div.innerHTML = html;
+      list.prepend(div.firstChild);
+    }
+    // Cap feed display at 100 entries
+    while (list.children.length > 100) list.removeChild(list.lastChild);
   });
 
   evtSource.onopen  = () => setLiveStatus(true);
@@ -1049,18 +1077,42 @@ document.getElementById('gd-close-btn').addEventListener('click', () => {
 // ═══════════════════════════════════════════════════════════════════════════
 
 let accountsData = [];
-let accountsPassType = '';
-let accountsSortCol = 'xp';
+let accountsPassTypes = [];
+let accountsSortCol = 'currentXp';
 let accountsSortDir = -1; // -1 = desc, 1 = asc
 
+function renderAccountsHeader() {
+  const headerRow = document.getElementById('accounts-thead-row');
+  // Remove any previously injected pass columns (keep static cols: #, Username, Slug, Created, Last IP, Flags = 6)
+  while (headerRow.children.length > 6) headerRow.removeChild(headerRow.lastChild);
+  for (const pt of accountsPassTypes) {
+    const shortName = pt.replace('pass_survivr', 'S');
+    const th = document.createElement('th');
+    th.className = 'sortable';
+    th.dataset.col = 'pass_' + pt;
+    th.textContent = shortName + ' Lvl';
+    headerRow.appendChild(th);
+  }
+  // Update sort arrows
+  document.querySelectorAll('#accounts-table .sortable').forEach(th => {
+    const col = th.dataset.col;
+    const base = th.textContent.replace(/ [▲▼]$/, '');
+    th.textContent = col === accountsSortCol ? base + (accountsSortDir === 1 ? ' ▲' : ' ▼') : base;
+  });
+}
+
 async function loadAccounts() {
-  document.getElementById('accounts-tbody').innerHTML = '<tr><td colspan="7" class="loading">Loading…</td></tr>';
+  const colCount = 6 + accountsPassTypes.length;
+  document.getElementById('accounts-tbody').innerHTML = \`<tr><td colspan="\${colCount}" class="loading">Loading…</td></tr>\`;
   try {
     const data = await get('/api/accounts');
     accountsData = data.accounts ?? [];
-    accountsPassType = data.passType ?? '';
+    accountsPassTypes = data.passTypes ?? [];
+    renderAccountsHeader();
     renderAccounts();
-  } catch (e) { document.getElementById('accounts-tbody').innerHTML = '<tr><td colspan="7" class="empty">Failed to load accounts.</td></tr>'; }
+  } catch (e) {
+    document.getElementById('accounts-tbody').innerHTML = '<tr><td colspan="6" class="empty">Failed to load accounts.</td></tr>';
+  }
 }
 
 function renderAccounts() {
@@ -1071,13 +1123,17 @@ function renderAccounts() {
 
   // Sort
   rows = [...rows].sort((a, b) => {
-    let av = a[accountsSortCol], bv = b[accountsSortCol];
-    if (accountsSortCol === 'xp' || accountsSortCol === 'level') {
-      av = Number(av ?? -1); bv = Number(bv ?? -1);
-    } else if (accountsSortCol === 'lastUpdated') {
-      av = av ? new Date(av).getTime() : -1; bv = bv ? new Date(bv).getTime() : -1;
+    let av, bv;
+    if (accountsSortCol.startsWith('pass_')) {
+      const pt = accountsSortCol.slice(5);
+      av = Number(a.passes?.[pt]?.level ?? -1);
+      bv = Number(b.passes?.[pt]?.level ?? -1);
+    } else if (accountsSortCol === 'userCreated') {
+      av = a.userCreated ? new Date(a.userCreated).getTime() : -1;
+      bv = b.userCreated ? new Date(b.userCreated).getTime() : -1;
     } else {
-      av = (av ?? '').toString().toLowerCase(); bv = (bv ?? '').toString().toLowerCase();
+      av = (a[accountsSortCol] ?? '').toString().toLowerCase();
+      bv = (b[accountsSortCol] ?? '').toString().toLowerCase();
     }
     if (av < bv) return -accountsSortDir;
     if (av > bv) return  accountsSortDir;
@@ -1091,22 +1147,30 @@ function renderAccounts() {
     th.textContent = col === accountsSortCol ? base + (accountsSortDir === 1 ? ' ▲' : ' ▼') : base;
   });
 
+  const passCols = accountsPassTypes.map(pt =>
+    \`<td style="font-weight:600;text-align:center;">\${a_passes_level(a, pt)}</td>\`
+  );
+
+  const colCount = 6 + accountsPassTypes.length;
   const tbody = document.getElementById('accounts-tbody');
   tbody.innerHTML = rows.length ? rows.map((a, i) => \`
     <tr>
       <td style="color:var(--text-muted);font-size:11px;">\${i+1}</td>
       <td><span style="color:var(--blue-t)">\${esc(a.username||'–')}</span></td>
       <td style="font-size:11px;color:var(--text-dim);">\${esc(a.slug||'–')}</td>
-      <td style="font-weight:600;">\${a.level ?? '–'}</td>
-      <td style="font-family:monospace;">\${a.xp != null ? Number(a.xp).toLocaleString() : '–'}</td>
-      <td style="font-size:11px;color:var(--text-muted);">\${fmtDate(a.lastUpdated)}</td>
+      <td style="font-size:11px;color:var(--text-muted);white-space:nowrap;">\${fmtDate(a.userCreated)}</td>
+      <td style="font-size:11px;font-family:monospace;">\${a.lastIp ? ipLink(a.lastIp) : '–'}</td>
       <td>
         \${a.admin ? '<span class="badge badge-admin">ADMIN</span>' : ''}
         \${a.banned ? '<span class="badge badge-perm">BANNED</span>' : ''}
       </td>
+      \${accountsPassTypes.map(pt => \`<td style="font-weight:600;text-align:center;">\${a.passes?.[pt]?.level ?? '–'}</td>\`).join('')}
     </tr>
-  \`).join('') : '<tr><td colspan="7" class="empty">No accounts found.</td></tr>';
+  \`).join('') : \`<tr><td colspan="\${colCount}" class="empty">No accounts found.</td></tr>\`;
 }
+
+// Helper to suppress template-literal reference error (resolved inline above)
+function a_passes_level(a, pt) { return a.passes?.[pt]?.level ?? '–'; }
 
 document.getElementById('accounts-search').addEventListener('input', renderAccounts);
 
@@ -1118,9 +1182,10 @@ document.getElementById('accounts-table').addEventListener('click', (e) => {
     accountsSortDir *= -1;
   } else {
     accountsSortCol = col;
-    accountsSortDir = col === 'xp' || col === 'level' || col === 'lastUpdated' ? -1 : 1;
+    accountsSortDir = (col.startsWith('pass_') || col === 'userCreated') ? -1 : 1;
   }
   renderAccounts();
+  renderAccountsHeader();
 });
 
 document.getElementById('reconcile-btn').addEventListener('click', async () => {
@@ -1131,7 +1196,7 @@ document.getElementById('reconcile-btn').addEventListener('click', async () => {
   result.textContent = '';
   try {
     const data = await post('/api/reconcile_pass_xp', {});
-    result.textContent = \`Done: \${data.usersReconciled} users fixed, +\${data.totalXpAdded} XP total\`;
+    result.textContent = \`Done: \${data.usersReconciled} users fixed, +\${data.totalXpAdded} XP, \${data.totalUnlocksGranted} unlocks granted\`;
     result.style.color = 'var(--green-t)';
     await loadAccounts();
   } catch (e) {
@@ -1139,8 +1204,22 @@ document.getElementById('reconcile-btn').addEventListener('click', async () => {
     result.style.color = 'var(--red-t)';
   } finally {
     btn.disabled = false;
-    btn.textContent = '⚡ Reconcile Pass XP';
+    btn.textContent = '⚡ Reconcile All Passes + Unlocks';
   }
+});
+
+// ── Admin chat send ────────────────────────────────────────────────────────
+
+document.getElementById('chat-send-btn').addEventListener('click', async () => {
+  const input = document.getElementById('chat-send-input');
+  const text = input.value.trim();
+  if (!text || !activeGameId) return;
+  input.value = '';
+  await gameCmd({ action: 'chat', text, sender: currentAdminSlug || 'ADMIN' });
+});
+
+document.getElementById('chat-send-input').addEventListener('keydown', (e) => {
+  if (e.key === 'Enter') document.getElementById('chat-send-btn').click();
 });
 
 // ═══════════════════════════════════════════════════════════════════════════

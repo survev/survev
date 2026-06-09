@@ -22,7 +22,7 @@
  *   POST /moderation/api/game/:region/:id/cmd      → execute admin command on a game
  */
 
-import { and, desc, eq, gte, inArray, sql } from "drizzle-orm";
+import { and, asc, desc, eq, gt, gte, inArray, sql } from "drizzle-orm";
 import { Hono } from "hono";
 import { getCookie } from "hono/cookie";
 import { streamSSE, type SSEStreamingApi } from "hono/streaming";
@@ -30,7 +30,7 @@ import { util } from "../../../../shared/utils/util";
 import { validateSessionToken } from "../auth";
 import { validateParams } from "../auth/middleware";
 import { db } from "../db";
-import { bannedIpsTable, chatBannedIpsTable, chatLogsTable, ipLogsTable, matchDataTable, usersTable, userXpTable } from "../db/schema";
+import { bannedIpsTable, chatBannedIpsTable, chatLogsTable, ipLogsTable, itemsTable, matchDataTable, usersTable, userXpTable } from "../db/schema";
 import { server } from "../apiServer";
 import type { Context } from "..";
 import { z } from "zod";
@@ -502,6 +502,31 @@ export const ModerationDashboardRouter = new Hono<Context>()
                   }, 3_000)
                 : null;
 
+            // Periodic chat + kill feed for the watched game (every 3 s)
+            let lastFeedAt = new Date();
+            const feedTimer = gameId
+                ? setInterval(async () => {
+                      const since = lastFeedAt;
+                      lastFeedAt = new Date();
+                      const chat = await db
+                          .select({
+                              id:        chatLogsTable.id,
+                              createdAt: chatLogsTable.createdAt,
+                              username:  chatLogsTable.username,
+                              channel:   chatLogsTable.channel,
+                              message:   chatLogsTable.message,
+                          })
+                          .from(chatLogsTable)
+                          .where(and(eq(chatLogsTable.gameId, gameId), gt(chatLogsTable.createdAt, since)))
+                          .orderBy(asc(chatLogsTable.createdAt))
+                          .limit(50);
+                      const kills = await server.getDashboardGameFeed(regionId, gameId);
+                      if (chat.length || kills.length) {
+                          await push("feed", { chat, kills });
+                      }
+                  }, 3_000)
+                : null;
+
             // Keep the stream open until the client disconnects
             await new Promise<void>((resolve) => {
                 c.req.raw.signal.addEventListener("abort", () => resolve(), { once: true });
@@ -510,6 +535,7 @@ export const ModerationDashboardRouter = new Hono<Context>()
             // Cleanup on disconnect
             clearInterval(serverTimer);
             if (playerTimer) clearInterval(playerTimer);
+            if (feedTimer) clearInterval(feedTimer);
             activeSseStreams.delete(stream);
         });
     })
@@ -576,7 +602,7 @@ export const ModerationDashboardRouter = new Hono<Context>()
 
     /**
      * Executes an admin command on a running game.
-     * Supported actions: freeze | unfreeze | verify | kick | announce | announce_player
+     * Supported actions: freeze | unfreeze | verify | kick | announce | announce_player | chat
      */
     .post(
         "/api/game/:region/:id/cmd",
@@ -591,10 +617,43 @@ export const ModerationDashboardRouter = new Hono<Context>()
             const regionId = c.req.param("region");
             const gameId   = c.req.param("id");
             const cmd      = c.req.valid("json");
+
+            // For chat injection, persist to DB so it shows up in the live feed
+            if (cmd.action === "chat" && cmd.text) {
+                await db.insert(chatLogsTable).values({
+                    gameId,
+                    username: cmd.sender ?? "ADMIN",
+                    userId: "",
+                    encodedIp: "admin",
+                    channel: 0,
+                    message: cmd.text,
+                });
+            }
+
             await server.sendDashboardGameCmd(regionId, gameId, cmd);
             return c.json({ ok: true });
         },
     )
+
+    /** Returns recent chat messages for a game since an optional ISO timestamp. */
+    .get("/api/game/:region/:id/chat", async (c) => {
+        const gameId    = c.req.param("id");
+        const sinceStr  = c.req.query("since");
+        const sinceDate = sinceStr ? new Date(sinceStr) : new Date(0);
+        const messages  = await db
+            .select({
+                id:        chatLogsTable.id,
+                createdAt: chatLogsTable.createdAt,
+                username:  chatLogsTable.username,
+                channel:   chatLogsTable.channel,
+                message:   chatLogsTable.message,
+            })
+            .from(chatLogsTable)
+            .where(and(eq(chatLogsTable.gameId, gameId), gt(chatLogsTable.createdAt, sinceDate)))
+            .orderBy(asc(chatLogsTable.createdAt))
+            .limit(100);
+        return c.json({ messages });
+    })
 
     .post("/api/servers/:region/verify", async (c) => {
         await server.setServerVerified(c.req.param("region"), true);
@@ -606,116 +665,191 @@ export const ModerationDashboardRouter = new Hono<Context>()
         return c.json({ ok: true });
     })
 
-    /** Returns all registered accounts with their current pass XP and level. */
+    /** Returns all registered accounts with pass levels for all seasons, creation date, and last known IP. */
     .get("/api/accounts", async (c) => {
-        const passType = GameConfig.serverSettings.currentPass;
-        const rows = await db
+        // 1. All users
+        const users = await db
             .select({
                 id: usersTable.id,
                 username: usersTable.username,
                 slug: usersTable.slug,
                 banned: usersTable.banned,
                 admin: usersTable.admin,
-                xp: userXpTable.xp,
-                level: userXpTable.level,
-                lastUpdated: userXpTable.lastUpdated,
+                userCreated: usersTable.userCreated,
             })
-            .from(usersTable)
-            .leftJoin(
-                userXpTable,
-                and(eq(userXpTable.userId, usersTable.id), eq(userXpTable.passType, passType)),
-            )
-            .orderBy(desc(userXpTable.xp));
-        return c.json({ accounts: rows, passType });
+            .from(usersTable);
+
+        // 2. All XP rows across every pass type
+        const allXp = await db.select().from(userXpTable);
+        const xpByUser = new Map<string, Map<string, { level: number; xp: string }>>();
+        for (const row of allXp) {
+            if (!xpByUser.has(row.userId)) xpByUser.set(row.userId, new Map());
+            xpByUser.get(row.userId)!.set(row.passType, { level: row.level, xp: row.xp });
+        }
+
+        // 3. Most recent encoded IP per user (DISTINCT ON, PostgreSQL)
+        const latestIpRows = await db.execute<{ user_id: string; encoded_ip: string }>(
+            sql`SELECT DISTINCT ON (user_id) user_id, encoded_ip FROM ip_logs WHERE user_id != '' ORDER BY user_id, created_at DESC`,
+        );
+        const ipByUser = new Map<string, string>();
+        for (const row of latestIpRows.rows) {
+            ipByUser.set(row.user_id as string, row.encoded_ip as string);
+        }
+
+        const passTypes = Object.keys(
+            (GameConfig.serverSettings as any).passes ?? {},
+        );
+
+        const accounts = users.map((u) => ({
+            ...u,
+            lastIp: ipByUser.get(u.id) ?? null,
+            passes: Object.fromEntries(
+                (xpByUser.get(u.id) ?? new Map()).entries(),
+            ),
+        }));
+
+        // Sort by current pass XP descending
+        const currentPass = GameConfig.serverSettings.currentPass;
+        accounts.sort((a, b) => {
+            const ax = Number(a.passes[currentPass]?.xp ?? 0);
+            const bx = Number(b.passes[currentPass]?.xp ?? 0);
+            return bx - ax;
+        });
+
+        return c.json({ accounts, passTypes });
     })
 
-    /** Reconciles pass XP for all users: recalculates from seasonStart and adds missing XP. */
+    /** Reconciles pass XP and item unlocks for all users across all passes. */
     .post("/api/reconcile_pass_xp", async (c) => {
-        const passType = GameConfig.serverSettings.currentPass;
-        const seasonStart = new Date(GameConfig.serverSettings.seasonStart);
-
-        const allUserXp = await db
-            .select()
-            .from(userXpTable)
-            .where(eq(userXpTable.passType, passType));
-
         const mapIdToName = Object.fromEntries(
             Object.entries(MapDefs).map(([name, def]) => [def.mapId, name]),
         ) as Record<number, string>;
 
         let usersReconciled = 0;
         let totalXpAdded = 0;
+        let totalUnlocksGranted = 0;
 
-        for (const record of allUserXp) {
-            const currentXp = Number(record.xp);
+        const allPasses = (GameConfig.serverSettings as any).passes as
+            Record<string, { seasonStart: string }>;
 
-            const stats = await db
-                .select({
-                    gameId: matchDataTable.gameId,
-                    kills: sql<number>`max(${matchDataTable.kills})`,
-                    damage: sql<number>`max(${matchDataTable.damageDealt})`,
-                    timeAlive: sql<number>`max(${matchDataTable.timeAlive})`,
-                    rank: sql<number>`min(${matchDataTable.rank})`,
-                    mapId: sql<number>`max(${matchDataTable.mapId})`,
-                    createdAt: sql<Date>`max(${matchDataTable.createdAt})`,
-                })
-                .from(matchDataTable)
-                .where(
-                    and(
-                        eq(matchDataTable.userId, record.userId),
-                        gte(matchDataTable.createdAt, seasonStart),
-                    ),
-                )
-                .groupBy(matchDataTable.gameId)
-                .having(sql`count(*) = 1`);
+        for (const [passType, passCfg] of Object.entries(allPasses)) {
+            const seasonStart = new Date(passCfg.seasonStart);
 
-            let correctXp = 0;
-            for (const stat of stats) {
-                const mapDef = getMapDefById(stat.mapId);
-                const xpMultiplier = mapDef?.gameMode?.xpMultiplier || {
-                    kill: 0, damage: 0, win: 0, timeSurvived: 0,
-                };
-                const mapTypeName = mapIdToName[stat.mapId] ?? "";
-                const boostEvents = GameConfig.serverSettings.xpBoostEvents?.[passType];
-                let boost = 1;
-                if (boostEvents) {
-                    const t = stat.createdAt instanceof Date
-                        ? stat.createdAt.getTime()
-                        : new Date(stat.createdAt).getTime();
-                    for (const event of Object.values(boostEvents)) {
-                        if (
-                            t >= new Date(event.start).getTime() &&
-                            t <= new Date(event.end).getTime() &&
-                            event.maps.includes(mapTypeName)
-                        ) { boost = event.boost; break; }
-                    }
-                }
-                let matchXp = 0;
-                matchXp += stat.kills * xpMultiplier.kill;
-                matchXp += stat.damage * xpMultiplier.damage;
-                matchXp += (stat.rank === 1 ? 1 : 0) * xpMultiplier.win;
-                matchXp += stat.timeAlive * xpMultiplier.timeSurvived;
-                correctXp += matchXp * boost;
-            }
-            correctXp = Math.floor(correctXp);
+            const allUserXp = await db
+                .select()
+                .from(userXpTable)
+                .where(eq(userXpTable.passType, passType));
 
-            if (correctXp > currentXp) {
-                const { level } = getPassLevelAndXp(passType, correctXp);
-                await db
-                    .update(userXpTable)
-                    .set({ xp: String(correctXp), level, lastUpdated: new Date() })
+            for (const record of allUserXp) {
+                const currentXp = Number(record.xp);
+
+                const stats = await db
+                    .select({
+                        gameId: matchDataTable.gameId,
+                        kills: sql<number>`max(${matchDataTable.kills})`,
+                        damage: sql<number>`max(${matchDataTable.damageDealt})`,
+                        timeAlive: sql<number>`max(${matchDataTable.timeAlive})`,
+                        rank: sql<number>`min(${matchDataTable.rank})`,
+                        mapId: sql<number>`max(${matchDataTable.mapId})`,
+                        createdAt: sql<Date>`max(${matchDataTable.createdAt})`,
+                    })
+                    .from(matchDataTable)
                     .where(
                         and(
-                            eq(userXpTable.userId, record.userId),
-                            eq(userXpTable.passType, passType),
+                            eq(matchDataTable.userId, record.userId),
+                            gte(matchDataTable.createdAt, seasonStart),
                         ),
-                    );
-                usersReconciled++;
-                totalXpAdded += correctXp - currentXp;
+                    )
+                    .groupBy(matchDataTable.gameId)
+                    .having(sql`count(*) = 1`);
+
+                let correctXp = 0;
+                for (const stat of stats) {
+                    const mapDef = getMapDefById(stat.mapId);
+                    const xpMultiplier = mapDef?.gameMode?.xpMultiplier || {
+                        kill: 0, damage: 0, win: 0, timeSurvived: 0,
+                    };
+                    const mapTypeName = mapIdToName[stat.mapId] ?? "";
+                    const boostEvents = (GameConfig.serverSettings.xpBoostEvents as any)?.[passType];
+                    let boost = 1;
+                    if (boostEvents) {
+                        const t = stat.createdAt instanceof Date
+                            ? stat.createdAt.getTime()
+                            : new Date(stat.createdAt).getTime();
+                        for (const event of Object.values(boostEvents) as any[]) {
+                            if (
+                                t >= new Date(event.start).getTime() &&
+                                t <= new Date(event.end).getTime() &&
+                                event.maps.includes(mapTypeName)
+                            ) { boost = event.boost; break; }
+                        }
+                    }
+                    let matchXp = 0;
+                    matchXp += stat.kills * xpMultiplier.kill;
+                    matchXp += stat.damage * xpMultiplier.damage;
+                    matchXp += (stat.rank === 1 ? 1 : 0) * xpMultiplier.win;
+                    matchXp += stat.timeAlive * xpMultiplier.timeSurvived;
+                    correctXp += matchXp * boost;
+                }
+                correctXp = Math.floor(correctXp);
+
+                const effectiveXp = Math.max(correctXp, currentXp);
+                const { level } = getPassLevelAndXp(passType, effectiveXp);
+
+                if (correctXp > currentXp) {
+                    await db
+                        .update(userXpTable)
+                        .set({ xp: String(correctXp), level, lastUpdated: new Date() })
+                        .where(
+                            and(
+                                eq(userXpTable.userId, record.userId),
+                                eq(userXpTable.passType, passType),
+                            ),
+                        );
+                    usersReconciled++;
+                    totalXpAdded += correctXp - currentXp;
+                }
+
+                // Reconcile item unlocks for this pass
+                const passDef = PassDefs[passType as keyof typeof PassDefs];
+                if (passDef) {
+                    const expectedItems = passDef.items
+                        .filter((i: any) => i.level <= level)
+                        .map((i: any) => i.item as string);
+
+                    if (expectedItems.length > 0) {
+                        const ownedItems = await db
+                            .select({ type: itemsTable.type })
+                            .from(itemsTable)
+                            .where(
+                                and(
+                                    eq(itemsTable.userId, record.userId),
+                                    eq(itemsTable.source, passType),
+                                ),
+                            );
+                        const ownedSet = new Set(ownedItems.map((i) => i.type));
+                        const missing = expectedItems.filter((item) => !ownedSet.has(item));
+                        if (missing.length > 0) {
+                            await db
+                                .insert(itemsTable)
+                                .values(
+                                    missing.map((item) => ({
+                                        userId: record.userId,
+                                        type: item,
+                                        source: passType,
+                                        timeAcquired: Date.now(),
+                                        status: 0,
+                                    })),
+                                )
+                                .onConflictDoNothing();
+                            totalUnlocksGranted += missing.length;
+                        }
+                    }
+                }
             }
         }
 
-        return c.json({ ok: true, usersReconciled, totalXpAdded });
+        return c.json({ ok: true, usersReconciled, totalXpAdded, totalUnlocksGranted });
     });
 
 function getPassLevelXp(passType: string, level: number): number {
