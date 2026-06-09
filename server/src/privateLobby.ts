@@ -835,7 +835,7 @@ export class PrivateLobbyMenu {
             switch (msg.type) {
                 case "create": {
                     // creating a private lobby requires an account; joining one doesn't
-                    if (!player.userId) {
+                    if (!player.userId && !Config.debug.allowEditMsg) {
                         player.send("error", { type: "login_required" });
                         break;
                     }

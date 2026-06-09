@@ -191,15 +191,20 @@ export const GameConfig = {
     },
     serverSettings:{
         passes: {
+            "pass_survivr1": {
+                passMaxLevel: 99,
+                seasonStart: "2026-03-01T22:00:00Z",
+                seasonEnd:   "2026-05-31T23:59:30Z",
+            },
             "pass_survivr2": {
                 passMaxLevel: 99,
                 seasonStart: "2026-05-31T22:00:00Z",
-                seasonEnd:   "2026-07-31T23:59:59",
+                seasonEnd:   "2026-07-31T23:59:30",
             },
             "pass_survivr3": {
                 passMaxLevel: 99,
                 seasonStart: "2026-07-31T23:59:59",
-                seasonEnd:   "2026-10-31T23:59:59",
+                seasonEnd:   "2026-10-31T23:59:30",
             },
         } as Record<string, { passMaxLevel: number; seasonStart: string; seasonEnd: string }>,
         get currentPass(): string {
@@ -233,16 +238,16 @@ export const GameConfig = {
                     maps: ["comp"],
                     start: "2026-06-12T00:00:00Z",
                     end:   "2026-06-14T23:59:59Z",
-                    boost: 2,
+                    boost: 1.5,
                 },
                 "Weekend 3": {
                     maps: ["local", "comp"],
                     start: "2026-06-19T00:00:00Z",
                     end:   "2026-06-21T23:59:59Z",
-                    boost: 2,
+                    boost: 1.2,
                 },
                 "Weekend 4": {
-                    maps: ["local", "comp"],
+                    maps: ["scrims"],
                     start: "2026-06-26T00:00:00Z",
                     end:   "2026-06-28T23:59:59Z",
                     boost: 2,

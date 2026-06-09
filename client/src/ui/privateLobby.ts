@@ -657,15 +657,17 @@ export class PrivateLobbyMenu {
             // Lets anyone grab a link/code that drops a joiner straight into
             // this team slot (e.g. "ABC123-2"); not leader-gated since sharing
             // it doesn't change lobby state, only where the joiner lands.
-            const copyLinkBtn = $("<a/>", {
-                class: "private-lobby-team-copy-link",
-                title: this.localization.translate("index-private-lobby-copy-team-link"),
-            });
-            copyLinkBtn.on("click", (e) => {
-                e.stopPropagation();
-                this.copyTeamInviteCode(t, e);
-            });
-            header.append(copyLinkBtn);
+            if (teamSize > 1) {
+                const copyLinkBtn = $("<a/>", {
+                    class: "private-lobby-team-copy-link",
+                    title: this.localization.translate("index-private-lobby-copy-team-link"),
+                });
+                copyLinkBtn.on("click", (e) => {
+                    e.stopPropagation();
+                    this.copyTeamInviteCode(t, e);
+                });
+                header.append(copyLinkBtn);
+            }
             team.append(header);
             const slot = $("<div/>", { class: "private-lobby-team-slot" });
             for (const player of members) {
@@ -1021,7 +1023,7 @@ export class PrivateLobbyMenu {
                 );
 
                 const showWaitMessage = playersInGame && !this.joiningGame;
-                waitReason.css("display", showWaitMessage ? "block" : "none");
+                waitReason.css("display", "none");
                 this.stopGameBtn.css("display", showWaitMessage ? "block" : "none");
 
                 // Auto-reset if no more AFK players while dialog is open

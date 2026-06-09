@@ -116,7 +116,7 @@ export class Application {
     wasPlayingVideo = false;
     checkedPingTest = false;
     hasFocus = true;
-    newsDisplayed = true;
+    newsDisplayed = false;
 
     updateLogoBasedOnLanguage(lang: string) {
         const header = $("#start-row-header");
@@ -213,11 +213,11 @@ export class Application {
             this.siteInfo.load();
             this.localization.localizeIndex();
 
-            if (!this.config.get("rulesAccepted")) {
+            if (this.config.get("rulesAcceptedVersion") !== GameConfig.protocolVersion) {
                 this.rulesModal.show(true);
             }
             $("#btn-rules-accept").on("click", () => {
-                this.config.set("rulesAccepted", true);
+                this.config.set("rulesAcceptedVersion", GameConfig.protocolVersion);
                 this.config.store();
                 this.rulesModal.hide();
             });
@@ -846,7 +846,7 @@ export class Application {
 
             if (create || roomUrl != "") {
                 // Only creating a lobby requires an account; joining one (e.g. via link) doesn't
-                if (create && !this.account.loggedIn) {
+                if (create && !this.account.loggedIn && import.meta.env.PROD) {
                     this.errorMessage = this.localization.translate(
                         "index-private-lobby-login-required",
                     );
@@ -862,7 +862,7 @@ export class Application {
     }
 
     tryQuickStartGame(gameModeIdx: number) {
-        if (!this.config.get("rulesAccepted")) {
+        if (this.config.get("rulesAcceptedVersion") !== GameConfig.protocolVersion) {
             this.rulesModal.show(true);
             return;
         }

@@ -1829,10 +1829,11 @@ a:active {
 
 #private-lobby-menu-settings {
   display: none;
-  flex: 1;
+  flex: 0 0 auto;
   flex-direction: column;
-  margin-top: 8px;
+  margin-top: auto;
   min-height: 0;
+  padding-top: 8px;
 }
 
 #private-lobby-settings-tabs {
@@ -1948,6 +1949,10 @@ a:active {
 
 #btn-start-private-lobby {
   display: block;
+}
+
+#private-lobby-menu-options-start {
+  flex: 0 0 auto;
 }
 
 #btn-stop-private-lobby-game {
