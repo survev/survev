@@ -46,6 +46,10 @@ class ErrorLog {
     }
 
     storeGeneric(parent: string, child: unknown) {
+        // account errors don't give any useful information.. :/
+        // they just happen when a network request fails
+        // so disable them for now
+        if (parent === "account") return;
         if (this.sample()) {
             this.store("storeGeneric", {
                 parent: parent,
