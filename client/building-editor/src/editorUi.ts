@@ -168,7 +168,7 @@ export class EditorUi {
 
         {
             const avaliableObjects = MapObjectDefs.getAllTypes()
-                .filter(([type]) => {
+                .filter((type) => {
                     const def = MapObjectDefs.typeToDef(type);
                     // we cant render loot spawner, also no point on spawning them individually
                     if (def.type === "loot_spawner") return false;
