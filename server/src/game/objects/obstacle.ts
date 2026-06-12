@@ -157,7 +157,7 @@ export class Obstacle extends BaseGameObject {
         this.health = def.health;
 
         this.maxScale = scale;
-        this.minScale = def.scale.destroy;
+        this.minScale = scale * def.scale.destroy;
 
         this.updateCollider();
 
