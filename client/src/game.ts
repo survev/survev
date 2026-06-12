@@ -924,7 +924,7 @@ export class Game {
             this.m_camera,
             this.m_renderer,
         );
-        this.m_renderer.m_update(dt, this.m_camera, this.m_map);
+        this.m_renderer.m_update(dt, this.m_camera, this.m_map, debug?.structures?.layerMasks);
 
         for (let i = 0; i < this.m_emoteBarn.newPings.length; i++) {
             const ping = this.m_emoteBarn.newPings[i];

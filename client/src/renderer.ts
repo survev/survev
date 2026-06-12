@@ -60,6 +60,7 @@ export class Renderer {
     m_free() {
         this.layerMask.parent?.removeChild(this.layerMask);
         this.layerMask.destroy(true);
+        this.debugLayerMask?.destroy(true);
     }
 
     addPIXIObj(obj: PIXI.Container, layer: number, zOrd: number, zIdx?: number) {
@@ -191,22 +192,30 @@ export class Renderer {
     }
 
     redrawDebugLayerMask(camera: Camera, map: Map) {
-        const mask = this.debugLayerMask as PIXI.Graphics;
+        if (!this.debugLayerMask) {
+            // create the debug mask and add it on top of the main layer containers
+            // kinda guh but it works /shrug
+            this.debugLayerMask = new PIXI.Graphics();
+            const layer = this.layers[this.layers.length - 1];
+            const idx = layer.parent.getChildIndex(layer);
+            layer.parent.addChildAt(this.debugLayerMask, idx + 1);
+        }
+        const mask = this.debugLayerMask;
         mask.clear();
-        mask.beginFill(16711935, 1);
+        mask.beginFill(0xff00ff, 0.5);
         const structures = map.m_structurePool.m_getPool();
         for (let i = 0; i < structures.length; i++) {
             const structure = structures[i];
             if (structure.active) {
-                for (let s = 0; s < structure.mask.length; s++) {
-                    const n = structure.mask[s];
-                    const c = v2.mul(v2.sub(n.max, n.min), 0.5);
-                    const m = v2.add(n.min, c);
-                    const p = m.x - c.x;
-                    const h = m.y - c.y;
-                    const u = c.x * 2;
-                    const g = c.y * 2;
-                    drawRect(mask, p, h, u, g);
+                for (let j = 0; j < structure.mask.length; j++) {
+                    const sMask = structure.mask[j];
+                    const halfWidths = v2.mul(v2.sub(sMask.max, sMask.min), 0.5);
+                    const center = v2.add(sMask.min, halfWidths);
+                    const x = center.x - halfWidths.x;
+                    const y = center.y - halfWidths.y;
+                    const w = halfWidths.x * 2;
+                    const h = halfWidths.y * 2;
+                    drawRect(mask, x, y, w, h);
                 }
             }
         }
@@ -217,7 +226,7 @@ export class Renderer {
         mask.scale.set(s, -s);
     }
 
-    m_update(dt: number, camera: Camera, map: Map) {
+    m_update(dt: number, camera: Camera, map: Map, debugLayerMaskEnabled: boolean) {
         // Adjust layer alpha
         const alphaTarget = this.layer > 0 ? 1.0 : 0.0;
         this.layerAlpha += step(this.layerAlpha, alphaTarget, dt * 12.0);
@@ -236,6 +245,13 @@ export class Renderer {
 
         // Set stairs mask
         this.redrawLayerMask(camera, map);
+
+        if (debugLayerMaskEnabled) {
+            this.redrawDebugLayerMask(camera, map);
+        }
+        if (this.debugLayerMask) {
+            this.debugLayerMask.visible = debugLayerMaskEnabled;
+        }
 
         const maskActive = this.layer == 0;
         if (maskActive && !this.layerMaskActive) {

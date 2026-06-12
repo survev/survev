@@ -461,7 +461,7 @@ export class LoadoutDisplay {
         );
         this.particleBarn.m_update(dt, this.camera);
         this.decalBarn.m_update(dt, this.camera, this.renderer);
-        this.renderer.m_update(dt, this.camera, this.map);
+        this.renderer.m_update(dt, this.camera, this.map, false);
         this.activePlayer.playActionStartSfx = false;
 
         this.render(dt, debug);

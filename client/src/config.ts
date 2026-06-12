@@ -50,6 +50,7 @@ export const debugRenderConfig = {
         bridge: false,
         waterEdge: false,
         stairs: false,
+        layerMasks: false,
     },
 };
 
