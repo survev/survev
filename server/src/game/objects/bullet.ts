@@ -175,6 +175,7 @@ export class Bullet {
     skipCollision!: boolean;
     reflected!: boolean;
     canReflect!: boolean;
+    damagedObjIds!: Set<number>;
 
     constructor(public bulletManager: BulletBarn) {}
 
@@ -205,6 +206,7 @@ export class Bullet {
         this.hasModifier = this.speedMult !== 1 || this.distanceMult !== 1;
         this.onHitFx = bulletDef.onHit ?? params.onHitFx;
         this.canReflect = this.onHitFx !== "explosion_rounds";
+        this.damagedObjIds = new Set();
 
         this.hasOnHitFx = !!this.onHitFx;
 
@@ -581,6 +583,12 @@ export class Bullet {
 
         for (let i = 0; i < collisions.length; i++) {
             const col = collisions[i];
+
+            if (col.obj) {
+                if (this.damagedObjIds.has(col.obj.__id)) continue;
+
+                this.damagedObjIds.add(col.obj.__id);
+            }
 
             if (col.type == "obstacle") {
                 const mapDef = MapObjectDefs.typeToDef(col.obstacleType!, "obstacle");
