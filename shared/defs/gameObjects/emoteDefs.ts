@@ -1,4 +1,4 @@
-import { Rarity } from "../../gameConfig";
+import { Rarity } from "../../gameConfig.ts";
 
 export enum EmoteCategory {
     Locked,
@@ -1025,6 +1025,16 @@ export const EmotesDefs: Record<string, EmoteDef> = {
         teamOnly: false,
         category: EmoteCategory.Food,
     },
+    emote_tomato: {
+        type: "emote",
+        name: "Tomato",
+        rarity: Rarity.Common,
+        texture: "tomato.img",
+        sound: "emote_01",
+        channel: "ui",
+        teamOnly: false,
+        category: EmoteCategory.Food,
+    },
     emote_cake: {
         type: "emote",
         name: "Cake",
@@ -1100,16 +1110,6 @@ export const EmotesDefs: Record<string, EmoteDef> = {
         name: "Flag India",
         rarity: Rarity.Common,
         texture: "flag-india.img",
-        sound: "emote_01",
-        channel: "ui",
-        teamOnly: false,
-        category: EmoteCategory.Flags,
-    },
-    emote_flagisrael: {
-        type: "emote",
-        name: "Flag Israel",
-        rarity: Rarity.Common,
-        texture: "flag-israel.img",
         sound: "emote_01",
         channel: "ui",
         teamOnly: false,
@@ -1650,6 +1650,16 @@ export const EmotesDefs: Record<string, EmoteDef> = {
         name: "Flag Non-Binary",
         rarity: Rarity.Common,
         texture: "flag-nonbinary.img",
+        sound: "emote_01",
+        channel: "ui",
+        teamOnly: false,
+        category: EmoteCategory.Flags,
+    },
+    emote_flagbisexual: {
+        type: "emote",
+        name: "Flag Bisexual",
+        rarity: Rarity.Common,
+        texture: "flag-bisexual.img",
         sound: "emote_01",
         channel: "ui",
         teamOnly: false,

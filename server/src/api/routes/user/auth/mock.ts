@@ -1,10 +1,10 @@
 import { eq } from "drizzle-orm";
 import { Hono } from "hono";
 import { setCookie } from "hono/cookie";
-import { Config } from "../../../../config";
-import { db } from "../../../db";
-import { usersTable } from "../../../db/schema";
-import { createNewUser, generateId, setSessionTokenCookie } from "./authUtils";
+import { Config } from "../../../../config.ts";
+import { db } from "../../../db/index.ts";
+import { usersTable } from "../../../db/schema.ts";
+import { createNewUser, generateId, setSessionTokenCookie } from "./authUtils.ts";
 
 export const MockRouter = new Hono();
 

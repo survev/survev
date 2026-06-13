@@ -1,4 +1,4 @@
-import { HealEffectDefs } from "./healEffectDefs";
+import { HealEffectDefs } from "./healEffectDefs.ts";
 
 const _allowedHealEffects = Object.keys(HealEffectDefs);
 const _allowedMeleeSkins = [
@@ -134,6 +134,7 @@ const _allowedEmotes = [
     "emote_sunglassface",
     "emote_headshotface",
     "emote_potato",
+    "emote_tomato",
     "emote_leek",
     "emote_eggplant",
     "emote_baguette",
@@ -141,7 +142,6 @@ const _allowedEmotes = [
     "emote_flagbolivia",
     "emote_flagcroatia",
     "emote_flagindia",
-    "emote_flagisrael",
     "emote_flaggeorgia",
     "emote_flaggreece",
     "emote_flagguatemala",
@@ -306,6 +306,7 @@ export const UnlockDefs: Record<UnlockDefKey, UnlockDef> = {
             "emote_sunglassface",
             "emote_headshotface",
             "emote_potato",
+            "emote_tomato",
             "emote_leek",
             "emote_eggplant",
             "emote_baguette",
@@ -313,7 +314,6 @@ export const UnlockDefs: Record<UnlockDefKey, UnlockDef> = {
             "emote_flagbolivia",
             "emote_flagcroatia",
             "emote_flagindia",
-            "emote_flagisrael",
             "emote_flaggeorgia",
             "emote_flaggreece",
             "emote_flagguatemala",
@@ -369,11 +369,11 @@ export const UnlockDefs: Record<UnlockDefKey, UnlockDef> = {
             "emote_flaggay",
             "emote_flagasexual",
             "emote_flagnonbinary",
+            "emote_flagbisexual",
             "emote_flaglibya",
             "emote_flagbosnia",
             "emote_logocloud",
             "emote_logotwins",
-
             /* use this to unlock everything :)
             ...new Set([
                 ...allowedOutfits,

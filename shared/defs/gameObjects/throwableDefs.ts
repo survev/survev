@@ -1,4 +1,4 @@
-import type { Vec2 } from "../../utils/v2";
+import type { Vec2 } from "../../utils/v2.ts";
 
 export interface ThrowableDef {
     readonly type: "throwable";
@@ -749,6 +749,57 @@ export const ThrowableDefs: Record<string, ThrowableDef> = {
             tint: 0x5a5636,
         },
     },
+    potato_lmgshot: {
+        name: "PMG-134",
+        type: "throwable",
+        quality: 0,
+        explosionType: "explosion_potato_lmgshot",
+        inventoryOrder: 0,
+        noPotatoSwap: true,
+        cookable: true,
+        forceMaxThrowDistance: true,
+        explodeOnImpact: true,
+        destroyNonCollidables: true,
+        playerCollision: true,
+        fuseTime: 999,
+        aimDistance: 32,
+        rad: 0.1,
+        throwPhysics: {
+            playerVelMult: 0,
+            velZ: 5,
+            speed: 96,
+            spinVel: 0,
+            spinDrag: 1,
+            fixedCollisionHeight: 0.25,
+        },
+        speed: { equip: 0, attack: 0 },
+        lootImg: {
+            sprite: "loot-throwable-potato.img",
+            tint: 0xff00,
+            border: "loot-circle-outer-01.img",
+            borderTint: 0,
+            scale: 0.2,
+        },
+        worldImg: {
+            sprite: "proj-potato-03.img",
+            scale: 0.06,
+            tint: 0xffffff,
+        },
+        handImg: {},
+        useThrowParticles: false,
+        sound: {
+            pullPin: "",
+            throwing: "frag_throw_01",
+            pickup: "frag_pickup_01",
+            deploy: "frag_deploy_01",
+        },
+        trail: {
+            maxLength: 80,
+            width: 2,
+            alpha: 1,
+            tint: 0xad6d25,
+        },
+    },
     bomb_iron: {
         name: "Iron Bomb",
         type: "throwable",
@@ -757,8 +808,7 @@ export const ThrowableDefs: Record<string, ThrowableDef> = {
         inventoryOrder: 1,
         cookable: true,
         noPotatoSwap: true,
-        // HACK: force constant velocity until we figure out how surviv's airstrike bomb velocity really worked
-        forceMaxThrowDistance: true,
+        forceMaxThrowDistance: false,
         explodeOnImpact: true,
         playerCollision: false,
         fuseTime: 4,
@@ -860,5 +910,72 @@ export const ThrowableDefs: Record<string, ThrowableDef> = {
             pickup: "potato_pickup_01",
             deploy: "frag_deploy_01",
         },
+    },
+    tomato: {
+        name: "Tomato",
+        type: "throwable",
+        quality: 0,
+        explosionType: "explosion_tomato",
+        freezeOnImpact: true,
+        changeTime: 1,
+        inventoryOrder: 0,
+        cookable: true,
+        forceMaxThrowDistance: true,
+        explodeOnImpact: true,
+        playerCollision: true,
+        fuseTime: 9999,
+        aimDistance: 32,
+        rad: 1,
+        throwPhysics: {
+            playerVelMult: 0,
+            velZ: 3.35,
+            speed: 55,
+            spinVel: 10 * Math.PI,
+            spinDrag: 1,
+            fixedCollisionHeight: 0.25,
+        },
+        speed: { equip: 0, attack: 0 },
+        lootImg: {
+            sprite: "loot-throwable-tomato.img",
+            tint: 0xff00,
+            border: "loot-circle-outer-01.img",
+            borderTint: 0,
+            scale: 0.2,
+        },
+        worldImg: {
+            sprite: "proj-tomato-01.img",
+            scale: 0.12,
+            tint: 0xffffff,
+        },
+        handImg: {
+            equip: {
+                right: {
+                    sprite: "proj-tomato-01.img",
+                    pos: { x: 3, y: 4.2 },
+                    scale: 0.14,
+                },
+                left: { sprite: "none" },
+            },
+            cook: {
+                right: {
+                    sprite: "proj-tomato-01.img",
+                    pos: { x: 3, y: 4.2 },
+                    scale: 0.14,
+                },
+                left: { sprite: "none" },
+            },
+            throwing: {
+                right: { sprite: "none" },
+                left: { sprite: "none" },
+            },
+        },
+        useThrowParticles: false,
+        sound: {
+            pullPin: "",
+            throwing: "frag_throw_01",
+            pickup: "potato_pickup_01",
+            deploy: "frag_deploy_01",
+        },
+        emoteId: 210,
     },
 };

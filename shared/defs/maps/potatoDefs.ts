@@ -1,9 +1,9 @@
-import { GameConfig } from "../../gameConfig";
-import { util } from "../../utils/util";
-import { v2 } from "../../utils/v2";
-import type { MapDef } from "../mapDefs";
-import { MapId } from "../types/misc";
-import { Main, type PartialMapDef } from "./baseDefs";
+import { GameConfig } from "../../gameConfig.ts";
+import { util } from "../../utils/util.ts";
+import { v2 } from "../../utils/v2.ts";
+import type { MapDef } from "../mapDefs.ts";
+import { MapId } from "../types/misc.ts";
+import { Main, type PartialMapDef } from "./baseDefs.ts";
 
 const mapDef: PartialMapDef = {
     mapId: MapId.Potato,
@@ -25,8 +25,11 @@ const mapDef: PartialMapDef = {
                 name: "ambient_steam_01",
                 channel: "ambient",
             },
+            { name: "log_05", channel: "sfx" },
             { name: "log_11", channel: "sfx" },
             { name: "log_12", channel: "sfx" },
+            { name: "vault_change_03", channel: "sfx" },
+            { name: "watering_01", channel: "sfx" },
         ],
         atlases: ["gradient", "loadout", "shared", "main", "potato"],
     },
@@ -42,7 +45,6 @@ const mapDef: PartialMapDef = {
             playerSubmerge: 0x2b8ca4,
         },
         particles: { camera: "falling_potato" },
-        frozenSprites: ["player-mash-01.img", "player-mash-02.img", "player-mash-03.img"],
     },
     gameMode: { maxPlayers: 80, potatoMode: true },
     /* STRIP_FROM_PROD_CLIENT:START */
@@ -143,13 +145,20 @@ const mapDef: PartialMapDef = {
             { name: "chest03", count: 1, weight: 1 },
             { name: "backpack03", count: 1, weight: 1 },
         ],
+        tier_hatchet: [
+            { name: "potato_lmg", count: 1, weight: 0.1 },
+            { name: "potato_cannon", count: 1, weight: 0.1 },
+            { name: "potato_smg", count: 1, weight: 0.1 },
+        ],
         tier_ring_case: [
             { name: "potato_cannon", count: 1, weight: 1 },
             { name: "potato_smg", count: 1, weight: 0.1 },
+            { name: "potato_lmg", count: 1, weight: 0.2 },
         ],
         tier_airdrop_rare: [
             { name: "potato_cannon", count: 1, weight: 1 },
-            { name: "potato_smg", count: 1, weight: 0.1 },
+            { name: "potato_smg", count: 1, weight: 1 },
+            { name: "potato_lmg", count: 1, weight: 1 },
         ],
     },
     mapGen: {

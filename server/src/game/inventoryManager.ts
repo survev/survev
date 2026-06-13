@@ -1,9 +1,10 @@
-import { GameObjectDefs } from "../../../shared/defs/gameObjectDefs";
-import { SCOPE_LEVELS, type ScopeDef } from "../../../shared/defs/gameObjects/gearDefs";
-import { GameConfig, type InventoryItem } from "../../../shared/gameConfig";
-import { math } from "../../../shared/utils/math";
-import type { Player } from "./objects/player";
-import { throwableList } from "./weaponManager";
+import { SCOPE_LEVELS } from "../../../shared/defs/gameObjects/gearDefs.ts";
+import { PerkProperties } from "../../../shared/defs/gameObjects/perkDefs.ts";
+import { GameObjectDefs } from "../../../shared/defs/register.ts";
+import { GameConfig, type InventoryItem } from "../../../shared/gameConfig.ts";
+import { math } from "../../../shared/utils/math.ts";
+import type { Player } from "./objects/player.ts";
+import { throwableList } from "./weaponManager.ts";
 
 const emptyInventory = Object.keys(GameConfig.bagSizes).reduce(
     (inv, key) => {
@@ -69,7 +70,25 @@ export class InventoryManager {
 
     getMaxCapacity(item: InventoryItem): number {
         const bagLevel = this.player.getGearLevel(this.player.backpack);
-        return this.bagSizes[item][bagLevel];
+        let amount = this.bagSizes[item][bagLevel];
+        if (this.player.hasPerk("flak_jacket")) {
+            if (item === "frag") {
+                amount += PerkProperties.flak_jacket.fragBonus;
+            } else if (item === "mirv") {
+                amount += PerkProperties.flak_jacket.mirvBonus;
+            }
+        }
+        return amount;
+    }
+
+    enforceMaxCapacity(item: InventoryItem) {
+        const max = this.getMaxCapacity(item);
+        const current = this.get(item);
+
+        if (current > max) {
+            this.set(item, max);
+            this.player.dropLoot(item, current - max, false);
+        }
     }
 
     wipeInventory() {
@@ -162,7 +181,7 @@ export class InventoryManager {
      * Runs only when an item drops to 0
      */
     private _onItemRemoved(item: InventoryItem) {
-        const def = GameObjectDefs[item];
+        const def = GameObjectDefs.typeToDef(item);
 
         switch (def.type) {
             case "scope": {
@@ -191,12 +210,12 @@ export class InventoryManager {
      * Runs only when an item was 0 and now is not
      */
     private _onItemAdded(item: InventoryItem) {
-        const def = GameObjectDefs[item];
+        const def = GameObjectDefs.typeToDef(item);
 
         switch (def.type) {
             case "scope": {
                 // switch to scope if its higher than the equipped one
-                const currentScope = GameObjectDefs[this.player.scope] as ScopeDef;
+                const currentScope = GameObjectDefs.typeToDef(this.player.scope, "scope");
                 if (def.level > currentScope.level) {
                     this.player.scope = item;
                 }
@@ -205,8 +224,8 @@ export class InventoryManager {
             case "throwable": {
                 // set the throwable slot to this item if there was no throwables before
                 if (
-                    !this.player.weapons[GameConfig.WeaponSlot.Throwable].type &&
-                    throwableList.includes(item)
+                    !this.player.weapons[GameConfig.WeaponSlot.Throwable].type
+                    && throwableList.includes(item)
                 ) {
                     this.player.weaponManager.setWeapon(
                         GameConfig.WeaponSlot.Throwable,
@@ -218,11 +237,11 @@ export class InventoryManager {
             }
             case "ammo": {
                 // automatically reloads gun if inventory has 0 ammo and ammo is picked up
-                const weaponInfo = GameObjectDefs[this.player.activeWeapon];
+                const weaponInfo = GameObjectDefs.typeToDef(this.player.activeWeapon);
                 if (
-                    weaponInfo.type === "gun" &&
-                    this.player.weapons[this.player.curWeapIdx].ammo <= 0 &&
-                    weaponInfo.ammo === item
+                    weaponInfo.type === "gun"
+                    && this.player.weapons[this.player.curWeapIdx].ammo <= 0
+                    && weaponInfo.ammo === item
                 ) {
                     this.player.weaponManager.scheduledReload = true;
                 }

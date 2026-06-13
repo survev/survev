@@ -613,10 +613,10 @@
             <div id="ui-stats-logo"></div>
           </div>
           <div id="ui-stats-ad-container-desktop" class="ui-stats-ad-container">
-            <div data-fuse="died_mrec" style="min-height: 250px;"></div>
+            <div id="nitro-died-mrec" data-fuse="died_mrec" style="min-height: 90px;"></div>
           </div>
           <div id="ui-stats-ad-container-mobile" class="ui-stats-ad-container">
-            <div data-fuse="died_mrec_mobile" style="min-height: 200px;"></div>
+            <div id="nitro-died-mrec-mobile" data-fuse="died_mrec_mobile" style="min-height: 200px;"></div>
           </div>
         </div>
       </div>
@@ -657,13 +657,13 @@
           </div>
         </div>
         <div class="ad-block-header hide-on-mobile">
-          <div data-fuse="header" style="min-height: 90px;"></div>
+          <div id="nitro-header" data-fuse="header" style="min-height: 90px;"></div>
         </div>
         <div class="ad-block-left-center hide-on-mobile">
-          <div data-fuse="home_vrec" style="min-height: 250px;"></div>
+          <div id="nitro-home-vrec" data-fuse="home_vrec" style="min-height: 250px;"></div>
         </div>
         <div class="ad-block-right-center hide-on-mobile" style="min-height: 250px;">
-          <div data-fuse="home_mrec"></div>
+          <div id="nitro-home-mrec" data-fuse="home_mrec"></div>
         </div>
         <!-- Accounts Modals -->
         <div id="modal-account-name-change" class="modal modal-account">
@@ -820,6 +820,7 @@
                     -->
                     <a href="https://discord.gg/75RAK3p3K2" target="_blank" class="btn-social btn-darken btn-discord"></a>
                     <a href="https://ko-fi.com/survev" target="_blank" style="display: none;" class="btn-social btn-darken btn-kofi"></a>
+                    <a href="https://survev.wiki.gg/" target="_blank" class="btn-social btn-darken btn-wiki"></a>
                     <!--
                     <a href="https://www.youtube.com/c/survev?sub_confirmation=1" target="_blank" class="btn-social btn-darken btn-youtube"></a>
                     -->
@@ -937,7 +938,7 @@
               <a class="btn-darken menu-option" id="btn-team-mobile-link-leave" data-l10n="index-back-to-main">Back to Main Menu</a>
             </div>
             <div id="right-column" class="menu-column">
-              <div id="pass-wrapper" style="display: none!important;">
+              <div id="pass-wrapper">
                 <div id="pass-unlock-tooltip">
                   <div class="tooltip-pass-title"></div>
                   <div class="tooltip-pass-desc"></div>
@@ -1034,12 +1035,38 @@
                   </div>
                 </div>
               </div>
-              <div id="news-wrapper" style="display: block!important;">
-                <div class="right-column-toggle pass-toggle" style="display: none!important;"></div>
+              <div id="news-wrapper">
+                <div class="right-column-toggle pass-toggle"></div>
                 <div id="news-block" class="menu-block">
                   <div id="news">
                     <h3 class="news-header">What's New!</h3>
-                    <div id="news-current" data-date="2026-03-24">
+                     <div id="news-current" data-date="2026-06-01">
+                      <small class="news-date">June 1st, 2026</small>
+                      <p class="news-paragraph"><strong>Tuber Trouble</strong></p>
+                      <p class="news-paragraph">With the augmenting vats having exhausted PARMA's reasources, focus has shifted to the FSTMS division and further testing of the PMG-134.</p>
+                      <p class="news-paragraph">Our next large update is making steady progress; for all the latest leeks, be sure to join our <a href="https://discord.gg/75RAK3p3K2">Discord Server</a>!</p>
+                    </div>
+                    <div data-date="2026-05-11">
+                      <small class="news-date">May 11th, 2026</small>
+                      <p class="news-paragraph"><strong>Precursor</strong></p>
+                      <p class="news-paragraph">Before the Soviet incursion and brutal fighting that ensued, PARMA scientists were given a directive: create the strongest survevr they possibly could. Their work now lies deep within the Twins...</p>
+                      <p class="news-paragraph">Project: COBALT has returned! Along with much-needed adjustments for the Medic and Demo classes, PARMA is proud to announce a new perk: <span class="highlight">Indomitable Spirit</span>, allowing survevrs to shrug off fatal injuries through (quite literally) pure adrenaline.</p>
+                      <p class="news-paragraph">Additionally, the long-anticipated <span class="highlight">Survevr Pass 1</span> has arrived, allowing you to flex your style with over 20 different cosmetics! The pass is completely <span class="highlight">free</span>; just <span class="highlight">log in</span> and complete two quests per day! If you don't like a quest, you can refresh it for a new one.</p>
+                    </div>
+                    <div data-date="2026-04-13">
+                      <small class="news-date">April 13th, 2026</small>
+                      <p class="news-paragraph"><strong>IntElegance</strong></p>
+                      <p class="news-paragraph">As both sides exhaust their nightshade and weapon supplies, the Island rests again... what could have prompted such fierce fighting?</p>
+                      <p class="news-paragraph">Over the past couple of years, PARMA has relied on third-party archives to train newbie survevrs, many of which were either misleading or hard to navigate. We've taken matters into our own hands and begun developing a comprehensive guide: the <a href="https://survev.wiki.gg">Survev.io Wiki</a>!</p>
+                      <p class="news-paragraph">However, many of the sections are still yet to be filled, so we're welcoming our veterans to help contribute! For easier communication between survevrs, be sure to join the <a href="https://discord.gg/75RAK3p3K2">Discord Server</a>!</p>
+                    </div>
+                    <div data-date="2026-04-01">
+                      <small class="news-date">April 1st, 2026</small>
+                      <p class="news-paragraph"><strong>Potato vs. Tomato</strong></p>
+                      <p class="news-paragraph">While survevrs have since become accustomed to the periodical spuddy incursions on the island, life was not always this way. Once, botanist brothers Spud and Percy Solanum worked in tandem, seeking to uncover the mysteries of the <span class="highlight">[REDACTED]</span>. In an act of betrayal, the Soviets obtained their precious research secrets, fragmenting their partnership forever. Join the fight of potato vs <span class="highlight">tomato</span>... and may the best nightshade win!</p>
+                      <p class="news-paragraph">Additionally, PARMA's FSTMS division is proud to present their latest concoction: the <span class="highlight">PMG-134</span> (Potato Minigun 134), using a six-barrel rotary machine gun to blast tater tots at insane firerates. It's perfect for mowing down your local Soviet!</p>
+                    </div>
+                    <div data-date="2026-03-24">
                       <small class="news-date">March 24th, 2026</small>
                       <p class="news-paragraph"><strong>Spring Blossoms</strong></p>
                       <p class="news-paragraph">As PARMA continues to work on their research, the snow has melted and spring has returned to the island! Enjoy the cherry blossoms!</p>
@@ -1084,34 +1111,6 @@
                       <p class="news-paragraph">The <span class="highlight">Mk45G</span> and <span class="highlight">Desert Camo</span> have also been made more common.</p>
                       <p class="news-paragraph">Stay tuned for new content, with the return of our <span class="highlight">arboreal</span> and <span class="highlight">veld</span> landscapes...</p>
                     </div>
-                    <div data-date="2025-07-23">
-                      <small class="news-date">July 23, 2025</small>
-                      <p class="news-paragraph"><strong>New Leadership</strong></p>
-                      <p class="news-paragraph">50v50 is back for another round, and getting straight to fighting is easier than ever: select guns are now <span class="highlight">bundled with ammo</span>.</p>
-                      <p class="news-paragraph">Additionally, if a team leader fails to fire their flare soon after being promoted, it will now be <span class="highlight">auto-fired</span>.</p>
-                      <p class="news-paragraph">A new role, the <span class="highlight">Captain</span>, has joined the ranks, but promotion to this role is not as easy as it seems. Lone Survivrs have also picked up a new perk: <span class="highlight">AP Rounds</span>.</p>
-                      <p class="news-paragraph">Enjoy a selection of role buffs and new gun world images. Let us know your thoughts by hopping into our <a href="https://discord.gg/75RAK3p3K2">Discord server!</a></p>
-                    </div>
-                    <div data-date="2025-05-19">
-                      <small class="news-date">May 19, 2025</small>
-                      <p class="news-paragraph"><strong>Class-ified Logs</strong></p>
-                      <p class="news-paragraph">Project COBALT has begun once again on the Island! Pick from one of <span class="highlight">six classes</span> and spawn in with special perks, then find <span class="highlight">class-pods</span> to gather unique class loot.</p>
-                      <p class="news-paragraph">Be nimble and stealthy as the <span class="highlight">Scout</span>, unleash firepower as the <span class="highlight">Assault</span>, or stand your ground as the deflective <span class="highlight">Tank</span>. Team up with friends and form the perfect strategy, the group combinations are endless!</p>
-                      <p class="news-paragraph"><span class="highlight">Accounts</span> have also returned! Personalize them with a unique name and emoji, and have the ability to track and <span class="highlight">view your stats</span> -- even gamemode specific! You can also view the <a href="/stats">leaderboards</a>.</p>
-                      <p class="news-paragraph">Need to assemble a classy squad? Make sure to join our <a href="https://discord.gg/75RAK3p3K2">Discord server</a> to form the perfect team.</p>
-                    </div>
-                    <div data-date="2025-04-01">
-                      <small class="news-date">April 01, 2025</small>
-                      <p class="news-paragraph"><strong>Boiled potato</strong></p>
-                      <p class="news-paragraph">As spring continues to progress on the island, so does the regrowth of vegetation. PARMA's FSTMS division have once again started up more testing on the fan-favorite <span class="highlight">potatoes</span>.</p>
-                      <p class="news-paragraph">Don't worry, there's plenty to go around, and is that…. Is that… An <span class="highlight">egg</span>?</p>
-                    </div>
-                    <div data-date="2025-03-15">
-                      <small class="news-date">March 15, 2025</small>
-                      <p class="news-paragraph"><strong>Spring Hunting</strong></p>
-                      <p class="news-paragraph">Spring has sprung once again on the island, enjoy the cherry trees! And it doesn't come alone, <span class="highlight">woods mode</span> is also back to crown more kings!</p>
-                      <p class="news-paragraph">We also made a few adjustments and balancing changes to the base game. Check the <a href="changelogRec.html" target="_blank">changelog</a>.</p>
-                    </div>
                   </div>
                 </div>
               </div>
@@ -1120,7 +1119,7 @@
 
         </div>
 
-        <div class="ad-block-leaderboard-bottom" id="%VITE_AD_PREFIX%_728x90"></div>
+        <div class="ad-block-leaderboard-bottom" id="survevio_728x90"></div>
         <div id="start-bottom-left">
           <div id="mobile-settings-front">
             <div class="btn-settings menu-option btn-darken btn-start-option"></div>
@@ -1185,6 +1184,9 @@
       </div>
       <!-- Loadouts -->
       <div id="modal-customize" class="modal">
+        <div class="ad-block-loadouts-left hide-on-mobile">
+          <div id="nitro-loadout-vrec" data-fuse="loadout_vrec" style="min-height: 600px;"></div>
+        </div>
         <div id="modal-customize-wrapper" class="modal-close">
           <div id="modal-content-left" class="modal-content-shadow">
             <div id="modal-customize-cat-title"></div>

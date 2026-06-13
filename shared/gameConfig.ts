@@ -123,7 +123,7 @@ export const GameConfig = {
     // the protocol we originated from was 78
     // remember to bump this every time a serialization function is changed
     // or a definition item added, removed or moved
-    protocolVersion: 1014,
+    protocolVersion: 1020,
     Input,
     EmoteSlot,
     WeaponSlot,
@@ -215,6 +215,7 @@ export const GameConfig = {
                 mirv: 0,
                 snowball: 0,
                 potato: 0,
+                tomato: 0,
                 coconut: 0,
                 bandage: 0,
                 healthkit: 0,
@@ -346,7 +347,11 @@ export const GameConfig = {
             chambered: 0xb500ff,
             apSaturated: 0x470349,
         },
-        shrapnel: { regular: 0x333333, saturated: 0x333333 },
+        shrapnel: {
+            regular: 0x333333,
+            saturated: 0x333333,
+            chambered: 0x660900,
+        },
         frag: { regular: 0xcb0000, saturated: 0xcb0000, apSaturated: 0xcb0000 },
         invis: { regular: 0, saturated: 0, chambered: 0, apSaturated: 0 },
     },
@@ -381,6 +386,7 @@ export const GameConfig = {
         mirv: [2, 4, 6, 8],
         snowball: [10, 20, 30, 40],
         potato: [10, 20, 30, 40],
+        tomato: [10, 20, 30, 40],
         coconut: [3, 6, 9, 12],
         bandage: [5, 10, 15, 30],
         healthkit: [1, 2, 3, 4],

@@ -16,6 +16,7 @@
     "allowSyntheticDefaultImports": true,
     "allowUnusedLabels": false,
     "noFallthroughCasesInSwitch": true,
+    "verbatimModuleSyntax": true,
     "noImplicitAny": true,
     "noImplicitThis": true,
     "strict": true,

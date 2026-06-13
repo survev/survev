@@ -2,15 +2,17 @@ import $ from "jquery";
 // TODO(performance): only load needed bootstrap components
 import "bootstrap";
 import slugify from "slugify";
-import { ConfigManager } from "../../config";
-import { MainView } from "./mainView";
-import { PlayerView } from "./playerView";
+import { ConfigManager } from "../../config.ts";
+import { device } from "../../device.ts";
+import { SDK } from "../../sdk/sdk.ts";
+import { MainView } from "./mainView.ts";
+import { PlayerView } from "./playerView.ts";
 import language from "./templates/langauge.ejs";
 
 import "bootstrap/dist/css/bootstrap.css";
 import "../../../css/stats/app.css";
-import { helpers } from "../../helpers";
-import { Localization } from "../../ui/localization";
+import { helpers } from "../../helpers.ts";
+import { Localization } from "../../ui/localization.ts";
 import EnJs from "../en.json";
 
 const templates = {
@@ -18,24 +20,7 @@ const templates = {
 };
 
 type AcceptedLocales = "en" | "es";
-
 type Routes = "player" | "main";
-
-//
-// Ads
-//
-class Ads {
-    slotIdToPlacement = {
-        survevio_728x90_leaderboard_top: "survevio_728x90_leaderboard",
-        survevio_300x250_leaderboard_top: "survevio_300x250_leaderboard",
-        survevio_300x250_leaderboard_bottom: "survevio_300x250_leaderboard",
-        survevio_728x90_playerprofile_top: "survevio_728x90_playerprofile",
-        survevio_300x250_playerprofile_top: "survevio_300x250_playerprofile",
-        survevio_300x250_playerprofile_bottom: "survevio_300x250_playerprofile",
-    };
-    showFreestarAds(_slotIds: string) {}
-    getFreestarSlotPlacement(_slotId: string) {}
-}
 
 export class App {
     el = $("#content");
@@ -44,7 +29,7 @@ export class App {
     config: ConfigManager;
     localization: Localization;
     view!: MainView | PlayerView;
-    adManager: Ads;
+    activeAdSlots: string[] = [];
 
     constructor() {
         this.mainView = new MainView(this);
@@ -82,73 +67,83 @@ export class App {
         this.localization.setLocale(this.config.get("language") as AcceptedLocales);
         this.localization.localizeIndex();
 
-        this.adManager = new Ads();
-
         window.addEventListener("load", () => {
-            if (helpers.getParameterByName("slug")) {
-                this.setView("player");
-            } else {
-                this.setView("main");
-            }
+            SDK.ensureNitroReady()
+                .catch(() => {})
+                .finally(() => {
+                    if (helpers.getParameterByName("slug")) {
+                        this.setView("player");
+                    } else {
+                        this.setView("main");
+                    }
+                });
         });
     }
-    setView(name?: Routes) {
-        /*
+
+    updateAds(name: Routes) {
         const phoneDetected = device.mobile && !device.tablet;
         const elAdsLeaderboardTop = $("#adsLeaderBoardTop");
         const elAdsLeaderboardBottom = $("#adsLeaderBoardBottom");
         const elAdsPlayerTop = $("#adsPlayerTop");
         const elAdsPlayerBottom = $("#adsPlayerBottom");
-        */
 
-        if (name == "player") {
-            /*
-            elAdsLeaderboardTop.css("display", "none");
-            elAdsLeaderboardBottom.css("display", "none");
+        const nextAdSlots: string[] = [];
+        if (name === "player") {
+            elAdsLeaderboardTop.hide();
+            elAdsLeaderboardBottom.hide();
+
             if (phoneDetected) {
-                elAdsPlayerTop.css("display", "none");
-                elAdsPlayerBottom.css("display", "block");
+                elAdsPlayerTop.hide();
+                elAdsPlayerBottom.show();
             } else {
-                elAdsPlayerTop.css("display", "block");
-                elAdsPlayerBottom.css("display", "none");
+                elAdsPlayerTop.show();
+                elAdsPlayerBottom.hide();
             }
-            */
+        } else {
+            elAdsPlayerTop.hide();
+            elAdsPlayerBottom.hide();
+
+            if (phoneDetected) {
+                elAdsLeaderboardTop.hide();
+                elAdsLeaderboardBottom.show();
+            } else {
+                elAdsLeaderboardTop.show();
+                elAdsLeaderboardBottom.hide();
+            }
+        }
+
+        if (elAdsLeaderboardTop.css("display") !== "none") {
+            nextAdSlots.push(
+                "survevio_728x90_leaderboard_top",
+                "survevio_300x250_leaderboard_top",
+            );
+        }
+        if (elAdsLeaderboardBottom.css("display") !== "none") {
+            nextAdSlots.push("survevio_300x250_leaderboard_bottom");
+        }
+        if (elAdsPlayerTop.css("display") !== "none") {
+            nextAdSlots.push(
+                "survevio_728x90_playerprofile_top",
+                "survevio_300x250_playerprofile_top",
+            );
+        }
+        if (elAdsPlayerBottom.css("display") !== "none") {
+            nextAdSlots.push("survevio_300x250_playerprofile_bottom");
+        }
+
+        SDK.hideNitroPlacementsById(this.activeAdSlots);
+        SDK.showNitroPlacements(nextAdSlots);
+        this.activeAdSlots = nextAdSlots;
+    }
+
+    setView(name?: Routes) {
+        if (name == "player") {
             this.view = this.playerView;
         } else {
-            /*
-            elAdsPlayerTop.css("display", "none");
-            elAdsPlayerBottom.css("display", "none");
-
-            if (phoneDetected) {
-                elAdsLeaderboardTop.css("display", "none");
-                elAdsLeaderboardBottom.css("display", "block");
-            } else {
-                elAdsLeaderboardTop.css("display", "block");
-                elAdsLeaderboardBottom.css("display", "none");
-            }
-            */
             this.view = this.mainView;
         }
 
-        /*
-        // show ads
-        const slotIds = [];
-        if (elAdsLeaderboardTop && elAdsLeaderboardTop.css("display") != "none") {
-            slotIds.push("survevio_728x90_leaderboard_top");
-            slotIds.push("survevio_300x250_leaderboard_top");
-        }
-        if (elAdsLeaderboardBottom && elAdsLeaderboardBottom.css("display") != "none") {
-            slotIds.push("survevio_300x250_leaderboard_bottom");
-        }
-        if (elAdsPlayerTop && elAdsPlayerTop.css("display") != "none") {
-            slotIds.push("survevio_728x90_playerprofile_top");
-            slotIds.push("survevio_300x250_playerprofile_top");
-        }
-        if (elAdsPlayerBottom && elAdsPlayerBottom.css("display") != "none") {
-            slotIds.push("survevio_300x250_playerprofile_bottom");
-        }
-        this.adManager.showFreestarAds(slotIds);
-        */
+        this.updateAds(name || "main");
 
         this.view.load();
         // @ts-expect-error go away

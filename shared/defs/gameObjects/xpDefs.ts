@@ -1,4 +1,4 @@
-import { type DeepPartial, util } from "../../utils/util";
+import { type DeepPartial, util } from "../../utils/util.ts";
 
 function defineXpSkin(baseType: string, params: DeepPartial<XPDef>): XPDef {
     return util.mergeDeep({}, BaseDefs[baseType], params);

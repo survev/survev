@@ -1,6 +1,6 @@
 import { z } from "zod";
-import type { MapDefs } from "../defs/mapDefs";
-import type { TeamMode } from "../gameConfig";
+import type { MapDefKey } from "../defs/mapDefs.ts";
+import type { TeamMode } from "../gameConfig.ts";
 
 export const zFindGameBody = z.object({
     region: z.string(),
@@ -39,26 +39,26 @@ export type FindGameError =
 
 export type FindGameResponse =
     | {
-          res: FindGameMatchData[];
-          error?: undefined;
+        res: FindGameMatchData[];
+        error?: undefined;
 
-          banned?: undefined;
-      }
+        banned?: undefined;
+    }
     | {
-          error: FindGameError;
+        error: FindGameError;
 
-          res?: undefined;
-          banned?: undefined;
-      }
+        res?: undefined;
+        banned?: undefined;
+    }
     | {
-          banned: true;
-          reason: string;
-          permanent: boolean;
-          expiresIn: Date | string;
+        banned: true;
+        reason: string;
+        permanent: boolean;
+        expiresIn: Date | string;
 
-          res?: undefined;
-          error?: undefined;
-      };
+        res?: undefined;
+        error?: undefined;
+    };
 
 export interface SiteInfoRes {
     country: string;
@@ -69,7 +69,7 @@ export interface SiteInfoRes {
         teamMode: TeamMode;
         enabled: boolean;
     }>;
-    clientTheme: keyof typeof MapDefs;
+    clientTheme: MapDefKey;
     pops: Record<
         string,
         {

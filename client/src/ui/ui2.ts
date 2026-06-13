@@ -1,4 +1,4 @@
-import { GameObjectDefs, type LootDef } from "../../../shared/defs/gameObjectDefs";
+import type { LootDef } from "../../../shared/defs/gameObjectDefs.ts";
 import {
     type AmmoDef,
     type BoostDef,
@@ -6,32 +6,27 @@ import {
     GEAR_TYPES,
     type HealDef,
     SCOPE_LEVELS,
-} from "../../../shared/defs/gameObjects/gearDefs";
-import type { GunDef } from "../../../shared/defs/gameObjects/gunDefs";
-import type { MeleeDef } from "../../../shared/defs/gameObjects/meleeDefs";
-import type { RoleDef } from "../../../shared/defs/gameObjects/roleDefs";
-import { MapObjectDefs } from "../../../shared/defs/mapObjectDefs";
-import type { ObstacleDef } from "../../../shared/defs/mapObjectsTyping";
-import {
-    Action,
-    DamageType,
-    GameConfig,
-    Input,
-    type InventoryItem,
-} from "../../../shared/gameConfig";
-import { PickupMsgType } from "../../../shared/net/net";
-import { collider } from "../../../shared/utils/collider";
-import { math } from "../../../shared/utils/math";
-import { util } from "../../../shared/utils/util";
-import { v2 } from "../../../shared/utils/v2";
-import { device } from "../device";
-import { helpers } from "../helpers";
-import type { InputBinds } from "../inputBinds";
-import type { Map } from "../map";
-import type { Loot, LootBarn } from "../objects/loot";
-import type { Obstacle } from "../objects/obstacle";
-import type { Player, PlayerBarn } from "../objects/player";
-import type { Localization } from "./localization";
+} from "../../../shared/defs/gameObjects/gearDefs.ts";
+import type { GunDef } from "../../../shared/defs/gameObjects/gunDefs.ts";
+import type { MeleeDef } from "../../../shared/defs/gameObjects/meleeDefs.ts";
+import type { RoleDef } from "../../../shared/defs/gameObjects/roleDefs.ts";
+
+import type { ObstacleDef } from "../../../shared/defs/mapObjectsTyping.ts";
+import { GameObjectDefs, MapObjectDefs } from "../../../shared/defs/register.ts";
+import { Action, DamageType, GameConfig, Input, type InventoryItem } from "../../../shared/gameConfig.ts";
+import { PickupMsgType } from "../../../shared/net/net.ts";
+import { collider } from "../../../shared/utils/collider.ts";
+import { math } from "../../../shared/utils/math.ts";
+import { util } from "../../../shared/utils/util.ts";
+import { v2 } from "../../../shared/utils/v2.ts";
+import { device } from "../device.ts";
+import { helpers } from "../helpers.ts";
+import type { InputBinds } from "../inputBinds.ts";
+import type { Map } from "../map.ts";
+import type { Loot, LootBarn } from "../objects/loot.ts";
+import type { Obstacle } from "../objects/obstacle.ts";
+import type { Player, PlayerBarn } from "../objects/player.ts";
+import type { Localization } from "./localization.ts";
 
 const maxKillFeedLines = 6;
 const touchHoldDuration = 0.75 * 1000;
@@ -103,14 +98,14 @@ function diff(a: any, b: any, all: boolean): any {
 }
 
 function m() {
-    const e = Object.keys(GameObjectDefs);
+    const e = GameObjectDefs.getAllTypes();
     const t = [];
     for (let r = 0; r < e.length; r++) {
         const a = e[r];
-        const i = GameObjectDefs[a] as AmmoDef | HealDef | BoostDef;
+        const i = GameObjectDefs.typeToDef(a) as AmmoDef | HealDef | BoostDef;
         if (
-            !(i as AmmoDef).hideUi &&
-            (i.type == "heal" || i.type == "boost" || i.type == "ammo")
+            !(i as AmmoDef).hideUi
+            && (i.type == "heal" || i.type == "boost" || i.type == "ammo")
         ) {
             t.push(a);
         }
@@ -480,7 +475,7 @@ export class UiManager2 {
         }
         for (let i = 0; i < this.dom.loot.length; i++) {
             const loot = this.dom.loot[i];
-            const def = GameObjectDefs[loot.lootType];
+            const def = GameObjectDefs.typeToDef(loot.lootType);
             if (def.type == "heal" || def.type == "boost") {
                 addItemAction("use", "loot", loot.lootType, loot.div);
             }
@@ -499,8 +494,8 @@ export class UiManager2 {
             const item = this.itemActions[i];
             setEventListener("mousedown", item.div, (e) => {
                 if (
-                    (item.action == "use" && isLmb(e)) ||
-                    (item.action == "drop" && isRmb(e))
+                    (item.action == "use" && isLmb(e))
+                    || (item.action == "drop" && isRmb(e))
                 ) {
                     e.stopPropagation();
                     item.actionQueued = true;
@@ -508,9 +503,9 @@ export class UiManager2 {
             });
             setEventListener("mouseup", item.div, (e) => {
                 if (
-                    item.actionQueued &&
-                    ((item.action == "use" && isLmb(e)) ||
-                        (item.action == "drop" && isRmb(e)))
+                    item.actionQueued
+                    && ((item.action == "use" && isLmb(e))
+                        || (item.action == "drop" && isRmb(e)))
                 ) {
                     e.stopPropagation();
                     this.pushAction(item);
@@ -527,9 +522,9 @@ export class UiManager2 {
             });
             setEventListener("touchend", item.div, (_e) => {
                 if (
-                    new Date().getTime() - item.actionTime < touchHoldDuration &&
-                    item.actionQueued &&
-                    item.action == "use"
+                    new Date().getTime() - item.actionTime < touchHoldDuration
+                    && item.actionQueued
+                    && item.action == "use"
                 ) {
                     this.pushAction(item);
                 }
@@ -623,9 +618,9 @@ export class UiManager2 {
 
         // Perk message
         if (
-            state.rareLootMessage.ticker >= state.rareLootMessage.duration &&
+            state.rareLootMessage.ticker >= state.rareLootMessage.duration
             // Create a new message if we aren't displaying one
-            this.rareLootMessageQueue.length > 0
+            && this.rareLootMessageQueue.length > 0
         ) {
             const lootType = this.rareLootMessageQueue.shift()!;
             state.rareLootMessage.lootType = lootType;
@@ -644,17 +639,15 @@ export class UiManager2 {
         state.pickupMessage.ticker += dt;
         const x = state.pickupMessage.ticker;
         const z = state.pickupMessage.duration;
-        state.pickupMessage.opacity =
-            math.smoothstep(x, 0, 0.2) *
-            (1 - math.smoothstep(x, z, z + 0.2)) *
-            (1 - state.rareLootMessage.opacity);
+        state.pickupMessage.opacity = math.smoothstep(x, 0, 0.2)
+            * (1 - math.smoothstep(x, z, z + 0.2))
+            * (1 - state.rareLootMessage.opacity);
 
         // Kill message
         state.killMessage.ticker += dt;
         const I = state.killMessage.ticker;
         const T = state.killMessage.duration;
-        state.killMessage.opacity =
-            (1 - math.smoothstep(I, T - 0.2, T)) * (1 - state.rareLootMessage.opacity);
+        state.killMessage.opacity = (1 - math.smoothstep(I, T - 0.2, T)) * (1 - state.rareLootMessage.opacity);
 
         // KillFeed
         let offset = 0;
@@ -693,20 +686,35 @@ export class UiManager2 {
             for (let i = 0; i < obstacles.length; i++) {
                 const obstacle = obstacles[i];
                 if (
-                    obstacle.active &&
-                    !obstacle.dead &&
-                    util.sameLayer(obstacle.layer, activePlayer.layer)
+                    obstacle.active
+                    && !obstacle.dead
+                    && util.sameLayer(obstacle.layer, activePlayer.layer)
                 ) {
-                    const interact = obstacle.getInteraction();
+                    const interact = obstacle.getInteraction(activePlayer);
                     if (interact) {
-                        const res = collider.intersectCircle(
-                            obstacle.collider,
-                            activePlayer.m_netData.m_pos,
-                            interact.rad + activePlayer.m_rad,
-                        );
-                        if (res && res.pen >= closestPen) {
-                            closestObj = obstacle;
-                            closestPen = res.pen;
+                        if (obstacle.isButton && obstacle.button.isVat) {
+                            const distance = v2.distance(
+                                activePlayer.m_pos,
+                                obstacle.pos,
+                            );
+
+                            if (
+                                distance + activePlayer.m_rad
+                                    < interact.rad * obstacle.scale
+                            ) {
+                                closestObj = obstacle;
+                                closestPen = 0;
+                            }
+                        } else {
+                            const res = collider.intersectCircle(
+                                obstacle.collider,
+                                activePlayer.m_netData.m_pos,
+                                interact.rad + activePlayer.m_rad,
+                            );
+                            if (res && res.pen >= closestPen) {
+                                closestObj = obstacle;
+                                closestPen = res.pen;
+                            }
                         }
                     }
                 }
@@ -722,25 +730,24 @@ export class UiManager2 {
             if (loot && !activePlayer.m_netData.m_downed) {
                 // Ignore if it's a gun and we have full guns w/ fists out...
                 // unless we're on a small screen
-                const itemDef = GameObjectDefs[loot.type] as LootDef;
+                const itemDef = GameObjectDefs.typeToDef(loot.type) as LootDef;
 
                 const X = activePlayer.m_hasWeaponInSlot(GameConfig.WeaponSlot.Primary);
                 const K = activePlayer.m_hasWeaponInSlot(GameConfig.WeaponSlot.Secondary);
                 const Z = X && K;
-                const usable =
-                    itemDef.type != "gun" ||
-                    !Z ||
-                    activePlayer.m_equippedWeaponType() == "gun";
+                const usable = itemDef.type != "gun"
+                    || !Z
+                    || activePlayer.m_equippedWeaponType() == "gun";
 
                 let J = false;
                 if (
-                    (state.touch &&
-                        itemDef.type == "helmet" &&
-                        activePlayer.m_getHelmetLevel() == itemDef.level &&
-                        loot.type != activePlayer.m_netData.m_helmet) ||
-                    (itemDef.type == "chest" &&
-                        activePlayer.m_getChestLevel() == itemDef.level &&
-                        loot.type != activePlayer.m_netData.m_chest)
+                    (state.touch
+                        && itemDef.type == "helmet"
+                        && activePlayer.m_getHelmetLevel() == itemDef.level
+                        && loot.type != activePlayer.m_netData.m_helmet)
+                    || (itemDef.type == "chest"
+                        && activePlayer.m_getChestLevel() == itemDef.level
+                        && loot.type != activePlayer.m_netData.m_chest)
                 ) {
                     J = true;
                 }
@@ -749,22 +756,21 @@ export class UiManager2 {
                     interactionType = InteractionType.Loot;
                     interactionObject = loot;
                 }
-                interactionUsable =
-                    usable &&
-                    (!state.touch ||
-                        itemDef.type == "gun" ||
-                        itemDef.type == "melee" ||
-                        itemDef.type == "outfit" ||
-                        itemDef.type == "perk" ||
-                        J);
+                interactionUsable = usable
+                    && (!state.touch
+                        || itemDef.type == "gun"
+                        || itemDef.type == "melee"
+                        || itemDef.type == "outfit"
+                        || itemDef.type == "perk"
+                        || J);
             }
 
             // Reviving
             const canSelfRevive = activePlayer.m_hasPerk("self_revive");
 
             if (
-                activePlayer.m_action.type == Action.None &&
-                (!activePlayer.m_netData.m_downed || canSelfRevive)
+                activePlayer.m_action.type == Action.None
+                && (!activePlayer.m_netData.m_downed || canSelfRevive)
             ) {
                 const ourTeamId = playerBarn.getPlayerInfo(activePlayer.__id).teamId;
                 const players = playerBarn.playerPool.m_getPool();
@@ -774,18 +780,18 @@ export class UiManager2 {
                     if (p.active) {
                         const theirTeamId = playerBarn.getPlayerInfo(p.__id).teamId;
                         if (
-                            (p.__id != activePlayer.__id || canSelfRevive) &&
-                            ourTeamId == theirTeamId &&
-                            p.m_netData.m_downed &&
-                            !p.m_netData.m_dead &&
-                            p.m_action.type != Action.Revive
+                            (p.__id != activePlayer.__id || canSelfRevive)
+                            && ourTeamId == theirTeamId
+                            && p.m_netData.m_downed
+                            && !p.m_netData.m_dead
+                            && p.m_action.type != Action.Revive
                         ) {
                             const dist = v2.length(
                                 v2.sub(p.m_netData.m_pos, activePlayer.m_netData.m_pos),
                             );
                             if (
-                                dist < GameConfig.player.reviveRange &&
-                                util.sameLayer(p.layer, activePlayer.layer)
+                                dist < GameConfig.player.reviveRange
+                                && util.sameLayer(p.layer, activePlayer.layer)
                             ) {
                                 interactionType = InteractionType.Revive;
                                 interactionObject = p;
@@ -797,9 +803,9 @@ export class UiManager2 {
             }
 
             if (
-                activePlayer.m_action.type == Action.Revive &&
-                activePlayer.m_netData.m_downed &&
-                !canSelfRevive
+                activePlayer.m_action.type == Action.Revive
+                && activePlayer.m_netData.m_downed
+                && !canSelfRevive
             ) {
                 interactionType = InteractionType.None;
                 interactionObject = null;
@@ -807,10 +813,10 @@ export class UiManager2 {
             }
 
             if (
-                (activePlayer.m_action.type == Action.UseItem ||
-                    (activePlayer.m_action.type == Action.Revive &&
-                        (!activePlayer.m_netData.m_downed || !!canSelfRevive))) &&
-                !spectating
+                (activePlayer.m_action.type == Action.UseItem
+                    || (activePlayer.m_action.type == Action.Revive
+                        && (!activePlayer.m_netData.m_downed || !!canSelfRevive)))
+                && !spectating
             ) {
                 interactionType = InteractionType.Cancel;
                 interactionObject = null;
@@ -863,15 +869,14 @@ export class UiManager2 {
             ne.bindStr = ue ? ue.toString() : "";
         }
         const ge = state.weapons[activePlayer.m_localData.m_curWeapIdx];
-        const weaponDef = GameObjectDefs[ge.type] as GunDef | MeleeDef;
+        const weaponDef = GameObjectDefs.typeToDef(ge.type) as GunDef | MeleeDef;
         const we = ge.ammo;
-        const fe =
-            weaponDef.type == "gun"
-                ? weaponDef.ammoInfinite ||
-                  (activePlayer.m_hasPerk("endless_ammo") && !weaponDef.ignoreEndlessAmmo)
-                    ? Number.MAX_VALUE
-                    : activePlayer.m_localData.m_inventory[weaponDef.ammo]
-                : 0;
+        const fe = weaponDef.type == "gun"
+            ? weaponDef.ammoInfinite
+                    || (activePlayer.m_hasPerk("endless_ammo") && !weaponDef.ignoreEndlessAmmo)
+                ? Number.MAX_VALUE
+                : activePlayer.m_localData.m_inventory[weaponDef.ammo]
+            : 0;
         state.ammo.current = we;
         state.ammo.remaining = fe;
         state.ammo.displayCurrent = weaponDef.type != "melee";
@@ -914,8 +919,8 @@ export class UiManager2 {
             } else if (Me.type == "helmet") {
                 Pe = activePlayer.m_netData.m_helmet;
             } else if (
-                Me.type == "backpack" &&
-                (Pe = activePlayer.m_netData.m_backpack) == "backpack00"
+                Me.type == "backpack"
+                && (Pe = activePlayer.m_netData.m_backpack) == "backpack00"
             ) {
                 Pe = "";
             }
@@ -990,7 +995,7 @@ export class UiManager2 {
         // Rare loot message
         if (patch.rareLootMessage.lootType) {
             const lootType = state.rareLootMessage.lootType;
-            const lootDef = GameObjectDefs[lootType] as LootDef;
+            const lootDef = GameObjectDefs.typeToDefSafe(lootType) as LootDef;
             if (lootDef && lootDef.type == "xp") {
                 const lootDesc = this.localization.translate("game-xp-drop-desc");
                 dom.rareLootMessage.desc.innerHTML = `+${lootDef.xp} ${lootDesc}`;
@@ -1045,8 +1050,7 @@ export class UiManager2 {
             }
 
             if (patchK.offset) {
-                const top =
-                    device.uiLayout != device.UiLayout.Sm || device.tablet ? 35 : 15;
+                const top = device.uiLayout != device.UiLayout.Sm || device.tablet ? 35 : 15;
                 domK.line.style.top = `${Math.floor(x.offset * top)}px`;
             }
             if (patchK.color) {
@@ -1134,18 +1138,16 @@ export class UiManager2 {
             dom.boost.div.style.opacity = String(state.boost == 0 ? 0 : 1);
         }
         if (patch.interaction.type) {
-            dom.interaction.div.style.display =
-                state.interaction.type == InteractionType.None ? "none" : "flex";
+            dom.interaction.div.style.display = state.interaction.type == InteractionType.None ? "none" : "flex";
         }
         if (patch.interaction.text) {
             dom.interaction.text.innerHTML = state.interaction.text;
         }
         if (patch.interaction.key) {
             dom.interaction.key.innerHTML = state.touch ? "" : state.interaction.key;
-            dom.interaction.key.className =
-                dom.interaction.key.innerHTML.length > 1
-                    ? "ui-interaction-small"
-                    : "ui-interaction-large";
+            dom.interaction.key.className = dom.interaction.key.innerHTML.length > 1
+                ? "ui-interaction-small"
+                : "ui-interaction-large";
         }
         if (patch.interaction.usable) {
             dom.interaction.key.style.display = state.interaction.usable
@@ -1159,11 +1161,10 @@ export class UiManager2 {
             if (B.type) {
                 let q = "";
                 let F = "";
-                const j = GameObjectDefs[L.type];
+                const j = GameObjectDefs.typeToDefSafe(L.type);
                 if (j) {
-                    q =
-                        this.localization.translate(`game-hud-${L.type}`) ||
-                        this.localization.translate(`game-${L.type}`);
+                    q = this.localization.translate(`game-hud-${L.type}`)
+                        || this.localization.translate(`game-${L.type}`);
                     F = helpers.getCssTransformFromGameType(L.type);
                 }
                 R.type.innerHTML = q;
@@ -1177,8 +1178,7 @@ export class UiManager2 {
                     : "rgba(0, 0, 0, 0)";
             }
             if (B.selectable) {
-                R.div.style.pointerEvents =
-                    L.type != "" || L.selectable ? "auto" : "none";
+                R.div.style.pointerEvents = L.type != "" || L.selectable ? "auto" : "none";
             }
             if (B.width) {
                 const N = math.lerp(L.width, 83.33, 100);
@@ -1248,11 +1248,11 @@ export class UiManager2 {
                 if (Z.count || Z.maximum) {
                     Y.count.innerHTML = String(J.count);
                     Y.div.style.opacity = String(
-                        (GameObjectDefs[Y.lootType] as AmmoDef).special && J.count == 0
+                        (GameObjectDefs.typeToDef(Y.lootType) as AmmoDef).special && J.count == 0
                             ? 0
                             : J.count > 0
-                              ? 1
-                              : 0.25,
+                            ? 1
+                            : 0.25,
                     );
                     Y.div.style.color = J.count == J.maximum ? "#ff9900" : "#ffffff";
                 }
@@ -1275,11 +1275,11 @@ export class UiManager2 {
             const ae = state.gear[ee];
             if (te.item) {
                 // GearDef?
-                const ie = ae.item ? (GameObjectDefs[ae.item] as ChestDef) : null;
+                const ie = ae.item ? (GameObjectDefs.typeToDef(ae.item) as ChestDef) : null;
                 const oe = ie ? ie.level : 0;
                 re.div.style.display = ie ? "block" : "none";
                 re.level.innerHTML = this.localization.translate(`game-level-${oe}`);
-                re.level.style.color = oe >= 3 ? "#ff9900" : "#ffffff";
+                re.level.style.color = oe === 4 ? "#b30000" : oe === 3 ? "#ff9900" : "#ffffff";
                 re.image.src = helpers.getSvgFromGameType(ae.item);
             }
             if (te.selectable) {
@@ -1288,7 +1288,7 @@ export class UiManager2 {
             if (te.width) {
                 const se = 1 + ae.width * 0.33;
                 let ne = `scale(${se}, ${se})`;
-                const le = GameObjectDefs[ae.item] as MeleeDef;
+                const le = GameObjectDefs.typeToDefSafe(ae.item) as MeleeDef;
                 if (le?.lootImg.rot !== undefined) {
                     ne += ` rotate(${le.lootImg.rot}rad)`;
                 }
@@ -1374,7 +1374,7 @@ export class UiManager2 {
     }
 
     getRareLootMessageText(perk: string) {
-        if (GameObjectDefs[perk]) {
+        if (GameObjectDefs.typeExists(perk)) {
             return `Acquired perk: ${this.localization.translate(`game-${perk}`)}`;
         }
         return "";
@@ -1400,11 +1400,15 @@ export class UiManager2 {
     ) {
         switch (damageType) {
             case DamageType.Player:
-                return `${killerName} ${this.localization.translate(
-                    downed ? "game-knocked-out" : "game-killed",
-                )} ${targetName} ${this.localization.translate(
-                    "game-with",
-                )} ${this.localization.translate(`game-${sourceType}`)}`;
+                return `${killerName} ${
+                    this.localization.translate(
+                        downed ? "game-knocked-out" : "game-killed",
+                    )
+                } ${targetName} ${
+                    this.localization.translate(
+                        "game-with",
+                    )
+                } ${this.localization.translate(`game-${sourceType}`)}`;
             case DamageType.Bleeding: {
                 const killTxt = this.localization.translate(
                     killerName ? "game-finally-killed" : "game-finally-bled-out",
@@ -1431,13 +1435,13 @@ export class UiManager2 {
                 return `${targetName} ${killTxt}`;
             }
             case DamageType.Airdrop: {
-                const mapObj = MapObjectDefs[sourceType] as ObstacleDef;
+                const mapObj = MapObjectDefs.typeToDefSafe(sourceType) as ObstacleDef;
                 const killName = this.localization.translate("game-the-air-drop");
                 const killTxt = downed
                     ? this.localization.translate("game-knocked-out")
                     : mapObj && !mapObj.airdropCrate
-                      ? this.localization.translate("game-killed")
-                      : this.localization.translate("game-crushed");
+                    ? this.localization.translate("game-killed")
+                    : this.localization.translate("game-crushed");
                 return `${killName} ${killTxt} ${targetName}`;
             }
             case DamageType.Airstrike: {
@@ -1445,13 +1449,17 @@ export class UiManager2 {
                     downed ? "game-knocked-out" : "game-killed",
                 );
                 if (killerName) {
-                    return `${killerName} ${killTxt} ${targetName} ${this.localization.translate(
-                        "game-with",
-                    )} ${this.localization.translate("game-an-air-strike")}`;
+                    return `${killerName} ${killTxt} ${targetName} ${
+                        this.localization.translate(
+                            "game-with",
+                        )
+                    } ${this.localization.translate("game-an-air-strike")}`;
                 }
-                return `${this.localization.translate(
-                    "game-the-air-strike",
-                )} ${killTxt} ${targetName}`;
+                return `${
+                    this.localization.translate(
+                        "game-the-air-strike",
+                    )
+                } ${killTxt} ${targetName}`;
             }
             default:
                 return "";
@@ -1477,7 +1485,7 @@ export class UiManager2 {
     }
 
     getRoleKillFeedColor(role: string, teamId: number, playerBarn: PlayerBarn) {
-        const roleDef = GameObjectDefs[role] as RoleDef;
+        const roleDef = GameObjectDefs.typeToDefSafe(role) as RoleDef | undefined;
         if (roleDef?.killFeed?.color) {
             return roleDef.killFeed.color;
         }
@@ -1493,24 +1501,30 @@ export class UiManager2 {
     }
 
     getRoleAnnouncementText(role: string, teamId: number) {
-        return `${this.localization.translate(
-            "game-youve-been-promoted-to",
-        )} ${this.getRoleTranslation(role, teamId)}!`;
+        return `${
+            this.localization.translate(
+                "game-youve-been-promoted-to",
+            )
+        } ${this.getRoleTranslation(role, teamId)}!`;
     }
 
     getRoleAssignedKillFeedText(role: string, teamId: number, playerName: string) {
         const roleTxt = this.getRoleTranslation(role, teamId);
-        return `${playerName} ${this.localization.translate(
-            "game-promoted-to",
-        )} ${roleTxt}!`;
+        return `${playerName} ${
+            this.localization.translate(
+                "game-promoted-to",
+            )
+        } ${roleTxt}!`;
     }
 
     getRoleKilledKillFeedText(role: string, teamId: number, killerName: string) {
         const roleTxt = this.getRoleTranslation(role, teamId);
         if (killerName) {
-            return `${killerName} ${this.localization.translate(
-                "game-killed",
-            )} ${roleTxt}!`;
+            return `${killerName} ${
+                this.localization.translate(
+                    "game-killed",
+                )
+            } ${roleTxt}!`;
         }
         return `${roleTxt} ${this.localization.translate("game-is-dead")}!`;
     }
@@ -1533,8 +1547,8 @@ export class UiManager2 {
         const killKey = knockedOut
             ? "game-knocked-out"
             : completeKill
-              ? "game-killed"
-              : "game-finally-killed";
+            ? "game-killed"
+            : "game-finally-killed";
         const killTxt = this.localization.translate(killKey);
         const targetTxt = suicide
             ? spectating
@@ -1555,9 +1569,11 @@ export class UiManager2 {
     }
 
     getKillCountText(killCount: number) {
-        return `${killCount} ${this.localization.translate(
-            killCount != 1 ? "game-kills" : "game-kill",
-        )}`;
+        return `${killCount} ${
+            this.localization.translate(
+                killCount != 1 ? "game-kills" : "game-kill",
+            )
+        }`;
     }
 
     getDownedText(
@@ -1598,6 +1614,7 @@ export class UiManager2 {
             [PickupMsgType.AlreadyEquipped]: "game-item-already-equipped",
             [PickupMsgType.BetterItemEquipped]: "game-better-item-equipped",
             [PickupMsgType.GunCannotFire]: "game-gun-cannot-fire",
+            [PickupMsgType.MaxPerks]: "game-max-perks",
         };
         const key = typeMap[type] || typeMap[PickupMsgType.Full];
         return this.localization.translate(key);
@@ -1615,19 +1632,21 @@ export class UiManager2 {
                 return this.localization.translate("game-cancel");
             case InteractionType.Revive:
                 if (
-                    object &&
-                    player &&
-                    (object == player || player.downed) &&
-                    player.m_hasPerk("self_revive")
+                    object
+                    && player
+                    && (object == player || player.downed)
+                    && player.m_hasPerk("self_revive")
                 ) {
                     return this.localization.translate("game-revive-self");
                 }
                 return this.localization.translate("game-revive-teammate");
             case InteractionType.Object: {
-                const x = (object as Obstacle).getInteraction()!;
-                return `${this.localization.translate(
-                    x.action,
-                )} ${this.localization.translate(x.object)}`;
+                const x = (object as Obstacle).getInteraction(player)!;
+                return `${
+                    this.localization.translate(
+                        x.action,
+                    )
+                } ${this.localization.translate(x.object)}`;
             }
             case InteractionType.Loot: {
                 const loot = object as Loot;
@@ -1649,19 +1668,16 @@ export class UiManager2 {
                 bind = this.inputBinds.getBind(Input.Cancel);
                 break;
             case InteractionType.Loot:
-                bind =
-                    this.inputBinds.getBind(Input.Loot) ||
-                    this.inputBinds.getBind(Input.Interact);
+                bind = this.inputBinds.getBind(Input.Loot)
+                    || this.inputBinds.getBind(Input.Interact);
                 break;
             case InteractionType.Object:
-                bind =
-                    this.inputBinds.getBind(Input.Use) ||
-                    this.inputBinds.getBind(Input.Interact);
+                bind = this.inputBinds.getBind(Input.Use)
+                    || this.inputBinds.getBind(Input.Interact);
                 break;
             case InteractionType.Revive:
-                bind =
-                    this.inputBinds.getBind(Input.Revive) ||
-                    this.inputBinds.getBind(Input.Interact);
+                bind = this.inputBinds.getBind(Input.Revive)
+                    || this.inputBinds.getBind(Input.Interact);
                 break;
             case InteractionType.None:
             default:

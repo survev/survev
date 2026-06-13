@@ -1,11 +1,11 @@
 import * as PIXI from "pixi.js-legacy";
 import highResAtlasDefs from "virtual-atlases-high";
 import lowResAtlasDefs from "virtual-atlases-low";
-import { type Atlas, MapDefs } from "../../shared/defs/mapDefs";
-import type { AudioManager } from "./audioManager";
-import type { ConfigManager } from "./config";
-import { device } from "./device";
-import SoundDefs from "./soundDefs";
+import { type Atlas, type MapDefKey, MapDefs } from "../../shared/defs/mapDefs.ts";
+import type { AudioManager } from "./audioManager.ts";
+import type { ConfigManager } from "./config.ts";
+import { device } from "./device.ts";
+import SoundDefs from "./soundDefs.ts";
 
 type AtlasDef = Record<Atlas, PIXI.ISpritesheetData[]>;
 
@@ -66,9 +66,9 @@ function selectTextureRes(renderer: PIXI.IRenderer, config: ConfigManager) {
     let textureRes: "high" | "low" = config.get("highResTex") ? "high" : "low";
 
     if (
-        smallScreen ||
-        (device.mobile && !device.tablet) ||
-        renderer.type == PIXI.RENDERER_TYPE.CANVAS
+        smallScreen
+        || (device.mobile && !device.tablet)
+        || renderer.type == PIXI.RENDERER_TYPE.CANVAS
     ) {
         textureRes = "low";
     }
@@ -174,7 +174,7 @@ export class ResourceManager {
     loadMapAssets(mapName: string) {
         console.log("Load map", mapName);
 
-        const mapDef = MapDefs[mapName as keyof typeof MapDefs];
+        const mapDef = MapDefs[mapName as MapDefKey];
         if (!mapDef) {
             throw new Error(`Failed loading mapDef ${this.mapName}`);
         }

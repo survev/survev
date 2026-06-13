@@ -1,7 +1,7 @@
-import { util } from "../../utils/util";
-import type { MapDef } from "../mapDefs";
-import type { PartialMapDef } from "./baseDefs";
-import { Potato } from "./potatoDefs";
+import { util } from "../../utils/util.ts";
+import type { MapDef } from "../mapDefs.ts";
+import type { PartialMapDef } from "./baseDefs.ts";
+import { Potato } from "./potatoDefs.ts";
 
 const mapDef: PartialMapDef = {
     assets: {

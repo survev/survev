@@ -1,29 +1,30 @@
 import * as PIXI from "pixi.js-legacy";
-import { MapObjectDefs } from "../../../shared/defs/mapObjectDefs";
-import type { BuildingDef, StructureDef } from "../../../shared/defs/mapObjectsTyping";
-import { MapMsg } from "../../../shared/net/mapMsg";
-import { type ObjectData, ObjectType } from "../../../shared/net/objectSerializeFns";
-import type { LocalDataWithDirty } from "./../../../shared/net/updateMsg";
-import { math } from "../../../shared/utils/math";
-import { assert, util } from "../../../shared/utils/util";
-import { type Vec2, v2 } from "../../../shared/utils/v2";
-import type { Ambiance } from "../../src/ambiance";
-import type { AudioManager } from "../../src/audioManager";
-import Camera from "../../src/camera";
-import type { ConfigManager, DebugRenderOpts } from "../../src/config";
-import { debugLines } from "../../src/debug/debugLines";
-import { device } from "../../src/device";
-import type { Game } from "../../src/game";
-import type { InputBinds } from "../../src/inputBinds";
-import { Map } from "../../src/map";
-import { DecalBarn } from "../../src/objects/decal";
-import { Creator } from "../../src/objects/objectPool";
-import { ParticleBarn } from "../../src/objects/particles";
-import { type Player, PlayerBarn } from "../../src/objects/player";
-import { SmokeBarn } from "../../src/objects/smoke";
-import { Renderer } from "../../src/renderer";
-import type { ResourceManager } from "../../src/resources";
-import type { UiManager2 } from "../../src/ui/ui2";
+
+import { MapDefs } from "../../../shared/defs/mapDefs.ts";
+import { MapObjectDefs } from "../../../shared/defs/register.ts";
+import { MapMsg } from "../../../shared/net/mapMsg.ts";
+import { type ObjectData, ObjectType } from "../../../shared/net/objectSerializeFns.ts";
+import type { LocalDataWithDirty } from "./../../../shared/net/updateMsg.ts";
+import { math } from "../../../shared/utils/math.ts";
+import { util } from "../../../shared/utils/util.ts";
+import { v2, type Vec2 } from "../../../shared/utils/v2.ts";
+import type { Ambiance } from "../../src/ambiance.ts";
+import type { AudioManager } from "../../src/audioManager.ts";
+import Camera from "../../src/camera.ts";
+import type { ConfigManager, DebugRenderOpts } from "../../src/config.ts";
+import { debugLines } from "../../src/debug/debugLines.ts";
+import { device } from "../../src/device.ts";
+import type { Game } from "../../src/game.ts";
+import type { InputBinds } from "../../src/inputBinds.ts";
+import { Map } from "../../src/map.ts";
+import { DecalBarn } from "../../src/objects/decal.ts";
+import { Creator } from "../../src/objects/objectPool.ts";
+import { ParticleBarn } from "../../src/objects/particles.ts";
+import { type Player, PlayerBarn } from "../../src/objects/player.ts";
+import { SmokeBarn } from "../../src/objects/smoke.ts";
+import { Renderer } from "../../src/renderer.ts";
+import type { ResourceManager } from "../../src/resources.ts";
+import type { UiManager2 } from "../../src/ui/ui2.ts";
 
 export class EditorDisplay {
     active = false;
@@ -115,35 +116,35 @@ export class EditorDisplay {
         this.updatePlayer();
 
         this.activePlayer = this.playerBarn.getPlayerById(this.activeId)!;
-        this.activePlayer.m_setLocalData({
-            boost: 100,
-            boostDirty: true,
-            hasAction: false,
-            health: 100,
-            inventoryDirty: false,
-            scopedIn: false,
-            spectatorCountDirty: false,
-            weapsDirty: true,
-            curWeapIdx: 2,
-            weapons: [
-                {
-                    name: "",
-                    ammo: 0,
-                },
-                {
-                    name: "",
-                    ammo: 0,
-                },
-                {
-                    name: "bayonet_rugged",
-                    ammo: 0,
-                },
-                {
-                    name: "",
-                    ammo: 0,
-                },
-            ],
-        } as unknown as LocalDataWithDirty);
+        this.activePlayer.m_setLocalData(
+            {
+                boost: 100,
+                boostDirty: true,
+                health: 100,
+                inventoryDirty: false,
+                spectatorCountDirty: false,
+                weapsDirty: true,
+                curWeapIdx: 2,
+                weapons: [
+                    {
+                        type: "",
+                        ammo: 0,
+                    },
+                    {
+                        type: "",
+                        ammo: 0,
+                    },
+                    {
+                        type: "fists",
+                        ammo: 0,
+                    },
+                    {
+                        type: "",
+                        ammo: 0,
+                    },
+                ],
+            } satisfies Partial<LocalDataWithDirty> as LocalDataWithDirty,
+        );
 
         this.activePlayer.layer = this.activePlayer.m_netData.m_layer;
         this.renderer.setActiveLayer(this.activePlayer.layer);
@@ -194,7 +195,7 @@ export class EditorDisplay {
 
     updatePlayer() {
         const pos = this.toWorldPos(this.config.get("buildingEditor")!.pos);
-        const obj = {
+        const obj: ObjectData<ObjectType.Player> = {
             outfit: "outfitDev",
             backpack: "backpack02",
             helmet: "helmet01",
@@ -210,8 +211,10 @@ export class EditorDisplay {
             actionItem: "",
             wearingPan: false,
             healEffect: false,
+            lastStandEffect: false,
             frozen: false,
             frozenOri: 0,
+            frozenType: "",
             hasteType: 0,
             hasteSeq: 0,
             scale: 1,
@@ -221,12 +224,12 @@ export class EditorDisplay {
             dir: v2.create(0, -1),
         };
 
-        this.objectCreator.m_updateObjFull(
+        const p = this.objectCreator.m_updateObjFull(
             ObjectType.Player,
             this.activeId,
             obj as unknown as ObjectData<ObjectType.Player>,
             this.getCtx(),
-        );
+        ) as Player;
 
         this.playerBarn.setPlayerInfo({
             playerId: 98,
@@ -252,9 +255,7 @@ export class EditorDisplay {
     }
 
     addStructure(type: string, pos: Vec2, ori: number) {
-        assert(MapObjectDefs[type]?.type === "structure");
-
-        const def = MapObjectDefs[type] as StructureDef;
+        const def = MapObjectDefs.typeToDef(type, "structure");
 
         const data: ObjectData<ObjectType.Structure> = {
             type,
@@ -285,8 +286,6 @@ export class EditorDisplay {
     }
 
     addBuilding(type: string, pos: Vec2, ori: number, layer: number) {
-        assert(MapObjectDefs[type]?.type === "building");
-
         const data: ObjectData<ObjectType.Building> = {
             type,
             pos,
@@ -305,7 +304,7 @@ export class EditorDisplay {
             data,
             this.getCtx(),
         );
-        const def = MapObjectDefs[type] as BuildingDef;
+        const def = MapObjectDefs.typeToDef(type, "building");
 
         for (const child of def.mapObjects) {
             let partType = child.type;
@@ -358,7 +357,7 @@ export class EditorDisplay {
         parentId?: number,
         puzzlePiece?: boolean,
     ) {
-        assert(MapObjectDefs[type]?.type === "obstacle");
+        MapObjectDefs.typeToDef(type, "obstacle");
 
         const data: ObjectData<ObjectType.Obstacle> = {
             type,
@@ -396,7 +395,7 @@ export class EditorDisplay {
     }
 
     addDecal(type: string, pos: Vec2, ori: number, scale: number, layer: number) {
-        assert(MapObjectDefs[type]?.type === "decal");
+        MapObjectDefs.typeToDef(type, "decal");
 
         const data: ObjectData<ObjectType.Decal> = {
             type,
@@ -425,11 +424,12 @@ export class EditorDisplay {
         puzzlePiece?: boolean,
         ignoreMapSpawnReplacement?: boolean,
     ) {
-        const def = MapObjectDefs[type];
+        let def = MapObjectDefs.typeToDef(type);
 
         const spawnReplacements = this.map.getMapDef().mapGen.spawnReplacements[0];
         if (spawnReplacements[type] && !ignoreMapSpawnReplacement) {
             type = spawnReplacements[type];
+            def = MapObjectDefs.typeToDef(type);
         }
 
         switch (def.type) {
@@ -484,8 +484,12 @@ export class EditorDisplay {
 
     resetObj() {
         const cfg = this.config.get("buildingEditor")!;
-        const mapName = cfg.map;
+        let mapName = cfg.map;
         const type = cfg.object;
+
+        if (!(mapName in MapDefs)) {
+            mapName = "main";
+        }
 
         this.resourceManager.loadMapAssets(mapName);
 
@@ -506,7 +510,7 @@ export class EditorDisplay {
         this.clearAllObjs();
         const center = v2.create(this.map.width / 2, this.map.height / 2);
 
-        if (type) {
+        if (type && MapObjectDefs.typeExists(type)) {
             this.addAuto(type, center, 0, 0, 1);
         }
 
@@ -607,7 +611,7 @@ export class EditorDisplay {
         );
         this.particleBarn.m_update(dt, this.camera);
         this.decalBarn.m_update(dt, this.camera, this.renderer);
-        this.renderer.m_update(dt, this.camera, this.map);
+        this.renderer.m_update(dt, this.camera, this.map, debug.structures.layerMasks);
         this.activePlayer.playActionStartSfx = false;
 
         this.render(debug);

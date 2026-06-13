@@ -809,6 +809,19 @@ export const BaseDefs: Record<string, BulletDef> = {
         tracerWidth: 0.125,
         tracerLength: 0.6,
     },
+    shrapnel_cobalt: {
+        type: "bullet",
+        damage: 5,
+        obstacleDamage: 0.1,
+        falloff: 1,
+        speed: 20,
+        distance: 8,
+        variance: 1.5,
+        shrapnel: true,
+        tracerColor: "shrapnel",
+        tracerWidth: 0.15,
+        tracerLength: 0.4,
+    },
 };
 
 export const BulletDefs: Record<string, BulletDef> = { ...BaseDefs };

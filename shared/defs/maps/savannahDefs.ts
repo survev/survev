@@ -1,7 +1,7 @@
-import { util } from "../../utils/util";
-import { v2 } from "../../utils/v2";
-import { MapId } from "../types/misc";
-import { Main, type PartialMapDef } from "./baseDefs";
+import { util } from "../../utils/util.ts";
+import { v2 } from "../../utils/v2.ts";
+import { MapId } from "../types/misc.ts";
+import { Main, type PartialMapDef } from "./baseDefs.ts";
 
 const mapDef: PartialMapDef = {
     mapId: MapId.Savannah,
@@ -152,8 +152,8 @@ const mapDef: PartialMapDef = {
             { name: "mirv", count: 2, weight: 1 },
         ],
         tier_crow_case_skin: [
-            { name: "outfitWheat", count: 1, weight: 1 },
-            { name: "outfitCarbonFiber", count: 1, weight: 1 },
+            { name: "tier_outfits", count: 1, weight: 0.5 },
+            { name: "outfitWheat", count: 1, weight: 0.5 },
         ],
         tier_crow_case_melee: [
             { name: "crowbar", count: 1, weight: 9 },

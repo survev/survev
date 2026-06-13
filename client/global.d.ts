@@ -14,10 +14,10 @@ declare global {
                 | JQuery.htmlString
                 | JQuery.Node
                 | ((
-                      this: TElement,
-                      index: number,
-                      oldhtml: JQuery.htmlString,
-                  ) => JQuery.htmlString | JQuery.Node),
+                    this: TElement,
+                    index: number,
+                    oldhtml: JQuery.htmlString,
+                ) => JQuery.htmlString | JQuery.Node),
         ): this;
     }
 
@@ -37,6 +37,10 @@ declare global {
             setTargeting: (key: string, value: TargetingValue) => void;
             setAllowRefreshCallback: (callback: (slotDivId: string) => boolean) => void;
             destroySticky: () => void;
+        };
+        nitroAds?: {
+            queue: Array<unknown>;
+            createAd: (id: string, options: Record<string, unknown>) => Promise<unknown>;
         };
 
         // SDK
@@ -70,6 +74,8 @@ declare global {
             readonly l10n: string;
         }
     >;
+
+    const PASS_TYPE: string;
 
     const IS_DEV: boolean;
     const VITE_ENABLE_SURVEV_ADS: boolean;

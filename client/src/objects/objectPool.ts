@@ -1,16 +1,12 @@
-import type { BitStream } from "../../../shared/net/net";
-import {
-    type ObjectData,
-    type ObjectsPartialData,
-    ObjectType,
-} from "../../../shared/net/objectSerializeFns";
-import { assert } from "../../../shared/utils/util";
-import { errorLogManager } from "../errorLogs";
-import type { Ctx } from "../game";
+import type { BitStream } from "../../../shared/net/net.ts";
+import { type ObjectData, type ObjectsPartialData, ObjectType } from "../../../shared/net/objectSerializeFns.ts";
+import { assert } from "../../../shared/utils/util.ts";
+import { errorLogManager } from "../errorLogs.ts";
+import type { Ctx } from "../game.ts";
 
-import type { AbstractObject } from "./player";
+import type { AbstractObject } from "./player.ts";
 
-type C<T extends AbstractObject> = new () => T;
+type C<T extends AbstractObject> = new() => T;
 
 export class Pool<T extends AbstractObject> {
     m_pool: T[] = [];
@@ -94,7 +90,7 @@ export class Creator {
                 ids: Object.keys(this.m_idToObj),
                 stream: [...s.view.view],
             };
-            errorLogManager.logError(`getTypeById${JSON.stringify(err)}`);
+            errorLogManager.logError("getTypeById", err);
             errorLogManager.storeGeneric("objectPoolErr", "getTypeById");
             return ObjectType.Invalid;
         }

@@ -3,13 +3,13 @@ import { eq } from "drizzle-orm";
 import type { Context } from "hono";
 import { deleteCookie, setCookie } from "hono/cookie";
 import slugify from "slugify";
-import { UnlockDefs } from "../../../../../../shared/defs/gameObjects/unlockDefs";
-import { util } from "../../../../../../shared/utils/util";
-import { Config } from "../../../../config";
-import { checkForBadWords } from "../../../../utils/serverHelpers";
-import { createSession, invalidateSession } from "../../../auth";
-import { db } from "../../../db";
-import { itemsTable, type UsersTableInsert, usersTable } from "../../../db/schema";
+import { UnlockDefs } from "../../../../../../shared/defs/gameObjects/unlockDefs.ts";
+import { util } from "../../../../../../shared/utils/util.ts";
+import { Config } from "../../../../config.ts";
+import { checkForBadWords } from "../../../../utils/badWords.ts";
+import { createSession, invalidateSession } from "../../../auth/index.ts";
+import { db } from "../../../db/index.ts";
+import { itemsTable, usersTable, type UsersTableInsert } from "../../../db/schema.ts";
 
 let oauthBaseURL: URL | undefined = undefined;
 if (URL.canParse(Config.oauthBasePath)) {
@@ -18,7 +18,7 @@ if (URL.canParse(Config.oauthBasePath)) {
 export const cookieDomain = oauthBaseURL?.hostname;
 
 const random = {
-    read(bytes: Uint8Array) {
+    read(bytes: Uint8Array<ArrayBuffer>) {
         crypto.getRandomValues(bytes);
     },
 };
@@ -32,7 +32,7 @@ export function sanitizeSlug(username: string) {
         username
             .toLowerCase()
             .trim()
-            .replace(/[\.,\?""!@#\$%\^&\*\(\)_=\+;:<>\/\\\|\}\{\[\]`~]/g, "-"),
+            .replace(/[.,?""!@#$%^&*()_=+;:<>/\\|}{[\]`~]/g, "-"),
         {
             trim: true,
             strict: true,
@@ -116,8 +116,7 @@ export async function handleAuthUser(c: Context, provider: Provider, authId: str
         generateUsername = !!slugTaken;
     }
 
-    const linkedProvider =
-        provider === "discord" ? { linkedDiscord: true } : { linkedGoogle: true };
+    const linkedProvider = provider === "discord" ? { linkedDiscord: true } : { linkedGoogle: true };
 
     const userId = generateId(15);
     await createNewUser({

@@ -1,24 +1,22 @@
 import * as PIXI from "pixi.js-legacy";
-import { GameObjectDefs } from "../../../shared/defs/gameObjectDefs";
-import type { ThrowableDef } from "../../../shared/defs/gameObjects/throwableDefs";
-import { MapObjectDefs } from "../../../shared/defs/mapObjectDefs";
-import type { ObstacleDef } from "../../../shared/defs/mapObjectsTyping";
-import { GameConfig } from "../../../shared/gameConfig";
-import type { ObjectData, ObjectType } from "./../../../shared/net/objectSerializeFns";
-import { collider } from "../../../shared/utils/collider";
-import { math } from "../../../shared/utils/math";
-import { util } from "../../../shared/utils/util";
-import { type Vec2, v2 } from "../../../shared/utils/v2";
-import type { AudioManager } from "../audioManager";
-import type { Camera } from "../camera";
-import type { Ctx } from "../game";
-import type { Map } from "../map";
-import type { Renderer } from "../renderer";
-import { playHitFx } from "./bullet";
-import { Pool } from "./objectPool";
-import type { Obstacle } from "./obstacle";
-import type { ParticleBarn } from "./particles";
-import type { AbstractObject, Player } from "./player";
+
+import { GameObjectDefs, MapObjectDefs } from "../../../shared/defs/register.ts";
+import { GameConfig } from "../../../shared/gameConfig.ts";
+import type { ObjectData, ObjectType } from "./../../../shared/net/objectSerializeFns.ts";
+import { collider } from "../../../shared/utils/collider.ts";
+import { math } from "../../../shared/utils/math.ts";
+import { util } from "../../../shared/utils/util.ts";
+import { v2, type Vec2 } from "../../../shared/utils/v2.ts";
+import type { AudioManager } from "../audioManager.ts";
+import type { Camera } from "../camera.ts";
+import type { Ctx } from "../game.ts";
+import type { Map } from "../map.ts";
+import type { Renderer } from "../renderer.ts";
+import { playHitFx } from "./bullet.ts";
+import { Pool } from "./objectPool.ts";
+import type { Obstacle } from "./obstacle.ts";
+import type { ParticleBarn } from "./particles.ts";
+import type { AbstractObject, Player } from "./player.ts";
 
 export const halloweenSpriteMap: Record<string, string> = {
     "proj-frag-nopin-01.img": "proj-frag-nopin-02.img",
@@ -98,7 +96,7 @@ class Projectile implements AbstractObject {
     ) {
         // Copy data
         if (fullUpdate) {
-            const itemDef = GameObjectDefs[data.type] as ThrowableDef;
+            const itemDef = GameObjectDefs.typeToDef(data.type, "throwable");
             this.layer = data.layer;
             this.type = data.type;
             // Use a smaller visual radius for collision effects
@@ -116,7 +114,7 @@ class Projectile implements AbstractObject {
         this.dir = v2.copy(data.dir);
 
         if (isNew) {
-            const itemDef = GameObjectDefs[data.type] as ThrowableDef;
+            const itemDef = GameObjectDefs.typeToDef(data.type, "throwable");
             const imgDef = itemDef.worldImg;
             this.imgScale = imgDef.scale;
             this.rot = 0;
@@ -196,7 +194,7 @@ export class ProjectileBarn {
         for (let i = 0; i < projectiles.length; i++) {
             const p = projectiles[i];
             if (p.active) {
-                const itemDef = GameObjectDefs[p.type] as ThrowableDef;
+                const itemDef = GameObjectDefs.typeToDef(p.type, "throwable");
                 let rotDrag = p.rotDrag;
                 if (p.inWater) {
                     rotDrag *= 3;
@@ -228,8 +226,8 @@ export class ProjectileBarn {
                         if (res) {
                             const col = o.height > p.posZ ? wallCol : groundCol;
                             if (
-                                res.pen > col.pen &&
-                                (!col.obj || col.obj.height <= o.height)
+                                res.pen > col.pen
+                                && (!col.obj || col.obj.height <= o.height)
                             ) {
                                 col.obj = o;
                                 col.pen = res.pen;
@@ -242,13 +240,13 @@ export class ProjectileBarn {
                 const vel = v2.div(v2.sub(p.pos, p.posOld), dt);
                 const speed = v2.length(vel);
                 if (
-                    wallCol.obj &&
-                    wallCol.obj.__id != p.lastSoundObjId &&
-                    speed > 7.5 &&
-                    ((p.lastSoundObjId = wallCol.obj.__id), p.playHitSfx)
+                    wallCol.obj
+                    && wallCol.obj.__id != p.lastSoundObjId
+                    && speed > 7.5
+                    && ((p.lastSoundObjId = wallCol.obj.__id), p.playHitSfx)
                 ) {
                     const dir = v2.mul(v2.normalizeSafe(vel, v2.create(1, 0)), -1);
-                    const mapDef = MapObjectDefs[wallCol.obj.type] as ObstacleDef;
+                    const mapDef = MapObjectDefs.typeToDef(wallCol.obj.type, "obstacle");
                     playHitFx(
                         mapDef.hitParticle,
                         mapDef.sound.bullet!,
@@ -292,13 +290,12 @@ export class ProjectileBarn {
                     if (groundCol.obj) {
                         if (p.lastSoundObjId != groundCol.obj.__id) {
                             p.lastSoundObjId = groundCol.obj.__id;
-                            const def = MapObjectDefs[groundCol.obj.type] as ObstacleDef;
+                            const def = MapObjectDefs.typeToDef(groundCol.obj.type, "obstacle");
                             sound.name = def.sound.bullet!;
                         }
                     } else {
                         p.grounded = true;
-                        sound.name =
-                            groundSounds[surface.type as keyof typeof groundSounds];
+                        sound.name = groundSounds[surface.type as keyof typeof groundSounds];
                         // @HACK: Attept to use a footstep sound if we failed
                         // finding a surface
                         if (sound.name === undefined) {
@@ -336,15 +333,14 @@ export class ProjectileBarn {
                 // Trail
                 if (itemDef.trail) {
                     const speed = v2.length(vel);
-                    const trailT =
-                        math.remap(
-                            speed,
-                            itemDef.throwPhysics.speed * 0.25,
-                            itemDef.throwPhysics.speed * 1,
-                            0,
-                            1,
-                        ) *
-                        math.remap(
+                    const trailT = math.remap(
+                        speed,
+                        itemDef.throwPhysics.speed * 0.25,
+                        itemDef.throwPhysics.speed * 1,
+                        0,
+                        1,
+                    )
+                        * math.remap(
                             p.posZ,
                             0.1,
                             GameConfig.projectile.maxHeight * 0.5,
@@ -369,10 +365,10 @@ export class ProjectileBarn {
                 const onStairs = map.insideStructureStairs(stairCollider);
                 const onMask = map.insideStructureMask(stairCollider);
                 if (
-                    p.posZ >= 0.25 &&
-                    !!onStairs &&
-                    (p.layer & 1) == (activePlayer.layer & 1) &&
-                    (!onMask || !(activePlayer.layer & 2))
+                    p.posZ >= 0.25
+                    && !!onStairs
+                    && (p.layer & 1) == (activePlayer.layer & 1)
+                    && (!onMask || !(activePlayer.layer & 2))
                 ) {
                     layer |= 2;
                     zOrd += 100;
@@ -382,9 +378,8 @@ export class ProjectileBarn {
                     layer |= 2;
                 }
                 renderer.addPIXIObj(p.container, layer, zOrd);
-                const scale =
-                    p.imgScale *
-                    math.remap(p.posZ, 0, GameConfig.projectile.maxHeight, 1, 4.75);
+                const scale = p.imgScale
+                    * math.remap(p.posZ, 0, GameConfig.projectile.maxHeight, 1, 4.75);
 
                 let pos = p.pos;
                 if (camera.m_interpEnabled) {

@@ -2,11 +2,12 @@ import { zValidator } from "@hono/zod-validator";
 import type { Context, Next } from "hono";
 import { deleteCookie, getCookie, setCookie } from "hono/cookie";
 import type { z } from "zod";
-import { Config } from "../../config";
-import { getHonoIp, HTTPRateLimit } from "../../utils/serverHelpers";
-import { server } from "../apiServer";
-import { cookieDomain, deleteSessionTokenCookie } from "../routes/user/auth/authUtils";
-import { validateSessionToken } from ".";
+import { Config } from "../../config.ts";
+import { HTTPRateLimit } from "../../utils/rateLimit.ts";
+import { getHonoIp } from "../apiHelpers.ts";
+import { server } from "../apiServer.ts";
+import { cookieDomain, deleteSessionTokenCookie } from "../routes/user/auth/authUtils.ts";
+import { validateSessionToken } from "./index.ts";
 
 export const authMiddleware = async (c: Context, next: Next) => {
     try {
@@ -58,6 +59,7 @@ export function validateParams<Schema extends z.ZodSchema>(
             return c.json(
                 response ?? {
                     error: "Invalid params",
+                    issues: result.error.issues,
                 },
                 400,
             );
@@ -82,7 +84,7 @@ export async function privateMiddleware(c: Context, next: Next) {
 export function rateLimitMiddleware(limit: number, interval: number) {
     const rateLimit = new HTTPRateLimit(limit, interval);
 
-    return async function (c: Context, next: Next) {
+    return async function(c: Context, next: Next) {
         const ip = getHonoIp(c, Config.apiServer.proxyIPHeader);
 
         if (!ip) {

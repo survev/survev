@@ -1,13 +1,8 @@
-import { createHash } from "node:crypto";
 import { eq, lt } from "drizzle-orm";
-import { Config } from "../../config";
-import { db } from "../db";
-import {
-    type SessionTableSelect,
-    sessionTable,
-    type UsersTableSelect,
-    usersTable,
-} from "../db/schema";
+import { createHash } from "node:crypto";
+import { Config } from "../../config.ts";
+import { db } from "../db/index.ts";
+import { sessionTable, type SessionTableSelect, usersTable, type UsersTableSelect } from "../db/schema.ts";
 
 export const sessionCookieName = "auth_session";
 

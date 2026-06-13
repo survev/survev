@@ -1,8 +1,8 @@
-import { type AABB, coldet } from "./coldet";
-import { collider } from "./collider";
-import { math } from "./math";
-import { Spline } from "./spline";
-import { type Vec2, v2 } from "./v2";
+import { type AABB, coldet } from "./coldet.ts";
+import { collider } from "./collider.ts";
+import { math } from "./math.ts";
+import { Spline } from "./spline.ts";
+import { v2, type Vec2 } from "./v2.ts";
 
 export class River {
     spline: Spline;
@@ -113,9 +113,9 @@ export class River {
                     shoreWidth = math.max(shoreWidth, river.shoreWidth);
                 }
                 if (
-                    (i === 0 || i === splinePts.length - 1) &&
-                    _len < 1.5 &&
-                    !nearMapEdge
+                    (i === 0 || i === splinePts.length - 1)
+                    && _len < 1.5
+                    && !nearMapEdge
                 ) {
                     boundingRiver = river;
                 }

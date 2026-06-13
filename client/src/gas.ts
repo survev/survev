@@ -1,12 +1,12 @@
 import * as PIXI from "pixi.js-legacy";
-import { GameConfig } from "../../shared/gameConfig";
-import { Constants } from "../../shared/net/net";
-import type { GasData } from "../../shared/net/updateMsg";
-import { math } from "../../shared/utils/math";
-import { type Vec2, v2 } from "../../shared/utils/v2";
-import type { Camera } from "./camera";
-import { helpers } from "./helpers";
-import type { UiManager } from "./ui/ui";
+import { GameConfig } from "../../shared/gameConfig.ts";
+import { Constants } from "../../shared/net/net.ts";
+import type { GasData } from "../../shared/net/updateMsg.ts";
+import { math } from "../../shared/utils/math.ts";
+import { v2, type Vec2 } from "../../shared/utils/v2.ts";
+import type { Camera } from "./camera.ts";
+import { helpers } from "./helpers.ts";
+import type { UiManager } from "./ui/ui.ts";
 
 const gasMode = GameConfig.GasMode;
 
@@ -201,10 +201,9 @@ export class Gas {
     }
 
     getCircle(interpT: number) {
-        const t =
-            this.mode == gasMode.Moving
-                ? math.lerp(interpT, this.circleTOld, this.circleT)
-                : 0;
+        const t = this.mode == gasMode.Moving
+            ? math.lerp(interpT, this.circleTOld, this.circleT)
+            : 0;
         return {
             pos: v2.lerp(t, this.circleOld.pos, this.circleNew.pos),
             rad: math.lerp(t, this.circleOld.rad, this.circleNew.rad),

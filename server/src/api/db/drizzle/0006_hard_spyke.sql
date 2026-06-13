@@ -1,0 +1,1 @@
+ALTER TABLE "match_data" ADD COLUMN "role" text DEFAULT '' NOT NULL;

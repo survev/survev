@@ -1,14 +1,13 @@
-import { GameObjectDefs } from "../../../../shared/defs/gameObjectDefs";
-import type { ThrowableDef } from "../../../../shared/defs/gameObjects/throwableDefs";
-import { DamageType, GameConfig } from "../../../../shared/gameConfig";
-import { ObjectType } from "../../../../shared/net/objectSerializeFns";
-import { type AABB, coldet } from "../../../../shared/utils/coldet";
-import { collider } from "../../../../shared/utils/collider";
-import { math } from "../../../../shared/utils/math";
-import { util } from "../../../../shared/utils/util";
-import { type Vec2, v2 } from "../../../../shared/utils/v2";
-import type { Game } from "../game";
-import { BaseGameObject } from "./gameObject";
+import { GameObjectDefs } from "../../../../shared/defs/register.ts";
+import { DamageType, GameConfig } from "../../../../shared/gameConfig.ts";
+import { ObjectType } from "../../../../shared/net/objectSerializeFns.ts";
+import { type AABB, coldet } from "../../../../shared/utils/coldet.ts";
+import { collider } from "../../../../shared/utils/collider.ts";
+import { math } from "../../../../shared/utils/math.ts";
+import { util } from "../../../../shared/utils/util.ts";
+import { v2, type Vec2 } from "../../../../shared/utils/v2.ts";
+import type { Game } from "../game.ts";
+import { BaseGameObject } from "./gameObject.ts";
 
 // 10.5 is based on the distance a potato cannon projectile traveled before hitting the floor
 // and exploding, from recorded packets from the original game
@@ -60,6 +59,37 @@ export class ProjectileBarn {
         this.game.objectRegister.register(proj);
         return proj;
     }
+
+    addSplitProjectiles(
+        playerId: number,
+        type: string,
+        pos: Vec2,
+        layer: number,
+        initialVel: Vec2,
+        count: number,
+        maxVel: number,
+        weaponSourceType?: string,
+    ) {
+        for (let i = 0; i < count; i++) {
+            const def = GameObjectDefs.typeToDef(type, "throwable");
+
+            const vel = util.randomPointInCircle(maxVel);
+            const velocity = v2.add(v2.mul(initialVel, 0.6), vel);
+
+            this.game.projectileBarn.addProjectile(
+                playerId,
+                type,
+                pos,
+                1,
+                layer,
+                velocity,
+                def.fuseTime,
+                DamageType.Player,
+                undefined,
+                weaponSourceType,
+            );
+        }
+    }
 }
 
 export class Projectile extends BaseGameObject {
@@ -88,6 +118,11 @@ export class Projectile extends BaseGameObject {
     dead = false;
 
     obstacleBellowId = 0;
+    /**
+     * 0 if not on top of an obstacle
+     * aka on the ground
+     */
+    obstacleBellowHeight = 0;
 
     strobe?: {
         timeToPing: number;
@@ -124,13 +159,17 @@ export class Projectile extends BaseGameObject {
         this.throwDir = throwDir ?? v2.copy(this.dir);
         this.weaponSourceType = weaponSourceType || this.type;
 
-        const def = GameObjectDefs[type] as ThrowableDef;
+        const def = GameObjectDefs.typeToDef(type, "throwable");
         this.velZ = def.throwPhysics.velZ;
         this.rad = def.rad * 0.5;
         this.bounds = collider.createAabbExtents(
             v2.create(0, 0),
             v2.create(this.rad, this.rad),
         );
+
+        if (def.fuseVariance) {
+            this.fuseTime += util.random(0, def.fuseVariance);
+        }
     }
 
     updateStrobe(dt: number): void {
@@ -159,10 +198,9 @@ export class Projectile extends BaseGameObject {
                     rotAngle *= -1;
                 }
                 const nextDir = v2.rotate(this.throwDir, rotAngle);
-                const newOffset =
-                    Math.ceil(
-                        (this.strobe.airstrikesTotal - this.strobe.airstrikesLeft) / 2,
-                    ) * this.strobe.airstrikeOffset;
+                const newOffset = Math.ceil(
+                    (this.strobe.airstrikesTotal - this.strobe.airstrikesLeft) / 2,
+                ) * this.strobe.airstrikeOffset;
                 const pos = v2.add(this.pos, v2.mul(nextDir, newOffset));
                 this.game.planeBarn.addAirStrike(pos, this.throwDir, this.playerId);
                 this.strobe.airstrikesLeft--;
@@ -176,14 +214,18 @@ export class Projectile extends BaseGameObject {
             this.updateStrobe(dt);
         }
 
-        const def = GameObjectDefs[this.type] as ThrowableDef;
+        const def = GameObjectDefs.typeToDef(this.type, "throwable");
         //
         // Velocity
         //
-        if (!def.forceMaxThrowDistance) {
-            // velocity needs to stay constant to reach max throw dist
-            this.vel = v2.mul(this.vel, 1 / (1 + dt * (this.posZ != 0 ? 1.2 : 2)));
+
+        if (this.posZ <= this.obstacleBellowHeight) {
+            const isOnWater = this.game.map.isOnWater(this.pos, this.layer);
+            // drag values based on plotted data from surviv
+            const drag = isOnWater ? 5 : 2.3;
+            this.vel = v2.mul(this.vel, 1 / (1 + dt * drag));
         }
+
         const posOld = v2.copy(this.pos);
         this.pos = v2.add(this.pos, v2.mul(this.vel, dt));
 
@@ -192,7 +234,11 @@ export class Projectile extends BaseGameObject {
         //
         this.velZ -= gravity * dt;
         this.posZ += this.velZ * dt;
-        this.posZ = math.clamp(this.posZ, 0, GameConfig.projectile.maxHeight);
+        this.posZ = math.clamp(
+            this.posZ,
+            this.obstacleBellowHeight,
+            GameConfig.projectile.maxHeight,
+        );
         let height = this.posZ;
         if (def.throwPhysics.fixedCollisionHeight) {
             height = def.throwPhysics.fixedCollisionHeight;
@@ -203,16 +249,20 @@ export class Projectile extends BaseGameObject {
         //
         const objs = this.game.grid.intersectGameObject(this);
 
+        const rad = this.rad / 2;
+
+        let insideObstacle = false;
+
         for (const obj of objs) {
             if (
-                obj.__type === ObjectType.Obstacle &&
-                util.sameLayer(this.layer, obj.layer) &&
-                !obj.dead
+                obj.__type === ObjectType.Obstacle
+                && util.sameLayer(this.layer, obj.layer)
+                && !obj.dead
             ) {
                 const intersection = collider.intersectCircle(
                     obj.collider,
                     this.pos,
-                    this.rad,
+                    rad,
                 );
                 const lineIntersection = collider.intersectSegment(
                     obj.collider,
@@ -221,7 +271,7 @@ export class Projectile extends BaseGameObject {
                 );
 
                 if (intersection || lineIntersection) {
-                    if (obj.height >= height && obj.__id !== this.obstacleBellowId) {
+                    if (obj.height > height) {
                         let damage = 1;
                         if (def.destroyNonCollidables && !obj.collidable) {
                             damage = 999;
@@ -242,7 +292,7 @@ export class Projectile extends BaseGameObject {
                         if (lineIntersection) {
                             this.pos = v2.add(
                                 lineIntersection.point,
-                                v2.mul(lineIntersection.normal, this.rad + 0.1),
+                                v2.mul(lineIntersection.normal, rad + 0.1),
                             );
                         } else if (intersection) {
                             this.pos = v2.add(
@@ -261,24 +311,37 @@ export class Projectile extends BaseGameObject {
                                 : lineIntersection!.normal;
                             const dot = v2.dot(dir, normal);
                             const newDir = v2.add(v2.mul(normal, dot * -2), dir);
-                            this.vel = v2.mul(newDir, len * 0.3);
+
+                            const velocityScale = math.max(1 + dot, 0.15);
+
+                            this.vel = v2.mul(newDir, len * velocityScale);
                             this.dir = v2.normalizeSafe(this.vel);
                         }
                     } else if (obj.collidable) {
                         this.obstacleBellowId = obj.__id;
+                        this.obstacleBellowHeight = math.max(
+                            this.obstacleBellowHeight,
+                            obj.height,
+                        );
+                        insideObstacle = true;
                     }
                 }
             } else if (
-                obj.__type === ObjectType.Player &&
-                def.playerCollision &&
-                !obj.dead &&
-                util.sameLayer(this.layer, obj.layer) &&
-                obj.__id !== this.playerId
+                obj.__type === ObjectType.Player
+                && def.playerCollision
+                && !obj.dead
+                && util.sameLayer(this.layer, obj.layer)
+                && obj.__id !== this.playerId
             ) {
-                if (coldet.testCircleCircle(this.pos, this.rad, obj.pos, obj.rad)) {
+                if (coldet.testCircleCircle(this.pos, rad, obj.pos, obj.rad)) {
                     this.explode();
                 }
             }
+        }
+
+        if (!insideObstacle) {
+            this.obstacleBellowId = 0;
+            this.obstacleBellowHeight = 0;
         }
 
         this.game.map.clampToMapBounds(this.pos, this.rad);
@@ -286,7 +349,7 @@ export class Projectile extends BaseGameObject {
         if (this.destroyed) return;
 
         const originalLayer = this.layer;
-        this.checkStairs(objs, this.rad);
+        this.checkStairs(objs, 0.01);
 
         if (!this.dead) {
             if (this.layer !== originalLayer) {
@@ -297,7 +360,7 @@ export class Projectile extends BaseGameObject {
 
             this.game.grid.updateObject(this);
 
-            if (this.posZ === 0 && def.explodeOnImpact) {
+            if (this.posZ === this.obstacleBellowHeight && def.explodeOnImpact) {
                 this.explode();
             }
 
@@ -326,8 +389,8 @@ export class Projectile extends BaseGameObject {
                 const zoomRegion = obj.zoomRegions[i];
 
                 if (
-                    zoomRegion.zoomIn &&
-                    coldet.testCircleAabb(
+                    zoomRegion.zoomIn
+                    && coldet.testCircleAabb(
                         this.pos,
                         this.rad,
                         zoomRegion.zoomIn.min,
@@ -344,26 +407,19 @@ export class Projectile extends BaseGameObject {
     explode() {
         if (this.dead) return;
         this.dead = true;
-        const def = GameObjectDefs[this.type] as ThrowableDef;
+        const def = GameObjectDefs.typeToDef(this.type, "throwable");
 
-        // courtesy of kaklik
         if (def.splitType && def.numSplit) {
-            for (let i = 0; i < def.numSplit; i++) {
-                const splitDef = GameObjectDefs[def.splitType] as ThrowableDef;
-                const velocity = v2.add(this.vel, v2.mul(v2.randomUnit(), 5));
-                this.game.projectileBarn.addProjectile(
-                    this.playerId,
-                    def.splitType,
-                    this.pos,
-                    1,
-                    this.layer,
-                    velocity,
-                    splitDef.fuseTime,
-                    DamageType.Player,
-                    undefined,
-                    this.weaponSourceType,
-                );
-            }
+            this.game.projectileBarn.addSplitProjectiles(
+                this.playerId,
+                def.splitType,
+                this.pos,
+                this.layer,
+                this.vel,
+                def.numSplit,
+                4,
+                this.weaponSourceType,
+            );
         }
 
         if (this.type == "bomb_iron" && !this.canBombIronExplode()) {
@@ -374,18 +430,12 @@ export class Projectile extends BaseGameObject {
         const explosionType = def.explosionType;
         if (explosionType) {
             const source = this.game.objectRegister.getById(this.playerId);
-            this.game.explosionBarn.addExplosion(
-                explosionType,
-                this.pos,
-                this.layer,
-                {
-                    gameSourceType: this.type,
-                    weaponSourceType: this.weaponSourceType,
-                    damageType: this.damageType,
-                    source,
-                },
-                this.obstacleBellowId,
-            );
+            this.game.explosionBarn.addExplosion(explosionType, this.pos, this.layer, {
+                gameSourceType: this.type,
+                weaponSourceType: this.weaponSourceType,
+                damageType: this.damageType,
+                source,
+            });
         }
         this.destroy();
     }

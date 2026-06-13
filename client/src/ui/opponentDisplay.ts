@@ -1,29 +1,30 @@
 import * as PIXI from "pixi.js-legacy";
-import { GameObjectDefs } from "../../../shared/defs/gameObjectDefs";
-import type { OutfitDef } from "../../../shared/defs/gameObjects/outfitDefs";
-import { type Action, type Anim, GameConfig } from "../../../shared/gameConfig";
-import type { MapMsg } from "../../../shared/net/mapMsg";
-import { type ObjectData, ObjectType } from "../../../shared/net/objectSerializeFns";
-import { collider } from "../../../shared/utils/collider";
-import { type Loadout, loadout as loadouts } from "../../../shared/utils/loadout";
-import { math } from "../../../shared/utils/math";
-import { v2 } from "../../../shared/utils/v2";
-import type { Account } from "../account";
-import type { AudioManager } from "../audioManager";
-import { Camera } from "../camera";
-import type { ConfigManager, DebugRenderOpts } from "../config";
-import { debugLines } from "../debug/debugLines";
-import { device } from "../device";
-import type { Game } from "../game";
-import type { InputBinds } from "../inputBinds";
-import { Map } from "../map";
-import { DecalBarn } from "../objects/decal";
-import { Creator } from "../objects/objectPool";
-import { ParticleBarn } from "../objects/particles";
-import { type Player, PlayerBarn } from "../objects/player";
-import { SmokeBarn } from "../objects/smoke";
-import { Renderer } from "../renderer";
-import type { UiManager2 } from "./ui2";
+
+import type { OutfitDef } from "../../../shared/defs/gameObjects/outfitDefs.ts";
+import { GameObjectDefs } from "../../../shared/defs/register.ts";
+import { type Action, type Anim, GameConfig } from "../../../shared/gameConfig.ts";
+import type { MapMsg } from "../../../shared/net/mapMsg.ts";
+import { type ObjectData, ObjectType } from "../../../shared/net/objectSerializeFns.ts";
+import { collider } from "../../../shared/utils/collider.ts";
+import { type Loadout, loadout as loadouts } from "../../../shared/utils/loadout.ts";
+import { math } from "../../../shared/utils/math.ts";
+import { v2 } from "../../../shared/utils/v2.ts";
+import type { Account } from "../account.ts";
+import type { AudioManager } from "../audioManager.ts";
+import { Camera } from "../camera.ts";
+import type { ConfigManager, DebugRenderOpts } from "../config.ts";
+import { debugLines } from "../debug/debugLines.ts";
+import { device } from "../device.ts";
+import type { Game } from "../game.ts";
+import type { InputBinds } from "../inputBinds.ts";
+import { Map } from "../map.ts";
+import { DecalBarn } from "../objects/decal.ts";
+import { Creator } from "../objects/objectPool.ts";
+import { ParticleBarn } from "../objects/particles.ts";
+import { type Player, PlayerBarn } from "../objects/player.ts";
+import { SmokeBarn } from "../objects/smoke.ts";
+import { Renderer } from "../renderer.ts";
+import type { UiManager2 } from "./ui2.ts";
 
 export class LoadoutDisplay {
     active = false;
@@ -280,8 +281,10 @@ export class LoadoutDisplay {
             actionItem: options.actionItem || "",
             wearingPan: false,
             healEffect: false,
+            lastStandEffect: false,
             frozen: false,
             frozenOri: 0,
+            frozenType: "",
             hasteType: 0,
             hasteSeq: 0,
             scale: 1,
@@ -308,12 +311,12 @@ export class LoadoutDisplay {
     getCameraTargetZoom() {
         return (
             ((document.getElementById("modal-content-left")!.getBoundingClientRect()
-                .height /
-                this.camera.m_screenHeight) *
-                0.2 *
-                this.camera.m_screenHeight *
-                0.5) /
-            this.camera.m_ppu
+                .height
+                / this.camera.m_screenHeight)
+                * 0.2
+                * this.camera.m_screenHeight
+                * 0.5)
+            / this.camera.m_ppu
         );
     }
 
@@ -386,13 +389,13 @@ export class LoadoutDisplay {
         // DebugLines.addCircle(this.m_activePlayer.pos, 1.5, 0xff0000, 0.0);
 
         if (
-            hasFocus &&
-            (this.view == this.viewOld ||
-                (this.view != "heal" && this.view != "boost") ||
-                (this.animIdleTicker = 0),
-            (this.viewOld = this.view),
-            (this.animIdleTicker -= dt),
-            this.animIdleTicker < 0)
+            hasFocus
+            && (this.view == this.viewOld
+                || (this.view != "heal" && this.view != "boost")
+                || (this.animIdleTicker = 0),
+                (this.viewOld = this.view),
+                (this.animIdleTicker -= dt),
+                this.animIdleTicker < 0)
         ) {
             if (this.view == "heal") {
                 this.actionSeq = (this.actionSeq + 1) % 8;
@@ -427,7 +430,7 @@ export class LoadoutDisplay {
         const outfitDirty = this.loadout.outfit != this.outfitOld;
         this.outfitOld = this.loadout.outfit;
         if (hasFocus && outfitDirty) {
-            const itemDef = GameObjectDefs[this.loadout.outfit] as OutfitDef;
+            const itemDef = GameObjectDefs.typeToDefSafe(this.loadout.outfit) as OutfitDef;
             if (itemDef) {
                 this.audioManager.playSound(itemDef.sound.pickup, {
                     channel: "ui",
@@ -458,7 +461,7 @@ export class LoadoutDisplay {
         );
         this.particleBarn.m_update(dt, this.camera);
         this.decalBarn.m_update(dt, this.camera, this.renderer);
-        this.renderer.m_update(dt, this.camera, this.map);
+        this.renderer.m_update(dt, this.camera, this.map, false);
         this.activePlayer.playActionStartSfx = false;
 
         this.render(dt, debug);

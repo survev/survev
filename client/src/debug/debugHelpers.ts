@@ -1,21 +1,17 @@
-import { MapObjectDefs } from "../../../shared/defs/mapObjectDefs";
-import type {
-    BuildingDef,
-    ObstacleDef,
-    StructureDef,
-} from "../../../shared/defs/mapObjectsTyping";
-import type { AABB } from "../../../shared/utils/coldet";
-import { collider } from "../../../shared/utils/collider";
-import { mapHelpers } from "../../../shared/utils/mapHelpers";
-import type { River } from "../../../shared/utils/river";
-import { type Vec2, v2 } from "../../../shared/utils/v2";
-import type { Building } from "../objects/building";
-import type { Obstacle } from "../objects/obstacle";
-import type { Structure } from "../objects/structure";
-import { debugLines } from "./debugLines";
+import type { BuildingDef, ObstacleDef, StructureDef } from "../../../shared/defs/mapObjectsTyping.ts";
+import { MapObjectDefs } from "../../../shared/defs/register.ts";
+import type { AABB } from "../../../shared/utils/coldet.ts";
+import { collider } from "../../../shared/utils/collider.ts";
+import { mapHelpers } from "../../../shared/utils/mapHelpers.ts";
+import type { River } from "../../../shared/utils/river.ts";
+import { v2, type Vec2 } from "../../../shared/utils/v2.ts";
+import type { Building } from "../objects/building.ts";
+import type { Obstacle } from "../objects/obstacle.ts";
+import type { Structure } from "../objects/structure.ts";
+import { debugLines } from "./debugLines.ts";
 
 export function renderMapBuildingBounds(mapObj: Building | Structure) {
-    const def = MapObjectDefs[mapObj.type] as BuildingDef;
+    const def = MapObjectDefs.typeToDef(mapObj.type) as BuildingDef | StructureDef;
     const boundScale = def.type == "building" || def.type == "structure" ? 1.15 : 1.0;
     const bounds = [
         collider.transform(
@@ -43,7 +39,7 @@ export function renderMapBuildingBounds(mapObj: Building | Structure) {
 }
 
 export function renderMapObstacleBounds(mapObj: Obstacle | Building | Structure) {
-    const def = MapObjectDefs[mapObj.type] as ObstacleDef | BuildingDef | StructureDef;
+    const def = MapObjectDefs.typeToDef(mapObj.type) as ObstacleDef | BuildingDef | StructureDef;
     const boundScale = def.type == "building" || def.type == "structure" ? 1.1 : 1.0;
     let bounds = [
         collider.transform(
@@ -72,7 +68,7 @@ export function renderMapObstacleBounds(mapObj: Obstacle | Building | Structure)
 }
 
 export function renderWaterEdge(mapObj: Structure | Building) {
-    const def = MapObjectDefs[mapObj.type] as StructureDef | BuildingDef;
+    const def = MapObjectDefs.typeToDef(mapObj.type) as StructureDef | BuildingDef;
     if (def.terrain.waterEdge !== undefined) {
         const { waterEdge } = def.terrain;
         const bounds = collider.transform(
@@ -96,7 +92,7 @@ export function renderWaterEdge(mapObj: Structure | Building) {
 }
 
 export function renderBridge(mapObj: Building | Structure) {
-    const def = MapObjectDefs[mapObj.type] as StructureDef | BuildingDef;
+    const def = MapObjectDefs.typeToDef(mapObj.type) as StructureDef | BuildingDef;
     if (def.terrain.bridge !== undefined) {
         const bridgeLandBounds = def.bridgeLandBounds || [];
         for (let i = 0; i < bridgeLandBounds.length; i++) {

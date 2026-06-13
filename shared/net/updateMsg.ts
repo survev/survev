@@ -1,12 +1,12 @@
-import { GameConfig, type Plane as PlaneType } from "../gameConfig";
-import { type Vec2, v2 } from "./../utils/v2";
-import { type AbstractMsg, BitSizes, type BitStream, Constants } from "./net";
+import { GameConfig, type Plane as PlaneType } from "../gameConfig.ts";
+import { v2, type Vec2 } from "./../utils/v2.ts";
+import { type AbstractMsg, BitSizes, type BitStream, Constants } from "./net.ts";
 import {
     ObjectSerializeFns,
     type ObjectsFullData,
     type ObjectsPartialData,
     type ObjectType,
-} from "./objectSerializeFns";
+} from "./objectSerializeFns.ts";
 
 function serializeActivePlayer(s: BitStream, data: LocalDataWithDirty) {
     s.writeBoolean(data.healthDirty);
@@ -248,13 +248,14 @@ export const UpdateExtFlags = {
 export class UpdateMsg implements AbstractMsg {
     delObjIds: number[] = [];
     fullObjects: Array<
-        ObjectsFullData[ObjectType] &
-            ObjectsPartialData[ObjectType] & {
-                __id: number;
-                __type: ObjectType;
-                partialStream: BitStream;
-                fullStream: BitStream;
-            }
+        & ObjectsFullData[ObjectType]
+        & ObjectsPartialData[ObjectType]
+        & {
+            __id: number;
+            __type: ObjectType;
+            partialStream: BitStream;
+            fullStream: BitStream;
+        }
     > = [];
 
     partObjects: Array<
@@ -311,7 +312,6 @@ export class UpdateMsg implements AbstractMsg {
 
         if (this.fullObjects.length) {
             s.writeArray(this.fullObjects, 16, (obj) => {
-                s.writeUint8(obj.__type);
                 s.writeBytes(obj.partialStream, 0, obj.partialStream.byteIndex);
                 s.writeBytes(obj.fullStream, 0, obj.fullStream.byteIndex);
             });
@@ -403,6 +403,7 @@ export class UpdateMsg implements AbstractMsg {
                     s.writeBoolean(bullet.trailSaturated);
                     s.writeBoolean(bullet.apRounds);
                     s.writeBoolean(bullet.highVelocity);
+                    s.writeBoolean(bullet.combatStims);
                     s.writeBoolean(bullet.trailSmall);
                     s.writeBoolean(bullet.trailThick);
                 }
@@ -527,10 +528,12 @@ export class UpdateMsg implements AbstractMsg {
 
         this.partObjects = s.readArray(16, () => {
             const data = {} as this["partObjects"][0];
+            data.__type = s.readUint8();
             data.__id = s.readUint16();
 
-            const type = objectCreator.m_getTypeById(data.__id, s);
-            ObjectSerializeFns[type].deserializePart(s, data as any);
+            // temporary disabled because of issues
+            // data.__type = objectCreator.m_getTypeById(data.__id, s);
+            ObjectSerializeFns[data.__type].deserializePart(s, data as any);
 
             s.readAlignToNextByte();
             return data;
@@ -623,6 +626,7 @@ export class UpdateMsg implements AbstractMsg {
                     bullet.trailSaturated = s.readBoolean();
                     bullet.apRounds = s.readBoolean();
                     bullet.highVelocity = s.readBoolean();
+                    bullet.combatStims = s.readBoolean();
                     bullet.trailSmall = s.readBoolean();
                     bullet.trailThick = s.readBoolean();
                 }
@@ -749,6 +753,7 @@ export interface Bullet {
     trailSaturated: boolean;
     apRounds: boolean;
     highVelocity: boolean;
+    combatStims: boolean;
     trailSmall: boolean;
     trailThick: boolean;
     speedMult: number;

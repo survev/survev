@@ -31,7 +31,6 @@ export class SDKManager {
         callback();
     }
 
-    // biome-ignore lint/suspicious/useAwait: no op
     async getPlayerName(): Promise<string | undefined> {
         return undefined;
     }
@@ -44,7 +43,6 @@ export class SDKManager {
         return false;
     }
 
-    // biome-ignore lint/suspicious/useAwait: no op
     async getInviteLink(_roomID: string): Promise<string | undefined> {
         return undefined;
     }
@@ -57,7 +55,19 @@ export class SDKManager {
 
     removeAllAds() {}
 
-    showStickyAd(): void {}
+    enterMenuAdState(): void {}
 
-    hideStickyAd(): void {}
+    enterGameplayAdState(): void {}
+
+    enterDeathAdState(): void {}
+
+    async ensureNitroReady(): Promise<void> {}
+
+    showNitroPlacements(_placementIDs: string[]): void {}
+
+    hideNitroPlacementsById(_placementIDs: string[]): void {}
+
+    showLoadoutAd(): void {}
+
+    hideLoadoutAd(): void {}
 }

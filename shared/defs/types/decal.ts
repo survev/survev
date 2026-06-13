@@ -1,5 +1,5 @@
-import type { Collider } from "../../utils/coldet";
-import type { TerrainSpawnDef } from "../mapObjectsTyping";
+import type { Collider } from "../../utils/coldet.ts";
+import type { TerrainSpawnDef } from "../mapObjectsTyping.ts";
 
 export interface DecalDef {
     readonly type: "decal";
@@ -21,9 +21,9 @@ export interface DecalDef {
     };
     lifetime?:
         | {
-              min: number;
-              max: number;
-          }
+            min: number;
+            max: number;
+        }
         | number;
     fadeChance?: number;
     surface?: {

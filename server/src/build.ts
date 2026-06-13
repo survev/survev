@@ -1,6 +1,5 @@
-import fs from "node:fs";
 import esbuild, { type BuildOptions } from "esbuild";
-import { pluginDir, readDirectory } from "./game/pluginManager";
+import fs from "node:fs";
 
 if (fs.existsSync("./dist")) {
     fs.rmSync("./dist", { recursive: true });
@@ -30,13 +29,3 @@ esbuild.buildSync({
         "./src/api/index.ts",
     ],
 });
-
-if (fs.existsSync(pluginDir)) {
-    const pluginPaths = readDirectory(pluginDir);
-
-    esbuild.buildSync({
-        ...esbuildConfig,
-        outdir: "./dist/plugins",
-        entryPoints: pluginPaths,
-    });
-}

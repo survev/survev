@@ -1,6 +1,6 @@
-import { util } from "../../utils/util";
-import type { MapDef } from "../mapDefs";
-import { Main, type PartialMapDef } from "./baseDefs";
+import { util } from "../../utils/util.ts";
+import type { MapDef } from "../mapDefs.ts";
+import { Main, type PartialMapDef } from "./baseDefs.ts";
 
 const mapDef: PartialMapDef = {
     desc: {
@@ -64,7 +64,8 @@ const mapDef: PartialMapDef = {
         ],
         fixedSpawns: [
             {
-                warehouse_01: 2,
+                warehouse_01: { small: 1, large: 2 },
+                warehouse_03: 1,
                 house_red_01: { small: 2, large: 3 },
                 house_red_02: { small: 2, large: 3 },
                 barn_01: { small: 1, large: 3 },
@@ -77,6 +78,7 @@ const mapDef: PartialMapDef = {
                 greenhouse_01: 1,
                 cache_01: 1,
                 cache_02sp: 1,
+                cache_04: 1,
                 cache_07: 1,
                 bunker_structure_01: { odds: 0.05 },
                 bunker_structure_02: 1,

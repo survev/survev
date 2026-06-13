@@ -1201,6 +1201,12 @@ td.data-player-status {
   box-shadow: inset 0 -4px #be4926;
 }
 
+#footer-social-links > .btn-wiki {
+  background-image: url(/img/icon_wiki.svg);
+  background-color: #ff1985;
+  box-shadow: inset 0 -4px #cd146d;
+}
+
 .btn-darken:hover,
 .btn-darken:active {
   color: inherit;
@@ -1213,6 +1219,12 @@ td.data-player-status {
 #ad-block-top {
   position: relative;
 }
+@media (max-width: 991px) {
+  .ad-block-top-med-rect {
+    display: none;
+  }
+}
+
 @media (max-width: 823px) {
   #ad-block-top {
     margin: initial;

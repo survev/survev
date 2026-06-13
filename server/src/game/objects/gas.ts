@@ -1,8 +1,8 @@
-import { GameConfig, GasMode } from "../../../../shared/gameConfig";
-import { math } from "../../../../shared/utils/math";
-import { util } from "../../../../shared/utils/util";
-import { type Vec2, v2 } from "../../../../shared/utils/v2";
-import type { Game } from "../game";
+import { GameConfig, GasMode } from "../../../../shared/gameConfig.ts";
+import { math } from "../../../../shared/utils/math.ts";
+import { util } from "../../../../shared/utils/util.ts";
+import { v2, type Vec2 } from "../../../../shared/utils/v2.ts";
+import type { Game } from "../game.ts";
 
 interface StageData {
     mode: GasMode;

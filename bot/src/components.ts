@@ -9,9 +9,9 @@ import {
     StringSelectMenuBuilder,
     type StringSelectMenuInteraction,
 } from "discord.js";
-import { util } from "../../shared/utils/util";
-import { BUTTON_PREFIXES, type SelectedPlayer } from "./commands/search-player";
-import { createCollector, honoClient } from "./utils";
+import { util } from "../../shared/utils/util.ts";
+import { BUTTON_PREFIXES, type SelectedPlayer } from "./commands/search-player.ts";
+import { createCollector, honoClient } from "./utils.ts";
 
 export async function createDiscordDropdownUI(
     interaction: RepliableInteraction,
@@ -23,7 +23,8 @@ export async function createDiscordDropdownUI(
         const slug = player.slug ? ` (slug: ${player.slug})` : "";
 
         return {
-            label: `[${player.region}] - ${player.mapId.toLowerCase()} - ${player.teamMode} - ${player.username} ${slug}`,
+            label:
+                `[${player.region}] - ${player.mapId.toLowerCase()} - ${player.teamMode} - ${player.username} ${slug}`,
             description: `Played at: ${util.formatDate(player.createdAt)}`,
             value: `ban_${index}`,
         };
@@ -134,16 +135,16 @@ export async function createDiscordPlayerInfoCardUI({
             const executorId = interaction.user.id;
 
             const { ipBanDuration, banReason } = interaction.customId.startsWith(
-                BUTTON_PREFIXES.BAN_FOR_CHEATING,
-            )
+                    BUTTON_PREFIXES.BAN_FOR_CHEATING,
+                )
                 ? {
-                      banReason: "Banned for cheating",
-                      ipBanDuration: 30,
-                  }
+                    banReason: "Banned for cheating",
+                    ipBanDuration: 30,
+                }
                 : {
-                      banReason: "Banned for bad name",
-                      ipBanDuration: 7,
-                  };
+                    banReason: "Banned for bad name",
+                    ipBanDuration: 7,
+                };
 
             if (selectedPlayer.slug) {
                 const res = await honoClient.moderation.ban_account.$post({
@@ -212,8 +213,8 @@ function getEmbedFields(selectedPlayer: SelectedPlayer) {
     }
 
     if (
-        selectedPlayer.findGameIp === undefined ||
-        selectedPlayer.findGameIp === selectedPlayer.ip
+        selectedPlayer.findGameIp === undefined
+        || selectedPlayer.findGameIp === selectedPlayer.ip
     ) {
         fields.push({
             name: "IP Address (Find Game IP is the same)",

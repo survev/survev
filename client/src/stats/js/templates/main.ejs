@@ -1,26 +1,3 @@
-<!-- Background -->
-<div id='leaderboard-bg' class='stats-bg'></div>
-
-<!-- Top ad -->
-<% if (!env.phoneDetected) { %>
-<div id='ad-block-top' class='container mt-3'>
-  <div class='ad-block-top-leaderboard'>
-    <div id='surviv-io_728x90_Leaderboard'>
-      <!-- <script type='text/javascript'>
-       aiptag.cmd.display.push(function() { aipDisplayTag.display('surviv-io_728x90_Leaderboard'); });
-      </script> -->
-    </div>
-  </div>
-  <div class='ad-block-top-med-rect'>
-    <div id='surviv-io_300x250_leaderboard'>
-      <!-- <script type='text/javascript'>
-       aiptag.cmd.display.push(function() { aipDisplayTag.display('surviv-io_300x250_leaderboard'); });
-      </script> -->
-    </div>
-  </div>
-</div>
-<% } %>
-
 <!-- Overview Card -->
 <div class="container mt-3">
   <div class="card card-leaderboard col-lg-8 col-12 p-0">
@@ -78,14 +55,3 @@
   </div>
 </div>
 
-<% if (env.phoneDetected) { %>
-<div class='col-12'>
-  <div class='ad-block-bot-med-rect'>
-    <div id='surviv-io_300x250_leaderboard'>
-      <!-- <script type='text/javascript'>
-       aiptag.cmd.display.push(function() { aipDisplayTag.display('surviv-io_300x250_leaderboard'); });
-      </script> -->
-    </div>
-  </div>
-</div>
-<% } %>

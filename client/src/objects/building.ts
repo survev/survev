@@ -1,32 +1,33 @@
 import * as PIXI from "pixi.js-legacy";
-import { MapObjectDefs } from "../../../shared/defs/mapObjectDefs";
-import type { BuildingDef } from "../../../shared/defs/mapObjectsTyping";
-import type { FloorImage } from "../../../shared/defs/types/building";
-import type { ObjectData, ObjectType } from "../../../shared/net/objectSerializeFns";
-import type { Collider } from "../../../shared/utils/coldet";
-import { collider } from "../../../shared/utils/collider";
-import { collisionHelpers } from "../../../shared/utils/collisionHelpers";
-import { mapHelpers } from "../../../shared/utils/mapHelpers";
-import { math } from "../../../shared/utils/math";
-import { util } from "../../../shared/utils/util";
-import { type Vec2, v2 } from "../../../shared/utils/v2";
-import type { AudioManager } from "../audioManager";
-import type { Camera } from "../camera";
-import type { DebugRenderOpts } from "../config";
+
+import type { BuildingDef } from "../../../shared/defs/mapObjectsTyping.ts";
+import { MapObjectDefs } from "../../../shared/defs/register.ts";
+import type { FloorImage } from "../../../shared/defs/types/building.ts";
+import type { ObjectData, ObjectType } from "../../../shared/net/objectSerializeFns.ts";
+import type { Collider } from "../../../shared/utils/coldet.ts";
+import { collider } from "../../../shared/utils/collider.ts";
+import { collisionHelpers } from "../../../shared/utils/collisionHelpers.ts";
+import { mapHelpers } from "../../../shared/utils/mapHelpers.ts";
+import { math } from "../../../shared/utils/math.ts";
+import { util } from "../../../shared/utils/util.ts";
+import { v2, type Vec2 } from "../../../shared/utils/v2.ts";
+import type { AudioManager } from "../audioManager.ts";
+import type { Camera } from "../camera.ts";
+import type { DebugRenderOpts } from "../config.ts";
 import {
     renderBridge,
     renderMapBuildingBounds,
     renderMapObstacleBounds,
     renderWaterEdge,
-} from "../debug/debugHelpers";
-import { debugLines } from "../debug/debugLines";
-import type { Ctx } from "../game";
-import type { SoundHandle } from "../lib/createJS";
-import type { Map } from "../map";
-import type { Renderer } from "../renderer";
-import type { Obstacle } from "./obstacle";
-import type { Emitter, ParticleBarn } from "./particles";
-import type { AbstractObject, Player } from "./player";
+} from "../debug/debugHelpers.ts";
+import { debugLines } from "../debug/debugLines.ts";
+import type { Ctx } from "../game.ts";
+import type { SoundHandle } from "../lib/createJS.ts";
+import type { Map } from "../map.ts";
+import type { Renderer } from "../renderer.ts";
+import type { Obstacle } from "./obstacle.ts";
+import type { Emitter, ParticleBarn } from "./particles.ts";
+import type { AbstractObject, Player } from "./player.ts";
 
 function step(cur: number, target: number, rate: number) {
     const delta = target - cur;
@@ -188,15 +189,13 @@ export class Building implements AbstractObject {
             this.puzzleErrSeq = data.puzzleErrSeq;
         }
 
-        const def = MapObjectDefs[this.type] as BuildingDef;
+        const def = MapObjectDefs.typeToDef(this.type, "building");
 
         if (isNew) {
             this.isNew = true;
-            this.playedCeilingDeadFx =
-                def.ceiling.destroy !== undefined &&
-                ctx.map.deadCeilingIds.includes(this.__id);
-            this.playedSolvedPuzzleFx =
-                this.hasPuzzle && ctx.map.solvedPuzzleIds.includes(this.__id);
+            this.playedCeilingDeadFx = def.ceiling.destroy !== undefined
+                && ctx.map.deadCeilingIds.includes(this.__id);
+            this.playedSolvedPuzzleFx = this.hasPuzzle && ctx.map.solvedPuzzleIds.includes(this.__id);
             const createSpriteFromDef = (imgDef: FloorImage) => {
                 const posOffset = imgDef.pos || v2.create(0, 0);
                 const rotOffset = math.oriToRad(imgDef.rot || 0);
@@ -277,19 +276,19 @@ export class Building implements AbstractObject {
                 this.ceiling.zoomRegions?.push({
                     zoomIn: region.zoomIn
                         ? collider.transform(
-                              region.zoomIn,
-                              this.pos,
-                              this.rot,
-                              this.scale,
-                          )
+                            region.zoomIn,
+                            this.pos,
+                            this.rot,
+                            this.scale,
+                        )
                         : null,
                     zoomOut: region.zoomOut
                         ? collider.transform(
-                              region.zoomOut,
-                              this.pos,
-                              this.rot,
-                              this.scale,
-                          )
+                            region.zoomOut,
+                            this.pos,
+                            this.rot,
+                            this.scale,
+                        )
                         : null,
                 });
             }
@@ -385,11 +384,11 @@ export class Building implements AbstractObject {
     ) {
         // Puzzle effects
         if (this.hasPuzzle) {
-            const def = MapObjectDefs[this.type] as BuildingDef;
+            const def = MapObjectDefs.typeToDef(this.type, "building");
             // Play puzzle error effects
             if (
-                this.puzzleErrSeqModified &&
-                ((this.puzzleErrSeqModified = false), !this.isNew)
+                this.puzzleErrSeqModified
+                && ((this.puzzleErrSeqModified = false), !this.isNew)
             ) {
                 // Find the nearest puzzle-piece obstacle and play the
                 // sound from that location. Fallback to the building location
@@ -442,7 +441,7 @@ export class Building implements AbstractObject {
 
         // Create residue if the ceiling has been destroyed
         if (this.ceilingDead && !this.residue) {
-            const def = MapObjectDefs[this.type] as BuildingDef;
+            const def = MapObjectDefs.typeToDef(this.type, "building");
             if (def.ceiling.destroy?.residue && def.ceiling.destroy.residue !== "none") {
                 const r = this.allocSprite();
                 r.texture = PIXI.Texture.from(def.ceiling.destroy.residue);
@@ -464,9 +463,9 @@ export class Building implements AbstractObject {
         for (let i = 0; i < this.ceiling.zoomRegions.length; i++) {
             const zoomIn = this.ceiling.zoomRegions[i].zoomIn;
             if (
-                zoomIn &&
-                (this.layer == activePlayer.layer || activePlayer.layer & 2) &&
-                collisionHelpers.scanCollider(
+                zoomIn
+                && (this.layer == activePlayer.layer || activePlayer.layer & 2)
+                && collisionHelpers.scanCollider(
                     zoomIn,
                     map.m_obstaclePool.m_getPool(),
                     activePlayer.m_pos,
@@ -500,17 +499,17 @@ export class Building implements AbstractObject {
         const ceilingStep = step(
             this.ceiling.fadeAlpha,
             visible ? 0 : 1,
-            dt * (visible ? 12 : vision?.fadeRate!),
+            dt * (visible ? 12 : (vision.fadeRate ?? 1)),
         );
         this.ceiling.fadeAlpha += ceilingStep;
 
         // Immediately reveal a ceiling if we're on stairs and
         // can see inside the other layer
         if (
-            canSeeInside &&
-            activePlayer.noCeilingRevealTicker <= 0 &&
-            activePlayer.layer & 2 &&
-            !util.sameLayer(activePlayer.layer, this.layer)
+            canSeeInside
+            && activePlayer.noCeilingRevealTicker <= 0
+            && activePlayer.layer & 2
+            && !util.sameLayer(activePlayer.layer, this.layer)
         ) {
             this.ceiling.fadeAlpha = 0;
         }
@@ -528,8 +527,8 @@ export class Building implements AbstractObject {
 
                 // Play sound if it's loaded
                 if (
-                    !soundEmitter.instance &&
-                    audioManager.isSoundLoaded(soundEmitter.sound, soundEmitter.channel)
+                    !soundEmitter.instance
+                    && audioManager.isSoundLoaded(soundEmitter.sound, soundEmitter.channel)
                 ) {
                     soundEmitter.instance = audioManager.playSound(soundEmitter.sound, {
                         channel: soundEmitter.channel,
@@ -551,12 +550,11 @@ export class Building implements AbstractObject {
                     );
                     const volumeFalloff = Math.pow(distT, soundEmitter.falloff);
                     const visibilityMult = math.lerp(this.ceiling.fadeAlpha, 1, 0.25);
-                    let volume =
-                        audioManager.baseVolume *
-                        audioManager.getTypeVolume("sound") *
-                        soundEmitter.volume *
-                        volumeFalloff *
-                        visibilityMult;
+                    let volume = audioManager.baseVolume
+                        * audioManager.getTypeVolume("sound")
+                        * soundEmitter.volume
+                        * volumeFalloff
+                        * visibilityMult;
                     if (!util.sameAudioLayer(this.layer, activePlayer.layer)) {
                         volume = 0;
                     }
@@ -584,9 +582,9 @@ export class Building implements AbstractObject {
             // It fixes an issue when outside of the mansion with players
             // standing on the interior mansion stairs.
             if (
-                img.isCeiling &&
-                (this.layer == activePlayer.layer ||
-                    (activePlayer.layer & 2 && this.layer == 1))
+                img.isCeiling
+                && (this.layer == activePlayer.layer
+                    || (activePlayer.layer & 2 && this.layer == 1))
             ) {
                 layer |= 2;
             }
@@ -619,7 +617,7 @@ export class Building implements AbstractObject {
     }
 
     destroyCeilingFx(particleBarn: ParticleBarn, audioManager: AudioManager) {
-        const def = (MapObjectDefs[this.type] as BuildingDef).ceiling.destroy!;
+        const def = MapObjectDefs.typeToDef(this.type, "building").ceiling.destroy!;
 
         // Spawn particles at random points inside the first surface collision
         const surface = this.surfaces[0];

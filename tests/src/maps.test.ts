@@ -1,14 +1,14 @@
-import "./testHelpers";
+import "./testHelpers.ts";
 import { describe, expect, test } from "vitest";
-import { Atlases } from "../../client/atlas-builder/atlasDefs";
-import { type MapDef, MapDefs } from "../../shared/defs/mapDefs";
-import { Constants } from "../../shared/net/net";
-import { getAllAtlasSprites, getAllMapSprites } from "./spriteHelpers";
+import { Atlases } from "../../client/atlas-builder/atlasDefs.ts";
+import { type MapDef, type MapDefKey, MapDefs } from "../../shared/defs/mapDefs.ts";
+import { Constants } from "../../shared/net/net.ts";
+import { getAllAtlasSprites, getAllMapSprites } from "./spriteHelpers.ts";
 
 const maps = Object.keys(MapDefs);
 
 describe.for(maps)("Map %s", (map) => {
-    const mapDef: MapDef = MapDefs[map as keyof typeof MapDefs];
+    const mapDef: MapDef = MapDefs[map as MapDefKey];
 
     describe("Loot Tables", () => {
         test.for(Object.entries(mapDef.lootTable))("Loot table $0", ([
@@ -117,8 +117,8 @@ describe.for(maps)("Map %s", (map) => {
     });
 
     test("Map has no missing sprites", () => {
-        const atlasSprites = getAllAtlasSprites(map as keyof typeof MapDefs);
-        const mapSprites = getAllMapSprites(map as keyof typeof MapDefs);
+        const atlasSprites = getAllAtlasSprites(map as MapDefKey);
+        const mapSprites = getAllMapSprites(map as MapDefKey);
 
         const diff = mapSprites.difference(atlasSprites);
 

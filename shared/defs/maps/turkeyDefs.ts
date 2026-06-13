@@ -1,5 +1,5 @@
-import { util } from "../../utils/util";
-import { Main, type PartialMapDef } from "./baseDefs";
+import { util } from "../../utils/util.ts";
+import { Main, type PartialMapDef } from "./baseDefs.ts";
 
 const mapDef: PartialMapDef = {
     desc: {
@@ -24,6 +24,9 @@ const mapDef: PartialMapDef = {
             { name: "xp_drop_01", channel: "sfx" },
             { name: "xp_drop_02", channel: "sfx" },
             { name: "pumpkin_break_01", channel: "sfx" },
+            { name: "log_05", channel: "sfx" },
+            { name: "vault_change_03", channel: "sfx" },
+            { name: "watering_01", channel: "sfx" },
         ],
         atlases: ["gradient", "loadout", "shared", "turkey"],
     },
@@ -75,7 +78,8 @@ const mapDef: PartialMapDef = {
         fixedSpawns: [
             {
                 // small is spawn count for solos and duos, large is spawn count for squads
-                warehouse_01: 3,
+                warehouse_01: { small: 1, large: 2 },
+                warehouse_03: 1,
                 house_red_01: { small: 3, large: 4 },
                 house_red_02: { small: 3, large: 4 },
                 barn_01: { small: 1, large: 3 },
@@ -88,6 +92,7 @@ const mapDef: PartialMapDef = {
                 greenhouse_01: 1,
                 cache_01: 1,
                 cache_02w: 1, // mosin tree
+                cache_04: 1,
                 cache_07: 1,
                 bunker_structure_01: { odds: 0.05 },
                 bunker_structure_02: 1,

@@ -21,12 +21,12 @@
      inkscape:pagecheckerboard="0"
      inkscape:deskcolor="#d1d1d1"
      inkscape:zoom="1.3374672"
-     inkscape:cx="221.68767"
-     inkscape:cy="219.44463"
-     inkscape:window-width="1920"
-     inkscape:window-height="1022"
-     inkscape:window-x="1512"
-     inkscape:window-y="30"
+     inkscape:cx="337.20453"
+     inkscape:cy="275.89462"
+     inkscape:window-width="1464"
+     inkscape:window-height="921"
+     inkscape:window-x="51"
+     inkscape:window-y="33"
      inkscape:window-maximized="1"
      inkscape:current-layer="svg5" />
   <defs
@@ -43,7 +43,7 @@
   </defs>
   <g
      id="g1"
-     transform="translate(-41.804403,-3.7041067)">
+     transform="translate(-42.333571,-3.7041067)">
     <path
        style="fill:#272727;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
        d="m 146.13585,63.265073 v 4.868348 l -0.97367,0.97367 h -5.84202 l -2.92101,0.730252 h -16.55239 l -1.94734,-0.486835 v -7.302522 l 1.94734,-0.486835 h 16.55239 l 2.92101,0.730253 h 5.84202 z"
@@ -208,8 +208,8 @@
      ry="4.7919998"
      rx="4.7950001"
      transform="matrix(0.06031685,-0.99817928,0.99817507,0.06038654,0,0)"
-     cy="103.4963"
-     cx="-61.172474"
+     cy="106.52245"
+     cx="-60.989403"
      fill="#7a7a7a"
      stroke="#333333"
      stroke-width="1.746"
@@ -237,6 +237,13 @@
      stroke-width="1.746"
      id="ellipse2" />
   <path
+     d="m 55.948362,46.042586 c -7.937,3.704 -6.35,6.35 -6.35,6.35 h 7.408 c 2.117,5.292 6.35,5.292 6.35,5.292 0,0 4.234,0 6.35,-5.292 h 7.409 c 0,0 1.587,-2.646 -6.35,-6.35 -3.704,-1.974 -10.054,-1.974 -14.817,0 z"
+     fill="#d6d6d6"
+     stroke="#515151"
+     stroke-width="2.646"
+     stroke-opacity="0.655"
+     id="path5" />
+  <path
      transform="matrix(0.14668,0,0,0.14668,41.881362,44.201586)"
      d="m 188,128 c 0,80 -69.756,119.362 -69.756,119.362 C 64,244 8.638,193.922 8.638,128 8.638,62.078 64,12 118.244,8.638 118.244,8.638 188,48 188,128 Z"
      clip-path="url(#b)"
@@ -250,11 +257,4 @@
      stroke="#242424"
      stroke-width="1.21744"
      id="path4" />
-  <path
-     d="m 55.948362,46.042586 c -7.937,3.704 -6.35,6.35 -6.35,6.35 h 7.408 c 2.117,5.292 6.35,5.292 6.35,5.292 0,0 4.234,0 6.35,-5.292 h 7.409 c 0,0 1.587,-2.646 -6.35,-6.35 -3.704,-1.974 -10.054,-1.974 -14.817,0 z"
-     fill="#d6d6d6"
-     stroke="#515151"
-     stroke-width="2.646"
-     stroke-opacity="0.655"
-     id="path5" />
 </svg>

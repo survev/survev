@@ -1,9 +1,9 @@
-import { GameConfig } from "../../gameConfig";
-import { util } from "../../utils/util";
-import { v2 } from "../../utils/v2";
-import type { MapDef } from "../mapDefs";
-import { MapId } from "../types/misc";
-import { Main, type PartialMapDef } from "./baseDefs";
+import { GameConfig } from "../../gameConfig.ts";
+import { util } from "../../utils/util.ts";
+import { v2 } from "../../utils/v2.ts";
+import type { MapDef } from "../mapDefs.ts";
+import { MapId } from "../types/misc.ts";
+import { Main, type PartialMapDef } from "./baseDefs.ts";
 
 export enum TeamColor {
     // NONE = 0, // can be used ambiguously with code that runs the same regardless of team color
@@ -82,6 +82,9 @@ const mapDef: PartialMapDef = {
                 name: "bugle_03",
                 channel: "otherPlayers",
             },
+            { name: "log_05", channel: "sfx" },
+            { name: "vault_change_03", channel: "sfx" },
+            { name: "watering_01", channel: "sfx" },
         ],
         atlases: ["gradient", "loadout", "shared", "faction"],
     },
@@ -375,6 +378,12 @@ const mapDef: PartialMapDef = {
                 weight: 0.5,
             },
         ],
+        tier_airdrop_scopes: [
+            { name: "", count: 1, weight: 12 },
+            { name: "4xscope", count: 1, weight: 5 },
+            { name: "8xscope", count: 1, weight: 1 },
+            { name: "15xscope", count: 1, weight: 0.01 },
+        ],
         tier_ammo_crate: [
             { name: "9mm", count: 60, weight: 3 },
             { name: "762mm", count: 60, weight: 3 },
@@ -462,9 +471,9 @@ const mapDef: PartialMapDef = {
                 shack_03a: 2,
                 shack_03b: 3,
                 greenhouse_01: 1,
-                cache_01: 1,
+                cache_01f: 1,
                 cache_02f: 1,
-                cache_07: 1,
+                cache_07f: 1,
                 mansion_structure_01: 1,
                 bunker_structure_01: { odds: 1 },
                 bunker_structure_03: 1,

@@ -1,4 +1,4 @@
-import type { AbstractMsg, BitStream } from "./net";
+import type { AbstractMsg, BitStream } from "./net.ts";
 
 export class SpectateMsg implements AbstractMsg {
     specBegin = false;

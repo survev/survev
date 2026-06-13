@@ -1,35 +1,18 @@
-import { ObjectType } from "../../../../shared/net/objectSerializeFns";
-import { type AABB, coldet } from "../../../../shared/utils/coldet";
-import { collider } from "../../../../shared/utils/collider";
-import { math } from "../../../../shared/utils/math";
-import { util } from "../../../../shared/utils/util";
-import { type Vec2, v2 } from "../../../../shared/utils/v2";
-import type { Game } from "../game";
-import { BaseGameObject } from "./gameObject";
-
-// max smokes an emitter can spawn
-const MAX_SMOKES = 10;
-// delay between smokes the emitter spawns
-const SPAWN_DELAY = 0.1;
-const LIFE_TIME = 15;
-// min and max radius a smoke can reach
-const RAD_MIN = 5;
-const RAD_MAX = 6.5;
-// speed which the radius increases (in radius/second)
-const RAD_SPEED = 10;
-// speed drag
-const SPEED_DRAG = 2;
-// min speed it can have
-const SPEED_MIN = 0.1;
-// min / max spawn speed
-const SPAWN_MIN_SPEED = 3;
-const SPAWN_MAX_SPEED = 5;
+import { ObjectType } from "../../../../shared/net/objectSerializeFns.ts";
+import { type AABB, coldet } from "../../../../shared/utils/coldet.ts";
+import { collider } from "../../../../shared/utils/collider.ts";
+import { math } from "../../../../shared/utils/math.ts";
+import { util } from "../../../../shared/utils/util.ts";
+import { v2, type Vec2 } from "../../../../shared/utils/v2.ts";
+import type { Game } from "../game.ts";
+import { BaseGameObject } from "./gameObject.ts";
 
 class SmokeEmitter {
     active = true;
 
     smokesSpawned = 0;
     spawnTicker = 0;
+    activeTicker = 0;
 
     constructor(
         public smokeBarn: SmokeBarn,
@@ -39,14 +22,23 @@ class SmokeEmitter {
     ) {}
 
     update(dt: number) {
-        this.spawnTicker += dt;
-        if (this.spawnTicker > SPAWN_DELAY) {
-            this.smokeBarn.addSmoke(this.pos, this.layer, this.interior);
-            this.smokesSpawned++;
-            this.spawnTicker = 0;
+        this.spawnTicker -= dt;
+        if (this.spawnTicker <= 0) {
+            if (this.smokesSpawned < 8) {
+                this.smokeBarn.addSmoke(this.pos, this.layer, this.interior, this, false);
+                this.smokesSpawned++;
+                this.spawnTicker = 1.75;
+            }
         }
-        if (this.smokesSpawned > MAX_SMOKES) {
+        this.activeTicker += dt;
+        if (this.activeTicker >= 16) {
             this.active = false;
+        }
+    }
+
+    addStartSmokes(amount: number) {
+        for (let i = 0; i < amount; i++) {
+            this.smokeBarn.addSmoke(this.pos, this.layer, this.interior, this, true);
         }
     }
 }
@@ -97,12 +89,19 @@ export class SmokeBarn {
         }
 
         const emitter = new SmokeEmitter(this, pos, layer, interior);
+        emitter.addStartSmokes(3);
 
         this.emitters.push(emitter);
     }
 
-    addSmoke(pos: Vec2, layer: number, interior: number) {
-        const smoke = new Smoke(this.game, pos, layer, interior);
+    addSmoke(
+        pos: Vec2,
+        layer: number,
+        interior: number,
+        emitter: SmokeEmitter,
+        startSmoke: boolean,
+    ) {
+        const smoke = new Smoke(this.game, pos, layer, interior, emitter, startSmoke);
         this.game.objectRegister.register(smoke);
         this.smokes.push(smoke);
     }
@@ -114,18 +113,40 @@ export class Smoke extends BaseGameObject {
 
     layer: number;
 
-    life = LIFE_TIME;
-    rad = util.random(0.5, 1);
+    rad = 0;
+
+    lastClientPos = v2.create(0, 0);
+    lastClientRad = 0;
+
     interior: number;
 
-    maxSize = util.random(RAD_MIN, RAD_MAX);
-    dir = v2.randomUnit();
-    speed = util.random(SPAWN_MIN_SPEED, SPAWN_MAX_SPEED);
+    maxSize = util.random(5.5, 6.5);
+    vel: Vec2;
+    growTime: number;
+    drag: number;
+    emitter: SmokeEmitter;
 
-    constructor(game: Game, pos: Vec2, layer: number, interior: number) {
+    constructor(
+        game: Game,
+        pos: Vec2,
+        layer: number,
+        interior: number,
+        emitter: SmokeEmitter,
+        startSmoke: boolean,
+    ) {
         super(game, pos);
         this.layer = layer;
         this.interior = interior;
+        this.emitter = emitter;
+        if (startSmoke) {
+            this.growTime = 0.1;
+            this.vel = v2.mul(v2.randomUnit(), util.random(0, 1.5));
+            this.drag = 0.3;
+        } else {
+            this.growTime = 2;
+            this.vel = v2.mul(v2.randomUnit(), util.random(0.5, 1.5));
+            this.drag = 0.1;
+        }
         this.bounds = collider.createAabbExtents(
             v2.create(0, 0),
             v2.create(this.rad, this.rad),
@@ -133,24 +154,25 @@ export class Smoke extends BaseGameObject {
     }
 
     update(dt: number) {
-        this.life -= dt;
-
-        const radOld = this.rad;
-        this.rad += RAD_SPEED * dt;
+        this.rad += (this.maxSize / this.growTime) * dt;
         this.rad = math.clamp(this.rad, 0, this.maxSize);
 
-        this.speed -= SPEED_DRAG * dt;
-        this.speed = math.max(this.speed, SPEED_MIN);
-        const posOld = v2.copy(this.pos);
-        v2.set(this.pos, v2.add(this.pos, v2.mul(this.dir, this.speed * dt)));
+        v2.set(this.vel, v2.mul(this.vel, 1 / (1 + dt * this.drag)));
+        v2.set(this.pos, v2.add(this.pos, v2.mul(this.vel, dt)));
+        this.game.map.clampToMapBounds(this.pos, this.rad);
 
-        if (!v2.eq(posOld, this.pos) || !math.eqAbs(radOld, this.rad)) {
+        if (
+            !math.eqAbs(this.lastClientRad, this.rad, 0.05)
+            || !v2.eq(this.lastClientPos, this.pos, 0.2)
+        ) {
             this.setPartDirty();
             this.game.grid.updateObject(this);
-            this.game.map.clampToMapBounds(this.pos, this.rad);
+
+            v2.set(this.lastClientPos, this.pos);
+            this.lastClientRad = this.rad;
         }
 
-        if (this.life <= 0) {
+        if (!this.emitter.active) {
             this.destroy();
         }
     }

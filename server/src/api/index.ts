@@ -1,36 +1,29 @@
 import { serve } from "@hono/node-server";
 import { createNodeWebSocket } from "@hono/node-ws";
 import { Cron } from "croner";
-import { randomUUID } from "crypto";
 import { Hono } from "hono";
 import { getCookie } from "hono/cookie";
 import { cors } from "hono/cors";
 import { HTTPException } from "hono/http-exception";
-import { z } from "zod";
-import { version } from "../../../package.json";
-import {
-    type FindGameResponse,
-    type SiteInfoRes,
-    zFindGameBody,
-} from "../../../shared/types/api";
-import { Config } from "../config";
-import { GIT_VERSION } from "../utils/gitRevision";
-import {
-    getHonoIp,
-    HTTPRateLimit,
-    isBehindProxy,
-    logErrorToWebhook,
-    verifyTurnsStile,
-} from "../utils/serverHelpers";
-import { server } from "./apiServer";
-import { deleteExpiredSessions, validateSessionToken } from "./auth";
-import { rateLimitMiddleware, validateParams } from "./auth/middleware";
-import type { SessionTableSelect, UsersTableSelect } from "./db/schema";
-import { cleanupOldLogs, isBanned } from "./routes/private/ModerationRouter";
-import { PrivateRouter } from "./routes/private/private";
-import { StatsRouter } from "./routes/stats/StatsRouter";
-import { AuthRouter } from "./routes/user/AuthRouter";
-import { UserRouter } from "./routes/user/UserRouter";
+import { randomUUID } from "node:crypto";
+import pkgJson from "../../../package.json" with { type: "json" };
+import { type FindGameResponse, type SiteInfoRes, zFindGameBody } from "../../../shared/types/api.ts";
+import { Config } from "../config.ts";
+import { GIT_VERSION } from "../utils/gitRevision.ts";
+import { logErrorToWebhook } from "../utils/logger.ts";
+import { isBehindProxy } from "../utils/proxyCheck.ts";
+import { HTTPRateLimit } from "../utils/rateLimit.ts";
+import { getFindGamePlayerData } from "./apiHelpers.ts";
+import { getHonoIp, verifyTurnsStile } from "./apiHelpers.ts";
+import { server } from "./apiServer.ts";
+import { deleteExpiredSessions, validateSessionToken } from "./auth/index.ts";
+import { rateLimitMiddleware, validateParams } from "./auth/middleware.ts";
+import type { SessionTableSelect, UsersTableSelect } from "./db/schema.ts";
+import { cleanupOldLogs, isBanned } from "./routes/private/ModerationRouter.ts";
+import { PrivateRouter } from "./routes/private/private.ts";
+import { StatsRouter } from "./routes/stats/StatsRouter.ts";
+import { AuthRouter } from "./routes/user/AuthRouter.ts";
+import { UserRouter } from "./routes/user/UserRouter.ts";
 
 export type Context = {
     Variables: {
@@ -151,20 +144,21 @@ app.post("/api/find_game", validateParams(zFindGameBody), async (c) => {
         return c.json<FindGameResponse>({ error: "full" });
     }
 
+    const playerData = await getFindGamePlayerData([
+        {
+            token,
+            userId: user?.id || null,
+            ip,
+        },
+    ]);
+
     const data = await server.findGame({
         region: body.region,
         version: body.version,
         mapName: mode.mapName,
         teamMode: mode.teamMode,
         autoFill: true,
-        playerData: [
-            {
-                token,
-                userId: user?.id || null,
-                ip,
-                loadout: user?.loadout,
-            },
-        ],
+        playerData,
     });
 
     if ("error" in data) {
@@ -185,34 +179,27 @@ app.post("/api/find_game", validateParams(zFindGameBody), async (c) => {
     });
 });
 
-app.post(
-    "/api/report_error",
-    rateLimitMiddleware(5, 60 * 1000),
-    validateParams(z.object({ loc: z.string(), error: z.any(), data: z.any() })),
-    (c) => {
-        const content = c.req.valid("json");
-        if (content.error) {
-            try {
-                content.error = JSON.parse(content.error);
-            } catch {}
-        }
+app.post("/api/report_error", rateLimitMiddleware(5, 60 * 1000), async (c) => {
+    const content = await c.req.json();
 
-        let stackTrace: string | undefined;
-        if (
-            typeof content.error == "object" &&
-            "stacktrace" in content.error &&
-            typeof content.error.stacktrace == "string" &&
-            content.error.stacktrace
-        ) {
-            stackTrace = `### Stacktrace:\n \`\`\`${content.error.stacktrace.replaceAll("`", "\\`")}\`\`\``;
-            delete content.error.stacktrace;
-        }
+    let stackTrace: string | undefined;
+    if (
+        typeof content.data === "object"
+        && "stacktrace" in content.data
+        && typeof content.data.stacktrace === "string"
+        && content.data.stacktrace
+    ) {
+        stackTrace = `### Stacktrace:\n \`\`\`${content.data.stacktrace.replaceAll("`", "\\`")}\`\`\``;
+        delete content.data.stacktrace;
+    }
 
+    if (stackTrace) {
         logErrorToWebhook("client", content, stackTrace);
-
-        return c.json({ success: true }, 200);
-    },
-);
+    } else {
+        logErrorToWebhook("client", content);
+    }
+    return c.json({ success: true }, 200);
+});
 
 // reset player count to 0 if region seems to be down
 setInterval(() => {
@@ -244,6 +231,6 @@ new Cron("0 0 * * *", async () => {
     }
 });
 
-server.logger.info(`Survev API Server v${version} - GIT ${GIT_VERSION}`);
+server.logger.info(`Survev API Server v${pkgJson.version} - GIT ${GIT_VERSION}`);
 server.logger.info(`Listening on ${Config.apiServer.host}:${Config.apiServer.port}`);
 server.logger.info("Press Ctrl+C to exit.");

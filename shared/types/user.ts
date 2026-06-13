@@ -1,26 +1,26 @@
 import { z } from "zod";
-import { Constants } from "../../shared/net/net";
-import { type Item, ItemStatus, type Loadout, loadoutSchema } from "../utils/loadout";
+import { Constants } from "../../shared/net/net.ts";
+import { type Item, ItemStatus, type Loadout, loadoutSchema } from "../utils/loadout.ts";
 
 export type ProfileResponse =
     | {
-          readonly banned: true;
-          reason: string;
-          success?: false;
-      }
+        readonly banned: true;
+        reason: string;
+        success?: false;
+    }
     | {
-          banned?: false;
-          readonly success: true;
-          profile: {
-              slug: string;
-              username: string;
-              usernameSet: boolean;
-              linked: boolean;
-              usernameChangeTime: number;
-          };
-          loadout: Loadout;
-          items: Item[];
-      };
+        banned?: false;
+        readonly success: true;
+        profile: {
+            slug: string;
+            username: string;
+            usernameSet: boolean;
+            linked: boolean;
+            usernameChangeTime: number;
+        };
+        loadout: Loadout;
+        items: Item[];
+    };
 
 export const zUsernameRequest = z.object({
     username: z.string().trim().min(1).max(Constants.PlayerNameMaxLen),
@@ -28,11 +28,11 @@ export const zUsernameRequest = z.object({
 export type UsernameRequest = z.infer<typeof zUsernameRequest>;
 export type UsernameResponse =
     | {
-          result: "success";
-      }
+        result: "success";
+    }
     | {
-          result: "failed" | "invalid" | "taken" | "change_time_not_expired";
-      };
+        result: "failed" | "invalid" | "taken" | "change_time_not_expired";
+    };
 
 export const zLoadoutRequest = z.object({ loadout: loadoutSchema });
 
@@ -42,7 +42,7 @@ export type LoadoutResponse = {
 };
 
 export const zSetItemStatusRequest = z.object({
-    status: z.nativeEnum(ItemStatus),
+    status: z.enum(ItemStatus),
     itemTypes: z.array(z.string()).max(50),
 });
 
@@ -70,7 +70,29 @@ export const zGetPassRequest = z.object({
     tryRefreshQuests: z.boolean(),
 });
 export type GetPassRequest = z.infer<typeof zGetPassRequest>;
-export type GetPassResponse = { success: boolean };
+export type PassState = {
+    type: string;
+    level: number;
+    xp: number;
+    unlocks: Record<string, boolean>;
+    newItems: boolean;
+};
+
+export type QuestState = {
+    idx: number;
+    type: string;
+    progress: number;
+    target: number;
+    complete: boolean;
+    rerolled: boolean;
+    timeToRefresh: number;
+};
+
+export type GetPassResponse = {
+    success: true;
+    pass: PassState;
+    quests: QuestState[];
+};
 
 export const zRefreshQuestRequest = z.object({
     idx: z.number(),

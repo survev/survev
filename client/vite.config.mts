@@ -1,12 +1,12 @@
 import { resolve } from "node:path";
 import { defineConfig, loadEnv, type Plugin, type ServerOptions } from "vite";
 import stripBlockPlugin from "vite-plugin-strip-block";
-import { getConfig } from "../config";
+import { getConfig } from "../config.ts";
 import { version } from "../package.json";
-import { GIT_VERSION } from "../server/src/utils/gitRevision";
-import { atlasBuilderPlugin } from "./atlas-builder/vitePlugin";
-import { codefendPlugin } from "./vite-plugins/codefendPlugin";
-import { ejsPlugin } from "./vite-plugins/ejsPlugin";
+import { GIT_VERSION } from "../server/src/utils/gitRevision.ts";
+import { atlasBuilderPlugin } from "./atlas-builder/vitePlugin.ts";
+import { codefendPlugin } from "./vite-plugins/codefendPlugin.ts";
+import { ejsPlugin } from "./vite-plugins/ejsPlugin.ts";
 
 export default defineConfig(({ mode }) => {
     const viteEnv = loadEnv(mode, process.cwd(), "VITE_");
@@ -15,9 +15,9 @@ export default defineConfig(({ mode }) => {
     const Config = getConfig(!isDev, "");
 
     process.env.VITE_TURNSTILE_SCRIPT = "";
-    process.env.VITE_AD_PREFIX = Config.secrets.AD_PREFIX;
     if (Config.secrets.TURNSTILE_SITE_KEY) {
-        process.env.VITE_TURNSTILE_SCRIPT = `<script src="https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit" defer></script>`;
+        process.env.VITE_TURNSTILE_SCRIPT =
+            `<script src="https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit" defer></script>`;
     }
 
     process.env.VITE_DEBUG_CSS_LINK = isDev
@@ -79,11 +79,11 @@ export default defineConfig(({ mode }) => {
                     stats: resolve(import.meta.dirname, "stats/index.html"),
                     ...(isDev
                         ? {
-                              "building-editor": resolve(
-                                  import.meta.dirname,
-                                  "building-editor/index.html",
-                              ),
-                          }
+                            "building-editor": resolve(
+                                import.meta.dirname,
+                                "building-editor/index.html",
+                            ),
+                        }
                         : {}),
                 },
                 output: {
@@ -101,10 +101,9 @@ export default defineConfig(({ mode }) => {
         resolve: {
             extensions: [".ts", ".js"],
             alias: {
-                "@/sdk":
-                    viteEnv?.VITE_ENABLE_SURVEV_ADS === "true"
-                        ? "./sdk-manager.prod"
-                        : "./sdk-manager",
+                "@/sdk.ts": viteEnv?.VITE_ENABLE_SURVEV_ADS === "true"
+                    ? "./sdk-manager.prod"
+                    : "./sdk-manager",
             },
         },
         define: {
@@ -118,6 +117,7 @@ export default defineConfig(({ mode }) => {
                     https: data.https,
                 };
             }),
+            PASS_TYPE: JSON.stringify(Config.passType),
             AD_PREFIX: JSON.stringify(Config.secrets.AD_PREFIX),
             VITE_GAMEMONETIZE_ID: JSON.stringify(Config.secrets.GAMEMONETIZE_ID),
             SPELLSYNC_PROJECT_ID: JSON.stringify(Config.secrets.SPELLSYNC_PROJECT_ID),

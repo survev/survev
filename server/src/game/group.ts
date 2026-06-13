@@ -1,8 +1,8 @@
-import { GameConfig } from "../../../shared/gameConfig";
-import { util } from "../../../shared/utils/util";
-import type { Vec2 } from "../../../shared/utils/v2";
-import type { Game } from "./game";
-import type { Player } from "./objects/player";
+import { GameConfig } from "../../../shared/gameConfig.ts";
+import { util } from "../../../shared/utils/util.ts";
+import type { Vec2 } from "../../../shared/utils/v2.ts";
+import type { Game } from "./game.ts";
+import type { Player } from "./objects/player.ts";
 
 class BasePlayerGroup {
     id: number;
@@ -104,7 +104,6 @@ class BasePlayerGroup {
     }
 
     /**
-     *
      * @param player optional player to exclude
      * @returns random alive player
      */
@@ -127,8 +126,7 @@ class BasePlayerGroup {
     prevPlayer(currentPlayer: Player) {
         const alivePlayers = this.getAlivePlayers();
         const currentPlayerIndex = alivePlayers.indexOf(currentPlayer);
-        const newIndex =
-            currentPlayerIndex == 0 ? alivePlayers.length - 1 : currentPlayerIndex - 1;
+        const newIndex = currentPlayerIndex == 0 ? alivePlayers.length - 1 : currentPlayerIndex - 1;
         return alivePlayers[newIndex];
     }
 }
@@ -157,8 +155,8 @@ export class Group extends BasePlayerGroup {
 
     canJoin(players: number) {
         return (
-            this.maxPlayers - this.reservedSlots - players >= 0 &&
-            !this.allDeadOrDisconnected
+            this.maxPlayers - this.reservedSlots - players >= 0
+            && !this.allDeadOrDisconnected
         );
     }
 }

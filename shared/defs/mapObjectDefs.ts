@@ -1,13 +1,7 @@
-import { collider } from "../utils/collider";
-import { util } from "../utils/util";
-import { v2 } from "../utils/v2";
-import type {
-    BuildingDef,
-    LootSpawnDef,
-    MapObjectDef,
-    ObstacleDef,
-    StructureDef,
-} from "./mapObjectsTyping";
+import { collider } from "../utils/collider.ts";
+import { util } from "../utils/util.ts";
+import { v2 } from "../utils/v2.ts";
+import type { BuildingDef, LootSpawnDef, MapObjectDef, ObstacleDef, StructureDef } from "./mapObjectsTyping.ts";
 
 // some errors could be fixed by this but opted to using Partial and casting instead to avoid choking the lsp server
 // type DeepPartial<T> = T extends object ? {
@@ -428,6 +422,52 @@ function createBush<T extends ObstacleDef>(e: Partial<T>): T {
     return util.mergeDeep(t, e || {});
 }
 
+function createButton<T extends ObstacleDef>(e: Partial<T>): T {
+    const t = {
+        type: "obstacle",
+        scale: { createMin: 1, createMax: 1, destroy: 0.8 },
+        collision: collider.createAabbExtents(v2.create(0, 0), v2.create(0.5, 0.5)),
+        height: 0.3,
+        collidable: false,
+        destructible: false,
+        health: 50,
+        hitParticle: "barrelChip",
+        explodeParticle: "",
+        reflectBullets: false,
+        loot: [],
+        map: { display: false, color: 0xffffff, scale: 1 },
+        terrain: { grass: true, beach: true },
+        img: {
+            sprite: "map-button-01.img",
+            residue: "none",
+            scale: 0.5,
+            alpha: 1,
+            tint: 0xffffff,
+            zIdx: 10,
+        },
+        sound: {
+            bullet: "wall_bullet",
+            punch: "metal_punch",
+            explode: "deposit_box_break_01",
+            enter: "none",
+        },
+        button: {
+            interactionRad: 1.25,
+            interactionText: "game-use",
+            useOnce: true,
+            useType: "",
+            useDelay: 0.25,
+            useDir: v2.create(-1, 0),
+            useImg: "map-button-02.img",
+            sound: {
+                on: "button_press_01",
+                off: "button_press_01",
+            },
+        },
+    };
+    return util.mergeDeep(t, e || {});
+}
+
 function createCampfire<T extends ObstacleDef>(e: Partial<T>): T {
     const t = {
         type: "obstacle",
@@ -657,13 +697,13 @@ function createContainer(props: {
                     collision: [
                         props.open
                             ? collider.createAabbExtents(
-                                  v2.create(0, 0),
-                                  v2.create(2.5, 11),
-                              )
+                                v2.create(0, 0),
+                                v2.create(2.5, 11),
+                            )
                             : collider.createAabbExtents(
-                                  v2.create(0, 0),
-                                  v2.create(2.5, 8),
-                              ),
+                                v2.create(0, 0),
+                                v2.create(2.5, 8),
+                            ),
                     ],
                 },
             ],
@@ -683,19 +723,19 @@ function createContainer(props: {
                 {
                     zoomIn: props.open
                         ? collider.createAabbExtents(
-                              v2.create(0, 0),
-                              v2.create(2.5, 5.75),
-                          )
+                            v2.create(0, 0),
+                            v2.create(2.5, 5.75),
+                        )
                         : collider.createAabbExtents(
-                              v2.create(0, 2.25),
-                              v2.create(2.5, 5.5),
-                          ),
+                            v2.create(0, 2.25),
+                            v2.create(2.5, 5.5),
+                        ),
                     zoomOut: props.open
                         ? collider.createAabbExtents(v2.create(0, 0), v2.create(2.5, 11))
                         : collider.createAabbExtents(
-                              v2.create(0, -0.5),
-                              v2.create(2.5, 8.75),
-                          ),
+                            v2.create(0, -0.5),
+                            v2.create(2.5, 8.75),
+                        ),
                 },
             ],
             imgs: props.ceilingImgs! || [
@@ -1276,6 +1316,41 @@ function createPotato<T extends ObstacleDef>(e: Partial<T>): T {
     };
     return util.mergeDeep(t, e || {});
 }
+function createTomato<T extends ObstacleDef>(e: Partial<T>): T {
+    const t = {
+        type: "obstacle",
+        scale: { createMin: 1, createMax: 1, destroy: 0.8 },
+        collision: collider.createCircle(v2.create(0, 0), 1.1),
+        height: 0.5,
+        collidable: true,
+        destructible: true,
+        health: 100,
+        hitParticle: "tomatoChip_01",
+        explodeParticle: "tomatoBreak_01",
+        reflectBullets: false,
+        swapWeaponOnDestroy: true,
+        regrow: true,
+        regrowTimer: 60,
+        loot: [tierLoot("tier_potato_perks", 1, 1)],
+        map: { display: false, color: 0x907155, scale: 1 },
+        terrain: { grass: true, beach: true, riverShore: true },
+        img: {
+            sprite: "map-tomato-01.img",
+            residue: "map-tomato-res-01.img",
+            scale: 0.5,
+            alpha: 1,
+            tint: 0xffffff,
+            zIdx: 10,
+        },
+        sound: {
+            bullet: "organic_hit",
+            punch: "organic_hit",
+            explode: "tomato_break_01",
+            enter: "none",
+        },
+    };
+    return util.mergeDeep(t, e || {});
+}
 
 function createEgg<T extends ObstacleDef>(e: Partial<T>): T {
     const def: ObstacleDef = {
@@ -1551,6 +1626,53 @@ function createStone<T extends ObstacleDef>(e: Partial<T>): T {
             bullet: "stone_bullet",
             punch: "stone_bullet",
             explode: "stone_break_01",
+            enter: "none",
+        },
+    };
+    return util.mergeDeep(t, e || {});
+}
+function createSwitch<T extends ObstacleDef>(e: Partial<T>): T {
+    const t = {
+        type: "obstacle",
+        scale: { createMin: 1, createMax: 1, destroy: 0.8 },
+        collision: collider.createAabbExtents(v2.create(0, 0), v2.create(0.45, 0.55)),
+        height: 0.5,
+        collidable: true,
+        destructible: false,
+        explosion: "",
+        health: 100,
+        hitParticle: "barrelChip",
+        explodeParticle: "",
+        reflectBullets: true,
+        loot: [],
+        map: { display: false },
+        terrain: { grass: false, beach: true },
+        button: {
+            interactionRad: 0.2,
+            interactionText: "game-use",
+            useOnce: true,
+            useType: "",
+            useDelay: 0.25,
+            useDir: v2.create(-1, 0),
+            useImg: "map-switch-02.img",
+            offImg: "map-switch-03.img",
+            sound: {
+                on: "button_press_01",
+                off: "button_press_01",
+            },
+        },
+        img: {
+            sprite: "map-switch-01.img",
+            residue: "",
+            scale: 0.5,
+            alpha: 1,
+            tint: 0xffffff,
+            zIdx: 10,
+        },
+        sound: {
+            bullet: "wall_bullet",
+            punch: "metal_punch",
+            explode: "deposit_box_break_01",
             enter: "none",
         },
     };
@@ -3596,9 +3718,8 @@ function createCabin<T extends ExtendedBuildingDef>(e: Partial<T>): T {
                 ori: 2,
             },
             {
-                type:
-                    e.cabin_mount ||
-                    randomObstacleType({
+                type: e.cabin_mount
+                    || randomObstacleType({
                         gun_mount_01: 50,
                         gun_mount_05: 50,
                         gun_mount_04: 10,
@@ -5906,9 +6027,8 @@ function createMansion<T extends ExtendedBuildingDef>(e: Partial<T>): T {
                 ori: 0,
             },
             {
-                type:
-                    e.bush ||
-                    randomObstacleType({
+                type: e.bush
+                    || randomObstacleType({
                         bush_01: 25,
                         bush_03: 1,
                         "": e.bush_chance || 0,
@@ -5919,9 +6039,8 @@ function createMansion<T extends ExtendedBuildingDef>(e: Partial<T>): T {
                 ignoreMapSpawnReplacement: true,
             },
             {
-                type:
-                    e.bush ||
-                    randomObstacleType({
+                type: e.bush
+                    || randomObstacleType({
                         bush_01: 25,
                         bush_03: 1,
                         "": e.bush_chance || 0,
@@ -5932,9 +6051,8 @@ function createMansion<T extends ExtendedBuildingDef>(e: Partial<T>): T {
                 ignoreMapSpawnReplacement: true,
             },
             {
-                type:
-                    e.bush ||
-                    randomObstacleType({
+                type: e.bush
+                    || randomObstacleType({
                         bush_01: 25,
                         bush_03: 1,
                         "": e.bush_chance || 0,
@@ -5945,9 +6063,8 @@ function createMansion<T extends ExtendedBuildingDef>(e: Partial<T>): T {
                 ignoreMapSpawnReplacement: true,
             },
             {
-                type:
-                    e.bush ||
-                    randomObstacleType({
+                type: e.bush
+                    || randomObstacleType({
                         bush_01: 25,
                         bush_03: 1,
                         "": e.bush_chance || 0,
@@ -9862,7 +9979,7 @@ const MaterialDefs = {
     },
 };
 
-export const MapObjectDefs: Record<string, MapObjectDef> = {
+export const RawMapObjectDefs: Record<string, MapObjectDef> = {
     barrel_01: createBarrel({}),
     barrel_01b: createBarrel({
         img: { tint: 0xc9c9c9 },
@@ -9890,6 +10007,16 @@ export const MapObjectDefs: Record<string, MapObjectDef> = {
             autoLoot("coconut", 4),
             autoLoot("coconut", 4),
             autoLoot("mirv", 1),
+        ],
+    }),
+    barrel_01f: createBarrel({
+        img: { tint: 0xc9c9c9 },
+        loot: [
+            tierLoot("tier_surviv", 2, 3),
+            autoLoot("chest02", 1),
+            autoLoot("mirv", 2),
+            autoLoot("mirv", 2),
+            autoLoot("frag", 6),
         ],
     }),
     barrel_01bd: createBarrel({
@@ -10124,6 +10251,7 @@ export const MapObjectDefs: Record<string, MapObjectDef> = {
         sound: { enter: "bush_enter_02" },
     }),
     bush_07x: createBush({ img: { sprite: "map-bush-07x.img" } }),
+    bush_07cb: createBush({ img: { sprite: "map-bush-07cb.img" } }),
 
     campfire_01: createCampfire({}),
 
@@ -10206,6 +10334,24 @@ export const MapObjectDefs: Record<string, MapObjectDef> = {
         hitParticle: "blackChip",
         map: { display: false, color: 0x6b3500, scale: 0.85 },
     }),
+    // Cobalt Case
+    case_09: createCase({
+        health: 140,
+        img: {
+            sprite: "map-case-twins-01.img",
+            residue: "map-case-hatchet-res-01.img",
+        },
+        loot: [
+            tierLoot("tier_guns_rare_classless", 1, 1),
+            autoLoot("healthkit", 1),
+            autoLoot("soda", 2),
+            autoLoot("4xscope", 1),
+            autoLoot("chest02", 1),
+            autoLoot("backpack02", 1),
+            autoLoot("naginata_daemon", 1),
+        ],
+        hitParticle: "blackChip",
+    }),
     chest_01: createChest({
         loot: [
             tierLoot("tier_chest", 3, 4),
@@ -10226,7 +10372,7 @@ export const MapObjectDefs: Record<string, MapObjectDef> = {
         loot: [tierLoot("tier_chest", 3, 5), autoLoot("outfitWaterElem", 1)],
     }),
     chest_03cb: createRiverChest({
-        img: { sprite: "map-chest-03.img" },
+        img: { sprite: "map-chest-03cb.img" },
         loot: [tierLoot("tier_chest", 3, 5)],
     }),
     chest_03d: createRiverChest({
@@ -10333,24 +10479,15 @@ export const MapObjectDefs: Record<string, MapObjectDef> = {
         health: 200,
         img: { sprite: "map-control-panel-06.img" },
     }),
-    switch_01: createControlPanel({
-        collision: collider.createAabbExtents(v2.create(0, 0), v2.create(0.45, 0.55)),
-        destructible: false,
-        button: {
-            interactionRad: 0.2,
-            interactionText: "game-use",
-            useOnce: true,
-            useType: "",
-            useDelay: 0.25,
-            useDir: v2.create(-1, 0),
-            useImg: "map-switch-02.img",
-            offImg: "map-switch-03.img",
-            sound: {
-                on: "button_press_01",
-                off: "button_press_01",
-            },
-        },
-        img: { sprite: "map-switch-01.img" },
+    switch_01: createSwitch({}),
+    switch_01o: createSwitch({
+        img: { sprite: "map-switch-01o.img" },
+    }),
+    switch_01p: createSwitch({
+        img: { sprite: "map-switch-01p.img" },
+    }),
+    switch_01y: createSwitch({
+        img: { sprite: "map-switch-01y.img" },
     }),
     switch_02: createControlPanel({
         collision: collider.createAabbExtents(v2.create(0, 0), v2.create(0.45, 0.55)),
@@ -10754,6 +10891,52 @@ export const MapObjectDefs: Record<string, MapObjectDef> = {
         },
         sound: { explode: "crate_break_01" },
     } as unknown as Partial<ObstacleDef>),
+    crate_12po: createCrate({
+        collision: collider.createAabbExtents(v2.create(0, 0), v2.create(3.5, 3.5)),
+        scale: { destroy: 0.75 },
+        health: 500,
+        loot: [
+            tierLoot("tier_airdrop_rare", 2, 2, {
+                preloadGuns: true,
+            }),
+            tierLoot("tier_airdrop_uncommon", 7, 8, {
+                preloadGuns: true,
+            }),
+            tierLoot("tier_airdrop_armor", 5, 6),
+            tierLoot("tier_medical", 12, 15),
+            tierLoot("tier_airdrop_scopes", 7, 8),
+            tierLoot("tier_airdrop_outfits", 3, 4),
+            tierLoot("tier_airdrop_melee", 6, 7),
+            tierLoot("tier_airdrop_ammo", 10, 12),
+            tierLoot("tier_airdrop_throwables", 6, 8),
+        ],
+        map: { display: false },
+        img: {
+            sprite: "map-crate-12.img",
+            residue: "map-crate-res-03.img",
+        },
+        sound: { explode: "crate_break_01" },
+    } as unknown as Partial<ObstacleDef>),
+    crate_12dev: createCrate({
+        collision: collider.createAabbExtents(v2.create(0, 0), v2.create(3.5, 3.5)),
+        scale: { destroy: 0.75 },
+        health: 1100,
+        loot: [
+            tierLoot("tier_dev_guns", 20, 20, {
+                preloadGuns: true,
+            }),
+            tierLoot("tier_dev_melee", 6, 7),
+            autoLoot("snowball", 100),
+            autoLoot("bandage", 1),
+            autoLoot("smoke", 1),
+        ],
+        map: { display: false },
+        img: {
+            sprite: "map-crate-13.img",
+            residue: "map-crate-res-03.img",
+        },
+        sound: { explode: "crate_break_01" },
+    } as unknown as Partial<ObstacleDef>),
     crate_13: createCrate({
         collision: collider.createAabbExtents(v2.create(0, 0), v2.create(3.5, 3.5)),
         scale: { destroy: 0.75 },
@@ -10767,7 +10950,39 @@ export const MapObjectDefs: Record<string, MapObjectDef> = {
             }),
             tierLoot("tier_airdrop_armor", 6, 8),
             tierLoot("tier_medical", 12, 15),
-            tierLoot("tier_airdrop_scopes", 6, 8),
+            tierLoot("tier_airdrop_scopes", 7, 8),
+            tierLoot("tier_airdrop_faction_outfits", 1, 2),
+            tierLoot("tier_airdrop_melee", 2, 3),
+            tierLoot("tier_airdrop_faction_melee", 3, 3),
+            tierLoot("tier_airdrop_ammo", 10, 12),
+            tierLoot("tier_airdrop_throwables", 6, 8),
+            autoLoot("strobe", 1),
+            autoLoot("strobe", 1),
+            autoLoot("strobe", 1),
+        ],
+        map: { display: false },
+        img: {
+            sprite: "map-crate-13.img",
+            residue: "map-crate-res-03.img",
+        },
+        sound: { explode: "crate_break_01" },
+    } as unknown as Partial<ObstacleDef>),
+    crate_13po: createCrate({
+        // TODO: same as crate 12
+        collision: collider.createAabbExtents(v2.create(0, 0), v2.create(3.5, 3.5)),
+        scale: { destroy: 0.75 },
+        health: 200,
+        loot: [
+            tierLoot("tier_airdrop_potato", 2, 2),
+            tierLoot("tier_airdrop_mythic", 3, 4, {
+                preloadGuns: true,
+            }),
+            tierLoot("tier_airdrop_rare", 5, 5, {
+                preloadGuns: true,
+            }),
+            tierLoot("tier_airdrop_armor", 6, 8),
+            tierLoot("tier_medical", 12, 15),
+            tierLoot("tier_airdrop_scopes", 7, 8),
             tierLoot("tier_airdrop_faction_outfits", 1, 2),
             tierLoot("tier_airdrop_melee", 2, 3),
             tierLoot("tier_airdrop_faction_melee", 3, 3),
@@ -10933,6 +11148,34 @@ export const MapObjectDefs: Record<string, MapObjectDef> = {
         destroyType: "crate_12",
         explodeParticle: "airdropCrate04",
     } as unknown as Partial<ObstacleDef>),
+    airdrop_crate_03po: createAirdrop({
+        collision: collider.createAabbExtents(v2.create(0, 0), v2.create(4, 4)),
+        button: {
+            useImg: "map-airdrop-04.img",
+            useParticle: "airdropCrate03",
+            sound: { on: "airdrop_open_01", off: "" },
+        },
+        img: {
+            sprite: "map-airdrop-03.img",
+            residue: "none",
+        },
+        destroyType: "crate_12po",
+        explodeParticle: "airdropCrate04",
+    } as unknown as Partial<ObstacleDef>),
+    airdrop_crate_03dev: createAirdrop({
+        collision: collider.createAabbExtents(v2.create(0, 0), v2.create(4, 4)),
+        button: {
+            useImg: "map-airdrop-04.img",
+            useParticle: "airdropCrate03",
+            sound: { on: "airdrop_open_01", off: "" },
+        },
+        img: {
+            sprite: "map-airdrop-03.img",
+            residue: "none",
+        },
+        destroyType: "crate_12dev",
+        explodeParticle: "airdropCrate04",
+    } as unknown as Partial<ObstacleDef>),
     airdrop_crate_04: createAirdrop({
         collision: collider.createAabbExtents(v2.create(0, 0), v2.create(4, 4)),
         button: {
@@ -10945,6 +11188,20 @@ export const MapObjectDefs: Record<string, MapObjectDef> = {
             residue: "none",
         },
         destroyType: "crate_13",
+        explodeParticle: "airdropCrate04",
+    } as unknown as Partial<ObstacleDef>),
+    airdrop_crate_04po: createAirdrop({
+        collision: collider.createAabbExtents(v2.create(0, 0), v2.create(4, 4)),
+        button: {
+            useImg: "map-airdrop-04.img",
+            useParticle: "airdropCrate03",
+            sound: { on: "airdrop_open_01", off: "" },
+        },
+        img: {
+            sprite: "map-airdrop-03.img",
+            residue: "none",
+        },
+        destroyType: "crate_13po",
         explodeParticle: "airdropCrate04",
     } as unknown as Partial<ObstacleDef>),
     airdrop_crate_01sv: createAirdrop({
@@ -11040,7 +11297,12 @@ export const MapObjectDefs: Record<string, MapObjectDef> = {
         explodeParticle: "airdropCrate02x",
     } as unknown as Partial<ObstacleDef>),
     class_shell_01: createAirdrop({
+        obstacleType: undefined,
+        terrain: {
+            minDistanceFromSameType: 32,
+        },
         collision: collider.createCircle(v2.create(0, 0), 2.25),
+        airdropCrate: false,
         button: {
             useImg: "map-class-shell-01b.img",
             useParticle: "classShell01a",
@@ -11090,9 +11352,7 @@ export const MapObjectDefs: Record<string, MapObjectDef> = {
             autoLoot("crowbar_scout", 1),
             autoLoot("helmet01", 1),
             autoLoot("backpack01", 1),
-            autoLoot("soda", 1),
-            autoLoot("soda", 1),
-            autoLoot("soda", 1),
+            autoLoot("soda", 2),
         ],
         img: { sprite: "map-class-crate-scout.img" },
     }),
@@ -11123,13 +11383,10 @@ export const MapObjectDefs: Record<string, MapObjectDef> = {
             tierLoot("tier_guns_common_demo", 1, 1),
             autoLoot("katana_demo", 1),
             autoLoot("helmet01", 1),
+            autoLoot("chest01", 1),
             autoLoot("backpack02", 1),
-            autoLoot("mirv", 1),
-            autoLoot("mirv", 1),
-            autoLoot("mirv", 1),
-            autoLoot("mirv", 1),
-            autoLoot("mirv", 1),
-            autoLoot("mirv", 1),
+            autoLoot("2xscope", 1),
+            tierLoot("tier_throwables_demo", 3, 4),
         ],
         img: { sprite: "map-class-crate-demo.img" },
     }),
@@ -11137,7 +11394,9 @@ export const MapObjectDefs: Record<string, MapObjectDef> = {
         loot: [
             tierLoot("tier_guns_common_assault", 2, 2),
             autoLoot("spade_assault", 1),
+            autoLoot("bandage", 5),
             autoLoot("helmet01", 1),
+            autoLoot("chest01", 1),
             autoLoot("backpack01", 1),
         ],
         img: { sprite: "map-class-crate-assault.img" },
@@ -11151,6 +11410,16 @@ export const MapObjectDefs: Record<string, MapObjectDef> = {
             autoLoot("backpack01", 1),
         ],
         img: { sprite: "map-class-crate-tank.img" },
+    }),
+    class_crate_common_classless: createClassCrate({
+        loot: [
+            tierLoot("tier_guns_common_classless", 1, 1),
+            tierLoot("tier_medical", 1, 2),
+            tierLoot("tier_throwables", 1, 2),
+            tierLoot("tier_ammo", 1, 1),
+            autoLoot("naginata_daemon", 1),
+        ],
+        img: { sprite: "map-class-crate-classless.img" },
     }),
     class_crate_rare_scout: createClassCrate({
         loot: [
@@ -11196,7 +11465,7 @@ export const MapObjectDefs: Record<string, MapObjectDef> = {
             tierLoot("tier_medical", 1, 1),
             tierLoot("tier_airdrop_scopes", 1, 1),
             tierLoot("tier_airdrop_ammo", 2, 2),
-            tierLoot("tier_airdrop_throwables", 1, 1),
+            tierLoot("tier_throwables_demo", 4, 5),
         ],
         img: { sprite: "map-class-crate-demo.img" },
     }),
@@ -11223,6 +11492,18 @@ export const MapObjectDefs: Record<string, MapObjectDef> = {
             tierLoot("tier_airdrop_throwables", 1, 1),
         ],
         img: { sprite: "map-class-crate-tank.img" },
+    }),
+    class_crate_rare_classless: createClassCrate({
+        loot: [
+            tierLoot("tier_guns_rare_classless", 1, 1),
+            autoLoot("naginata_daemon", 1),
+            autoLoot("chest03", 1),
+            tierLoot("tier_medical", 2, 3),
+            tierLoot("tier_airdrop_throwables", 2, 2),
+            tierLoot("tier_airdrop_scopes", 1, 1),
+            tierLoot("tier_airdrop_ammo", 2, 2),
+        ],
+        img: { sprite: "map-class-crate-classless.img" },
     }),
     class_crate_mythic: createClassCrate({
         loot: [tierLoot("tier_class_crate_mythic", 1, 1)],
@@ -11254,7 +11535,7 @@ export const MapObjectDefs: Record<string, MapObjectDef> = {
     mil_crate_03: createCrate({
         collision: collider.createAabbExtents(v2.create(0, 0), v2.create(2.7, 1.25)),
         health: 100,
-        loot: [autoLoot("ots38_dual", 1), autoLoot("outfitWhite", 1)], // TODO: Remove Arctic Avenger when the survevr pass is added.
+        loot: [autoLoot("ots38_dual", 1), autoLoot("outfitSpetsnaz", 1)],
         map: { display: false },
         terrain: { grass: true, beach: true },
         img: { sprite: "map-crate-mil-03.img" },
@@ -11360,6 +11641,41 @@ export const MapObjectDefs: Record<string, MapObjectDef> = {
             punch: "glass_bullet",
             explode: "window_break_01",
             enter: "none",
+        },
+    }),
+    button_01: createButton({}),
+    button_01g: createButton({
+        img: { sprite: "map-button-01g.img" },
+        button: {
+            interactionRad: 1.25,
+            interactionText: "game-use",
+            useOnce: true,
+            useType: "",
+            useDelay: 0.25,
+            useDir: v2.create(-1, 0),
+            useImg: "map-button-02.img",
+            offImg: "map-button-02.img",
+            sound: {
+                on: "button_press_01",
+                off: "button_press_01",
+            },
+        },
+    }),
+    button_01b: createButton({
+        img: { sprite: "map-button-01b.img" },
+        button: {
+            interactionRad: 1.25,
+            interactionText: "game-use",
+            useOnce: true,
+            useType: "",
+            useDelay: 0.25,
+            useDir: v2.create(-1, 0),
+            useImg: "map-button-02.img",
+            offImg: "map-button-02.img",
+            sound: {
+                on: "button_press_01",
+                off: "button_press_01",
+            },
         },
     }),
     candle_01: {
@@ -11581,8 +11897,42 @@ export const MapObjectDefs: Record<string, MapObjectDef> = {
         loot: [autoLoot("scout_elite", 1), tierLoot("tier_islander_outfit", 1, 1)],
     }),
     potato_01: createPotato({}),
+    potato_01f: createPotato({
+        terrain: { grass: true, beach: true, riverShore: false },
+        teamId: 2,
+    }),
     potato_02: createPotato({ img: { sprite: "map-potato-02.img" } }),
+    potato_02f: createPotato({
+        terrain: { grass: true, beach: true, riverShore: false },
+        img: { sprite: "map-potato-02.img" },
+        teamId: 2,
+    }),
     potato_03: createPotato({ img: { sprite: "map-potato-03.img" } }),
+    potato_03f: createPotato({
+        terrain: { grass: true, beach: true, riverShore: false },
+        img: { sprite: "map-potato-03.img" },
+        teamId: 2,
+    }),
+    tomato_01: createTomato({
+        terrain: { grass: true, beach: true, riverShore: false },
+        teamId: 1,
+    }),
+    tomato_02: createTomato({
+        terrain: { grass: true, beach: true, riverShore: false },
+        img: { sprite: "map-tomato-02.img" },
+        sound: { explode: "tomato_break_02" },
+        teamId: 1,
+    }),
+    tomato_03: createTomato({
+        hitParticle: "tomatoChip_02",
+        explodeParticle: "tomatoBreak_02",
+        terrain: { grass: true, beach: true, riverShore: false },
+        img: {
+            sprite: "map-tomato-03.img",
+            residue: "map-tomato-res-02.img",
+        },
+        teamId: 1,
+    }),
     egg_01: createEgg({
         img: { sprite: "map-egg-01.img" },
         hitParticle: "pinkChip",
@@ -11632,9 +11982,9 @@ export const MapObjectDefs: Record<string, MapObjectDef> = {
         explodeParticle: "squashBreak",
         loot: [
             autoLoot("turkey_shoot", 1),
-            tierLoot("tier_turkey_outfit", 0, 1),
+            // tierLoot("tier_fruit_xp", 1, 1)], // TODO: enable with artifacts
             tierLoot("tier_world", 0, 1),
-        ], // tierLoot("tier_fruit_xp", 1, 1)], i replaced it with fowl facade %
+        ],
     }),
     squash_02: createPumpkin({
         collision: collider.createCircle(v2.create(0, 0), 1.5),
@@ -11649,9 +11999,9 @@ export const MapObjectDefs: Record<string, MapObjectDef> = {
         loot: [
             autoLoot("turkey_shoot", 1),
             autoLoot("turkey_shoot", 1),
-            tierLoot("tier_turkey_outfit", 1, 2),
+            // tierLoot("tier_fruit_xp", 1, 1)], // TODO: enable with artifacts
             tierLoot("tier_soviet", 1, 2),
-        ], // tierLoot("tier_fruit_xp", 1, 1)], i replaced it with fowl facade %
+        ],
     }),
     refrigerator_01: createRefrigerator({}),
     refrigerator_01b: createRefrigerator({
@@ -11904,6 +12254,18 @@ export const MapObjectDefs: Record<string, MapObjectDef> = {
         img: { tint: 0xe5e5e5 },
         loot: [tierLoot("tier_surviv", 2, 3), autoLoot("groza", 1)],
     }),
+    stone_02f: createStone({
+        map: { display: false },
+        img: { tint: 0xe5e5e5 },
+        loot: [
+            tierLoot("tier_surviv", 1, 1),
+            autoLoot("ak47", 1),
+            autoLoot("helmet02", 1),
+            autoLoot("chest02", 1),
+            autoLoot("bandage", 5),
+            autoLoot("2xscope", 1),
+        ],
+    }),
     stone_03: createRiverStone({}),
     stone_03b: createRiverStone({
         img: {
@@ -12023,6 +12385,44 @@ export const MapObjectDefs: Record<string, MapObjectDef> = {
             zIdx: 10,
         },
     }),
+    // River Stone Caches
+    stone_08: createRiverStone({
+        loot: [
+            tierLoot("tier_medical", 2, 3),
+            tierLoot("tier_surviv", 1, 2),
+            autoLoot("vss", 1),
+        ],
+        img: {
+            sprite: "map-stone-03.img",
+            residue: "",
+            tint: 0xe6e6e6,
+        },
+    }),
+    stone_08x: createRiverStone({
+        loot: [
+            tierLoot("tier_medical", 2, 3),
+            tierLoot("tier_surviv", 1, 2),
+            autoLoot("m39", 1),
+        ],
+        img: {
+            sprite: "map-stone-03x.img",
+            residue: "",
+            tint: 0xe6e6e6,
+        },
+    }),
+    stone_08cb: createRiverStone({
+        loot: [
+            tierLoot("tier_medical", 2, 3),
+            tierLoot("tier_surviv", 1, 2),
+            autoLoot("svd", 1),
+            autoLoot("helmet02", 1),
+        ],
+        img: {
+            sprite: "map-stone-03cb.img",
+            residue: "",
+            tint: 0xe6e6e6,
+        },
+    }),
     stove_01: createControlPanel({
         obstacleType: "furniture",
         scale: {
@@ -12122,7 +12522,7 @@ export const MapObjectDefs: Record<string, MapObjectDef> = {
             zIdx: 60,
         },
     }),
-    tire_01: (function <T extends ObstacleDef>(e: Partial<T>): T {
+    tire_01: (function<T extends ObstacleDef>(e: Partial<T>): T {
         const t = {
             type: "obstacle",
             scale: {
@@ -12304,7 +12704,12 @@ export const MapObjectDefs: Record<string, MapObjectDef> = {
             zIdx: 801,
             tint: 0xb1b1b1,
         },
-        loot: [tierLoot("tier_surviv", 2, 3), autoLoot("mosin", 1)],
+        loot: [
+            tierLoot("tier_surviv", 2, 3),
+            autoLoot("mosin", 1),
+            autoLoot("4xscope", 1),
+            autoLoot("helmet02", 1),
+        ],
     } as unknown as Partial<ObstacleDef>),
     // woods cache
     tree_03w: createTree({
@@ -12742,7 +13147,51 @@ export const MapObjectDefs: Record<string, MapObjectDef> = {
             enter: "none",
         },
     },
-    vending_01: (function () {
+    vat_03: {
+        type: "obstacle",
+        scale: { createMin: 1, createMax: 1, destroy: 0.9 },
+        collision: collider.createCircle(v2.create(0, 0), 1.75),
+        height: 0.2,
+        collidable: false,
+        destructible: false,
+        health: 250,
+        reflectBullets: false,
+        hitParticle: "glassChip",
+        explodeParticle: "windowBreak",
+        loot: [],
+        map: { display: true, color: 0xb3b3b3, scale: 1 },
+        terrain: { grass: false, beach: false },
+        img: {
+            sprite: "map-vat-03.img",
+            residue: "map-vat-res.img",
+            scale: 0.5,
+            alpha: 1,
+            tint: 0xffffff,
+            zIdx: 50,
+        },
+        sound: {
+            bullet: "glass_bullet",
+            punch: "glass_bullet",
+            explode: "window_break_01",
+            enter: "none",
+        },
+        button: {
+            interactionRad: 1.75,
+            interactionText: "game-use",
+            useOnce: true,
+            destroyOnUse: true,
+            isVat: true,
+            roleToPromote: "classless",
+            useDelay: 0.1,
+            useDir: v2.create(-1, 0),
+            useImg: "",
+            sound: {
+                on: "",
+                off: "",
+            },
+        },
+    },
+    vending_01: (function() {
         const t = {
             type: "obstacle",
             obstacleType: "vending",
@@ -13711,6 +14160,8 @@ export const MapObjectDefs: Record<string, MapObjectDef> = {
         extents: v2.create(1, 3.5),
         img: { sprite: "map-door-02.img" },
         door: {
+            canUse: false,
+            locked: true,
             interactionRad: 1.5,
             openSpeed: 0.23,
             openOneWay: -1,
@@ -13757,7 +14208,7 @@ export const MapObjectDefs: Record<string, MapObjectDef> = {
                     tint: 0xffffff,
                 },
                 {
-                    sprite: "map-bunker-chrys-compartment-floor-01b.img",
+                    sprite: "map-bunker-chrys-compartment-floor-01d.img",
                     pos: v2.create(3.5, 2),
                     scale: 0.5,
                     alpha: 1,
@@ -13847,34 +14298,100 @@ export const MapObjectDefs: Record<string, MapObjectDef> = {
                 ori: 1,
             },
             {
-                type: randomObstacleType({ crate_01: 2, crate_04: 1 }),
-                pos: v2.create(1.5, 5),
+                type: randomObstacleType({ planter_07: 1, "": 1 }),
+                pos: v2.create(-0.5, 7),
                 scale: 1,
                 ori: 0,
+                // puzzlePiece: "rice",
             },
             {
-                type: randomObstacleType({ crate_01: 2, crate_04: 1 }),
-                pos: v2.create(1.5, 0),
+                type: randomObstacleType({ planter_07: 1, "": 1 }),
+                pos: v2.create(2.5, 7),
                 scale: 1,
                 ori: 0,
+                // puzzlePiece: "priest",
             },
             {
-                type: randomObstacleType({ crate_01: 2, crate_04: 1 }),
-                pos: v2.create(6.5, 5),
+                type: randomObstacleType({ planter_07: 1, "": 1 }),
+                pos: v2.create(5.5, 7),
                 scale: 1,
                 ori: 0,
+                // puzzlePiece: "harmony",
             },
             {
-                type: randomObstacleType({ crate_01: 2, crate_04: 1 }),
-                pos: v2.create(6.5, 0),
+                type: "planter_04",
+                pos: v2.create(8.5, 7),
                 scale: 1,
                 ori: 0,
+                puzzlePiece: "leaves",
+            },
+            {
+                type: randomObstacleType({ planter_07: 1, "": 1 }),
+                pos: v2.create(-0.5, 4),
+                scale: 1,
+                ori: 0,
+                // puzzlePiece: "gods",
+            },
+            {
+                type: randomObstacleType({ planter_07: 1, "": 1 }),
+                pos: v2.create(8.5, 4),
+                scale: 1,
+                ori: 0,
+                // puzzlePiece: "growth",
+            },
+            {
+                type: "planter_04",
+                pos: v2.create(-0.5, 1),
+                scale: 1,
+                ori: 0,
+                puzzlePiece: "frost",
+            },
+            {
+                type: randomObstacleType({ planter_07: 1, "": 1 }),
+                pos: v2.create(8.5, 1),
+                scale: 1,
+                ori: 0,
+                // puzzlePiece: "book",
+            },
+            {
+                type: randomObstacleType({ planter_07: 1, "": 1 }),
+                pos: v2.create(-0.5, -2),
+                scale: 1,
+                ori: 0,
+                // puzzlePiece: "water",
+            },
+            {
+                type: "planter_04",
+                pos: v2.create(2.5, -2),
+                scale: 1,
+                ori: 0,
+                puzzlePiece: "flower",
+            },
+            {
+                type: "planter_04",
+                pos: v2.create(5.5, -2),
+                scale: 1,
+                ori: 0,
+                puzzlePiece: "moon",
+            },
+            {
+                type: randomObstacleType({ planter_07: 1, "": 1 }),
+                pos: v2.create(8.5, -2),
+                scale: 1,
+                ori: 0,
+                // puzzlePiece: "clothes",
             },
             {
                 type: "vault_door_chrys_01",
                 pos: v2.create(0.5, 15.5),
                 scale: 1,
                 ori: 3,
+            },
+            {
+                type: "recorder_05",
+                pos: v2.create(-7.75, -1.75),
+                scale: 1,
+                ori: 0,
             },
             {
                 type: "loot_tier_chrys_01",
@@ -14414,7 +14931,7 @@ export const MapObjectDefs: Record<string, MapObjectDef> = {
                 ori: 1,
             },
             {
-                type: "crate_01",
+                type: "case_06",
                 pos: v2.create(0, 4.75),
                 scale: 0.9,
                 ori: 0,
@@ -14738,6 +15255,24 @@ export const MapObjectDefs: Record<string, MapObjectDef> = {
         ],
         map: { displayType: "stone_01" },
     }),
+    cache_01f: createCache({
+        mapObjects: [
+            {
+                type: "stone_02f",
+                pos: v2.create(0, 0),
+                scale: 1,
+                ori: 0,
+            },
+            {
+                type: "decal_initiative_01",
+                pos: v2.create(0, 0),
+                scale: 1,
+                ori: 0,
+                inheritOri: false,
+            },
+        ],
+        map: { displayType: "stone_01" },
+    }),
     cache_02: createCache({
         mapObjects: [
             {
@@ -14972,6 +15507,72 @@ export const MapObjectDefs: Record<string, MapObjectDef> = {
         ],
         map: { displayType: "bush_06" },
     }),
+    cache_04: createCache({
+        terrain: {
+            grass: false,
+            beach: false,
+            river: { centerWeight: 0.5 },
+            riverShore: false,
+        },
+        mapObjects: [
+            {
+                type: "stone_08",
+                pos: v2.create(0, 0),
+                scale: 1,
+                ori: 0,
+            },
+            {
+                type: "decal_caduceus_01",
+                pos: v2.create(0, 0),
+                scale: 1,
+                ori: 0,
+            },
+        ],
+    }),
+    cache_04x: createCache({
+        terrain: {
+            grass: false,
+            beach: false,
+            river: { centerWeight: 0.5 },
+            riverShore: false,
+        },
+        mapObjects: [
+            {
+                type: "stone_08x",
+                pos: v2.create(0, 0),
+                scale: 1,
+                ori: 0,
+            },
+            {
+                type: "decal_caduceus_01",
+                pos: v2.create(0, 0),
+                scale: 1,
+                ori: 0,
+            },
+        ],
+    }),
+    cache_04cb: createCache({
+        terrain: {
+            grass: false,
+            beach: false,
+            river: { centerWeight: 0.5 },
+            riverShore: false,
+        },
+        mapObjects: [
+            {
+                type: "stone_08cb",
+                pos: v2.create(0, 0),
+                scale: 1,
+                ori: 0,
+            },
+            {
+                type: "decal_caduceus_01",
+                pos: v2.create(0, 0),
+                scale: 1,
+                ori: 0,
+            },
+        ],
+    }),
     cache_06: createCache({
         mapObjects: [
             {
@@ -15030,6 +15631,42 @@ export const MapObjectDefs: Record<string, MapObjectDef> = {
         mapObjects: [
             {
                 type: "barrel_01w",
+                pos: v2.create(0, 0),
+                scale: 1,
+                ori: 0,
+            },
+            {
+                type: "decal_initiative_01",
+                pos: v2.create(0, 0),
+                scale: 1.1,
+                ori: 0,
+                inheritOri: false,
+            },
+        ],
+        map: { displayType: "barrel_01" },
+    }),
+    cache_06cb: createCache({
+        mapObjects: [
+            {
+                type: "bush_07cb",
+                pos: v2.create(0, 0),
+                scale: 1,
+                ori: 0,
+            },
+            {
+                type: "loot_tier_leaf_pile",
+                pos: v2.create(0, 0),
+                scale: 1,
+                ori: 0,
+                inheritOri: false,
+            },
+        ],
+        map: { displayType: "bush_07cb" },
+    }),
+    cache_07f: createCache({
+        mapObjects: [
+            {
+                type: "barrel_01f",
                 pos: v2.create(0, 0),
                 scale: 1,
                 ori: 0,
@@ -17979,11 +18616,12 @@ export const MapObjectDefs: Record<string, MapObjectDef> = {
             ],
         },
     } as unknown as Partial<BuildingDef>),
-    shilo_01: (function <T extends BuildingDef>(e: Partial<T>): T {
+    shilo_01: (function<T extends BuildingDef>(e: Partial<T>): T {
         const t = {
             type: "building",
             map: { display: true, color: 0x317120, scale: 1 },
             terrain: { grass: true, beach: false },
+            teamId: 2,
             mapObstacleBounds: [
                 collider.createAabbExtents(v2.create(0, -1), v2.create(17, 15)),
             ],
@@ -18331,7 +18969,7 @@ export const MapObjectDefs: Record<string, MapObjectDef> = {
         },
         obs: "toilet_02b",
     }),
-    perch_01: (function (e) {
+    perch_01: (function(e) {
         const t = {
             type: "building",
             map: { display: true, color: 0x1d3900, scale: 1 },
@@ -18973,6 +19611,10 @@ export const MapObjectDefs: Record<string, MapObjectDef> = {
         material: "metal",
         extents: v2.create(1.5, 14.5),
     }),
+    metal_wall_ext_thicker_30: createWall({
+        material: "metal",
+        extents: v2.create(1.5, 0.75),
+    }),
     metal_wall_ext_thicker_32: createWall({
         material: "metal",
         extents: v2.create(1.5, 16),
@@ -18992,6 +19634,10 @@ export const MapObjectDefs: Record<string, MapObjectDef> = {
     metal_wall_ext_thicker_48: createWall({
         material: "metal",
         extents: v2.create(1.5, 24),
+    }),
+    metal_wall_ext_thicker_49: createWall({
+        material: "metal",
+        extents: v2.create(2.5, 7),
     }),
     glass_wall_9: createWall({
         material: "glass",
@@ -21380,7 +22026,13 @@ export const MapObjectDefs: Record<string, MapObjectDef> = {
         tree_small: "tree_10",
         tree_large: "tree_10",
     }),
-    savannah_patch_01: (function <T extends BuildingDef>(e: Partial<T>): T {
+    teahouse_complex_01cb: createTeaHouseComplex({
+        grass_color: 0x414c58,
+        tea_house: "teahouse_01",
+        tree_small: "tree_01cb",
+        tree_large: "tree_01cb",
+    }),
+    savannah_patch_01: (function<T extends BuildingDef>(e: Partial<T>): T {
         const t = {
             type: "building",
             map: { display: true, shapes: [] },
@@ -21478,7 +22130,7 @@ export const MapObjectDefs: Record<string, MapObjectDef> = {
         grass_color: 0xebc634,
         terrain: { grass: true, beach: false, spawnPriority: 1 },
     }),
-    kopje_patch_01: (function <T extends BuildingDef>(e: Partial<T>): T {
+    kopje_patch_01: (function<T extends BuildingDef>(e: Partial<T>): T {
         const t = {
             type: "building",
             map: { display: true, shapes: [] },
@@ -22627,7 +23279,7 @@ export const MapObjectDefs: Record<string, MapObjectDef> = {
         },
         img: { tint: 0x4b4b4b },
     } as unknown as Partial<ObstacleDef>),
-    club_01: (function (e) {
+    club_01: (function(e) {
         const t = {
             type: "building",
             map: {
@@ -23698,7 +24350,7 @@ export const MapObjectDefs: Record<string, MapObjectDef> = {
         };
         return util.mergeDeep(t, e || {});
     })({}),
-    bathhouse_01: (function (e) {
+    bathhouse_01: (function(e) {
         const t = {
             type: "building",
             map: { display: false },
@@ -24227,7 +24879,7 @@ export const MapObjectDefs: Record<string, MapObjectDef> = {
         };
         return util.mergeDeep(t, e || {});
     })({}),
-    bathhouse_sideroom_01: (function (e) {
+    bathhouse_sideroom_01: (function(e) {
         const t = {
             type: "building",
             map: { display: true, shapes: [] },
@@ -24346,7 +24998,7 @@ export const MapObjectDefs: Record<string, MapObjectDef> = {
         };
         return util.mergeDeep(t, e || {});
     })({}),
-    bathhouse_sideroom_02: (function (e) {
+    bathhouse_sideroom_02: (function(e) {
         const t = {
             type: "building",
             map: { display: true, shapes: [] },
@@ -29867,13 +30519,13 @@ export const MapObjectDefs: Record<string, MapObjectDef> = {
         mapObjects: [
             {
                 type: "bunker_twins_stairs_01",
-                pos: v2.create(5, 13.5),
+                pos: v2.create(1, 13.5),
                 scale: 1,
                 ori: 0,
             },
             {
                 type: "bunker_twins_stairs_01",
-                pos: v2.create(-5, -13.5),
+                pos: v2.create(-1, -13.5),
                 scale: 1,
                 ori: 2,
             },
@@ -29889,12 +30541,25 @@ export const MapObjectDefs: Record<string, MapObjectDef> = {
                 scale: 1,
                 ori: 3,
             },
+            {
+                type: "tree_01cb",
+                pos: v2.create(-14.5, 9),
+                scale: 1,
+                ori: 0,
+            },
+            {
+                type: "tree_01cb",
+                pos: v2.create(10.5, -13.5),
+                scale: 1,
+                ori: 0,
+            },
         ],
     },
     cobalt_wall_int_4: createWall({
         material: "cobalt",
         extents: v2.create(0.6, 2),
         img: wallImg("map-wall-04-cobalt.img", 0xffffff),
+        explosion: "explosion_cobalt",
     }),
     bunker_twins_sublevel_01: {
         type: "building",
@@ -29939,34 +30604,46 @@ export const MapObjectDefs: Record<string, MapObjectDef> = {
                 },
             ],
         },
+        puzzle: {
+            name: "bunker_twins",
+            completeUseType: "cobalt_wall_int_4",
+            completeOffDelay: 1,
+            completeUseDelay: 2,
+            errorResetDelay: 1,
+            pieceResetDelay: 6,
+            sound: {
+                fail: "door_error_01",
+                complete: "",
+            },
+        },
         mapObjects: [
             {
                 type: "concrete_wall_ext_6",
-                pos: v2.create(5, 17.5),
+                pos: v2.create(1, 17.5),
                 scale: 1,
                 ori: 1,
             },
             {
                 type: "metal_wall_ext_thicker_8",
-                pos: v2.create(1.5, 14),
+                pos: v2.create(-2.5, 14),
                 scale: 1,
                 ori: 0,
             },
             {
                 type: "metal_wall_ext_thicker_8",
-                pos: v2.create(8.5, 14),
+                pos: v2.create(4.5, 14),
                 scale: 1,
                 ori: 0,
             },
             {
                 type: "metal_wall_ext_thicker_15",
-                pos: v2.create(-7.5, 11.5),
+                pos: v2.create(-11.5, 11.5),
                 scale: 1,
                 ori: 1,
             },
             {
-                type: "metal_wall_ext_thicker_5",
-                pos: v2.create(12.5, 11.5),
+                type: "metal_wall_ext_thicker_30",
+                pos: v2.create(6.75, 11.5),
                 scale: 1,
                 ori: 1,
             },
@@ -29984,31 +30661,31 @@ export const MapObjectDefs: Record<string, MapObjectDef> = {
             },
             {
                 type: "concrete_wall_ext_6",
-                pos: v2.create(-5, -17.5),
+                pos: v2.create(-1, -17.5),
                 scale: 1,
                 ori: 1,
             },
             {
                 type: "metal_wall_ext_thicker_8",
-                pos: v2.create(-1.5, -14),
+                pos: v2.create(2.5, -14),
                 scale: 1,
                 ori: 0,
             },
             {
                 type: "metal_wall_ext_thicker_8",
-                pos: v2.create(-8.5, -14),
+                pos: v2.create(-4.5, -14),
                 scale: 1,
                 ori: 0,
             },
             {
                 type: "metal_wall_ext_thicker_15",
-                pos: v2.create(7.5, -11.5),
+                pos: v2.create(11.5, -11.5),
                 scale: 1,
                 ori: 1,
             },
             {
-                type: "metal_wall_ext_thicker_5",
-                pos: v2.create(-12.5, -11.5),
+                type: "metal_wall_ext_thicker_30",
+                pos: v2.create(-6.75, -11.5),
                 scale: 1,
                 ori: 1,
             },
@@ -30062,13 +30739,13 @@ export const MapObjectDefs: Record<string, MapObjectDef> = {
             },
             {
                 type: "lab_door_locked_01",
-                pos: v2.create(3, 10.5),
+                pos: v2.create(-1, 10.5),
                 scale: 1,
                 ori: 3,
             },
             {
                 type: "lab_door_locked_01",
-                pos: v2.create(-3, -10.5),
+                pos: v2.create(1, -10.5),
                 scale: 1,
                 ori: 1,
             },
@@ -30121,12 +30798,6 @@ export const MapObjectDefs: Record<string, MapObjectDef> = {
                 ori: 2,
             },
             {
-                type: "cobalt_wall_int_4",
-                pos: v2.create(-12.5, -10.385),
-                scale: 1,
-                ori: 3,
-            },
-            {
                 type: "barrel_01",
                 pos: v2.create(-10, -8),
                 scale: 0.9,
@@ -30140,9 +30811,15 @@ export const MapObjectDefs: Record<string, MapObjectDef> = {
             },
             {
                 type: "recorder_14",
-                pos: v2.create(-13.5, -8.75),
+                pos: v2.create(-2.5, 8.75),
                 scale: 1,
                 ori: 1,
+            },
+            {
+                type: "cobalt_wall_int_4",
+                pos: v2.create(-12.5, -10.385),
+                scale: 1,
+                ori: 3,
             },
             {
                 type: "cobalt_wall_int_4",
@@ -30174,6 +30851,51 @@ export const MapObjectDefs: Record<string, MapObjectDef> = {
                 scale: 1,
                 ori: 2,
             },
+            {
+                type: "button_01b",
+                pos: v2.create(-12, 8.5),
+                scale: 1,
+                ori: 0,
+                layer: 0,
+                puzzlePiece: "sniper",
+            },
+            {
+                type: "button_01g",
+                pos: v2.create(8, -12.25),
+                scale: 1,
+                ori: 1,
+                layer: 0,
+                puzzlePiece: "scout",
+            },
+            {
+                type: "switch_01",
+                pos: v2.create(18, 3),
+                scale: 1,
+                ori: 2,
+                layer: 0,
+                puzzlePiece: "demo",
+            },
+            {
+                type: "switch_01y",
+                pos: v2.create(-15, -8.25),
+                scale: 1,
+                ori: 1,
+                puzzlePiece: "assault",
+            },
+            {
+                type: "switch_01o",
+                pos: v2.create(5.5, 10),
+                scale: 1,
+                ori: 0,
+                puzzlePiece: "tank",
+            },
+            {
+                type: "switch_01p",
+                pos: v2.create(15, 8.25),
+                scale: 1,
+                ori: 3,
+                puzzlePiece: "medic",
+            },
         ],
     },
     bunker_twins_compartment_01: {
@@ -30186,14 +30908,29 @@ export const MapObjectDefs: Record<string, MapObjectDef> = {
                 {
                     type: "bunker",
                     collision: [
-                        collider.createAabbExtents(v2.create(0, 0), v2.create(0, 0)),
+                        collider.createAabbExtents(v2.create(0, 2), v2.create(9, 8.75)),
                     ],
                 },
             ],
-            imgs: [],
+            imgs: [
+                {
+                    sprite: "map-bunker-twins-compartment-floor-01.img",
+                    pos: v2.create(0, -2),
+                    scale: 0.5,
+                    alpha: 1,
+                    tint: 0xffffff,
+                },
+            ],
         },
         ceiling: {
-            zoomRegions: [],
+            zoomRegions: [
+                {
+                    zoomIn: collider.createAabbExtents(
+                        v2.create(0, 0.75),
+                        v2.create(10, 7.75),
+                    ),
+                },
+            ],
             imgs: [
                 {
                     sprite: "map-bunker-hydra-compartment-ceiling-03.img",
@@ -30206,17 +30943,63 @@ export const MapObjectDefs: Record<string, MapObjectDef> = {
                 },
             ],
         },
-        mapObjects: [],
+        mapObjects: [
+            {
+                type: "metal_wall_ext_thicker_17",
+                pos: v2.create(-10.5, -2),
+                scale: 1,
+                ori: 0,
+            },
+            {
+                type: "metal_wall_ext_thicker_18",
+                pos: v2.create(0, -9),
+                scale: 1,
+                ori: 1,
+            },
+            {
+                type: "metal_wall_ext_thicker_18",
+                pos: v2.create(10.5, -0.5),
+                scale: 1,
+                ori: 0,
+            },
+            {
+                type: "metal_wall_ext_thicker_49",
+                pos: v2.create(-2, 6),
+                scale: 1,
+                ori: 1,
+            },
+            {
+                type: "case_09",
+                pos: v2.create(6.5, -5.65),
+                scale: 1,
+                ori: 0,
+                inheritOri: false,
+            },
+            {
+                type: "control_panel_03",
+                pos: v2.create(-6.75, -5.5),
+                scale: 1,
+                ori: 1,
+            },
+            {
+                type: "vat_03",
+                pos: v2.create(-5, -0.5),
+                scale: 1.25,
+                ori: 0,
+            },
+        ],
     },
     bunker_structure_09: {
         type: "structure",
         terrain: { grass: true, beach: false },
         ori: 0,
         mapObstacleBounds: [
-            collider.createAabbExtents(v2.create(5, 15.4), v2.create(3.5, 6)),
-            collider.createAabbExtents(v2.create(-5, -15.4), v2.create(3.5, 6)),
+            collider.createAabbExtents(v2.create(1, 15.4), v2.create(3.5, 6)),
+            collider.createAabbExtents(v2.create(-1, -15.4), v2.create(3.5, 6)),
             collider.createAabbExtents(v2.create(20.5, 0), v2.create(6, 3.5)),
             collider.createAabbExtents(v2.create(-20.5, 0), v2.create(6, 3.5)),
+            collider.createAabbExtents(v2.create(8, -12.25), v2.create(6, 6)),
+            collider.createAabbExtents(v2.create(-12, 8.5), v2.create(6, 6)),
             collider.createAabbExtents(v2.create(0, 0), v2.create(2.5, 2.5)),
         ],
         layers: [
@@ -30234,14 +31017,14 @@ export const MapObjectDefs: Record<string, MapObjectDef> = {
         stairs: [
             {
                 collision: collider.createAabbExtents(
-                    v2.create(5, 14.4),
+                    v2.create(1, 14.4),
                     v2.create(2, 2.6),
                 ),
                 downDir: v2.create(0, -1),
             },
             {
                 collision: collider.createAabbExtents(
-                    v2.create(-5, -14.4),
+                    v2.create(-1, -14.4),
                     v2.create(2, 2.6),
                 ),
                 downDir: v2.create(0, 1),
@@ -30435,7 +31218,7 @@ export const MapObjectDefs: Record<string, MapObjectDef> = {
             zIdx: 10,
         },
     }),
-    bridge_xlg_01: (function (e) {
+    bridge_xlg_01: (function(e) {
         const t = {
             type: "building",
             map: {
@@ -31417,6 +32200,18 @@ export const MapObjectDefs: Record<string, MapObjectDef> = {
         height: 0,
         img: {
             sprite: "map-decal-initiative.img",
+            scale: 0.5,
+            alpha: 1,
+            tint: 0xffffff,
+            zIdx: 0,
+        },
+    },
+    decal_caduceus_01: {
+        type: "decal",
+        collision: collider.createCircle(v2.create(0, 0), 3),
+        height: 0,
+        img: {
+            sprite: "map-decal-caduceus.img",
             scale: 0.5,
             alpha: 1,
             tint: 0xffffff,

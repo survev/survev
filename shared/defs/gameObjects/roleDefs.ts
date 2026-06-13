@@ -1,6 +1,6 @@
-import type { InventoryItem } from "../../gameConfig";
-import { type DeepPartial, util } from "../../utils/util";
-import { TeamColor } from "../maps/factionDefs";
+import type { InventoryItem } from "../../gameConfig.ts";
+import { type DeepPartial, util } from "../../utils/util.ts";
+import { TeamColor } from "../maps/factionDefs.ts";
 
 type BasicRoleWeapon = {
     type: string;
@@ -14,14 +14,14 @@ type BasicRoleWeapon = {
  */
 type RoleWeapon = BasicRoleWeapon | ((teamcolor: TeamColor) => BasicRoleWeapon);
 
-function getTeamWeapon(
+export function getTeamWeapon(
     colorToWeaponMap: Record<TeamColor, BasicRoleWeapon>,
     teamcolor: TeamColor,
 ): BasicRoleWeapon {
     return colorToWeaponMap[teamcolor];
 }
 
-function getTeamHelmet(
+export function getTeamHelmet(
     colorToHelmetMap: Record<TeamColor, string>,
     teamcolor: TeamColor,
 ) {
@@ -71,7 +71,7 @@ export interface RoleDef {
     color?: number;
 }
 
-function createDefaultItems(e: DeepPartial<DefaultItems>): DefaultItems {
+export function createDefaultItems(e: DeepPartial<DefaultItems>): DefaultItems {
     const defaultItems: DefaultItems = {
         weapons: [
             { type: "", ammo: 0 },
@@ -327,14 +327,14 @@ export const RoleDefs: Record<string, RoleDef> = {
                 { type: "", ammo: 0 },
                 { type: "saiga", ammo: 5, fillInv: true },
                 { type: "katana", ammo: 0 },
-                { type: "mirv", ammo: 8 },
+                { type: "mirv", ammo: 10 },
             ],
             backpack: "backpack03",
             helmet: "helmet03_grenadier",
             chest: "chest03",
             inventory: {
-                mirv: 8,
-                frag: 12,
+                mirv: 10,
+                frag: 15,
                 "4xscope": 1,
                 bandage: 5,
             },
@@ -462,7 +462,7 @@ export const RoleDefs: Record<string, RoleDef> = {
         }),
         announce: false,
         sound: { assign: "spawn_01" },
-        perks: ["field_medic", "self_revive"],
+        perks: ["field_medic", "combat_stims"],
         visorImg: {
             baseSprite: "player-visor-healer.img",
             spriteScale: 0.3,
@@ -530,7 +530,7 @@ export const RoleDefs: Record<string, RoleDef> = {
         }),
         announce: false,
         sound: { assign: "spawn_01" },
-        perks: ["fabricate", "flak_jacket"],
+        perks: ["amped_explosives", "flak_jacket"],
         visorImg: {
             baseSprite: "player-visor-demo.img",
             spriteScale: 0.3,
@@ -555,5 +555,20 @@ export const RoleDefs: Record<string, RoleDef> = {
         },
         guiImg: "img/gui/role-assault.svg",
         color: 0xffec17,
+    },
+    classless: {
+        type: "role",
+        defaultItems: createDefaultItems({
+            outfit: "outfitClassless",
+            helmet: "helmet04_classless",
+            inventory: {},
+        }),
+        announce: false,
+        sound: { assign: "spawn_01" },
+        perks: [],
+        visorImg: {
+            baseSprite: "player-visor-classless.img",
+            spriteScale: 0.3,
+        },
     },
 };

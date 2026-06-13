@@ -1,27 +1,32 @@
-import { createHash } from "node:crypto";
 import { and, desc, eq, inArray, lt, ne } from "drizzle-orm";
 import { Hono } from "hono";
+import { createHash } from "node:crypto";
 import { z } from "zod";
-import { MapId, TeamModeToString } from "../../../../../shared/defs/types/misc";
+import { MapId, TeamModeToString } from "../../../../../shared/defs/types/misc.ts";
 import {
     zBanAccountParams,
     zBanIpParams,
     zFindDiscordUserSlugParams,
     zGetPlayerIpParams,
+    zGiveXpParams,
+    zLogoutFromGameParams,
+    zResetPassParams,
+    zResetStatsParams,
     zSetAccountNameParams,
     zSetMatchDataNameParams,
     zUnbanAccountParams,
     zUnbanIpParams,
-} from "../../../../../shared/types/moderation";
-import { util } from "../../../../../shared/utils/util";
-import { Config } from "../../../config";
-import { validateUserName } from "../../../utils/serverHelpers";
-import type { SaveGameBody } from "../../../utils/types";
-import { server } from "../../apiServer";
-import { databaseEnabledMiddleware, validateParams } from "../../auth/middleware";
-import { db } from "../../db";
-import { bannedIpsTable, ipLogsTable, matchDataTable, usersTable } from "../../db/schema";
-import { sanitizeSlug } from "../user/auth/authUtils";
+} from "../../../../../shared/types/moderation.ts";
+import { util } from "../../../../../shared/utils/util.ts";
+import { Config } from "../../../config.ts";
+import { validateUserName } from "../../../utils/badWords.ts";
+import type { SaveGameBody } from "../../../utils/types.ts";
+import { server } from "../../apiServer.ts";
+import { databaseEnabledMiddleware, validateParams } from "../../auth/middleware.ts";
+import { db } from "../../db/index.ts";
+import { bannedIpsTable, ipLogsTable, itemsTable, matchDataTable, userPassTable, usersTable } from "../../db/schema.ts";
+import { sanitizeSlug } from "../user/auth/authUtils.ts";
+import { incrementPassXp } from "./passXp.ts";
 
 export const ModerationRouter = new Hono()
     .use(databaseEnabledMiddleware)
@@ -396,7 +401,131 @@ export const ModerationRouter = new Hono()
 
             return c.json({ message: `slug: ${user.slug}` }, 200);
         },
-    );
+    )
+    .post("reset_pass", validateParams(zResetPassParams), async (c) => {
+        const { slug, pass } = c.req.valid("json");
+
+        const user = await db.query.usersTable.findFirst({
+            where: eq(usersTable.slug, slug),
+            columns: {
+                id: true,
+            },
+        });
+
+        if (!user) {
+            return c.json({ message: "No user found with that slug." }, 404);
+        }
+
+        // default to the active pass
+        const actualPass = pass || Config.passType;
+
+        await db.transaction(async (t) => {
+            await t
+                .delete(userPassTable)
+                .where(
+                    and(
+                        eq(userPassTable.userId, user.id),
+                        eq(userPassTable.passType, actualPass),
+                    ),
+                );
+
+            // also remove the pass items from their account
+            await t
+                .delete(itemsTable)
+                .where(
+                    and(
+                        eq(itemsTable.userId, user.id),
+                        eq(itemsTable.source, actualPass),
+                    ),
+                );
+        });
+
+        return c.json({ message: `Successfully reset pass for ${slug}` }, 200);
+    })
+    .post("give_xp", validateParams(zGiveXpParams), async (c) => {
+        const { slug, xp } = c.req.valid("json");
+
+        const user = await db.query.usersTable.findFirst({
+            where: eq(usersTable.slug, slug),
+            columns: {
+                id: true,
+            },
+        });
+
+        if (!user) {
+            return c.json({ message: "No user found with that slug." }, 404);
+        }
+
+        await db.transaction(async (tx) => {
+            await incrementPassXp(tx, user.id, xp);
+        });
+
+        return c.json({ message: `Successfully gave ${xp} xp to ${slug}` }, 200);
+    })
+    .post("logout_from_game", validateParams(zLogoutFromGameParams), async (c) => {
+        const { slug, game_id } = c.req.valid("json");
+
+        const user = await db.query.usersTable.findFirst({
+            where: eq(usersTable.slug, slug),
+            columns: {
+                id: true,
+            },
+        });
+
+        if (!user) {
+            return c.json({ message: "No user found with that slug." }, 404);
+        }
+
+        const result = await db
+            .update(matchDataTable)
+            .set({ userId: null })
+            .where(
+                and(
+                    eq(matchDataTable.userId, user.id),
+                    eq(matchDataTable.gameId, game_id),
+                ),
+            );
+
+        if (!result.rowCount) {
+            return c.json(
+                { message: `User ${slug} was not found on game ${game_id}` },
+                404,
+            );
+        }
+
+        return c.json(
+            {
+                message: `Successfully logged out ${slug} from game ${game_id}.`,
+            },
+            200,
+        );
+    })
+    .post("reset_stats", validateParams(zResetStatsParams), async (c) => {
+        const { slug } = c.req.valid("json");
+
+        const user = await db.query.usersTable.findFirst({
+            where: eq(usersTable.slug, slug),
+            columns: {
+                id: true,
+            },
+        });
+
+        if (!user) {
+            return c.json({ message: "No user found with that slug." }, 404);
+        }
+
+        const result = await db
+            .update(matchDataTable)
+            .set({ userId: null })
+            .where(eq(matchDataTable.userId, user.id));
+
+        return c.json(
+            {
+                message: `Successfully reset stats for ${slug} (${result.rowCount} games affected).`,
+            },
+            200,
+        );
+    });
 
 async function banAccount(userId: string, banReason: string, executorId: string) {
     await db

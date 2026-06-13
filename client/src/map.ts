@@ -1,33 +1,33 @@
 import * as PIXI from "pixi.js-legacy";
-import { type MapDef, MapDefs } from "../../shared/defs/mapDefs";
-import { MapObjectDefs } from "../../shared/defs/mapObjectDefs";
-import type { BuildingDef, ObstacleDef } from "../../shared/defs/mapObjectsTyping";
-import { GameConfig } from "../../shared/gameConfig";
-import type { GroundPatch, MapMsg } from "../../shared/net/mapMsg";
-import { type Circle, type Collider, coldet } from "../../shared/utils/coldet";
-import { collider } from "../../shared/utils/collider";
-import { mapHelpers } from "../../shared/utils/mapHelpers";
-import { math } from "../../shared/utils/math";
-import type { River } from "../../shared/utils/river";
-import { generateJaggedAabbPoints, generateTerrain } from "../../shared/utils/terrainGen";
-import { util } from "../../shared/utils/util";
-import { type Vec2, v2 } from "../../shared/utils/v2";
-import type { Ambiance } from "./ambiance";
-import type { AudioManager } from "./audioManager";
-import type { Camera } from "./camera";
-import type { DebugRenderOpts } from "./config";
-import { renderSpline } from "./debug/debugHelpers";
-import { debugLines } from "./debug/debugLines";
-import { device } from "./device";
-import { Building } from "./objects/building";
-import type { DecalBarn } from "./objects/decal";
-import { Pool } from "./objects/objectPool";
-import { Obstacle } from "./objects/obstacle";
-import type { Emitter, ParticleBarn } from "./objects/particles";
-import type { Player, PlayerBarn } from "./objects/player";
-import type { SmokeParticle } from "./objects/smoke";
-import { Structure } from "./objects/structure";
-import type { Renderer } from "./renderer";
+import { type MapDef, type MapDefKey, MapDefs } from "../../shared/defs/mapDefs.ts";
+import type { BuildingDef, ObstacleDef } from "../../shared/defs/mapObjectsTyping.ts";
+import { MapObjectDefs } from "../../shared/defs/register.ts";
+import { GameConfig } from "../../shared/gameConfig.ts";
+import type { GroundPatch, MapMsg } from "../../shared/net/mapMsg.ts";
+import { type Circle, coldet, type Collider } from "../../shared/utils/coldet.ts";
+import { collider } from "../../shared/utils/collider.ts";
+import { mapHelpers } from "../../shared/utils/mapHelpers.ts";
+import { math } from "../../shared/utils/math.ts";
+import type { River } from "../../shared/utils/river.ts";
+import { generateJaggedAabbPoints, generateTerrain } from "../../shared/utils/terrainGen.ts";
+import { util } from "../../shared/utils/util.ts";
+import { v2, type Vec2 } from "../../shared/utils/v2.ts";
+import type { Ambiance } from "./ambiance.ts";
+import type { AudioManager } from "./audioManager.ts";
+import type { Camera } from "./camera.ts";
+import type { DebugRenderOpts } from "./config.ts";
+import { renderSpline } from "./debug/debugHelpers.ts";
+import { debugLines } from "./debug/debugLines.ts";
+import { device } from "./device.ts";
+import { Building } from "./objects/building.ts";
+import type { DecalBarn } from "./objects/decal.ts";
+import { Pool } from "./objects/objectPool.ts";
+import { Obstacle } from "./objects/obstacle.ts";
+import type { Emitter, ParticleBarn } from "./objects/particles.ts";
+import type { Player, PlayerBarn } from "./objects/player.ts";
+import type { SmokeParticle } from "./objects/smoke.ts";
+import { Structure } from "./objects/structure.ts";
+import type { Renderer } from "./renderer.ts";
 
 // Drawing
 
@@ -104,9 +104,10 @@ export class Map {
         ground: new PIXI.Graphics(),
     };
 
-    mapName = "";
+    mapName = "" as MapDefKey;
     mapDef = {} as MapDef;
     factionMode = false;
+    potatoMode = false;
     perkMode = false;
     turkeyMode = false;
     seed = 0;
@@ -178,12 +179,13 @@ export class Map {
     ) {
         this.mapName = mapMsg.mapName;
         // Clone the source mapDef
-        const mapDef = MapDefs[this.mapName as keyof typeof MapDefs];
+        const mapDef = MapDefs[this.mapName];
         if (!mapDef) {
             throw new Error(`Failed loading mapDef ${this.mapName}`);
         }
         this.mapDef = util.cloneDeep(mapDef);
         this.factionMode = !!this.mapDef.gameMode.factionMode;
+        this.potatoMode = !!this.mapDef.gameMode.potatoMode;
         this.perkMode = !!this.mapDef.gameMode.perkMode;
         this.turkeyMode = !!this.mapDef.gameMode.turkeyMode;
         this.seed = mapMsg.seed;
@@ -457,7 +459,7 @@ export class Map {
     }
 
     getMinimapRender(obj: (typeof this.mapData.objects)[number]) {
-        const def = MapObjectDefs[obj.type] as ObstacleDef | BuildingDef;
+        const def = MapObjectDefs.typeToDef(obj.type) as ObstacleDef | BuildingDef;
         const zIdx = def.type == "building" ? 750 + (def.zIdx || 0) : def.img.zIdx || 0;
         let shapes: Array<{
             scale?: number;
@@ -466,22 +468,21 @@ export class Map {
         }> = [];
         if ((def as BuildingDef).map?.shapes !== undefined) {
             // @ts-expect-error stfu
-            shapes = (def as BuildingDef).map?.shapes!;
+            shapes = (def as BuildingDef).map?.shapes;
         } else {
             let col = null;
             if (
-                (col =
-                    def.type == "obstacle"
-                        ? def.collision
-                        : def.ceiling.zoomRegions.length > 0 &&
-                            def.ceiling.zoomRegions[0].zoomIn
-                          ? def.ceiling.zoomRegions[0].zoomIn
-                          : mapHelpers.getBoundingCollider(obj.type))
+                (col = def.type == "obstacle"
+                    ? def.collision
+                    : def.ceiling.zoomRegions.length > 0
+                            && def.ceiling.zoomRegions[0].zoomIn
+                    ? def.ceiling.zoomRegions[0].zoomIn
+                    : mapHelpers.getBoundingCollider(obj.type))
             ) {
                 shapes.push({
                     collider: collider.copy(col) as Circle,
-                    scale: def.map?.scale! || 1,
-                    color: def.map?.color!,
+                    scale: def.map!.scale || 1,
+                    color: def.map!.color!,
                 });
             }
         }
@@ -659,12 +660,10 @@ export class Map {
         const groundSurface = (type: string, data: Record<string, any> = {}) => {
             if (type == "water") {
                 const mapColors = this.getMapDef().biome.colors;
-                data.waterColor =
-                    data.waterColor !== undefined ? data.waterColor : mapColors.water;
-                data.rippleColor =
-                    data.rippleColor !== undefined
-                        ? data.rippleColor
-                        : mapColors.waterRipple;
+                data.waterColor = data.waterColor !== undefined ? data.waterColor : mapColors.water;
+                data.rippleColor = data.rippleColor !== undefined
+                    ? data.rippleColor
+                    : mapColors.waterRipple;
             }
             return {
                 type,
@@ -680,10 +679,10 @@ export class Map {
         for (let i = 0; i < decals.length; i++) {
             const decal = decals[i];
             if (
-                decal.active &&
-                decal.surface &&
-                util.sameLayer(decal.layer, layer) &&
-                collider.intersectCircle(decal.collider, pos, 0.0001)
+                decal.active
+                && decal.surface
+                && util.sameLayer(decal.layer, layer)
+                && collider.intersectCircle(decal.collider, pos, 0.0001)
             ) {
                 return groundSurface(decal.surface.type, decal.surface.data);
             }
@@ -697,11 +696,11 @@ export class Map {
         for (let i = 0; i < buildings.length; i++) {
             const building = buildings[i];
             if (
-                building.active &&
-                building.zIdx >= zIdx &&
+                building.active
+                && building.zIdx >= zIdx
                 // Prioritize layer0 building surfaces when on stairs
-                (building.layer == layer || !!onStairs) &&
-                (building.layer != 1 || !onStairs)
+                && (building.layer == layer || !!onStairs)
+                && (building.layer != 1 || !onStairs)
             ) {
                 for (let i = 0; i < building.surfaces.length; i++) {
                     const s = building.surfaces[i];
@@ -723,13 +722,13 @@ export class Map {
         // Check rivers
         let onRiverShore = false;
         if (layer != 1) {
-            const rivers = this.terrain?.rivers!;
+            const rivers = this.terrain!.rivers;
             for (let v = 0; v < rivers.length; v++) {
                 const river = rivers[v];
                 if (
-                    coldet.testPointAabb(pos, river.aabb.min, river.aabb.max) &&
-                    math.pointInsidePolygon(pos, river.shorePoly) &&
-                    ((onRiverShore = true), math.pointInsidePolygon(pos, river.waterPoly))
+                    coldet.testPointAabb(pos, river.aabb.min, river.aabb.max)
+                    && math.pointInsidePolygon(pos, river.shorePoly)
+                    && ((onRiverShore = true), math.pointInsidePolygon(pos, river.waterPoly))
                 ) {
                     return groundSurface("water", {
                         river,
@@ -740,22 +739,22 @@ export class Map {
         // Check terrain
         return groundSurface(
             // Use a stone step sound if we're in the main-spring def
-            math.pointInsidePolygon(pos, this.terrain?.grass!)
+            math.pointInsidePolygon(pos, this.terrain!.grass)
                 ? onRiverShore
                     ? this.mapDef.biome.sound.riverShore
                     : "grass"
-                : math.pointInsidePolygon(pos, this.terrain?.shore!)
-                  ? "sand"
-                  : "water",
+                : math.pointInsidePolygon(pos, this.terrain!.shore)
+                ? "sand"
+                : "water",
         );
     }
 
     isInOcean(pos: Vec2) {
-        return !math.pointInsidePolygon(pos, this.terrain?.shore!);
+        return !math.pointInsidePolygon(pos, this.terrain!.shore);
     }
 
     distanceToShore(pos: Vec2) {
-        return math.distToPolygon(pos, this.terrain?.shore!);
+        return math.distToPolygon(pos, this.terrain!.shore);
     }
 
     insideStructureStairs(collision: Collider) {
@@ -796,10 +795,10 @@ export class Map {
         for (let i = 0; i < buildings.length; i++) {
             const building = buildings[i];
             if (
-                building.active &&
-                (!checkVisible ||
-                    (building.ceiling.visionTicker > 0 && !building.ceilingDead)) &&
-                building.isInsideCeiling(collision)
+                building.active
+                && (!checkVisible
+                    || (building.ceiling.visionTicker > 0 && !building.ceilingDead))
+                && building.isInsideCeiling(collision)
             ) {
                 return true;
             }

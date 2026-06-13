@@ -1,160 +1,239 @@
+type QuestEvent =
+    | "kill"
+    | "damage"
+    | "survived"
+    | "placement"
+    | "item_used"
+    | "destruction";
+
+interface QuestWhere {
+    mode?: "solo" | "duo" | "squad";
+    maxRank?: number;
+    buildingType?: string;
+    ammo?: string;
+    weaponClass?: "melee" | "throwable";
+    itemType?: string;
+    itemClass?: "heal" | "boost";
+    obstacleType?: string;
+}
+
 export interface QuestDef {
     readonly type: "quest";
-    category: string;
+    event: QuestEvent;
     target: number;
     xp: number;
-    timed?: boolean;
     icon?: string;
+    timed?: boolean;
+    where?: QuestWhere;
 }
 
 export const QuestDefs: Record<string, QuestDef> = {
     quest_top_solo: {
         type: "quest",
-        category: "top",
+        event: "placement",
         target: 2,
         xp: 30,
+        where: {
+            mode: "solo",
+            maxRank: 10,
+        },
     },
     quest_top_squad: {
         type: "quest",
-        category: "top",
+        event: "placement",
         target: 2,
         xp: 30,
+        where: {
+            mode: "squad",
+            maxRank: 5,
+        },
     },
     quest_kills: {
         type: "quest",
-        category: "pvp",
+        event: "kill",
         target: 5,
         xp: 30,
     },
     quest_kills_hard: {
         type: "quest",
-        category: "pvp",
+        event: "kill",
         target: 10,
         xp: 40,
     },
     quest_damage: {
         type: "quest",
-        category: "pvp",
+        event: "damage",
         target: 750,
         xp: 30,
     },
     quest_damage_hard: {
         type: "quest",
-        category: "pvp",
+        event: "damage",
         target: 1500,
         xp: 40,
     },
     quest_survived: {
         type: "quest",
-        category: "pvp",
+        event: "survived",
         target: 900,
         xp: 30,
         timed: true,
     },
     quest_damage_9mm: {
         type: "quest",
-        category: "damage",
+        event: "damage",
         target: 250,
         xp: 30,
         icon: "img/emotes/ammo-9mm.svg",
+        where: {
+            ammo: "9mm",
+        },
     },
     quest_damage_762mm: {
         type: "quest",
-        category: "damage",
+        event: "damage",
         target: 250,
         xp: 30,
         icon: "img/emotes/ammo-762mm.svg",
+        where: {
+            ammo: "762mm",
+        },
     },
     quest_damage_556mm: {
         type: "quest",
-        category: "damage",
+        event: "damage",
         target: 250,
         xp: 30,
         icon: "img/emotes/ammo-556mm.svg",
+        where: {
+            ammo: "556mm",
+        },
     },
     quest_damage_12gauge: {
         type: "quest",
-        category: "damage",
+        event: "damage",
         target: 250,
         xp: 30,
         icon: "img/emotes/ammo-12gauge.svg",
+        where: {
+            ammo: "12gauge",
+        },
     },
     quest_damage_grenade: {
         type: "quest",
-        category: "damage",
+        event: "damage",
         target: 100,
         xp: 40,
+        where: {
+            weaponClass: "throwable",
+        },
     },
     quest_damage_melee: {
         type: "quest",
-        category: "damage",
+        event: "damage",
         target: 150,
         xp: 40,
+        where: {
+            weaponClass: "melee",
+        },
     },
     quest_heal: {
         type: "quest",
-        category: "item",
+        event: "item_used",
         target: 10,
         xp: 30,
+        where: {
+            itemClass: "heal",
+        },
     },
     quest_boost: {
         type: "quest",
-        category: "item",
+        event: "item_used",
         target: 10,
         xp: 30,
+        where: {
+            itemClass: "boost",
+        },
     },
     quest_airdrop: {
         type: "quest",
-        category: "item",
+        event: "item_used",
         target: 1,
         xp: 30,
+        where: {
+            itemType: "airdrop_crate",
+        },
     },
     quest_crates: {
         type: "quest",
-        category: "destruction",
+        event: "destruction",
         target: 25,
         xp: 30,
+        where: {
+            obstacleType: "crate",
+        },
     },
     quest_toilets: {
         type: "quest",
-        category: "destruction",
+        event: "destruction",
         target: 5,
         xp: 30,
+        where: {
+            obstacleType: "toilet",
+        },
     },
     quest_furniture: {
         type: "quest",
-        category: "destruction",
+        event: "destruction",
         target: 10,
         xp: 30,
+        where: {
+            obstacleType: "furniture",
+        },
     },
     quest_barrels: {
         type: "quest",
-        category: "destruction",
+        event: "destruction",
         target: 10,
         xp: 30,
+        where: {
+            obstacleType: "barrel",
+        },
     },
     quest_lockers: {
         type: "quest",
-        category: "destruction",
+        event: "destruction",
         target: 10,
         xp: 30,
+        where: {
+            obstacleType: "locker",
+        },
     },
     quest_pots: {
         type: "quest",
-        category: "destruction",
+        event: "destruction",
         target: 8,
         xp: 30,
+        where: {
+            obstacleType: "pot",
+        },
     },
     quest_vending: {
         type: "quest",
-        category: "destruction",
+        event: "destruction",
         target: 1,
         xp: 40,
+        where: {
+            obstacleType: "vending",
+        },
     },
     quest_club_kills: {
         type: "quest",
-        category: "location",
+        event: "kill",
         target: 2,
         xp: 40,
+        where: {
+            buildingType: "club",
+        },
     },
 };

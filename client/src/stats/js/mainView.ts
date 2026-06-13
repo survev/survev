@@ -1,10 +1,10 @@
 import $ from "jquery";
-import { MinGames } from "../../../../shared/constants";
-import type { LeaderboardRequest } from "../../../../shared/types/stats";
-import { api } from "../../api";
-import { device } from "../../device";
-import { helpers } from "../../helpers";
-import type { App } from "./app";
+import { MinGames } from "../../../../shared/constants.ts";
+import type { LeaderboardRequest } from "../../../../shared/types/stats.ts";
+import { api } from "../../api.ts";
+import { device } from "../../device.ts";
+import { helpers } from "../../helpers.ts";
+import type { App } from "./app.ts";
 import leaderboard from "./templates/leaderboard.ejs";
 import leaderboardError from "./templates/leaderboardError.ejs";
 import loading from "./templates/loading.ejs";
@@ -41,8 +41,6 @@ export class MainView {
     );
 
     constructor(readonly app: App) {
-        this.app = app;
-
         this.el.find(".leaderboard-opt").change(() => {
             this.onChangedParams();
         });
@@ -56,11 +54,9 @@ export class MainView {
         //   interval: daily, weekly, alltime
         //   teamMode: solo, duo, squad
         //   maxCount: 10, 100
-        let type =
-            helpers.getParameterByName<LeaderboardRequest["type"]>("type") ||
-            "most_kills";
-        const interval =
-            helpers.getParameterByName<LeaderboardRequest["interval"]>("t") || "daily";
+        let type = helpers.getParameterByName<LeaderboardRequest["type"]>("type")
+            || "most_kills";
+        const interval = helpers.getParameterByName<LeaderboardRequest["interval"]>("t") || "daily";
         const teamMode = helpers.getParameterByName("team") || "solo";
         const mapId = helpers.getParameterByName("mapId") || "0";
         // Change to most_damage_dealt if faction mode and most_kills selected
@@ -129,11 +125,10 @@ export class MainView {
         } else if (this.error || !this.data.data) {
             content = templates.leaderboardError({});
         } else {
-            const statName =
-                TypeToString[this.data.type as keyof typeof TypeToString] || "";
+            const statName = TypeToString[this.data.type as keyof typeof TypeToString] || "";
             let minGames = MinGames[this.data.type as keyof typeof MinGames]
-                ? // @ts-expect-error go away
-                  MinGames[this.data.type][this.data.interval]
+                // @ts-expect-error go away
+                ? MinGames[this.data.type][this.data.interval]
                 : 1;
             minGames = minGames || 1;
 
@@ -152,12 +147,12 @@ export class MainView {
             // Disable most kills option if 50v50 selected
             const factionMode = Number(this.data.mapId) == 3;
             if (factionMode) {
-                $('#leaderboard-type option[value="most_kills"]').attr(
+                $("#leaderboard-type option[value=\"most_kills\"]").attr(
                     "disabled",
                     "disabled",
                 );
             } else {
-                $('#leaderboard-type option[value="most_kills"]').removeAttr("disabled");
+                $("#leaderboard-type option[value=\"most_kills\"]").removeAttr("disabled");
             }
         }
 

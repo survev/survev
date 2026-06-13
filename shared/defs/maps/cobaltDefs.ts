@@ -1,7 +1,7 @@
-import { util } from "../../utils/util";
-import { v2 } from "../../utils/v2";
-import { MapId } from "../types/misc";
-import { Main, type PartialMapDef } from "./baseDefs";
+import { util } from "../../utils/util.ts";
+import { v2 } from "../../utils/v2.ts";
+import { MapId } from "../types/misc.ts";
+import { Main, type PartialMapDef } from "./baseDefs.ts";
 
 const mapDef: PartialMapDef = {
     mapId: MapId.Cobalt,
@@ -47,8 +47,8 @@ const mapDef: PartialMapDef = {
                 {
                     type: "bunker_twins_sublevel_01",
                     stagger: 0.2,
-                    circleIdx: 2,
-                    wait: 5,
+                    circleIdx: 1,
+                    wait: 30,
                 },
             ],
         },
@@ -59,9 +59,18 @@ const mapDef: PartialMapDef = {
             { name: "chest02", count: 1, weight: 1 },
             { name: "helmet02", count: 1, weight: 1 },
         ],
+        tier_armor: [
+            { name: "helmet01", count: 1, weight: 4 },
+            { name: "helmet02", count: 1, weight: 4 },
+            { name: "helmet03", count: 1, weight: 0.2 },
+            { name: "chest01", count: 1, weight: 6 },
+            { name: "chest02", count: 1, weight: 4 },
+            { name: "chest03", count: 1, weight: 0.2 },
+        ],
         tier_mansion_floor: [{ name: "tier_outfits", count: 1, weight: 1 }],
         tier_vault_floor: [{ name: "tier_outfits", count: 1, weight: 1 }],
         tier_police_floor: [{ name: "tier_outfits", count: 1, weight: 1 }],
+        tier_fragtastic: [{ name: "", count: 1, weight: 1 }],
         tier_conch: [{ name: "tier_outfits", count: 1, weight: 1 }],
         tier_noir_outfit: [{ name: "tier_outfits", count: 1, weight: 1 }],
         tier_khaki_outfit: [{ name: "tier_outfits", count: 1, weight: 1 }],
@@ -116,7 +125,7 @@ const mapDef: PartialMapDef = {
                 crate_02: 4,
                 crate_03: 8,
                 bush_01cb: 78,
-                cache_06: 12,
+                cache_06cb: 12,
                 tree_01cb: 320,
                 hedgehog_01: 24,
                 container_01: 5,
@@ -143,6 +152,7 @@ const mapDef: PartialMapDef = {
                 shack_03b: { small: 2, large: 3 },
                 cache_01cb: 1,
                 cache_02cb: 1, // mosin tree
+                cache_04cb: 1,
                 cache_07: 1,
                 bunker_structure_01: { odds: 0.05 },
                 bunker_structure_02: 1,
@@ -153,13 +163,16 @@ const mapDef: PartialMapDef = {
                 chest_01cb: 1,
                 chest_03cb: { odds: 0.2 },
                 mil_crate_02: { odds: 0.25 },
-                teahouse_complex_01su: {
+                teahouse_complex_01cb: {
                     small: 1,
                     large: 2,
                 },
                 stone_04: 1,
                 club_complex_01: 1,
-                class_shell_01: 40,
+                class_shell_01: {
+                    small: 45,
+                    large: 55,
+                },
                 cache_log_13: 1, // recorder crate
             },
         ],

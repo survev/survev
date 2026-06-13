@@ -1,4 +1,4 @@
-import { TeamMode } from "../../gameConfig";
+import { TeamMode } from "../../gameConfig.ts";
 
 export enum MapId {
     Main = 0,
@@ -17,4 +17,4 @@ export const TeamModeToString = {
     [TeamMode.Solo]: "solo",
     [TeamMode.Duo]: "duo",
     [TeamMode.Squad]: "squad",
-};
+} as const;

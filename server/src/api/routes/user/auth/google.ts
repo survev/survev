@@ -1,8 +1,8 @@
-import { Google, generateCodeVerifier, generateState } from "arctic";
+import { generateCodeVerifier, generateState, Google } from "arctic";
 import { Hono } from "hono";
 import { getCookie, setCookie } from "hono/cookie";
-import { Config } from "../../../../config";
-import { cookieDomain, getRedirectUri, handleAuthUser } from "./authUtils";
+import { Config } from "../../../../config.ts";
+import { cookieDomain, getRedirectUri, handleAuthUser } from "./authUtils.ts";
 
 const google = new Google(
     Config.secrets.GOOGLE_CLIENT_ID!,

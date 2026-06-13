@@ -1,5 +1,5 @@
-import { type DeepPartial, util } from "../../utils/util";
-import type { Vec2 } from "../../utils/v2";
+import { type DeepPartial, util } from "../../utils/util.ts";
+import type { Vec2 } from "../../utils/v2.ts";
 
 export interface GunDef {
     readonly type: "gun";
@@ -92,6 +92,7 @@ export interface GunDef {
     ignoreDetune?: boolean;
     aimDelay?: boolean;
     isBullpup?: boolean;
+    isMinigun?: boolean;
     jitter?: number;
     maxReloadAlt?: number;
     extendedReloadAlt?: number;
@@ -2000,9 +2001,9 @@ export const BaseDefs: Record<string, GunDef> = {
             scale: 0.3,
         },
         worldImg: {
-            sprite: "gun-long-01.img",
-            scale: { x: 0.5, y: 0.4 },
-            tint: 0x2d4251,
+            sprite: "gun-spas12-01.img",
+            scale: { x: 0.5, y: 0.5 },
+            tint: 0xffffff,
             leftHandOffset: { x: 4.9, y: 0 },
             recoil: 1.33,
         },
@@ -2031,12 +2032,12 @@ export const BaseDefs: Record<string, GunDef> = {
         extendedClip: 8,
         extendedReload: 8,
         reloadTime: 2.9,
-        fireDelay: 0.29,
+        fireDelay: 0.35,
         switchDelay: 0.75,
         pullDelay: 0.75,
         barrelLength: 3.65,
         barrelOffset: 0,
-        recoilTime: 3,
+        recoilTime: 1e10,
         moveSpread: 1.5,
         shotSpread: 5.5,
         bulletCount: 8,
@@ -2223,7 +2224,7 @@ export const BaseDefs: Record<string, GunDef> = {
         isDual: true,
         pistol: true,
         ammo: "9mm",
-        ammoSpawnCount: 45,
+        ammoSpawnCount: 90,
         maxClip: 30,
         maxReload: 30,
         extendedClip: 60,
@@ -2375,7 +2376,7 @@ export const BaseDefs: Record<string, GunDef> = {
         isDual: true,
         pistol: true,
         ammo: "9mm",
-        ammoSpawnCount: 60,
+        ammoSpawnCount: 120,
         maxClip: 40,
         maxReload: 40,
         extendedClip: 60,
@@ -2474,7 +2475,7 @@ export const BaseDefs: Record<string, GunDef> = {
         fireMode: "auto",
         caseTiming: "shoot",
         ammo: "9mm",
-        ammoSpawnCount: 51,
+        ammoSpawnCount: 102,
         isDual: true,
         pistol: true,
         maxClip: 34,
@@ -2672,7 +2673,7 @@ export const BaseDefs: Record<string, GunDef> = {
         fireMode: "single",
         caseTiming: "reload",
         ammo: "762mm",
-        ammoSpawnCount: 20,
+        ammoSpawnCount: 40,
         isDual: true,
         pistol: true,
         maxClip: 10,
@@ -2870,7 +2871,7 @@ export const BaseDefs: Record<string, GunDef> = {
         fireMode: "auto",
         caseTiming: "reload",
         ammo: "45acp",
-        ammoSpawnCount: 48,
+        ammoSpawnCount: 96,
         isDual: true,
         pistol: true,
         maxClip: 12,
@@ -2971,7 +2972,7 @@ export const BaseDefs: Record<string, GunDef> = {
         isDual: true,
         pistol: true,
         ammo: "45acp",
-        ammoSpawnCount: 28,
+        ammoSpawnCount: 56,
         maxClip: 14,
         maxReload: 14,
         extendedClip: 24,
@@ -3380,6 +3381,63 @@ export const BaseDefs: Record<string, GunDef> = {
             pickup: "gun_pickup_01",
             empty: "empty_fire_01",
             deploy: "potato_smg_switch_01",
+        },
+    },
+    potato_lmg: {
+        name: "PMG-134",
+        type: "gun",
+        quality: 0,
+        fireMode: "auto",
+        caseTiming: "shoot",
+        isMinigun: true,
+        noPotatoSwap: true,
+        ammo: "potato_ammo",
+        ammoSpawnCount: 0,
+        ammoInfinite: true,
+        maxClip: 150,
+        maxReload: 150,
+        extendedClip: 250,
+        extendedReload: 250,
+        reloadTime: 5.8,
+        fireDelay: 0.07,
+        switchDelay: 0.75,
+        barrelLength: 4.5,
+        barrelOffset: 0,
+        recoilTime: 1e10,
+        moveSpread: 4,
+        shotSpread: 8,
+        bulletCount: 2,
+        bulletType: "bullet_invis",
+        projType: "potato_lmgshot",
+        noSplinter: true,
+        headshotMult: 1.5,
+        speed: { equip: -1.5, attack: -6 },
+        lootImg: {
+            sprite: "loot-weapon-potato-lmg.img",
+            tint: 0xff00,
+            border: "loot-circle-outer-01.img",
+            borderTint: 0,
+            scale: 0.3,
+        },
+        worldImg: {
+            sprite: "gun-potato-lmg-top-01.img",
+            scale: { x: 0.5, y: 0.5 },
+            tint: 0xffffff,
+            gunOffset: { x: -30, y: 1.75 },
+            recoil: 1,
+        },
+        particle: {
+            shellScale: 1,
+            shellOffset: 0.1,
+            shellReverse: true,
+            shellOffsetY: -0.2,
+        },
+        sound: {
+            shoot: "potato_lmg_01",
+            reload: "potato_lmg_reload_01",
+            pickup: "gun_pickup_01",
+            empty: "empty_fire_01",
+            deploy: "potato_lmg_switch_01",
         },
     },
     bugle: {

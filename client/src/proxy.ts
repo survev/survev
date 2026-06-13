@@ -1,4 +1,4 @@
-import type { ProxyDef } from "../../shared/types/api";
+import type { ProxyDef } from "../../shared/types/api.ts";
 
 declare const PROXY_DEFS: Record<string, ProxyDef>;
 
@@ -27,9 +27,9 @@ export const proxy = {
 
     anyLoginSupported() {
         return (
-            proxy.loginSupported("google") ||
-            proxy.loginSupported("discord") ||
-            proxy.loginSupported("mock")
+            proxy.loginSupported("google")
+            || proxy.loginSupported("discord")
+            || proxy.loginSupported("mock")
         );
     },
 };

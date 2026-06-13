@@ -1,6 +1,6 @@
-import { collider } from "./collider";
-import { math } from "./math";
-import { type Vec2, v2 } from "./v2";
+import { collider } from "./collider.ts";
+import { math } from "./math.ts";
+import { v2, type Vec2 } from "./v2.ts";
 
 export interface Circle {
     type: 0;
@@ -153,8 +153,8 @@ export const coldet = {
         );
         const dstSqr = v2.lengthSqr(v2.sub(pos, cpt));
         return (
-            dstSqr < rad * rad ||
-            (pos.x >= min.x && pos.x <= max.x && pos.y >= min.y && pos.y <= max.y)
+            dstSqr < rad * rad
+            || (pos.x >= min.x && pos.x <= max.x && pos.y >= min.y && pos.y <= max.y)
         );
     },
 

@@ -1,8 +1,8 @@
-import type { AABB, Collider } from "../../../shared/utils/coldet";
-import { collider } from "../../../shared/utils/collider";
-import { math } from "../../../shared/utils/math";
-import { type Vec2, v2 } from "../../../shared/utils/v2";
-import type { Loot } from "./objects/loot";
+import type { AABB, Collider } from "../../../shared/utils/coldet.ts";
+import { collider } from "../../../shared/utils/collider.ts";
+import { math } from "../../../shared/utils/math.ts";
+import { v2, type Vec2 } from "../../../shared/utils/v2.ts";
+import type { Loot } from "./objects/loot.ts";
 
 interface GameObject {
     __gridCells: Vec2[];
@@ -29,8 +29,9 @@ export class Grid<T extends GameObject = GameObject> {
         this.width = Math.floor(width / this.cellSize);
         this.height = Math.floor(height / this.cellSize);
 
-        this._grid = Array.from({ length: this.width + 1 }, () =>
-            Array.from({ length: this.height + 1 }, () => new Set()),
+        this._grid = Array.from(
+            { length: this.width + 1 },
+            () => Array.from({ length: this.height + 1 }, () => new Set()),
         );
     }
 
@@ -173,14 +174,12 @@ export class Grid<T extends GameObject = GameObject> {
         const gridDeltaX = lineEnd.x >= lineStart.x ? 1 : -1;
         const gridDeltaY = lineEnd.y >= lineStart.y ? 1 : -1;
 
-        const deltaX =
-            Math.abs(diff.x) > 0.00001
-                ? (gridDeltaX * this.cellSize) / diff.x
-                : Number.MAX_VALUE;
-        const deltaY =
-            Math.abs(diff.y) > 0.00001
-                ? (gridDeltaY * this.cellSize) / diff.y
-                : Number.MAX_VALUE;
+        const deltaX = Math.abs(diff.x) > 0.00001
+            ? (gridDeltaX * this.cellSize) / diff.x
+            : Number.MAX_VALUE;
+        const deltaY = Math.abs(diff.y) > 0.00001
+            ? (gridDeltaY * this.cellSize) / diff.y
+            : Number.MAX_VALUE;
 
         const relativeX = math.mod(lineStart.x / this.cellSize, 1);
         const relativeY = math.mod(lineStart.y / this.cellSize, 1);

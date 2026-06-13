@@ -122,6 +122,15 @@ Barrel Cache (Woods)
     > Drops a Level 3 Vest, MIRV, Strobe, & a random item from tier_surviv.
     > Not previously in the mode.
 
+Tree Cache (Factions)
+    > Drops an additional 4x Scope and Tier 2 Helmet
+Rock Cache (Factions)
+    > Drops a Tier 2 Vest & Helmet, 5 Bandages, and a 2x Scope.
+    > Drops 1 item from tier_surviv instead of 2-3.
+Barrel Cache (Factions)
+    > Drops 4 MIRVs & 6 Frags from 3 MIRVs
+    > Drops a Tier 2 Vest
+
 ## Other Changes
 Sorted by the patch they were done in.
 
@@ -139,7 +148,7 @@ Factions Changes (2025/07/23):
 
 Cobalt Loot Changes (2025/10/22):
 + Medic Common: Added VSS (weight of 1)
-+ Scout Common: Added Dual M93R, DEagle (weights of 1 & 0.2 respectively).
++ Scout Common: Added Dual M93R, DEagle (weights of 1 & 0.2, respectively).
 + Demo Common: Added MP220 (weight 1).
 + Tank Common: Added BAR M1918 (weight of 0.5), 
 ~ Tank Common: Adjusted QBB-97 weight (0.1 -> 0.2)
@@ -148,7 +157,7 @@ Cobalt Loot Changes (2025/10/22):
 - Demo Rare: Removed MP220
 + Demo Rare: Added Super-90 (weight of 0.1).
 ~ Demo Rare: Adjusted Saiga weight (0.5 -> 1) 
-~ Tank Rare: Adjusted QBB-97 & M249 weights (1 -> 1.3 & 0.05 -> 0.2 respectively).
+~ Tank Rare: Adjusted QBB-97 & M249 weights (1 -> 1.2 & 0.05 -> 0.2, respectively).
 
 Turkey Cache Changes (2025/11/01): 
 + 50 Leafpile Loot Caches
@@ -213,3 +222,59 @@ Turkey Cache Changes (2025/11/01):
 
 0.2.23 (Spring Woods) (2026/03/24):
 + Tier Airdrop Melee: Adjusted Stonehammer weight (1 -> 6) (applies to the Ice Axe in Winter Woods).
+
+0.2.3 (Potato vs Tomato) (2026/04/01):
++ Added Faction-specific Stone & Barrel cache drops.
+~ Adjusted the Faction tree cache drops.
+
+~ Normal airdrops have the following changes:
+    + tier_airdrop_uncommon: 4-6 -> 7-8
+    + tier_airdrop_armor: 4-5 -> 5-6
+    + tier_airdrop_scopes: 6-8 -> 7-8
+    + tier_airdrop_melee: 5-7 -> 6-7
+    - tier_katanas: 1 -> 0
+
+~ Gold airdrops have following changes:
+    + tier_airdrop_rare: 3-4 -> 5-5
+    - tier_airdrop_faction_melee: 3-4 -> 3
+    + tier_airdro_melee: 0 -> 2-3
+    - tier_katanas: 1 -> 0
+
+~ Tier Airdrop Mythic: Adjusted USAS, AWM-S, PKP, & M249 weights (0.5 -> 1, 0.1 -> 0.75, 0.3 -> 1, & 0.3 -> 1, respectively).
++ Tier Airdrop Mythic: Added SV-98 (weight of 1).
++ Tier Airdrop Melee: Added Tier Katanas, Naginata, Fireaxe, Sledgehammer (weights of 3, 1, 1, & 1, respectively).
+~ Tier Airdrop Melee: Adjusted "" weight (19 -> 2).
+~ Tier Airdrop Rare: Adjusted Garand, AWM-S, PKP, M4A1, CZ-3A1, & Dual OTs-38 weights (6 -> 2, 3 -> 2.25, 0.08 -> 0.1, 5 -> 3, & 4.5 -> 2, respectively).
++ Tier Airdrop Rare: Added Groza-S, SPAS-16, SV-98, Dual P30L, & Dual DEagle 50 (weights of 3, 2, 2, 0.3, & 0.3, respectively).
+~ Tier Airdrop Uncommon: Adjusted Vector, VSS, M39 EMR, Mk 12 SPR, Saiga-12, Scout Elite, BAR, SCAR-H, Mosin, & QBB weights (1 -> 2, 2.5 -> 2, 2.5 -> 2, 2.5 -> 2, 1 -> 2, 2.5 -> 2, 1 -> 2, 0.75 -> 1.5, 1.5 -> 1, & 1.5 -> 1, respectively).
++ Tier Airdrop Uncommon: Added Dual OTs-38 & Garand (weights of 1 & 0.5, respectively).
+
+0.3.0 (Cobalt & Pass) (2026/05/11):
++ Assault Common: Added SCAR-H (weight of 0.2).
++ Tank Common: Added IMD-2 (weight of 0.5).
+~ Tank Common: Adjusted QBB-97 weight (0.2 --> 0.25).
++ Demo Rare: Added SPAS-16 (weight of 0.2).
+~ Demo Rare: Adjusted Saiga-12 weight (1 --> 0.7).
+~ Medic Rare: Adjusted Garand weight (0.5 --> 0.44).
+~ Sniper Rare: Adjusted SV, AWM-S weights (0.1 --> 0.15 & 0.05 --> 0.075, respectively).
+~ Demo Pod: Replaced MIRV (6x) with Tier Throwable Demo (3-4).
++ Tier Class Crate Mythic: Added Indomitable Spirit (weight of 1).
+~ Rare Demo Pod: Replaced Airdrop Throwable (1) with Tier Throwable Demo (4-5).
++ 5-15 Class Pods (30 -> 35-45 depending on map size).
+
+0.3.01 (Cobalt B-Patch) (2026/05/18):
+~ Flak Jacket now gives +3 Frag and +2 MIRV capacity (updated perk description to match).
+~ Grenadier now gets 15 Frags and 12 MIRVs on-promotion (to match the Flak Jacket change).
+~ The Twins bunker now opens 30s after first zone closure.
++ Added Tier Armor (T3 armor odds increased by ~2x [~0.5% -> ~1%], T2 armor odds made similar to T1).
+~ Scout Pod: Adjusted the number of Sodas (3 -> 2).
++ Demo Pod: Added Level 1 Chest (1).
++ Demo Pod: Added 2x Scope (1).
++ Assault Pod: Added Bandages (5).
++ Assault Pod: Added Tier 1 Vest (1).
+~ Scout Common: Adjusted DEagle weight (0.2 -> 0.3).
+~ Demo Common: Swapped SPAS-12 & MP220 weights (0.5 <-> 1).
+~ Assault Common: Adjusted SCAR-H weight (0.2 -> 0.4).
+~ Scout Rare: Adjusted Mk 20 SSR weight (0.05 -> 0.2).
+~ Assault Rare: Adjusted AN-94 weight (0.5 -> 1).
+~ Tank Rare: Adjusted QBB weight (1.2 -> 1).

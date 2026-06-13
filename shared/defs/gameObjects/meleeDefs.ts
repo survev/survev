@@ -1,6 +1,6 @@
-import { Rarity } from "../../gameConfig";
-import { type DeepPartial, util } from "../../utils/util";
-import type { Vec2 } from "../../utils/v2";
+import { Rarity } from "../../gameConfig.ts";
+import { type DeepPartial, util } from "../../utils/util.ts";
+import type { Vec2 } from "../../utils/v2.ts";
 
 export interface MeleeDef {
     readonly type: "melee";
@@ -1385,6 +1385,11 @@ const SkinDefs: Record<string, MeleeDef> = {
             sprite: "loot-melee-warhammer-tank.img",
             pos: { x: -10.5, y: -3 },
         },
+    }),
+    naginata_daemon: defineMeleeSkin("naginata", {
+        name: "Naginata Daemon",
+        lootImg: { sprite: "loot-melee-naginata-daemon.img" },
+        worldImg: { sprite: "loot-melee-naginata-daemon.img" },
     }),
     cutlass_gold: defineMeleeSkin("cutlass", {
         name: "Gold Cutlass",

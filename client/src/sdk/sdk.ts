@@ -1,3 +1,3 @@
-import { SDKManager } from "@/sdk";
+import { SDKManager } from "@/sdk.ts";
 
 export const SDK = new SDKManager();

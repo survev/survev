@@ -1,6 +1,6 @@
-import { util } from "../../utils/util";
-import type { MapDef } from "../mapDefs";
-import { Main, type PartialMapDef } from "./baseDefs";
+import { util } from "../../utils/util.ts";
+import type { MapDef } from "../mapDefs.ts";
+import { Main, type PartialMapDef } from "./baseDefs.ts";
 
 const mapDef: PartialMapDef = {
     assets: {
@@ -11,8 +11,11 @@ const mapDef: PartialMapDef = {
                 name: "ambient_steam_01",
                 channel: "ambient",
             },
+            { name: "log_05", channel: "sfx" },
             { name: "log_11", channel: "sfx" },
             { name: "log_12", channel: "sfx" },
+            { name: "vault_change_03", channel: "sfx" },
+            { name: "watering_01", channel: "sfx" },
         ],
         atlases: ["gradient", "loadout", "shared", "main"],
     },
@@ -55,7 +58,8 @@ const mapDef: PartialMapDef = {
         ],
         fixedSpawns: [
             {
-                warehouse_01: 2,
+                warehouse_01: { small: 1, large: 2 },
+                warehouse_03: 1,
                 house_red_01: { small: 3, large: 4 },
                 house_red_02: { small: 3, large: 4 },
                 barn_01: { small: 1, large: 3 },
@@ -68,6 +72,7 @@ const mapDef: PartialMapDef = {
                 greenhouse_01: 1,
                 cache_01: 1,
                 cache_02su: 1,
+                cache_04: 1,
                 cache_07: 1,
                 bunker_structure_01: { odds: 0.05 },
                 bunker_structure_02: 1,

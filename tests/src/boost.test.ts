@@ -1,6 +1,6 @@
 import { expect, test } from "vitest";
-import { GameConfig, TeamMode } from "../../shared/gameConfig";
-import { createGame } from "./gameTestHelpers";
+import { GameConfig, TeamMode } from "../../shared/gameConfig.ts";
+import { createGame } from "./gameTestHelpers.ts";
 
 // i kept fucking up the logic with less and greater than while refactoring boost logic
 // so decided to write a test
@@ -9,8 +9,8 @@ import { createGame } from "./gameTestHelpers";
 const healAmounts = GameConfig.player.boostHealAmounts;
 const breakPoints = GameConfig.player.boostBreakpoints;
 
-test("Boost values", async () => {
-    const game = await createGame(TeamMode.Solo, "test_normal");
+test("Boost values", () => {
+    const game = createGame(TeamMode.Solo, "test_normal");
 
     const player = game.playerBarn.addTestPlayer({});
 
@@ -26,8 +26,8 @@ test("Boost values", async () => {
     }
 });
 
-test("Leadership", async () => {
-    const game = await createGame(TeamMode.Solo, "test_normal");
+test("Leadership", () => {
+    const game = createGame(TeamMode.Solo, "test_normal");
 
     const player = game.playerBarn.addTestPlayer({});
     player.addPerk("leadership");
@@ -37,8 +37,8 @@ test("Leadership", async () => {
     expect(player.health).toBe(1 + healAmounts[3]);
 });
 
-test("Assume leadership", async () => {
-    const game = await createGame(TeamMode.Solo, "test_normal");
+test("Assume leadership", () => {
+    const game = createGame(TeamMode.Solo, "test_normal");
 
     const player = game.playerBarn.addTestPlayer({});
     player.addPerk("assume_leadership");

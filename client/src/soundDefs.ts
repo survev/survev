@@ -771,6 +771,19 @@ const Sounds: Record<string, Record<string, SoundDef>> = {
             path: "audio/guns/potato_smg_switch_01.mp3",
             volume: 1,
         },
+        potato_lmg_01: {
+            path: "audio/guns/potato_lmg_01.mp3",
+            volume: 1,
+            maxInstances: 8,
+        },
+        potato_lmg_reload_01: {
+            path: "audio/guns/potato_lmg_reload_01.mp3",
+            volume: 1,
+        },
+        potato_lmg_switch_01: {
+            path: "audio/guns/potato_lmg_switch_01.mp3",
+            volume: 1,
+        },
         bugle_01: {
             path: "audio/guns/bugle_01.mp3",
             volume: 1.5,
@@ -1130,6 +1143,16 @@ const Sounds: Record<string, Record<string, SoundDef>> = {
             volume: 1,
             preload: false,
         },
+        tomato_break_01: {
+            path: "audio/sfx/tomato_break_01.mp3",
+            volume: 1,
+            preload: false,
+        },
+        tomato_break_02: {
+            path: "audio/sfx/tomato_break_01.mp3",
+            volume: 1,
+            preload: false,
+        },
         ceramic_break_01: {
             path: "audio/sfx/ceramic_break_01.mp3",
             volume: 1,
@@ -1318,6 +1341,11 @@ const Sounds: Record<string, Record<string, SoundDef>> = {
         },
         coconut_01: {
             path: "audio/sfx/coconut_01.mp3",
+            volume: 1,
+            preload: false,
+        },
+        tomato_01: {
+            path: "audio/sfx/tomato_01.mp3",
             volume: 1,
             preload: false,
         },

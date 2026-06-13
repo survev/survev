@@ -1,6 +1,6 @@
-import type { AABB, Collider } from "../../utils/coldet";
-import type { Vec2 } from "../../utils/v2";
-import type { LootSpawnDef, TerrainSpawnDef } from "../mapObjectsTyping";
+import type { AABB, Collider } from "../../utils/coldet.ts";
+import type { Vec2 } from "../../utils/v2.ts";
+import type { LootSpawnDef, TerrainSpawnDef } from "../mapObjectsTyping.ts";
 
 export interface ObstacleDef {
     readonly type: "obstacle";
@@ -86,6 +86,11 @@ export interface ObstacleDef {
         interactionText: string;
         useOnce: boolean;
         useType?: string;
+        /**
+         * Will make interactions require the player to be completely inside the interactionRad
+         */
+        isVat?: boolean;
+        roleToPromote?: string;
         useDelay: number;
         useDir: Vec2;
         useImg: string;

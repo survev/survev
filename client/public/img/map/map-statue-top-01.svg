@@ -21,12 +21,12 @@
      inkscape:pagecheckerboard="0"
      inkscape:deskcolor="#d1d1d1"
      inkscape:zoom="1.8221386"
-     inkscape:cx="482.6746"
-     inkscape:cy="156.95843"
+     inkscape:cx="327.08818"
+     inkscape:cy="146.25671"
      inkscape:window-width="1920"
-     inkscape:window-height="1021"
+     inkscape:window-height="1022"
      inkscape:window-x="1512"
-     inkscape:window-y="31"
+     inkscape:window-y="30"
      inkscape:window-maximized="1"
      inkscape:current-layer="svg5" />
   <defs
@@ -208,6 +208,13 @@
      stroke-width="1.746"
      id="ellipse3" />
   <path
+     d="m 52.387614,42.333355 c -7.938,3.704 -6.35,6.35 -6.35,6.35 h 7.408 l 6.35,7.408 6.35,-7.408 h 7.409 c 0,0 1.587,-2.646 -6.35,-6.35 -3.705,-1.974 -10.055,-1.974 -14.817,0 z"
+     fill="#c2c2c2"
+     stroke="#515151"
+     stroke-width="2.646"
+     stroke-opacity="0.657"
+     id="path5" />
+  <path
      transform="matrix(0.14668,0,0,0.14668,38.320614,40.492355)"
      d="m 188,128 c 0,80 -69.756,119.362 -69.756,119.362 C 64,244 8.638,193.922 8.638,128 8.638,62.078 64,12 118.244,8.638 118.244,8.638 188,48 188,128 Z"
      clip-path="url(#b)"
@@ -221,11 +228,4 @@
      stroke="#242424"
      stroke-width="1.21744"
      id="path4" />
-  <path
-     d="m 52.387614,42.333355 c -7.938,3.704 -6.35,6.35 -6.35,6.35 h 7.408 l 6.35,7.408 6.35,-7.408 h 7.409 c 0,0 1.587,-2.646 -6.35,-6.35 -3.705,-1.974 -10.055,-1.974 -14.817,0 z"
-     fill="#c2c2c2"
-     stroke="#515151"
-     stroke-width="2.646"
-     stroke-opacity="0.657"
-     id="path5" />
 </svg>

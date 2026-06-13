@@ -1,11 +1,11 @@
 import * as PIXI from "pixi.js-legacy";
-import { math } from "../../../shared/utils/math";
-import { util } from "../../../shared/utils/util";
-import { type Vec2, v2 } from "../../../shared/utils/v2";
-import type { Camera } from "../camera";
-import type { Map } from "../map";
-import type { Renderer } from "../renderer";
-import { SDK } from "../sdk/sdk";
+import { math } from "../../../shared/utils/math.ts";
+import { util } from "../../../shared/utils/util.ts";
+import { v2, type Vec2 } from "../../../shared/utils/v2.ts";
+import type { Camera } from "../camera.ts";
+import type { Map } from "../map.ts";
+import type { Renderer } from "../renderer.ts";
+import { SDK } from "../sdk/sdk.ts";
 
 class Range {
     constructor(
@@ -78,6 +78,7 @@ export class Particle {
         parent: PIXI.Container | null,
         zOrd: number,
         valueAdjust: number,
+        tint?: number,
     ) {
         const def = ParticleDefs[type];
         this.active = true;
@@ -100,15 +101,15 @@ export class Particle {
         this.rotDrag = getRangeValue(def.drag) / 2;
         this.scaleUseExp = def.scale.exp !== undefined;
         this.scale = getRangeValue(def.scale.start) * scale;
-        this.scaleEnd = this.scaleUseExp ? 0 : getRangeValue(def.scale?.end!) * scale;
+        this.scaleEnd = this.scaleUseExp ? 0 : getRangeValue(def.scale.end!) * scale;
         this.scaleExp = this.scaleUseExp ? def.scale.exp! : 0;
         this.alphaUseExp = def.alpha.exp !== undefined;
         this.alpha = getRangeValue(def.alpha.start);
-        this.alphaEnd = this.alphaUseExp ? 0 : getRangeValue(def.alpha?.end!);
+        this.alphaEnd = this.alphaUseExp ? 0 : getRangeValue(def.alpha.end!);
         this.alphaExp = this.alphaUseExp ? def.alpha.exp! : 0;
         this.alphaIn = def.alphaIn !== undefined;
-        this.alphaInStart = this.alphaIn ? getRangeValue(def.alphaIn?.start!) : 0;
-        this.alphaInEnd = this.alphaIn ? getRangeValue(def.alphaIn?.end!) : 0;
+        this.alphaInStart = this.alphaIn ? getRangeValue(def.alphaIn!.start!) : 0;
+        this.alphaInEnd = this.alphaIn ? getRangeValue(def.alphaIn!.end!) : 0;
         this.emitterIdx = -1;
         const tex = Array.isArray(def.image)
             ? def.image[Math.floor(Math.random() * def.image.length)]
@@ -116,7 +117,7 @@ export class Particle {
         this.sprite.texture = PIXI.Texture.from(tex);
         this.sprite.visible = false;
         this.valueAdjust = def.ignoreValueAdjust ? 1 : valueAdjust;
-        this.setColor(getColorValue(def.color!));
+        this.setColor(tint !== undefined ? tint : getColorValue(def.color!));
 
         if (SDK.disableBloodParticles() && type == "bloodSplat") {
             this.sprite.renderable = false;
@@ -151,6 +152,7 @@ interface EmitterOptions {
     radius?: number;
     rateMult?: number;
     parent?: PIXI.Container | null;
+    color?: number;
 }
 
 export class Emitter {
@@ -170,6 +172,7 @@ export class Emitter {
     alpha!: number;
     rateMult!: number;
     zOrd!: number;
+    color?: number;
 
     init(type: string, options = {} as EmitterOptions) {
         const def = EmitterDefs[type];
@@ -180,8 +183,7 @@ export class Emitter {
         this.dir = options.dir ? v2.copy(options.dir) : v2.create(0, 1);
         this.scale = options.scale !== undefined ? options.scale : 1;
         this.layer = options.layer || 0;
-        this.duration =
-            options.duration !== undefined ? options.duration : Number.MAX_VALUE;
+        this.duration = options.duration !== undefined ? options.duration : Number.MAX_VALUE;
         this.radius = options.radius !== undefined ? options.radius : def.radius;
         this.ticker = 0;
         this.nextSpawn = 0;
@@ -189,13 +191,13 @@ export class Emitter {
         this.parent = options.parent || null;
         this.alpha = 1;
         this.rateMult = options.rateMult !== undefined ? options.rateMult : 1;
+        this.color = options.color;
         const partDef = ParticleDefs[def.particle];
-        this.zOrd =
-            def.zOrd !== undefined
-                ? def.zOrd
-                : partDef.zOrd !== undefined
-                  ? partDef.zOrd
-                  : 20;
+        this.zOrd = def.zOrd !== undefined
+            ? def.zOrd
+            : partDef.zOrd !== undefined
+            ? partDef.zOrd
+            : 20;
     }
 
     free() {
@@ -241,6 +243,7 @@ export class ParticleBarn {
         rot?: number,
         parent?: PIXI.Container | null,
         zOrd?: number,
+        tint?: number,
     ) {
         let particle = null;
         for (let i = 0; i < this.particles.length; i++) {
@@ -268,6 +271,7 @@ export class ParticleBarn {
             parent!,
             zOrd,
             this.valueAdjust,
+            tint,
         );
         return particle;
     }
@@ -329,6 +333,9 @@ export class ParticleBarn {
                         e.parent,
                         e.zOrd,
                     );
+                    if (e.color !== undefined) {
+                        particle.setColor(e.color);
+                    }
                     particle.emitterIdx = i;
                     let rate = getRangeValue(def.rate);
                     if (def.maxRate) {
@@ -366,26 +373,26 @@ export class ParticleBarn {
                 let scale = p.scaleUseExp
                     ? p.scale
                     : math.remap(
-                          t,
-                          (p.def.scale.lerp as Range)?.min,
-                          (p.def.scale.lerp as Range)?.max,
-                          p.scale,
-                          p.scaleEnd,
-                      );
+                        t,
+                        (p.def.scale.lerp as Range)?.min,
+                        (p.def.scale.lerp as Range)?.max,
+                        p.scale,
+                        p.scaleEnd,
+                    );
                 let alpha = p.alphaUseExp
                     ? p.alpha
                     : math.remap(
-                          t,
-                          p.def.alpha.lerp?.min!,
-                          p.def.alpha.lerp?.max!,
-                          p.alpha,
-                          p.alphaEnd,
-                      );
-                if (p.alphaIn && t < p.def.alphaIn?.lerp?.max!) {
+                        t,
+                        p.def.alpha.lerp!.min,
+                        p.def.alpha.lerp!.max,
+                        p.alpha,
+                        p.alphaEnd,
+                    );
+                if (p.alphaIn && t < p.def.alphaIn!.lerp!.max) {
                     alpha = math.remap(
                         t,
-                        p.def.alphaIn?.lerp?.min!,
-                        p.def.alphaIn?.lerp?.max!,
+                        p.def.alphaIn!.lerp!.min,
+                        p.def.alphaIn!.lerp!.max,
                         p.alphaInStart,
                         p.alphaInEnd,
                     );
@@ -429,7 +436,7 @@ const ParticleDefs: Record<string, ParticleDef> = {
             end: 0,
             lerp: new Range(0.9, 1),
         },
-        color: function () {
+        color: function() {
             return util.rgbToInt(util.hsvToRgb(0.06, 0.84, util.random(0.46, 0.48)));
         },
     },
@@ -448,7 +455,7 @@ const ParticleDefs: Record<string, ParticleDef> = {
             end: 0,
             lerp: new Range(0.75, 1),
         },
-        color: function () {
+        color: function() {
             return util.rgbToInt(util.hsvToRgb(0xff0000, 1, util.random(0.45, 0.8)));
         },
     },
@@ -467,7 +474,7 @@ const ParticleDefs: Record<string, ParticleDef> = {
             end: 0,
             lerp: new Range(0.9, 1),
         },
-        color: function () {
+        color: function() {
             return util.rgbToInt(util.hsvToRgb(0.09, 0.8, util.random(0.66, 0.68)));
         },
     },
@@ -486,7 +493,7 @@ const ParticleDefs: Record<string, ParticleDef> = {
             end: 0,
             lerp: new Range(0.95, 1),
         },
-        color: function () {
+        color: function() {
             return util.rgbToInt(util.hsvToRgb(0.01, 0.02, util.random(0.38, 0.41)));
         },
     },
@@ -505,7 +512,7 @@ const ParticleDefs: Record<string, ParticleDef> = {
             end: 0,
             lerp: new Range(0.9, 1),
         },
-        color: function () {
+        color: function() {
             return util.rgbToInt(util.hsvToRgb(0.01, 0.02, util.random(0.38, 0.41)));
         },
     },
@@ -524,7 +531,7 @@ const ParticleDefs: Record<string, ParticleDef> = {
             end: 0,
             lerp: new Range(0.9, 1),
         },
-        color: function () {
+        color: function() {
             return util.rgbToInt(util.hsvToRgb(0, 0.08, util.random(0.16, 0.18)));
         },
     },
@@ -543,7 +550,7 @@ const ParticleDefs: Record<string, ParticleDef> = {
             end: 0,
             lerp: new Range(0.95, 1),
         },
-        color: function () {
+        color: function() {
             return util.rgbToInt(util.hsvToRgb(0.64, 1, util.random(0.83, 0.85)));
         },
     },
@@ -562,7 +569,7 @@ const ParticleDefs: Record<string, ParticleDef> = {
             end: 0,
             lerp: new Range(0.9, 1),
         },
-        color: function () {
+        color: function() {
             return util.rgbToInt(util.hsvToRgb(0.08, 0.42, util.random(0.72, 0.74)));
         },
     },
@@ -683,7 +690,7 @@ const ParticleDefs: Record<string, ParticleDef> = {
             end: 0,
             lerp: new Range(0.95, 1),
         },
-        color: function () {
+        color: function() {
             return util.rgbToInt(util.hsvToRgb(0, 0.71, util.random(0.32, 0.34)));
         },
     },
@@ -702,7 +709,7 @@ const ParticleDefs: Record<string, ParticleDef> = {
             end: 0,
             lerp: new Range(0.9, 1),
         },
-        color: function () {
+        color: function() {
             return util.rgbToInt(util.hsvToRgb(0, 0, util.random(0.95, 1)));
         },
     },
@@ -721,7 +728,7 @@ const ParticleDefs: Record<string, ParticleDef> = {
             end: 0,
             lerp: new Range(0.95, 1),
         },
-        color: function () {
+        color: function() {
             return util.rgbToInt(util.hsvToRgb(0, 0, util.random(0.95, 1)));
         },
     },
@@ -740,7 +747,7 @@ const ParticleDefs: Record<string, ParticleDef> = {
             end: 0,
             lerp: new Range(0.9, 1),
         },
-        color: function () {
+        color: function() {
             return util.rgbToInt(util.hsvToRgb(0, 0, util.random(0.36, 0.38)));
         },
     },
@@ -759,7 +766,7 @@ const ParticleDefs: Record<string, ParticleDef> = {
             end: 0,
             lerp: new Range(0.9, 1),
         },
-        color: function () {
+        color: function() {
             return util.rgbToInt(util.hsvToRgb(0.11, 0.84, util.random(0.64, 0.66)));
         },
     },
@@ -812,7 +819,7 @@ const ParticleDefs: Record<string, ParticleDef> = {
             end: 0,
             lerp: new Range(0.95, 1),
         },
-        color: function () {
+        color: function() {
             return util.rgbToInt(util.hsvToRgb(0.11, 0.84, util.random(0.88, 0.9)));
         },
     },
@@ -831,7 +838,7 @@ const ParticleDefs: Record<string, ParticleDef> = {
             end: 0,
             lerp: new Range(0.9, 1),
         },
-        color: function () {
+        color: function() {
             return util.rgbToInt(util.hsvToRgb(0, 0.52, util.random(0.98, 1)));
         },
     },
@@ -850,7 +857,7 @@ const ParticleDefs: Record<string, ParticleDef> = {
             end: 0,
             lerp: new Range(0.9, 1),
         },
-        color: function () {
+        color: function() {
             return util.rgbToInt(util.hsvToRgb(0.5, 0.65, util.random(0.98, 1)));
         },
     },
@@ -869,7 +876,7 @@ const ParticleDefs: Record<string, ParticleDef> = {
             end: 0,
             lerp: new Range(0.9, 1),
         },
-        color: function () {
+        color: function() {
             return util.rgbToInt(util.hsvToRgb(0.16, 0.73, util.random(0.98, 1)));
         },
     },
@@ -888,7 +895,7 @@ const ParticleDefs: Record<string, ParticleDef> = {
             end: 0,
             lerp: new Range(0.95, 1),
         },
-        color: function () {
+        color: function() {
             return util.rgbToInt(util.hsvToRgb(0.4, 0.18, util.random(0.5, 0.62)));
         },
     },
@@ -941,7 +948,7 @@ const ParticleDefs: Record<string, ParticleDef> = {
             end: 0,
             lerp: new Range(0.9, 1),
         },
-        color: function () {
+        color: function() {
             return util.rgbToInt(util.hsvToRgb(0.1, 0.81, util.random(0.78, 0.82)));
         },
     },
@@ -960,7 +967,7 @@ const ParticleDefs: Record<string, ParticleDef> = {
             end: 0,
             lerp: new Range(0.9, 1),
         },
-        color: function () {
+        color: function() {
             return util.rgbToInt(util.hsvToRgb(0, 0, util.random(0.5, 0.75)));
         },
     },
@@ -979,7 +986,7 @@ const ParticleDefs: Record<string, ParticleDef> = {
             end: 0,
             lerp: new Range(0.9, 1),
         },
-        color: function () {
+        color: function() {
             return util.rgbToInt(util.hsvToRgb(0, 0, util.random(0.8, 0.85)));
         },
     },
@@ -998,7 +1005,7 @@ const ParticleDefs: Record<string, ParticleDef> = {
             end: 0,
             lerp: new Range(0.9, 1),
         },
-        color: function () {
+        color: function() {
             return util.rgbToInt(util.hsvToRgb(0, 0, util.random(0.5, 0.75)));
         },
     },
@@ -1017,7 +1024,7 @@ const ParticleDefs: Record<string, ParticleDef> = {
             end: 0,
             lerp: new Range(0.9, 1),
         },
-        color: function () {
+        color: function() {
             return util.rgbToInt(util.hsvToRgb(0.1, 0.23, util.random(0.51, 0.53)));
         },
     },
@@ -1036,7 +1043,7 @@ const ParticleDefs: Record<string, ParticleDef> = {
             end: 0,
             lerp: new Range(0.9, 1),
         },
-        color: function () {
+        color: function() {
             return util.rgbToInt(util.hsvToRgb(0.2, 0.42, util.random(0.38, 0.42)));
         },
     },
@@ -1055,7 +1062,7 @@ const ParticleDefs: Record<string, ParticleDef> = {
             end: 0,
             lerp: new Range(0.9, 1),
         },
-        color: function () {
+        color: function() {
             return util.rgbToInt(util.hsvToRgb(0.08, 0.57, util.random(0.4, 0.46)));
         },
     },
@@ -1074,7 +1081,7 @@ const ParticleDefs: Record<string, ParticleDef> = {
             end: 0,
             lerp: new Range(0.9, 1),
         },
-        color: function () {
+        color: function() {
             return util.rgbToInt(util.hsvToRgb(0.08, 0.79, util.random(0.52, 0.54)));
         },
     },
@@ -1093,7 +1100,7 @@ const ParticleDefs: Record<string, ParticleDef> = {
             end: 0,
             lerp: new Range(0.9, 1),
         },
-        color: function () {
+        color: function() {
             return util.rgbToInt(util.hsvToRgb(0.08, 0.57, util.random(0.4, 0.46)));
         },
     },
@@ -1112,7 +1119,7 @@ const ParticleDefs: Record<string, ParticleDef> = {
             end: 0,
             lerp: new Range(0.95, 1),
         },
-        color: function () {
+        color: function() {
             return util.rgbToInt(util.hsvToRgb(0.06, 0.84, util.random(0.73, 0.77)));
         },
     },
@@ -1131,7 +1138,7 @@ const ParticleDefs: Record<string, ParticleDef> = {
             end: 0,
             lerp: new Range(0.9, 1),
         },
-        color: function () {
+        color: function() {
             return util.rgbToInt(util.hsvToRgb(0.06, 0.84, util.random(0.73, 0.77)));
         },
     },
@@ -1150,7 +1157,7 @@ const ParticleDefs: Record<string, ParticleDef> = {
             end: 0,
             lerp: new Range(0.95, 1),
         },
-        color: function () {
+        color: function() {
             return util.rgbToInt(util.hsvToRgb(0.075, 0.43, util.random(0.48, 0.5)));
         },
     },
@@ -1169,8 +1176,84 @@ const ParticleDefs: Record<string, ParticleDef> = {
             end: 0,
             lerp: new Range(0.9, 1),
         },
-        color: function () {
+        color: function() {
             return util.rgbToInt(util.hsvToRgb(0.075, 0.43, util.random(0.48, 0.5)));
+        },
+    },
+    tomatoChip_01: {
+        image: ["part-spark-02.img"],
+        life: 0.5,
+        drag: new Range(1, 10),
+        rotVel: 0,
+        scale: {
+            start: new Range(0.04, 0.08),
+            end: new Range(0.01, 0.02),
+            lerp: new Range(0, 1),
+        },
+        alpha: {
+            start: 1,
+            end: 0,
+            lerp: new Range(0.95, 1),
+        },
+        color: function() {
+            return util.rgbToInt(util.hsvToRgb(0, util.random(0.43, 0.64), 0.7));
+        },
+    },
+    tomatoChip_02: {
+        image: ["part-spark-02.img"],
+        life: 0.5,
+        drag: new Range(1, 10),
+        rotVel: 0,
+        scale: {
+            start: new Range(0.04, 0.08),
+            end: new Range(0.01, 0.02),
+            lerp: new Range(0, 1),
+        },
+        alpha: {
+            start: 1,
+            end: 0,
+            lerp: new Range(0.95, 1),
+        },
+        color: function() {
+            return util.rgbToInt(util.hsvToRgb(0.26, util.random(0.53, 0.63), 0.55));
+        },
+    },
+    tomatoBreak_01: {
+        image: ["part-pumpkin-01.img"],
+        life: new Range(0.8, 1),
+        drag: new Range(1, 5),
+        rotVel: 0,
+        scale: {
+            start: new Range(0.07, 0.12),
+            end: new Range(0.05, 0.1),
+            lerp: new Range(0, 1),
+        },
+        alpha: {
+            start: 1,
+            end: 0,
+            lerp: new Range(0.9, 1),
+        },
+        color: function() {
+            return util.rgbToInt(util.hsvToRgb(0, util.random(0.43, 0.64), 0.7));
+        },
+    },
+    tomatoBreak_02: {
+        image: ["part-pumpkin-01.img"],
+        life: new Range(0.8, 1),
+        drag: new Range(1, 5),
+        rotVel: 0,
+        scale: {
+            start: new Range(0.07, 0.12),
+            end: new Range(0.05, 0.1),
+            lerp: new Range(0, 1),
+        },
+        alpha: {
+            start: 1,
+            end: 0,
+            lerp: new Range(0.9, 1),
+        },
+        color: function() {
+            return util.rgbToInt(util.hsvToRgb(0.26, util.random(0.53, 0.63), 0.55));
         },
     },
     pumpkinChip: {
@@ -1188,7 +1271,7 @@ const ParticleDefs: Record<string, ParticleDef> = {
             end: 0,
             lerp: new Range(0.95, 1),
         },
-        color: function () {
+        color: function() {
             return util.rgbToInt(util.hsvToRgb(0.07, 1, util.random(0.98, 1)));
         },
     },
@@ -1207,7 +1290,7 @@ const ParticleDefs: Record<string, ParticleDef> = {
             end: 0,
             lerp: new Range(0.9, 1),
         },
-        color: function () {
+        color: function() {
             return util.rgbToInt(util.hsvToRgb(0.08, 1, util.random(0.95, 0.97)));
         },
     },
@@ -1226,7 +1309,7 @@ const ParticleDefs: Record<string, ParticleDef> = {
             end: 0,
             lerp: new Range(0.95, 1),
         },
-        color: function () {
+        color: function() {
             return util.rgbToInt(util.hsvToRgb(0.31, 0.86, util.random(0.35, 0.36)));
         },
     },
@@ -1245,7 +1328,7 @@ const ParticleDefs: Record<string, ParticleDef> = {
             end: 0,
             lerp: new Range(0.9, 1),
         },
-        color: function () {
+        color: function() {
             return util.rgbToInt(util.hsvToRgb(0.31, 0.86, util.random(0.35, 0.36)));
         },
     },
@@ -1264,7 +1347,7 @@ const ParticleDefs: Record<string, ParticleDef> = {
             end: 0,
             lerp: new Range(0.95, 1),
         },
-        color: function () {
+        color: function() {
             return util.rgbToInt(util.hsvToRgb(0.98, 1, util.random(0.52, 0.54)));
         },
     },
@@ -1283,7 +1366,7 @@ const ParticleDefs: Record<string, ParticleDef> = {
             end: 0,
             lerp: new Range(0.9, 1),
         },
-        color: function () {
+        color: function() {
             return util.rgbToInt(util.hsvToRgb(0.98, 1, util.random(0.52, 0.54)));
         },
     },
@@ -1302,7 +1385,7 @@ const ParticleDefs: Record<string, ParticleDef> = {
             end: 0,
             lerp: new Range(0.9, 1),
         },
-        color: function () {
+        color: function() {
             return util.rgbToInt(util.hsvToRgb(0.02, 1, util.random(0.26, 0.28)));
         },
     },
@@ -1321,7 +1404,7 @@ const ParticleDefs: Record<string, ParticleDef> = {
             end: 0,
             lerp: new Range(0.95, 1),
         },
-        color: function () {
+        color: function() {
             return util.rgbToInt(util.hsvToRgb(0, 0, util.random(0.5, 0.75)));
         },
     },
@@ -1340,7 +1423,7 @@ const ParticleDefs: Record<string, ParticleDef> = {
             end: 0,
             lerp: new Range(0.9, 1),
         },
-        color: function () {
+        color: function() {
             return util.rgbToInt(util.hsvToRgb(0, 0, util.random(0.5, 0.75)));
         },
     },
@@ -1393,7 +1476,7 @@ const ParticleDefs: Record<string, ParticleDef> = {
             end: 0,
             lerp: new Range(0.9, 1),
         },
-        color: function () {
+        color: function() {
             return util.rgbToInt(util.hsvToRgb(0.1, 0.24, util.random(0.38, 0.41)));
         },
     },
@@ -1429,7 +1512,7 @@ const ParticleDefs: Record<string, ParticleDef> = {
             end: 0,
             lerp: new Range(0.9, 1),
         },
-        color: function () {
+        color: function() {
             return util.rgbToInt(util.hsvToRgb(0.1, 0.35, util.random(0.48, 0.52)));
         },
     },
@@ -1448,7 +1531,7 @@ const ParticleDefs: Record<string, ParticleDef> = {
             end: 0,
             lerp: new Range(0.9, 1),
         },
-        color: function () {
+        color: function() {
             return util.rgbToInt(util.hsvToRgb(0.6, 0.31, util.random(0.42, 0.45)));
         },
     },
@@ -1467,7 +1550,7 @@ const ParticleDefs: Record<string, ParticleDef> = {
             end: 0,
             lerp: new Range(0.9, 1),
         },
-        color: function () {
+        color: function() {
             return util.rgbToInt(util.hsvToRgb(0, 0.8, util.random(0.6, 0.62)));
         },
     },
@@ -1486,7 +1569,7 @@ const ParticleDefs: Record<string, ParticleDef> = {
             end: 0,
             lerp: new Range(0.9, 1),
         },
-        color: function () {
+        color: function() {
             return util.rgbToInt(util.hsvToRgb(0.97, 0, util.random(0.95, 0.97)));
         },
     },
@@ -1505,7 +1588,7 @@ const ParticleDefs: Record<string, ParticleDef> = {
             end: 0,
             lerp: new Range(0.9, 1),
         },
-        color: function () {
+        color: function() {
             return util.rgbToInt(util.hsvToRgb(0.01, 0.02, util.random(0.38, 0.41)));
         },
     },
@@ -1524,7 +1607,7 @@ const ParticleDefs: Record<string, ParticleDef> = {
             end: 0,
             lerp: new Range(0.95, 1),
         },
-        color: function () {
+        color: function() {
             return 0xffffff;
         },
     },
@@ -1543,7 +1626,7 @@ const ParticleDefs: Record<string, ParticleDef> = {
             end: 0,
             lerp: new Range(0.95, 1),
         },
-        color: function () {
+        color: function() {
             return 0xffffff;
         },
     },
@@ -1562,7 +1645,7 @@ const ParticleDefs: Record<string, ParticleDef> = {
             end: 0,
             lerp: new Range(0.95, 1),
         },
-        color: function () {
+        color: function() {
             return util.rgbToInt(util.hsvToRgb(0.97, 0, util.random(0.95, 0.97)));
         },
     },
@@ -1581,7 +1664,7 @@ const ParticleDefs: Record<string, ParticleDef> = {
             end: 0,
             lerp: new Range(0.9, 1),
         },
-        color: function () {
+        color: function() {
             return util.rgbToInt(util.hsvToRgb(0.97, 0, util.random(0.95, 0.97)));
         },
     },
@@ -1617,7 +1700,7 @@ const ParticleDefs: Record<string, ParticleDef> = {
             end: 0,
             lerp: new Range(0.9, 1),
         },
-        color: function () {
+        color: function() {
             return util.rgbToInt(util.hsvToRgb(0.05, 1, util.random(0.35, 0.45)));
         },
     },
@@ -1636,7 +1719,7 @@ const ParticleDefs: Record<string, ParticleDef> = {
             end: 0,
             lerp: new Range(0.9, 1),
         },
-        color: function () {
+        color: function() {
             return util.rgbToInt(util.hsvToRgb(0.05, 1, util.random(0.35, 0.45)));
         },
     },
@@ -1655,7 +1738,7 @@ const ParticleDefs: Record<string, ParticleDef> = {
             end: 0,
             lerp: new Range(0.9, 1),
         },
-        color: function () {
+        color: function() {
             return util.rgbToInt(util.hsvToRgb(0.05, 1, util.random(0.25, 0.35)));
         },
     },
@@ -1674,7 +1757,7 @@ const ParticleDefs: Record<string, ParticleDef> = {
             end: 0,
             lerp: new Range(0.9, 1),
         },
-        color: function () {
+        color: function() {
             return util.rgbToInt(util.hsvToRgb(0.05, 1, util.random(0.25, 0.35)));
         },
     },
@@ -1693,7 +1776,7 @@ const ParticleDefs: Record<string, ParticleDef> = {
             end: 0,
             lerp: new Range(0.95, 1),
         },
-        color: function () {
+        color: function() {
             return util.rgbToInt(util.hsvToRgb(0, 0, util.random(0.9, 0.95)));
         },
     },
@@ -1712,7 +1795,7 @@ const ParticleDefs: Record<string, ParticleDef> = {
             end: 0,
             lerp: new Range(0.95, 1),
         },
-        color: function () {
+        color: function() {
             return util.rgbToInt(util.hsvToRgb(0, 0, util.random(0.9, 0.95)));
         },
     },
@@ -1731,7 +1814,7 @@ const ParticleDefs: Record<string, ParticleDef> = {
             end: 0,
             lerp: new Range(0.925, 1),
         },
-        color: function () {
+        color: function() {
             return util.rgbToInt(util.hsvToRgb(0, 0, util.random(0.9, 0.95)));
         },
     },
@@ -1750,7 +1833,7 @@ const ParticleDefs: Record<string, ParticleDef> = {
             end: 0,
             lerp: new Range(0.925, 1),
         },
-        color: function () {
+        color: function() {
             return util.rgbToInt(util.hsvToRgb(0, 0, util.random(0.9, 0.95)));
         },
     },
@@ -1769,7 +1852,7 @@ const ParticleDefs: Record<string, ParticleDef> = {
             end: 0,
             lerp: new Range(0.95, 1),
         },
-        color: function () {
+        color: function() {
             return util.rgbToInt(util.hsvToRgb(0, 0, util.random(0.9, 0.95)));
         },
     },
@@ -1788,7 +1871,7 @@ const ParticleDefs: Record<string, ParticleDef> = {
             end: 0,
             lerp: new Range(0.95, 1),
         },
-        color: function () {
+        color: function() {
             return util.rgbToInt(util.hsvToRgb(0, 0, util.random(0.9, 0.95)));
         },
     },
@@ -1807,7 +1890,7 @@ const ParticleDefs: Record<string, ParticleDef> = {
             end: 0,
             lerp: new Range(0.95, 1),
         },
-        color: function () {
+        color: function() {
             return util.rgbToInt(util.hsvToRgb(0, 0, util.random(0.9, 0.95)));
         },
     },
@@ -1826,7 +1909,7 @@ const ParticleDefs: Record<string, ParticleDef> = {
             end: 0,
             lerp: new Range(0.95, 1),
         },
-        color: function () {
+        color: function() {
             return util.rgbToInt(util.hsvToRgb(0, 0, util.random(0.9, 0.95)));
         },
     },
@@ -1845,7 +1928,7 @@ const ParticleDefs: Record<string, ParticleDef> = {
             end: 0,
             lerp: new Range(0.95, 1),
         },
-        color: function () {
+        color: function() {
             return util.rgbToInt(util.hsvToRgb(0, 0, util.random(0.9, 0.95)));
         },
     },
@@ -1932,7 +2015,7 @@ const ParticleDefs: Record<string, ParticleDef> = {
             end: 0,
             lerp: new Range(0.75, 1),
         },
-        color: function () {
+        color: function() {
             return util.rgbToInt(util.hsvToRgb(0.065, 1, util.random(0.98, 0.99)));
         },
     },
@@ -1951,7 +2034,7 @@ const ParticleDefs: Record<string, ParticleDef> = {
             end: 0,
             lerp: new Range(0.75, 1),
         },
-        color: function () {
+        color: function() {
             return util.rgbToInt(util.hsvToRgb(0, 1, util.random(0.82, 0.84)));
         },
     },
@@ -1970,7 +2053,7 @@ const ParticleDefs: Record<string, ParticleDef> = {
             end: 0,
             lerp: new Range(0.9, 1),
         },
-        color: function () {
+        color: function() {
             return util.rgbToInt(util.hsvToRgb(0, 0, util.random(0.9, 0.95)));
         },
     },
@@ -1989,7 +2072,7 @@ const ParticleDefs: Record<string, ParticleDef> = {
             end: 0,
             lerp: new Range(0.75, 1),
         },
-        color: function () {
+        color: function() {
             return util.rgbToInt(util.hsvToRgb(0.08, 1, util.random(0.98, 0.99)));
         },
     },
@@ -2008,7 +2091,7 @@ const ParticleDefs: Record<string, ParticleDef> = {
             end: 0,
             lerp: new Range(0.75, 1),
         },
-        color: function () {
+        color: function() {
             return util.rgbToInt(util.hsvToRgb(0.08, 0.7, util.random(0.75, 0.8)));
         },
     },
@@ -2079,7 +2162,7 @@ const ParticleDefs: Record<string, ParticleDef> = {
             end: 0,
             lerp: new Range(0.9, 1),
         },
-        color: function () {
+        color: function() {
             return util.rgbToInt(util.hsvToRgb(0, 0, util.random(0.9, 0.95)));
         },
     },
@@ -2341,7 +2424,7 @@ const ParticleDefs: Record<string, ParticleDef> = {
             end: 0.7,
             lerp: new Range(0, 0.1),
         },
-        color: function () {
+        color: function() {
             return util.rgbToInt(util.hsvToRgb(0, 0, util.random(0.69, 0.695)));
         },
     },
@@ -2365,7 +2448,7 @@ const ParticleDefs: Record<string, ParticleDef> = {
             end: 0.5,
             lerp: new Range(0, 0.1),
         },
-        color: function () {
+        color: function() {
             return util.rgbToInt(util.hsvToRgb(0, 0, util.random(0.99, 0.995)));
         },
     },
@@ -2385,7 +2468,7 @@ const ParticleDefs: Record<string, ParticleDef> = {
             end: 0,
             lerp: new Range(0.9, 1),
         },
-        color: function () {
+        color: function() {
             return util.rgbToInt(util.hsvToRgb(0, 0, util.random(0.95, 1)));
         },
     },
@@ -2430,7 +2513,7 @@ const ParticleDefs: Record<string, ParticleDef> = {
             end: 1,
             lerp: new Range(0, 0.05),
         },
-        color: function () {
+        color: function() {
             return util.rgbToInt(util.hsvToRgb(0, 0, util.random(0.9, 0.95)));
         },
     },
@@ -2459,7 +2542,7 @@ const ParticleDefs: Record<string, ParticleDef> = {
             end: 1,
             lerp: new Range(0, 0.05),
         },
-        color: function () {
+        color: function() {
             return util.rgbToInt(util.hsvToRgb(0, 0, util.random(0.5, 0.55)));
         },
         ignoreValueAdjust: true,
@@ -2489,7 +2572,7 @@ const ParticleDefs: Record<string, ParticleDef> = {
             end: 1,
             lerp: new Range(0, 0.05),
         },
-        color: function () {
+        color: function() {
             return util.rgbToInt(util.hsvToRgb(0, 0, util.random(0.9, 0.95)));
         },
     },
@@ -2513,7 +2596,7 @@ const ParticleDefs: Record<string, ParticleDef> = {
             end: 1,
             lerp: new Range(0, 0.05),
         },
-        color: function () {
+        color: function() {
             return util.rgbToInt(util.hsvToRgb(0, 0, util.random(0.7, 0.95)));
         },
         ignoreValueAdjust: true,
@@ -2544,7 +2627,7 @@ const ParticleDefs: Record<string, ParticleDef> = {
             end: 1,
             lerp: new Range(0, 0.05),
         },
-        color: function () {
+        color: function() {
             return util.rgbToInt(util.hsvToRgb(0, 0, util.random(0.9, 0.95)));
         },
     },
@@ -2568,7 +2651,31 @@ const ParticleDefs: Record<string, ParticleDef> = {
             end: 1,
             lerp: new Range(0, 0.05),
         },
-        color: function () {
+        color: function() {
+            return util.rgbToInt(util.hsvToRgb(0, 0, util.random(0.9, 0.95)));
+        },
+    },
+    potato_factions: {
+        image: ["part-potato-02.img", "part-tomato-02.img"],
+        life: new Range(10, 15),
+        drag: new Range(0, 0),
+        rotVel: new Range(Math.PI * 0.25, Math.PI * 0.5),
+        scale: {
+            start: new Range(0.13, 0.15),
+            end: new Range(0.08, 0.11),
+            lerp: new Range(0, 1),
+        },
+        alpha: {
+            start: 1,
+            end: 0,
+            lerp: new Range(0.9, 1),
+        },
+        alphaIn: {
+            start: 0,
+            end: 1,
+            lerp: new Range(0, 0.05),
+        },
+        color: function() {
             return util.rgbToInt(util.hsvToRgb(0, 0, util.random(0.9, 0.95)));
         },
     },
@@ -2592,7 +2699,7 @@ const ParticleDefs: Record<string, ParticleDef> = {
             end: 1,
             lerp: new Range(0, 0.05),
         },
-        color: function () {
+        color: function() {
             return util.rgbToInt(util.hsvToRgb(0, 0, util.random(0.9, 0.95)));
         },
     },
@@ -2611,7 +2718,7 @@ const ParticleDefs: Record<string, ParticleDef> = {
             end: 0,
             lerp: new Range(0.9, 1),
         },
-        color: function () {
+        color: function() {
             return util.rgbToInt(util.hsvToRgb(0, 0, util.random(0.9, 0.95)));
         },
     },
@@ -2630,7 +2737,7 @@ const ParticleDefs: Record<string, ParticleDef> = {
             end: 0,
             lerp: new Range(0.9, 1),
         },
-        color: function () {
+        color: function() {
             return util.rgbToInt(util.hsvToRgb(0, 0, util.random(0.9, 0.95)));
         },
     },
@@ -2666,7 +2773,26 @@ const ParticleDefs: Record<string, ParticleDef> = {
             end: 0,
             lerp: new Range(0.9, 1),
         },
-        color: function () {
+        color: function() {
+            return util.rgbToInt(util.hsvToRgb(0, 0, util.random(0.9, 0.95)));
+        },
+    },
+    tomato_impact: {
+        image: ["part-tomato-01.img"],
+        life: new Range(0.5, 1),
+        drag: new Range(0, 0),
+        rotVel: new Range(Math.PI * 0.25, Math.PI * 0.5),
+        scale: {
+            start: new Range(0.13, 0.23),
+            end: new Range(0.07, 0.14),
+            lerp: new Range(0, 1),
+        },
+        alpha: {
+            start: 1,
+            end: 0,
+            lerp: new Range(0.9, 1),
+        },
+        color: function() {
             return util.rgbToInt(util.hsvToRgb(0, 0, util.random(0.9, 0.95)));
         },
     },
@@ -2690,7 +2816,7 @@ const ParticleDefs: Record<string, ParticleDef> = {
             end: 1,
             lerp: new Range(0, 0.05),
         },
-        color: function () {
+        color: function() {
             return util.rgbToInt(util.hsvToRgb(0, 1, util.random(0.7, 1)));
         },
         ignoreValueAdjust: true,
@@ -2715,7 +2841,7 @@ const ParticleDefs: Record<string, ParticleDef> = {
             end: 1,
             lerp: new Range(0, 0.05),
         },
-        color: function () {
+        color: function() {
             return util.rgbToInt(util.hsvToRgb(0, 1, util.random(0.7, 1)));
         },
         ignoreValueAdjust: true,
@@ -2740,7 +2866,7 @@ const ParticleDefs: Record<string, ParticleDef> = {
             end: 1,
             lerp: new Range(0, 0.05),
         },
-        color: function () {
+        color: function() {
             return util.rgbToInt(util.hsvToRgb(0, 1, util.random(0.7, 1)));
         },
         ignoreValueAdjust: true,
@@ -2765,7 +2891,7 @@ const ParticleDefs: Record<string, ParticleDef> = {
             end: 1,
             lerp: new Range(0, 0.05),
         },
-        color: function () {
+        color: function() {
             return util.rgbToInt(util.hsvToRgb(0, 1, util.random(0.7, 1)));
         },
         ignoreValueAdjust: true,
@@ -2790,7 +2916,7 @@ const ParticleDefs: Record<string, ParticleDef> = {
             end: 1,
             lerp: new Range(0, 0.05),
         },
-        color: function () {
+        color: function() {
             return util.rgbToInt(util.hsvToRgb(0.3, 1, util.random(0.7, 1)));
         },
         ignoreValueAdjust: true,
@@ -2815,7 +2941,7 @@ const ParticleDefs: Record<string, ParticleDef> = {
             end: 1,
             lerp: new Range(0, 0.05),
         },
-        color: function () {
+        color: function() {
             return util.rgbToInt(util.hsvToRgb(0.3, 1, util.random(0.7, 1)));
         },
         ignoreValueAdjust: true,
@@ -2840,7 +2966,7 @@ const ParticleDefs: Record<string, ParticleDef> = {
             end: 1,
             lerp: new Range(0, 0.05),
         },
-        color: function () {
+        color: function() {
             return util.rgbToInt(util.hsvToRgb(0.3, 1, util.random(0.7, 1)));
         },
         ignoreValueAdjust: true,
@@ -2865,7 +2991,7 @@ const ParticleDefs: Record<string, ParticleDef> = {
             end: 1,
             lerp: new Range(0, 0.05),
         },
-        color: function () {
+        color: function() {
             return util.rgbToInt(util.hsvToRgb(0.3, 1, util.random(0.7, 1)));
         },
         ignoreValueAdjust: true,
@@ -2890,7 +3016,7 @@ const ParticleDefs: Record<string, ParticleDef> = {
             end: 1,
             lerp: new Range(0, 0.05),
         },
-        color: function () {
+        color: function() {
             return util.rgbToInt(util.hsvToRgb(0.83, 1, util.random(0.7, 1)));
         },
         ignoreValueAdjust: true,
@@ -2920,7 +3046,7 @@ const ParticleDefs: Record<string, ParticleDef> = {
             end: 1,
             lerp: new Range(0, 0.05),
         },
-        color: function () {
+        color: function() {
             return util.rgbToInt(util.hsvToRgb(0.37, 1, util.random(0.95, 1)));
         },
     },
@@ -2966,7 +3092,7 @@ const ParticleDefs: Record<string, ParticleDef> = {
             end: 1,
             lerp: new Range(0, 0.05),
         },
-        color: function () {
+        color: function() {
             return util.rgbToInt(util.hsvToRgb(0.13, 1, util.random(0.98, 1)));
         },
     },
@@ -2990,7 +3116,7 @@ const ParticleDefs: Record<string, ParticleDef> = {
             end: 1,
             lerp: new Range(0, 0.05),
         },
-        color: function () {
+        color: function() {
             if (Math.random() > 0.5) {
                 return util.rgbToInt(util.hsvToRgb(0.12, 0.97, util.random(0.95, 1)));
             }
@@ -3018,7 +3144,7 @@ const ParticleDefs: Record<string, ParticleDef> = {
             end: 1,
             lerp: new Range(0, 0.05),
         },
-        color: function () {
+        color: function() {
             if (Math.random() > 0.5) {
                 return util.rgbToInt(util.hsvToRgb(0.05, 0.94, util.random(0.85, 0.88)));
             }
@@ -3046,7 +3172,7 @@ const ParticleDefs: Record<string, ParticleDef> = {
             end: 1,
             lerp: new Range(0, 0.05),
         },
-        color: function () {
+        color: function() {
             if (Math.random() > 0.5) {
                 return util.rgbToInt(util.hsvToRgb(0, 0.96, util.random(0.91, 0.94)));
             }
@@ -3160,6 +3286,16 @@ const EmitterDefs: Record<string, EmitterDef> = {
     },
     falling_potato: {
         particle: "potato",
+        rate: new Range(0.2, 0.24),
+        radius: 120,
+        speed: new Range(2, 3),
+        angle: Math.PI * 0.2,
+        rot: new Range(0, Math.PI * 2),
+        maxCount: Number.MAX_VALUE,
+        zOrd: 999,
+    },
+    falling_pvt: {
+        particle: "potato_factions",
         rate: new Range(0.2, 0.24),
         radius: 120,
         speed: new Range(2, 3),

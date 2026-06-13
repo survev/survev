@@ -1,15 +1,15 @@
 import * as PIXI from "pixi.js-legacy";
-import type { ObjectData, ObjectType } from "../../../shared/net/objectSerializeFns";
-import { collider } from "../../../shared/utils/collider";
-import { math } from "../../../shared/utils/math";
-import { util } from "../../../shared/utils/util";
-import { type Vec2, v2 } from "../../../shared/utils/v2";
-import type { Camera } from "../camera";
-import type { Ctx } from "../game";
-import type { Map } from "../map";
-import type { Renderer } from "../renderer";
-import { Pool } from "./objectPool";
-import type { AbstractObject, Player } from "./player";
+import type { ObjectData, ObjectType } from "../../../shared/net/objectSerializeFns.ts";
+import { collider } from "../../../shared/utils/collider.ts";
+import { math } from "../../../shared/utils/math.ts";
+import { util } from "../../../shared/utils/util.ts";
+import { v2, type Vec2 } from "../../../shared/utils/v2.ts";
+import type { Camera } from "../camera.ts";
+import type { Ctx } from "../game.ts";
+import type { Map } from "../map.ts";
+import type { Renderer } from "../renderer.ts";
+import { Pool } from "./objectPool.ts";
+import type { AbstractObject, Player } from "./player.ts";
 
 class Smoke implements AbstractObject {
     __id!: number;
@@ -153,11 +153,11 @@ export class SmokeBarn {
                 // level but occluded by the cellar when on the stairs).
                 let layer = p.layer;
                 if (
-                    (!!util.sameLayer(p.layer, activePlayer.layer) ||
-                        !!(activePlayer.layer & 2)) &&
-                    (p.layer == 1 ||
-                        !(activePlayer.layer & 2) ||
-                        !map.insideStructureMask(collider.createCircle(p.pos, 1)))
+                    (!!util.sameLayer(p.layer, activePlayer.layer)
+                        || !!(activePlayer.layer & 2))
+                    && (p.layer == 1
+                        || !(activePlayer.layer & 2)
+                        || !map.insideStructureMask(collider.createCircle(p.pos, 1)))
                 ) {
                     layer |= 2;
                 }

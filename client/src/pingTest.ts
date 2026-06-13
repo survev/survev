@@ -56,7 +56,7 @@ export class PingTest {
             this.testsCompleted++;
         };
 
-        const onClose = function (test: Test) {
+        const onClose = function(test: Test) {
             if (test.ws) {
                 test.ws.close();
                 test.ws = null;
@@ -76,17 +76,17 @@ export class PingTest {
             if (!test.ws) {
                 const ws = new WebSocket(`ws${test.https ? "s" : ""}://${test.url}/ptc`);
                 ws.binaryType = "arraybuffer";
-                ws.onopen = function () {};
-                ws.onmessage = function (_msg) {
+                ws.onopen = function() {};
+                ws.onmessage = function(_msg) {
                     const elapsed = (Date.now() - test.sendTime) / 1000;
                     test.ping = Math.min(test.ping, elapsed);
                     test.recvCount++;
                     test.sendDelay = 0.125;
                 };
-                ws.onerror = function (_e) {
+                ws.onerror = function(_e) {
                     onClose(test);
                 };
-                ws.onclose = function () {
+                ws.onclose = function() {
                     onClose(test);
                 };
                 test.ws = ws;

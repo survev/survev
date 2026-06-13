@@ -1,5 +1,5 @@
 import pg from "pg";
-import { Config } from "../../config";
+import { Config } from "../../config.ts";
 
 async function dropDatabase() {
     if (process.env.NODE_ENV === "production") return;

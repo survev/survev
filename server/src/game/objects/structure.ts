@@ -1,13 +1,12 @@
-import { MapObjectDefs } from "../../../../shared/defs/mapObjectDefs";
-import type { StructureDef } from "../../../../shared/defs/mapObjectsTyping";
-import { ObjectType } from "../../../../shared/net/objectSerializeFns";
-import { type AABB, coldet } from "../../../../shared/utils/coldet";
-import { collider } from "../../../../shared/utils/collider";
-import { mapHelpers } from "../../../../shared/utils/mapHelpers";
-import { math } from "../../../../shared/utils/math";
-import { type Vec2, v2 } from "../../../../shared/utils/v2";
-import type { Game } from "../game";
-import { BaseGameObject } from "./gameObject";
+import { MapObjectDefs } from "../../../../shared/defs/register.ts";
+import { ObjectType } from "../../../../shared/net/objectSerializeFns.ts";
+import { type AABB, coldet } from "../../../../shared/utils/coldet.ts";
+import { collider } from "../../../../shared/utils/collider.ts";
+import { mapHelpers } from "../../../../shared/utils/mapHelpers.ts";
+import { math } from "../../../../shared/utils/math.ts";
+import { v2, type Vec2 } from "../../../../shared/utils/v2.ts";
+import type { Game } from "../game.ts";
+import { BaseGameObject } from "./gameObject.ts";
 
 interface Stair {
     collision: AABB;
@@ -52,7 +51,7 @@ export class Structure extends BaseGameObject {
             1,
         ) as AABB;
 
-        const def = MapObjectDefs[type] as StructureDef;
+        const def = MapObjectDefs.typeToDef(type, "structure");
 
         this.stairs = [];
         for (let i = 0; i < def.stairs.length; i++) {

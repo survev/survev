@@ -1,14 +1,13 @@
-import { MapObjectDefs } from "../../../../shared/defs/mapObjectDefs";
-import type { DecalDef } from "../../../../shared/defs/mapObjectsTyping";
-import { ObjectType } from "../../../../shared/net/objectSerializeFns";
-import type { AABB, Circle } from "../../../../shared/utils/coldet";
-import { collider } from "../../../../shared/utils/collider";
-import { mapHelpers } from "../../../../shared/utils/mapHelpers";
-import { math } from "../../../../shared/utils/math";
-import { util } from "../../../../shared/utils/util";
-import { type Vec2, v2 } from "../../../../shared/utils/v2";
-import type { Game } from "../game";
-import { BaseGameObject } from "./gameObject";
+import { MapObjectDefs } from "../../../../shared/defs/register.ts";
+import { ObjectType } from "../../../../shared/net/objectSerializeFns.ts";
+import type { AABB, Circle } from "../../../../shared/utils/coldet.ts";
+import { collider } from "../../../../shared/utils/collider.ts";
+import { mapHelpers } from "../../../../shared/utils/mapHelpers.ts";
+import { math } from "../../../../shared/utils/math.ts";
+import { util } from "../../../../shared/utils/util.ts";
+import { v2, type Vec2 } from "../../../../shared/utils/v2.ts";
+import type { Game } from "../game.ts";
+import { BaseGameObject } from "./gameObject.ts";
 
 export class DecalBarn {
     decals: Decal[] = [];
@@ -65,7 +64,7 @@ export class Decal extends BaseGameObject {
         this.ori = ori ?? 0;
         this.rot = math.oriToRad(this.ori);
 
-        const def = MapObjectDefs[type] as DecalDef;
+        const def = MapObjectDefs.typeToDef(type, "decal");
 
         this.collider = collider.transform(
             def.collision,
@@ -87,10 +86,9 @@ export class Decal extends BaseGameObject {
         const fadeChance = def.fadeChance ?? 1;
 
         if (def.lifetime && Math.random() < fadeChance) {
-            this.lifeTime =
-                typeof def.lifetime === "number"
-                    ? def.lifetime
-                    : util.random(def.lifetime.min, def.lifetime.max);
+            this.lifeTime = typeof def.lifetime === "number"
+                ? def.lifetime
+                : util.random(def.lifetime.min, def.lifetime.max);
         }
     }
 }

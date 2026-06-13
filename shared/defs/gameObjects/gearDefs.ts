@@ -1,4 +1,4 @@
-import { util } from "../../utils/util";
+import { util } from "../../utils/util.ts";
 
 function defineSkin(baseType: string, params: unknown) {
     return util.mergeDeep({}, BaseDefs[baseType], { baseType }, params);
@@ -92,7 +92,7 @@ const ChestDefs: Record<string, ChestDef> = {
             baseSprite: "player-armor-base-01.img",
         },
         lootImg: {
-            sprite: "loot-chest-03.img",
+            sprite: "loot-chest-04.img",
             tint: 0xffffff,
             border: "loot-circle-outer-01.img",
             borderTint: 0,
@@ -910,6 +910,21 @@ const SkinDefs = {
         lootImg: {
             sprite: "player-helmet-captain.img",
             scale: 0.3,
+            rot: 0.5 * Math.PI,
+        },
+    }),
+    helmet04_classless: defineSkin("helmet04", {
+        name: "Classless Helmet",
+        noDrop: true,
+        skinImg: {
+            baseTint: 0xffffff,
+            baseTintRed: 0xffffff,
+            baseTintBlue: 0xffffff,
+            baseSprite: "player-helmet-classless.img",
+            spriteScale: 0.275,
+        },
+        lootImg: {
+            sprite: "player-helmet-classless.img",
             rot: 0.5 * Math.PI,
         },
     }),

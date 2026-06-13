@@ -1,5 +1,6 @@
 import $ from "jquery";
 import type {
+    GetPassRequest,
     LoadoutRequest,
     LoadoutResponse,
     ProfileResponse,
@@ -11,16 +12,16 @@ import type {
     SetQuestRequest,
     UsernameRequest,
     UsernameResponse,
-} from "../../shared/types/user";
-import type { ItemStatus } from "../../shared/utils/loadout";
-import { type Loadout, loadout as loadouts } from "../../shared/utils/loadout";
-import { util } from "../../shared/utils/util";
-import { api } from "./api";
-import type { ConfigManager } from "./config";
-import { errorLogManager } from "./errorLogs";
-import { helpers } from "./helpers";
-import { proxy } from "./proxy";
-import type { Item } from "./ui/loadoutMenu";
+} from "../../shared/types/user.ts";
+import type { ItemStatus } from "../../shared/utils/loadout.ts";
+import { type Loadout, loadout as loadouts } from "../../shared/utils/loadout.ts";
+import { util } from "../../shared/utils/util.ts";
+import { api } from "./api.ts";
+import type { ConfigManager } from "./config.ts";
+import { errorLogManager } from "./errorLogs.ts";
+import { helpers } from "./helpers.ts";
+import { proxy } from "./proxy.ts";
+import type { Item } from "./ui/loadoutMenu.ts";
 
 type DataOrCallback =
     | Record<string, unknown>
@@ -176,29 +177,6 @@ export class Account {
         document.cookie = "app-data=;expires=Thu, 01 Jan 1970 00:00:01 GMT;";
     }
 
-    loginWithAccessToken(
-        authUrl: string,
-        requestTokenFn: (cb: (...args: any[]) => void) => void,
-        extractTokenFn: (...args: any[]) => void,
-    ) {
-        requestTokenFn((err, data) => {
-            if (err) {
-                this.emit("error", "login_failed");
-                return;
-            }
-            const token = extractTokenFn(data) as unknown as string;
-            this.ajaxRequest(`${authUrl}?access_token=${token}`, (err, res) => {
-                if (err) {
-                    this.emit("error", "login_failed");
-                } else {
-                    this.config.set("sessionCookie", res.cookie);
-                    this.setSessionCookies();
-                    this.login();
-                }
-            });
-        });
-    }
-
     login() {
         if (helpers.getCookie("app-data")) {
             this.loadProfile();
@@ -345,8 +323,7 @@ export class Account {
     }
 
     getPass(tryRefreshQuests: boolean) {
-        return;
-        const args = {
+        const args: GetPassRequest = {
             tryRefreshQuests,
         };
         this.ajaxRequest("/api/user/get_pass", args, (err, res) => {

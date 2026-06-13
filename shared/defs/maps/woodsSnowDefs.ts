@@ -1,7 +1,7 @@
-import { util } from "../../utils/util";
-import type { MapDef } from "../mapDefs";
-import type { PartialMapDef } from "./baseDefs";
-import { Woods } from "./woodsDefs";
+import { util } from "../../utils/util.ts";
+import type { MapDef } from "../mapDefs.ts";
+import type { PartialMapDef } from "./baseDefs.ts";
+import { Woods } from "./woodsDefs.ts";
 
 const mapDef: PartialMapDef = {
     assets: {
@@ -62,14 +62,11 @@ const mapDef: PartialMapDef = {
             { name: "outfitGhillie", count: 1, weight: 0.5 },
         ],
         tier_outfits: [
-            { name: "outfitCobaltShell", count: 1, weight: 0.2 },
-            { name: "outfitWoodland", count: 1, weight: 0.2 },
-            { name: "outfitWhite", count: 1, weight: 0.15 },
-            { name: "outfitCarbonFiber", count: 1, weight: 0.15 },
-            { name: "outfitBlackIce", count: 1, weight: 0.15 },
-            { name: "outfitDarkGloves", count: 1, weight: 0.1 },
-            { name: "outfitCamo", count: 1, weight: 0.1 },
-            { name: "outfitSnow", count: 1, weight: 0.1 },
+            { name: "outfitCobaltShell", count: 1, weight: 0.3 },
+            { name: "outfitWoodland", count: 1, weight: 0.3 },
+            { name: "outfitBlackIce", count: 1, weight: 0.2 },
+            { name: "outfitCamo", count: 1, weight: 0.15 },
+            { name: "outfitSnow", count: 1, weight: 0.15 },
             { name: "outfitGhillie", count: 1, weight: 0.01 },
         ],
         tier_hatchet_melee: [

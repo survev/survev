@@ -1,10 +1,10 @@
+import hjson from "hjson";
 import { randomBytes } from "node:crypto";
 import fs from "node:fs";
 import path from "node:path";
-import hjson from "hjson";
-import type { ConfigType, PartialConfig } from "./configType";
-import { TeamMode } from "./shared/gameConfig";
-import { util } from "./shared/utils/util";
+import type { ConfigType, PartialConfig } from "./configType.ts";
+import { TeamMode } from "./shared/gameConfig.ts";
+import { util } from "./shared/utils/util.ts";
 
 export const configFileName = "survev-config.hjson";
 
@@ -34,9 +34,9 @@ export function getConfig(isProduction: boolean, dir: string) {
             { mapName: "main", teamMode: TeamMode.Squad, enabled: true },
         ],
         clientTheme: "main",
+        passType: "pass_survivr1",
         gameTps: 100,
         netSyncTps: 33,
-        processMode: isDev ? "single" : "multi",
         logging: {
             logDate: true,
             infoLogs: true,
@@ -56,7 +56,6 @@ export function getConfig(isProduction: boolean, dir: string) {
         oauthBasePath: "/",
         secrets: {
             SURVEV_API_KEY: "",
-            SURVEV_LOADOUT_SECRET: "",
             SURVEV_IP_SECRET: "",
         },
         captchaEnabled: false,
@@ -75,7 +74,6 @@ export function getConfig(isProduction: boolean, dir: string) {
     const dirname = import.meta?.dirname || __dirname;
 
     const configPath = path.join(dirname, dir, configFileName);
-    const legacyConfigPath = path.join(dirname, dir, "survev-config.json");
 
     let localConfig: PartialConfig = {};
 
@@ -83,37 +81,12 @@ export function getConfig(isProduction: boolean, dir: string) {
         console.log(`Sourcing config ${configPath}`);
         const configText = fs.readFileSync(configPath).toString();
         localConfig = hjson.parse(configText);
-    } else if (fs.existsSync(legacyConfigPath)) {
-        // migrate old config...
-        // todo: remove this after some months :)
-        console.log("Migrating old survev-config.json config file");
-
-        try {
-            migrateConfig(localConfig, legacyConfigPath);
-        } catch (err) {
-            console.error("Failed to migrate old config:", err);
-            console.error("Creating a new config file");
-            localConfig = {
-                // always specify default random keys..
-                secrets: {
-                    SURVEV_API_KEY: randomBytes(64).toString("base64"),
-                    SURVEV_LOADOUT_SECRET: randomBytes(32).toString("base64"),
-                    SURVEV_IP_SECRET: randomBytes(32).toString("base64"),
-                },
-            };
-        }
-
-        fs.writeFileSync(
-            configPath,
-            hjson.stringify(localConfig, { bracesSameLine: true }),
-        );
     } else {
         console.log("Config file doesn't exist... creating");
         localConfig = {
             // always specify default random keys..
             secrets: {
                 SURVEV_API_KEY: randomBytes(64).toString("base64"),
-                SURVEV_LOADOUT_SECRET: randomBytes(32).toString("base64"),
                 SURVEV_IP_SECRET: randomBytes(32).toString("base64"),
             },
         };
@@ -142,14 +115,14 @@ export function getConfig(isProduction: boolean, dir: string) {
         config.secrets.GOOGLE_CLIENT_ID && config.secrets.GOOGLE_SECRET_ID
     );
     const discordLogin = !!(
-        config.secrets.DISCORD_CLIENT_ID && config.secrets.DISCORD_CLIENT_ID
+        config.secrets.DISCORD_CLIENT_ID && config.secrets.DISCORD_SECRET_ID
     );
 
     config.proxies[baseUrl.hostname] = {
         google: googleLogin,
         discord: discordLogin,
         mock: config.debug.allowMockAccount,
-        ...(config.proxies[baseUrl.hostname] ?? {}),
+        ...config.proxies[baseUrl.hostname],
     };
 
     if (isDev) {
@@ -182,77 +155,4 @@ export function saveConfig(dir: string, config: PartialConfig) {
     } catch (err) {
         console.error("Failed saving config", err);
     }
-}
-
-function migrateConfig(localConfig: PartialConfig, legacyConfigPath: string) {
-    const configText = fs.readFileSync(legacyConfigPath).toString();
-
-    const oldConfig = JSON.parse(configText) as PartialConfig & {
-        thisRegion?: string;
-        apiKey?: string;
-        encryptLoadoutSecret?: string;
-        client?: {
-            AIP_ID?: string;
-            AIP_PLACEMENT_ID?: string;
-            theme?: string;
-        };
-        DISCORD_CLIENT_ID?: string;
-        DISCORD_SECRET_ID?: string;
-
-        GOOGLE_CLIENT_ID?: string;
-        GOOGLE_SECRET_ID?: string;
-
-        PROXYCHECK_KEY?: string;
-    };
-
-    if (oldConfig.thisRegion) {
-        localConfig.gameServer ??= {};
-        localConfig.gameServer.thisRegion = oldConfig.thisRegion;
-        delete oldConfig.thisRegion;
-    }
-
-    localConfig.secrets ??= {};
-
-    if (oldConfig.apiKey) {
-        localConfig.secrets.SURVEV_API_KEY = oldConfig.apiKey;
-        delete oldConfig.encryptLoadoutSecret;
-    }
-    if (oldConfig.encryptLoadoutSecret) {
-        localConfig.secrets.SURVEV_LOADOUT_SECRET = oldConfig.encryptLoadoutSecret;
-        delete oldConfig.encryptLoadoutSecret;
-    }
-
-    for (const key of [
-        "DISCORD_CLIENT_ID",
-        "DISCORD_SECRET_ID",
-        "GOOGLE_CLIENT_ID",
-        "GOOGLE_SECRET_ID",
-        "PROXYCHECK_KEY",
-    ] as const) {
-        if (oldConfig[key]) {
-            localConfig.secrets[key] = oldConfig[key];
-            delete oldConfig[key];
-        }
-    }
-
-    if (oldConfig.client) {
-        if (oldConfig.client.theme) {
-            localConfig.clientTheme = oldConfig.client.theme as "main";
-        }
-        if (oldConfig.client.AIP_PLACEMENT_ID) {
-            localConfig.secrets ??= {};
-            localConfig.secrets.AD_PREFIX = oldConfig.client.AIP_PLACEMENT_ID;
-        }
-
-        delete oldConfig.client;
-    }
-
-    if (!localConfig.secrets.SURVEV_API_KEY) {
-        localConfig.secrets.SURVEV_API_KEY = randomBytes(64).toString("base64");
-    }
-    if (!localConfig.secrets.SURVEV_LOADOUT_SECRET) {
-        localConfig.secrets.SURVEV_LOADOUT_SECRET = randomBytes(32).toString("base64");
-    }
-
-    util.mergeDeep(localConfig, oldConfig);
 }

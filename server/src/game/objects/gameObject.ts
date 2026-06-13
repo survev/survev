@@ -1,24 +1,21 @@
-import type { DamageType } from "../../../../shared/gameConfig";
-import { BitStream } from "../../../../shared/net/net";
-import {
-    ObjectSerializeFns,
-    ObjectType,
-} from "../../../../shared/net/objectSerializeFns";
-import { type AABB, coldet } from "../../../../shared/utils/coldet";
-import { assert } from "../../../../shared/utils/util";
-import { type Vec2, v2 } from "../../../../shared/utils/v2";
-import type { Game } from "../game";
-import type { Grid } from "../grid";
-import type { Airdrop } from "./airdrop";
-import type { Building } from "./building";
-import type { DeadBody } from "./deadBody";
-import type { Decal } from "./decal";
-import type { Loot } from "./loot";
-import type { Obstacle } from "./obstacle";
-import type { Player } from "./player";
-import type { Projectile } from "./projectile";
-import type { Smoke } from "./smoke";
-import type { Structure } from "./structure";
+import type { DamageType } from "../../../../shared/gameConfig.ts";
+import { BitStream } from "../../../../shared/net/net.ts";
+import { ObjectSerializeFns, ObjectType } from "../../../../shared/net/objectSerializeFns.ts";
+import { type AABB, coldet } from "../../../../shared/utils/coldet.ts";
+import { assert } from "../../../../shared/utils/util.ts";
+import { v2, type Vec2 } from "../../../../shared/utils/v2.ts";
+import type { Game } from "../game.ts";
+import type { Grid } from "../grid.ts";
+import type { Airdrop } from "./airdrop.ts";
+import type { Building } from "./building.ts";
+import type { DeadBody } from "./deadBody.ts";
+import type { Decal } from "./decal.ts";
+import type { Loot } from "./loot.ts";
+import type { Obstacle } from "./obstacle.ts";
+import type { Player } from "./player.ts";
+import type { Projectile } from "./projectile.ts";
+import type { Smoke } from "./smoke.ts";
+import type { Structure } from "./structure.ts";
 
 export type GameObject =
     | Player
@@ -74,15 +71,16 @@ export class ObjectRegister {
         }
 
         const preAllocIds = (type: ObjectType, amount: number) => {
+            this.freeLists[type] = new Array(amount);
             for (let i = 0; i < amount; i++) {
-                const id = this.allocId(type);
-                this.freeId(type, id);
+                const id = this.idNext++;
+                this.freeLists[type][i] = id;
             }
         };
 
-        preAllocIds(ObjectType.Player, 64);
+        preAllocIds(ObjectType.Player, 128);
         preAllocIds(ObjectType.Loot, 256);
-        preAllocIds(ObjectType.DeadBody, 64);
+        preAllocIds(ObjectType.DeadBody, 128);
         preAllocIds(ObjectType.Decal, 256);
         preAllocIds(ObjectType.Projectile, 128);
         preAllocIds(ObjectType.Smoke, 64);
@@ -199,8 +197,11 @@ export abstract class BaseGameObject {
 
     init(): void {
         this.initialized = true;
-        this.partialStream = new BitStream(new ArrayBuffer(64));
-        this.fullStream = new BitStream(new ArrayBuffer(64));
+
+        const sFns = ObjectSerializeFns[this.__type];
+
+        this.partialStream = new BitStream(new ArrayBuffer(3 + sFns.serializedPartialSize));
+        this.fullStream = new BitStream(new ArrayBuffer(sFns.serializedFullSize));
         this.serializeFull();
     }
 
@@ -212,8 +213,11 @@ export abstract class BaseGameObject {
             return;
         }
         assert(this.__id !== 0 && this.__type !== 0, "Object not registered");
+
         this.partialStream.index = 0;
+        this.partialStream.writeUint8(this.__type);
         this.partialStream.writeUint16(this.__id);
+
         (
             ObjectSerializeFns[this.__type].serializePart as (
                 s: BitStream,
@@ -231,6 +235,7 @@ export abstract class BaseGameObject {
             return;
         }
         assert(this.__id !== 0 && this.__type !== 0, "Object not registered");
+
         this.serializePartial();
         this.fullStream.index = 0;
         (
@@ -319,6 +324,8 @@ export abstract class BaseGameObject {
         }
         this.game.grid.remove(this as unknown as GameObject);
         this.game.objectRegister.deletedObjs.push(this as unknown as GameObject);
+        this.game.objectRegister.dirtyPart[this.__id] = 0;
+        this.game.objectRegister.dirtyFull[this.__id] = 0;
         this.destroyed = true;
     }
 }

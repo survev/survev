@@ -1,9 +1,9 @@
 import { z } from "zod";
 
-import { GameObjectDefs } from "../defs/gameObjectDefs";
-import { UnlockDefs } from "../defs/gameObjects/unlockDefs";
-import { GameConfig } from "../gameConfig";
-import { deepEqual } from "./deepEqual";
+import { UnlockDefs } from "../defs/gameObjects/unlockDefs.ts";
+import { GameObjectDefs } from "../defs/register.ts";
+import { GameConfig } from "../gameConfig.ts";
+import { deepEqual } from "./deepEqual.js";
 
 export type Item = {
     type: string;
@@ -41,7 +41,7 @@ export const loadout = {
     ItemStatus,
     validate: (userLoadout: Loadout): Loadout => {
         const getGameType = (type: string, gameType: string, defaultValue: string) => {
-            const def = GameObjectDefs[gameType];
+            const def = GameObjectDefs.typeToDefSafe(gameType);
             if (def && def.type == type) {
                 return gameType;
             }
@@ -55,16 +55,14 @@ export const loadout = {
             return val;
         };
         const mergedLoadout = {
-            ...{
-                crosshair: {
-                    type: "",
-                    color: 0xffffff,
-                    size: 1,
-                    stroke: 0,
-                },
-                emotes: [],
+            crosshair: {
+                type: "",
+                color: 0xffffff,
+                size: 1,
+                stroke: 0,
             },
-            ...userLoadout,
+            emotes: [],
+            ...userLoadout as Partial<Loadout>,
         } as Loadout;
         const validatedLoadout: Loadout = {
             outfit: getGameType("outfit", mergedLoadout.outfit, "outfitBase"),
@@ -78,9 +76,8 @@ export const loadout = {
                     mergedLoadout.crosshair.type,
                     "crosshair_default",
                 ),
-                color:
-                    parseInt(mergedLoadout.crosshair.color as unknown as string) ||
-                    0xffffff,
+                color: parseInt(mergedLoadout.crosshair.color as unknown as string)
+                    || 0xffffff,
                 size: getFloat(mergedLoadout.crosshair.size, 1).toFixed(2),
                 stroke: getFloat(mergedLoadout.crosshair.stroke, 0).toFixed(2),
             },
@@ -89,8 +86,7 @@ export const loadout = {
 
         const defaultEmotes = GameConfig.defaultEmoteLoadout.slice();
         for (let i = 0; i < GameConfig.EmoteSlot.Count; i++) {
-            const inputEmote =
-                i < mergedLoadout.emotes.length ? mergedLoadout.emotes[i] : "";
+            const inputEmote = i < mergedLoadout.emotes.length ? mergedLoadout.emotes[i] : "";
             validatedLoadout.emotes.push(
                 getGameType("emote", inputEmote, defaultEmotes[i]),
             );
@@ -108,13 +104,16 @@ export const loadout = {
             }
             return "";
         };
-        const newLoadout: Loadout = {
-            ...{
-                crosshair: {},
-                emotes: [],
+        const newLoadout = {
+            crosshair: {
+                type: "",
+                color: 0xffffff,
+                size: 1,
+                stroke: 0,
             },
-            ...userLoadout,
-        };
+            emotes: [],
+            ...userLoadout as Partial<Loadout>,
+        } as Loadout;
         const itemsToCheck = ["outfit", "melee", "heal", "boost", "player_icon"] as const;
 
         itemsToCheck.forEach((item) => {
@@ -132,8 +131,7 @@ export const loadout = {
     getUserAvailableItems: (heroItems: Item[]) => {
         const items: typeof heroItems = [];
         // Add default items
-        const unlockDefaultDef =
-            GameObjectDefs.unlock_default as unknown as (typeof UnlockDefs)["unlock_default"];
+        const unlockDefaultDef = GameObjectDefs.typeToDef("unlock_default", "unlock");
         for (let i = 0; i < unlockDefaultDef.unlocks.length; i++) {
             const unlock = unlockDefaultDef.unlocks[i];
             items.push({

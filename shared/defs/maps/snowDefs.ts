@@ -1,7 +1,7 @@
-import { GameConfig } from "../../gameConfig";
-import { util } from "../../utils/util";
-import type { MapDef } from "../mapDefs";
-import { Main, type PartialMapDef } from "./baseDefs";
+import { GameConfig } from "../../gameConfig.ts";
+import { util } from "../../utils/util.ts";
+import type { MapDef } from "../mapDefs.ts";
+import { Main, type PartialMapDef } from "./baseDefs.ts";
 
 const mapDef: PartialMapDef = {
     desc: {
@@ -37,7 +37,6 @@ const mapDef: PartialMapDef = {
             planeSound: "plane_02",
             airdropImg: "map-chute-01x.img",
         },
-        frozenSprites: ["player-snow-01.img", "player-snow-02.img", "player-snow-03.img"],
     },
     /* STRIP_FROM_PROD_CLIENT:START */
     gameConfig: {
@@ -194,14 +193,11 @@ const mapDef: PartialMapDef = {
             { name: "iceaxe", count: 1, weight: 1 },
         ],
         tier_outfits: [
-            { name: "outfitCobaltShell", count: 1, weight: 0.2 },
-            { name: "outfitWoodland", count: 1, weight: 0.2 },
-            { name: "outfitWhite", count: 1, weight: 0.15 },
-            { name: "outfitCarbonFiber", count: 1, weight: 0.15 },
-            { name: "outfitBlackIce", count: 1, weight: 0.15 },
-            { name: "outfitDarkGloves", count: 1, weight: 0.1 },
-            { name: "outfitCamo", count: 1, weight: 0.1 },
-            { name: "outfitSnow", count: 1, weight: 0.1 },
+            { name: "outfitCobaltShell", count: 1, weight: 0.3 },
+            { name: "outfitWoodland", count: 1, weight: 0.3 },
+            { name: "outfitBlackIce", count: 1, weight: 0.2 },
+            { name: "outfitCamo", count: 1, weight: 0.15 },
+            { name: "outfitSnow", count: 1, weight: 0.15 },
             { name: "outfitGhillie", count: 1, weight: 0.01 },
         ],
     },
@@ -247,6 +243,7 @@ const mapDef: PartialMapDef = {
                 greenhouse_02: 1,
                 cache_01x: 1,
                 cache_02x: 1, // mosin tree
+                cache_04: 1, // river stone cache
                 cache_07: 1,
                 bunker_structure_01: { odds: 0.05 },
                 bunker_structure_02: 1,

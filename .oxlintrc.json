@@ -1,0 +1,35 @@
+{
+  "$schema": "./node_modules/oxlint/configuration_schema.json",
+  "plugins": [
+    "oxc",
+    "eslint",
+    "import",
+    "typescript",
+    "unicorn"
+  ],
+  "env": {
+    "browser": true,
+    "node": true,
+    "es2022": true
+  },
+  "globals": {
+    "foo": "readonly"
+  },
+  "settings": {},
+  "rules": {
+    "eqeqeq": "off",
+    "import/no-cycle": "off",
+    "eslint/no-unused-vars": "off",
+    "typescript/no-this-alias": "off",
+    "import/extensions": [
+      "error",
+      "always",
+      {
+        "ignorePackages": true
+      }
+    ],
+    "unicorn/prefer-node-protocol": "error",
+    "unicorn/no-new-array": "off"
+  },
+  "overrides": []
+}

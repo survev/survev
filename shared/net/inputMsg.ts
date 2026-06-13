@@ -1,6 +1,6 @@
-import type { Input } from "../gameConfig";
-import { v2 } from "../utils/v2";
-import { type AbstractMsg, type BitStream, Constants } from "./net";
+import type { Input } from "../gameConfig.ts";
+import { v2 } from "../utils/v2.ts";
+import { type AbstractMsg, type BitStream, Constants } from "./net.ts";
 
 export class InputMsg implements AbstractMsg {
     seq = 0;

@@ -5,13 +5,14 @@ import {
     SlashCommandBuilder,
 } from "discord.js";
 import type z from "zod";
-import { botLogger, type Command, honoClient, isAdmin } from "../utils";
+import { botLogger, type Command, honoClient, isAdmin } from "../utils.ts";
 
 export function createCommand<T extends z.ZodSchema = z.ZodSchema>(config: {
     name: Command;
     description: string;
     optionValidator: T;
     isPrivateRoute?: boolean;
+    requiresAdmin?: boolean;
     options: {
         name: keyof z.input<T>;
         description: string;
@@ -30,9 +31,15 @@ export async function genericExecute<N extends Exclude<Command, "search_player">
     name: N,
     interaction: ChatInputCommandInteraction,
     validator: z.ZodTypeAny,
+    requiresAdmin = false,
     isPrivateRoute = false,
 ) {
     await interaction.deferReply();
+
+    if (requiresAdmin && !isAdmin(interaction)) {
+        await sendNoPermissionMessage(interaction);
+        return;
+    }
 
     const options = interaction.options.data.reduce(
         (obj, { name, value }) => {
@@ -49,39 +56,16 @@ export async function genericExecute<N extends Exclude<Command, "search_player">
 
     if (!args.success) {
         botLogger.error("Failed to parse arguments", options, args.error);
-        await interaction.reply({
-            content: "Invalid arguments",
-            flags: MessageFlags.Ephemeral,
+        await interaction.editReply({
+            content: `Invalid arguments, error: \`\`\`json\n${args.error.message}\`\`\``,
         });
         return;
     }
 
-    if (isPrivateRoute) {
-        await handlePrivateRoute(interaction, name, args.data);
-        return;
-    }
-
     // @ts-expect-error - we don't care at this point
-    const res = await honoClient.moderation[name].$post({
+    const route = isPrivateRoute ? honoClient[name] : honoClient.moderation[name];
+    const res = await route.$post({
         json: args.data as any,
-    });
-    const { message } = await res.json();
-    await interaction.editReply(message);
-}
-
-async function handlePrivateRoute(
-    interaction: ChatInputCommandInteraction,
-    name: any,
-    payload: any,
-) {
-    if (!isAdmin(interaction)) {
-        await sendNoPermissionMessage(interaction);
-        return;
-    }
-
-    // @ts-expect-error - we don't care at this point
-    const res = await honoClient[name].$post({
-        json: payload,
     });
     const { message } = await res.json();
     await interaction.editReply(message);

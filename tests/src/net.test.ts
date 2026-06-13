@@ -1,10 +1,10 @@
 import { beforeEach, expect, test } from "vitest";
-import { Main } from "../../shared/defs/maps/baseDefs";
-import { GameConfig, GasMode } from "../../shared/gameConfig";
-import * as net from "../../shared/net/net";
-import { ObjectType } from "../../shared/net/objectSerializeFns";
-import { util } from "../../shared/utils/util";
-import { v2 } from "../../shared/utils/v2";
+import { Main } from "../../shared/defs/maps/baseDefs.ts";
+import { GameConfig, GasMode } from "../../shared/gameConfig.ts";
+import * as net from "../../shared/net/net.ts";
+import { ObjectType } from "../../shared/net/objectSerializeFns.ts";
+import { util } from "../../shared/utils/util.ts";
+import { v2 } from "../../shared/utils/v2.ts";
 
 const stream = new net.MsgStream(new ArrayBuffer(1 << 16));
 

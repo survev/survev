@@ -16,20 +16,20 @@
     "ejs": "^4.0.1",
     "jquery": "^3.7.1",
     "pixi.js-legacy": "^7.4.3",
-    "slugify": "^1.6.8"
+    "slugify": "^1.6.9"
   },
   "devDependencies": {
     "@tweakpane/core": "^2.0.5",
     "@types/ejs": "^3.1.5",
     "@types/jquery": "^3.5.34",
-    "canvas": "^3.2.2",
+    "canvas": "^3.2.3",
     "codefend": "^3.2.0",
     "maxrects-packer": "^2.7.3",
     "sharp": "^0.34.5",
-    "tsx": "^4.21.0",
+    "tsx": "^4.22.4",
     "turnstile-types": "^1.2.3",
     "tweakpane": "^4.0.5",
-    "vite": "^8.0.2",
-    "vite-plugin-strip-block": "^1.0.1"
+    "vite": "^8.0.16",
+    "vite-plugin-strip-block": "^1.1.1"
   }
 }

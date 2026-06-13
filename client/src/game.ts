@@ -1,51 +1,52 @@
 import * as PIXI from "pixi.js-legacy";
-import { GameObjectDefs } from "../../shared/defs/gameObjectDefs";
-import { RoleDefs } from "../../shared/defs/gameObjects/roleDefs";
-import { GameConfig, Input, TeamMode, WeaponSlot } from "../../shared/gameConfig";
-import * as net from "../../shared/net/net";
-import { ObjectType } from "../../shared/net/objectSerializeFns";
-import { math } from "../../shared/utils/math";
-import { v2 } from "../../shared/utils/v2";
-import type { Ambiance } from "./ambiance";
-import type { AudioManager } from "./audioManager";
-import { Camera } from "./camera";
-import type { ConfigManager, DebugRenderOpts } from "./config";
-import { DebugHUD } from "./debug/debugHUD";
-import { debugLines } from "./debug/debugLines";
+
+import { GameConfig, Input, TeamMode, WeaponSlot } from "../../shared/gameConfig.ts";
+import * as net from "../../shared/net/net.ts";
+import { ObjectType } from "../../shared/net/objectSerializeFns.ts";
+import { math } from "../../shared/utils/math.ts";
+import { v2 } from "../../shared/utils/v2.ts";
+import type { Ambiance } from "./ambiance.ts";
+import type { AudioManager } from "./audioManager.ts";
+import { Camera } from "./camera.ts";
+import type { ConfigManager, DebugRenderOpts } from "./config.ts";
+import { DebugHUD } from "./debug/debugHUD.ts";
+import { debugLines } from "./debug/debugLines.ts";
 
 /* STRIP_FROM_PROD_CLIENT:START */
-import { Editor } from "./debug/editor";
+import { Editor } from "./debug/editor.ts";
 /* STRIP_FROM_PROD_CLIENT:END */
 
-import { device } from "./device";
-import { EmoteBarn } from "./emote";
-import { Gas } from "./gas";
-import { helpers } from "./helpers";
-import { type InputHandler, Key } from "./input";
-import type { InputBinds, InputBindUi } from "./inputBinds";
-import type { SoundHandle } from "./lib/createJS";
-import { Map } from "./map";
-import { AirdropBarn } from "./objects/airdrop";
-import { BulletBarn, createBullet } from "./objects/bullet";
-import { DeadBodyBarn } from "./objects/deadBody";
-import { DecalBarn } from "./objects/decal";
-import { ExplosionBarn } from "./objects/explosion";
-import { FlareBarn } from "./objects/flare";
-import { LootBarn } from "./objects/loot";
-import { Creator } from "./objects/objectPool";
-import { ParticleBarn } from "./objects/particles";
-import { PlaneBarn } from "./objects/plane";
-import { type Player, PlayerBarn } from "./objects/player";
-import { ProjectileBarn } from "./objects/projectile";
-import { ShotBarn } from "./objects/shot";
-import { SmokeBarn } from "./objects/smoke";
-import { Renderer } from "./renderer";
-import type { ResourceManager } from "./resources";
-import { SDK } from "./sdk/sdk";
-import type { Localization } from "./ui/localization";
-import { Touch } from "./ui/touch";
-import { UiManager } from "./ui/ui";
-import { UiManager2 } from "./ui/ui2";
+import { GameObjectDefs } from "../../shared/defs/register.ts";
+import { device } from "./device.ts";
+import { EmoteBarn } from "./emote.ts";
+import { errorLogManager } from "./errorLogs.ts";
+import { Gas } from "./gas.ts";
+import { helpers } from "./helpers.ts";
+import { type InputHandler, Key } from "./input.ts";
+import type { InputBinds, InputBindUi } from "./inputBinds.ts";
+import type { SoundHandle } from "./lib/createJS.ts";
+import { Map } from "./map.ts";
+import { AirdropBarn } from "./objects/airdrop.ts";
+import { BulletBarn, createBullet } from "./objects/bullet.ts";
+import { DeadBodyBarn } from "./objects/deadBody.ts";
+import { DecalBarn } from "./objects/decal.ts";
+import { ExplosionBarn } from "./objects/explosion.ts";
+import { FlareBarn } from "./objects/flare.ts";
+import { LootBarn } from "./objects/loot.ts";
+import { Creator } from "./objects/objectPool.ts";
+import { ParticleBarn } from "./objects/particles.ts";
+import { PlaneBarn } from "./objects/plane.ts";
+import { type Player, PlayerBarn } from "./objects/player.ts";
+import { ProjectileBarn } from "./objects/projectile.ts";
+import { ShotBarn } from "./objects/shot.ts";
+import { SmokeBarn } from "./objects/smoke.ts";
+import { Renderer } from "./renderer.ts";
+import type { ResourceManager } from "./resources.ts";
+import { SDK } from "./sdk/sdk.ts";
+import type { Localization } from "./ui/localization.ts";
+import { Touch } from "./ui/touch.ts";
+import { UiManager } from "./ui/ui.ts";
+import { UiManager2 } from "./ui/ui2.ts";
 
 export interface Ctx {
     audioManager: AudioManager;
@@ -134,16 +135,6 @@ export class Game {
         public onJoin: () => void,
         public onQuit: (err?: string) => void,
     ) {
-        this.m_pixi = m_pixi;
-        this.m_audioManager = m_audioManager;
-        this.m_ambience = m_ambience;
-        this.m_localization = m_localization;
-        this.m_config = m_config;
-        this.m_input = m_input;
-        this.m_inputBinds = m_inputBinds;
-        this.m_inputBindUi = m_inputBindUi;
-        this.m_resourceManager = m_resourceManager;
-
         if (IS_DEV) {
             this.editor = new Editor(this.m_config);
         }
@@ -157,10 +148,10 @@ export class Game {
     ) {
         if (!this.connecting && !this.connected && !this.initialized) {
             if (this.m_ws) {
-                this.m_ws.onerror = function () {};
-                this.m_ws.onopen = function () {};
-                this.m_ws.onmessage = function () {};
-                this.m_ws.onclose = function () {};
+                this.m_ws.onerror = function() {};
+                this.m_ws.onopen = function() {};
+                this.m_ws.onmessage = function() {};
+                this.m_ws.onclose = function() {};
                 this.m_ws.close();
                 this.m_ws = null;
             }
@@ -358,7 +349,7 @@ export class Game {
 
     free() {
         if (this.m_ws) {
-            this.m_ws.onmessage = function () {};
+            this.m_ws.onmessage = function() {};
             this.m_ws.close();
             this.m_ws = null;
         }
@@ -392,11 +383,11 @@ export class Game {
 
     warnPageReload() {
         return (
-            import.meta.env.PROD &&
-            this.initialized &&
-            this.m_playing &&
-            !this.m_spectating &&
-            !this.m_uiManager.displayingStats
+            import.meta.env.PROD
+            && this.initialized
+            && this.m_playing
+            && !this.m_spectating
+            && !this.m_uiManager.displayingStats
         );
     }
 
@@ -415,6 +406,9 @@ export class Game {
         let debug: DebugRenderOpts;
         if (IS_DEV) {
             debug = this.m_config.get("debugRenderer")!;
+            dt *= this.editor.toolParams.gameSpeedEnabled
+                ? this.editor.toolParams.gameSpeed
+                : 1;
         } else {
             debug = {} as DebugRenderOpts;
         }
@@ -456,8 +450,7 @@ export class Game {
         this.m_camera.m_targetZoom = (maxScreenDim * 0.5) / (zoom * this.m_camera.m_ppu);
         const zoomLerpIn = this.m_activePlayer.zoomFast ? 3 : 2;
         const zoomLerpOut = this.m_activePlayer.zoomFast ? 3 : 1.4;
-        const zoomLerp =
-            this.m_camera.m_targetZoom > this.m_camera.m_zoom ? zoomLerpIn : zoomLerpOut;
+        const zoomLerp = this.m_camera.m_targetZoom > this.m_camera.m_zoom ? zoomLerpIn : zoomLerpOut;
         this.m_camera.m_zoom = math.lerp(
             dt * zoomLerp,
             this.m_camera.m_zoom,
@@ -469,8 +462,8 @@ export class Game {
         }
         // Large Map
         if (
-            this.m_inputBinds.isBindPressed(Input.ToggleMap) ||
-            (this.m_input.keyPressed(Key.G) && !this.m_inputBinds.isKeyBound(Key.G))
+            this.m_inputBinds.isBindPressed(Input.ToggleMap)
+            || (this.m_input.keyPressed(Key.G) && !this.m_inputBinds.isKeyBound(Key.G))
         ) {
             this.m_uiManager.displayMapLarge(false);
         }
@@ -480,26 +473,25 @@ export class Game {
         }
         // Hide UI
         if (
-            this.m_inputBinds.isBindPressed(Input.HideUI) ||
-            (this.m_input.keyPressed(Key.Escape) && !this.m_uiManager.hudVisible)
+            this.m_inputBinds.isBindPressed(Input.HideUI)
+            || (this.m_input.keyPressed(Key.Escape) && !this.m_uiManager.hudVisible)
         ) {
             this.m_uiManager.cycleHud();
         }
         // Update facing direction
         const playerPos = this.m_activePlayer.m_pos;
         const mousePos = v2.create(
-            this.m_activePlayer.m_pos.x +
-                (this.m_input.mousePos.x - this.m_camera.m_screenWidth * 0.5) /
-                    this.m_camera.m_z(),
-            this.m_activePlayer.m_pos.y +
-                (this.m_camera.m_screenHeight * 0.5 - this.m_input.mousePos.y) /
-                    this.m_camera.m_z(),
+            this.m_activePlayer.m_pos.x
+                + (this.m_input.mousePos.x - this.m_camera.m_screenWidth * 0.5)
+                    / this.m_camera.m_z(),
+            this.m_activePlayer.m_pos.y
+                + (this.m_camera.m_screenHeight * 0.5 - this.m_input.mousePos.y)
+                    / this.m_camera.m_z(),
         );
         // const mousePos = this.m_camera.m_screenToPoint(this.m_input.mousePos);
         const toMousePos = v2.sub(mousePos, playerPos);
         let toMouseLen = v2.length(toMousePos);
-        let toMouseDir =
-            toMouseLen > 0.00001 ? v2.div(toMousePos, toMouseLen) : v2.create(1, 0);
+        let toMouseDir = toMouseLen > 0.00001 ? v2.div(toMousePos, toMouseLen) : v2.create(1, 0);
 
         if (this.m_emoteBarn.wheelDisplayed) {
             toMouseLen = this.m_prevInputMsg.toMouseLen;
@@ -524,10 +516,9 @@ export class Game {
                         touchPlayerMovement.toMoveDir,
                         v2.create(1, 0),
                     );
-                    const modifiedAimDir =
-                        this.m_touch.turnDirTicker < 0
-                            ? touchDir
-                            : touchAimMovement.aimMovement.toAimDir;
+                    const modifiedAimDir = this.m_touch.turnDirTicker < 0
+                        ? touchDir
+                        : touchAimMovement.aimMovement.toAimDir;
                     this.m_touch.setAimDir(modifiedAimDir);
                     aimDir = modifiedAimDir;
                 }
@@ -547,29 +538,24 @@ export class Game {
                 }
                 inputMsg.touchMoveActive = true;
                 const aimLen = touchAimMovement.aimMovement.toAimLen;
-                const toTouchLenAdjusted =
-                    math.clamp(aimLen / this.m_touch.padPosRange, 0, 1) *
-                    GameConfig.player.throwableMaxMouseDist;
+                const toTouchLenAdjusted = math.clamp(aimLen / this.m_touch.padPosRange, 0, 1)
+                    * GameConfig.player.throwableMaxMouseDist;
                 inputMsg.toMouseLen = toTouchLenAdjusted;
                 inputMsg.toMouseDir = aimDir;
             } else {
                 // Only use arrow keys if they are unbound
-                inputMsg.moveLeft =
-                    this.m_inputBinds.isBindDown(Input.MoveLeft) ||
-                    (this.m_input.keyDown(Key.Left) &&
-                        !this.m_inputBinds.isKeyBound(Key.Left));
-                inputMsg.moveRight =
-                    this.m_inputBinds.isBindDown(Input.MoveRight) ||
-                    (this.m_input.keyDown(Key.Right) &&
-                        !this.m_inputBinds.isKeyBound(Key.Right));
-                inputMsg.moveUp =
-                    this.m_inputBinds.isBindDown(Input.MoveUp) ||
-                    (this.m_input.keyDown(Key.Up) &&
-                        !this.m_inputBinds.isKeyBound(Key.Up));
-                inputMsg.moveDown =
-                    this.m_inputBinds.isBindDown(Input.MoveDown) ||
-                    (this.m_input.keyDown(Key.Down) &&
-                        !this.m_inputBinds.isKeyBound(Key.Down));
+                inputMsg.moveLeft = this.m_inputBinds.isBindDown(Input.MoveLeft)
+                    || (this.m_input.keyDown(Key.Left)
+                        && !this.m_inputBinds.isKeyBound(Key.Left));
+                inputMsg.moveRight = this.m_inputBinds.isBindDown(Input.MoveRight)
+                    || (this.m_input.keyDown(Key.Right)
+                        && !this.m_inputBinds.isKeyBound(Key.Right));
+                inputMsg.moveUp = this.m_inputBinds.isBindDown(Input.MoveUp)
+                    || (this.m_input.keyDown(Key.Up)
+                        && !this.m_inputBinds.isKeyBound(Key.Up));
+                inputMsg.moveDown = this.m_inputBinds.isBindDown(Input.MoveDown)
+                    || (this.m_input.keyDown(Key.Down)
+                        && !this.m_inputBinds.isKeyBound(Key.Down));
                 inputMsg.toMouseDir = v2.copy(toMouseDir);
                 inputMsg.toMouseLen = toMouseLen;
             }
@@ -584,12 +570,9 @@ export class Game {
                 0,
                 net.Constants.MouseMaxDist,
             );
-            inputMsg.shootStart =
-                this.m_inputBinds.isBindPressed(Input.Fire) || this.m_touch.shotDetected;
-            inputMsg.shootHold =
-                this.m_inputBinds.isBindDown(Input.Fire) || this.m_touch.shotDetected;
-            inputMsg.portrait =
-                this.m_camera.m_screenWidth < this.m_camera.m_screenHeight;
+            inputMsg.shootStart = this.m_inputBinds.isBindPressed(Input.Fire) || this.m_touch.shotDetected;
+            inputMsg.shootHold = this.m_inputBinds.isBindDown(Input.Fire) || this.m_touch.shotDetected;
+            inputMsg.portrait = this.m_camera.m_screenWidth < this.m_camera.m_screenHeight;
             const checkInputs = [
                 Input.Reload,
                 Input.Revive,
@@ -637,8 +620,8 @@ export class Game {
 
             // Swap weapon slots
             if (
-                this.m_inputBinds.isBindPressed(Input.SwapWeapSlots) ||
-                this.m_uiManager.swapWeapSlots
+                this.m_inputBinds.isBindPressed(Input.SwapWeapSlots)
+                || this.m_uiManager.swapWeapSlots
             ) {
                 inputMsg.addInput(Input.SwapWeapSlots);
                 this.m_activePlayer.gunSwitchCooldown = 0;
@@ -664,8 +647,7 @@ export class Game {
                             [WeaponSlot.Melee]: Input.EquipMelee,
                             [WeaponSlot.Throwable]: Input.EquipThrowable,
                         };
-                        const input =
-                            weapIdxToInput[e.data as keyof typeof weapIdxToInput];
+                        const input = weapIdxToInput[e.data as keyof typeof weapIdxToInput];
                         if (input) {
                             inputMsg.addInput(input);
                         }
@@ -703,12 +685,11 @@ export class Game {
                             dropMsg.item = Q.type;
                         }
                     } else {
-                        const item =
-                            uiEvent.data == "helmet"
-                                ? this.m_activePlayer.m_netData.m_helmet
-                                : uiEvent.data == "chest"
-                                  ? this.m_activePlayer.m_netData.m_chest
-                                  : uiEvent.data;
+                        const item = uiEvent.data == "helmet"
+                            ? this.m_activePlayer.m_netData.m_helmet
+                            : uiEvent.data == "chest"
+                            ? this.m_activePlayer.m_netData.m_chest
+                            : uiEvent.data;
                         dropMsg.item = item as string;
                     }
                     if (dropMsg.item != "") {
@@ -738,16 +719,13 @@ export class Game {
 
         this.m_spectateCooldown -= dt;
         const specBegin = this.m_uiManager.specBegin;
-        const specNext = (this.m_uiManager.specNext ||=
-            this.m_spectating && this.m_input.keyPressed(Key.Right));
-        const specPrev = (this.m_uiManager.specPrev ||=
-            this.m_spectating && this.m_input.keyPressed(Key.Left));
-        const specForce =
-            this.m_input.keyPressed(Key.Right) || this.m_input.keyPressed(Key.Left);
+        const specNext = (this.m_uiManager.specNext ||= this.m_spectating && this.m_input.keyPressed(Key.Right));
+        const specPrev = (this.m_uiManager.specPrev ||= this.m_spectating && this.m_input.keyPressed(Key.Left));
+        const specForce = this.m_input.keyPressed(Key.Right) || this.m_input.keyPressed(Key.Left);
 
         if (
-            specBegin ||
-            (this.m_spectating && this.m_spectateCooldown < 0 && (specNext || specPrev))
+            specBegin
+            || (this.m_spectating && this.m_spectateCooldown < 0 && (specNext || specPrev))
         ) {
             this.m_spectateCooldown = 1;
 
@@ -787,8 +765,8 @@ export class Game {
                 } else if (k == "shootStart") {
                     diff = inputMsg[k] || inputMsg[k] != this.m_prevInputMsg[k];
                 } else if (
-                    this.m_prevInputMsg[k as keyof typeof this.m_prevInputMsg] !=
-                    inputMsg[k as keyof typeof inputMsg]
+                    this.m_prevInputMsg[k as keyof typeof this.m_prevInputMsg]
+                        != inputMsg[k as keyof typeof inputMsg]
                 ) {
                     diff = true;
                 }
@@ -946,7 +924,7 @@ export class Game {
             this.m_camera,
             this.m_renderer,
         );
-        this.m_renderer.m_update(dt, this.m_camera, this.m_map);
+        this.m_renderer.m_update(dt, this.m_camera, this.m_map, debug?.structures?.layerMasks);
 
         for (let i = 0; i < this.m_emoteBarn.newPings.length; i++) {
             const ping = this.m_emoteBarn.newPings[i];
@@ -1095,6 +1073,26 @@ export class Game {
     }
 
     m_processGameUpdate(msg: net.UpdateMsg) {
+        // Latency determination
+        // calculate this before the rest of this function
+        // so client-side lag caused by the rest of the code wont count
+        // on the server latency and update interval measurements
+        const now = Date.now();
+        this.m_updateRecvCount++;
+        if (msg.ack == this.seq && this.seqInFlight) {
+            this.seqInFlight = false;
+            const ping = now - this.seqSendTime;
+            this.debugHUD.pingGraph.addEntry(ping);
+            this.pings.push(ping);
+        }
+        if (this.lastUpdateTime > 0) {
+            const interval = now - this.lastUpdateTime;
+            this.m_camera.m_interpInterval = interval / 1000;
+            this.debugHUD.updateIntervalGraph.addEntry(interval);
+            this.updateIntervals.push(interval);
+        }
+        this.lastUpdateTime = now;
+
         const ctx: Ctx = {
             audioManager: this.m_audioManager,
             renderer: this.m_renderer,
@@ -1149,6 +1147,19 @@ export class Game {
         // Update partial objects
         for (let i = 0; i < msg.partObjects.length; i++) {
             const obj = msg.partObjects[i];
+
+            const clientType = this.m_objectCreator.m_getObjById(obj.__id)?.__type ?? 0;
+            if (obj.__type !== clientType) {
+                const errString = `updateObjPart: type mismatch, received ${obj.__type}, client has ${clientType};`;
+                errorLogManager.logError(errString, {
+                    id: obj.__id,
+                    ids: Object.keys(this.m_objectCreator.m_idToObj),
+                    msg,
+                });
+                console.error(errString);
+                continue;
+            }
+
             this.m_objectCreator.m_updateObjPart(obj.__id, obj, ctx);
         }
         this.m_spectating = this.m_activeId != this.m_localId;
@@ -1234,22 +1245,6 @@ export class Game {
                 this.m_map.getMapDef().gameMode,
             );
         }
-
-        // Latency determination
-        const now = Date.now();
-        this.m_updateRecvCount++;
-        if (msg.ack == this.seq && this.seqInFlight) {
-            this.seqInFlight = false;
-            const ping = now - this.seqSendTime;
-            this.debugHUD.pingGraph.addEntry(ping);
-            this.pings.push(ping);
-        }
-        if (this.lastUpdateTime > 0) {
-            const interval = now - this.lastUpdateTime;
-            this.m_camera.m_interpInterval = interval / 1000;
-            this.updateIntervals.push(interval);
-        }
-        this.lastUpdateTime = now;
     }
 
     // Socket functions
@@ -1301,12 +1296,15 @@ export class Game {
                 this.m_particleBarn.onMapLoad(this.m_map);
                 this.m_uiManager.onMapLoad(this.m_map, this.m_camera);
                 if (this.m_map.perkMode) {
-                    const role = this.m_config.get("perkModeRole")!;
-                    this.m_uiManager.setRoleMenuOptions(
-                        role,
-                        this.m_map.getMapDef().gameMode.perkModeRoles!,
-                    );
-                    this.m_uiManager.setRoleMenuActive(true);
+                    const player = this.m_activePlayer as Player | undefined;
+                    if (!player?.m_netData.m_role) {
+                        const role = this.m_config.get("perkModeRole")!;
+                        this.m_uiManager.setRoleMenuOptions(
+                            role,
+                            this.m_map.getMapDef().gameMode.perkModeRoles!,
+                        );
+                        this.m_uiManager.setRoleMenuActive(true);
+                    }
                 } else {
                     this.m_uiManager.setRoleMenuActive(false);
                 }
@@ -1331,11 +1329,10 @@ export class Game {
                 const activeTeamId = this.m_playerBarn.getPlayerInfo(
                     this.m_activeId,
                 ).teamId;
-                const useKillerInfoInFeed =
-                    (msg.downed && !msg.killed) ||
-                    msg.damageType == GameConfig.DamageType.Gas ||
-                    msg.damageType == GameConfig.DamageType.Bleeding ||
-                    msg.damageType == GameConfig.DamageType.Airdrop;
+                const useKillerInfoInFeed = (msg.downed && !msg.killed)
+                    || msg.damageType == GameConfig.DamageType.Gas
+                    || msg.damageType == GameConfig.DamageType.Bleeding
+                    || msg.damageType == GameConfig.DamageType.Airdrop;
                 const targetInfo = this.m_playerBarn.getPlayerInfo(msg.targetId);
                 const killerInfo = this.m_playerBarn.getPlayerInfo(msg.killCreditId);
                 const killfeedKillerInfo = useKillerInfoInFeed
@@ -1362,8 +1359,7 @@ export class Game {
                 // Display the kill / downed notification for the active player
                 if (msg.killCreditId == this.m_activeId) {
                     const completeKill = msg.killerId == this.m_activeId;
-                    const suicide =
-                        msg.killerId == msg.targetId || msg.killCreditId == msg.targetId;
+                    const suicide = msg.killerId == msg.targetId || msg.killCreditId == msg.targetId;
                     const killText = this.m_ui2Manager.getKillText(
                         killerName,
                         targetName,
@@ -1375,10 +1371,9 @@ export class Game {
                         msg.damageType,
                         this.m_spectating,
                     );
-                    const killCountText =
-                        msg.killed && !suicide
-                            ? this.m_ui2Manager.getKillCountText(msg.killerKills)
-                            : "";
+                    const killCountText = msg.killed && !suicide
+                        ? this.m_ui2Manager.getKillCountText(msg.killerKills)
+                        : "";
                     this.m_ui2Manager.displayKillMessage(killText, killCountText);
                 } else if (msg.targetId == this.m_activeId && msg.downed && !msg.killed) {
                     const downedText = this.m_ui2Manager.getDownedText(
@@ -1434,10 +1429,7 @@ export class Game {
             case net.MsgType.RoleAnnouncement: {
                 const msg = new net.RoleAnnouncementMsg();
                 msg.deserialize(stream);
-                const roleDef = RoleDefs[msg.role];
-                if (!roleDef) {
-                    break;
-                }
+                const roleDef = GameObjectDefs.typeToDef(msg.role, "role");
                 const playerInfo = this.m_playerBarn.getPlayerInfo(msg.playerId);
                 const nameText = helpers.htmlEscape(
                     this.m_playerBarn.getPlayerName(msg.playerId, this.m_activeId, true),
@@ -1445,8 +1437,8 @@ export class Game {
                 if (msg.assigned) {
                     if (roleDef.sound?.assign) {
                         if (
-                            msg.role == "kill_leader" &&
-                            this.m_map.getMapDef().gameMode.spookyKillSounds
+                            msg.role == "kill_leader"
+                            && this.m_map.getMapDef().gameMode.spookyKillSounds
                         ) {
                             // Halloween map has special logic for the kill leader sounds
                             this.m_audioManager.playGroup("kill_leader_assigned", {
@@ -1454,9 +1446,9 @@ export class Game {
                             });
                         } else if (
                             // The intent here is to not play the role-specific assignment sounds in perkMode unless you're the player selecting a role.
-                            msg.role == "kill_leader" ||
-                            !this.m_map.perkMode ||
-                            this.m_localId == msg.playerId
+                            msg.role == "kill_leader"
+                            || !this.m_map.perkMode
+                            || this.m_localId == msg.playerId
                         ) {
                             this.m_audioManager.playSound(roleDef.sound.assign, {
                                 channel: "ui",
@@ -1589,7 +1581,7 @@ export class Game {
                         msg.item,
                         this.m_audioManager,
                     );
-                    const itemDef = GameObjectDefs[msg.item];
+                    const itemDef = GameObjectDefs.typeToDefSafe(msg.item);
                     if (itemDef && itemDef.type == "xp") {
                         this.m_ui2Manager.addRareLootMessage(msg.item, true);
                     }

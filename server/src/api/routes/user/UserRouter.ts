@@ -1,43 +1,35 @@
 import { and, eq, inArray, ne, notInArray } from "drizzle-orm";
 import { Hono } from "hono";
-import { UnlockDefs } from "../../../../../shared/defs/gameObjects/unlockDefs";
+import { UnlockDefs } from "../../../../../shared/defs/gameObjects/unlockDefs.ts";
 import {
-    type GetPassResponse,
     type LoadoutResponse,
     type ProfileResponse,
-    type RefreshQuestResponse,
-    type SetPassUnlockResponse,
     type UsernameResponse,
-    zGetPassRequest,
     zLoadoutRequest,
-    zRefreshQuestRequest,
     zSetItemStatusRequest,
-    zSetPassUnlockRequest,
     zUsernameRequest,
-} from "../../../../../shared/types/user";
-import loadout from "../../../../../shared/utils/loadout";
-import { validateUserName } from "../../../utils/serverHelpers";
-import { server } from "../../apiServer";
+} from "../../../../../shared/types/user.ts";
+import loadout from "../../../../../shared/utils/loadout.ts";
+import { validateUserName } from "../../../utils/badWords.ts";
+import { server } from "../../apiServer.ts";
 import {
     authMiddleware,
     databaseEnabledMiddleware,
     rateLimitMiddleware,
     validateParams,
-} from "../../auth/middleware";
-import { db } from "../../db";
-import { itemsTable, matchDataTable, usersTable } from "../../db/schema";
-import type { Context } from "../../index";
-import {
-    getTimeUntilNextUsernameChange,
-    logoutUser,
-    sanitizeSlug,
-} from "./auth/authUtils";
+} from "../../auth/middleware.ts";
+import { db } from "../../db/index.ts";
+import { itemsTable, matchDataTable, usersTable } from "../../db/schema.ts";
+import type { Context } from "../../index.ts";
+import { getTimeUntilNextUsernameChange, logoutUser, sanitizeSlug } from "./auth/authUtils.ts";
+import { PassRouter } from "./PassRouter.ts";
 
 export const UserRouter = new Hono<Context>();
 
 UserRouter.use(databaseEnabledMiddleware);
 UserRouter.use(rateLimitMiddleware(40, 60 * 1000));
 UserRouter.use(authMiddleware);
+UserRouter.route("/", PassRouter);
 
 UserRouter.post("/profile", async (c) => {
     const user = c.get("user")!;
@@ -230,19 +222,4 @@ UserRouter.post("/reset_stats", async (c) => {
         .where(eq(matchDataTable.userId, user.id));
 
     return c.json({}, 200);
-});
-
-//
-// NOT IMPLEMENTED
-//
-UserRouter.post("/set_pass_unlock", validateParams(zSetPassUnlockRequest), (c) => {
-    return c.json<SetPassUnlockResponse>({ success: true }, 200);
-});
-
-UserRouter.post("/get_pass", validateParams(zGetPassRequest), (c) => {
-    return c.json<GetPassResponse>({ success: true }, 200);
-});
-
-UserRouter.post("/refresh_quest", validateParams(zRefreshQuestRequest), (c) => {
-    return c.json<RefreshQuestResponse>({ success: true }, 200);
 });

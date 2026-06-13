@@ -1,35 +1,25 @@
-import { App, SSLApp, type WebSocket } from "uWebSockets.js";
+import { Cron } from "croner";
+import { randomUUID } from "node:crypto";
 import { existsSync } from "node:fs";
 import fs from "node:fs/promises";
 import path from "node:path";
-import { Cron } from "croner";
-import { randomUUID } from "crypto";
-import { version } from "../../package.json";
-import { GameConfig } from "../../shared/gameConfig";
-import * as net from "../../shared/net/net";
-import { Config } from "./config";
-import { SingleThreadGameManager } from "./game/gameManager";
-import { GameProcessManager } from "./game/gameProcessManager";
-import { GIT_VERSION } from "./utils/gitRevision";
-import { ServerLogger } from "./utils/logger";
-import {
-    apiPrivateRouter,
-    cors,
-    forbidden,
-    getIp,
-    HTTPRateLimit,
-    logErrorToWebhook,
-    readPostedJSON,
-    returnJson,
-    WebSocketRateLimit,
-} from "./utils/serverHelpers";
+import { App, SSLApp, type WebSocket } from "uWebSockets.js";
+import pkgJson from "../../package.json" with { type: "json" };
+import { GameConfig } from "../../shared/gameConfig.ts";
+import * as net from "../../shared/net/net.ts";
+import { Config } from "./config.ts";
+import { GameProcessManager, type GameSocketData } from "./game/gameProcessManager.ts";
+import { apiPrivateRouter } from "./utils/apiRouter.ts";
+import { GIT_VERSION } from "./utils/gitRevision.ts";
+import { logErrorToWebhook, ServerLogger } from "./utils/logger.ts";
+import { HTTPRateLimit, WebSocketRateLimit } from "./utils/rateLimit.ts";
 import {
     type FindGamePrivateBody,
     type FindGamePrivateRes,
-    type GameSocketData,
     type SaveGameBody,
     zFindGamePrivateBody,
-} from "./utils/types";
+} from "./utils/types.ts";
+import { uwsHelpers } from "./utils/uwsHelpers.ts";
 
 process.on("uncaughtException", async (err) => {
     console.error(err);
@@ -45,15 +35,12 @@ class GameServer {
     readonly region = Config.regions[Config.gameServer.thisRegion];
     readonly regionId = Config.gameServer.thisRegion;
 
-    readonly manager =
-        Config.processMode === "single"
-            ? new SingleThreadGameManager()
-            : new GameProcessManager();
+    readonly manager = new GameProcessManager();
 
     async findGame(body: FindGamePrivateBody): Promise<FindGamePrivateRes> {
         const parsed = zFindGamePrivateBody.safeParse(body);
 
-        if (!parsed.success || !parsed.data) {
+        if (!parsed.success) {
             this.logger.warn("/api/find_game: Invalid body");
             return {
                 error: "failed_to_parse_body",
@@ -73,7 +60,7 @@ class GameServer {
             };
         }
 
-        const gameId = await this.manager.findGame({
+        const game = await this.manager.findGame({
             region: data.region,
             version: data.version,
             autoFill: data.autoFill,
@@ -83,7 +70,7 @@ class GameServer {
         });
 
         return {
-            gameId,
+            gameId: game.gameData.id,
             useHttps: this.region.https,
             hosts: [this.region.address],
             addrs: [this.region.address],
@@ -173,9 +160,9 @@ if (process.env.NODE_ENV !== "production") {
 
 const app = Config.gameServer.ssl
     ? SSLApp({
-          key_file_name: Config.gameServer.ssl.keyFile,
-          cert_file_name: Config.gameServer.ssl.certFile,
-      })
+        key_file_name: Config.gameServer.ssl.keyFile,
+        cert_file_name: Config.gameServer.ssl.certFile,
+    })
     : App();
 
 app.get("/health", (res) => {
@@ -184,8 +171,30 @@ app.get("/health", (res) => {
     res.end();
 });
 
+app.get("/private/status", (res, req) => {
+    if (req.getHeader("survev-api-key") !== Config.secrets.SURVEV_API_KEY) {
+        uwsHelpers.forbidden(res);
+        return;
+    }
+
+    uwsHelpers.returnJson(res, {
+        socketCount: server.manager.sockets.size,
+        gameCount: server.manager.processes.length,
+        games: server.manager.processes.map(p => {
+            return {
+                id: p.gameData.id,
+                aliveCount: p.gameData.aliveCount,
+                map: p.gameData.mapName,
+                teamMode: p.gameData.teamMode,
+                stopped: p.gameData.stopped,
+                canJoin: p.gameData.canJoin,
+            };
+        }),
+    });
+});
+
 app.options("/api/find_game", (res) => {
-    cors(res);
+    uwsHelpers.cors(res);
     res.end();
 });
 
@@ -195,38 +204,46 @@ app.post("/api/find_game", (res, req) => {
     });
 
     if (req.getHeader("survev-api-key") !== Config.secrets.SURVEV_API_KEY) {
-        forbidden(res);
+        uwsHelpers.forbidden(res);
         return;
     }
 
-    readPostedJSON(
-        res,
-        async (body: FindGamePrivateBody) => {
-            try {
-                if (res.aborted) return;
+    const findGameBodyLimit = 1024 * 1024; // 1 MB
 
-                const parsed = zFindGamePrivateBody.safeParse(body);
-                if (!parsed.success || !parsed.data) {
-                    returnJson(res, { error: "failed_to_parse_body" });
-                    return;
-                }
-
-                returnJson(res, await server.findGame(parsed.data));
-            } catch (error) {
-                server.logger.warn("API find_game error: ", error);
-            }
-        },
-        () => {
+    res.collectBody(findGameBodyLimit, async (fullBody) => {
+        try {
             if (res.aborted) return;
-            res.cork(() => {
-                if (res.aborted) return;
-                res.writeStatus("500 Internal Server Error");
-                res.write("500 Internal Server Error");
+
+            if (!fullBody) {
+                res.writeStatus("413 Content Too Large");
+                res.write("413 Content Too Large");
                 res.end();
-            });
-            server.logger.warn("/api/find_game: Error retrieving body");
-        },
-    );
+                server.logger.warn("/api/find_game: Body exceeded size limit");
+                return;
+            }
+
+            let body: unknown;
+            try {
+                body = JSON.parse(Buffer.from(fullBody).toString("utf8"));
+            } catch (_error) {
+                res.writeStatus("400 Bad Request");
+                res.write("400 Bad Request");
+                res.end();
+                server.logger.warn("/api/find_game: Error retrieving body");
+                return;
+            }
+
+            const parsed = zFindGamePrivateBody.safeParse(body);
+            if (!parsed.success) {
+                uwsHelpers.returnJson(res, { error: "failed_to_parse_body" });
+                return;
+            }
+
+            uwsHelpers.returnJson(res, await server.findGame(parsed.data));
+        } catch (error) {
+            server.logger.warn("API find_game error: ", error);
+        }
+    });
 });
 
 const gameHTTPRateLimit = new HTTPRateLimit(5, 1000);
@@ -244,7 +261,7 @@ app.ws<GameSocketData>("/play", {
         const wsProtocol = req.getHeader("sec-websocket-protocol");
         const wsExtensions = req.getHeader("sec-websocket-extensions");
 
-        const ip = getIp(res, req, Config.gameServer.proxyIPHeader);
+        const ip = uwsHelpers.getIp(res, req, Config.gameServer.proxyIPHeader);
 
         if (!ip) {
             server.logger.warn(`Invalid IP Found`);
@@ -266,20 +283,20 @@ app.ws<GameSocketData>("/play", {
 
         if (!gameId) {
             server.logger.warn("game_id_missing");
-            forbidden(res);
+            uwsHelpers.forbidden(res);
             return;
         }
-        const gameData = server.manager.getById(gameId);
+        const proc = server.manager.getById(gameId);
 
-        if (!gameData) {
+        if (!proc) {
             server.logger.warn("invalid_game_id");
-            forbidden(res);
+            uwsHelpers.forbidden(res);
             return;
         }
 
-        if (!gameData.canJoin) {
+        if (!proc.gameData.canJoin) {
             server.logger.warn("game_started");
-            forbidden(res);
+            uwsHelpers.forbidden(res);
             return;
         }
 
@@ -365,7 +382,7 @@ app.ws<pingSocketData>("/ptc", {
     upgrade(res, req, context) {
         res.onAborted((): void => {});
 
-        const ip = getIp(res, req, Config.gameServer.proxyIPHeader);
+        const ip = uwsHelpers.getIp(res, req, Config.gameServer.proxyIPHeader);
 
         if (!ip) {
             server.logger.warn(`Invalid IP Found`);
@@ -412,8 +429,11 @@ setInterval(() => {
     server.sendData();
 }, 20 * 1000);
 
-app.listen(Config.gameServer.host, Config.gameServer.port, () => {
-    server.logger.info(`Survev Game Server v${version} - GIT ${GIT_VERSION}`);
+app.listen(Config.gameServer.host, Config.gameServer.port, 1, (socket) => {
+    if (!socket) {
+        throw new Error(`Port ${Config.gameServer.port} is already in use`);
+    }
+    server.logger.info(`Survev Game Server v${pkgJson.version} - GIT ${GIT_VERSION}`);
     server.logger.info(
         `Listening on ${Config.gameServer.host}:${Config.gameServer.port}`,
     );

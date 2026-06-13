@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg
+   width="128"
+   height="128"
+   viewBox="0 0 33.866667 33.866667"
+   version="1.1"
+   id="svg6"
+   sodipodi:docname="loot-throwable-tomato.svg"
+   inkscape:version="1.4 (e7c3feb1, 2024-10-09)"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:dc="http://purl.org/dc/elements/1.1/">
+  <metadata
+     id="metadata12">
+    <rdf:RDF>
+      <cc:Work
+         rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type
+           rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+      </cc:Work>
+    </rdf:RDF>
+  </metadata>
+  <defs
+     id="defs10" />
+  <sodipodi:namedview
+     pagecolor="#ffffff"
+     bordercolor="#666666"
+     borderopacity="1"
+     objecttolerance="10"
+     gridtolerance="10"
+     guidetolerance="10"
+     inkscape:pageopacity="0"
+     inkscape:pageshadow="2"
+     inkscape:window-width="1464"
+     inkscape:window-height="921"
+     id="namedview8"
+     showgrid="false"
+     inkscape:zoom="3.6533016"
+     inkscape:cx="60.766951"
+     inkscape:cy="46.259526"
+     inkscape:window-x="51"
+     inkscape:window-y="33"
+     inkscape:window-maximized="1"
+     inkscape:current-layer="svg6"
+     inkscape:showpageshadow="2"
+     inkscape:pagecheckerboard="0"
+     inkscape:deskcolor="#d1d1d1" />
+  <path
+     id="path1"
+     style="fill:#ffffff;fill-opacity:1;fill-rule:evenodd;stroke:#2d2d2d;stroke-width:1.5875;stroke-dasharray:none"
+     d="m 28.586391,17.494622 c 0,6.434765 -5.217252,11.651173 -11.653058,11.651173 -3.148459,0 -5.347083,-1.833398 -7.4441071,-3.862148 -2.1895306,-2.118245 -4.2089493,-4.502209 -4.2089492,-7.789025 0,-1.400884 0.2472756,-2.744025 0.700567,-3.988166 1.6288379,-4.4706453 5.1069083,-7.1225011 10.1416023,-7.1225013 3.132861,-1e-7 6.349058,1.207432 8.443173,3.218428 2.207806,2.1201723 4.020772,4.5898283 4.020772,7.8922393 z"
+     sodipodi:nodetypes="ssssssss" />
+  <path
+     style="fill:#ffffff;fill-opacity:1;stroke:#2e2e2e;stroke-width:1.05833;stroke-dasharray:none;stroke-opacity:1"
+     d="M 27.14366,10.613864 C 26.158962,9.2732622 23.860389,6.8243607 21.104664,7.1945485 c -0.26534,0.035901 -0.479575,-0.21252 -0.401593,-0.4686871 l 0.676205,-2.2213318 c 0.156792,-0.513224 -0.0643,-1.0395864 -0.490795,-1.1691597 L 19.72515,2.9819456 C 19.298646,2.8523727 18.821642,3.1666532 18.665362,3.6800321 L 17.949048,6.0331073 C 17.881398,6.2552929 17.628692,6.3624212 17.424154,6.2511649 16.50348,5.7504301 13.568112,5.9662113 10.685877,6.680627 c -0.394509,0.097751 -0.369062,1.1734576 0.03532,1.2197812 1.325961,0.6453369 2.653758,-0.109401 3.845734,0.00386 0.233128,0.1844817 0.245709,0.265138 -0.03982,0.3485922 -0.859901,0.2499278 -1.054351,0.4222624 -2.523691,2.1370586 -0.250064,0.291843 0.07256,0.71941 0.427871,0.572051 1.385411,-0.575173 2.312515,-1.111915 3.797754,-0.443092 0.174955,0.07886 0.267913,0.269298 0.209434,0.452002 -0.282789,1.036695 -0.461917,2.837474 -0.286929,4.400096 0.07102,0.251178 0.370336,0.353526 0.578974,0.195885 0.581965,-0.658905 1.400251,-0.662623 2.805749,-3.578897 0.05901,-0.20482 0.273173,-0.320803 0.475197,-0.252003 0.772105,0.261981 2.139993,0.652825 3.166371,2.520995 0.168014,0.306342 0.625599,0.224897 0.68463,-0.119267 0.161511,-0.941861 0.485479,-2.076928 -0.99976,-3.690419 -0.225564,-0.245008 -0.05391,-0.6417715 0.278456,-0.6236137 0.67147,0.03665 1.842641,0.7805687 3.599906,1.3783987 0.357223,0.12052 0.625116,-0.285238 0.402593,-0.588187 z"
+     id="path1-6"
+     sodipodi:nodetypes="scccsssccccccsccccccccccccss"
+     inkscape:transform-center-x="-0.043511287"
+     inkscape:transform-center-y="-0.36564971" />
+  <path
+     style="fill:#a3a3a3;fill-opacity:1;stroke-width:4.09579"
+     d="m 25.262554,14.542135 c 0.02405,-0.0065 0.0493,-0.01213 0.0738,-0.01649 0.585819,-0.114433 1.144473,0.281503 1.249523,0.881989 0.251049,1.449457 0.306412,2.908205 0.162634,4.339444 -0.06061,0.609684 -0.587858,1.053583 -1.181571,0.999792 -0.591116,-0.05677 -1.019862,-0.598613 -0.959241,-1.208307 0.123585,-1.223439 0.07594,-2.473908 -0.140251,-3.717825 -0.100297,-0.576612 0.251613,-1.132182 0.795097,-1.278638 z"
+     id="path4"
+     inkscape:transform-center-x="1.3225379"
+     inkscape:transform-center-y="1.0152844" />
+</svg>

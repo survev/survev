@@ -1,12 +1,9 @@
-import { GameObjectDefs } from "../defs/gameObjectDefs";
-import { MapObjectDefs } from "../defs/mapObjectDefs";
-import { GameConfig } from "../gameConfig";
-import * as bb from "../lib/bitBuffer";
-import { math } from "../utils/math";
-import { assert } from "../utils/util";
-import type { Vec2 } from "../utils/v2";
-
-const DEV_MODE = false;
+import { GameObjectDefs, MapObjectDefs } from "../defs/register.ts";
+import { GameConfig } from "../gameConfig.ts";
+import * as bb from "../lib/bitBuffer.ts";
+import { math } from "../utils/math.ts";
+import { assert } from "../utils/util.ts";
+import type { Vec2 } from "../utils/v2.ts";
 
 export const Constants = {
     MaxPosition: 1024,
@@ -43,85 +40,6 @@ export abstract class AbstractMsg {
     abstract serialize(s: BitStream): void;
     abstract deserialize(s: BitStream): void;
 }
-
-/**
- * Map type strings to integers for more efficient serialization.
- */
-class ConfigTypeMap {
-    _typeToId: Record<string, number> = {};
-    _idToType: Record<number, string> = {};
-    nextId = 0;
-    maxId: number;
-
-    constructor(typeBits: number) {
-        this.maxId = 2 ** typeBits;
-        this.addType("");
-    }
-
-    addType(type: string) {
-        assert(
-            this._typeToId[type] === undefined,
-            `Type ${type} has already been defined!`,
-        );
-        assert(this.nextId < this.maxId);
-        this._typeToId[type] = this.nextId;
-        this._idToType[this.nextId] = type;
-        this.nextId++;
-    }
-
-    typeToId(type: string) {
-        const id = this._typeToId[type];
-        assert(id !== undefined, `Invalid type ${type}`);
-        return id;
-    }
-
-    idToType(id: number) {
-        const type = this._idToType[id];
-        if (type === undefined) {
-            console.error(
-                "Invalid id given to idToType",
-                id,
-                "max",
-                Object.keys(this._idToType).length,
-            );
-        }
-        return type;
-    }
-}
-
-function createTypeSerialization(
-    type: string,
-    typeList: Record<string, unknown>,
-    bitsPerType: number,
-) {
-    const typeMap = new ConfigTypeMap(bitsPerType);
-
-    const types = Object.keys(typeList);
-    assert(
-        types.length <= typeMap.maxId,
-        `${type} contains ${types.length} types, max ${typeMap.maxId}`,
-    );
-    for (let i = 0; i < types.length; i++) {
-        typeMap.addType(types[i]);
-    }
-
-    if (DEV_MODE) {
-        console.log(`Used ${typeMap.nextId} / ${typeMap.maxId} ${type} types`);
-    }
-
-    // Create serialization functions
-    /* bb.BitStream.prototype[`write${type}Type`] = function(v) {
-        this.writeBits(typeMap.typeToId(v), bitsPerType);
-    };
-    bb.BitStream.prototype[`read${type}Type`] = function() {
-        return typeMap.idToType(this.readBits(bitsPerType));
-    }; */
-
-    return typeMap;
-}
-
-const gameTypeSerialization = createTypeSerialization("Game", GameObjectDefs, 10);
-const mapTypeSerialization = createTypeSerialization("Map", MapObjectDefs, 12);
 
 export class BitStream extends bb.BitStream {
     writeString(str: string, len?: number) {
@@ -219,19 +137,19 @@ export class BitStream extends bb.BitStream {
     }
 
     writeGameType(type: string) {
-        this.writeBits(gameTypeSerialization.typeToId(type), 10);
+        this.writeBits(GameObjectDefs.typeToId(type), 10);
     }
 
     readGameType() {
-        return gameTypeSerialization.idToType(this.readBits(10));
+        return GameObjectDefs.idToType(this.readBits(10));
     }
 
     writeMapType(type: string) {
-        this.writeBits(mapTypeSerialization.typeToId(type), 12);
+        this.writeBits(MapObjectDefs.typeToId(type), 12);
     }
 
     readMapType() {
-        return mapTypeSerialization.idToType(this.readBits(12));
+        return MapObjectDefs.idToType(this.readBits(12));
     }
 
     writeArray<T>(array: T[], bits: number, writeFn: (item: T, index: number) => void) {
@@ -277,16 +195,13 @@ export class MsgStream {
     arrayBuf: ArrayBuffer;
 
     constructor(buf: ArrayBuffer | Uint8Array) {
-        const arrayBuf =
-            buf instanceof ArrayBuffer
-                ? buf
-                : buf.buffer.slice(buf.byteOffset, buf.byteOffset + buf.byteLength);
+        const arrayBuf = buf instanceof ArrayBuffer
+            ? buf
+            : buf.buffer.slice(buf.byteOffset, buf.byteOffset + buf.byteLength);
 
         if (!(arrayBuf instanceof ArrayBuffer)) {
             throw new Error(
-                `Invalid buf type ${
-                    typeof buf === "undefined" ? "undefined" : typeof buf
-                }`,
+                `Invalid buf type ${typeof buf === "undefined" ? "undefined" : typeof buf}`,
             );
         }
         this.arrayBuf = arrayBuf;
@@ -360,6 +275,7 @@ export enum PickupMsgType {
     BetterItemEquipped,
     Success,
     GunCannotFire,
+    MaxPerks,
 }
 
 export class UpdatePassMsg {
@@ -367,20 +283,20 @@ export class UpdatePassMsg {
     deserialize(_e: BitStream) {}
 }
 
-export { AliveCountsMsg } from "./aliveCountsMsg";
-export { DisconnectMsg } from "./disconnectMsg";
-export { DropItemMsg } from "./dropItemMsg";
-export { EditMsg } from "./editMsg";
-export { EmoteMsg } from "./emoteMsg";
-export { GameOverMsg } from "./gameOverMsg";
-export { InputMsg } from "./inputMsg";
-export { JoinedMsg } from "./joinedMsg";
-export { JoinMsg } from "./joinMsg";
-export { KillMsg } from "./killMsg";
-export { MapMsg } from "./mapMsg";
-export { PerkModeRoleSelectMsg } from "./perkModeRoleSelectMsg";
-export { PickupMsg } from "./pickupMsg";
-export { PlayerStatsMsg } from "./playerStatsMsg";
-export { RoleAnnouncementMsg } from "./roleAnnouncementMsg";
-export { SpectateMsg } from "./spectateMsg";
-export { getPlayerStatusUpdateRate, UpdateMsg } from "./updateMsg";
+export { AliveCountsMsg } from "./aliveCountsMsg.ts";
+export { DisconnectMsg } from "./disconnectMsg.ts";
+export { DropItemMsg } from "./dropItemMsg.ts";
+export { EditMsg } from "./editMsg.ts";
+export { EmoteMsg } from "./emoteMsg.ts";
+export { GameOverMsg } from "./gameOverMsg.ts";
+export { InputMsg } from "./inputMsg.ts";
+export { JoinedMsg } from "./joinedMsg.ts";
+export { JoinMsg } from "./joinMsg.ts";
+export { KillMsg } from "./killMsg.ts";
+export { MapMsg } from "./mapMsg.ts";
+export { PerkModeRoleSelectMsg } from "./perkModeRoleSelectMsg.ts";
+export { PickupMsg } from "./pickupMsg.ts";
+export { PlayerStatsMsg } from "./playerStatsMsg.ts";
+export { RoleAnnouncementMsg } from "./roleAnnouncementMsg.ts";
+export { SpectateMsg } from "./spectateMsg.ts";
+export { getPlayerStatusUpdateRate, UpdateMsg } from "./updateMsg.ts";

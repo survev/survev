@@ -1,5 +1,5 @@
-import type { AtlasDef } from "../atlasDefs";
-import { BuildingSprites } from "./buildings";
+import type { AtlasDef } from "../atlasDefs.ts";
+import { BuildingSprites } from "./buildings.ts";
 
 export const SharedAtlas: AtlasDef = {
     compress: true,
@@ -126,6 +126,7 @@ export const SharedAtlas: AtlasDef = {
         "map/map-decal-club-01.svg",
         "map/map-decal-club-02.svg",
         "map/map-decal-initiative.svg",
+        "map/map-decal-caduceus.svg",
 
         "map/map-decal-oil-01.svg",
         "map/map-decal-oil-02.svg",

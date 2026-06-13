@@ -1,11 +1,11 @@
+import enquirer from "enquirer";
+import hjson from "hjson";
 import { randomBytes } from "node:crypto";
 import fs from "node:fs";
 import path from "node:path";
-import enquirer from "enquirer";
-import hjson from "hjson";
-import { configFileName } from "./config";
-import type { PartialConfig } from "./configType";
-import { util } from "./shared/utils/util";
+import { configFileName } from "./config.ts";
+import type { PartialConfig } from "./configType.ts";
+import { util } from "./shared/utils/util.ts";
 
 const prompt = enquirer.prompt;
 
@@ -18,28 +18,6 @@ async function importKeys(config: PartialConfig) {
         required: true,
     });
     config.secrets.SURVEV_API_KEY = apiKey.value;
-
-    const loadoutSecret = await prompt<{ value: string }>({
-        message: "Enter Loadout secret:",
-        name: "value",
-        type: "text",
-        required: true,
-        validate(value) {
-            try {
-                atob(value);
-            } catch {
-                return "Invalid base64 string";
-            }
-
-            const buff = Buffer.from(value, "base64");
-            if (buff.length < 32) {
-                return "Loadout secret should have more than 32 bytes!";
-            }
-            return true;
-        },
-    });
-
-    config.secrets.SURVEV_LOADOUT_SECRET = loadoutSecret.value;
 }
 
 async function setupGameServer(config: PartialConfig) {
@@ -70,8 +48,7 @@ async function setupGameServer(config: PartialConfig) {
         });
 
         const l10n = await prompt<{ value: string }>({
-            message:
-                "Enter region translation key (eg: index-north-america, index-south-america)",
+            message: "Enter region translation key (eg: index-north-america, index-south-america)",
             name: "value",
             type: "text",
         });
@@ -101,8 +78,7 @@ async function setupGameServer(config: PartialConfig) {
 
 async function setupDatabase(config: PartialConfig, initial = true) {
     const dbEnabled = await prompt<{ value: boolean }>({
-        message:
-            "Would you like to setup database support (required for accounts, IP bans, leaderboards etc)",
+        message: "Would you like to setup database support (required for accounts, IP bans, leaderboards etc)",
         name: "value",
         type: "confirm",
         initial,
@@ -131,8 +107,7 @@ async function setupDatabase(config: PartialConfig, initial = true) {
 
 async function setupAccounts(config: PartialConfig) {
     const redirectURI = await prompt<{ value: string }>({
-        message:
-            "Enter the full base URL of the website for oauth2 redirects (eg: https://survev.io)",
+        message: "Enter the full base URL of the website for oauth2 redirects (eg: https://survev.io)",
         name: "value",
         type: "text",
         initial: `http://${config.apiServer?.host ?? "127.0.0.1"}:${config.apiServer?.port ?? 8000}`,
@@ -198,8 +173,7 @@ async function setupAccounts(config: PartialConfig) {
 
 async function setupAPIServer(config: PartialConfig) {
     const shouldImportKeys = await prompt<{ value: "import" | "random" }>({
-        message:
-            "Would you like to import the API and loadout secret keys or use random ones?",
+        message: "Would you like to import the API and loadout secret keys or use random ones?",
         name: "value",
         type: "select",
         choices: ["import", "random"],
@@ -239,8 +213,7 @@ async function setupRegions(config: PartialConfig) {
         });
 
         const l10n = await prompt<{ value: string }>({
-            message:
-                "Enter region translation key (eg: index-north-america, index-south-america)",
+            message: "Enter region translation key (eg: index-north-america, index-south-america)",
             name: "value",
             type: "text",
         });
@@ -420,7 +393,6 @@ async function setupConfig() {
     const config: PartialConfig = {
         secrets: {
             SURVEV_API_KEY: randomBytes(64).toString("base64"),
-            SURVEV_LOADOUT_SECRET: randomBytes(32).toString("base64"),
         },
     };
 
@@ -429,8 +401,7 @@ async function setupConfig() {
     await loadExistingConfig(config);
 
     const devOrProd = await prompt<{ value: "development" | "production" }>({
-        message:
-            "Are you setting up a local development environment or a production server?",
+        message: "Are you setting up a local development environment or a production server?",
         name: "value",
         type: "select",
         choices: ["production", "development"],

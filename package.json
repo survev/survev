@@ -1,6 +1,6 @@
 {
   "name": "survev",
-  "version": "0.2.23",
+  "version": "0.3.02",
   "type": "module",
   "description": "Open Source Surviv.io Server",
   "scripts": {
@@ -12,8 +12,8 @@
     "dev:client": "cd client && pnpm dev",
     "build": "cd server && pnpm build && cd ../client && pnpm build",
     "stressTest": "cd server && pnpm stressTest",
-    "lint": "biome check --write",
-    "lint:ci": "biome check"
+    "lint": "oxlint --fix; dprint fmt",
+    "lint:ci": "oxlint; dprint check"
   },
   "engines": {
     "node": ">=20.19.0"
@@ -21,21 +21,22 @@
   "author": "Leia",
   "license": "GPL-3.0-or-later",
   "devDependencies": {
-    "@biomejs/biome": "2.4.7",
     "@types/hjson": "^2.4.6",
-    "@types/node": "^25.5.0",
+    "@types/node": "^25.9.1",
     "concurrently": "^9.2.1",
-    "typescript": "^5.9.3"
+    "dprint": "^0.54.0",
+    "oxlint": "^1.68.0",
+    "typescript": "^6.0.3"
   },
   "dependencies": {
     "enquirer": "^2.4.1",
     "hjson": "^3.2.2",
-    "tsx": "^4.21.0"
+    "tsx": "^4.22.4"
   },
   "workspaces": [
     "client",
     "server",
     "shared"
   ],
-  "packageManager": "pnpm@10.31.0"
+  "packageManager": "pnpm@10.33.0"
 }

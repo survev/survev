@@ -1,11 +1,11 @@
 import { generateUsername } from "unique-username-generator";
-import { MapId } from "../../../../shared/defs/types/misc";
-import { TeamMode } from "../../../../shared/gameConfig";
-import { util } from "../../../../shared/utils/util";
-import type { MatchDataTable } from "../../api/db/schema";
-import { createNewUser, generateId } from "../routes/user/auth/authUtils";
-import { db } from ".";
-import { matchDataTable } from "./schema";
+import { MapId } from "../../../../shared/defs/types/misc.ts";
+import { TeamMode } from "../../../../shared/gameConfig.ts";
+import { util } from "../../../../shared/utils/util.ts";
+import type { MatchDataTable } from "../../api/db/schema.ts";
+import { createNewUser, generateId } from "../routes/user/auth/authUtils.ts";
+import { db } from "./index.ts";
+import { matchDataTable } from "./schema.ts";
 
 const playersWithAccounts = Array.from({ length: 3000 }, (_, _idx) => ({
     slug: generateUsername(),
@@ -124,9 +124,9 @@ function generateMatchHistory(
         const loggedInUser = isLoggedIn
             ? loggedInUsersInGame.pop()!
             : {
-                  slug: null,
-                  userId: generateId(15),
-              };
+                slug: null,
+                userId: generateId(15),
+            };
         const playerUserId = Math.random() < 0.3 ? loggedInUser?.userId : null;
         const playerSlug = Math.random() < 0.3 ? loggedInUser?.slug : null;
 
@@ -148,9 +148,8 @@ function generateMatchHistory(
             rank: player.rank,
             died: player.dead,
             kills: player.killerIds.length,
-            damageDealt:
-                player.killerIds.length * util.randomInt(70, 120) +
-                util.randomInt(40, 100),
+            damageDealt: player.killerIds.length * util.randomInt(70, 120)
+                + util.randomInt(40, 100),
             damageTaken: util.randomInt(100, 300),
             killerId: player.killedBy ?? 0,
             killedIds: player.killerIds,
@@ -183,9 +182,7 @@ function shuffle<T>(array: T[]): T[] {
 }
 
 function chunk<T>(array: T[], size: number): T[][] {
-    return Array.from({ length: Math.ceil(array.length / size) }, (_, i) =>
-        array.slice(i * size, i * size + size),
-    );
+    return Array.from({ length: Math.ceil(array.length / size) }, (_, i) => array.slice(i * size, i * size + size));
 }
 
 function weightedRandom<T>(options: { value: T; weight: number }[]): T {

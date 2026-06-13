@@ -1,11 +1,11 @@
 import type { Hono } from "hono";
 import type { UpgradeWebSocket } from "hono/ws";
-import type { SiteInfoRes } from "../../../shared/types/api";
-import { Config } from "../config";
-import { TeamMenu } from "../teamMenu";
-import { GIT_VERSION } from "../utils/gitRevision";
-import { defaultLogger, ServerLogger } from "../utils/logger";
-import type { FindGamePrivateBody, FindGamePrivateRes } from "../utils/types";
+import type { SiteInfoRes } from "../../../shared/types/api.ts";
+import { Config } from "../config.ts";
+import { TeamMenu } from "../teamMenu.ts";
+import { GIT_VERSION } from "../utils/gitRevision.ts";
+import { defaultLogger, ServerLogger } from "../utils/logger.ts";
+import type { FindGamePrivateBody, FindGamePrivateRes } from "../utils/types.ts";
 
 class Region {
     data: (typeof Config)["regions"][string];

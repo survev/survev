@@ -1,8 +1,8 @@
-import type { Collider } from "./coldet";
-import { collider } from "./collider";
-import { math } from "./math";
-import { util } from "./util";
-import { type Vec2, v2 } from "./v2";
+import type { Collider } from "./coldet.ts";
+import { collider } from "./collider.ts";
+import { math } from "./math.ts";
+import { util } from "./util.ts";
+import { v2, type Vec2 } from "./v2.ts";
 
 interface Obstacle {
     __id: number;
@@ -28,11 +28,11 @@ function intersectSegmentObstacle(
     const o = obstacle;
 
     if (
-        o.dead ||
-        !o.collidable ||
-        o.isWindow ||
-        o.height < height ||
-        !util.sameLayer(o.layer, layer)
+        o.dead
+        || !o.collidable
+        || o.isWindow
+        || o.height < height
+        || !util.sameLayer(o.layer, layer)
     ) {
         return null;
     }

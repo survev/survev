@@ -1,37 +1,33 @@
-import { styleText } from "util";
-import { type MapDef, MapDefs } from "../../../shared/defs/mapDefs";
-import { MapObjectDefs } from "../../../shared/defs/mapObjectDefs";
-import type {
-    BuildingDef,
-    ObstacleDef,
-    StructureDef,
-} from "../../../shared/defs/mapObjectsTyping";
-import type { MapId } from "../../../shared/defs/types/misc";
-import { GameConfig, TeamMode } from "../../../shared/gameConfig";
-import * as net from "../../../shared/net/net";
-import { MsgStream, MsgType } from "../../../shared/net/net";
-import { ObjectType } from "../../../shared/net/objectSerializeFns";
-import { type AABB, type Collider, coldet } from "../../../shared/utils/coldet";
-import { collider } from "../../../shared/utils/collider";
-import { mapHelpers } from "../../../shared/utils/mapHelpers";
-import { math } from "../../../shared/utils/math";
-import type { River } from "../../../shared/utils/river";
-import { generateTerrain, type MapRiverData } from "../../../shared/utils/terrainGen";
-import { assert, util } from "../../../shared/utils/util";
-import { type Vec2, v2 } from "../../../shared/utils/v2";
-import { Config } from "../config";
-import type { Game } from "./game";
-import type { Group, Team } from "./group";
-import { Building } from "./objects/building";
-import { Obstacle } from "./objects/obstacle";
-import type { Player } from "./objects/player";
-import { Structure } from "./objects/structure";
-import { RiverCreator } from "./riverCreator";
+import { styleText } from "node:util";
+import { type MapDef, MapDefs } from "../../../shared/defs/mapDefs.ts";
+import type { BuildingDef, ObstacleDef, StructureDef } from "../../../shared/defs/mapObjectsTyping.ts";
+import { MapObjectDefs } from "../../../shared/defs/register.ts";
+import type { MapId } from "../../../shared/defs/types/misc.ts";
+import { GameConfig, TeamMode } from "../../../shared/gameConfig.ts";
+import * as net from "../../../shared/net/net.ts";
+import { MsgStream, MsgType } from "../../../shared/net/net.ts";
+import { ObjectType } from "../../../shared/net/objectSerializeFns.ts";
+import { type AABB, coldet, type Collider } from "../../../shared/utils/coldet.ts";
+import { collider } from "../../../shared/utils/collider.ts";
+import { mapHelpers } from "../../../shared/utils/mapHelpers.ts";
+import { math } from "../../../shared/utils/math.ts";
+import type { River } from "../../../shared/utils/river.ts";
+import { generateTerrain, type MapRiverData } from "../../../shared/utils/terrainGen.ts";
+import { assert, util } from "../../../shared/utils/util.ts";
+import { v2, type Vec2 } from "../../../shared/utils/v2.ts";
+import { Config } from "../config.ts";
+import type { Game } from "./game.ts";
+import type { Group, Team } from "./group.ts";
+import { Building } from "./objects/building.ts";
+import { Obstacle } from "./objects/obstacle.ts";
+import type { Player } from "./objects/player.ts";
+import { Structure } from "./objects/structure.ts";
+import { RiverCreator } from "./riverCreator.ts";
 
 // most of this logic is based on the `renderMapBuildingBounds` from client debugHelpers
 // which was found on BHA leak
 function getBuildingBounds(type: string, layer = 0, pos: Vec2, rot: number) {
-    const def = MapObjectDefs[type] as BuildingDef | StructureDef;
+    const def = MapObjectDefs.typeToDef(type) as BuildingDef | StructureDef;
 
     const bounds: Array<{ layer: number; collision: Collider }> = [];
 
@@ -72,10 +68,11 @@ function getBuildingBounds(type: string, layer = 0, pos: Vec2, rot: number) {
             if (typeof mt === "object") {
                 mt = util.weightedRandomObject(mt);
             }
+            if (!mt) continue;
 
-            const childDef = MapObjectDefs[mt];
+            const childDef = MapObjectDefs.typeToDef(mt);
             // only add child structures, not child buildings and obstacles
-            if (mt && childDef && childDef.type === "structure") {
+            if (childDef.type === "structure") {
                 const childRot = math.oriToRad(mapObj.ori);
                 const childPos = v2.add(pos, v2.rotate(mapObj.pos, childRot));
 
@@ -125,9 +122,7 @@ export class MapGrid<T extends GridCollider = GridCollider> {
         this.width = Math.floor(width / this.cellSize);
         this.height = Math.floor(height / this.cellSize);
 
-        this._grid = Array.from({ length: this.width + 1 }, () =>
-            Array.from({ length: this.height + 1 }, () => []),
-        );
+        this._grid = Array.from({ length: this.width + 1 }, () => Array.from({ length: this.height + 1 }, () => []));
     }
 
     addCollider(coll: T): void {
@@ -443,10 +438,9 @@ export class GameMap {
             building.occupied = false;
 
             const livingPlayers = this.game.playerBarn.livingPlayers;
-            const players =
-                livingPlayers.length < 20
-                    ? livingPlayers
-                    : this.game.grid.intersectCollider(building.emitterBounds);
+            const players = livingPlayers.length < 20
+                ? livingPlayers
+                : this.game.grid.intersectCollider(building.emitterBounds);
 
             for (let i = 0; i < players.length; i++) {
                 const player = players[i];
@@ -504,9 +498,8 @@ export class GameMap {
             if (scheduledUnlock.time <= 0) {
                 this.scheduledUnlocks.splice(i, 1);
 
-                const unlockObject =
-                    this.buildings.find((b) => b.type == scheduledUnlock.type) ||
-                    this.obstacles.find(
+                const unlockObject = this.buildings.find((b) => b.type == scheduledUnlock.type)
+                    || this.obstacles.find(
                         (o) => o.type == scheduledUnlock.type && o.door && o.door.locked,
                     );
                 if (!unlockObject) continue;
@@ -755,10 +748,10 @@ export class GameMap {
 
         let bridge:
             | {
-                  type: string;
-                  pos: Vec2;
-                  ori: number;
-              }
+                type: string;
+                pos: Vec2;
+                ori: number;
+            }
             | undefined = undefined;
         this.trySpawn(type, () => {
             const { pos, ori } = getPosAndOri();
@@ -908,7 +901,7 @@ export class GameMap {
                     count = Math.random() < count.odds ? 1 : 0;
                 }
             }
-            const def = MapObjectDefs[type];
+            const def = MapObjectDefs.typeToDef(type);
 
             if (def.terrain?.bridge || mapGen.importantSpawns.includes(type)) {
                 objsToSpawn.stage1.push({
@@ -1066,7 +1059,7 @@ export class GameMap {
     }
 
     genDensitySpawn(type: string, density: number) {
-        const def = MapObjectDefs[type];
+        const def = MapObjectDefs.typeToDef(type);
 
         // for objects the spawn only on river shores
         // we need to do a density calculation for each river
@@ -1092,7 +1085,7 @@ export class GameMap {
 
     genFromMapDef(type: string, count: number): void {
         for (let i = 0; i < count; i++) {
-            const def = MapObjectDefs[type];
+            const def = MapObjectDefs.typeToDef(type);
 
             if (def.terrain?.waterEdge) {
                 this.genOnWaterEdge(type);
@@ -1123,16 +1116,13 @@ export class GameMap {
         ignoreMapSpawnReplacement?: boolean,
         hideFromMap?: boolean,
     ) {
-        const def = MapObjectDefs[type];
-
-        if (!def) {
-            this.game.logger.warn("Invalid map object:", type);
-            return;
-        }
+        let def = MapObjectDefs.typeToDef(type);
 
         const spawnReplacements = this.mapDef.mapGen.spawnReplacements[0];
-        if (spawnReplacements[type] && !ignoreMapSpawnReplacement)
+        if (spawnReplacements[type] && !ignoreMapSpawnReplacement) {
             type = spawnReplacements[type];
+            def = MapObjectDefs.typeToDef(type);
+        }
 
         this.clampToMapBounds(pos);
 
@@ -1160,17 +1150,11 @@ export class GameMap {
                     const item = this.game.lootBarn.getLootTable(tier.tier!);
                     if (!item) break;
 
-                    this.game.lootBarn.addLoot(
-                        item.name,
-                        pos,
-                        layer,
-                        item.count,
-                        undefined,
-                        0,
-                        undefined,
-                        item.preload === true,
-                        "map",
-                    );
+                    this.game.lootBarn.addLoot(item.name, pos, layer, item.count, {
+                        pushSpeed: 0,
+                        preloadGun: !!item.preload,
+                        source: "map",
+                    });
 
                     this.grid.addCollider({
                         collision: collider.createCircle(pos, 3),
@@ -1219,7 +1203,7 @@ export class GameMap {
      * Checks if a map object can spawn at a given position, orientation and scale
      */
     canSpawn(type: string, pos: Vec2, ori: number, scale = 1): boolean {
-        const def = MapObjectDefs[type];
+        const def = MapObjectDefs.typeToDef(type);
 
         const rot = math.oriToRad(ori);
 
@@ -1372,10 +1356,9 @@ export class GameMap {
             }
 
             if (def.type === "obstacle" && !def.terrain.riverShore) {
-                const aabb =
-                    def.collision.type === collider.Type.Aabb
-                        ? def.collision
-                        : coldet.circleToAabb(def.collision.pos, def.collision.rad);
+                const aabb = def.collision.type === collider.Type.Aabb
+                    ? def.collision
+                    : coldet.circleToAabb(def.collision.pos, def.collision.rad);
 
                 const points = collider.getPoints(
                     collider.transform(aabb, pos, rot, scale) as AABB,
@@ -1393,6 +1376,22 @@ export class GameMap {
             }
         }
 
+        if (def.terrain?.minDistanceFromSameType) {
+            const objs = this.game.grid.intersectCollider(
+                coldet.circleToAabb(pos, def.terrain.minDistanceFromSameType),
+            );
+            for (let i = 0; i < objs.length; i++) {
+                const obj = objs[i];
+                if (obj.__type !== ObjectType.Obstacle) continue;
+                if (obj.type !== type) continue;
+
+                const distance = v2.distance(obj.pos, pos);
+                if (distance <= def.terrain.minDistanceFromSameType) {
+                    return false;
+                }
+            }
+        }
+
         return true;
     }
 
@@ -1400,7 +1399,7 @@ export class GameMap {
         let ori = 0;
         let scale = 1;
 
-        const def = MapObjectDefs[type];
+        const def = MapObjectDefs.typeToDef(type);
         if (def.type === "building" || def.type === "structure") {
             if ("oris" in def) {
                 ori = def.oris![util.randomInt(0, def.oris!.length - 1)];
@@ -1415,7 +1414,7 @@ export class GameMap {
     }
 
     genOnWaterEdge(type: string): void {
-        const def = MapObjectDefs[type] as BuildingDef | StructureDef;
+        const def = MapObjectDefs.typeToDef(type) as BuildingDef | StructureDef;
         // safety check + makes ts shut up about it being possibly undefined
         const waterEdge = def.terrain.waterEdge;
         if (!waterEdge) return;
@@ -1491,7 +1490,7 @@ export class GameMap {
 
     genOnGrass(type: string) {
         const bounds = collider.toAabb(mapHelpers.getBoundingCollider(type));
-        const def = MapObjectDefs[type];
+        const def = MapObjectDefs.typeToDef(type);
 
         const getSpawnAabb = (ori: number, scale: number) => {
             const rot = math.oriToRad(ori);
@@ -1527,6 +1526,16 @@ export class GameMap {
                     "barn_01",
                 ];
 
+                // obstacles, buildings, and structures that are specific to a team but can spawn anywhere on their side.
+                const teamObjects = [
+                    "potato_01f",
+                    "potato_02f",
+                    "potato_03f",
+                    "tomato_01",
+                    "tomato_02",
+                    "tomato_03",
+                ];
+
                 // obstacles, buildings, and structures that need to spawn away from the sides and closer to the center river
                 const centerObjects = [
                     "greenhouse_01",
@@ -1537,8 +1546,16 @@ export class GameMap {
                 let divisionIdx: number;
                 if ("teamId" in def && def.teamId) {
                     const teamId = def.teamId;
-                    // picks either of the furthest divisions from the center
-                    divisionIdx = (teamId - 1) * (divisions - 1);
+                    if (teamObjects.includes(type)) {
+                        // picks any of the divisions on the team's side (0-4 for red, 5-9 for blue)
+                        divisionIdx = util.randomInt(
+                            (teamId - 1) * (divisions / 2),
+                            teamId * (divisions / 2) - 1,
+                        );
+                    } else {
+                        // picks either of the furthest divisions from the center
+                        divisionIdx = (teamId - 1) * (divisions - 1);
+                    }
                 } else if (edgeObjects.includes(type)) {
                     const teamId = util.randomInt(1, 2);
                     // picks either of the furthest divisions from the center
@@ -1670,7 +1687,7 @@ export class GameMap {
         }
         let { ori, scale } = this.getOriAndScale(type);
 
-        const def = MapObjectDefs[type];
+        const def = MapObjectDefs.typeToDef(type);
 
         let rivers = this.normalRivers;
         if (type === "bunker_structure_05") {
@@ -1698,10 +1715,9 @@ export class GameMap {
                 const finalT = finalRiver.spline.getClosestTtoPoint(pos);
                 const finalNorm = finalRiver.spline.getNormal(finalT);
 
-                const riverOri =
-                    (math.radToOri(Math.atan2(finalNorm.y, finalNorm.x)) +
-                        (otherSide ? 2 : 0)) %
-                    4;
+                const riverOri = (math.radToOri(Math.atan2(finalNorm.y, finalNorm.x))
+                    + (otherSide ? 2 : 0))
+                    % 4;
                 ori = (def.terrain.nearbyRiver.facingOri + riverOri) % 4;
             } else {
                 const norm = finalRiver.spline.getNormal(t);
@@ -1741,14 +1757,13 @@ export class GameMap {
         this.trySpawn(type, () => {
             river = river ?? rivers[util.randomInt(0, rivers.length - 1)];
             const t = util.random(0, 1);
-            const def = MapObjectDefs[type];
+            const def = MapObjectDefs.typeToDef(type);
 
             let width = river.getWaterWidth(t);
             if (def.type === "obstacle") {
-                let circle =
-                    def.collision.type === collider.Type.Circle
-                        ? def.collision
-                        : coldet.aabbToCircle(def.collision.min, def.collision.max);
+                let circle = def.collision.type === collider.Type.Circle
+                    ? def.collision
+                    : coldet.aabbToCircle(def.collision.min, def.collision.max);
                 width -= circle.rad + 1;
             }
             if (def.terrain?.riverShore) {
@@ -1807,15 +1822,14 @@ export class GameMap {
             v2.create(this.width - inset, this.height - inset),
         );
 
-        const def = MapObjectDefs[type] as BuildingDef;
+        const def = MapObjectDefs.typeToDef(type, "building");
 
         const bound = mapHelpers.getBoundingCollider(type) as AABB;
         const height = bound.max.y - bound.min.y / 2;
 
         this.trySpawn(type, () => {
             const t = util.random(0.1, 0.9);
-            const river =
-                this.normalRivers[util.randomInt(0, this.normalRivers.length - 1)];
+            const river = this.normalRivers[util.randomInt(0, this.normalRivers.length - 1)];
             let pos = river.spline.getPos(t);
 
             const otherSide = Math.random() < 0.5;
@@ -1827,10 +1841,9 @@ export class GameMap {
             const finalT = river.spline.getClosestTtoPoint(pos);
             const finalNorm = river.spline.getNormal(finalT);
 
-            const riverOri =
-                (math.radToOri(Math.atan2(finalNorm.y, finalNorm.x)) +
-                    (otherSide ? 2 : 0)) %
-                4;
+            const riverOri = (math.radToOri(Math.atan2(finalNorm.y, finalNorm.x))
+                + (otherSide ? 2 : 0))
+                % 4;
             const ori = (def.terrain.nearbyRiver!.facingOri + riverOri) % 4;
 
             const bounds = collider.transform(bound, pos, math.oriToRad(ori), 1) as AABB;
@@ -1862,8 +1875,7 @@ export class GameMap {
                 const riverPos = river.spline.getPos(t);
                 const riverNorm = river.spline.getNormal(t);
 
-                const offset =
-                    river.waterWidth * (otherSide ? -1 : 1) + util.random(-5, 0);
+                const offset = river.waterWidth * (otherSide ? -1 : 1) + util.random(-5, 0);
                 const dockPos = v2.add(riverPos, v2.mul(riverNorm, offset));
 
                 if (!this.canSpawn(type, dockPos, ori)) return false;
@@ -1886,7 +1898,7 @@ export class GameMap {
         puzzlePiece?: string,
         hideFromMap?: boolean,
     ): Obstacle {
-        const def = MapObjectDefs[type] as ObstacleDef;
+        const def = MapObjectDefs.typeToDef(type, "obstacle");
 
         scale = scale ?? util.random(def.scale.createMin, def.scale.createMax);
 
@@ -1906,8 +1918,9 @@ export class GameMap {
             this.dynamicObstacles.push(obstacle);
         }
 
-        if (def.map?.display && layer === 0 && !hideFromMap)
+        if (def.map?.display && layer === 0 && !hideFromMap) {
             this.msg.objects.push(obstacle);
+        }
 
         this.addBounds(obstacle, !!buildingId);
 
@@ -1915,7 +1928,7 @@ export class GameMap {
     }
 
     genOutfitObstacle(type: string, player: Player) {
-        const def = MapObjectDefs[type] as ObstacleDef;
+        const def = MapObjectDefs.typeToDef(type, "obstacle");
 
         const obstacle = new Obstacle(
             this.game,
@@ -1948,7 +1961,7 @@ export class GameMap {
         hideFromMap?: boolean,
         dontSpawnLoot?: boolean,
     ): Building {
-        const def = MapObjectDefs[type] as BuildingDef;
+        const def = MapObjectDefs.typeToDef(type, "building");
 
         if (ori === undefined) {
             ori = this.getOriAndScale(type).ori;
@@ -1983,7 +1996,7 @@ export class GameMap {
             }
             if (!partType) continue;
 
-            if (dontSpawnLoot && MapObjectDefs[partType].type == "loot_spawner") continue;
+            if (dontSpawnLoot && MapObjectDefs.typeToDef(partType).type == "loot_spawner") continue;
 
             let partOri: number;
             if (mapObject.inheritOri === false) partOri = mapObject.ori;
@@ -1994,7 +2007,7 @@ export class GameMap {
             const obj = this.genAuto(
                 partType,
                 partPos,
-                layer,
+                mapObject.layer ?? layer,
                 partOri,
                 mapObject.scale,
                 building.__id,
@@ -2030,7 +2043,7 @@ export class GameMap {
         ori?: number,
         parentId?: number,
     ): Structure {
-        const def = MapObjectDefs[type] as StructureDef;
+        const def = MapObjectDefs.typeToDef(type, "structure");
 
         ori = ori ?? def.ori ?? util.randomInt(0, 3);
 
@@ -2056,7 +2069,7 @@ export class GameMap {
     }
 
     addBounds(mapObj: Obstacle | Building | Structure, hasParent: boolean) {
-        const def = MapObjectDefs[mapObj.type] as
+        const def = MapObjectDefs.typeToDef(mapObj.type) as
             | BuildingDef
             | ObstacleDef
             | StructureDef;
@@ -2084,8 +2097,7 @@ export class GameMap {
                 }
             } else {
                 // scale found on client debugHelpers
-                const boundScale =
-                    def.type == "building" || def.type == "structure" ? 1.1 : 1.0;
+                const boundScale = def.type == "building" || def.type == "structure" ? 1.1 : 1.0;
 
                 const bounds = collider.transform(
                     mapHelpers.getBoundingCollider(mapObj.type),
@@ -2297,8 +2309,8 @@ export class GameMap {
             }
 
             if (
-                util.sameLayer(decal.layer, layer) &&
-                collider.intersectCircle(decal.collider!, pos, 0.0001)
+                util.sameLayer(decal.layer, layer)
+                && collider.intersectCircle(decal.collider!, pos, 0.0001)
             ) {
                 return groundSurface(decal.surface);
             }
@@ -2317,8 +2329,8 @@ export class GameMap {
             }
             // Prioritize layer0 building surfaces when on stairs
             if (
-                (building.layer !== layer && !onStairs) ||
-                (building.layer === 1 && onStairs)
+                (building.layer !== layer && !onStairs)
+                || (building.layer === 1 && onStairs)
             ) {
                 continue;
             }
@@ -2346,8 +2358,8 @@ export class GameMap {
             for (let i = 0; i < rivers.length; i++) {
                 const river = rivers[i];
                 if (
-                    coldet.testPointAabb(pos, river.aabb.min, river.aabb.max) &&
-                    math.pointInsidePolygon(pos, river.shorePoly)
+                    coldet.testPointAabb(pos, river.aabb.min, river.aabb.max)
+                    && math.pointInsidePolygon(pos, river.shorePoly)
                 ) {
                     onRiverShore = true;
                     if (math.pointInsidePolygon(pos, river.waterPoly)) {
@@ -2383,8 +2395,8 @@ export class GameMap {
             }
 
             if (
-                util.sameLayer(decal.layer, layer) &&
-                collider.intersectCircle(decal.collider!, pos, 0.0001)
+                util.sameLayer(decal.layer, layer)
+                && collider.intersectCircle(decal.collider!, pos, 0.0001)
             ) {
                 return decal.surface === "water";
             }
@@ -2403,8 +2415,8 @@ export class GameMap {
             }
             // Prioritize layer0 building surfaces when on stairs
             if (
-                (building.layer !== layer && !onStairs) ||
-                (building.layer === 1 && onStairs)
+                (building.layer !== layer && !onStairs)
+                || (building.layer === 1 && onStairs)
             ) {
                 continue;
             }
@@ -2431,8 +2443,8 @@ export class GameMap {
             for (let i = 0; i < rivers.length; i++) {
                 const river = rivers[i];
                 if (
-                    coldet.testPointAabb(pos, river.aabb.min, river.aabb.max) &&
-                    math.pointInsidePolygon(pos, river.waterPoly)
+                    coldet.testPointAabb(pos, river.aabb.min, river.aabb.max)
+                    && math.pointInsidePolygon(pos, river.waterPoly)
                 ) {
                     return true;
                 }

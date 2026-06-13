@@ -1,39 +1,34 @@
 import $ from "jquery";
 import * as PIXI from "pixi.js-legacy";
-import { GameConfig } from "../../shared/gameConfig";
-import * as net from "../../shared/net/net";
-import type {
-    FindGameBody,
-    FindGameError,
-    FindGameMatchData,
-    FindGameResponse,
-} from "../../shared/types/api";
-import { math } from "../../shared/utils/math";
-import { Account } from "./account";
-import { Ambiance } from "./ambiance";
-import { api } from "./api";
-import { AudioManager } from "./audioManager";
-import { ConfigManager, type ConfigType } from "./config";
-import { device } from "./device";
-import { errorLogManager } from "./errorLogs";
-import { Game } from "./game";
-import { helpers } from "./helpers";
-import { InputHandler } from "./input";
-import { InputBinds, InputBindUi } from "./inputBinds";
-import { PingTest } from "./pingTest";
-import { proxy } from "./proxy";
-import { ResourceManager } from "./resources";
-import { SDK } from "./sdk/sdk";
-import { SiteInfo } from "./siteInfo";
-import { LoadoutMenu } from "./ui/loadoutMenu";
-import { Localization } from "./ui/localization";
-import Menu from "./ui/menu";
-import { MenuModal } from "./ui/menuModal";
-import { LoadoutDisplay } from "./ui/opponentDisplay";
-import { Pass } from "./ui/pass";
-import { ProfileUi } from "./ui/profileUi";
-import { TeamMenu } from "./ui/teamMenu";
-import { loadStaticDomImages } from "./ui/ui2";
+import { GameConfig } from "../../shared/gameConfig.ts";
+import * as net from "../../shared/net/net.ts";
+import type { FindGameBody, FindGameError, FindGameMatchData, FindGameResponse } from "../../shared/types/api.ts";
+import { math } from "../../shared/utils/math.ts";
+import { Account } from "./account.ts";
+import { Ambiance } from "./ambiance.ts";
+import { api } from "./api.ts";
+import { AudioManager } from "./audioManager.ts";
+import { ConfigManager, type ConfigType } from "./config.ts";
+import { device } from "./device.ts";
+import { errorLogManager } from "./errorLogs.ts";
+import { Game } from "./game.ts";
+import { helpers } from "./helpers.ts";
+import { InputHandler } from "./input.ts";
+import { InputBinds, InputBindUi } from "./inputBinds.ts";
+import { PingTest } from "./pingTest.ts";
+import { proxy } from "./proxy.ts";
+import { ResourceManager } from "./resources.ts";
+import { SDK } from "./sdk/sdk.ts";
+import { SiteInfo } from "./siteInfo.ts";
+import { LoadoutMenu } from "./ui/loadoutMenu.ts";
+import { Localization } from "./ui/localization.ts";
+import Menu from "./ui/menu.ts";
+import { MenuModal } from "./ui/menuModal.ts";
+import { LoadoutDisplay } from "./ui/opponentDisplay.ts";
+import { Pass } from "./ui/pass.ts";
+import { ProfileUi } from "./ui/profileUi.ts";
+import { TeamMenu } from "./ui/teamMenu.ts";
+import { loadStaticDomImages } from "./ui/ui2.ts";
 
 export class Application {
     nameInput = $("#player-name-input-solo");
@@ -82,7 +77,7 @@ export class Application {
     initialized = false;
     active = false;
     sessionId = helpers.random64();
-    contextListener = function (e: MouseEvent) {
+    contextListener = function(e: MouseEvent) {
         e.preventDefault();
     };
 
@@ -150,8 +145,7 @@ export class Application {
                 this.localization.setLocale(window.spellSync.language);
                 this.updateLogoBasedOnLanguage(window.spellSync.language);
             } else {
-                const language =
-                    this.config.get("language") || this.localization.detectLocale();
+                const language = this.config.get("language") || this.localization.detectLocale();
                 this.config.set("language", language);
                 this.localization.setLocale(language);
                 this.updateLogoBasedOnLanguage(language);
@@ -244,7 +238,7 @@ export class Application {
                 this.tryJoinTeam(true);
             });
             $("#btn-team-mobile-link-join").on("click", () => {
-                let t = $<HTMLInputElement>("#team-link-input").val()?.trim()!;
+                let t = $<HTMLInputElement>("#team-link-input").val()!.trim()!;
                 const r = t.indexOf("#");
                 if (r >= 0) {
                     t = t.slice(r + 1);
@@ -265,22 +259,36 @@ export class Application {
                 this.game?.free();
                 this.teamMenu.leave();
             });
-            const r = $("#news-current").data("date");
-            const a = new Date(r).getTime();
+
+            // hide pass and show news by default if login is unsupported
+            const loginSupported = !SDK.isAnySDK && proxy.anyLoginSupported();
+            if (loginSupported) {
+                $("#news-wrapper").hide();
+                $("#pass-wrapper").show();
+                this.newsDisplayed = false;
+            } else {
+                $(".right-column-toggle").hide();
+                $("#news-wrapper").show();
+                $("#pass-wrapper").hide();
+                this.newsDisplayed = true;
+            }
+
+            const currentNews = $("#news-current").data("date");
+            const currentNewsTime = new Date(currentNews).getTime();
             $(".right-column-toggle").on("click", () => {
                 if (this.newsDisplayed) {
                     $("#news-wrapper").fadeOut(250);
                     $("#pass-wrapper").fadeIn(250);
                 } else {
-                    this.config.set("lastNewsTimestamp", a);
+                    this.config.set("lastNewsTimestamp", currentNewsTime);
                     $(".news-toggle").find(".account-alert").css("display", "none");
                     $("#news-wrapper").fadeIn(250);
                     $("#pass-wrapper").fadeOut(250);
                 }
                 this.newsDisplayed = !this.newsDisplayed;
             });
-            const i = this.config.get("lastNewsTimestamp")!;
-            if (a > i) {
+            const lastSeenNewsTime = this.config.get("lastNewsTimestamp")!;
+            if (currentNewsTime > lastSeenNewsTime) {
                 $(".news-toggle").find(".account-alert").css("display", "block");
             }
             this.setDOMFromConfig();
@@ -352,8 +360,8 @@ export class Application {
                 }
                 if (errMsg) {
                     this.showErrorModal(errMsg);
+                    console.warn("Quitting", errMsg);
                 }
-                console.error("Quitting", errMsg);
                 SDK.gamePlayStop();
             };
             this.game = new Game(
@@ -428,7 +436,10 @@ export class Application {
     }
 
     setPlayLockout(lock: boolean) {
-        const delay = lock ? 0 : 1000;
+        let delay = lock ? 0 : 1000;
+        if (IS_DEV) {
+            delay = 0;
+        }
         this.playButtons
             .stop()
             .delay(delay)
@@ -436,7 +447,7 @@ export class Application {
                 {
                     opacity: lock ? 0.5 : 1,
                 },
-                250,
+                IS_DEV ? 0 : 250,
             );
         this.playLoading
             .stop()
@@ -446,7 +457,7 @@ export class Application {
                     opacity: lock ? 1 : 0,
                 },
                 {
-                    duration: 250,
+                    duration: IS_DEV ? 0 : 250,
                     start: () => {
                         this.playLoading.css({
                             "pointer-events": lock ? "initial" : "none",
@@ -573,7 +584,7 @@ export class Application {
         const updateButton = (ele: JQuery<HTMLElement>, gameModeIdx: number) => {
             ele.html(
                 this.quickPlayPendingModeIdx === gameModeIdx
-                    ? '<div class="ui-spinner"></div>'
+                    ? "<div class=\"ui-spinner\"></div>"
                     : this.localization.translate(ele.data("l10n")),
             );
         };
@@ -642,6 +653,11 @@ export class Application {
             }
             this.findGameTime = Date.now();
             this.findGameAttempts++;
+
+            // the delay is annoying on dev
+            if (IS_DEV) {
+                delay = 0;
+            }
 
             const version = GameConfig.protocolVersion;
             let region = this.config.get("region")!;
@@ -752,7 +768,7 @@ export class Application {
                         retry();
                     }
                 },
-                error: function (_e) {
+                error: function(_e) {
                     retry();
                 },
             });
@@ -776,9 +792,7 @@ export class Application {
         const urls: string[] = [];
         for (let i = 0; i < hosts.length; i++) {
             urls.push(
-                `ws${matchData.useHttps ? "s" : ""}://${hosts[i]}/play?gameId=${
-                    matchData.gameId
-                }`,
+                `ws${matchData.useHttps ? "s" : ""}://${hosts[i]}/play?gameId=${matchData.gameId}`,
             );
         }
         const joinGameImpl = (urls: string[], matchData: FindGameMatchData) => {
@@ -787,7 +801,7 @@ export class Application {
                 this.onJoinGameError("join_game_failed");
                 return;
             }
-            const onFailure = function () {
+            const onFailure = function() {
                 joinGameImpl(urls, matchData);
             };
             this.game!.tryJoinGame(
@@ -964,12 +978,19 @@ window.addEventListener("blur", () => {
 });
 
 const reportedErrors: string[] = [];
-window.onerror = function (msg, url, lineNo, columnNo, error) {
+window.onerror = function(msg, url, lineNo, columnNo, error) {
     msg = msg || "undefined_error_msg";
     const stacktrace = error ? error.stack : "";
 
     // don't report useless errors lol
-    if (!url && !lineNo && !columnNo) return;
+    if (!url || lineNo === undefined || columnNo === undefined) return;
+
+    // ignore errors not generated by our code
+    // and also weird errors that don't have a .js file
+    if (!url.startsWith(location.href) || !/.js|.ts/.test(url)) return;
+
+    // ignore scrappers
+    if (/googlebot|bingbot|yandexbot/gi.test(navigator.userAgent)) return;
 
     const errObj = {
         msg,
@@ -991,9 +1012,3 @@ window.onerror = function (msg, url, lineNo, columnNo, error) {
         errorLogManager.logWindowOnError(errObj);
     }
 };
-
-navigator.serviceWorker?.getRegistrations().then((registrations) => {
-    for (const registration of registrations) {
-        registration.unregister();
-    }
-});

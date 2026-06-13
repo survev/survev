@@ -1,6 +1,6 @@
+import ejs from "ejs";
 import { readFile } from "node:fs/promises";
 import { relative } from "node:path";
-import ejs from "ejs";
 import type { Plugin } from "vite";
 
 export function ejsPlugin(): Plugin {
