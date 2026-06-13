@@ -734,6 +734,7 @@ export class Game {
             specMsg.specNext = specNext;
             specMsg.specPrev = specPrev;
             specMsg.specForce = specForce;
+            specMsg.specAnon = this.m_uiManager.specAnon;
             this.m_sendMessage(net.MsgType.Spectate, specMsg, 128);
 
             this.m_uiManager.specBegin = false;

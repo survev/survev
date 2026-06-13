@@ -273,7 +273,7 @@ export class GameModeManager {
         // in 50v50: random players spectated in 50v50 should be on the same team as the spectator.
 
         // If there are no spectators, we have no need to run any logic.
-        if (player.spectatorCount === 0) return;
+        if (player.spectators.size === 0) return;
 
         // Priority list of spectate targets.
         const spectateTargets = [

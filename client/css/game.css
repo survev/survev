@@ -3111,6 +3111,33 @@ span.ui-stats-header-value {
   width: 125px;
 }
 
+.ui-stats-anon-toggle {
+  position: absolute;
+  left: 175px;
+  appearance: none;
+  margin: 0px;
+  width: 40px;
+  height: 40px;
+  border-radius: 5px;
+  outline: none;
+
+  background-size: 32px 32px;
+  background-position: center;
+  background-repeat: no-repeat;
+
+  background-image: url("/img/gui/eye.svg");
+  background-color: #83af50;
+  border-bottom: 2px solid #5b7a38;
+  box-shadow: inset 0 -2px #5b7a38;
+}
+
+.ui-stats-anon-toggle:checked {
+  background-image: url("/img/gui/private.svg");
+  background-color: #626262;
+  border-bottom: 2px solid #7a7a7a;
+  box-shadow: inset 0 -2px #7a7a7a;
+}
+
 .ui-stats-ad-container {
   display: none;
   margin-top: 80px;
@@ -4961,6 +4988,13 @@ span.ui-stats-header-value {
     background: #50afab;
     border-bottom: 2px solid #387c79;
     box-shadow: none;
+  }
+
+  .ui-stats-anon-toggle {
+    left: 120px;
+    background-size: 20px 20px;
+    width: 28px;
+    height: 28px;
   }
 
   .ui-stats-ad-container {

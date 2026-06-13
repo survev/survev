@@ -765,13 +765,13 @@ export class Player extends BaseGameObject {
     }
 
     private _spectatorCount = 0;
-    set spectatorCount(spectatorCount: number) {
-        if (this._spectatorCount === spectatorCount) return;
-        this._spectatorCount = spectatorCount;
-        this._spectatorCount = math.clamp(this._spectatorCount, 0, 255); // byte size limit
-        this.spectatorCountDirty = true;
+    recalculateSpectatorCount() {
+        const newCount = [...this.spectators].filter(p => !p.spectateAnon).length;
+        if (this._spectatorCount !== newCount) {
+            this._spectatorCount = newCount;
+            this.spectatorCountDirty = true;
+        }
     }
-
     get spectatorCount(): number {
         return this._spectatorCount;
     }
@@ -794,12 +794,12 @@ export class Player extends BaseGameObject {
         if (this._spectating === player) return;
 
         if (this._spectating) {
-            this._spectating.spectatorCount--;
             this._spectating.spectators.delete(this);
+            this._spectating.recalculateSpectatorCount();
         }
-        if (player) {
-            player.spectatorCount++;
+        if (player && !this.spectateAnon) {
             player.spectators.add(this);
+            player.recalculateSpectatorCount();
         }
 
         this._spectating = player;
@@ -810,6 +810,7 @@ export class Player extends BaseGameObject {
     spectateCooldownCount = 0;
     spectateMsgCount = 0;
     spectateMsgTicker = 0;
+    spectateAnon = false;
 
     spectators = new Set<Player>();
 
@@ -2770,6 +2771,12 @@ export class Player extends BaseGameObject {
             );
             return;
         }
+
+        if (this.spectateAnon !== spectateMsg.specAnon && this.spectating) {
+            this.spectateAnon = spectateMsg.specAnon;
+            this.spectating.recalculateSpectatorCount();
+        }
+        this.spectateAnon = spectateMsg.specAnon;
 
         // livingPlayers is used here instead of a more "efficient" option because its sorted while other options are not
         const spectatablePlayers = this.game.playerBarn.livingPlayers.filter(
