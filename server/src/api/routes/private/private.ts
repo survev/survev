@@ -124,10 +124,13 @@ export const PrivateRouter = new Hono<Context>()
             );
         }
 
-        await leaderboardCache.invalidateCache(matchData);
-
         await db.insert(matchDataTable).values(matchData);
         await logPlayerIPs(matchData);
+        try {
+            await leaderboardCache.invalidateCache(matchData);
+        } catch (e) {
+            server.logger.error("Failed to invalidate leaderboard cache", e);
+        }
         server.logger.info(`Saved game data for ${matchData[0].gameId}`);
         return c.json({}, 200);
     })
