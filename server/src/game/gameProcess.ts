@@ -50,6 +50,9 @@ class ServerGame extends Game {
     }
 
     override async _saveGameToDatabase() {
+        // don't save games that never started
+        if (!this.started) return;
+
         const players = this.modeManager.getPlayersSortedByRank();
         /**
          * teamTotal is for total teams that started the match, i hope?

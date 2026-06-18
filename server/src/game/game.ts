@@ -44,6 +44,8 @@ export class Game {
     over = false;
     startedTime = 0;
     stopTicker = 0;
+    // used to stop the game if theres no connected players
+    noPlayersTicker = 0;
 
     id: string;
     teamMode: TeamMode;
@@ -173,6 +175,22 @@ export class Game {
             this.started = this.modeManager.isGameStarted();
             if (this.started) {
                 this.gas.advanceGasStage();
+            } else {
+                const connected = this.playerBarn.players.reduce((a, b) => {
+                    return a + (b.disconnected ? 0 : 1);
+                }, 0);
+                if (connected === 0) {
+                    this.noPlayersTicker += dt;
+                } else {
+                    this.noPlayersTicker = 0;
+                }
+                // after 30 seconds of no connected players on a game that didn't start
+                // we just force stop the game so it doesn't run forever...
+                if (this.noPlayersTicker > 30) {
+                    this.over = true;
+                    this.stop();
+                    return;
+                }
             }
         }
 
