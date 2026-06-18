@@ -1,7 +1,7 @@
 import { type ChildProcess, fork } from "node:child_process";
 import { randomUUID } from "node:crypto";
 import type { WebSocket } from "uWebSockets.js";
-import { type MapDef, type MapDefKey, MapDefs } from "../../../shared/defs/mapDefs.ts";
+import { type MapDefKey, MapDefs } from "../../../shared/defs/mapDefs.ts";
 import type { TeamMode } from "../../../shared/gameConfig.ts";
 import * as net from "../../../shared/net/net.ts";
 import { util } from "../../../shared/utils/util.ts";
@@ -16,7 +16,7 @@ if (process.env.NODE_ENV === "production") {
     procFile = "src/game/gameProcess.ts";
 }
 
-enum ProcState {
+export enum ProcState {
     Idle,
     CreatingGame,
     Running,
@@ -37,6 +37,8 @@ class GameProcess {
 
     state = ProcState.Idle;
 
+    createdTime = Date.now();
+
     stoppedTime = Date.now();
     lastMsgTime = Date.now();
 
@@ -45,6 +47,8 @@ class GameProcess {
     onCreatedCbs: Array<(_proc: typeof this) => void> = [];
 
     avaliableSlots = 0;
+
+    reusedCount = 0;
 
     constructor(manager: GameProcessManager, id: string, config: ServerGameConfig) {
         this.manager = manager;
@@ -130,6 +134,8 @@ class GameProcess {
 
         const mapDef = MapDefs[this.gameData.mapName as MapDefKey];
         this.avaliableSlots = mapDef.gameMode.maxPlayers;
+
+        this.reusedCount++;
     }
 
     addJoinTokens(tokens: FindGamePrivateBody["playerData"], autoFill: boolean) {
@@ -189,31 +195,43 @@ export class GameProcessManager {
             }
         });
 
+        // always keep some processes running even if theres no active games on them
+        // creating a new proc is more expensive than reusing one
+        const minIdleProcs = 3;
+
         setInterval(() => {
-            for (const gameProc of this.processes) {
-                gameProc.send({
+            for (const proc of this.processes) {
+                proc.send({
                     type: ProcessMsgType.KeepAlive,
                 });
 
-                if (Date.now() - gameProc.lastMsgTime > 10000) {
+                // kill processes that didn't send a keep alive msg in 10 seconds
+                // because this usually means they are frozen in an infinite loop
+                if (Date.now() - proc.lastMsgTime > 10000) {
+                    const id = proc.gameData.id.substring(0, 4);
                     this.logger.warn(
-                        `Process ${gameProc.process.pid} - #${
-                            gameProc.gameData.id.substring(0, 4)
-                        } did not send a message in more 10 seconds, killing`,
+                        `Process ${proc.process.pid} - #${id} did not send a message in more 10 seconds, killing`,
                     );
                     // sigquit can dump a core of the process
                     // useful for debugging infinite loops
-                    this.killProcess(gameProc, "SIGQUIT");
-                } else if (
-                    gameProc.gameData.stopped
-                    && Date.now() - gameProc.stoppedTime > 60000
-                ) {
-                    this.logger.warn(
-                        `Process ${gameProc.process.pid} - #${
-                            gameProc.gameData.id.substring(0, 4)
-                        } stopped more than a minute ago, killing`,
-                    );
-                    this.killProcess(gameProc);
+                    this.killProcess(proc, "SIGQUIT");
+                    continue;
+                }
+            }
+
+            const idleProcs = this.processes.filter(p => {
+                return p.gameData.stopped && (Date.now() - p.stoppedTime) > 60000;
+            });
+
+            // kill stale processes if there's too many
+            if (idleProcs.length > minIdleProcs) {
+                idleProcs.sort((a, b) => a.createdTime - b.createdTime);
+
+                const procsToKill = Math.abs(minIdleProcs - idleProcs.length);
+                for (let i = 0; i < procsToKill; i++) {
+                    const proc = idleProcs[i];
+                    this.logger.info(`Killing ${proc.process.pid} because we have too many stale processes`);
+                    this.killProcess(proc);
                 }
             }
         }, 5000);
@@ -328,7 +346,7 @@ export class GameProcessManager {
         const data = socket.getUserData();
         const proc = this.processById.get(data.gameId);
         if (proc === undefined) {
-            this.logger.warn("prcoess not found, closing socket.");
+            this.logger.warn("process not found, closing socket.");
             socket.close();
             return;
         }

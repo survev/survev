@@ -8,7 +8,7 @@ import pkgJson from "../../package.json" with { type: "json" };
 import { GameConfig } from "../../shared/gameConfig.ts";
 import * as net from "../../shared/net/net.ts";
 import { Config } from "./config.ts";
-import { GameProcessManager, type GameSocketData } from "./game/gameProcessManager.ts";
+import { GameProcessManager, type GameSocketData, ProcState } from "./game/gameProcessManager.ts";
 import { apiPrivateRouter } from "./utils/apiRouter.ts";
 import { GIT_VERSION } from "./utils/gitRevision.ts";
 import { logErrorToWebhook, ServerLogger } from "./utils/logger.ts";
@@ -182,12 +182,9 @@ app.get("/private/status", (res, req) => {
         gameCount: server.manager.processes.length,
         games: server.manager.processes.map(p => {
             return {
-                id: p.gameData.id,
-                aliveCount: p.gameData.aliveCount,
-                map: p.gameData.mapName,
-                teamMode: p.gameData.teamMode,
-                stopped: p.gameData.stopped,
-                canJoin: p.gameData.canJoin,
+                state: ProcState[p.state],
+                reusedCount: p.reusedCount,
+                gameData: p.gameData,
             };
         }),
     });
