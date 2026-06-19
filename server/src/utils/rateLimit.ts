@@ -53,6 +53,8 @@ export class WebSocketRateLimit {
      * false otherwise
      */
     isIpRateLimited(ip: string): boolean {
+        if (!Config.rateLimitsEnabled) return false;
+
         let data = this._IPsData.get(ip);
         if (!data) {
             data = {
@@ -60,7 +62,6 @@ export class WebSocketRateLimit {
             };
             this._IPsData.set(ip, data);
         }
-        if (!Config.rateLimitsEnabled) return false;
 
         if (data.connections + 1 > this.maxConnections) {
             return true;

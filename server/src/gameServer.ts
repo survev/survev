@@ -268,6 +268,7 @@ app.ws<GameSocketData>("/play", {
 
         if (gameHTTPRateLimit.isRateLimited(ip) || gameWsRateLimit.isIpRateLimited(ip)) {
             res.cork(() => {
+                server.logger.warn("Websocket upgrade closed: Rate limited");
                 res.writeStatus("429 Too Many Requests");
                 res.write("429 Too Many Requests");
                 res.end();
@@ -279,20 +280,20 @@ app.ws<GameSocketData>("/play", {
         const gameId = searchParams.get("gameId");
 
         if (!gameId) {
-            server.logger.warn("game_id_missing");
+            server.logger.warn("Websocket upgrade closed: no game ID");
             uwsHelpers.forbidden(res);
             return;
         }
         const proc = server.manager.getById(gameId);
 
         if (!proc) {
-            server.logger.warn("invalid_game_id");
+            server.logger.warn("Websocket upgrade closed: invalid game ID");
             uwsHelpers.forbidden(res);
             return;
         }
 
         if (!proc.gameData.canJoin) {
-            server.logger.warn("game_started");
+            server.logger.warn("Websocket upgrade closed: game already started");
             uwsHelpers.forbidden(res);
             return;
         }

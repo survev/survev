@@ -145,6 +145,7 @@ export class PlayerBarn {
         const joinData = this.game.joinTokens.get(joinMsg.matchPriv);
 
         if (!joinData || joinData.expiresAt < Date.now()) {
+            this.game.logger.warn("player tried to join without or with expired join token");
             socket.close();
             if (joinData) {
                 this.game.joinTokens.delete(joinMsg.matchPriv);

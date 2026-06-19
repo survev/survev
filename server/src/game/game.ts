@@ -449,6 +449,7 @@ export class Game {
         }
 
         if (error) {
+            this.logger.warn("Disconnecting player because of packet error:", error);
             if (player) {
                 player.disconnect();
             } else {
@@ -465,6 +466,7 @@ export class Game {
         }
 
         if (!player) {
+            this.logger.warn("No player found and we didn't receive a JoinMsg, closing socket");
             socket.close();
             return;
         }
