@@ -108,8 +108,7 @@ class GameProcess {
                         stream.serializeMsg(net.MsgType.Disconnect, disconnectMsg);
                         socket.send(stream.getBuffer(), true, false);
                     }
-
-                    socket.close();
+                    socket.end();
                 }
                 break;
         }
@@ -285,7 +284,7 @@ export class GameProcessManager {
             const data = socket.getUserData();
             if (data.closed) continue;
             if (data.gameId !== gameProc.gameData.id) continue;
-            socket.close();
+            socket.end();
         }
 
         // send SIGTERM, if still hasn't terminated after 5 seconds, send SIGKILL >:3
