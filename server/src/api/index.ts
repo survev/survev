@@ -51,6 +51,18 @@ app.onError((err: unknown, c) => {
     return c.text("Internal Server Error", 500);
 });
 
+if (server.logger.config.debugLogs) {
+    app.use("*", async (ctx, next) => {
+        const url = ctx.req.path;
+        server.logger.debug(`start: ${url}`);
+        const start = performance.now();
+        await next();
+
+        const time = Math.round(performance.now() - start);
+        server.logger.debug(`end  : ${url} time: ${time}ms`);
+    });
+}
+
 app.use(
     "/api/*",
     cors({
