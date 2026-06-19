@@ -2287,7 +2287,7 @@ export class Player implements AbstractObject {
     }
 
     animMeleeCollision(animCtx: Partial<AnimCtx>, args: { playerHit?: string }) {
-        const meleeDef = GameObjectDefs.typeToDef(this.m_netData.m_activeWeapon, "melee");
+        const meleeDef = GameObjectDefs.typeToDefSafe(this.m_netData.m_activeWeapon);
         if (meleeDef && meleeDef.type == "melee") {
             const meleeCol = this.getMeleeCollider();
             const meleeDist = meleeCol.rad + v2.length(v2.sub(this.m_pos, meleeCol.pos));
