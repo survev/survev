@@ -1,4 +1,4 @@
-name: Deploy offline version of the PR to Cloudflare Pages
+name: Deploy to Cloudflare Pages
 
 on:
   pull_request_target:
@@ -16,7 +16,7 @@ jobs:
       id-token: write
 
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
         with:
           ref: ${{ github.event.pull_request.head.sha }}
           fetch-depth: 0
@@ -38,19 +38,19 @@ jobs:
           fi
 
       - name: Setup Node
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v6
         with:
           node-version: "22"
 
       - name: Setup pnpm
-        uses: pnpm/action-setup@v4
+        uses: pnpm/action-setup@v6
 
       - name: Install Packages
         run: pnpm install --filter client --filter shared --filter server
 
       - name: Restore Atlas Cache
         id: cache-atlases-restore
-        uses: actions/cache@v4
+        uses: actions/cache@v5
         if: always()
         with:
           path: ./client/node_modules/.atlas-cache/
@@ -58,20 +58,20 @@ jobs:
           restore-keys: |
             atlas-cache
 
-      - name: Build client
+      - name: Build Client
         run: pnpm run build
         working-directory: ./client
 
       - name: Save Atlas Cache
         id: cache-atlases-save
-        uses: actions/cache/save@v4
+        uses: actions/cache/save@v5
         with:
           path: ./client/node_modules/.atlas-cache/
           key: "atlas-cache-${{ github.run_id }}"
 
       - name: Deploy to Cloudflare Pages
         id: deploy
-        uses: cloudflare/wrangler-action@v3
+        uses: cloudflare/wrangler-action@v4
         with:
           apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
@@ -81,7 +81,7 @@ jobs:
           gitHubToken: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Comment on PR
-        uses: actions/github-script@v7
+        uses: actions/github-script@v9
         with:
           script: |
             await github.rest.issues.createComment({
@@ -89,6 +89,5 @@ jobs:
               owner: context.repo.owner,
               repo: context.repo.repo,
               body: `**Testing URL:** ${{ steps.deploy.outputs.deployment-url }}
-
               hope it works 💃`
             });

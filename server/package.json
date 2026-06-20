@@ -26,7 +26,7 @@
     "arctic": "^3.7.0",
     "croner": "^10.0.1",
     "drizzle-orm": "^0.45.2",
-    "hono": "^4.12.24",
+    "hono": "^4.12.25",
     "nanotimer": "^0.3.15",
     "obscenity": "^0.4.6",
     "pg": "^8.21.0",
@@ -34,12 +34,12 @@
     "redis": "^5.12.1",
     "slugify": "^1.6.9",
     "typescript": "^6.0.3",
-    "uWebSockets.js": "github:uNetworking/uWebSockets.js#v20.66.0",
+    "uWebSockets.js": "github:uNetworking/uWebSockets.js#v20.68.0",
     "zod": "^4.4.3"
   },
   "devDependencies": {
     "@types/nanotimer": "^0.3.2",
-    "@types/node": "^25.9.2",
+    "@types/node": "~22.12.0",
     "@types/pg": "^8.20.0",
     "concurrently": "^9.2.1",
     "drizzle-kit": "^0.31.10",
