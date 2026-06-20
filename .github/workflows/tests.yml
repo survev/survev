@@ -34,6 +34,6 @@ jobs:
       - name: Install Packages
         run: pnpm install --filter tests --filter shared --filter server
 
-      - name: Run tests
+      - name: Run Tests
         run: pnpm run test
         working-directory: ./tests

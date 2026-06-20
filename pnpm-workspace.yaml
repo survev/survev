@@ -1,13 +1,3 @@
-minimumReleaseAge: 10080
-
-packages:
-  - server/
-  - shared/
-  - client/
-  - bot/
-  - tests/
-  - '!**dist/**'
-ignoreWorkspaceRootCheck: true
 allowBuilds:
   '@taufik-nurrohman/color-picker': true
   canvas: true
@@ -15,3 +5,13 @@ allowBuilds:
   esbuild: true
   sharp: true
   workerd: true
+ignoreWorkspaceRootCheck: true
+minimumReleaseAge: 10080
+packages:
+  - server/
+  - shared/
+  - client/
+  - bot/
+  - tests/
+  - '!**dist/**'
+shellEmulator: true

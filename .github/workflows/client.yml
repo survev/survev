@@ -33,7 +33,7 @@ jobs:
       - name: Install Packages
         run: pnpm install --filter client --filter shared
 
-      - name: Typecheck client
+      - name: Typecheck Client
         run: pnpm run typecheck
         working-directory: ./client
 

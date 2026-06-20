@@ -90,7 +90,7 @@ function checkNode(node: svgParser.ElementNode): void {
 test.for(svgPaths)("Testing SVG %s", (path) => {
     const stats = fs.statSync(path);
 
-    const baseDir = path.split("/").at(-2)!;
+    const baseDir = path.split(npath.sep).at(-2)!;
 
     let maxSize = MAX_SIZES[baseDir];
 
