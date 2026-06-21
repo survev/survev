@@ -1,3 +1,4 @@
+import type { DebugRendererOpts } from "$lib/modules/ConfigManager.svelte.ts";
 import * as PIXI from "pixi.js-legacy";
 import { type MapDef, type MapDefKey, MapDefs } from "../../shared/defs/mapDefs.ts";
 import type { BuildingDef, ObstacleDef } from "../../shared/defs/mapObjectsTyping.ts";
@@ -19,10 +20,9 @@ import { v2, type Vec2 } from "../../shared/utils/v2.ts";
 import type { Ambiance } from "./ambiance.ts";
 import type { AudioManager } from "./audioManager.ts";
 import type { Camera } from "./camera.ts";
-import type { DebugRenderOpts } from "./config.ts";
 import { renderSpline } from "./debug/debugHelpers.ts";
 import { debugLines } from "./debug/debugLines.ts";
-import { device } from "./device.ts";
+import { device } from "./lib/modules/Device.svelte.ts";
 import { Building } from "./objects/building.ts";
 import type { DecalBarn } from "./objects/decal.ts";
 import { Pool } from "./objects/objectPool.ts";
@@ -260,7 +260,7 @@ export class Map {
         renderer: Renderer,
         camera: Camera,
         _smokeParticles: SmokeParticle[],
-        debug: DebugRenderOpts,
+        debug: DebugRendererOpts,
     ) {
         const obstacles = this.m_obstaclePool.m_getPool();
         for (let i = 0; i < obstacles.length; i++) {

@@ -132,8 +132,8 @@ export class SDKManager implements BaseSDKManager {
                 .html(`<a href="https://discord.gg/6uRdCdkTPt" target="_blank"></a>`);
 
             if (this.isSpellSync) {
-                $("a[href='changelogRec.html']").hide();
-                $("a[href='changelog.html']").hide();
+                $("a[href='changelogRec']").hide();
+                $("a[href='changelog']").hide();
                 $("a[href='proxy.txt']").hide();
                 $("a[href='privacy.html']").hide();
                 $("a[data-l10n='index-privacy']").hide();
