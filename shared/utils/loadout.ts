@@ -3,6 +3,7 @@ import { z } from "zod";
 import { UnlockDefs } from "../defs/gameObjects/unlockDefs.ts";
 import { GameObjectDefs } from "../defs/register.ts";
 import { GameConfig } from "../gameConfig.ts";
+import type { loadoutSchema } from "../types/api.ts";
 import { deepEqual } from "./deepEqual.js";
 
 export type Item = {
@@ -12,21 +13,6 @@ export type Item = {
     status?: ItemStatus;
     ackd?: ItemStatus.Ackd;
 };
-
-export const loadoutSchema = z.object({
-    outfit: z.string(),
-    melee: z.string(),
-    heal: z.string(),
-    boost: z.string(),
-    player_icon: z.string(),
-    crosshair: z.object({
-        type: z.string(),
-        color: z.number(),
-        size: z.string(),
-        stroke: z.string(),
-    }),
-    emotes: z.array(z.string()).length(6),
-});
 
 export type Loadout = z.infer<typeof loadoutSchema>;
 export type Crosshair = Loadout["crosshair"];

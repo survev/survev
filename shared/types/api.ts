@@ -23,6 +23,21 @@ export interface FindGameMatchData {
     data: string;
 }
 
+export const loadoutSchema = z.object({
+    outfit: z.string(),
+    melee: z.string(),
+    heal: z.string(),
+    boost: z.string(),
+    player_icon: z.string(),
+    crosshair: z.object({
+        type: z.string(),
+        color: z.number(),
+        size: z.string(),
+        stroke: z.string(),
+    }),
+    emotes: z.array(z.string()).length(6),
+});
+
 export type FindGameError =
     | "invalid_ip"
     | "find_game_failed"

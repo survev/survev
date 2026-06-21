@@ -1,8 +1,7 @@
 import { z } from "zod";
 import type { MapDefKey } from "../../../shared/defs/mapDefs.ts";
 import { TeamMode } from "../../../shared/gameConfig.ts";
-import type { FindGameError } from "../../../shared/types/api.ts";
-import { loadoutSchema } from "../../../shared/utils/loadout.ts";
+import { type FindGameError, loadoutSchema } from "../../../shared/types/api.ts";
 import type { MatchDataTable } from "../api/db/schema.ts";
 
 export const zUpdateRegionBody = z.object({
