@@ -1,5 +1,6 @@
 import * as PIXI from "pixi.js-legacy";
 
+import type { DebugRendererOpts } from "$lib/modules/ConfigManager.svelte.ts";
 import type { LootDef } from "../../../shared/defs/gameObjectDefs.ts";
 import type { BoostDef, HealDef } from "./../../../shared/defs/gameObjects/gearDefs.ts";
 import type { GunDef } from "../../../shared/defs/gameObjects/gunDefs.ts";
@@ -26,15 +27,14 @@ import { v2, type Vec2 } from "../../../shared/utils/v2.ts";
 import { Animations, Bones, IdlePoses, Pose } from "../animData.ts";
 import type { AudioManager } from "../audioManager.ts";
 import type { Camera } from "../camera.ts";
-import type { DebugRenderOpts } from "../config.ts";
 import { debugLines } from "../debug/debugLines.ts";
-import { device } from "../device.ts";
 import { errorLogManager } from "../errorLogs.ts";
 import type { Ctx } from "../game.ts";
 import { helpers } from "../helpers.ts";
 import type { InputHandler } from "../input.ts";
 import type { InputBinds } from "./../inputBinds.ts";
 import type { SoundHandle } from "../lib/createJS.ts";
+import { device } from "../lib/modules/Device.svelte.ts";
 import type { Map } from "../map.ts";
 import type { Renderer } from "../renderer.ts";
 import type { UiManager2 } from "../ui/ui2.ts";
@@ -1346,7 +1346,7 @@ export class Player implements AbstractObject {
         this.isNew = false;
     }
 
-    render(camera: Camera, debug: DebugRenderOpts) {
+    render(camera: Camera, debug: DebugRendererOpts) {
         const screenPos = camera.m_pointToScreen(this.m_visualPos);
         const screenScale = camera.m_pixels(1);
         this.container.position.set(screenPos.x, screenPos.y);
@@ -2708,7 +2708,7 @@ export class PlayerBarn {
         }
     }
 
-    m_render(camera: Camera, debug: DebugRenderOpts) {
+    m_render(camera: Camera, debug: DebugRendererOpts) {
         const players = this.playerPool.m_getPool();
         for (let i = 0; i < players.length; i++) {
             const p = players[i];
