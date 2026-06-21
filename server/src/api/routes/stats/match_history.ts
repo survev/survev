@@ -47,6 +47,7 @@ matchHistoryRouter.post(
                 team_kills: sum(aliased.kills).mapWith(Number),
                 damage_dealt: matchDataTable.damageDealt,
                 damage_taken: matchDataTable.damageTaken,
+                player_id: matchDataTable.playerId,
                 slug: usersTable.slug,
             })
             .from(matchDataTable)
@@ -63,6 +64,7 @@ matchHistoryRouter.post(
                 matchDataTable.kills,
                 matchDataTable.damageDealt,
                 matchDataTable.damageTaken,
+                matchDataTable.playerId,
                 usersTable.slug,
             )
             .leftJoin(

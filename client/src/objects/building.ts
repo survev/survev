@@ -1,5 +1,6 @@
 import * as PIXI from "pixi.js-legacy";
 
+import type { DebugRendererOpts } from "$lib/modules/ConfigManager.svelte.ts";
 import type { BuildingDef, FloorImage } from "../../../shared/defs/mapObjects/buildings/buildingDefs.ts";
 import { MapObjectDefs } from "../../../shared/defs/register.ts";
 import type { ObjectData, ObjectType } from "../../../shared/net/objectSerializeFns.ts";
@@ -12,7 +13,6 @@ import { util } from "../../../shared/utils/util.ts";
 import { v2, type Vec2 } from "../../../shared/utils/v2.ts";
 import type { AudioManager } from "../audioManager.ts";
 import type { Camera } from "../camera.ts";
-import type { DebugRenderOpts } from "../config.ts";
 import {
     renderBridge,
     renderMapBuildingBounds,
@@ -378,7 +378,7 @@ export class Building implements AbstractObject {
         activePlayer: Player,
         renderer: Renderer,
         camera: Camera,
-        debug: DebugRenderOpts,
+        debug: DebugRendererOpts,
     ) {
         // Puzzle effects
         if (this.hasPuzzle) {
@@ -656,7 +656,7 @@ export class Building implements AbstractObject {
         sprite.alpha = sprite.imgAlpha * alpha;
     }
 
-    render(_camera: Camera, debug: DebugRenderOpts, layer: number) {
+    render(_camera: Camera, debug: DebugRendererOpts, layer: number) {
         if (IS_DEV && layer === this.layer) {
             if (debug.buildings?.buildingBounds) {
                 renderMapBuildingBounds(this);

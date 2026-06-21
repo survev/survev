@@ -1,7 +1,7 @@
 import $ from "jquery";
-import { device } from "../device.ts";
 import { helpers } from "../helpers.ts";
 import type { InputBinds, InputBindUi } from "../inputBinds.ts";
+import { device } from "../lib/modules/Device.svelte.ts";
 import { MenuModal } from "./menuModal.ts";
 
 function createToast(
