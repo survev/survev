@@ -148,65 +148,10 @@ process.on("disconnect", () => {
     process.exit();
 });
 
-const socketMsgs: Array<{
-    socketId: string;
-    data: Uint8Array;
-    ip: string;
-}> = [];
-
 let lastMsgTime = Date.now();
 
-const socketIdToSocket = new Map<string, ProcessSocket<Client | undefined>>();
-class ProcessSocket<T> extends ClientSocket<T> {
-    private _id: string;
-    private _ip: string;
-    _closed = false;
-    constructor(id: string, ip: string) {
-        super();
-        this._id = id;
-        this._ip = ip;
-    }
-
-    ip(): string {
-        return this._ip;
-    }
-
-    closed(): boolean {
-        return this._closed;
-    }
-
-    send(data: Uint8Array<ArrayBuffer>): void {
-        if (this.closed()) return;
-
-        socketMsgs.push({
-            socketId: this._id,
-            data,
-            ip: "",
-        });
-    }
-    close(): void {
-        this._closed = true;
-        sendMsg({
-            type: ProcessMsgType.SocketClose,
-            socketId: this._id,
-            reason: undefined,
-        });
-    }
-
-    closeWithReason(reason: string): void {
-        this._closed = true;
-        sendMsg({
-            type: ProcessMsgType.SocketClose,
-            socketId: this._id,
-            reason: reason,
-        });
-    }
-}
-
 process.on("message", (msg: ProcessMsg) => {
-    if (msg.type) {
-        lastMsgTime = Date.now();
-    }
+    lastMsgTime = Date.now();
 
     if (msg.type === ProcessMsgType.Create && !game) {
         game = new ServerGame(msg.id, msg.config);
@@ -222,23 +167,6 @@ process.on("message", (msg: ProcessMsg) => {
         case ProcessMsgType.AddJoinToken:
             game.addJoinTokens(msg.tokens, msg.autoFill);
             break;
-        case ProcessMsgType.SocketOpen: {
-            const socket = new ProcessSocket<Client | undefined>(msg.socketId, msg.ip);
-            socketIdToSocket.set(msg.socketId, socket);
-            break;
-        }
-        case ProcessMsgType.ClientSocketMsg: {
-            let socket = socketIdToSocket.get(msg.socketId)!;
-            game.clientBarn.handleMsg(msg.data as ArrayBuffer, socket);
-            break;
-        }
-        case ProcessMsgType.SocketClose: {
-            const socket = socketIdToSocket.get(msg.socketId)!;
-            socket._closed = true;
-            game.clientBarn.handleSocketClose(socket);
-            socketIdToSocket.delete(msg.socketId);
-            break;
-        }
     }
 });
 
@@ -273,11 +201,6 @@ setGameInterval(() => {
 
 setGameInterval(() => {
     game?.netSync();
-    sendMsg({
-        type: ProcessMsgType.ServerSocketMsg,
-        msgs: socketMsgs,
-    });
-    socketMsgs.length = 0;
 }, 1000 / Config.netSyncTps);
 
 process.on("uncaughtException", async (err) => {
