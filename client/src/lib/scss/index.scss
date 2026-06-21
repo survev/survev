@@ -1,0 +1,44 @@
+// Please pay careful attention to the order of imports when
+// modifying this file. A specific structure must be maintained
+// in order to avoid unwanted behavior.
+
+@import "../../../node_modules/bootstrap/scss/functions.scss";
+
+// Any Bootstrap variable overrides MUST go here.
+@import "palette.scss";
+
+@import "../../../node_modules/bootstrap/scss/variables.scss";
+@import "../../../node_modules/bootstrap/scss/variables-dark.scss";
+@import "../../../node_modules/bootstrap/scss/maps.scss";
+@import "../../../node_modules/bootstrap/scss/mixins.scss";
+@import "../../../node_modules/bootstrap/scss/root.scss";
+
+// Optional bootstrap modules MUST go here.
+@import "../../../node_modules/bootstrap/scss/utilities.scss";
+@import "../../../node_modules/bootstrap/scss/reboot.scss";
+@import "../../../node_modules/bootstrap/scss/accordion.scss";
+@import "../../../node_modules/bootstrap/scss/buttons.scss";
+@import "../../../node_modules/bootstrap/scss/containers.scss";
+@import "../../../node_modules/bootstrap/scss/dropdown.scss";
+@import "../../../node_modules/bootstrap/scss/forms.scss";
+@import "../../../node_modules/bootstrap/scss/grid.scss";
+@import "../../../node_modules/bootstrap/scss/helpers.scss";
+@import "../../../node_modules/bootstrap/scss/nav.scss";
+@import "../../../node_modules/bootstrap/scss/navbar.scss";
+@import "../../../node_modules/bootstrap/scss/tooltip.scss";
+@import "../../../node_modules/bootstrap/scss/transitions.scss";
+
+
+@import "../../../node_modules/bootstrap/scss/utilities/api.scss";
+
+// All other global styles MUST go here.
+@import "animations.scss";
+@import "buttons.scss";
+
+body {
+    background: #80af49;
+}
+
+select {
+    cursor: pointer;
+}

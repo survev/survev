@@ -12,8 +12,8 @@ import { type Crosshair, type Loadout, loadout } from "../../../shared/utils/loa
 import { util } from "../../../shared/utils/util.ts";
 import type { Account } from "../account.ts";
 import { crosshair } from "../crosshair.ts";
-import { device } from "../device.ts";
 import { helpers } from "../helpers.ts";
+import { device } from "../lib/modules/Device.svelte.ts";
 import { SDK } from "../sdk/sdk.ts";
 import type { Localization } from "./localization.ts";
 import { MenuModal } from "./menuModal.ts";
@@ -1099,31 +1099,6 @@ export class LoadoutMenu {
             this.modalCustomizeItemName.trigger("click");
         }
 
-        // Disable crosshair elements on Edge
-        if (device.browser == "edge") {
-            if (category.loadoutType == "crosshair") {
-                const disableElem = function(
-                    parentElem: JQuery<HTMLElement>,
-                    disableElem: JQuery<HTMLElement>,
-                ) {
-                    const height = parentElem.height()!
-                        + parseInt(parentElem.css("padding-top"))
-                        + parseInt(parentElem.css("padding-bottom"));
-                    disableElem.css("height", height);
-                };
-                disableElem(
-                    $("#modal-customize-body"),
-                    $("#modal-content-left").find(".modal-disabled"),
-                );
-                disableElem(
-                    $("#modal-content-right-crosshair"),
-                    $("#modal-content-right-crosshair").find(".modal-disabled"),
-                );
-                $(".modal-disabled").css("display", "block");
-            } else {
-                $(".modal-disabled").css("display", "none");
-            }
-        }
         this.onResize();
     }
 
@@ -1142,20 +1117,21 @@ export class LoadoutMenu {
     }
 
     setEmoteDraggable(selector: JQuery<HTMLElement>, that: LoadoutMenu) {
-        selector.on("dragstart", function(e) {
-            if (
-                !$(this).hasClass("customize-list-item-locked")
-                && (that.selectItem($(this), false), device.browser != "edge")
-            ) {
-                const imgDiv = document.createElement("img");
-                imgDiv.src = that.selectedItem.img
-                    ? that.selectedItem.img
-                        .replace("url(", "")
-                        .replace(")", "")
-                        .replace(/'/gi, "")
-                    : "";
-                e.originalEvent?.dataTransfer?.setDragImage(imgDiv, 64, 64);
+        selector.on("dragstart", function(ev) {
+            if ($(this).hasClass("customize-list-item-locked")) {
+                return;
             }
+
+            that.selectItem($(this), false);
+
+            const imgDiv = document.createElement("img");
+            imgDiv.src = that.selectedItem.img
+                ? that.selectedItem.img
+                    .replace("url(", "")
+                    .replace(")", "")
+                    .replace(/'/gi, "")
+                : "";
+            ev.originalEvent?.dataTransfer?.setDragImage(imgDiv, 64, 64);
         });
     }
 

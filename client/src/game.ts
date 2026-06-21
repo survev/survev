@@ -1,5 +1,6 @@
 import * as PIXI from "pixi.js-legacy";
 
+import type { ConfigManager, DebugRendererOpts } from "$lib/modules/ConfigManager.svelte.ts";
 import { GameConfig, Input, TeamMode, WeaponSlot } from "../../shared/gameConfig.ts";
 import * as net from "../../shared/net/net.ts";
 import { ObjectType } from "../../shared/net/objectSerializeFns.ts";
@@ -8,7 +9,6 @@ import { v2 } from "../../shared/utils/v2.ts";
 import type { Ambiance } from "./ambiance.ts";
 import type { AudioManager } from "./audioManager.ts";
 import { Camera } from "./camera.ts";
-import type { ConfigManager, DebugRenderOpts } from "./config.ts";
 import { DebugHUD } from "./debug/debugHUD.ts";
 import { debugLines } from "./debug/debugLines.ts";
 
@@ -18,7 +18,6 @@ import { Editor } from "./debug/editor.ts";
 
 import { GameObjectDefs } from "../../shared/defs/register.ts";
 import { SpectateAction } from "../../shared/net/spectateMsg.ts";
-import { device } from "./device.ts";
 import { EmoteBarn } from "./emote.ts";
 import { errorLogManager } from "./errorLogs.ts";
 import { Gas } from "./gas.ts";
@@ -26,6 +25,7 @@ import { helpers } from "./helpers.ts";
 import { type InputHandler, Key } from "./input.ts";
 import type { InputBinds, InputBindUi } from "./inputBinds.ts";
 import type { SoundHandle } from "./lib/createJS.ts";
+import { device } from "./lib/modules/Device.svelte.ts";
 import { Map } from "./map.ts";
 import { AirdropBarn } from "./objects/airdrop.ts";
 import { BulletBarn, createBullet } from "./objects/bullet.ts";
@@ -400,14 +400,14 @@ export class Game {
             }
         }
 
-        let debug: DebugRenderOpts;
+        let debug: DebugRendererOpts;
         if (IS_DEV) {
             debug = this.m_config.get("debugRenderer")!;
             dt *= this.editor.toolParams.gameSpeedEnabled
                 ? this.editor.toolParams.gameSpeed
                 : 1;
         } else {
-            debug = {} as DebugRenderOpts;
+            debug = {} as DebugRendererOpts;
         }
 
         const smokeParticles = this.m_smokeBarn.m_particles;
@@ -987,7 +987,7 @@ export class Game {
         this.m_render(dt, debug);
     }
 
-    m_render(dt: number, debug: DebugRenderOpts) {
+    m_render(dt: number, debug: DebugRendererOpts) {
         const grassColor = this.m_map.mapLoaded
             ? this.m_map.getMapDef().biome.colors.grass
             : 0x80af49;

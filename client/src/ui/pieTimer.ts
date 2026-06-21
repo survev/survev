@@ -1,7 +1,7 @@
 import * as PIXI from "pixi.js-legacy";
 import { math } from "../../../shared/utils/math.ts";
 import type { Camera } from "../camera.ts";
-import { device } from "../device.ts";
+import { device } from "../lib/modules/Device.svelte.ts";
 import type { Touch } from "./touch.ts";
 
 const fontWidth = 24;
@@ -42,7 +42,7 @@ export class PieTimer {
         this.labelText.anchor.set(0.5, 0.5);
         this.labelText.style = {
             fontFamily: "Roboto Condensed, Arial, sans-serif",
-            fontWeight: "100",
+            fontWeight: "400",
             fontSize: fontWidth,
             align: "center",
             fill: 0xffffff,

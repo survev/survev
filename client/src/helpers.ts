@@ -5,7 +5,7 @@ import type { OutfitDef } from "../../shared/defs/gameObjects/outfitDefs.ts";
 import { type MapDefKey, MapDefs } from "../../shared/defs/mapDefs.ts";
 import { GameObjectDefs } from "../../shared/defs/register.ts";
 import * as net from "../../shared/net/net.ts";
-import { device } from "./device.ts";
+import { device } from "./lib/modules/Device.svelte.ts";
 
 const truncateCanvas = document.createElement("canvas");
 

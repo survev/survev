@@ -1,5 +1,6 @@
 import * as PIXI from "pixi.js-legacy";
 
+import type { DebugRendererOpts } from "$lib/modules/ConfigManager.svelte.ts";
 import type { DecalDef } from "../../../shared/defs/mapObjectsTyping.ts";
 import { MapObjectDefs } from "../../../shared/defs/register.ts";
 import type { ObjectData, ObjectType } from "../../../shared/net/objectSerializeFns.ts";
@@ -9,7 +10,6 @@ import { math } from "../../../shared/utils/math.ts";
 import { util } from "../../../shared/utils/util.ts";
 import { v2, type Vec2 } from "../../../shared/utils/v2.ts";
 import type { Camera } from "../camera.ts";
-import type { DebugRenderOpts } from "../config.ts";
 import type { Ctx } from "../game.ts";
 import type { Map } from "../map.ts";
 import type { Renderer } from "../renderer.ts";
@@ -288,5 +288,5 @@ export class DecalBarn {
         }
     }
 
-    m_render(_camera: Camera, _debug: DebugRenderOpts, _layer: number) {}
+    m_render(_camera: Camera, _debug: DebugRendererOpts, _layer: number) {}
 }

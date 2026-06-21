@@ -1,18 +1,24 @@
 {
   "$schema": "https://www.schemastore.org/tsconfig.json",
-  "extends": "../tsconfig.base.json",
+  "extends": ["../tsconfig.base.json"],
   "compilerOptions": {
     "lib": ["DOM", "ESNext"],
+    "types": ["svelte", "vite/client"],
     "paths": {
-      "@/sdk.ts": ["./src/sdk/sdk-manager.ts"]
+      "@/shared/*": ["../shared/*"],
+      "@/sdk.ts": ["./src/sdk/sdk-manager.ts"],
+      "$lib": ["./src/lib"],
+      "$lib/*": ["./src/lib/*"]
     }
   },
   "include": [
-    "./src/**/*.ts",
-    "./src/**/*.js",
+    "./**/*.ts",
+    "./**/*.js",
+    "./**/*.svelte",
     "../shared/",
     "./atlas-builder/**/*.ts",
     "./building-editor/**/*.ts",
+    "vite.config.ts",
     "./global.d.ts"
   ]
 }

@@ -1,13 +1,16 @@
+import { mount } from "svelte";
+
+import { ConfigManager } from "$lib/modules/ConfigManager.svelte.ts";
+import { math } from "@/shared/utils/math.ts";
 import * as PIXI from "pixi.js-legacy";
-import { math } from "../../../shared/utils/math.ts";
 import { Ambiance } from "../../src/ambiance.ts";
 import { AudioManager } from "../../src/audioManager.ts";
-import { ConfigManager } from "../../src/config.ts";
-import { device } from "../../src/device.ts";
 import { InputHandler } from "../../src/input.ts";
 import { InputBinds } from "../../src/inputBinds.ts";
+import { device } from "../../src/lib/modules/Device.svelte.ts";
 import { ResourceManager } from "../../src/resources.ts";
 import { Localization } from "../../src/ui/localization.ts";
+import SvelteApp from "../App.svelte";
 import { EditorDisplay } from "./editorDisplay.ts";
 import { EditorUi } from "./editorUi.ts";
 
@@ -162,9 +165,7 @@ function onPageLoad() {
     App.tryLoad();
 }
 
-document.addEventListener("DOMContentLoaded", onPageLoad);
-window.addEventListener("load", onPageLoad);
-
+window.addEventListener("DOMContentLoaded", onPageLoad);
 window.addEventListener("resize", () => {
     App.onResize();
 });
@@ -177,4 +178,8 @@ window.addEventListener("onfocus", () => {
 });
 window.addEventListener("onblur", () => {
     App.hasFocus = false;
+});
+
+mount(SvelteApp, {
+    target: document.querySelector("#app")!,
 });

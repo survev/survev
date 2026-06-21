@@ -1,15 +1,11 @@
 {
-  "@metadata": {
-    "last-updated": "2018-05-26",
-    "locale": "es"
-  },
   "word-order": "svo",
   "index-privacy": "privacy",
   "index-go": "Ir",
   "index-leaderboards": "Marcadores",
   "index-my-stats": "Mis Estadísticas",
   "index-search-players": "Buscar jugador",
-  "index-play-survivio": "Jugar survev.io!",
+  "index-play-survevio": "Jugar survev.io!",
   "stats-rank": "Posición",
   "stats-most-kills": "Mas muertes",
   "stats-total-kills": "Total de muertes",
@@ -25,7 +21,7 @@
   "stats-player": "Jugador",
   "stats-games": "Jugadas",
   "stats-rating": "Clasificación",
-  "stats-win-%": "Victoria %",
+  "stats-win-pct": "Victoria %",
   "stats-top-5": "% De top 5",
   "stats-win-streak": "Racha",
   "stats-kdr": "K/D",
@@ -52,6 +48,7 @@
   "stats-damage-dealt": "Daño repartido",
   "stats-damage-taken": "Daño recibido",
   "stats-survived": "Sobreviviste",
+  "stats-banned": "(Cuenta suspendida)",
   "game-backpack00": "Bolsa",
   "game-backpack01": "Mochila pequeña",
   "game-backpack02": "Mochila mediana",

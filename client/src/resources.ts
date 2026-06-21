@@ -1,10 +1,10 @@
+import type { ConfigManager } from "$lib/modules/ConfigManager.svelte.ts";
 import * as PIXI from "pixi.js-legacy";
 import highResAtlasDefs from "virtual-atlases-high";
 import lowResAtlasDefs from "virtual-atlases-low";
 import { type Atlas, type MapDefKey, MapDefs } from "../../shared/defs/mapDefs.ts";
 import type { AudioManager } from "./audioManager.ts";
-import type { ConfigManager } from "./config.ts";
-import { device } from "./device.ts";
+import { device } from "./lib/modules/Device.svelte.ts";
 import SoundDefs from "./soundDefs.ts";
 
 type AtlasDef = Record<Atlas, PIXI.ISpritesheetData[]>;

@@ -7,12 +7,25 @@
   "json": {
     "indentWidth": 2
   },
+  "markup": {
+    "printWidth": 120,
+    "indentWidth": 4,
+    "formatComments": true,
+    "scriptIndent": true,
+    "styleIndent": true,
+    "closingTagLineBreakForEmpty": "never",
+    "preferAttrsSingleLine": true,
+    "svelteAttrShorthand": true,
+    "svelteDirectiveShorthand": true
+  },
   "excludes": [
     "**/node_modules",
-    "**/*-lock.json"
+    "**/*-lock.json",
+    "**/*.svg"
   ],
   "plugins": [
     "https://plugins.dprint.dev/typescript-0.96.0.wasm",
-    "https://plugins.dprint.dev/json-0.21.3.wasm"
+    "https://plugins.dprint.dev/json-0.21.3.wasm",
+    "https://plugins.dprint.dev/g-plane/markup_fmt-v0.27.3.wasm"
   ]
 }
