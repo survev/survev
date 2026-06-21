@@ -111,6 +111,7 @@ export const zTeamJoinMsg = z.object({
         roomUrl: z.string(),
         playerData: z.object({
             name: z.string(),
+            clientId: z.string().optional(),
         }),
     }),
 });
@@ -138,6 +139,7 @@ export const zTeamCreateMsg = z.object({
         roomData: zClientRoomData,
         playerData: z.object({
             name: z.string(),
+            clientId: z.string().optional(),
         }),
     }),
 });

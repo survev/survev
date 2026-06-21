@@ -38,11 +38,14 @@ export const zFindGamePrivateBody = z.object({
     autoFill: z.boolean(),
     mapName: z.string(),
     teamMode: z.number(),
+    reservationId: z.string().optional(),
+    excludeGameIds: z.array(z.string()).optional(),
     playerData: z.array(
         z.object({
             token: z.string(),
             userId: z.string().nullable(),
             ip: z.string(),
+            clientId: z.string().optional(),
             loadout: loadoutSchema.optional(),
             quests: z.array(z.string()).optional(),
         }),

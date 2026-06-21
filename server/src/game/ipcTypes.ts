@@ -9,6 +9,10 @@ export interface GameData {
     aliveCount: number;
     startedTime: number;
     stopped: boolean;
+    participantRecords: Array<{
+        key: string;
+        reservationId: string;
+    }>;
 }
 
 export enum ProcessMsgType {
@@ -21,6 +25,7 @@ export enum ProcessMsgType {
     ClientSocketMsg,
     ServerSocketMsg,
     SocketClose,
+    JoinTokenConsumed,
 }
 
 export interface CreateGameMsg {
@@ -45,6 +50,7 @@ export interface AddJoinTokenMsg {
     type: ProcessMsgType.AddJoinToken;
     autoFill: boolean;
     tokens: FindGamePrivateBody["playerData"];
+    reservationId: string;
 }
 
 export interface SocketOpenMsg {
@@ -81,6 +87,11 @@ export interface SocketCloseMsg {
     reason?: string;
 }
 
+export interface JoinTokenConsumedMsg {
+    type: ProcessMsgType.JoinTokenConsumed;
+    token: string;
+}
+
 export type ProcessMsg =
     | CreateGameMsg
     | GameCreatedMsg
@@ -90,4 +101,5 @@ export type ProcessMsg =
     | SocketOpenMsg
     | SocketClientMsg
     | SocketServerMsg
-    | SocketCloseMsg;
+    | SocketCloseMsg
+    | JoinTokenConsumedMsg;

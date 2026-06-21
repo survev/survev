@@ -147,12 +147,19 @@ export class PlayerBarn {
         if (!joinData || joinData.expiresAt < Date.now()) {
             this.game.logger.warn("player tried to join without or with expired join token");
             socket.close();
+            this.game.notifyJoinTokenConsumed(joinMsg.matchPriv);
             if (joinData) {
                 this.game.joinTokens.delete(joinMsg.matchPriv);
             }
             return;
         }
         this.game.joinTokens.delete(joinMsg.matchPriv);
+        this.game.notifyJoinTokenConsumed(joinMsg.matchPriv);
+
+        if (this.game.hasParticipantConflict(joinData)) {
+            socket.closeWithReason("participant_conflict");
+            return;
+        }
 
         if (Config.rateLimitsEnabled) {
             const count = this.livingPlayers.filter(
@@ -219,6 +226,7 @@ export class PlayerBarn {
             joinData.quests,
         );
 
+        this.game.registerParticipant(joinData);
         this.activatePlayer(player, group, team);
         player.setLoadout(
             joinData.loadout ? joinData.loadout : joinMsg.loadout,
@@ -501,7 +509,11 @@ export class PlayerBarn {
         if (!group && groupData.autoFill) {
             const groups = team ? team.getGroups() : this.groups;
             group = groups.find((group) => {
-                return group.autoFill && group.canJoin(groupData.playerCount);
+                return (
+                    this.game.isEarlyJoinWindowOpen
+                    && group.autoFill
+                    && group.canJoin(groupData.playerCount)
+                );
             });
         }
 
@@ -2037,7 +2049,7 @@ export class Player extends BaseGameObject {
         // if we are in a valid spawn position (not on water, inside a building, etc)
         if (
             this.group?.players[0] === this
-            && this.game.canJoin
+            && this.game.canUpdateGroupSpawnAnchor
             && this.group.players.length < this.group.maxPlayers
         ) {
             this.group.spawnPositionTicker -= dt;

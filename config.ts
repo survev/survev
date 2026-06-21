@@ -60,6 +60,14 @@ export function getConfig(isProduction: boolean, dir: string) {
         },
         captchaEnabled: false,
         cachingEnabled: false,
+        matchmaking: {
+            lateJoinEnabled: true,
+            earlyJoinWindowSeconds: 60,
+            lateJoinMaxStartedTime: 120,
+            lateJoinMaxGasCircleIdx: 0,
+            lateJoinMinAliveCount: 4,
+            lateJoinTargetPlayers: 10,
+        },
         rateLimitsEnabled: isProduction,
         uniqueInGameNames: true,
         debug: {

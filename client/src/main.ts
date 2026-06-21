@@ -358,6 +358,10 @@ export class Application {
                 if (errMsg == "rate_limited") {
                     this.onJoinGameError(errMsg);
                 }
+                if (errMsg == "participant_conflict") {
+                    this.onJoinGameError("join_game_failed");
+                    return;
+                }
                 if (errMsg) {
                     this.showErrorModal(errMsg);
                     console.warn("Quitting", errMsg);
@@ -678,6 +682,7 @@ export class Application {
                 playerCount: 1,
                 autoFill: true,
                 gameModeIdx,
+                clientId: this.config.get("clientId"),
             };
 
             const tryQuickStartGameImpl = () => {
@@ -691,7 +696,7 @@ export class Application {
                             this.showIpBanModal(ban);
                             return;
                         }
-                        this.joinGame(matchData!);
+                        this.joinGame(matchData!, matchArgs);
                     });
                 });
             };
@@ -781,10 +786,14 @@ export class Application {
         );
     }
 
-    joinGame(matchData: FindGameMatchData) {
+    joinGame(
+        matchData: FindGameMatchData,
+        retryMatchArgs?: FindGameBody,
+        allowParticipantRetry = true,
+    ) {
         if (!this.game) {
             setTimeout(() => {
-                this.joinGame(matchData);
+                this.joinGame(matchData, retryMatchArgs, allowParticipantRetry);
             }, 250);
             return;
         }
@@ -809,6 +818,34 @@ export class Application {
                 matchData.data,
                 this.account.questPriv,
                 onFailure,
+                (reason) => {
+                    if (
+                        reason !== "participant_conflict"
+                        || !retryMatchArgs
+                        || !allowParticipantRetry
+                    ) {
+                        return false;
+                    }
+
+                    const excludeGameIds = [
+                        ...(retryMatchArgs.excludeGameIds ?? []),
+                        matchData.gameId,
+                    ];
+                    const nextMatchArgs = {
+                        ...retryMatchArgs,
+                        excludeGameIds,
+                    };
+
+                    this.findGame(nextMatchArgs, (err, nextMatchData, ban) => {
+                        if (err || ban || !nextMatchData) {
+                            this.onJoinGameError(err ?? "join_game_failed");
+                            return;
+                        }
+                        this.joinGame(nextMatchData, nextMatchArgs, false);
+                    });
+
+                    return true;
+                },
             );
         };
         joinGameImpl(urls, matchData);
@@ -820,6 +857,7 @@ export class Application {
             invalid_protocol: this.localization.translate("index-invalid-protocol"),
             invalid_captcha: this.localization.translate("index-invalid-captcha"),
             join_game_failed: this.localization.translate("index-failed-joining-game"),
+            participant_conflict: this.localization.translate("index-failed-joining-game"),
             rate_limited: this.localization.translate("index-rate-limited"),
         };
         if (err == "invalid_protocol") {

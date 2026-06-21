@@ -145,6 +145,7 @@ export class Game {
         matchPriv: string,
         questPriv: string,
         onConnectFail: () => void,
+        onJoinRejected?: (reason: string) => boolean,
     ) {
         if (!this.connecting && !this.connected && !this.initialized) {
             if (this.m_ws) {
@@ -202,6 +203,9 @@ export class Game {
                         onConnectFail();
                     } else if (connected && !this.m_gameOver && !displayingStats) {
                         const errMsg = this.m_disconnectMsg || "index-host-closed";
+                        if (!this.initialized && onJoinRejected?.(errMsg)) {
+                            return;
+                        }
                         this.onQuit(errMsg);
                     }
                 };

@@ -22,14 +22,22 @@ class ServerGame extends Game {
             id: this.id,
             teamMode: this.teamMode,
             mapName: this.mapName,
-            canJoin: this.canJoin,
+            canJoin: this.canAcceptMatchmakingPlayers,
             aliveCount: this.aliveCount,
             startedTime: this.startedTime,
             stopped: this.stopped,
+            participantRecords: this.participantRecordList,
         });
         if (this.stopped) {
             game = undefined;
         }
+    }
+
+    override notifyJoinTokenConsumed(token: string) {
+        sendMsg({
+            type: ProcessMsgType.JoinTokenConsumed,
+            token,
+        });
     }
 
     override async sendQuestProgress(userId: string, progress: Array<{ id: string; delta: number }>) {
@@ -214,7 +222,7 @@ process.on("message", (msg: ProcessMsg) => {
 
     switch (msg.type) {
         case ProcessMsgType.AddJoinToken:
-            game.addJoinTokens(msg.tokens, msg.autoFill);
+            game.addJoinTokens(msg.tokens, msg.autoFill, msg.reservationId);
             break;
         case ProcessMsgType.SocketOpen: {
             const socket = new ProcessSocket<Player | undefined>(msg.socketId, msg.ip);

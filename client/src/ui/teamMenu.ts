@@ -189,6 +189,7 @@ export class TeamMenu {
             // Load properties from config
             this.playerData = {
                 name: this.config.get("playerName"),
+                clientId: this.config.get("clientId"),
             };
             this.roomData = {
                 roomUrl,

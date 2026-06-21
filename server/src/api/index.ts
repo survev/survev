@@ -161,6 +161,7 @@ app.post("/api/find_game", validateParams(zFindGameBody), async (c) => {
             token,
             userId: user?.id || null,
             ip,
+            clientId: body.clientId,
         },
     ]);
 
@@ -170,6 +171,7 @@ app.post("/api/find_game", validateParams(zFindGameBody), async (c) => {
         mapName: mode.mapName,
         teamMode: mode.teamMode,
         autoFill: true,
+        excludeGameIds: body.excludeGameIds,
         playerData,
     });
 

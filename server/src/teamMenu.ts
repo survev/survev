@@ -62,6 +62,7 @@ class Player {
     disconnectTimeout: ReturnType<typeof setTimeout>;
 
     encodedIp: string;
+    clientId?: string;
 
     constructor(
         public socket: WSContext<SocketData>,
@@ -251,6 +252,7 @@ class Room {
                     token,
                     userId: player.userId,
                     ip: player.ip,
+                    clientId: player.clientId,
                 } satisfies FindGamePrivateBody["playerData"][0];
             }),
         );
@@ -546,6 +548,7 @@ export class TeamMenu {
                     }
 
                     player.setName(msg.data.playerData.name);
+                    player.clientId = msg.data.playerData.clientId;
 
                     const room = this.createRoom(msg.data.roomData);
                     room.addPlayer(player);
@@ -564,6 +567,7 @@ export class TeamMenu {
                         break;
                     }
                     player.setName(msg.data.playerData.name);
+                    player.clientId = msg.data.playerData.clientId;
 
                     room.addPlayer(player);
                 }

@@ -317,6 +317,42 @@ export interface ConfigType {
     cachingEnabled: boolean;
 
     /**
+     * Matchmaking behavior.
+     */
+    matchmaking: {
+        /**
+         * Allows fresh players to join already-started low-population games.
+         */
+        lateJoinEnabled: boolean;
+
+        /**
+         * Original early join window, also used by gameplay systems that should not
+         * be extended by late-join matchmaking.
+         */
+        earlyJoinWindowSeconds: number;
+
+        /**
+         * Latest started-game age, in seconds, that late join can target.
+         */
+        lateJoinMaxStartedTime: number;
+
+        /**
+         * Latest gas circle index that late join can target.
+         */
+        lateJoinMaxGasCircleIdx: number;
+
+        /**
+         * Do not late-join games already collapsing into endgame.
+         */
+        lateJoinMinAliveCount: number;
+
+        /**
+         * Stop backfilling started games once they reach this many alive players.
+         */
+        lateJoinTargetPlayers: number;
+    };
+
+    /**
      * If the turnstile captcha state is enabled.
      * Used by the API server and will be returned on site_info API.
      *

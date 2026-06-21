@@ -10,6 +10,8 @@ export const zFindGameBody = z.object({
     autoFill: z.boolean(),
     gameModeIdx: z.number(),
     turnstileToken: z.string().optional(),
+    clientId: z.string().optional(),
+    excludeGameIds: z.array(z.string()).optional(),
 });
 
 export type FindGameBody = z.infer<typeof zFindGameBody>;
@@ -47,6 +49,7 @@ export type FindGameError =
     | "full"
     | "invalid_protocol"
     | "join_game_failed"
+    | "participant_conflict"
     | "rate_limited"
     | "banned"
     | "behind_proxy"

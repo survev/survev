@@ -5,6 +5,11 @@ import { math } from "../../../shared/utils/math.ts";
 import { v2 } from "../../../shared/utils/v2.ts";
 import { Config } from "../config.ts";
 import { ServerLogger } from "../utils/logger.ts";
+import {
+    getParticipantKeys,
+    hasParticipantConflict,
+    type ParticipantRecord,
+} from "../utils/matchmaking.ts";
 import { type FindGamePrivateBody, type ServerGameConfig } from "../utils/types.ts";
 import { GameModeManager } from "./gameModeManager.ts";
 import { Grid } from "./grid.ts";
@@ -28,7 +33,9 @@ import type { ClientSocket } from "./socket.ts";
 export interface JoinTokenData {
     expiresAt: number;
     userId: string | null;
+    clientId?: string;
     findGameIp: string;
+    reservationId: string;
     loadout?: Loadout;
     quests?: string[];
     groupData: {
@@ -66,6 +73,7 @@ export class Game {
     netSyncWarnings = 0;
 
     joinTokens = new Map<string, JoinTokenData>();
+    participantRecords = new Map<string, string>();
 
     get aliveCount(): number {
         return this.playerBarn.livingPlayers.length;
@@ -331,12 +339,71 @@ export class Game {
         }
     }
 
-    get canJoin(): boolean {
+    get maxPlayers(): number {
+        return this.map.mapDef.gameMode.maxPlayers;
+    }
+
+    get participantRecordList(): ParticipantRecord[] {
+        return Array.from(this.participantRecords.entries()).map(([key, reservationId]) => ({
+            key,
+            reservationId,
+        }));
+    }
+
+    get isEarlyJoinWindowOpen(): boolean {
         return (
-            this.aliveCount < this.map.mapDef.gameMode.maxPlayers
+            this.aliveCount < this.maxPlayers
             && !this.over
-            && this.startedTime < 60
+            && !this.stopped
+            && this.startedTime < Config.matchmaking.earlyJoinWindowSeconds
         );
+    }
+
+    get canAcceptMatchmakingPlayers(): boolean {
+        if (this.aliveCount >= this.maxPlayers || this.over || this.stopped) return false;
+        if (this.isEarlyJoinWindowOpen) return true;
+        if (!Config.matchmaking.lateJoinEnabled || !this.started) return false;
+
+        const targetPlayers = Math.min(
+            this.maxPlayers,
+            Config.matchmaking.lateJoinTargetPlayers,
+        );
+        return (
+            this.startedTime <= Config.matchmaking.lateJoinMaxStartedTime
+            && this.gas.circleIdx <= Config.matchmaking.lateJoinMaxGasCircleIdx
+            && this.aliveCount >= Config.matchmaking.lateJoinMinAliveCount
+            && this.aliveCount < targetPlayers
+        );
+    }
+
+    get canUpdateGroupSpawnAnchor(): boolean {
+        return this.isEarlyJoinWindowOpen;
+    }
+
+    get canJoin(): boolean {
+        return this.canAcceptMatchmakingPlayers;
+    }
+
+    getJoinTokenParticipantKeys(joinData: JoinTokenData): string[] {
+        return getParticipantKeys({
+            userId: joinData.userId,
+            clientId: joinData.clientId,
+            ip: joinData.findGameIp,
+        });
+    }
+
+    hasParticipantConflict(joinData: JoinTokenData): boolean {
+        return hasParticipantConflict(
+            this.participantRecordList,
+            this.getJoinTokenParticipantKeys(joinData),
+            joinData.reservationId,
+        );
+    }
+
+    registerParticipant(joinData: JoinTokenData) {
+        for (const key of this.getJoinTokenParticipantKeys(joinData)) {
+            this.participantRecords.set(key, joinData.reservationId);
+        }
     }
 
     deserializeMsg(buff: ArrayBuffer): {
@@ -540,7 +607,11 @@ export class Game {
         }
     }
 
-    addJoinTokens(tokens: FindGamePrivateBody["playerData"], autoFill: boolean) {
+    addJoinTokens(
+        tokens: FindGamePrivateBody["playerData"],
+        autoFill: boolean,
+        reservationId: string,
+    ) {
         const groupData = {
             playerCount: tokens.length,
             groupHashToJoin: "",
@@ -551,6 +622,8 @@ export class Game {
             this.joinTokens.set(token.token, {
                 expiresAt: Date.now() + 10000,
                 userId: token.userId,
+                clientId: token.clientId,
+                reservationId,
                 groupData,
                 findGameIp: token.ip,
                 loadout: token.loadout,
@@ -558,6 +631,8 @@ export class Game {
             });
         }
     }
+
+    notifyJoinTokenConsumed(_token: string) {}
 
     stop() {
         if (this.stopped) return;

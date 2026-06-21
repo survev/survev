@@ -185,7 +185,7 @@ export class Team extends BasePlayerGroup {
             (p) => !p.downed && !p.disconnected,
         );
 
-        if (playersToPromote.length > 2 || this.game.canJoin) return;
+        if (playersToPromote.length > 2 || this.game.isEarlyJoinWindowOpen) return;
 
         const last1 = playersToPromote[0];
         const last2 = playersToPromote[1];

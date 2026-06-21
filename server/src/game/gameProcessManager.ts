@@ -6,6 +6,11 @@ import type { TeamMode } from "../../../shared/gameConfig.ts";
 import * as net from "../../../shared/net/net.ts";
 import { util } from "../../../shared/utils/util.ts";
 import { ServerLogger } from "../utils/logger.ts";
+import {
+    getParticipantKeys,
+    hasParticipantConflict,
+    type ParticipantRecord,
+} from "../utils/matchmaking.ts";
 import { type FindGamePrivateBody, type ServerGameConfig } from "../utils/types.ts";
 import { type GameData, type ProcessMsg, ProcessMsgType } from "./ipcTypes.ts";
 
@@ -33,6 +38,7 @@ class GameProcess {
         aliveCount: 0,
         startedTime: 0,
         stopped: false,
+        participantRecords: [],
     };
 
     state = ProcState.Idle;
@@ -46,7 +52,14 @@ class GameProcess {
 
     onCreatedCbs: Array<(_proc: typeof this) => void> = [];
 
-    avaliableSlots = 0;
+    pendingReservations = new Map<
+        string,
+        {
+            expiresAt: number;
+            reservationId: string;
+            keys: string[];
+        }
+    >();
 
     reusedCount = 0;
 
@@ -93,6 +106,9 @@ class GameProcess {
                     this.state = ProcState.Idle;
                 }
                 break;
+            case ProcessMsgType.JoinTokenConsumed:
+                this.pendingReservations.delete(msg.token);
+                break;
             case ProcessMsgType.ServerSocketMsg:
                 for (let i = 0; i < msg.msgs.length; i++) {
                     const socketMsg = msg.msgs[i];
@@ -133,22 +149,98 @@ class GameProcess {
         this.gameData.id = id;
         this.gameData.teamMode = config.teamMode;
         this.gameData.mapName = config.mapName;
+        this.gameData.canJoin = false;
+        this.gameData.aliveCount = 0;
+        this.gameData.startedTime = 0;
         this.gameData.stopped = false;
+        this.gameData.participantRecords = [];
+        this.pendingReservations.clear();
         this.state = ProcState.CreatingGame;
-
-        const mapDef = MapDefs[this.gameData.mapName as MapDefKey];
-        this.avaliableSlots = mapDef.gameMode.maxPlayers;
 
         this.reusedCount++;
     }
 
-    addJoinTokens(tokens: FindGamePrivateBody["playerData"], autoFill: boolean) {
+    get maxPlayers(): number {
+        const mapDef = MapDefs[this.gameData.mapName as MapDefKey];
+        return mapDef.gameMode.maxPlayers;
+    }
+
+    cleanupPendingReservations(now = Date.now()) {
+        for (const [token, reservation] of this.pendingReservations) {
+            if (reservation.expiresAt <= now) {
+                this.pendingReservations.delete(token);
+            }
+        }
+    }
+
+    get activePendingReservations(): number {
+        this.cleanupPendingReservations();
+        return this.pendingReservations.size;
+    }
+
+    get availableSlots(): number {
+        return this.maxPlayers - this.gameData.aliveCount - this.activePendingReservations;
+    }
+
+    get effectivePopulation(): number {
+        return this.gameData.aliveCount + this.activePendingReservations;
+    }
+
+    get participantAndPendingRecords(): ParticipantRecord[] {
+        this.cleanupPendingReservations();
+        const records = [...this.gameData.participantRecords];
+        for (const reservation of this.pendingReservations.values()) {
+            for (const key of reservation.keys) {
+                records.push({
+                    key,
+                    reservationId: reservation.reservationId,
+                });
+            }
+        }
+        return records;
+    }
+
+    hasParticipantConflict(body: FindGamePrivateBody & { reservationId: string }): boolean {
+        const records = this.participantAndPendingRecords;
+        const seenNonIpKeys = new Set<string>();
+
+        for (const player of body.playerData) {
+            const keys = getParticipantKeys(player);
+
+            for (const key of keys) {
+                if (key.startsWith("ip:")) continue;
+                if (seenNonIpKeys.has(key)) return true;
+                seenNonIpKeys.add(key);
+            }
+
+            if (hasParticipantConflict(records, keys, body.reservationId)) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    addJoinTokens(
+        tokens: FindGamePrivateBody["playerData"],
+        autoFill: boolean,
+        reservationId: string,
+    ) {
+        const expiresAt = Date.now() + 12000;
+        for (const token of tokens) {
+            this.pendingReservations.set(token.token, {
+                expiresAt,
+                reservationId,
+                keys: getParticipantKeys(token),
+            });
+        }
+
         this.send({
             type: ProcessMsgType.AddJoinToken,
             autoFill,
             tokens,
+            reservationId,
         });
-        this.avaliableSlots--;
     }
 
     handleSocketOpen(socketId: string, ip: string) {
@@ -309,24 +401,39 @@ export class GameProcessManager {
     }
 
     async findGame(body: FindGamePrivateBody): Promise<GameProcess> {
+        const request = {
+            ...body,
+            reservationId: body.reservationId ?? randomUUID(),
+        };
+
         let proc = this.processes
             .filter((proc) => {
                 const game = proc.gameData;
+                const excluded = request.excludeGameIds?.includes(game.id);
                 return (
+                    !excluded
+                    &&
                     (game.canJoin || proc.state === ProcState.CreatingGame)
-                    && proc.avaliableSlots > 0
-                    && game.teamMode === body.teamMode
-                    && game.mapName === body.mapName
+                    && proc.availableSlots >= request.playerData.length
+                    && !proc.hasParticipantConflict(request)
+                    && game.teamMode === request.teamMode
+                    && game.mapName === request.mapName
                 );
             })
             .sort((a, b) => {
-                return a.gameData.startedTime - b.gameData.startedTime;
+                const populationDiff = b.effectivePopulation - a.effectivePopulation;
+                if (populationDiff) return populationDiff;
+
+                const startedDiff = a.gameData.startedTime - b.gameData.startedTime;
+                if (startedDiff) return startedDiff;
+
+                return a.gameData.id.localeCompare(b.gameData.id);
             })[0];
 
         if (!proc) {
             proc = this.newGame({
-                teamMode: body.teamMode,
-                mapName: body.mapName as MapDefKey,
+                teamMode: request.teamMode,
+                mapName: request.mapName as MapDefKey,
             });
         }
 
@@ -335,13 +442,17 @@ export class GameProcessManager {
         if (proc.state !== ProcState.Running) {
             return await new Promise((resolve) => {
                 proc.onCreatedCbs.push((proc) => {
-                    proc.addJoinTokens(body.playerData, body.autoFill);
+                    proc.addJoinTokens(
+                        request.playerData,
+                        request.autoFill,
+                        request.reservationId,
+                    );
                     resolve(proc);
                 });
             });
         }
 
-        proc.addJoinTokens(body.playerData, body.autoFill);
+        proc.addJoinTokens(request.playerData, request.autoFill, request.reservationId);
 
         return proc;
     }

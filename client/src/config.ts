@@ -100,6 +100,7 @@ const defaultConfig = {
     touchAimStyle: "anywhere" as "locked" | "anywhere",
     touchAimLine: true,
     profile: null as { slug: string } | null,
+    clientId: "",
     playerName: "",
     region: "na",
     gameModeIdx: 2,
@@ -210,6 +211,10 @@ export class ConfigManager {
     checkUpgradeConfig() {
         // validation logic
         this.config.loadout = loadout.validate(this.config.loadout);
+        if (!this.config.clientId) {
+            this.config.clientId = crypto.randomUUID();
+            this.store();
+        }
 
         // seem not to be implemeted yet
         // this.get("version");
