@@ -10,9 +10,11 @@
     <img src="https://img.shields.io/badge/drizzle-%23C5F74F?style=for-the-badge&logo=drizzle&logoColor=black">
     <img src="https://img.shields.io/badge/vite-%23646CFF.svg?style=for-the-badge&logo=vite&logoColor=white">
 </div>
+<br />
 <div align="center">
     Open-source recreation of 2D top-down battle royale <a href="surviv.io">surviv.io</a>.
 </div>
+<br />
 
 ## Development
 Start the client dev server using `pnpm dev:client` and API / game servers with `pnpm dev:server`,  
