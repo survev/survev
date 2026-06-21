@@ -3,7 +3,7 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "build": "node --experimental-transform-types src/build.ts",
+    "build": "rolldown -c src/rolldown.config.ts",
     "typecheck": "tsc",
     "start:api": "node --enable-source-maps dist/index.js",
     "start:game": "node --enable-source-maps dist/gameServer.js",
@@ -43,7 +43,7 @@
     "@types/pg": "^8.20.0",
     "concurrently": "^9.2.1",
     "drizzle-kit": "^0.31.10",
-    "esbuild": "^0.27.7",
+    "rolldown": "^1.1.1",
     "unique-username-generator": "^1.5.1"
   }
 }
