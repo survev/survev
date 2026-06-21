@@ -311,7 +311,7 @@ export const PrivateRouter = new Hono<Context>()
                 return c.json({ banned: true, banData: banData, behindProxy: false });
             }
 
-            const isProxied = await isBehindProxy(ip, 0);
+            const isProxied = await isBehindProxy(ip, false);
             if (isProxied) {
                 return c.json({ banned: false, banData: undefined, behindProxy: true });
             }

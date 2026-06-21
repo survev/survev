@@ -30,7 +30,6 @@
     "nanotimer": "^0.3.15",
     "obscenity": "^0.4.6",
     "pg": "^8.21.0",
-    "proxycheck-ts": "^0.0.11",
     "redis": "^5.12.1",
     "slugify": "^1.6.9",
     "typescript": "^6.0.3",

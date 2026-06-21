@@ -1,37 +1,102 @@
-import ProxyCheck, { type IPAddressInfo } from "proxycheck-ts";
-import { util } from "../../../shared/utils/util.ts";
+import { assert, util } from "../../../shared/utils/util.ts";
 import { Config } from "../config.ts";
+import { fetchWithRetry } from "./fetchWithRetry.ts";
 import { defaultLogger } from "./logger.ts";
 
-const proxyCheck = Config.secrets.PROXYCHECK_KEY
-    ? new ProxyCheck({
-        api_key: Config.secrets.PROXYCHECK_KEY,
-    })
-    : undefined;
+type IpInfo = {
+    network: {
+        asn: string;
+        range: string;
+        hostname: string;
+        provider: string;
+        organisation: string;
+        type: string;
+    };
+    location: {
+        continent_name: string;
+        continent_code: string;
+        country_name: string;
+        country_code: string;
+        region_name: string;
+        region_code: string;
+        city_name: string;
+        postal_code: string;
+        latitude: number;
+        longitude: number;
+        timezone: string;
+        currency: {
+            name: string;
+            code: string;
+            symbol: string;
+        };
+    };
+    device_estimate: {
+        address: number;
+        subnet: number;
+    };
+    detections: {
+        proxy: boolean;
+        vpn: boolean;
+        compromised: boolean;
+        scraper: boolean;
+        tor: boolean;
+        hosting: boolean;
+        anonymous: boolean;
+        risk: number;
+        confidence: number;
+        first_seen: string;
+        last_seen: string;
+    };
+    detection_history: {
+        delisted: boolean;
+        delist_datetime: string;
+    };
+    attack_history: {
+        vulnerability_probing: number;
+    };
+    operator: null;
+    last_updated: string;
+};
+
+type ProxyCheckRes<IP extends string> =
+    & {
+        status: "ok" | "warning" | "denied" | "error";
+        query_time: number;
+    }
+    & {
+        [k in IP]: IpInfo;
+    };
 
 const proxyCheckCache = new Map<
     string,
     {
-        info: IPAddressInfo;
+        info: IpInfo;
         expiresAt: number;
     }
 >();
 
-export async function isBehindProxy(ip: string, vpn: 0 | 1 | 2 | 3): Promise<boolean> {
-    if (!proxyCheck) return false;
+async function fetchProxyCheck<IP extends string>(ip: IP) {
+    const url = new URL(`https://proxycheck.io/v3/${ip}`);
+    url.searchParams.set("key", Config.secrets.PROXYCHECK_KEY!);
+    const res = await fetchWithRetry(url);
 
-    let info: IPAddressInfo | undefined = undefined;
+    const data = await res.json();
+    return data as ProxyCheckRes<IP>;
+}
 
-    const key = `${ip}_${vpn}`;
+export async function isBehindProxy(ip: string, checkVpn: boolean): Promise<boolean> {
+    if (!Config.secrets.PROXYCHECK_KEY) return false;
+
+    let info: IpInfo | undefined = undefined;
+
+    const key = `${ip}_${checkVpn}`;
 
     const cached = proxyCheckCache.get(key);
     if (cached && cached.expiresAt > Date.now()) {
         info = cached.info;
     } else {
         try {
-            const proxyRes = await proxyCheck.checkIP(ip, {
-                vpn,
-            });
+            const proxyRes = await fetchProxyCheck(ip);
             switch (proxyRes.status) {
                 case "ok":
                 case "warning":
@@ -39,6 +104,7 @@ export async function isBehindProxy(ip: string, vpn: 0 | 1 | 2 | 3): Promise<boo
                     if (proxyRes.status === "warning") {
                         defaultLogger.warn(`ProxyCheck warning, res:`, proxyRes);
                     }
+                    assert(info.detections);
                     break;
                 case "denied":
                 case "error":
@@ -59,5 +125,7 @@ export async function isBehindProxy(ip: string, vpn: 0 | 1 | 2 | 3): Promise<boo
         });
     }
 
-    return info.proxy === "yes" || info.vpn === "yes";
+    if (checkVpn && info.detections.vpn) return true;
+
+    return info.detections.proxy;
 }

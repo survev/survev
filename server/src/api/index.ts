@@ -131,7 +131,7 @@ app.post("/api/find_game", validateParams(zFindGameBody), async (c) => {
         }
     }
 
-    if (await isBehindProxy(ip, user ? 0 : 3)) {
+    if (await isBehindProxy(ip, !user)) {
         return c.json<FindGameResponse>({ error: "behind_proxy" });
     }
 
