@@ -1,32 +1,34 @@
-# Open sourced surviv.io
-Survev.io is an open source recreation of a hit web game "surviv.io" that has been permanently shut down.
+<div align="center">
+    <img src="./client/public/img/survev_logo_full.png" alt="Survev logo" style="height: 200px;">
+</div>
+<hr />
+<div align="center">
+    <img src="https://img.shields.io/badge/node.js%20-%235FA04E.svg?style=for-the-badge&logo=nodedotjs&logoColor=white">
+    <img src="https://img.shields.io/badge/typescript-%233178C6?style=for-the-badge&logo=typescript&logoColor=white">
+    <img src="https://img.shields.io/badge/hono-%23E36002.svg?style=for-the-badge&logo=hono&logoColor=white">
+    <img src="https://img.shields.io/badge/jquery-%230769AD.svg?style=for-the-badge&logo=jquery&logoColor=white">
+    <img src="https://img.shields.io/badge/drizzle-%23C5F74F?style=for-the-badge&logo=drizzle&logoColor=black">
+    <img src="https://img.shields.io/badge/vite-%23646CFF.svg?style=for-the-badge&logo=vite&logoColor=white">
+</div>
+<div align="center">
+    Open-source recreation of 2D top-down battle royale <a href="surviv.io">surviv.io</a>.
+</div>
 
-Our goal is to immortalize it by getting the recreation as close as possible to the last canonical version of the game.
+## Development
+Start the client dev server using `pnpm dev:client` and API / game servers with `pnpm dev:server`,  
+or traverse into client and server directories individually to run `pnpm dev` in each.
 
-We do not consider any updates after the Kongregate acquisition canonical, so those will not be a part of the project.
-
-## Running locally
-
-start client development server with `pnpm dev:client`
-
-and server with `pnpm dev:server`
-
-or cd into server and client directories and run `pnpm dev` for each
-
-### Additional steps for accounts
-Accounts are optional, set `accountsEnabled` to false in config.ts to disable them. 
+### Accounts
+Accounts are optional. You can set `accountsEnabled` to `false` in `config.ts` to disable them.  
 If disabled, you can skip the steps below.
 
 First generate a private key and set encryptLoadoutSecret to it, this is used to encrypt loadouts.
 ```sh
 openssl rand -base64 10
 ```
- 
-After that, you need to create and populate the PostgreSQL database and apply the database schema.
 
-After [installing PostgreSQL](https://www.postgresql.org/download/), start the service and create a database:
-
-```bash
+After installing [PostgreSQL](https://www.postgresql.org), start the service and create a database:
+```sh
 sudo -u postgres initdb --locale=C.UTF-8 --encoding=UTF8 -D /var/lib/postgres/data --data-checksums
 
 systemctl enable --now postgresql.service
@@ -36,39 +38,40 @@ sudo -u postgres createdb survev -O survev
 ```
 
 Then populate the database with the schema:
+```sh
+cd server
 
-```bash
+# Run this everytime you make changes to schema.ts.
+pnpm run db:generate
+pnpm run db:migrate
 
- cd server
- 
- # run this everytime you make changes to the schema.ts
- pnpm run db:generate
- pnpm run db:migrate
-
- # start the server
- pnpm run dev
- # or
- # pnpm run dev:api
- # pnpm run dev:game
+# Start the server
+pnpm run dev
+# or
+# pnpm run dev:api
+# pnpm run dev:game
 ```
 
-to interact with the database through an interface
-```bash
- pnpm run db:studio 
+To interact with the database through an interface:
+```sh
+pnpm run db:studio 
 ```
 
-to wipe the db and start over run, useful when messing up things
-DO NOT RUN THIS IN PRODUCTION
-```bash
- # set database permissions
- sudo -u postgres psql -c "ALTER USER survev WITH PASSWORD 'survev';"
- pnpm run db:wipe
+To wipe the database and start over:
+```sh
+# Set database permissions.
+sudo -u postgres psql -c "ALTER USER survev WITH PASSWORD 'survev';"
+
+# Wipe database.
+pnpm run db:wipe
 ```
 
-### Additional steps for caching
-Caching is disabled by default, set cachingEnabled to true in config.ts to enable it.
+**NOTE:** Do not run this in production!
 
-First install redis:
+### Caching
+Caching is disabled by default. Set `cachingEnabled` to `true` in `config.ts` to use it.
+
+Install [Redis](https://redis.io):
 ```sh
 sudo apt install redis-server
 ```
@@ -78,5 +81,5 @@ Ensure Redis starts on boot and is running:
 systemctl enable --now redis-server
 ```
 
-## Production builds
+## Production
 See [HOSTING.md](./HOSTING.md)
