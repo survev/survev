@@ -4,14 +4,13 @@
   "type": "module",
   "scripts": {
     "typecheck": "tsc --noEmit",
-    "start": "tsx src/index.ts",
-    "dev": "tsx watch --clear-screen=false --include '../server/src/api/routes/private/*' --include ../survev-config.hjson src/index.ts",
-    "register-commands": "tsx src/register-commands.ts"
+    "start": "node --experimental-transform-types src/index.ts",
+    "dev": "node --watch --watch-preserve-output --watch-path=../survev-config.hjson --experimental-transform-types src/index.ts",
+    "register-commands": "node --experimental-transform-types src/register-commands.ts"
   },
   "dependencies": {
     "discord.js": "^14.26.4",
     "hono": "^4.12.25",
-    "tsx": "^4.22.4",
     "zod": "^4.4.3"
   }
 }

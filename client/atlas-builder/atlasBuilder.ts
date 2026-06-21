@@ -128,7 +128,7 @@ export class ImageManager {
             imagesPerThread = Math.ceil(imagesToRender.length / threadsLeft);
 
             const proc = cp.fork(Path.resolve(import.meta.dirname, "imageWorker.ts"), {
-                execArgv: ["--import", "tsx"],
+                execArgv: ["--experimental-transform-types"],
             });
 
             const promise = new Promise<void>((resolve) => {
@@ -302,7 +302,7 @@ export class AtlasManager {
 
             const proc = cp.fork(Path.resolve(import.meta.dirname, "atlasWorker.ts"), {
                 serialization: "advanced",
-                execArgv: ["--import", "tsx"],
+                execArgv: ["--experimental-transform-types"],
             });
 
             const promise = new Promise<void>((resolve) => {

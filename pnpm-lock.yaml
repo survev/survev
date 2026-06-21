@@ -14,9 +14,6 @@ importers:
       hjson:
         specifier: ^3.2.2
         version: 3.2.2
-      tsx:
-        specifier: ^4.22.4
-        version: 4.22.4
     devDependencies:
       '@types/hjson':
         specifier: ^2.4.6
@@ -45,9 +42,6 @@ importers:
       hono:
         specifier: ^4.12.25
         version: 4.12.25
-      tsx:
-        specifier: ^4.22.4
-        version: 4.22.4
       zod:
         specifier: ^4.4.3
         version: 4.4.3
@@ -97,9 +91,6 @@ importers:
       sharp:
         specifier: ^0.34.5
         version: 0.34.5
-      tsx:
-        specifier: ^4.22.4
-        version: 4.22.4
       turnstile-types:
         specifier: ^1.2.3
         version: 1.2.3
@@ -185,9 +176,6 @@ importers:
       esbuild:
         specifier: ^0.27.7
         version: 0.27.7
-      tsx:
-        specifier: ^4.22.4
-        version: 4.22.4
       unique-username-generator:
         specifier: ^1.5.1
         version: 1.5.1

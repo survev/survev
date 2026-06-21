@@ -4,7 +4,7 @@
   "type": "module",
   "description": "Open Source Surviv.io Server",
   "scripts": {
-    "survev-setup": "pnpm install && tsx setup.ts",
+    "survev-setup": "pnpm install && node --experimental-transform-types setup.ts",
     "dev": "concurrently \"pnpm run dev:api\" \"pnpm run dev:game\" \"pnpm run dev:client\"",
     "dev:server": "cd server && pnpm dev",
     "dev:api": "cd server && pnpm dev:api",
@@ -30,8 +30,7 @@
   },
   "dependencies": {
     "enquirer": "^2.4.1",
-    "hjson": "^3.2.2",
-    "tsx": "^4.22.4"
+    "hjson": "^3.2.2"
   },
   "workspaces": [
     "client",
