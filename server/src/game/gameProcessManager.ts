@@ -1,9 +1,7 @@
 import { type ChildProcess, fork } from "node:child_process";
 import { randomUUID } from "node:crypto";
-import type { WebSocket } from "uWebSockets.js";
 import { type MapDefKey, MapDefs } from "../../../shared/defs/mapDefs.ts";
 import type { TeamMode } from "../../../shared/gameConfig.ts";
-import type { GameWsDisconnectReason } from "../../../shared/types/api.ts";
 import { util } from "../../../shared/utils/util.ts";
 import { Config } from "../config.ts";
 import { ServerLogger } from "../utils/logger.ts";
@@ -109,22 +107,6 @@ class GameProcess {
                     this.state = ProcState.Idle;
                 }
                 break;
-            case ProcessMsgType.ServerSocketMsg:
-                for (let i = 0; i < msg.msgs.length; i++) {
-                    const socketMsg = msg.msgs[i];
-                    const socket = this.manager.sockets.get(socketMsg.socketId);
-
-                    if (!socket) continue;
-                    if (socket.getUserData().closed) continue;
-                    socket.send(socketMsg.data, true, false);
-                }
-                break;
-            case ProcessMsgType.SocketClose:
-                const socket = this.manager.sockets.get(msg.socketId);
-                if (socket && !socket.getUserData().closed) {
-                    socket.end(msg.reason ? 3000 : undefined, msg.reason);
-                }
-                break;
         }
     }
 
@@ -159,43 +141,9 @@ class GameProcess {
         });
         this.avaliableSlots--;
     }
-
-    handleSocketOpen(socketId: string, ip: string) {
-        this.send({
-            type: ProcessMsgType.SocketOpen,
-            socketId,
-            ip,
-        });
-    }
-
-    handleMsg(data: ArrayBuffer, socketId: string) {
-        this.send({
-            type: ProcessMsgType.ClientSocketMsg,
-            socketId,
-            data,
-        });
-    }
-
-    handleSocketClose(socketId: string) {
-        this.send({
-            type: ProcessMsgType.SocketClose,
-            socketId,
-        });
-    }
-}
-
-export interface GameSocketData {
-    gameId: string;
-    id: string;
-    closed: boolean;
-    rateLimit: Record<symbol, number>;
-    ip: string;
-    disconnectReason?: GameWsDisconnectReason;
 }
 
 export class GameProcessManager {
-    readonly sockets = new Map<string, WebSocket<GameSocketData>>();
-
     readonly processById = new Map<string, GameProcess>();
     readonly processes: GameProcess[] = [];
 
@@ -208,13 +156,6 @@ export class GameProcessManager {
     }
 
     constructor() {
-        process.on("exit", () => {
-            for (const socket of this.sockets.values()) {
-                if (socket.getUserData().closed) continue;
-                socket.end(3000, "server_restart");
-            }
-        });
-
         for (let i = 0; i < Config.gameServer.maxGames; i++) {
             this._freePorts.push(Config.gameServer.firstGamePort + i);
         }
@@ -313,13 +254,6 @@ export class GameProcessManager {
     }
 
     killProcess(gameProc: GameProcess, signal: NodeJS.Signals = "SIGTERM"): void {
-        for (const [, socket] of this.sockets) {
-            const data = socket.getUserData();
-            if (data.closed) continue;
-            if (data.gameId !== gameProc.gameData.id) continue;
-            socket.end(3000, "server_crashed");
-        }
-
         // send SIGTERM, if still hasn't terminated after 5 seconds, send SIGKILL >:3
         gameProc.process.kill(signal);
         setTimeout(() => {
@@ -376,30 +310,5 @@ export class GameProcessManager {
         proc.addJoinTokens(body.playerData, body.autoFill);
 
         return proc;
-    }
-
-    onOpen(socketId: string, socket: WebSocket<GameSocketData>): void {
-        const data = socket.getUserData();
-        const proc = this.processById.get(data.gameId);
-        if (proc === undefined) {
-            this.logger.warn("process not found, closing socket.");
-            socket.close();
-            return;
-        }
-        this.sockets.set(socketId, socket);
-        this.processById.get(data.gameId)?.handleSocketOpen(socketId, data.ip);
-    }
-
-    onMsg(socketId: string, msg: ArrayBuffer): void {
-        const data = this.sockets.get(socketId)?.getUserData();
-        if (!data) return;
-        this.processById.get(data.gameId)?.handleMsg(msg, socketId);
-    }
-
-    onClose(socketId: string) {
-        const data = this.sockets.get(socketId)?.getUserData();
-        this.sockets.delete(socketId);
-        if (!data) return;
-        this.processById.get(data.gameId)?.handleSocketClose(socketId);
     }
 }
