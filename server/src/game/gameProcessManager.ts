@@ -75,6 +75,11 @@ class GameProcess {
                     cb(this);
                 }
                 this.onCreatedCbs.length = 0;
+                if (this.reusedCount === 1) {
+                    this.manager.logger.info(
+                        `Process ${this.process.pid} created in ${Date.now() - this.createdTime}ms`,
+                    );
+                }
                 break;
             case ProcessMsgType.UpdateData:
                 if (this.gameData.id !== msg.id) {
