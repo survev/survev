@@ -1,9 +1,9 @@
 import { resolve } from "node:path";
-import { defineConfig, loadEnv, type Plugin, type ServerOptions } from "vite";
-import stripBlockPlugin from "vite-plugin-strip-block";
+import { defineConfig, loadEnv, PluginOption, type ServerOptions } from "vite";
 import { getConfig } from "../config.ts";
 import { version } from "../package.json";
 import { GIT_VERSION } from "../server/src/utils/gitRevision.ts";
+import { stripBlockPlugin } from "../shared/utils/stripBlockPlugin.ts";
 import { atlasBuilderPlugin } from "./atlas-builder/vitePlugin.ts";
 import { codefendPlugin } from "./vite-plugins/codefendPlugin.ts";
 import { ejsPlugin } from "./vite-plugins/ejsPlugin.ts";
@@ -28,7 +28,7 @@ export default defineConfig(({ mode }) => {
     process.env.VITE_SPELLSYNC_PROJECT_ID = Config.secrets.SPELLSYNC_PROJECT_ID;
     process.env.VITE_SPELLSYNC_PUBLIC_TOKEN = Config.secrets.SPELLSYNC_PUBLIC_TOKEN;
 
-    const plugins: Plugin[] = [ejsPlugin(), ...atlasBuilderPlugin()];
+    const plugins: PluginOption[] = [ejsPlugin(), ...atlasBuilderPlugin()];
 
     if (!isDev) {
         plugins.push(codefendPlugin());

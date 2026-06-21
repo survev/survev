@@ -4,5 +4,8 @@
   "type": "module",
   "dependencies": {
     "zod": "^4.4.3"
+  },
+  "devDependencies": {
+    "rolldown": "^1.1.5"
   }
 }
