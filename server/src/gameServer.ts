@@ -190,11 +190,6 @@ app.get("/private/status", (res, req) => {
     });
 });
 
-app.options("/api/find_game", (res) => {
-    uwsHelpers.cors(res);
-    res.end();
-});
-
 app.post("/api/find_game", (res, req) => {
     res.onAborted(() => {
         res.aborted = true;
