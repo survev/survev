@@ -1,7 +1,4 @@
-import { z } from "zod";
-import { Constants } from "../../shared/net/net.ts";
-import { type Item, ItemStatus, type Loadout } from "../utils/loadout.ts";
-import { loadoutSchema } from "./api.ts";
+import { type Item, type Loadout } from "../utils/loadout.ts";
 
 export type ProfileResponse =
     | {
@@ -23,10 +20,6 @@ export type ProfileResponse =
         items: Item[];
     };
 
-export const zUsernameRequest = z.object({
-    username: z.string().trim().min(1).max(Constants.PlayerNameMaxLen),
-});
-export type UsernameRequest = z.infer<typeof zUsernameRequest>;
 export type UsernameResponse =
     | {
         result: "success";
@@ -35,42 +28,10 @@ export type UsernameResponse =
         result: "failed" | "invalid" | "taken" | "change_time_not_expired";
     };
 
-export const zLoadoutRequest = z.object({ loadout: loadoutSchema });
-
-export type LoadoutRequest = z.infer<typeof zLoadoutRequest>;
-export type LoadoutResponse = {
-    loadout: Loadout;
-};
-
-export const zSetItemStatusRequest = z.object({
-    status: z.enum(ItemStatus),
-    itemTypes: z.array(z.string()).max(50),
-});
-
-export type SetItemStatusRequest = z.infer<typeof zSetItemStatusRequest>;
-export type SetItemStatusResponse = {};
-
 //
 // PASS
 //
 
-export const zSetQuestRequest = z.object({
-    questType: z.string(),
-    idx: z.number(),
-});
-export type SetQuestRequest = z.infer<typeof zSetQuestRequest>;
-export type SetQuestResponse = {};
-
-export const zSetPassUnlockRequest = z.object({
-    unlockType: z.string(),
-});
-export type SetPassUnlockRequest = z.infer<typeof zSetPassUnlockRequest>;
-export type SetPassUnlockResponse = { success: boolean };
-
-export const zGetPassRequest = z.object({
-    tryRefreshQuests: z.boolean(),
-});
-export type GetPassRequest = z.infer<typeof zGetPassRequest>;
 export type PassState = {
     type: string;
     level: number;
@@ -94,9 +55,3 @@ export type GetPassResponse = {
     pass: PassState;
     quests: QuestState[];
 };
-
-export const zRefreshQuestRequest = z.object({
-    idx: z.number(),
-});
-export type RefreshQuestRequest = z.infer<typeof zRefreshQuestRequest>;
-export type RefreshQuestResponse = { success: boolean };

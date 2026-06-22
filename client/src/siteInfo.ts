@@ -1,5 +1,5 @@
 import $ from "jquery";
-import { type MapDef, type MapDefKey, MapDefs } from "../../shared/defs/mapDefs.ts";
+import { type MapDefKey, MapDefs } from "../../shared/defs/mapDefs.ts";
 import { TeamModeToString } from "../../shared/defs/types/misc.ts";
 import type { SiteInfoRes } from "../../shared/types/api.ts";
 import { api } from "./api.ts";
@@ -19,7 +19,6 @@ export class SiteInfo {
 
     load() {
         const locale = this.localization.getLocale();
-        const siteInfoUrl = api.resolveUrl(`/api/site_info?language=${locale}`);
 
         const mainSelector = $("#server-opts");
         const teamSelector = $("#team-server-opts");
@@ -32,7 +31,8 @@ export class SiteInfo {
             teamSelector.append(elm);
         }
 
-        $.ajax(siteInfoUrl).done((data: SiteInfoRes) => {
+        const siteInfoUrl = api.resolveUrl(`/api/site_info?language=${locale}`);
+        fetch(siteInfoUrl).then(res => res.json()).then((data: SiteInfoRes) => {
             this.info = data || {};
             this.loaded = true;
             this.updatePageFromInfo();

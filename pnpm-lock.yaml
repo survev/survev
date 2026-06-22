@@ -66,6 +66,9 @@ importers:
       ejs:
         specifier: ^4.0.1
         version: 4.0.1
+      hono:
+        specifier: ^4.12.25
+        version: 4.12.25
       jquery:
         specifier: ^3.7.1
         version: 3.7.1

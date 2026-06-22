@@ -79,7 +79,7 @@ export const loadout = {
         }
         return validatedLoadout;
     },
-    validateWithAvailableItems: (userLoadout: Loadout, userItems: { type: string }[]) => {
+    validateWithAvailableItems: (userLoadout: Loadout, userItems: { type: string }[]): Loadout => {
         const unlockedItems = new Set([
             ...(userItems?.map((item) => item.type) || []),
             ...UnlockDefs.unlock_default.unlocks,
