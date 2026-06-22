@@ -143,7 +143,6 @@ export class Game {
     tryJoinGame(
         url: string,
         matchPriv: string,
-        questPriv: string,
         onConnectFail: () => void,
     ) {
         if (!this.connecting && !this.connected && !this.initialized) {
@@ -170,7 +169,6 @@ export class Game {
                     const joinMessage = new net.JoinMsg();
                     joinMessage.protocol = GameConfig.protocolVersion;
                     joinMessage.matchPriv = matchPriv;
-                    joinMessage.questPriv = questPriv;
                     joinMessage.name = name;
                     joinMessage.useTouch = device.touch;
                     joinMessage.isMobile = device.mobile || window.mobile!;

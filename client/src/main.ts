@@ -807,7 +807,6 @@ export class Application {
             this.game!.tryJoinGame(
                 url,
                 matchData.data,
-                this.account.questPriv,
                 onFailure,
             );
         };

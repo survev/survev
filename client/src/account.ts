@@ -98,7 +98,6 @@ export class Account {
     loadout = loadouts.defaultLoadout();
     items: Item[] = [];
     quests: Quest[] = [];
-    questPriv = "";
     pass: Record<string, PassType> = {};
 
     constructor(public config: ConfigManager) {}
@@ -329,13 +328,11 @@ export class Account {
         this.ajaxRequest("/api/user/get_pass", args, (err, res) => {
             this.pass = {};
             this.quests = [];
-            this.questPriv = "";
             if (err || !res.success) {
                 errorLogManager.storeGeneric("account", "get_pass_error");
             } else {
                 this.pass = res.pass || {};
                 this.quests = res.quests || [];
-                this.questPriv = res.questPriv || "";
                 this.quests.sort((a, b) => {
                     return a.idx - b.idx;
                 });
