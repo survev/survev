@@ -1,5 +1,5 @@
 import type { PassState, QuestState } from "../../shared/types/user.ts";
-import type { ItemStatus } from "../../shared/utils/loadout.ts";
+import type { Item, ItemStatus } from "../../shared/utils/loadout.ts";
 import { type Loadout, loadout as loadouts } from "../../shared/utils/loadout.ts";
 import { util } from "../../shared/utils/util.ts";
 import { api } from "./api.ts";
@@ -7,12 +7,21 @@ import type { ConfigManager } from "./config.ts";
 import { errorLogManager } from "./errorLogs.ts";
 import { helpers } from "./helpers.ts";
 import { proxy } from "./proxy.ts";
-import type { Item } from "./ui/loadoutMenu.ts";
 
 import { hc } from "hono/client";
 import type { UserRouterApp } from "../../server/src/api/routes/user/UserRouter.ts";
 
 type UserRouter = ReturnType<typeof hc<UserRouterApp>>;
+
+type AccountEventMap = {
+    request: (account: Account) => void;
+    requestsComplete: () => void;
+    login: (account: Account) => void;
+    loadout: (loadout: Loadout) => void;
+    items: (items: Item[]) => void;
+    error: (error: string, reason?: string) => void;
+    pass: (pass: PassState, quests: QuestState[], resetRefresh: boolean) => void;
+};
 
 export class Account {
     events: Record<string, Array<(...args: any[]) => void>> = {};
@@ -30,7 +39,7 @@ export class Account {
     loadout = loadouts.defaultLoadout();
     items: Item[] = [];
     quests: QuestState[] = [];
-    pass?: PassState = undefined;
+    pass = {} as PassState;
 
     router: UserRouter;
 
@@ -68,12 +77,18 @@ export class Account {
         }
     }
 
-    addEventListener(event: string, callback: (...args: any[]) => void) {
+    addEventListener<E extends keyof AccountEventMap>(
+        event: E,
+        callback: AccountEventMap[E],
+    ) {
         this.events[event] = this.events[event] || [];
         this.events[event].push(callback);
     }
 
-    removeEventListener(event: string, callback: () => void) {
+    removeEventListener<E extends keyof AccountEventMap>(
+        event: E,
+        callback: AccountEventMap[E],
+    ) {
         const listeners = this.events[event] || [];
         for (let i = listeners.length - 1; i >= 0; i--) {
             if (listeners[i] == callback) {
@@ -82,15 +97,9 @@ export class Account {
         }
     }
 
-    emit(event: string, ...args: any[]) {
+    emit<E extends keyof AccountEventMap>(event: E, ...args: Parameters<AccountEventMap[E]>): void {
         const listenersCopy = (this.events[event] || []).slice(0);
-        // const len = arguments.length;
-        // const data = Array(len > 1 ? len - 1 : 0);
-        // for (let i = 1; i < len; i++) {
-        //     data[i - 1] = arguments[i];
-        // }
         for (let i = 0; i < listenersCopy.length; i++) {
-            // listenersCopy[i].apply(listenersCopy, args);
             listenersCopy[i](...args);
         }
     }
@@ -143,7 +152,7 @@ export class Account {
     loadProfile() {
         this.loggingIn = !this.loggedIn;
         this.fetchApi("profile", {}, (err, data) => {
-            const a = this.loggingIn;
+            const wasLogginIn = this.loggingIn;
             this.loggingIn = false;
             this.loggedIn = false;
             this.profile = {} as this["profile"];
@@ -164,7 +173,7 @@ export class Account {
             if (!this.loggedIn) {
                 this.config.set("sessionCookie", null);
             }
-            if (a && this.loggedIn) {
+            if (wasLogginIn && this.loggedIn) {
                 this.emit("login", this);
             }
             this.emit("items", this.items);
@@ -261,18 +270,18 @@ export class Account {
 
     getPass(tryRefreshQuests: boolean) {
         this.fetchApi("get_pass", { json: { tryRefreshQuests } }, (err, res) => {
-            this.pass = undefined;
+            this.pass = {} as PassState;
             this.quests = [];
             if (err || !res.success) {
                 errorLogManager.storeGeneric("account", "get_pass_error");
             } else {
-                this.pass = res.pass || undefined;
+                this.pass = res.pass || {} as PassState;
                 this.quests = res.quests || [];
                 this.quests.sort((a, b) => {
                     return a.idx - b.idx;
                 });
                 this.emit("pass", this.pass, this.quests, true);
-                if (this.pass.newItems) {
+                if (this.pass?.newItems) {
                     this.loadProfile();
                 }
             }
@@ -299,7 +308,7 @@ export class Account {
                 this.getPass(false);
             } else {
                 // Give the pass UI a chance to update quests
-                this.emit("pass", this.pass, this.quests, false);
+                this.emit("pass", this.pass!, this.quests, false);
             }
         });
     }

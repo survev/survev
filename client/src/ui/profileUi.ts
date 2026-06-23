@@ -1,5 +1,5 @@
 import $ from "jquery";
-import loadout from "../../../shared/utils/loadout.ts";
+import loadout, { type Item } from "../../../shared/utils/loadout.ts";
 import type { Account } from "../account.ts";
 import { api } from "../api.ts";
 import { device } from "../device.ts";
@@ -359,7 +359,7 @@ export class ProfileUi {
         this.updateUserIcon();
     }
 
-    onItemsUpdated(items: Array<{ status: number }>) {
+    onItemsUpdated(items: Array<Item>) {
         let unconfirmedItemCount = 0;
         let unackedItemCount = 0;
         for (let i = 0; i < items.length; i++) {

@@ -4,6 +4,7 @@ import type { EmoteDef } from "../../../shared/defs/gameObjects/emoteDefs.ts";
 import { PassDefs } from "../../../shared/defs/gameObjects/passDefs.ts";
 import { QuestDefs } from "../../../shared/defs/gameObjects/questDefs.ts";
 import { GameObjectDefs } from "../../../shared/defs/register.ts";
+import type { PassState, QuestState } from "../../../shared/types/user.ts";
 import { math } from "../../../shared/utils/math.ts";
 import { passUtil } from "../../../shared/utils/passUtil.ts";
 import type { Account } from "../account.ts";
@@ -76,7 +77,7 @@ export class Pass {
         timer: {
             enabled: boolean;
             str: string;
-            displayed: boolean;
+            displayed?: boolean;
         };
         elems: Record<string, JQuery<HTMLElement>>;
         // elems: {
@@ -119,7 +120,7 @@ export class Pass {
             });
     }
 
-    onPass(pass: any, quests: any[], resetRefresh: boolean) {
+    onPass(pass: PassState, quests: QuestState[], resetRefresh: boolean) {
         const refreshOffset = 5 * 1000;
         const newQuests = [];
         let questAnimCount = 0;
@@ -142,7 +143,8 @@ export class Pass {
                     enabled: false,
                     str: "",
                 },
-            } as (typeof this.quests)[number];
+                elems: {},
+            } satisfies Partial<(typeof this.quests)[number]> as (typeof this.quests)[number];
             const curQuest = this.quests.find((existingQuest) => {
                 return (
                     existingQuest.data.idx == quest.data.idx

@@ -1,12 +1,13 @@
 import "@taufik-nurrohman/color-picker";
 import $ from "jquery";
 
+import type { GameObjectDef } from "../../../shared/defs/gameObjectDefs.ts";
 import { EmoteCategory, type EmoteDef } from "../../../shared/defs/gameObjects/emoteDefs.ts";
 import type { MeleeDef } from "../../../shared/defs/gameObjects/meleeDefs.ts";
-import type { UnlockDef } from "../../../shared/defs/gameObjects/unlockDefs.ts";
 import { GameObjectDefs } from "../../../shared/defs/register.ts";
 import { EmoteSlot, Rarity } from "../../../shared/gameConfig.ts";
-import type { ItemStatus } from "../../../shared/utils/loadout.ts";
+import type { PassState } from "../../../shared/types/user.ts";
+import type { Item } from "../../../shared/utils/loadout.ts";
 import { type Crosshair, type Loadout, loadout } from "../../../shared/utils/loadout.ts";
 import { util } from "../../../shared/utils/util.ts";
 import type { Account } from "../account.ts";
@@ -31,8 +32,13 @@ function emoteSlotToDomElem(e: Exclude<EmoteSlot, EmoteSlot.Count>) {
     return $(`#${domId}`);
 }
 
-function itemSort(sortFn: (a: Item, b: Item) => void) {
-    return function(a: Item, b: Item) {
+interface SortableItem {
+    type: string;
+    timeAcquired: number;
+}
+
+function itemSort(sortFn: (a: SortableItem, b: SortableItem) => number) {
+    return function(a: SortableItem, b: SortableItem) {
         // Always put stock items at the front of the list;
         // if not stock, sort by the given sort routine
         const rarityA = (GameObjectDefs.typeToDef(a.type) as EmoteDef).rarity || Rarity.Stock;
@@ -50,14 +56,14 @@ function itemSort(sortFn: (a: Item, b: Item) => void) {
     };
 }
 
-function sortAcquired(a: Item, b: Item) {
+function sortAcquired(a: SortableItem, b: SortableItem) {
     if (b.timeAcquired == a.timeAcquired) {
         return sortSubcat(a, b);
     }
     return b.timeAcquired - a.timeAcquired;
 }
 
-function sortAlphabetical(a: Item, b: Item) {
+function sortAlphabetical(a: SortableItem, b: SortableItem): number {
     const defA = GameObjectDefs.typeToDef(a.type) as EmoteDef;
     const defB = GameObjectDefs.typeToDef(b.type) as EmoteDef;
     if (defA.name! < defB.name!) {
@@ -69,7 +75,7 @@ function sortAlphabetical(a: Item, b: Item) {
     return 0;
 }
 
-function sortRarity(a: Item, b: Item) {
+function sortRarity(a: SortableItem, b: SortableItem) {
     const rarityA = (GameObjectDefs.typeToDef(a.type) as EmoteDef).rarity || Rarity.Stock;
     const rarityB = (GameObjectDefs.typeToDef(b.type) as EmoteDef).rarity || Rarity.Stock;
     if (rarityA == rarityB) {
@@ -78,7 +84,7 @@ function sortRarity(a: Item, b: Item) {
     return rarityB - rarityA;
 }
 
-function sortSubcat(a: Item, b: Item) {
+function sortSubcat(a: SortableItem, b: SortableItem) {
     const defA = GameObjectDefs.typeToDef(a.type) as EmoteDef;
     const defB = GameObjectDefs.typeToDef(b.type) as EmoteDef;
     if (!defA.category || !defB.category || defA.category == defB.category) {
@@ -87,20 +93,13 @@ function sortSubcat(a: Item, b: Item) {
     return defA.category - defB.category;
 }
 
-const sortTypes: Record<string, any> = {
+const sortTypes: Record<string, ReturnType<typeof itemSort>> = {
     newest: itemSort(sortAcquired),
     alpha: itemSort(sortAlphabetical),
     rarity: itemSort(sortRarity),
     subcat: itemSort(sortSubcat),
 };
 
-export interface Item {
-    type: string;
-    source: string;
-    timeAcquired: number;
-    status?: ItemStatus;
-    ackd?: ItemStatus.Ackd;
-}
 interface ItemInfo {
     type: string;
     loadoutType: string;
@@ -124,6 +123,7 @@ interface EquippedItem {
     subcat: EmoteCategory;
     displaySource?: string;
 }
+
 export class LoadoutMenu {
     initialized = false;
     active = false;
@@ -136,7 +136,11 @@ export class LoadoutMenu {
     confirmingItems = false;
     localAckItems: Item[] = [];
 
-    categories = [
+    categories: Array<{
+        loadoutType: Exclude<keyof Loadout, "emotes"> | "emote";
+        gameType: GameObjectDef["type"];
+        categoryImage: string;
+    }> = [
         {
             loadoutType: "outfit",
             gameType: "outfit",
@@ -459,7 +463,7 @@ export class LoadoutMenu {
         }
     }
 
-    onPass(pass: UnlockDef) {
+    onPass(pass: PassState) {
         // Show/hide the social media buttons based on whether we have
         // unlocked them
         const unlocks = ["facebook", "instagram", "youtube", "twitter"];
@@ -703,7 +707,7 @@ export class LoadoutMenu {
                 stroke: stroke.toFixed(2),
             };
         } else {
-            this.loadout[loadoutType as keyof Loadout] = this.selectedItem.type as any;
+            this.loadout[loadoutType] = this.selectedItem.type;
         }
 
         this.loadout = loadout.validate(this.loadout);

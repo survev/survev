@@ -10,8 +10,7 @@ export type Item = {
     type: string;
     timeAcquired: number;
     source: string;
-    status?: ItemStatus;
-    ackd?: ItemStatus.Ackd;
+    status: ItemStatus;
 };
 
 export type Loadout = z.infer<typeof loadoutSchema>;
@@ -124,7 +123,7 @@ export const loadout = {
                 type: unlock,
                 source: "unlock_default",
                 timeAcquired: 0,
-                ackd: loadout.ItemStatus.Ackd,
+                status: loadout.ItemStatus.Ackd,
             });
         }
         for (let i = 0; i < heroItems.length; i++) {
