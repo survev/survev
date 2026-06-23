@@ -223,24 +223,6 @@ export const ModerationRouter = new Hono()
             .execute();
         return c.json({ message: `IP ${encodedIp} has been unbanned.` }, 200);
     })
-    /**
-     * @deprecated
-     */
-    .post(
-        "/is_ip_banned",
-        validateParams(
-            z.object({
-                ip: z.string(),
-            }),
-        ),
-        async (c) => {
-            const { ip } = c.req.valid("json");
-
-            return c.json({
-                banned: (await isBanned(ip, false)) !== undefined,
-            });
-        },
-    )
     .post("/get_player_ip", validateParams(zGetPlayerIpParams), async (c) => {
         const { name, use_account_slug, game_id } = c.req.valid("json");
 
