@@ -984,6 +984,60 @@ export class Player extends BaseGameObject {
                 this.giveHaste(GameConfig.HasteType.Windwalk, 5);
                 break;
         }
+        
+        // A list of the new perks to add must be built first
+        const newPerks = new Set<string>();
+
+        // Random perk addition logiic
+        if (role === "classless") {
+            const perkPool = PerkProperties.classless.perkPool;
+            const candidatePerks = perkPool.filter((perk) => !this.hasPerk(perk));
+            const newPerk = util.randomItem(candidatePerks);
+
+            if (newPerk) {
+                newPerks.add(newPerk);
+            }
+        } else if (roleDef.perks) {
+            // client can only show 4 perks in the UI
+            // if this role has 4 or more perks, drop all our droppable perks
+            if (roleDef.perks.length >= 4) {
+                for (const perk of this.perks) {
+                    if (perk.droppable) {
+                        this.dropLoot(perk.type);
+                        this.removePerk(perk.type);
+                    }
+                }
+            }
+            for (let i = 0; i < roleDef.perks.length; i++) {
+                const perkOrPerkFunc = roleDef.perks[i];
+                const perkType = typeof perkOrPerkFunc === "string"
+                    ? perkOrPerkFunc
+                    : perkOrPerkFunc();
+
+                newPerks.add(perkType);
+            }
+        }
+        // Then, remove perks from the old role
+        // But skip perks that are going to be readded to avoid double adding them or removing / readding pointlessly.
+        for (let i = 0; i < this.perks.length; i++) {
+            const perkType = this.perks[i].type;
+            if (this.perks[i].isFromRole) {
+                if (role != "classless" && !newPerks.has(perkType)) {
+                    this.removePerk(perkType);
+                    i--;
+                } else {
+                    newPerks.delete(perkType);
+                }
+            } else if (this.perks[i].droppable && newPerks.has(perkType)) {
+                this.dropLoot(perkType);
+                this.removePerk(perkType);
+                i--;
+            }
+        }
+
+        for (const perk of newPerks) {
+            this.addPerk(perk, false, undefined, true);
+        }
 
         if (roleDef.defaultItems) {
             // for non faction modes where teamId > 2, just cycles between blue and red teamId
@@ -1077,60 +1131,6 @@ export class Player extends BaseGameObject {
                 }
                 this.weaponManager.setWeapon(i, trueWeapon.type, trueWeapon.ammo);
             }
-        }
-
-        // A list of the new perks to add must be built first
-        const newPerks = new Set<string>();
-
-        // Random perk addition logiic
-        if (role === "classless") {
-            const perkPool = PerkProperties.classless.perkPool;
-            const candidatePerks = perkPool.filter((perk) => !this.hasPerk(perk));
-            const newPerk = util.randomItem(candidatePerks);
-
-            if (newPerk) {
-                newPerks.add(newPerk);
-            }
-        } else if (roleDef.perks) {
-            // client can only show 4 perks in the UI
-            // if this role has 4 or more perks, drop all our droppable perks
-            if (roleDef.perks.length >= 4) {
-                for (const perk of this.perks) {
-                    if (perk.droppable) {
-                        this.dropLoot(perk.type);
-                        this.removePerk(perk.type);
-                    }
-                }
-            }
-            for (let i = 0; i < roleDef.perks.length; i++) {
-                const perkOrPerkFunc = roleDef.perks[i];
-                const perkType = typeof perkOrPerkFunc === "string"
-                    ? perkOrPerkFunc
-                    : perkOrPerkFunc();
-
-                newPerks.add(perkType);
-            }
-        }
-        // Then, remove perks from the old role
-        // But skip perks that are going to be readded to avoid double adding them or removing / readding pointlessly.
-        for (let i = 0; i < this.perks.length; i++) {
-            const perkType = this.perks[i].type;
-            if (this.perks[i].isFromRole) {
-                if (role != "classless" && !newPerks.has(perkType)) {
-                    this.removePerk(perkType);
-                    i--;
-                } else {
-                    newPerks.delete(perkType);
-                }
-            } else if (this.perks[i].droppable && newPerks.has(perkType)) {
-                this.dropLoot(perkType);
-                this.removePerk(perkType);
-                i--;
-            }
-        }
-
-        for (const perk of newPerks) {
-            this.addPerk(perk, false, undefined, true);
         }
     }
 
