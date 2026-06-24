@@ -984,7 +984,7 @@ export class Player extends BaseGameObject {
                 this.giveHaste(GameConfig.HasteType.Windwalk, 5);
                 break;
         }
-        
+
         // A list of the new perks to add must be built first
         const newPerks = new Set<string>();
 
