@@ -78,9 +78,21 @@ export class Obstacle extends BaseGameObject {
         seq: number;
         useOnce: boolean;
         useType: string;
+        useStyle?: "toggle" | "close" | "open";
+        useLock?: "lock" | "unlock";
+        useCooldown?: number;
+        resetAfterCooldown: boolean;
+        useExpiration?: number;
         isVat?: boolean;
         roleToPromote?: string;
         useDelay: number;
+        useDir: Vec2;
+    };
+
+    useExpirationTicker = 0;
+    memorizedDoorState?: {
+        open: boolean;
+        canUse: boolean;
         useDir: Vec2;
     };
 
@@ -100,9 +112,17 @@ export class Obstacle extends BaseGameObject {
     parentBuildingId?: number;
     parentBuilding?: Building;
 
-    toggleTicker = 0;
-    togglePlayer: Player | undefined = undefined;
-    toggleDir: Vec2 | undefined = undefined;
+    delayedDoorTicker = 0;
+    delayedDoorInteraction: {
+        player: Player | undefined;
+        dir: Vec2 | undefined;
+        type: "toggle" | "open" | "close";
+        lock?: "lock" | "unlock";
+    } = {
+        player: undefined,
+        dir: undefined,
+        type: "toggle",
+    };
 
     killTicker = 0;
     regrowTicker = 0;
@@ -197,6 +217,11 @@ export class Obstacle extends BaseGameObject {
                 seq: 1,
                 useOnce: def.button.useOnce,
                 useType: def.button.useType!,
+                useStyle: def.button.useStyle,
+                useLock: def.button.useLock,
+                useCooldown: def.button.useCooldown,
+                resetAfterCooldown: def.button.resetAfterCooldown ?? true,
+                useExpiration: def.button.useExpiration,
                 isVat: def.button.isVat,
                 roleToPromote: def.button.roleToPromote,
                 useDelay: def.button.useDelay,
@@ -209,10 +234,10 @@ export class Obstacle extends BaseGameObject {
     }
 
     update(dt: number): void {
-        if (this.toggleTicker > 0) {
-            this.toggleTicker -= dt;
+        if (this.delayedDoorTicker > 0) {
+            this.delayedDoorTicker -= dt;
 
-            if (this.toggleTicker < 0) {
+            if (this.delayedDoorTicker < 0) {
                 // for auto closing doors
                 // check if theres a player near by before closing
                 // to avoid it closing for a single tick to open again
@@ -224,7 +249,37 @@ export class Obstacle extends BaseGameObject {
                         && this.checkNearByPlayers()
                     )
                 ) {
-                    this.toggleDoor(this.togglePlayer, this.toggleDir);
+                    switch (this.delayedDoorInteraction.type) {
+                        case "toggle": {
+                            this.toggleDoor(
+                                this.delayedDoorInteraction.player,
+                                this.delayedDoorInteraction.dir,
+                            );
+                            break;
+                        }
+                        case "open": {
+                            this.openDoor(
+                                this.delayedDoorInteraction.player,
+                                this.delayedDoorInteraction.dir,
+                            );
+                            break;
+                        }
+                        case "close": {
+                            this.closeDoor(
+                                this.delayedDoorInteraction.player,
+                                this.delayedDoorInteraction.dir,
+                            );
+                            break;
+                        }
+                    }
+
+                    if (this.door && this.delayedDoorInteraction.lock) {
+                        const couldUse = this.door.canUse;
+                        this.door.canUse = this.delayedDoorInteraction.lock === "unlock";
+                        if (couldUse !== this.door.canUse) {
+                            this.setDirty();
+                        }
+                    }
                 }
             }
         }
@@ -250,13 +305,41 @@ export class Obstacle extends BaseGameObject {
 
         if (this.interactCooldown > 0) {
             this.interactCooldown -= dt;
+
+            if (this.isButton) {
+                this.button.canUse = !this.button.useOnce && this.interactCooldown < 0;
+
+                if (this.button.canUse && this.button?.resetAfterCooldown) {
+                    this.button.onOff = !this.button.onOff;
+                    this.button.seq++;
+                    this.setDirty();
+                }
+            }
+        }
+
+        if (this.useExpirationTicker > 0) {
+            this.useExpirationTicker -= dt;
+
+            if (this.useExpirationTicker < 0 && this.memorizedDoorState && this.isDoor) {
+                this.setDoorState(this.memorizedDoorState.open, undefined, this.memorizedDoorState.useDir);
+                this.door!.canUse = this.memorizedDoorState.canUse;
+                this.setDirty();
+            }
         }
     }
 
-    delayedToggle(delay: number, player?: Player, dir?: Vec2) {
-        this.toggleTicker = delay;
-        this.togglePlayer = player;
-        this.toggleDir = dir;
+    delayedInteraction(params: {
+        delay: number;
+        type?: "toggle" | "close" | "open";
+        player?: Player;
+        dir?: Vec2;
+        lock?: "lock" | "unlock";
+    }) {
+        this.delayedDoorTicker = params.delay;
+        this.delayedDoorInteraction.player = params.player;
+        this.delayedDoorInteraction.dir = params.dir;
+        this.delayedDoorInteraction.type = params.type ?? "toggle";
+        this.delayedDoorInteraction.lock = params.lock;
     }
 
     updateCollider() {
@@ -319,7 +402,7 @@ export class Obstacle extends BaseGameObject {
             );
 
             if (res) {
-                this.delayedToggle(this.door.autoCloseDelay);
+                this.delayedInteraction({ delay: this.door.autoCloseDelay });
                 return true;
             }
         }
@@ -611,7 +694,7 @@ export class Obstacle extends BaseGameObject {
 
         if (player && !auto) {
             if (this.interactCooldown > 0) return;
-            this.interactCooldown = 0.1;
+            this.interactCooldown = this.button?.useCooldown ?? 0.1;
         }
 
         if (
@@ -635,8 +718,8 @@ export class Obstacle extends BaseGameObject {
             this.interactedBy = player;
             this.setDirty();
             if (this.door.openDelay > 0) {
-                this.delayedToggle(this.door.openDelay, player);
-                this.toggleTicker = this.door.openDelay;
+                this.delayedInteraction({ delay: this.door.openDelay, player });
+                this.delayedDoorTicker = this.door.openDelay;
             } else {
                 this.toggleDoor(player);
             }
@@ -659,7 +742,7 @@ export class Obstacle extends BaseGameObject {
         this.button.onOff = !this.button.onOff;
         this.button.seq++;
 
-        if (this.button.useOnce) {
+        if (this.button.useOnce || this.button.useCooldown) {
             this.button.canUse = false;
         }
 
@@ -670,11 +753,21 @@ export class Obstacle extends BaseGameObject {
                     && obj.type === this.button.useType
                     && obj.isDoor
                 ) {
-                    obj.delayedToggle(
-                        this.button.useDelay,
-                        undefined,
-                        this.button.useDir,
-                    );
+                    if (this.button.useExpiration) {
+                        obj.useExpirationTicker = this.button.useExpiration + this.button.useDelay;
+                        const door = obj.door!;
+                        obj.memorizedDoorState = {
+                            open: door.open,
+                            canUse: door.canUse,
+                            useDir: v2.create(obj.door!.closedOri - obj.ori, 0),
+                        };
+                    }
+                    obj.delayedInteraction({
+                        type: this.button.useStyle ?? "toggle",
+                        delay: this.button.useDelay,
+                        dir: this.button.useDir,
+                        lock: this.button.useLock,
+                    });
                 }
             }
         }
@@ -708,7 +801,7 @@ export class Obstacle extends BaseGameObject {
         door.open = !door.open;
 
         if (door.autoClose && door.open) {
-            this.delayedToggle(door.autoCloseDelay, player);
+            this.delayedInteraction({ delay: door.autoCloseDelay, player });
         }
 
         if (door.slideToOpen) {
@@ -743,6 +836,27 @@ export class Obstacle extends BaseGameObject {
 
         this.checkLayer();
         this.setDirty();
+    }
+
+    openDoor(player?: Player, useDir?: Vec2): void {
+        if (!this.door) return;
+        if (this.door.open) return;
+
+        this.toggleDoor(player, useDir);
+    }
+
+    closeDoor(player?: Player, useDir?: Vec2): void {
+        if (!this.door) return;
+        if (!this.door.open) return;
+
+        this.toggleDoor(player, useDir);
+    }
+
+    setDoorState(open: boolean, player?: Player, useDir?: Vec2): void {
+        if (!this.door) return;
+        if (this.door.open === open) return;
+
+        this.toggleDoor(player, useDir);
     }
 
     updatePos(newPos: Vec2) {

@@ -81,18 +81,73 @@ export interface ObstacleDef {
     stonePlated?: boolean;
     aabb?: AABB;
     isTree?: boolean;
+    /**
+     * Configure intractability for this obstacle (used for buttons, control panels, etc).
+     *
+     * When interacted with, obstacles trigger an 'activation effect'; either a door opening,
+     * many doors opening, etc. Which obstacles are affected, how they are affected, and after
+     * how much time is all controlled by the properties on this object
+     */
     button?: {
         interactionRad: number;
         interactionText: string;
+        /**
+         * Whether the obstacle can only be interacted with once
+         */
         useOnce: boolean;
+        /**
+         * The type of obstacle to 'activate' when this obstacle is interacted with
+         *
+         * The definition of 'activate' depends on the obstacle in question and the
+         * other properties
+         */
         useType?: string;
+        /**
+         * What to do to doors which are triggered by this obstacle's interaction.
+         *
+         * @default "toggle"
+         */
+        useStyle?: "toggle" | "close" | "open";
+        /**
+         * Whether to lock or unlock doors triggered by this obstacle's interaction. `undefined`
+         * makes the interaction not touch the door's lock state.
+         *
+         * @default undefined
+         */
+        useLock?: "lock" | "unlock";
         /**
          * Will make interactions require the player to be completely inside the interactionRad
          */
         isVat?: boolean;
         roleToPromote?: string;
+        /**
+         * After the obstacle is interacted with, wait this many seconds before triggering the
+         * activation effect
+         */
         useDelay: number;
+        /**
+         * When simulating an interaction with a direction-sensitive obstacle (like a door),
+         * from what direction should the interaction pretend to come from?
+         */
         useDir: Vec2;
+        /**
+         * If specified, a period of time (in seconds) during which this obstacle cannot be
+         * interacted with again
+         */
+        useCooldown?: number;
+        /**
+         * If specified, indicates that obstacles should be 'deactivated' after this many seconds.
+         * Specifically, obstacles will return to the state they held before the activation caused
+         * by the interaction. The countdown starts after the use delay
+         */
+        useExpiration?: number;
+        /**
+         * If set to true, the obstacle is reset after its use cooldown expires. If there is
+         * no use cooldown, this property does nothing
+         *
+         * @default true
+         */
+        resetAfterCooldown?: boolean;
         useImg: string;
         sound: {
             on: string;
