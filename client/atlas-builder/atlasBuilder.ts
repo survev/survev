@@ -127,9 +127,7 @@ export class ImageManager {
             const images = imagesToRender.splice(0, imagesPerThread);
             imagesPerThread = Math.ceil(imagesToRender.length / threadsLeft);
 
-            const proc = cp.fork(Path.resolve(import.meta.dirname, "imageWorker.ts"), {
-                execArgv: ["--import", "tsx"],
-            });
+            const proc = cp.fork(Path.resolve(import.meta.dirname, "imageWorker.ts"));
 
             const promise = new Promise<void>((resolve) => {
                 proc.send(
@@ -302,7 +300,6 @@ export class AtlasManager {
 
             const proc = cp.fork(Path.resolve(import.meta.dirname, "atlasWorker.ts"), {
                 serialization: "advanced",
-                execArgv: ["--import", "tsx"],
             });
 
             const promise = new Promise<void>((resolve) => {

@@ -16,7 +16,7 @@
     "lint:ci": "oxlint; dprint check"
   },
   "engines": {
-    "node": ">=22.12.0"
+    "node": ">=22.18.0"
   },
   "author": "Leia",
   "license": "GPL-3.0-or-later",

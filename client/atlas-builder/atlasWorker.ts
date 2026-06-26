@@ -42,9 +42,11 @@ export class AtlasBuilder {
 
     atlases: WorkerToMainMsg[0]["data"] = [];
 
+    name: Atlas;
     def: AtlasDef;
 
-    constructor(public name: Atlas) {
+    constructor(name: Atlas) {
+        this.name = name;
         this.def = Atlases[name];
         this.packer = new MaxRectsPacker(4096, 4096, 8, {
             border: 8,
