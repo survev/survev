@@ -348,9 +348,44 @@ export class PlayerBarn {
                     );
                     if (promotablePlayers.length == 0) continue;
 
-                    const randomPlayer = promotablePlayers[
-                        util.randomInt(0, promotablePlayers.length - 1)
-                    ];
+                    // logic to combat people joining with multiple tabs to role farm
+                    const activePromotablePlayers = promotablePlayers.filter((player) => {
+                        const total = player.movingTicker + player.stayingStillTicker;
+                        if (total > 5) {
+                            // for players alive for more than 5 seconds, filter out the ones that have stayed still
+                            // for over 50% of the time
+                            const timeAfk = player.stayingStillTicker / total;
+                            if (timeAfk > 0.5) {
+                                return false;
+                            }
+                        }
+                        // also filter out players that haven't moved for the last 5 seconds
+                        if (player.timeWithoutMoving > 5) {
+                            return false;
+                        }
+
+                        // for people joining with the same account
+                        // only count their first join thats still connected
+                        if (player.userId) {
+                            const playersWithThisAccount = this.livingPlayers.filter(otherPlayer => {
+                                return !otherPlayer.disconnected && otherPlayer.userId === player.userId;
+                            });
+                            const thisIdx = playersWithThisAccount.indexOf(player);
+                            if (thisIdx !== 0) return false;
+                        }
+
+                        return true;
+                    });
+
+                    // if we don't have any active player to be promoted
+                    // then no harm in promoting possibly AFK players...
+                    const finalPlayers = activePromotablePlayers.length === 0
+                        ? promotablePlayers
+                        : activePromotablePlayers;
+
+                    if (!finalPlayers.length) continue;
+
+                    const randomPlayer = util.randomItem(finalPlayers)!;
                     randomPlayer.promoteToRole(scheduledRole.role);
                 }
             }
@@ -691,6 +726,11 @@ export class Player extends BaseGameObject {
 
     speed: number = 0;
     moveVel = v2.create(0, 0);
+
+    // used to filter out AFK players on 50v50 role promotions
+    movingTicker = 0;
+    stayingStillTicker = 0;
+    timeWithoutMoving = 0;
 
     shotSlowdownTimer: number = 0;
 
@@ -1987,10 +2027,17 @@ export class Player extends BaseGameObject {
         const hasTreeClimbing = this.hasPerk("tree_climbing");
 
         let steps: number;
-        if (movement.x !== 0 || movement.y !== 0) {
+
+        if (!v2.eq(movement, v2.create(0, 0))) {
             this.recalculateSpeed(hasTreeClimbing);
             steps = Math.round(math.max(this.speed * dt + 5, 5));
+
+            this.movingTicker += dt;
+            this.timeWithoutMoving = 0;
         } else {
+            this.timeWithoutMoving += dt;
+            this.stayingStillTicker += dt;
+
             this.speed = 0;
             steps = 1;
         }
