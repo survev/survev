@@ -5,21 +5,19 @@ on:
     types: [labeled, synchronize]
 
 jobs:
-  deploy-preview:
+  build-preview:
     if: contains(github.event.pull_request.labels.*.name, 'deploy-preview')
     runs-on: ubuntu-latest
-    concurrency: ci-deploy-${{ github.ref }}
+    concurrency: ci-build-deploy-${{ github.ref }}
     permissions:
       contents: read
-      pull-requests: write
-      deployments: write
-      id-token: write
 
     steps:
       - uses: actions/checkout@v7
         with:
           ref: ${{ github.event.pull_request.head.sha }}
           fetch-depth: 0
+          allow-unsafe-pr-checkout: true
 
       - name: Attempt merge with offline branch
         id: merge
@@ -68,6 +66,31 @@ jobs:
         with:
           path: ./client/node_modules/.atlas-cache/
           key: "atlas-cache-${{ github.run_id }}"
+
+      - uses: actions/upload-artifact@v7
+        with:
+          name: build-dist
+          path: ./client/dist
+
+  deploy-preview:
+    needs: build-preview
+    runs-on: ubuntu-latest
+    concurrency: ci-deploy-${{ github.ref }}
+    permissions:
+      contents: read
+      pull-requests: write
+      deployments: write
+      id-token: write
+    steps:
+      - uses: actions/checkout@v7
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v6
+
+      - uses: actions/download-artifact@v8
+        with:
+          name: build-dist
+          path: ./client/dist/
 
       - name: Deploy to Cloudflare Pages
         id: deploy
