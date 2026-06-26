@@ -2,6 +2,7 @@ import { Cron } from "croner";
 import { randomUUID } from "node:crypto";
 import { existsSync } from "node:fs";
 import fs from "node:fs/promises";
+import { EOL } from "node:os";
 import path from "node:path";
 import { App, SSLApp, type WebSocket } from "uWebSockets.js";
 import pkgJson from "../../package.json" with { type: "json" };
@@ -441,3 +442,12 @@ new Cron("0 * * * *", async () => {
         server.logger.error("Failed to save lost games", err);
     }
 });
+
+if (process.env.NODE_ENV !== "production") {
+    process.stdin.on("data", async (data) => {
+        if (data.toString() == EOL) {
+            // make nodejs watcher restart
+            await fs.writeFile(path.resolve(import.meta.dirname, "./game/restart.tmp"), "");
+        }
+    });
+}

@@ -6,6 +6,9 @@ import { getCookie } from "hono/cookie";
 import { cors } from "hono/cors";
 import { HTTPException } from "hono/http-exception";
 import { randomUUID } from "node:crypto";
+import fs from "node:fs/promises";
+import { EOL } from "node:os";
+import path from "node:path";
 import pkgJson from "../../../package.json" with { type: "json" };
 import { type FindGameResponse, type SiteInfoRes, zFindGameBody } from "../../../shared/types/api.ts";
 import { Config } from "../config.ts";
@@ -246,3 +249,12 @@ new Cron("0 0 * * *", async () => {
 server.logger.info(`Survev API Server v${pkgJson.version} - GIT ${GIT_VERSION}`);
 server.logger.info(`Listening on ${Config.apiServer.host}:${Config.apiServer.port}`);
 server.logger.info("Press Ctrl+C to exit.");
+
+if (process.env.NODE_ENV !== "production") {
+    process.stdin.on("data", async (data) => {
+        if (data.toString() == EOL) {
+            // make nodejs watcher restart
+            await fs.writeFile(path.resolve(import.meta.dirname, "./restart.tmp"), "");
+        }
+    });
+}

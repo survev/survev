@@ -3,19 +3,19 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "build": "tsx src/build.ts",
+    "build": "rolldown -c src/rolldown.config.ts",
     "typecheck": "tsc",
     "start:api": "node --enable-source-maps dist/index.js",
     "start:game": "node --enable-source-maps dist/gameServer.js",
     "dev": "concurrently \"pnpm run dev:api\" \"pnpm run dev:game\"",
-    "dev:api": "tsx watch --clear-screen=false --include ../survev-config.hjson src/api/index.ts",
-    "dev:game": "tsx watch --clear-screen=false --include ../survev-config.hjson --include ./src/game --include ../shared src/gameServer.ts",
+    "dev:api": "node --watch --watch-preserve-output --watch-path=../survev-config.hjson --watch-path=./src/api --experimental-transform-types src/api/index.ts",
+    "dev:game": "node --watch --watch-preserve-output --watch-path=../survev-config.hjson --watch-path=./src/game --watch-path=../shared --experimental-transform-types src/gameServer.ts",
     "db:generate": "drizzle-kit generate --config=src/api/drizzle.config.ts",
     "db:migrate": "drizzle-kit migrate --config=src/api/drizzle.config.ts",
-    "db:seed": "tsx src/api/db/seed.ts",
+    "db:seed": "node --experimental-transform-types src/api/db/seed.ts",
     "db:studio": "drizzle-kit studio --config=src/api/drizzle.config.ts",
-    "db:wipe": "rm -rf src/api/db/drizzle && tsx src/api/db/wipe.ts",
-    "stressTest": "tsx src/stressTest.ts",
+    "db:wipe": "rm -rf src/api/db/drizzle && node --experimental-transform-types src/api/db/wipe.ts",
+    "stressTest": "node --experimental-transform-types src/stressTest.ts",
     "lint": "cd .. && pnpm lint"
   },
   "dependencies": {
@@ -43,8 +43,7 @@
     "@types/pg": "^8.20.0",
     "concurrently": "^9.2.1",
     "drizzle-kit": "^0.31.10",
-    "esbuild": "^0.27.7",
-    "tsx": "^4.22.4",
+    "rolldown": "^1.1.1",
     "unique-username-generator": "^1.5.1"
   }
 }
