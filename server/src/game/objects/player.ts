@@ -3009,7 +3009,7 @@ export class Player extends BaseGameObject {
         this.cancelAction();
 
         this.weaponManager.throwThrowable();
-        this.weaponManager.setCurWeapIndex(GameConfig.WeaponSlot.Melee);
+        this.weaponManager.setCurWeapIndex(GameConfig.WeaponSlot.Melee, true);
 
         if (this.weapons[GameConfig.WeaponSlot.Melee].type === "pan") {
             this.wearingPan = true;
