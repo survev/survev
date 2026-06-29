@@ -164,6 +164,11 @@ const Sounds: Record<string, Record<string, SoundDef>> = {
             path: "audio/guns/deagle_switch_01.mp3",
             volume: 1,
         },
+        barrett_01: {
+            path: "audio/guns/barrett_01.mp3",
+            volume: 0.75,
+            maxInstances: 2,
+        },
         flare_gun_01: {
             path: "audio/guns/flare_gun_01.mp3",
             volume: 1,
