@@ -79,6 +79,9 @@ export const SharedAtlas: AtlasDef = {
         "map/map-case-hatchet-res-01.svg",
         "map/map-case-ring-01.svg",
 
+        "map/map-chair-01.svg",
+        "map/map-chair-02.svg",
+
         "map/map-chest-01.svg",
         "map/map-chest-02.svg",
         "map/map-chest-03.svg",
@@ -238,6 +241,8 @@ export const SharedAtlas: AtlasDef = {
         "map/map-tree-07su.svg",
         "map/map-tree-08su.svg",
         "map/map-tree-09.svg",
+        "map/map-tree-13.svg",
+        "map/map-tree-14.svg",
         "map/map-tree-res-01.svg",
         "map/map-tree-res-02.svg",
 
@@ -278,11 +283,13 @@ export const SharedAtlas: AtlasDef = {
         "map/map-wall-13.svg",
         "map/map-wall-14-rounded.svg",
         "map/map-wall-14.svg",
+        "map/map-wall-16-rounded.svg",
         "map/map-wall-18.svg",
+        "map/map-wall-glass-9.svg",
         "map/map-wall-glass-10.svg",
         "map/map-wall-glass-12-2.svg",
         "map/map-wall-glass-12.svg",
-        "map/map-wall-glass-9.svg",
+        "map/map-wall-glass-13.svg",
         "map/map-wall-outhouse-bot.svg",
         "map/map-wall-outhouse-side.svg",
         "map/map-wall-outhouse-top.svg",

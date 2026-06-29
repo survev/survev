@@ -14,6 +14,11 @@ export const GradientAtlas: AtlasDef = {
         "map/map-light-01.svg",
         "map/map-plane-01.svg",
         "map/map-plane-02.svg",
+
+        "map/map-table-01d.svg",
+        "map/map-table-05.svg",
+        "map/map-decal-pipe.svg",
+
         // dont use the svg because it breaks with node-canvas due to the embedded base64 png
         "map/map-decal-flyer-01.png",
     ],

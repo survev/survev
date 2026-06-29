@@ -11,7 +11,6 @@ export const BeachAtlas: AtlasDef = {
         "map/map-tree-01.svg",
         "map/map-tree-01x.svg",
         "map/map-tree-13x.svg",
-        "map/map-tree-14.svg",
         "map/map-tree-14x.svg",
     ],
 };

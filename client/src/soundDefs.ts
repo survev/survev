@@ -1613,6 +1613,16 @@ const Sounds: Record<string, Record<string, SoundDef>> = {
             volume: 1,
             preload: false,
         },
+        reserve_music_01: {
+            path: "audio/ambient/reserve_music_01.mp3",
+            volume: 0.66,
+            preload: false,
+        },
+        reserve_music_02: {
+            path: "audio/ambient/reserve_music_02.mp3",
+            volume: 0.66,
+            preload: false,
+        },
         ambient_lab_01: {
             path: "audio/ambient/ambient_lab_01.mp3",
             volume: 0.2,

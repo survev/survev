@@ -606,6 +606,12 @@ export const Main: MapDef = {
             { name: "scorpion", count: 1, weight: 5 }, // ?
             { name: "ots38_dual", count: 1, weight: 4.5 },
         ],
+        tier_airdrop_crimson: [
+            { name: "deagle_dual", count: 1, weight: 1 },
+            { name: "ash12", count: 1, weight: 1 },
+            { name: "sw500", count: 1, weight: 1 },
+            { name: "barrett", count: 1, weight: 1 },
+        ],
         tier_airdrop_mythic: [
             { name: "usas", count: 1, weight: 1 },
             { name: "scarssr", count: 1, weight: 1 },
@@ -655,6 +661,7 @@ export const Main: MapDef = {
         tier_saloon: [
             { name: "vector45", count: 1, weight: 1 },
             { name: "mkg45", count: 1, weight: 1 },
+            { name: "tier_airdrop_crimson", count: 1, weight: 0.22 },
         ],
         tier_cattle_crate: [
             { name: "m1a1", count: 1, weight: 1 },
@@ -741,6 +748,14 @@ export const Main: MapDef = {
             { name: "bonus_45", count: 1, weight: 1 },
             { name: "high_velocity", count: 1, weight: 1 },
         ],
+        tier_crimson_perks: [
+            { name: "ap_rounds", count: 1, weight: 1 },
+            { name: "splinter", count: 1, weight: 1 },
+            { name: "steelskin", count: 1, weight: 1 },
+            { name: "takedown", count: 1, weight: 1 },
+            { name: "windwalk", count: 1, weight: 1 },
+            { name: "field_medic", count: 1, weight: 1 },
+        ],
         tier_potato_perks: [
             { name: "", count: 1, weight: 25 },
             { name: "tier_perks", count: 1, weight: 1 },
@@ -766,6 +781,18 @@ export const Main: MapDef = {
             { name: "bayonet_rugged", count: 1, weight: 1 },
             { name: "karambit_drowned", count: 1, weight: 1 },
             { name: "karambit_prismatic", count: 1, weight: 1 },
+        ],
+        tier_revolvers: [
+            { name: "ot38", count: 1, weight: 5 },
+            { name: "colt45", count: 1, weight: 5 },
+            { name: "ots38", count: 1, weight: 2 },
+            { name: "sw500", count: 1, weight: 0.5 },
+        ],
+        tier_toilet_gold: [
+            { name: "", count: 1, weight: 0.95 },
+            { name: "awc", count: 1, weight: 0.02 },
+            { name: "garand", count: 1, weight: 0.02 },
+            { name: "m9", count: 1, weight: 0.01 },
         ],
         tier_knives: [],
     },

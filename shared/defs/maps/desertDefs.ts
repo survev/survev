@@ -15,6 +15,8 @@ const mapDef: PartialMapDef = {
     },
     assets: {
         audio: [
+            { name: "reserve_music_01", channel: "ambient" },
+            { name: "reserve_music_02", channel: "ambient" },
             { name: "piano_02", channel: "sfx" },
             { name: "log_03", channel: "sfx" },
             { name: "log_04", channel: "sfx" },
@@ -57,8 +59,9 @@ const mapDef: PartialMapDef = {
                 },
             ],
             crates: [
-                { name: "airdrop_crate_01", weight: 10 },
+                { name: "airdrop_crate_01", weight: 16 },
                 { name: "airdrop_crate_02de", weight: 1 },
+                { name: "airdrop_crate_05", weight: 1 },
             ],
         },
     },
@@ -290,8 +293,9 @@ const mapDef: PartialMapDef = {
         ],
         fixedSpawns: [
             {
-                warehouse_01: 4,
-                house_red_01: 3,
+                warehouse_01: 2,
+                warehouse_03: 1,
+                house_red_01: 2,
                 house_red_02: 1,
                 barn_01: 1,
                 barn_02d: 1,

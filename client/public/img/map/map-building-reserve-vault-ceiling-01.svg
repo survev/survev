@@ -1,0 +1,139 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg
+   width="528"
+   height="512"
+   viewBox="0 0 139.70001 135.46684"
+   version="1.1"
+   id="svg139"
+   sodipodi:docname="map-building-reserve-vault-ceiling-01.svg"
+   inkscape:version="1.4 (e7c3feb1, 2024-10-09)"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns:xlink="http://www.w3.org/1999/xlink"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:dc="http://purl.org/dc/elements/1.1/">
+  <metadata
+     id="metadata143">
+    <rdf:RDF>
+      <cc:Work
+         rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type
+           rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+      </cc:Work>
+    </rdf:RDF>
+  </metadata>
+  <sodipodi:namedview
+     pagecolor="#ffffff"
+     bordercolor="#666666"
+     borderopacity="1"
+     objecttolerance="10"
+     gridtolerance="10"
+     guidetolerance="10"
+     inkscape:pageopacity="0"
+     inkscape:pageshadow="2"
+     inkscape:window-width="1920"
+     inkscape:window-height="1022"
+     id="namedview141"
+     showgrid="true"
+     inkscape:showpageshadow="false"
+     inkscape:zoom="0.16540845"
+     inkscape:cx="1862.0572"
+     inkscape:cy="450.4002"
+     inkscape:window-x="0"
+     inkscape:window-y="128"
+     inkscape:window-maximized="1"
+     inkscape:current-layer="svg139"
+     fit-margin-top="0"
+     fit-margin-left="0"
+     fit-margin-right="0"
+     fit-margin-bottom="0"
+     inkscape:object-paths="true"
+     inkscape:snap-intersection-paths="true"
+     inkscape:snap-smooth-nodes="true"
+     inkscape:snap-midpoints="true"
+     inkscape:pagecheckerboard="0"
+     inkscape:deskcolor="#d1d1d1"
+     showguides="true">
+    <inkscape:grid
+       type="xygrid"
+       id="grid950"
+       empspacing="8"
+       spacingy="1.0583347"
+       spacingx="1.0583333"
+       originx="-5.8025057e-06"
+       originy="8.4666796"
+       units="px"
+       visible="true" />
+  </sodipodi:namedview>
+  <defs
+     id="defs95">
+    <pattern
+       xlink:href="#a-9"
+       id="c-7"
+       patternTransform="matrix(0.17004321,-0.17004321,0.17004321,0.17004321,28.589979,43.51029)" />
+    <pattern
+       patternUnits="userSpaceOnUse"
+       width="175.039"
+       height="75.039"
+       patternTransform="translate(108.576 213.448) scale(.26458)"
+       id="a-9">
+      <path
+         d="M0 0h175.039v15.04H0z"
+         fill="#fff"
+         id="path1-38" />
+      <path
+         d="M0 11.84h175.039v3.12H0z"
+         fill="#191919"
+         id="path2-02" />
+      <path
+         d="M0 15.04h175.039V60H0z"
+         fill="#b1b1b1"
+         id="path3-4" />
+      <path
+         d="M0 60h175.039v15.04H0z"
+         fill="#fff"
+         id="path4-83" />
+      <path
+         d="M0 60h175.039v3.2H0z"
+         fill="#191919"
+         id="path5-90" />
+    </pattern>
+    <clipPath
+       clipPathUnits="userSpaceOnUse"
+       id="clipPath1">
+      <path
+         d="M 139.69981,1.0583672 H -3.5063544e-4 V 136.52521 H 139.69981 l 6e-5,-46.557065 -5.29167,-1.19e-4 c -1.75893,-4e-5 -3.17496,-1.416028 -3.17496,-3.174959 l -1.1e-4,-36.002673 c -10e-6,-1.758928 1.41603,-3.175009 3.17496,-3.17497 l 5.29167,1.19e-4 z"
+         fill="#cbcbcb"
+         fill-opacity="0.99"
+         stroke-width="4.28583"
+         id="path2"
+         sodipodi:nodetypes="cccccsssscc" />
+    </clipPath>
+  </defs>
+  <path
+     inkscape:connector-curvature="0"
+     id="path2443-2-1-5-8-1"
+     d="M -67.73401,14.693213 H 169.33293 V -61.506886 H -67.73401 Z"
+     style="fill:none;fill-opacity:1;stroke-width:4.049"
+     sodipodi:nodetypes="ccccc" />
+  <path
+     d="m 101.59985,524.93426 -8e-5,389.4667 355.60012,-1e-5 8e-5,-389.4667 H 321.73326 v -25.4 h -84.66668 v 25.4 z"
+     id="path208-2"
+     inkscape:connector-curvature="0"
+     style="fill:none;fill-opacity:1"
+     sodipodi:nodetypes="ccccccccc" />
+  <path
+     d="M 139.69981,1.0583672 H -3.4947763e-4 L -4.5747825e-4,136.50587 H 139.6997 l 6e-5,-46.557057 -5.29167,-1.19e-4 c -1.75892,-3.9e-5 -3.17496,-1.41604 -3.17496,-3.17496 l -1.1e-4,-36.002749 c -1e-5,-1.75893 1.41605,-3.181408 3.17496,-3.17496 l 5.29178,0.0194 z"
+     clip-path="url(#clipPath1)"
+     fill="url(#c)"
+     stroke="#191919"
+     stroke-width="3.17496"
+     id="path7-27"
+     style="fill:url(#c-7);stroke-width:2.11667;stroke-dasharray:none"
+     sodipodi:nodetypes="cccccsssscc"
+     transform="translate(3.1330043e-4,-1.0486954)" />
+</svg>

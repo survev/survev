@@ -1,0 +1,192 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg
+   width="160"
+   height="160"
+   viewBox="0 0 42.333 42.33375"
+   version="1.1"
+   id="svg5"
+   sodipodi:docname="map-table-01d.svg"
+   inkscape:version="1.4 (e7c3feb1, 2024-10-09)"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns:xlink="http://www.w3.org/1999/xlink"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg">
+  <sodipodi:namedview
+     id="namedview5"
+     pagecolor="#ffffff"
+     bordercolor="#000000"
+     borderopacity="0.25"
+     inkscape:showpageshadow="2"
+     inkscape:pageopacity="0.0"
+     inkscape:pagecheckerboard="0"
+     inkscape:deskcolor="#d1d1d1"
+     showguides="true"
+     inkscape:zoom="1.8255434"
+     inkscape:cx="152.28342"
+     inkscape:cy="104.35249"
+     inkscape:window-width="1920"
+     inkscape:window-height="1022"
+     inkscape:window-x="0"
+     inkscape:window-y="128"
+     inkscape:window-maximized="1"
+     inkscape:current-layer="g2" />
+  <defs
+     id="defs3">
+    <pattern
+       xlink:href="#a"
+       id="c"
+       patternTransform="matrix(0.2447438,0.2447438,-0.2447438,0.2447438,16.933465,323.991)" />
+    <clipPath
+       id="b">
+      <rect
+         width="42.333"
+         height="33.867001"
+         x="-4.2329998"
+         y="267.367"
+         rx="4.2329998"
+         ry="4.2329998"
+         fill="#9b4c00"
+         stroke-width="3.098"
+         id="rect1" />
+    </clipPath>
+    <pattern
+       patternUnits="userSpaceOnUse"
+       width="159.999"
+       height="159.999"
+       patternTransform="translate(19.05 305.467) scale(.26458)"
+       id="a">
+      <path
+         fill="none"
+         stroke-width="3.78"
+         d="M0 0h159.999v159.999H0z"
+         id="path1" />
+      <path
+         d="M0 0h80v80H0zm80 80h79.999v79.999h-80z"
+         fill="#81431e"
+         id="path2" />
+      <path
+         d="M80 0h79.999v80h-80zM0 80h80v79.999H0z"
+         fill="#572b11"
+         id="path3" />
+    </pattern>
+    <linearGradient
+       inkscape:collect="always"
+       xlink:href="#linearGradient5"
+       id="linearGradient6"
+       x1="65.282257"
+       y1="24.520901"
+       x2="87.025414"
+       y2="24.520901"
+       gradientUnits="userSpaceOnUse"
+       gradientTransform="matrix(1.7275805,0,0,1,-47.498096,0)" />
+    <linearGradient
+       id="linearGradient5"
+       inkscape:collect="always">
+      <stop
+         style="stop-color:#ffffff;stop-opacity:0.68529409;"
+         offset="0"
+         id="stop5" />
+      <stop
+         style="stop-color:#ffffff;stop-opacity:0;"
+         offset="0.40000001"
+         id="stop6" />
+    </linearGradient>
+  </defs>
+  <g
+     transform="translate(4.2333747,-258.90025)"
+     stroke="#191919"
+     id="g5">
+    <rect
+       ry="4.2329998"
+       rx="4.2329998"
+       y="267.367"
+       x="-4.2329998"
+       height="33.867001"
+       width="42.333"
+       clip-path="url(#b)"
+       fill="url(#c)"
+       stroke-width="3.175"
+       id="rect3" />
+    <g
+       transform="translate(40.746,-4.233)"
+       id="g4">
+      <circle
+         r="5.8210001"
+         cy="282.71201"
+         cx="-14.817"
+         fill="#4d2600"
+         stroke-width="1.587"
+         id="circle3" />
+      <circle
+         cx="-13.229"
+         cy="282.71201"
+         r="1.587"
+         fill="#ff7800"
+         stroke-width="0.794"
+         id="circle4" />
+      <path
+         d="m -17.462,280.067 c 0,0 -0.864,2.7 -0.53,3.704 0.28,0.836 2.646,2.646 2.646,2.646 0,0 -1.894,-3.59 -2.116,-6.35 z"
+         fill="#f7ff00"
+         stroke-width="0.794"
+         id="path4" />
+    </g>
+  </g>
+  <g
+     id="g2"
+     transform="matrix(0,-1.0000098,1.0000098,0,-7.673182,83.414395)">
+    <path
+       style="font-variation-settings:normal;opacity:1;vector-effect:none;fill:url(#linearGradient6);stroke:none;stroke-width:5.56418;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;-inkscape-stroke:none;stop-color:#000000;stop-opacity:1"
+       d="M 65.282256,21.166483 102.8453,8.6130674 V 41.981731 L 65.282256,27.181737 Z"
+       id="path4-9"
+       sodipodi:nodetypes="ccccc" />
+    <rect
+       style="fill:#323232;fill-opacity:1;fill-rule:evenodd;stroke:#191919;stroke-width:1.5875;stroke-dasharray:none;stroke-opacity:1"
+       id="rect8-4"
+       width="4.6228456"
+       height="6.015255"
+       x="60.659409"
+       y="21.166483"
+       ry="1.3330789"
+       rx="1.3330789" />
+    <rect
+       style="fill:#323232;fill-opacity:1;fill-rule:evenodd;stroke:#191919;stroke-width:1.5875;stroke-dasharray:none;stroke-opacity:1"
+       id="rect8-4-3"
+       width="3.766618"
+       height="3.3465211"
+       x="59.601082"
+       y="14.995306"
+       ry="1.3330789"
+       rx="1.3330789" />
+    <rect
+       style="fill:#323232;fill-opacity:1;fill-rule:evenodd;stroke:#191919;stroke-width:1.5875;stroke-dasharray:none;stroke-opacity:1"
+       id="rect8"
+       width="17.4625"
+       height="15.345834"
+       x="44.784409"
+       y="13.493566"
+       ry="1.0848138"
+       rx="1.0848138" />
+    <rect
+       style="fill:#555555;fill-opacity:1;fill-rule:evenodd;stroke:#191919;stroke-width:1.5875;stroke-dasharray:none;stroke-opacity:1"
+       id="rect8-9"
+       width="11.714682"
+       height="2.9498415"
+       x="47.658333"
+       y="16.139399"
+       ry="1.0848138"
+       rx="1.0848138" />
+    <circle
+       style="fill:#191919;fill-opacity:1;stroke:none;stroke-width:0.79375;stroke-linecap:square;stroke-linejoin:round;stroke-dasharray:none;stroke-opacity:1;paint-order:markers fill stroke"
+       id="path9"
+       cx="55.235458"
+       cy="24.738363"
+       r="1.7197917" />
+    <circle
+       style="fill:#191919;fill-opacity:1;stroke:none;stroke-width:0.79375;stroke-linecap:square;stroke-linejoin:round;stroke-dasharray:none;stroke-opacity:1;paint-order:markers fill stroke"
+       id="path9-4"
+       cx="50.208359"
+       cy="24.738363"
+       r="1.7197917" />
+  </g>
+</svg>

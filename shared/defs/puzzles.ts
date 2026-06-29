@@ -18,4 +18,5 @@ export const Puzzles: Record<string, string[]> = {
     club_01: ["1", "2", "3", "4"],
     club_02: ["1"],
     bunker_twins: ["scout", "sniper", "medic", "demo", "assault", "tank"],
+    reserve_vault: ["1", "2", "3", "4", "2", "5"],
 };

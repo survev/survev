@@ -770,6 +770,25 @@ const ParticleDefs: Record<string, ParticleDef> = {
             return util.rgbToInt(util.hsvToRgb(0.11, 0.84, util.random(0.64, 0.66)));
         },
     },
+    depositBoxSilverBreak: {
+        image: ["part-plate-01.img"],
+        life: new Range(0.5, 1),
+        drag: new Range(6, 8),
+        rotVel: new Range(0, Math.PI * 3),
+        scale: {
+            start: new Range(0.2, 0.35),
+            end: new Range(0.18, 0.25),
+            lerp: new Range(0, 1),
+        },
+        alpha: {
+            start: 1,
+            end: 0,
+            lerp: new Range(0.9, 1),
+        },
+        color: function() {
+            return util.rgbToInt(util.hsvToRgb(0, 0, util.random(0.68, 0.72)));
+        },
+    },
     glassChip: {
         image: ["part-spark-02.img"],
         life: 0.5,
@@ -1571,6 +1590,44 @@ const ParticleDefs: Record<string, ParticleDef> = {
         },
         color: function() {
             return util.rgbToInt(util.hsvToRgb(0.97, 0, util.random(0.95, 0.97)));
+        },
+    },
+    toiletGoldChip: {
+        image: ["part-spark-02.img"],
+        life: 0.5,
+        drag: new Range(1, 10),
+        rotVel: 0,
+        scale: {
+            start: new Range(0.04, 0.08),
+            end: new Range(0.01, 0.02),
+            lerp: new Range(0, 1),
+        },
+        alpha: {
+            start: 1,
+            end: 0,
+            lerp: new Range(0.95, 1),
+        },
+        color: function() {
+            return util.rgbToInt(util.hsvToRgb(0.14, util.random(0.72, 0.86), util.random(0.71, 0.85)));
+        },
+    },
+    toiletGoldBreak: {
+        image: ["part-spark-02.img"],
+        life: new Range(0.8, 1),
+        drag: new Range(4, 5),
+        rotVel: 0,
+        scale: {
+            start: new Range(0.07, 0.12),
+            end: new Range(0.05, 0.1),
+            lerp: new Range(0, 1),
+        },
+        alpha: {
+            start: 1,
+            end: 0,
+            lerp: new Range(0.9, 1),
+        },
+        color: function() {
+            return util.rgbToInt(util.hsvToRgb(0.14, util.random(0.72, 0.86), util.random(0.71, 0.85)));
         },
     },
     toiletMetalBreak: {
