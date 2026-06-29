@@ -15,6 +15,7 @@ import { v2, type Vec2 } from "../../../shared/utils/v2.ts";
 import type { BulletParams } from "../game/objects/bullet.ts";
 import type { GameObject } from "../game/objects/gameObject.ts";
 import type { Player } from "../game/objects/player.ts";
+import type { Obstacle } from "./objects/obstacle.ts";
 import type { Projectile } from "./objects/projectile.ts";
 
 /**
@@ -992,8 +993,8 @@ export class WeaponManager {
     meleeDamage(): void {
         const meleeDef = GameObjectDefs.typeToDef(this.activeWeapon, "melee");
 
-        const coll = this.getMeleeCollider();
-        const lineEnd = coll.rad + v2.length(v2.sub(this.player.pos, coll.pos));
+        const meleeCol = this.getMeleeCollider();
+        const meleeDist = meleeCol.rad + v2.length(v2.sub(this.player.pos, meleeCol.pos));
 
         const hits: Array<{
             obj: GameObject;
@@ -1003,109 +1004,122 @@ export class WeaponManager {
             dir: Vec2;
         }> = [];
 
-        const objs = this.player.game.grid.intersectCollider(coll);
+        const objs = this.player.game.grid.intersectCollider(meleeCol);
 
-        const obstacles = objs.filter((obj) => obj.__type === ObjectType.Obstacle);
+        const obstacles = objs.filter((obj) => {
+            return obj.__type === ObjectType.Obstacle && coldet.test(obj.collider, meleeCol);
+        }) as Obstacle[];
 
-        for (const obj of objs) {
-            if (obj.__type === ObjectType.Obstacle) {
-                const obstacle = obj;
-                if (
-                    !obstacle.dead
-                    && !obstacle.isSkin
-                    && obstacle.height >= GameConfig.player.meleeHeight
-                    && util.sameLayer(obstacle.layer, this.player.layer & 1)
-                ) {
-                    let collision = collider.intersectCircle(
-                        obstacle.collider,
-                        coll.pos,
-                        coll.rad,
-                    );
+        // Obstacles
+        for (let i = 0; i < obstacles.length; i++) {
+            const obstacle = obstacles[i];
+            if (obstacle.dead || obstacle.isSkin) continue;
+            if (obstacle.height < GameConfig.player.meleeHeight) continue;
+            if (!util.sameLayer(obstacle.layer, this.player.layer & 1)) continue;
 
-                    if (meleeDef.cleave) {
-                        const normalized = v2.normalizeSafe(
-                            v2.sub(obstacle.pos, this.player.pos),
-                            v2.create(1, 0),
-                        );
-                        const wallCheck = collisionHelpers.intersectSegment(
-                            obstacles,
-                            this.player.pos,
-                            normalized,
-                            lineEnd,
-                            obstacle.height,
-                            this.player.layer,
-                            false,
-                        );
-                        if (wallCheck && wallCheck.id !== obstacle.__id) {
-                            collision = null;
-                        }
-                    }
-                    if (collision) {
-                        const pos = v2.add(
-                            coll.pos,
-                            v2.mul(v2.neg(collision.dir), coll.rad - collision.pen),
-                        );
-                        hits.push({
-                            obj: obstacle,
-                            pen: collision.pen,
-                            prio: 1,
-                            pos,
-                            dir: collision.dir,
-                        });
-                    }
-                }
-            } else if (obj.__type === ObjectType.Player) {
-                const player = obj;
-                if (
-                    player.__id !== this.player.__id
-                    && !player.dead
-                    && util.sameLayer(player.layer, this.player.layer)
-                ) {
-                    const normalized = v2.normalizeSafe(
-                        v2.sub(player.pos, this.player.pos),
-                        v2.create(1, 0),
-                    );
-                    const collision = coldet.intersectCircleCircle(
-                        coll.pos,
-                        coll.rad,
-                        player.pos,
-                        player.rad,
-                    );
-                    if (
-                        collision
-                        && math.eqAbs(
-                            lineEnd,
-                            collisionHelpers.intersectSegmentDist(
-                                obstacles,
-                                this.player.pos,
-                                normalized,
-                                lineEnd,
-                                GameConfig.player.meleeHeight,
-                                this.player.layer,
-                                false,
-                            ),
-                        )
-                    ) {
-                        hits.push({
-                            obj: player,
-                            pen: collision.pen,
-                            prio: player.teamId === this.player.teamId ? 2 : 0,
-                            pos: v2.copy(player.pos),
-                            dir: collision.dir,
-                        });
-                    }
+            let res = collider.intersectCircle(
+                obstacle.collider,
+                meleeCol.pos,
+                meleeCol.rad,
+            );
+            if (!res) continue;
+
+            // Certain melee weapons should perform a more expensive wall check
+            // to not hit obstacles behind walls.
+            if (meleeDef.cleave) {
+                const meleeDir = v2.normalizeSafe(
+                    v2.sub(obstacle.pos, this.player.pos),
+                    v2.create(1, 0),
+                );
+                const wallCheck = collisionHelpers.intersectSegment(
+                    obstacles,
+                    this.player.pos,
+                    meleeDir,
+                    meleeDist,
+                    obstacle.height,
+                    this.player.layer,
+                    false,
+                );
+                if (wallCheck && wallCheck.id !== obstacle.__id) {
+                    continue;
                 }
             }
+            const closestPt = v2.add(
+                meleeCol.pos,
+                v2.mul(v2.neg(res.dir), meleeCol.rad - res.pen),
+            );
+            hits.push({
+                obj: obstacle,
+                pen: res.pen,
+                prio: 1,
+                pos: closestPt,
+                dir: res.dir,
+            });
+        }
+
+        // Players
+        for (let i = 0; i < objs.length; i++) {
+            const playerCol = objs[i];
+            if (playerCol.__type !== ObjectType.Player) continue;
+            if (playerCol.__id === this.player.__id || playerCol.dead) continue;
+            if (!util.sameLayer(playerCol.layer, this.player.layer)) continue;
+
+            const res = coldet.intersectCircleCircle(
+                meleeCol.pos,
+                meleeCol.rad,
+                playerCol.pos,
+                playerCol.rad,
+            );
+            if (!res) continue;
+
+            const meleeDir = v2.normalizeSafe(
+                v2.sub(playerCol.pos, this.player.pos),
+                v2.create(1, 0),
+            );
+
+            const lineRes = coldet.intersectSegmentCircle(
+                this.player.pos,
+                v2.add(this.player.pos, v2.mul(meleeDir, meleeDist)),
+                playerCol.pos,
+                playerCol.rad,
+            );
+            const pt = lineRes ? lineRes.point : playerCol.pos;
+            const distToPlayer = v2.length(v2.sub(pt, this.player.pos));
+
+            const distToObstacle = collisionHelpers.intersectSegmentDist(
+                obstacles,
+                this.player.pos,
+                meleeDir,
+                meleeDist,
+                GameConfig.player.meleeHeight,
+                this.player.layer,
+                false,
+            );
+
+            if (distToObstacle < distToPlayer) continue;
+
+            hits.push({
+                obj: playerCol,
+                pen: res.pen,
+                prio: playerCol.teamId === this.player.teamId ? 2 : 0,
+                pos: v2.copy(playerCol.pos),
+                dir: meleeDir,
+            });
         }
 
         hits.sort((a, b) => {
-            return a.prio === b.prio ? b.pen - a.pen : a.prio - b.prio;
+            if (a.prio == b.prio) {
+                return b.pen - a.pen;
+            }
+            return a.prio - b.prio;
         });
 
-        let maxHits = hits.length;
-        if (!meleeDef.cleave) maxHits = math.min(maxHits, 1);
+        let hitCount = hits.length;
+        if (!meleeDef.cleave) {
+            hitCount = math.min(hitCount, 1);
+        }
 
-        for (let i = 0; i < maxHits; i++) {
+        for (let i = 0; i < hitCount; i++) {
             const hit = hits[i];
             const obj = hit.obj;
 
@@ -1125,7 +1139,7 @@ export class WeaponManager {
                     gameSourceType: this.activeWeapon,
                     damageType: GameConfig.DamageType.Player,
                     source: this.player,
-                    dir: v2.normalizeSafe(v2.sub(obj.pos, this.player.pos)),
+                    dir: hit.dir,
                 });
             }
         }

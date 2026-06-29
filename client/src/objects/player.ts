@@ -1263,13 +1263,13 @@ export class Player implements AbstractObject {
         this.gunRecoilL = math.max(0, this.gunRecoilL - this.gunRecoilL * dt * 5 - dt);
         this.gunRecoilR = math.max(0, this.gunRecoilR - this.gunRecoilR * dt * 5 - dt);
 
-        const xe: AnimCtx = {
+        const animCtx: AnimCtx = {
             playerBarn,
             map,
             audioManager,
             particleBarn,
         };
-        this.updateAnim(dt, xe);
+        this.updateAnim(dt, animCtx);
         if (this.currentAnim() == Anim.None) {
             this.throwableState = "equip";
         }
@@ -2165,7 +2165,7 @@ export class Player implements AbstractObject {
         }
     }
 
-    updateAnim(dt: number, AnimCtx: AnimCtx) {
+    updateAnim(dt: number, animCtx: AnimCtx) {
         if (this.anim.data.type == "none") {
             this.playAnim(Anim.None, this.anim.seq);
         }
@@ -2220,7 +2220,7 @@ export class Player implements AbstractObject {
                 const effect = anim.effects[i];
                 if (effect.time >= ticker && effect.time < f) {
                     (this[effect.fn] as (ctx: AnimCtx, args: unknown) => void)(
-                        AnimCtx,
+                        animCtx,
                         effect.args,
                     );
                 }
@@ -2231,11 +2231,11 @@ export class Player implements AbstractObject {
         }
     }
 
-    animPlaySound(animCtx: Partial<AnimCtx>, args: { sound: string }) {
+    animPlaySound(animCtx: AnimCtx, args: { sound: string }) {
         const itemDef = GameObjectDefs.typeToDef(this.m_netData.m_activeWeapon) as MeleeDef;
         const sound = itemDef.sound[args.sound];
         if (sound) {
-            animCtx.audioManager?.playSound(sound, {
+            animCtx.audioManager.playSound(sound, {
                 channel: "sfx",
                 soundPos: this.m_pos,
                 fallOff: 3,
@@ -2245,11 +2245,11 @@ export class Player implements AbstractObject {
         }
     }
 
-    animSetThrowableState(_animCtx: Partial<AnimCtx>, args: { state: string }) {
+    animSetThrowableState(_animCtx: AnimCtx, args: { state: string }) {
         this.throwableState = args.state;
     }
 
-    animThrowableParticles(animCtx: Partial<AnimCtx>, _args: unknown) {
+    animThrowableParticles(animCtx: AnimCtx, _args: unknown) {
         if (
             GameObjectDefs.typeToDef(this.m_netData.m_activeWeapon, "throwable")
                 .useThrowParticles
@@ -2259,7 +2259,7 @@ export class Player implements AbstractObject {
                 v2.create(0.75, 0.75),
                 Math.atan2(this.m_dir.y, this.m_dir.x),
             );
-            animCtx.particleBarn?.addParticle(
+            animCtx.particleBarn.addParticle(
                 "fragPin",
                 this.renderLayer,
                 v2.add(this.m_pos, pinOff),
@@ -2273,7 +2273,7 @@ export class Player implements AbstractObject {
                 v2.create(0.75, -0.75),
                 Math.atan2(this.m_dir.y, this.m_dir.x),
             );
-            animCtx.particleBarn?.addParticle(
+            animCtx.particleBarn.addParticle(
                 "fragLever",
                 this.renderLayer,
                 v2.add(this.m_pos, leverOff),
@@ -2286,159 +2286,176 @@ export class Player implements AbstractObject {
         }
     }
 
-    animMeleeCollision(animCtx: Partial<AnimCtx>, args: { playerHit?: string }) {
+    animMeleeCollision(animCtx: AnimCtx, args: { playerHit?: string }) {
         const meleeDef = GameObjectDefs.typeToDefSafe(this.m_netData.m_activeWeapon);
-        if (meleeDef && meleeDef.type == "melee") {
-            const meleeCol = this.getMeleeCollider();
-            const meleeDist = meleeCol.rad + v2.length(v2.sub(this.m_pos, meleeCol.pos));
-            const hits = [];
+        if (meleeDef?.type !== "melee") return;
 
-            // Obstacles
-            const obstacles = animCtx.map?.m_obstaclePool.m_getPool()!;
-            for (let i = 0; i < obstacles.length; i++) {
-                const obstacle = obstacles[i];
-                if (
-                    !!obstacle.active
-                    && !obstacle.dead
-                    && !obstacle.isSkin
-                    && obstacle.height >= GameConfig.player.meleeHeight
-                    && util.sameLayer(obstacle.layer, this.layer & 1)
-                ) {
-                    let res = collider.intersectCircle(
-                        obstacle.collider,
-                        meleeCol.pos,
-                        meleeCol.rad,
-                    );
+        const meleeCol = this.getMeleeCollider();
+        const meleeDist = meleeCol.rad + v2.length(v2.sub(this.m_pos, meleeCol.pos));
 
-                    // Certain melee weapons should perform a more expensive wall check
-                    // to not hit obstacles behind walls.
-                    // @ts-expect-error wallcheck not defined on meleeDefs
-                    if (meleeDef.cleave || meleeDef.wallCheck) {
-                        const meleeDir = v2.normalizeSafe(
-                            v2.sub(obstacle.pos, this.m_pos),
-                            v2.create(1, 0),
-                        );
-                        const wallCheck = collisionHelpers.intersectSegment(
-                            animCtx.map?.m_obstaclePool.m_getPool()!,
-                            this.m_pos,
-                            meleeDir,
-                            meleeDist,
-                            obstacle.height,
-                            this.layer,
-                            false,
-                        );
-                        if (wallCheck && wallCheck.id !== obstacle.__id) {
-                            res = null;
-                        }
-                    }
-                    if (res) {
-                        const def = MapObjectDefs.typeToDef(obstacle.type, "obstacle") as ObstacleDef;
-                        const closestPt = v2.add(
-                            meleeCol.pos,
-                            v2.mul(v2.neg(res.dir), meleeCol.rad - res.pen),
-                        );
-                        const vel = v2.rotate(
-                            v2.mul(res.dir, 7.5),
-                            ((Math.random() - 0.5) * Math.PI) / 3,
-                        );
-                        hits.push({
-                            pen: res.pen,
-                            prio: 1,
-                            pos: closestPt,
-                            vel,
-                            layer: this.renderLayer,
-                            zOrd: this.renderZOrd,
-                            particle: def.hitParticle,
-                            sound: def.sound.punch,
-                            soundFn: "playGroup",
-                        });
-                    }
-                }
-            }
-            const ourTeamId = animCtx.playerBarn?.getPlayerInfo(this.__id).teamId;
-            const players = animCtx.playerBarn?.playerPool.m_getPool()!;
-            for (let i = 0; i < players.length; i++) {
-                const playerCol = players[i];
-                if (
-                    playerCol.active
-                    && playerCol.__id != this.__id
-                    && !playerCol.m_netData.m_dead
-                    && util.sameLayer(playerCol.layer, this.layer)
-                ) {
-                    const meleeDir = v2.normalizeSafe(
-                        v2.sub(playerCol.m_pos, this.m_pos),
-                        v2.create(1, 0),
-                    );
-                    const col = coldet.intersectCircleCircle(
-                        meleeCol.pos,
-                        meleeCol.rad,
-                        playerCol.m_pos,
-                        playerCol.m_rad,
-                    );
-                    if (
-                        col
-                        && math.eqAbs(
-                            meleeDist,
-                            collisionHelpers.intersectSegmentDist(
-                                animCtx.map?.m_obstaclePool.m_getPool()!,
-                                this.m_pos,
-                                meleeDir,
-                                meleeDist,
-                                GameConfig.player.meleeHeight,
-                                this.layer,
-                                false,
-                            ),
-                        )
-                    ) {
-                        const teamId = animCtx.playerBarn?.getPlayerInfo(
-                            playerCol.__id,
-                        ).teamId;
-                        const vel = v2.rotate(
-                            meleeDir,
-                            ((Math.random() - 0.5) * Math.PI) / 3,
-                        );
-                        const hitSound = meleeDef.sound[args.playerHit!] || meleeDef.sound.playerHit;
-                        hits.push({
-                            pen: col.pen,
-                            prio: teamId == ourTeamId ? 2 : 0,
-                            pos: v2.copy(playerCol.m_pos),
-                            vel,
-                            layer: playerCol.renderLayer,
-                            zOrd: playerCol.renderZOrd,
-                            particle: "bloodSplat",
-                            sound: hitSound,
-                            soundFn: "playSound",
-                        });
-                    }
-                }
-            }
+        const hits: Array<{
+            pen: number;
+            prio: number;
+            pos: Vec2;
+            vel: Vec2;
+            layer: number;
+            zOrd: number;
+            particle: string;
+            sound: string | undefined;
+            soundFn: "playSound" | "playGroup";
+        }> = [];
 
-            hits.sort((a, b) => {
-                if (a.prio == b.prio) {
-                    return b.pen - a.pen;
-                }
-                return a.prio - b.prio;
-            });
+        // Obstacles
+        let obstacles = animCtx.map.m_obstaclePool.m_getPool().filter((obj) => {
+            return coldet.test(obj.collider, meleeCol);
+        });
 
-            let hitCount = hits.length;
-            if (!meleeDef.cleave) {
-                hitCount = math.min(hitCount, 1);
-            }
+        for (let i = 0; i < obstacles.length; i++) {
+            const obstacle = obstacles[i];
+            if (!obstacle.active) continue;
+            if (obstacle.dead || obstacle.isSkin) continue;
+            if (obstacle.height < GameConfig.player.meleeHeight) continue;
+            if (!util.sameLayer(obstacle.layer, this.layer & 1)) continue;
 
-            for (let i = 0; i < hitCount; i++) {
-                const hit = hits[i];
-                animCtx.particleBarn?.addParticle(
-                    hit.particle,
-                    hit.layer,
-                    hit.pos,
-                    hit.vel,
-                    1,
-                    Math.random() * Math.PI * 2,
-                    null,
-                    hit.zOrd + 1,
+            let res = collider.intersectCircle(
+                obstacle.collider,
+                meleeCol.pos,
+                meleeCol.rad,
+            );
+            if (!res) continue;
+
+            // Certain melee weapons should perform a more expensive wall check
+            // to not hit obstacles behind walls.
+            if (meleeDef.cleave) {
+                const meleeDir = v2.normalizeSafe(
+                    v2.sub(obstacle.pos, this.m_pos),
+                    v2.create(1, 0),
                 );
-                // @ts-expect-error go away
-                animCtx.audioManager?.[hit.soundFn](hit.sound, {
+                const wallCheck = collisionHelpers.intersectSegment(
+                    animCtx.map.m_obstaclePool.m_getPool(),
+                    this.m_pos,
+                    meleeDir,
+                    meleeDist,
+                    obstacle.height,
+                    this.layer,
+                    false,
+                );
+                if (wallCheck && wallCheck.id !== obstacle.__id) {
+                    continue;
+                }
+            }
+            const obstacleDef = MapObjectDefs.typeToDef(obstacle.type, "obstacle") as ObstacleDef;
+            const closestPt = v2.add(
+                meleeCol.pos,
+                v2.mul(v2.neg(res.dir), meleeCol.rad - res.pen),
+            );
+            const vel = v2.rotate(
+                v2.mul(res.dir, 7.5),
+                ((Math.random() - 0.5) * Math.PI) / 3,
+            );
+            hits.push({
+                pen: res.pen,
+                prio: 1,
+                pos: closestPt,
+                vel,
+                layer: this.renderLayer,
+                zOrd: this.renderZOrd,
+                particle: obstacleDef.hitParticle,
+                sound: obstacleDef.sound.punch,
+                soundFn: "playGroup",
+            });
+        }
+
+        // Players
+        const ourTeamId = animCtx.playerBarn.getPlayerInfo(this.__id).teamId;
+        const players = animCtx.playerBarn.playerPool.m_getPool();
+        for (let i = 0; i < players.length; i++) {
+            const playerCol = players[i];
+            if (!playerCol.active) continue;
+            if (playerCol.__id === this.__id || playerCol.dead) continue;
+            if (!util.sameLayer(playerCol.layer, this.layer)) continue;
+
+            const res = coldet.intersectCircleCircle(
+                meleeCol.pos,
+                meleeCol.rad,
+                playerCol.m_pos,
+                playerCol.m_rad,
+            );
+            if (!res) continue;
+
+            const meleeDir = v2.normalizeSafe(
+                v2.sub(playerCol.m_pos, this.m_pos),
+                v2.create(1, 0),
+            );
+
+            const lineRes = coldet.intersectSegmentCircle(
+                this.m_pos,
+                v2.add(this.m_pos, v2.mul(meleeDir, meleeDist)),
+                playerCol.m_pos,
+                playerCol.m_rad,
+            );
+            const pt = lineRes ? lineRes.point : playerCol.m_pos;
+            const distToPlayer = v2.length(v2.sub(pt, this.m_pos));
+
+            const distToObstacle = collisionHelpers.intersectSegmentDist(
+                obstacles,
+                this.m_pos,
+                meleeDir,
+                meleeDist,
+                GameConfig.player.meleeHeight,
+                this.layer,
+                false,
+            );
+
+            if (distToObstacle < distToPlayer) continue;
+
+            const teamId = animCtx.playerBarn.getPlayerInfo(
+                playerCol.__id,
+            ).teamId;
+            const vel = v2.rotate(
+                meleeDir,
+                ((Math.random() - 0.5) * Math.PI) / 3,
+            );
+            const hitSound = meleeDef.sound[args.playerHit!] || meleeDef.sound.playerHit;
+            hits.push({
+                pen: res.pen,
+                prio: teamId == ourTeamId ? 2 : 0,
+                pos: v2.copy(playerCol.m_pos),
+                vel,
+                layer: playerCol.renderLayer,
+                zOrd: playerCol.renderZOrd,
+                particle: "bloodSplat",
+                sound: hitSound,
+                soundFn: "playSound",
+            });
+        }
+
+        hits.sort((a, b) => {
+            if (a.prio == b.prio) {
+                return b.pen - a.pen;
+            }
+            return a.prio - b.prio;
+        });
+
+        let hitCount = hits.length;
+        if (!meleeDef.cleave) {
+            hitCount = math.min(hitCount, 1);
+        }
+
+        for (let i = 0; i < hitCount; i++) {
+            const hit = hits[i];
+            animCtx.particleBarn.addParticle(
+                hit.particle,
+                hit.layer,
+                hit.pos,
+                hit.vel,
+                1,
+                Math.random() * Math.PI * 2,
+                null,
+                hit.zOrd + 1,
+            );
+            if (hit.sound) {
+                animCtx.audioManager[hit.soundFn](hit.sound, {
                     channel: "hits",
                     soundPos: hit.pos,
                     layer: this.layer,
