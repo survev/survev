@@ -279,9 +279,9 @@ Turkey Cache Changes (2025/11/01):
 ~ Assault Rare: Adjusted AN-94 weight (0.5 -> 1).
 ~ Tank Rare: Adjusted QBB weight (1.2 -> 1).
 
-0.3.1 (Desert) (2026/07/10):
+0.3.1 (Desert) (2026/07/15):
 ~ Fabricate now gives 8 random explosives (60/35/5 to be a Frag/MIRV/Strobe) every 10s.
 ~ Overhauled the second desert town (TLDR: Bank + House 1 + House 2 -> The Reserve + House 1 + Random House + Barn + misc.)
 ~ Tier Saloon: Added tier_airdrop_crimson (weight of 0.22).
-~ Adjusted desert airdrops (added airdrop_crate_05 with weight 1, increased airdrop_crate_01 from 10 -> 16)
+~ Adjusted desert airdrops (added airdrop_crate_05 with weight 1, increased airdrop_crate_01 from 10 -> 12)
 + Tier Perks (desert): Added amped_explosives, explosive (weights of 1 and 1).
