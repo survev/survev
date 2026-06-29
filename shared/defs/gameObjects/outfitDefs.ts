@@ -1128,6 +1128,23 @@ const SkinDefs: Record<string, OutfitDef> = {
             tint: 0xffffff,
         },
     }),
+    outfitGold: defineOutfitSkin("outfitBase", {
+        name: "Captial Gains",
+        skinImg: {
+            baseTint: 0xffffff,
+            baseSprite: "player-base-outfitGold.img",
+            handTint: 0xffffff,
+            handSprite: "player-hands-outfitGold.img",
+            footTint: 0xffffff,
+            footSprite: "player-feet-outfitGold.img",
+            backpackTint: 0xffffff,
+            backpackSprite: "player-circle-outfitGold.img",
+        },
+        lootImg: {
+            sprite: "loot-shirt-outfitGold.img",
+            tint: 0xffffff,
+        },
+    }),
     outfitBarrel: defineOutfitSkin("outfitBase", {
         name: "Barrel Costume",
         obstacleType: "barrel_01",
