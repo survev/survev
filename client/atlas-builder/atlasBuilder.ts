@@ -129,7 +129,13 @@ export class ImageManager {
 
             const proc = cp.fork(Path.resolve(import.meta.dirname, "imageWorker.ts"));
 
-            const promise = new Promise<void>((resolve) => {
+            const promise = new Promise<void>((resolve, reject) => {
+                proc.on("exit", (code) => {
+                    if (code !== 0) {
+                        reject();
+                    }
+                });
+
                 proc.send(
                     {
                         images,
@@ -302,7 +308,13 @@ export class AtlasManager {
                 serialization: "advanced",
             });
 
-            const promise = new Promise<void>((resolve) => {
+            const promise = new Promise<void>((resolve, reject) => {
+                proc.on("exit", (code) => {
+                    if (code !== 0) {
+                        reject();
+                    }
+                });
+
                 proc.send(atlases satisfies MainToWorkerMsg);
 
                 proc.on("message", (msg: WorkerToMainMsg) => {
