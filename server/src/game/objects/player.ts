@@ -66,6 +66,8 @@ interface Emote {
     itemType: string;
 }
 
+type FabricateThrowable = keyof typeof PerkProperties["fabricate"]["weights"];
+
 const boostHeals: Array<{ maxBoost: number; heal: number }> = [];
 {
     const boostBreakPoints = GameConfig.player.boostBreakpoints;
@@ -858,7 +860,7 @@ export class Player extends BaseGameObject {
     /** for the perk fabricate, fills inventory with frags every 12 seconds */
     fabricateRefillTicker = 0;
     fabricateGiveTicker = 0;
-    fabricateThrowablesLeft = 0;
+    fabricateThrowablesLeft: Array<FabricateThrowable> = [];
 
     // "Gabby Ghost" perk random emojis
     chattyTicker = 0;
@@ -1224,6 +1226,7 @@ export class Player extends BaseGameObject {
             }
             case "fabricate":
                 this.fabricateRefillTicker = 0;
+                this.fabricateThrowablesLeft = [];
                 break;
             case "firepower":
                 this.weaponManager.clampGunsAmmo();
@@ -1828,17 +1831,17 @@ export class Player extends BaseGameObject {
         }
 
         if (this.hasPerk("fabricate")) {
-            if (this.fabricateThrowablesLeft > 0) {
+            if (this.fabricateThrowablesLeft.length > 0) {
                 this.fabricateGiveTicker -= dt;
                 if (this.fabricateGiveTicker < 0) {
                     this.fabricateGiveTicker = PerkProperties.fabricate.giveInterval;
-                    this.invManager.give("frag", 1);
 
-                    this.fabricateThrowablesLeft--;
+                    const item = this.fabricateThrowablesLeft.shift()!;
+                    this.invManager.give(item, 1);
 
                     const msg = new net.PickupMsg();
                     msg.type = net.PickupMsgType.Success;
-                    msg.item = "frag";
+                    msg.item = item;
                     msg.count = 1;
                     if (
                         !this.weaponManager.weapons[GameConfig.WeaponSlot.Throwable].type
@@ -1852,11 +1855,32 @@ export class Player extends BaseGameObject {
 
             this.fabricateRefillTicker -= dt;
             if (this.fabricateRefillTicker <= 0) {
-                const maxSize = this.invManager.getMaxCapacity("frag");
-                const current = this.invManager.get("frag");
-                const throwablesToGive = math.max(maxSize - current, 0);
+                const counts: Record<FabricateThrowable, number> = {
+                    frag: 0,
+                    mirv: 0,
+                    strobe: 0,
+                };
 
-                this.fabricateThrowablesLeft = throwablesToGive;
+                let remaining = 8;
+                while (remaining > 0) {
+                    const item = util.weightedRandomObject(PerkProperties.fabricate.weights) as FabricateThrowable;
+                    counts[item]++;
+                    remaining--;
+                }
+
+                const nextQueue: Array<FabricateThrowable> = [];
+                for (const item of Object.keys(PerkProperties.fabricate.weights) as FabricateThrowable[]) {
+                    const canGive = math.max(
+                        this.invManager.getMaxCapacity(item) - this.invManager.get(item),
+                        0,
+                    );
+                    const giveCount = math.min(counts[item], canGive);
+                    for (let i = 0; i < giveCount; i++) {
+                        nextQueue.push(item);
+                    }
+                }
+
+                this.fabricateThrowablesLeft = nextQueue;
                 this.fabricateGiveTicker = PerkProperties.fabricate.giveInterval;
                 this.fabricateRefillTicker = PerkProperties.fabricate.refillInterval;
             }

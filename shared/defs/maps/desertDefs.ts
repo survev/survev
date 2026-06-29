@@ -203,6 +203,8 @@ const mapDef: PartialMapDef = {
             { name: "fabricate", count: 1, weight: 1 },
             { name: "flak_jacket", count: 1, weight: 1 },
             { name: "bonus_45", count: 1, weight: 1 },
+            { name: "amped_explosives", count: 1, weight: 1 },
+            { name: "explosive", count: 1, weight: 1 },
         ],
     },
     mapGen: {

@@ -200,7 +200,7 @@ Turkey Cache Changes (2025/11/01):
 ~ Adjusted tier_outfits (Winter & Winter Woods)
 + Added Tier Toilet (tier_medical made more common).
 ~ Replaced the Stone Hammer with the Ice Axe (tier_airdrop_melee, tier_hatchet_melee).
-~ Tier Throwables: Adjusted MIRV, Smoke, & Snowball weights (0.5 -> 0.75, 1 -- 0.75, & 0.25 -> 0.5, respectively) // TODO
+~ Tier Throwables: Adjusted MIRV, Smoke, & Snowball weights (0.5 -> 0.75, 1 -- 0.75, & 0.25 -> 0.5, respectively)
 + Tier Guns: Added IMB-2 & M870 (weights of 2.75 & 2.5, respectively).
 ~ Tier Guns: Adjusted DP-28, Bar M1918, MP220, Saiga-12, Spas-12, QBB-97, PKP, & M249 weights (3.5 -> 2.75, 3 -> 2.75, 1.5 -> 3, 0.1 -> 0.15, 3 -> 2.5, 0.1 -> 0.125, 0.005 -> 0.008, & 0.008 -> 0.012, respecitvely).
 ~ Tier Armor: Adjusted Level 1 Helmet, Level 2 Helmet, Level 1 Vest, & Level 2 Vest weights (3 -> 2.5, 2 -> 2.5, 3 -> 2.5, & 2 -> 2.5, respectively).
@@ -278,3 +278,10 @@ Turkey Cache Changes (2025/11/01):
 ~ Scout Rare: Adjusted Mk 20 SSR weight (0.05 -> 0.2).
 ~ Assault Rare: Adjusted AN-94 weight (0.5 -> 1).
 ~ Tank Rare: Adjusted QBB weight (1.2 -> 1).
+
+0.3.1 (Desert) (2026/07/10):
+~ Fabricate now gives 8 random explosives (60/35/5 to be a Frag/MIRV/Strobe) every 10s.
+~ Overhauled the second desert town (TLDR: Bank + House 1 + House 2 -> The Reserve + House 1 + Random House + Barn + misc.)
+~ Tier Saloon: Added tier_airdrop_crimson (weight of 0.22).
+~ Adjusted desert airdrops (added airdrop_crate_05 with weight 1, increased airdrop_crate_01 from 10 -> 16)
++ Tier Perks (desert): Added amped_explosives, explosive (weights of 1 and 1).
