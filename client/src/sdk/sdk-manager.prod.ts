@@ -129,7 +129,7 @@ export class SDKManager implements BaseSDKManager {
             if (!this.isSpellSync) $("#btn-discord-top-right").show();
             $(".surviv-shirts")
                 .css("background-image", "url(./img/discord-promo.png)")
-                .html(`<a href="https://discord.gg/6uRdCdkTPt" target="_blank"></a>`);
+                .html(`<a href="https://discord.gg/" target="_blank"></a>`);
 
             if (this.isSpellSync) {
                 $("a[href='changelogRec.html']").hide();
