@@ -60,7 +60,7 @@ class PhysicsParticle {
             const player = players[i];
             if (
                 player.active
-                && !player.dead
+                && !player.m_netData.m_dead
                 && util.sameLayer(this.layer, player.layer)
             ) {
                 colliders.push(collider.createCircle(player.m_pos, player.m_rad));

@@ -373,7 +373,6 @@ export class Player implements AbstractObject {
     wasInsideObstacle!: boolean;
     insideObstacleType!: string;
     lastInsideObstacleTime!: number;
-    dead!: boolean;
     gunSwitchCooldown!: number;
 
     constructor() {
@@ -2372,7 +2371,7 @@ export class Player implements AbstractObject {
         for (let i = 0; i < players.length; i++) {
             const playerCol = players[i];
             if (!playerCol.active) continue;
-            if (playerCol.__id === this.__id || playerCol.dead) continue;
+            if (playerCol.__id === this.__id || playerCol.m_netData.m_dead) continue;
             if (!util.sameLayer(playerCol.layer, this.layer)) continue;
 
             const res = coldet.intersectCircleCircle(
