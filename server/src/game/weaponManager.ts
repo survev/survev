@@ -696,7 +696,7 @@ export class WeaponManager {
         if (itemDef.outsideOnly && this.player.indoors && !forceFire) {
             const msg = new net.PickupMsg();
             msg.type = net.PickupMsgType.GunCannotFire;
-            this.player.msgsToSend.push({ type: net.MsgType.Pickup, msg });
+            this.player.client.sendMsg(net.MsgType.Pickup, msg);
             return;
         }
 

@@ -17,6 +17,7 @@ import { Editor } from "./debug/editor.ts";
 /* STRIP_FROM_PROD_CLIENT:END */
 
 import { GameObjectDefs } from "../../shared/defs/register.ts";
+import { SpectateAction } from "../../shared/net/spectateMsg.ts";
 import { device } from "./device.ts";
 import { EmoteBarn } from "./emote.ts";
 import { errorLogManager } from "./errorLogs.ts";
@@ -98,7 +99,6 @@ export class Game {
     m_playing!: boolean;
     m_gameOver!: boolean;
     m_spectating!: boolean;
-    m_spectateCooldown!: number;
     m_inputMsgTimeout!: number;
     m_prevInputMsg!: net.InputMsg;
     m_playingTicker!: number;
@@ -312,7 +312,6 @@ export class Game {
         this.m_playing = false;
         this.m_gameOver = false;
         this.m_spectating = false;
-        this.m_spectateCooldown = 0;
         this.m_inputMsgTimeout = 0;
         this.m_prevInputMsg = new net.InputMsg();
         this.m_playingTicker = 0;
@@ -715,28 +714,21 @@ export class Game {
             }
         }
 
-        this.m_spectateCooldown -= dt;
-        const specBegin = this.m_uiManager.specBegin;
-        const specNext = (this.m_uiManager.specNext ||= this.m_spectating && this.m_input.keyPressed(Key.Right));
-        const specPrev = (this.m_uiManager.specPrev ||= this.m_spectating && this.m_input.keyPressed(Key.Left));
-        const specForce = this.m_input.keyPressed(Key.Right) || this.m_input.keyPressed(Key.Left);
+        let specAction = this.m_uiManager.specAction;
+        if (specAction === SpectateAction.None && this.m_spectating) {
+            if (this.m_input.keyPressed(Key.Right)) {
+                specAction = SpectateAction.Next;
+            } else if (this.m_input.keyPressed(Key.Left)) {
+                specAction = SpectateAction.Prev;
+            }
+        }
 
-        if (
-            specBegin
-            || (this.m_spectating && this.m_spectateCooldown < 0 && (specNext || specPrev))
-        ) {
-            this.m_spectateCooldown = 1;
-
+        if (specAction !== SpectateAction.None) {
             const specMsg = new net.SpectateMsg();
-            specMsg.specBegin = specBegin;
-            specMsg.specNext = specNext;
-            specMsg.specPrev = specPrev;
-            specMsg.specForce = specForce;
+            specMsg.action = specAction;
             this.m_sendMessage(net.MsgType.Spectate, specMsg, 128);
 
-            this.m_uiManager.specBegin = false;
-            this.m_uiManager.specNext = false;
-            this.m_uiManager.specPrev = false;
+            this.m_uiManager.specAction = SpectateAction.None;
         }
 
         this.m_uiManager.reloadTouched = false;

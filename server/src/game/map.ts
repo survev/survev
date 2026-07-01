@@ -420,8 +420,8 @@ export class GameMap {
 
         this.init(seed);
 
-        for (const player of this.game.playerBarn.players) {
-            player.sendData(this.mapStream.getBuffer());
+        for (const client of this.game.clientBarn.clients) {
+            client.sendData(this.mapStream.getBuffer());
         }
     }
 

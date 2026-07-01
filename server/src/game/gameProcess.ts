@@ -5,9 +5,9 @@ import { Config } from "../config.ts";
 import { apiPrivateRouter } from "../utils/apiRouter.ts";
 import { logErrorToWebhook } from "../utils/logger.ts";
 import type { SaveGameBody } from "../utils/types.ts";
+import type { Client } from "./client.ts";
 import { Game } from "./game.ts";
 import { type ProcessMsg, ProcessMsgType } from "./ipcTypes.ts";
-import type { Player } from "./objects/player.ts";
 import { ClientSocket } from "./socket.ts";
 
 let game: ServerGame | undefined;
@@ -92,8 +92,8 @@ class ServerGame extends Game {
                 mapSeed: this.map.seed,
                 killedIds: player.killedIds,
                 rank: rank,
-                ip: player.ip,
-                findGameIp: player.findGameIp,
+                ip: player.client.ip,
+                findGameIp: player.client.findGameIp,
                 role: player.role,
             };
         });
@@ -151,11 +151,11 @@ const socketMsgs: Array<{
 
 let lastMsgTime = Date.now();
 
-const socketIdToSocket = new Map<string, ProcessSocket<Player | undefined>>();
+const socketIdToSocket = new Map<string, ProcessSocket<Client | undefined>>();
 class ProcessSocket<T> extends ClientSocket<T> {
     private _id: string;
     private _ip: string;
-    private _closed = false;
+    _closed = false;
     constructor(id: string, ip: string) {
         super();
         this._id = id;
@@ -189,6 +189,7 @@ class ProcessSocket<T> extends ClientSocket<T> {
     }
 
     closeWithReason(reason: string): void {
+        this._closed = true;
         sendMsg({
             type: ProcessMsgType.SocketClose,
             socketId: this._id,
@@ -217,18 +218,19 @@ process.on("message", (msg: ProcessMsg) => {
             game.addJoinTokens(msg.tokens, msg.autoFill);
             break;
         case ProcessMsgType.SocketOpen: {
-            const socket = new ProcessSocket<Player | undefined>(msg.socketId, msg.ip);
+            const socket = new ProcessSocket<Client | undefined>(msg.socketId, msg.ip);
             socketIdToSocket.set(msg.socketId, socket);
             break;
         }
         case ProcessMsgType.ClientSocketMsg: {
             let socket = socketIdToSocket.get(msg.socketId)!;
-            game.handleMsg(msg.data as ArrayBuffer, socket);
+            game.clientBarn.handleMsg(msg.data as ArrayBuffer, socket);
             break;
         }
         case ProcessMsgType.SocketClose: {
             const socket = socketIdToSocket.get(msg.socketId)!;
-            game.handleSocketClose(socket);
+            socket._closed = true;
+            game.clientBarn.handleSocketClose(socket);
             socketIdToSocket.delete(msg.socketId);
             break;
         }

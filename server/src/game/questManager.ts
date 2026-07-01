@@ -86,7 +86,7 @@ export class QuestManager {
         if (progress.length === 0) return;
 
         if (!this.player.disconnected) {
-            this.player.sendMsg(MsgType.UpdatePass, new UpdatePassMsg());
+            this.player.client.sendInstantMsg(MsgType.UpdatePass, new UpdatePassMsg());
         }
 
         this.game.sendQuestProgress(this.player.userId, progress);

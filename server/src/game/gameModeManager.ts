@@ -263,42 +263,6 @@ export class GameModeManager {
         }
     }
 
-    /**
-     * gives all the players spectating the player who died a new player to spectate
-     * @param player player who died
-     */
-    assignNewSpectate(player: Player): void {
-        // This method doesn't use a mode switchcase like all the other methods in this class,
-        // as the spectate logic is identitical with the sole exception of narrowing random players
-        // in 50v50: random players spectated in 50v50 should be on the same team as the spectator.
-
-        // If there are no spectators, we have no need to run any logic.
-        if (player.spectatorCount === 0) return;
-
-        // Priority list of spectate targets.
-        const spectateTargets = [
-            player.group?.randomPlayer(), // undefined if no player to choose
-            player.team?.randomPlayer(), // undefined if no player to choose
-            player.getAliveKiller(),
-            player.game.playerBarn.randomPlayer(),
-        ];
-
-        const playerToSpec = spectateTargets.filter((x) => x !== undefined).shift();
-        for (const spectator of player.spectators) {
-            // If all group members have died, they need to be sent a game over message instead.
-            if (
-                player.group
-                && player.group.allDeadOrDisconnected
-                && player.group.players.includes(spectator)
-            ) {
-                continue;
-            }
-
-            // Set remaining spectators to new player.
-            spectator.spectating = playerToSpec;
-        }
-    }
-
     handlePlayerDeath(player: Player, params: DamageParams): void {
         if (this.isSolo) {
             player.kill(params);

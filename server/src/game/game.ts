@@ -1,11 +1,10 @@
-import { GameConfig, TeamMode } from "../../../shared/gameConfig.ts";
-import * as net from "../../../shared/net/net.ts";
+import { TeamMode } from "../../../shared/gameConfig.ts";
 import type { Loadout } from "../../../shared/utils/loadout.ts";
 import { math } from "../../../shared/utils/math.ts";
-import { v2 } from "../../../shared/utils/v2.ts";
 import { Config } from "../config.ts";
 import { ServerLogger } from "../utils/logger.ts";
 import { type FindGamePrivateBody, type ServerGameConfig } from "../utils/types.ts";
+import { ClientBarn } from "./client.ts";
 import { GameModeManager } from "./gameModeManager.ts";
 import { Grid } from "./grid.ts";
 import { GameMap } from "./map.ts";
@@ -19,11 +18,10 @@ import { Gas } from "./objects/gas.ts";
 import { LootBarn } from "./objects/loot.ts";
 import { MapIndicatorBarn } from "./objects/mapIndicator.ts";
 import { PlaneBarn } from "./objects/plane.ts";
-import { Player, PlayerBarn } from "./objects/player.ts";
+import { PlayerBarn } from "./objects/player.ts";
 import { ProjectileBarn } from "./objects/projectile.ts";
 import { SmokeBarn } from "./objects/smoke.ts";
 import { Profiler } from "./profiler.ts";
-import type { ClientSocket } from "./socket.ts";
 
 export interface JoinTokenData {
     expiresAt: number;
@@ -71,21 +69,12 @@ export class Game {
         return this.playerBarn.livingPlayers.length;
     }
 
-    get trueAliveCount(): number {
-        return this.playerBarn.livingPlayers.filter((p) => !p.disconnected).length;
-    }
-
-    /**
-     * All msgs created this tick that will be sent to all players
-     * cached in a single stream
-     */
-    msgsToSend = new net.MsgStream(new ArrayBuffer(4096));
-
     grid: Grid<GameObject>;
     map: GameMap;
     gas: Gas;
     objectRegister: ObjectRegister;
 
+    clientBarn: ClientBarn;
     playerBarn: PlayerBarn;
     lootBarn: LootBarn;
     deadBodyBarn: DeadBodyBarn;
@@ -120,6 +109,7 @@ export class Game {
         this.grid = new Grid(this.map.width, this.map.height);
         this.objectRegister = new ObjectRegister(this.grid);
 
+        this.clientBarn = new ClientBarn(this);
         this.playerBarn = new PlayerBarn(this);
         this.lootBarn = new LootBarn(this);
         this.deadBodyBarn = new DeadBodyBarn(this);
@@ -205,6 +195,10 @@ export class Game {
 
         this.profiler.addSample("players");
         this.playerBarn.update(dt);
+        this.profiler.endSample();
+
+        this.profiler.addSample("clients");
+        this.clientBarn.update(dt);
         this.profiler.endSample();
 
         this.profiler.addSample("map");
@@ -294,11 +288,12 @@ export class Game {
 
         // serialize objects and send msgs
         this.objectRegister.serializeObjs();
-        this.playerBarn.sendMsgs();
+        this.clientBarn.sendMsgs();
 
         //
         // reset stuff
         //
+        this.clientBarn.flush();
         this.playerBarn.flush();
         this.lootBarn.flush();
         this.planeBarn.flush();
@@ -308,8 +303,6 @@ export class Game {
         this.explosionBarn.flush();
         this.gas.flush();
         this.mapIndicatorBarn.flush();
-
-        this.msgsToSend.stream.index = 0;
 
         const syncTime = performance.now() - start;
         if (syncTime > 1000) {
@@ -337,189 +330,6 @@ export class Game {
             && !this.over
             && this.startedTime < 60
         );
-    }
-
-    deserializeMsg(buff: ArrayBuffer): {
-        type: net.MsgType;
-        msg: net.AbstractMsg | undefined;
-        error?: string;
-    } {
-        const msgStream = new net.MsgStream(buff);
-        const stream = msgStream.stream;
-
-        const type = msgStream.deserializeMsgType();
-
-        let msg:
-            | net.JoinMsg
-            | net.InputMsg
-            | net.EmoteMsg
-            | net.DropItemMsg
-            | net.SpectateMsg
-            | net.PerkModeRoleSelectMsg
-            | net.EditMsg
-            | undefined = undefined;
-
-        switch (type) {
-            case net.MsgType.Join: {
-                // read protocol version outside of JoinMsg
-                // reason: if theres a protocol change in JoinMsg it will fail to deserialize the entire msg
-                // and won't give the proper invalid-protocol error
-                // so we read it before deserializing the msg to avoid it throwing and giving the wrong error
-
-                const oldIdx = stream.index;
-                const protocol = stream.readUint32();
-
-                if (protocol !== GameConfig.protocolVersion) {
-                    return {
-                        type: net.MsgType.Join,
-                        msg: undefined,
-                        error: "index-invalid-protocol",
-                    };
-                }
-                stream.index = oldIdx;
-
-                msg = new net.JoinMsg();
-                msg.deserialize(stream);
-                break;
-            }
-            case net.MsgType.Input: {
-                msg = new net.InputMsg();
-                msg.deserialize(stream);
-                break;
-            }
-            case net.MsgType.Emote:
-                msg = new net.EmoteMsg();
-                msg.deserialize(stream);
-                break;
-            case net.MsgType.DropItem:
-                msg = new net.DropItemMsg();
-                msg.deserialize(stream);
-                break;
-            case net.MsgType.Spectate:
-                msg = new net.SpectateMsg();
-                msg.deserialize(stream);
-                break;
-            case net.MsgType.PerkModeRoleSelect:
-                msg = new net.PerkModeRoleSelectMsg();
-                msg.deserialize(stream);
-                break;
-            case net.MsgType.Edit:
-                if (!Config.debug.allowEditMsg) break;
-                msg = new net.EditMsg();
-                msg.deserialize(stream);
-                break;
-        }
-
-        return {
-            type,
-            msg,
-        };
-    }
-
-    handleMsg(buff: ArrayBuffer | Buffer, socket: ClientSocket<Player | undefined>) {
-        if (!(buff instanceof ArrayBuffer)) return;
-
-        const player = socket.getUserData();
-
-        let msg: net.AbstractMsg | undefined = undefined;
-        let type = net.MsgType.None;
-        let error: string | undefined;
-
-        try {
-            const deserialized = this.deserializeMsg(buff);
-            msg = deserialized.msg;
-            type = deserialized.type;
-            error = deserialized.error;
-        } catch (err) {
-            this.logger.error(
-                "Failed to deserialize msg: ",
-                err,
-                "msg buffer: ",
-                // JSON.stringify doesn't work on buffers, so need to convert to an Uint8Array first
-                // and then to a regular array... 😭
-                // the slice is to make sure it doesn't overflow the error webhook
-                JSON.stringify([...new Uint8Array(buff.slice(0, 255))]),
-            );
-            if (player) {
-                player.disconnect();
-            } else {
-                socket.close();
-            }
-            return;
-        }
-
-        if (error) {
-            this.logger.warn("Disconnecting player because of packet error:", error);
-            if (player) {
-                player.disconnect();
-            } else {
-                socket.close();
-            }
-            return;
-        }
-
-        if (!msg) return;
-
-        if (type === net.MsgType.Join && !player) {
-            this.playerBarn.addPlayer(socket, msg as net.JoinMsg);
-            return;
-        }
-
-        if (!player) {
-            this.logger.warn("No player found and we didn't receive a JoinMsg, closing socket");
-            socket.close();
-            return;
-        }
-
-        if (player.disconnected) {
-            return;
-        }
-
-        switch (type) {
-            case net.MsgType.Input: {
-                player.handleInput(msg as net.InputMsg);
-                break;
-            }
-            case net.MsgType.Emote: {
-                player.emoteFromMsg(msg as net.EmoteMsg);
-                break;
-            }
-            case net.MsgType.DropItem: {
-                player.dropItem(msg as net.DropItemMsg);
-                break;
-            }
-            case net.MsgType.Spectate: {
-                player.spectate(msg as net.SpectateMsg);
-                break;
-            }
-            case net.MsgType.PerkModeRoleSelect: {
-                player.roleSelect((msg as net.PerkModeRoleSelectMsg).role);
-                break;
-            }
-            case net.MsgType.Edit: {
-                player.processEditMsg(msg as net.EditMsg);
-                break;
-            }
-        }
-    }
-
-    handleSocketClose(socket: ClientSocket<Player | undefined>) {
-        const player = socket.getUserData();
-        if (!player) return;
-        this.logger.info(`"${player.name}" left`);
-        player.questManager.flushProgress();
-        player.disconnected = true;
-        player.group?.checkPlayers();
-        player.spectating = undefined;
-        player.dirNew = v2.create(1, 0);
-        player.setPartDirty();
-        if (player.canDespawn()) {
-            player.game.playerBarn.removePlayer(player);
-        }
-    }
-
-    broadcastMsg(type: net.MsgType, msg: net.Msg) {
-        this.msgsToSend.serializeMsg(type, msg);
     }
 
     checkGameOver() {
@@ -562,10 +372,8 @@ export class Game {
     stop() {
         if (this.stopped) return;
         this.stopped = true;
-        for (const player of this.playerBarn.players) {
-            if (!player.disconnected) {
-                player.disconnect();
-            }
+        for (const client of this.clientBarn.clients) {
+            client.disconnect();
         }
         this.logger.info("Game Ended");
         this.updateData();

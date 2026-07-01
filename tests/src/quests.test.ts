@@ -7,8 +7,7 @@ test("Kill enemies inside building test", () => {
     const game = createGame(TeamMode.Solo, "test_normal");
     game.map.genBuilding("club_complex_01", game.map.center, 0, 0);
 
-    const playerA = game.playerBarn.addTestPlayer({});
-    playerA.userId = "meow";
+    const playerA = game.playerBarn.addTestPlayer({ userId: "meow" });
     playerA.questManager.quests = [
         {
             id: "quest_club_kills",
@@ -55,8 +54,7 @@ test("Kill enemies inside building test", () => {
 test("Players shouldn't get placement progress for just disconnecting", () => {
     const game = createGame(TeamMode.Solo, "test_normal");
 
-    const playerA = game.playerBarn.addTestPlayer({});
-    playerA.userId = "meow";
+    const playerA = game.playerBarn.addTestPlayer({ userId: "meow" });
     playerA.questManager.quests = [
         {
             id: "quest_top_solo",
@@ -67,7 +65,7 @@ test("Players shouldn't get placement progress for just disconnecting", () => {
 
     expect(playerA.questManager.quests[0].delta).toBe(0);
 
-    playerA.socket.close();
+    playerA.client.socket.close();
 
     // player leaving shouldn't count as progress
     expect(playerA.questManager.quests[0].totalDelta).toBe(0);
@@ -76,8 +74,7 @@ test("Players shouldn't get placement progress for just disconnecting", () => {
 test("Solo placement success on win", () => {
     const game = createGame(TeamMode.Solo, "test_normal");
 
-    const playerA = game.playerBarn.addTestPlayer({});
-    playerA.userId = "meow";
+    const playerA = game.playerBarn.addTestPlayer({ userId: "meow" });
     playerA.questManager.quests = [
         {
             id: "quest_top_solo",
@@ -109,8 +106,7 @@ test("Solo placement success on win", () => {
 test("Solo placement success on death", () => {
     const game = createGame(TeamMode.Solo, "test_normal");
 
-    const playerA = game.playerBarn.addTestPlayer({});
-    playerA.userId = "meow";
+    const playerA = game.playerBarn.addTestPlayer({ userId: "meow" });
     playerA.questManager.quests = [
         {
             id: "quest_top_solo",
@@ -141,8 +137,7 @@ test("Solo placement success on death", () => {
 test("Solo placement test fail on death", () => {
     const game = createGame(TeamMode.Solo, "test_normal");
 
-    const playerA = game.playerBarn.addTestPlayer({});
-    playerA.userId = "meow";
+    const playerA = game.playerBarn.addTestPlayer({ userId: "meow" });
     playerA.questManager.quests = [
         {
             id: "quest_top_solo",
@@ -173,8 +168,7 @@ test("Squad placement success on win", () => {
     const game = createGame(TeamMode.Squad, "test_normal");
 
     const groupA = game.playerBarn.addGroup(false);
-    const playerA = game.playerBarn.addTestPlayer({ group: groupA });
-    playerA.userId = "meow";
+    const playerA = game.playerBarn.addTestPlayer({ group: groupA, userId: "meow" });
     playerA.questManager.quests = [
         {
             id: "quest_top_squad",
@@ -208,8 +202,7 @@ test("Squad placement success on death", () => {
     const game = createGame(TeamMode.Squad, "test_normal");
 
     const groupA = game.playerBarn.addGroup(false);
-    const playerA = game.playerBarn.addTestPlayer({ group: groupA });
-    playerA.userId = "meow";
+    const playerA = game.playerBarn.addTestPlayer({ group: groupA, userId: "meow" });
     playerA.questManager.quests = [
         {
             id: "quest_top_squad",
@@ -251,8 +244,7 @@ test("Squad placement fail on death", () => {
     const game = createGame(TeamMode.Squad, "test_normal");
 
     const groupA = game.playerBarn.addGroup(false);
-    const playerA = game.playerBarn.addTestPlayer({ group: groupA });
-    playerA.userId = "meow";
+    const playerA = game.playerBarn.addTestPlayer({ group: groupA, userId: "meow" });
     playerA.questManager.quests = [
         {
             id: "quest_top_squad",
@@ -292,8 +284,7 @@ test("Squad placement fail on death", () => {
 test("Survived time on death", () => {
     const game = createGame(TeamMode.Solo, "test_normal");
 
-    const playerA = game.playerBarn.addTestPlayer({});
-    playerA.userId = "meow";
+    const playerA = game.playerBarn.addTestPlayer({ userId: "meow" });
     playerA.questManager.quests = [
         {
             id: "quest_survived",
@@ -317,8 +308,7 @@ test("Survived time on death", () => {
 test("Survived time on win", () => {
     const game = createGame(TeamMode.Solo, "test_normal");
 
-    const playerA = game.playerBarn.addTestPlayer({});
-    playerA.userId = "meow";
+    const playerA = game.playerBarn.addTestPlayer({ userId: "meow" });
     playerA.questManager.quests = [
         {
             id: "quest_survived",

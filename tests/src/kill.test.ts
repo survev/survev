@@ -120,7 +120,7 @@ test("Downed by enemy, killed by teammate", () => {
     const playerB = game.playerBarn.addTestPlayer({ group });
     const playerC = game.playerBarn.addTestPlayer({ group });
 
-    playerB.disconnected = true;
+    playerB.client.disconnected = true;
 
     playerB.damage({
         amount: 999,
@@ -153,7 +153,7 @@ test("Downed by teammate, killed by teammate", () => {
     const playerA = game.playerBarn.addTestPlayer({ group });
     const playerB = game.playerBarn.addTestPlayer({ group });
 
-    playerB.disconnected = true;
+    playerB.client.disconnected = true;
 
     playerB.damage({
         amount: 999,
@@ -186,7 +186,7 @@ test("Downed by teammate, killed by enemy", () => {
     const playerB = game.playerBarn.addTestPlayer({ group });
     const playerC = game.playerBarn.addTestPlayer({ group });
 
-    playerB.disconnected = true;
+    playerB.client.disconnected = true;
 
     playerB.damage({
         amount: 999,
@@ -219,7 +219,7 @@ test("Downed by teammate, killed by bleeding", () => {
     const playerA = game.playerBarn.addTestPlayer({ group });
     const playerB = game.playerBarn.addTestPlayer({ group });
 
-    playerB.disconnected = true;
+    playerB.client.disconnected = true;
 
     playerB.damage({
         amount: 999,
@@ -250,7 +250,7 @@ test("Downed by teammate, killed by gas", () => {
     const playerA = game.playerBarn.addTestPlayer({ group });
     const playerB = game.playerBarn.addTestPlayer({ group });
 
-    playerB.disconnected = true;
+    playerB.client.disconnected = true;
 
     playerB.damage({
         amount: 999,

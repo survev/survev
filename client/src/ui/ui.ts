@@ -7,6 +7,7 @@ import type { MapDef } from "../../../shared/defs/mapDefs.ts";
 import { GameObjectDefs } from "../../../shared/defs/register.ts";
 import { Action, GameConfig, GasMode, TeamMode } from "../../../shared/gameConfig.ts";
 import type { PlayerStatsMsg } from "../../../shared/net/playerStatsMsg.ts";
+import { SpectateAction } from "../../../shared/net/spectateMsg.ts";
 import type { MapIndicator, PlayerStatus } from "../../../shared/net/updateMsg.ts";
 import { coldet } from "../../../shared/utils/coldet.ts";
 import { math } from "../../../shared/utils/math.ts";
@@ -164,9 +165,7 @@ export class UiManager {
     resumeButton = $("#btn-game-resume");
 
     specStatsButton = $("#btn-spectate-view-stats");
-    specBegin = false;
-    specNext = false;
-    specPrev = false;
+    specAction = SpectateAction.None;
     specNextButton = $("#btn-spectate-next-player");
     specPrevButton = $("#btn-spectate-prev-player");
 
@@ -381,10 +380,10 @@ export class UiManager {
         });
 
         this.specNextButton.on("click", () => {
-            this.specNext = true;
+            this.specAction = SpectateAction.Next;
         });
         this.specPrevButton.on("click", () => {
-            this.specPrev = true;
+            this.specAction = SpectateAction.Prev;
         });
 
         // Touch specific buttons
@@ -1289,7 +1288,7 @@ export class UiManager {
     }
 
     beginSpectating() {
-        this.specBegin = true;
+        this.specAction = SpectateAction.Begin;
     }
 
     hideStats() {
