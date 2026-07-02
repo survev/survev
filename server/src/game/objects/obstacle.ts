@@ -476,11 +476,9 @@ export class Obstacle extends BaseGameObject {
 
         this.healthT = math.clamp(this.health / this.maxHealth, 0, 1);
 
-        if (this.minScale < 1) {
-            this.scale = math.lerp(this.healthT, this.minScale, this.maxScale);
-            this.updateCollider();
-            this.game.lootBarn.forceLootUpdates(this.collider, this.layer);
-        }
+        this.scale = math.lerp(this.healthT, this.minScale, this.maxScale);
+        this.updateCollider();
+        this.game.lootBarn.forceLootUpdates(this.collider, this.layer);
 
         // need to send full object for obstacles with explosions
         // so smoke particles work on the client
