@@ -167,6 +167,7 @@ export class UiManager {
     specBegin = false;
     specNext = false;
     specPrev = false;
+    specAnon = false;
     specNextButton = $("#btn-spectate-next-player");
     specPrevButton = $("#btn-spectate-prev-player");
 
@@ -554,6 +555,9 @@ export class UiManager {
                 },
             });
         }
+
+        this.specAnon = game.m_config.get("spectateAnon") ?? false;
+
         this.init();
     }
 
@@ -1556,12 +1560,23 @@ export class UiManager {
                         ? -72
                         : -46,
                 });
-                const q = $("<a/>", {
+                const spectateBtn = $("<a/>", {
                     class: "btn-green btn-darken menu-option ui-stats-spectate",
                     html: this.localization.translate("game-spectate"),
                 });
-                q.on("click", this.beginSpectating.bind(this));
-                this.statsOptions.append(q);
+                spectateBtn.on("click", this.beginSpectating.bind(this));
+                this.statsOptions.append(spectateBtn);
+
+                const anonToggle = $<HTMLInputElement & { type: "checkbox" }>(`<input/>`, {
+                    type: "checkbox",
+                    checked: this.specAnon,
+                    class: "btn-green btn-darken ui-stats-anon-toggle",
+                });
+                anonToggle.on("input", () => {
+                    this.specAnon = Boolean(anonToggle.prop("checked"));
+                    this.game.m_config.set("spectateAnon", this.specAnon);
+                });
+                this.statsOptions.append(anonToggle);
             }
 
             let elemIdx = 0;
