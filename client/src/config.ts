@@ -43,6 +43,7 @@ export const debugRenderConfig = {
         waterEdge: false,
         ceiling: false,
         floors: false,
+        minimap: false,
     },
     structures: {
         buildingBounds: false,
