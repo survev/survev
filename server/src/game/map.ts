@@ -442,13 +442,13 @@ export class GameMap {
                 ? livingPlayers
                 : this.game.grid.intersectCollider(building.emitterBounds);
 
-            for (let i = 0; i < players.length; i++) {
-                const player = players[i];
+            for (let j = 0; j < players.length; j++) {
+                const player = players[j];
                 if (player.__type !== ObjectType.Player) continue;
                 if (player.dead) continue;
                 if (!util.sameLayer(player.layer, building.layer)) continue;
-                for (let j = 0; j < building.zoomRegions.length; j++) {
-                    const region = building.zoomRegions[j];
+                for (let k = 0; k < building.zoomRegions.length; k++) {
+                    const region = building.zoomRegions[k];
 
                     if (!region.zoomIn) continue;
                     if (
