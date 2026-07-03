@@ -470,7 +470,7 @@ export class Client {
         }
         const rect = collider.createAabbExtents(player.pos, v2.create(width, height));
 
-        const newVisibleObjects = game.grid.intersectColliderSet(rect);
+        const newVisibleObjects = game.grid.intersectAABBSet(rect);
         // client crashes if active player is not visible
         // so make sure its always added to visible objects
         newVisibleObjects.add(player);
