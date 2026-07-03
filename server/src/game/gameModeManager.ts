@@ -125,8 +125,10 @@ export class GameModeManager {
             }
             case GameMode.Team: {
                 const winner = this.game.playerBarn.getAliveGroups()[0];
-                for (const player of winner.getAlivePlayers()) {
-                    player.addGameOverMsg(winner.id);
+                for (const player of winner.players) {
+                    if (!player.disconnected && !player.dead) {
+                        player.addGameOverMsg(winner.id);
+                    }
                 }
                 break;
             }
