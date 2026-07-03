@@ -118,6 +118,7 @@ export class UiManager {
     rightCenter = $("#ui-right-center");
     leaderboardAlive = $("#ui-leaderboard-alive");
     playersAlive = $(".js-ui-players-alive");
+    playersAliveCounter = 0;
     leaderboardAliveFaction = $("#ui-leaderboard-alive-faction");
     playersAliveRed = $(".js-ui-players-alive-red");
     playersAliveBlue = $(".js-ui-players-alive-blue");
@@ -1543,7 +1544,8 @@ export class UiManager {
                 });
             });
             this.statsOptions.append(restartButton);
-            if (gameOver || this.waitingForPlayers) {
+            const alive = this.playersAliveCounter + this.playersAliveRedCounter + this.playersAliveBlueCounter;
+            if (gameOver || alive === 0) {
                 restartButton.css({
                     width: device.uiLayout != device.UiLayout.Sm || device.tablet
                         ? 225
@@ -1819,6 +1821,7 @@ export class UiManager {
 
     updatePlayersAlive(alive: number) {
         this.playersAlive.html(alive);
+        this.playersAliveCounter = alive;
 
         this.leaderboardAlive.css("display", "block");
         this.leaderboardAliveFaction.css("display", "none");
