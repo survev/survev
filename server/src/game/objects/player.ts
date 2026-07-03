@@ -270,10 +270,11 @@ export class PlayerBarn {
             params.pos ?? v2.create(this.game.map.width / 2, this.game.map.height / 2),
             0,
             client,
-            params.name ?? `TEST-${this.testPlayerCount++}`,
+            params.name ?? `TEST-${String.fromCharCode(65 + this.testPlayerCount++)}`,
             false,
             false,
         );
+        client.player = player;
 
         this.activatePlayer(player, group, team);
 

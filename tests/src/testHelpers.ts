@@ -2,6 +2,7 @@ import { expect } from "vitest";
 
 import type { GameObjectDef } from "../../shared/defs/gameObjectDefs.ts";
 
+import type { Player } from "../../server/src/game/objects/player.ts";
 import type { MapObjectDef } from "../../shared/defs/mapObjectsTyping.ts";
 import { Main } from "../../shared/defs/maps/baseDefs.ts";
 import { GameObjectDefs, MapObjectDefs } from "../../shared/defs/register.ts";
@@ -14,6 +15,8 @@ interface GameTestHelpers<R = unknown> {
     toBeValidGameObj: (type?: GameObjectDef["type"]) => R;
     toBeValidLoot: (type?: GameObjectDef["type"]) => R;
     toBeValidLootTier: () => R;
+
+    toBeSamePlayer: (obj?: Player) => R;
 }
 
 declare module "vitest" {
@@ -122,6 +125,23 @@ expect.extend({
         if (!(received in Main.lootTable)) {
             return {
                 message: () => `Expected '${received}' to be a valid loot table`,
+                pass: false,
+            };
+        }
+
+        return { pass: true, message: () => "" };
+    },
+
+    toBeSamePlayer: (received: Player | undefined, expected: Player) => {
+        if (!received) {
+            return {
+                message: () => `Expected a player instance, received '${expected}'`,
+                pass: false,
+            };
+        }
+        if (received.__id !== expected.__id) {
+            return {
+                message: () => `Expected player '${received.name}' to be '${expected.name}'`,
                 pass: false,
             };
         }

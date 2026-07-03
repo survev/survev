@@ -3,6 +3,7 @@ import { GameConfig, TeamMode } from "../../shared/gameConfig.ts";
 import { InputMsg } from "../../shared/net/inputMsg.ts";
 import { v2 } from "../../shared/utils/v2.ts";
 import { createGame } from "./gameTestHelpers.ts";
+import "./testHelpers.ts";
 
 // + 0.1 to account for off by one tick on the timer system lol
 const reviveDur = GameConfig.player.reviveDuration + 0.1;
@@ -51,7 +52,7 @@ test("Normal 2 players successful revive", () => {
     const msg = new InputMsg();
     msg.addInput(GameConfig.Input.Interact);
     playerA.handleInput(msg);
-    expect(playerA.playerBeingRevived).toBe(playerB);
+    expect(playerA.playerBeingRevived).toBeSamePlayer(playerB);
 
     game.step(reviveDur);
 
@@ -140,7 +141,7 @@ test("Normal medic reviving multiple players", () => {
     const msg = new InputMsg();
     msg.addInput(GameConfig.Input.Interact);
     medic.handleInput(msg);
-    expect(medic.playerBeingRevived).toBe(playerB);
+    expect(medic.playerBeingRevived).toBeSamePlayer(playerB);
 
     game.step(reviveDur);
 
@@ -172,7 +173,7 @@ test("Faction 2 players successful revive", () => {
     const msg = new InputMsg();
     msg.addInput(GameConfig.Input.Interact);
     playerA.handleInput(msg);
-    expect(playerA.playerBeingRevived).toBe(playerB);
+    expect(playerA.playerBeingRevived).toBeSamePlayer(playerB);
 
     game.step(reviveDur);
 
@@ -311,7 +312,7 @@ test("Faction medic reviving multiple players", () => {
     const msg = new InputMsg();
     msg.addInput(GameConfig.Input.Interact);
     medic.handleInput(msg);
-    expect(medic.playerBeingRevived).toBe(playerB);
+    expect(medic.playerBeingRevived).toBeSamePlayer(playerB);
 
     game.step(reviveDur);
 
