@@ -275,7 +275,7 @@ const mapDef: PartialMapDef = {
                 crate_03: 8,
                 bush_01: 90,
                 tree_06: 220,
-                tree_05c: 144,
+                tree_05c: 96,
                 tree_09: 40,
                 hedgehog_01: 12,
                 container_01: 5,
