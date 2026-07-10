@@ -987,7 +987,7 @@ window.onerror = function(msg, url, lineNo, columnNo, error) {
     if (!url.startsWith(location.href) || !/.js|.ts/.test(url)) return;
 
     // ignore scrappers
-    if (/googlebot|bingbot|yandexbot/gi.test(navigator.userAgent)) return;
+    if (/googlebot|bingbot|yandexbot|mediapartners-google/gi.test(navigator.userAgent)) return;
 
     const errObj = {
         msg,
