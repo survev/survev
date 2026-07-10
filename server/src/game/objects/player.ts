@@ -191,8 +191,8 @@ export class PlayerBarn {
             layer,
             client,
             finalName,
-            joinMsg.isMobile,
             joinMsg.bot,
+            joinMsg.isMobile,
             joinData.quests,
         );
 
