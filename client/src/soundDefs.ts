@@ -166,8 +166,42 @@ const Sounds: Record<string, Record<string, SoundDef>> = {
         },
         barrett_01: {
             path: "audio/guns/barrett_01.mp3",
-            volume: 0.75,
-            maxInstances: 2,
+            volume: 1,
+            maxInstances: 5,
+        },
+        barrett_reload_01: {
+            path: "audio/guns/barrett_reload_01.mp3",
+            volume: 1.25,
+        },
+        barrett_switch_01: {
+            path: "audio/guns/barrett_switch_01.mp3",
+            volume: 1,
+        },
+        sw500_01: {
+            path: "audio/guns/sw500_01.mp3",
+            volume: 1,
+            maxInstances: 5,
+        },
+        sw500_reload_01: {
+            path: "audio/guns/sw500_reload_01.mp3",
+            volume: 1,
+        },
+        sw500_switch_01: {
+            path: "audio/guns/sw500_switch_01.mp3",
+            volume: 1,
+        },
+        ash12_01: {
+            path: "audio/guns/ash12_01.mp3",
+            volume: 1,
+            maxInstances: 5,
+        },
+        ash12_reload_01: {
+            path: "audio/guns/ash12_reload_01.mp3",
+            volume: 1.25,
+        },
+        ash12_switch_01: {
+            path: "audio/guns/ash12_switch_01.mp3",
+            volume: 1,
         },
         flare_gun_01: {
             path: "audio/guns/flare_gun_01.mp3",
