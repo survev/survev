@@ -33,7 +33,7 @@
     "redis": "^5.12.1",
     "slugify": "^1.6.9",
     "typescript": "^6.0.3",
-    "uWebSockets.js": "github:uNetworking/uWebSockets.js#v20.68.0",
+    "uWebSockets.js": "github:uNetworking/uWebSockets.js#v20.69.0",
     "zod": "^4.4.3"
   },
   "devDependencies": {
