@@ -33,9 +33,10 @@ class Region {
             if (res.ok) {
                 return (await res.json()) as Data;
             }
+
+            defaultLogger.warn(`Region ${this.id} returned status ${res.statusText}`);
         } catch (err) {
             defaultLogger.error(`Error fetching region ${this.id}`, err);
-            return undefined;
         }
     }
 
