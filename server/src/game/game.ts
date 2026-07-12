@@ -21,7 +21,7 @@ import { PlaneBarn } from "./objects/plane.ts";
 import { PlayerBarn } from "./objects/player.ts";
 import { ProjectileBarn } from "./objects/projectile.ts";
 import { SmokeBarn } from "./objects/smoke.ts";
-import { Profiler } from "./profiler.ts";
+import { Profiler, TickProfiler } from "./profiler.ts";
 
 export interface JoinTokenData {
     expiresAt: number;
@@ -57,9 +57,11 @@ export class Game {
     perfTicker = 0;
     tickTimes: number[] = [];
 
+    gameTickProfiler = new TickProfiler("Game", Config.logging.debugLogs);
     tickTimeWarnThreshold = (1000 / Config.gameTps) * 4;
     gameTickWarnings = 0;
 
+    netTickprofiler = new TickProfiler("Net", Config.logging.debugLogs);
     netSyncWarnThreshold = (1000 / Config.netSyncTps) * 4;
     netSyncWarnings = 0;
 
@@ -145,13 +147,11 @@ export class Game {
         if (this.stopped) return;
         this.profiler.flush();
 
-        const now = performance.now();
-        if (!this.now) this.now = now;
-        dt ??= math.clamp((now - this.now) / 1000, 0.001, 1 / 8);
+        this.gameTickProfiler.beginTick();
+
+        dt ??= math.clamp(this.gameTickProfiler.dt / 1000, 0.001, 1 / 8);
 
         dt *= this.debugSpeedMulti;
-
-        this.now = now;
 
         if (this.over) {
             this.stopTicker -= dt;
@@ -241,8 +241,9 @@ export class Game {
         this.planeBarn.update(dt);
         this.profiler.endSample();
 
-        const tickTime = performance.now() - this.now;
+        this.gameTickProfiler.endTick();
 
+        const tickTime = this.gameTickProfiler.mspt;
         if (tickTime > 1000) {
             let errString = `Tick took over 1 second! ${tickTime.toFixed(2)}ms\n`;
             errString += "Profiler stats:\n";
@@ -266,17 +267,14 @@ export class Game {
         }
 
         if (Config.logging.debugLogs) {
-            this.tickTimes.push(tickTime);
+            this.gameTickProfiler.profileTick += dt;
 
-            this.perfTicker += dt;
-            if (this.perfTicker >= 15) {
-                this.perfTicker = 0;
-                const mspt = this.tickTimes.reduce((a, b) => a + b) / this.tickTimes.length;
+            if (this.gameTickProfiler.profileTick >= 15) {
+                this.gameTickProfiler.profileTick = 0;
 
-                this.logger.debug(
-                    `Avg ms/tick: ${mspt.toFixed(2)} | Load: ${((mspt / (1000 / Config.gameTps)) * 100).toFixed(1)}%`,
-                );
-                this.tickTimes = [];
+                const stats = this.gameTickProfiler.getStats();
+
+                this.gameTickProfiler.printStats(this.logger, stats, Config.gameTps);
             }
         }
     }
@@ -284,7 +282,7 @@ export class Game {
     netSync() {
         if (this.stopped) return;
 
-        const start = performance.now();
+        this.netTickprofiler.beginTick();
 
         // serialize objects and send msgs
         this.objectRegister.serializeObjs();
@@ -304,12 +302,14 @@ export class Game {
         this.gas.flush();
         this.mapIndicatorBarn.flush();
 
-        const syncTime = performance.now() - start;
+        this.netTickprofiler.endTick();
+
+        const syncTime = this.netTickprofiler.mspt;
         if (syncTime > 1000) {
-            this.logger.error(`Tick took over 1 second! ${syncTime.toFixed(2)}ms`);
+            this.logger.error(`Net tick took over 1 second! ${syncTime.toFixed(2)}ms`);
         } else if (syncTime > this.netSyncWarnThreshold) {
             this.logger.warn(
-                `Tick took over ${this.netSyncWarnThreshold}ms! ${syncTime.toFixed(2)}ms`,
+                `Net tick took over ${this.netSyncWarnThreshold}ms! ${syncTime.toFixed(2)}ms`,
             );
             this.netSyncWarnings++;
 
@@ -320,6 +320,17 @@ export class Game {
 
                 this.netSyncWarnings = 0;
                 this.netSyncWarnThreshold *= 2;
+            }
+        }
+
+        if (Config.logging.debugLogs) {
+            this.netTickprofiler.profileTick += this.netTickprofiler.dt / 1000;
+
+            if (this.netTickprofiler.profileTick >= 15) {
+                this.netTickprofiler.profileTick = 0;
+
+                const stats = this.netTickprofiler.getStats();
+                this.netTickprofiler.printStats(this.logger, stats, Config.netSyncTps);
             }
         }
     }

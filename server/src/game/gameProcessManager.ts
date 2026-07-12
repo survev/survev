@@ -1,10 +1,9 @@
 import { type ChildProcess, fork } from "node:child_process";
 import { randomUUID } from "node:crypto";
-import type { WebSocket } from "uWebSockets.js";
 import { type MapDefKey, MapDefs } from "../../../shared/defs/mapDefs.ts";
 import type { TeamMode } from "../../../shared/gameConfig.ts";
-import * as net from "../../../shared/net/net.ts";
 import { util } from "../../../shared/utils/util.ts";
+import { Config } from "../config.ts";
 import { ServerLogger } from "../utils/logger.ts";
 import { type FindGamePrivateBody, type ServerGameConfig } from "../utils/types.ts";
 import { type GameData, type ProcessMsg, ProcessMsgType } from "./ipcTypes.ts";
@@ -24,6 +23,7 @@ export enum ProcState {
 
 class GameProcess {
     process: ChildProcess;
+    port: number;
 
     gameData: GameData = {
         id: "",
@@ -50,9 +50,16 @@ class GameProcess {
 
     reusedCount = 0;
 
-    constructor(manager: GameProcessManager, id: string, config: ServerGameConfig) {
+    constructor(
+        manager: GameProcessManager,
+        id: string,
+        config: ServerGameConfig,
+        port: number,
+    ) {
         this.manager = manager;
-        this.process = fork(procFile, [], {
+        this.port = port;
+
+        this.process = fork(procFile, [port.toString()], {
             serialization: "advanced",
         });
 
@@ -93,29 +100,6 @@ class GameProcess {
                     this.state = ProcState.Idle;
                 }
                 break;
-            case ProcessMsgType.ServerSocketMsg:
-                for (let i = 0; i < msg.msgs.length; i++) {
-                    const socketMsg = msg.msgs[i];
-                    const socket = this.manager.sockets.get(socketMsg.socketId);
-
-                    if (!socket) continue;
-                    if (socket.getUserData().closed) continue;
-                    socket.send(socketMsg.data, true, false);
-                }
-                break;
-            case ProcessMsgType.SocketClose:
-                const socket = this.manager.sockets.get(msg.socketId);
-                if (socket && !socket.getUserData().closed) {
-                    if (msg.reason) {
-                        const disconnectMsg = new net.DisconnectMsg();
-                        disconnectMsg.reason = msg.reason;
-                        const stream = new net.MsgStream(new ArrayBuffer(128));
-                        stream.serializeMsg(net.MsgType.Disconnect, disconnectMsg);
-                        socket.send(stream.getBuffer(), true, false);
-                    }
-                    socket.end();
-                }
-                break;
         }
     }
 
@@ -150,49 +134,25 @@ class GameProcess {
         });
         this.avaliableSlots--;
     }
-
-    handleSocketOpen(socketId: string, ip: string) {
-        this.send({
-            type: ProcessMsgType.SocketOpen,
-            socketId,
-            ip,
-        });
-    }
-
-    handleMsg(data: ArrayBuffer, socketId: string) {
-        this.send({
-            type: ProcessMsgType.ClientSocketMsg,
-            socketId,
-            data,
-        });
-    }
-
-    handleSocketClose(socketId: string) {
-        this.send({
-            type: ProcessMsgType.SocketClose,
-            socketId,
-        });
-    }
-}
-
-export interface GameSocketData {
-    gameId: string;
-    id: string;
-    closed: boolean;
-    rateLimit: Record<symbol, number>;
-    ip: string;
-    disconnectReason: string;
 }
 
 export class GameProcessManager {
-    readonly sockets = new Map<string, WebSocket<GameSocketData>>();
-
     readonly processById = new Map<string, GameProcess>();
     readonly processes: GameProcess[] = [];
 
     readonly logger = new ServerLogger("Game Process Manager");
 
+    private readonly _freePorts: number[] = [];
+
+    getNextPort() {
+        return this._freePorts.shift();
+    }
+
     constructor() {
+        for (let i = 0; i < Config.gameServer.maxGames; i++) {
+            this._freePorts.push(Config.gameServer.firstGamePort + i);
+        }
+
         process.on("beforeExit", () => {
             for (const gameProc of this.processes) {
                 gameProc.process.kill();
@@ -247,7 +207,7 @@ export class GameProcessManager {
         }, 0);
     }
 
-    newGame(config: ServerGameConfig): GameProcess {
+    newGame(config: ServerGameConfig): GameProcess | undefined {
         let gameProc: GameProcess | undefined;
 
         for (let i = 0; i < this.processes.length; i++) {
@@ -260,13 +220,21 @@ export class GameProcessManager {
 
         const id = randomUUID();
         if (!gameProc) {
-            gameProc = new GameProcess(this, id, config);
+            const port = this.getNextPort();
+            if (port === undefined) {
+                return undefined;
+            }
+            gameProc = new GameProcess(this, id, config, port);
 
             this.processes.push(gameProc);
 
             gameProc.process.on("exit", () => {
                 this.killProcess(gameProc!);
+                if (!this._freePorts.includes(gameProc!.port)) {
+                    this._freePorts.push(gameProc!.port);
+                }
             });
+
             gameProc.process.on("close", () => {
                 this.killProcess(gameProc!);
             });
@@ -285,13 +253,6 @@ export class GameProcessManager {
     }
 
     killProcess(gameProc: GameProcess, signal: NodeJS.Signals = "SIGTERM"): void {
-        for (const [, socket] of this.sockets) {
-            const data = socket.getUserData();
-            if (data.closed) continue;
-            if (data.gameId !== gameProc.gameData.id) continue;
-            socket.end();
-        }
-
         // send SIGTERM, if still hasn't terminated after 5 seconds, send SIGKILL >:3
         gameProc.process.kill(signal);
         setTimeout(() => {
@@ -308,8 +269,8 @@ export class GameProcessManager {
         return this.processById.get(id);
     }
 
-    async findGame(body: FindGamePrivateBody): Promise<GameProcess> {
-        let proc = this.processes
+    async findGame(body: FindGamePrivateBody): Promise<GameProcess | undefined> {
+        let proc: GameProcess | undefined = this.processes
             .filter((proc) => {
                 const game = proc.gameData;
                 return (
@@ -330,6 +291,10 @@ export class GameProcessManager {
             });
         }
 
+        if (!proc) {
+            return undefined;
+        }
+
         // if the game has not finished creating
         // wait for it to be created to send the find game response
         if (proc.state !== ProcState.Running) {
@@ -344,30 +309,5 @@ export class GameProcessManager {
         proc.addJoinTokens(body.playerData, body.autoFill);
 
         return proc;
-    }
-
-    onOpen(socketId: string, socket: WebSocket<GameSocketData>): void {
-        const data = socket.getUserData();
-        const proc = this.processById.get(data.gameId);
-        if (proc === undefined) {
-            this.logger.warn("process not found, closing socket.");
-            socket.close();
-            return;
-        }
-        this.sockets.set(socketId, socket);
-        this.processById.get(data.gameId)?.handleSocketOpen(socketId, data.ip);
-    }
-
-    onMsg(socketId: string, msg: ArrayBuffer): void {
-        const data = this.sockets.get(socketId)?.getUserData();
-        if (!data) return;
-        this.processById.get(data.gameId)?.handleMsg(msg, socketId);
-    }
-
-    onClose(socketId: string) {
-        const data = this.sockets.get(socketId)?.getUserData();
-        this.sockets.delete(socketId);
-        if (!data) return;
-        this.processById.get(data.gameId)?.handleSocketClose(socketId);
     }
 }
