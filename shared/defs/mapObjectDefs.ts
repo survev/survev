@@ -8568,7 +8568,7 @@ function createOasis<T extends BuildingDef>(e: Partial<T>): T {
         mapGroundPatches: [
             {
                 bound: collider.createCircle(v2.create(0, 0), 40),
-                color: 0x709e59, // 96a750
+                color: 0x80af49,
                 roughness: 0.3,
                 offsetDist: 2,
             },
@@ -8578,7 +8578,21 @@ function createOasis<T extends BuildingDef>(e: Partial<T>): T {
             imgs: [],
         },
         ceiling: { zoomRegions: [], imgs: [] },
+        soundEmitters: [
+            {
+                sound: "ambient_wind_01",
+                channel: "ambient",
+                pos: v2.create(0, 0),
+                range: { min: 15, max: 35 },
+                falloff: 1,
+                volume: 1,
+            },
+        ],
         mapObjects: [
+            //
+            // Central Island
+            //
+
             {
                 type: "tree_14d",
                 pos: v2.create(-1, 0),
@@ -8597,6 +8611,11 @@ function createOasis<T extends BuildingDef>(e: Partial<T>): T {
                 scale: 1,
                 ori: 0,
             },
+
+            //
+            // Outer Region
+            //
+
             {
                 type: randomObstacleType({ tree_13: 1, tree_14: 1 }),
                 pos: v2.create(25, 25),
@@ -8607,6 +8626,12 @@ function createOasis<T extends BuildingDef>(e: Partial<T>): T {
                 type: randomObstacleType({ tree_13: 1, tree_14: 1 }),
                 pos: v2.create(20, 26),
                 scale: 0.9,
+                ori: 0,
+            },
+            {
+                type: randomObstacleType({ tree_13: 1, tree_14: 1 }),
+                pos: v2.create(23, 12),
+                scale: 1,
                 ori: 0,
             },
             {
@@ -8646,26 +8671,26 @@ function createOasis<T extends BuildingDef>(e: Partial<T>): T {
                 ori: 0,
             },
             {
-                type: randomObstacleType({ tree_13: 5, tree_14: 5, cache_02bh: 1 }),
-                pos: v2.create(-2, -28),
+                type: randomObstacleType({ tree_13: 1, tree_14: 1 }),
+                pos: v2.create(-2, -25),
                 scale: 1.2,
                 ori: 0,
             },
             {
                 type: randomObstacleType({ tree_13: 1, tree_14: 1 }),
-                pos: v2.create(-7, -31),
+                pos: v2.create(-7, -32),
                 scale: 1,
                 ori: 0,
             },
             {
                 type: randomObstacleType({ tree_13: 1, tree_14: 1 }),
-                pos: v2.create(3, -33),
+                pos: v2.create(3, -34),
                 scale: 1.1,
                 ori: 0,
             },
             {
                 type: randomObstacleType({ tree_13: 1, tree_14: 1 }),
-                pos: v2.create(5, -27),
+                pos: v2.create(5, -28),
                 scale: 1,
                 ori: 0,
             },
@@ -8712,9 +8737,21 @@ function createOasis<T extends BuildingDef>(e: Partial<T>): T {
                 ori: 0,
             },
             {
+                type: randomObstacleType({ tree_13: 1, tree_14: 1 }),
+                pos: v2.create(23.5, -18.5),
+                scale: 1.15,
+                ori: 0,
+            },
+            {
                 type: "crate_01",
                 pos: v2.create(20, -23),
                 scale: 1,
+                ori: 0,
+            },
+            {
+                type: randomObstacleType({ tree_13: 1, tree_14: 1 }),
+                pos: v2.create(-22.5, -16),
+                scale: 1.15,
                 ori: 0,
             },
             {

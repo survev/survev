@@ -21,6 +21,7 @@ const mapDef: PartialMapDef = {
             { name: "log_03", channel: "sfx" },
             { name: "log_04", channel: "sfx" },
             { name: "coconut_01", channel: "sfx" },
+            { name: "potato_pickup_01", channel: "ui" },
             { name: "piano_music_01", channel: "ambient" },
         ],
         atlases: ["gradient", "loadout", "shared", "desert"],
