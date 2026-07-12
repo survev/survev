@@ -60,7 +60,7 @@ const mapDef: PartialMapDef = {
                 },
             ],
             crates: [
-                { name: "airdrop_crate_01", weight: 16 },
+                { name: "airdrop_crate_01", weight: 12 },
                 { name: "airdrop_crate_02de", weight: 1 },
                 { name: "airdrop_crate_05", weight: 1 },
             ],
