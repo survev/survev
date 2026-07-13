@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg
+   width="128"
+   height="128"
+   version="1.1"
+   id="svg4"
+   sodipodi:docname="face-boffy.svg"
+   inkscape:version="1.4 (e7c3feb1, 2024-10-09)"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg">
+  <defs
+     id="defs4" />
+  <sodipodi:namedview
+     id="namedview4"
+     pagecolor="#ffffff"
+     bordercolor="#000000"
+     borderopacity="0.25"
+     inkscape:showpageshadow="2"
+     inkscape:pageopacity="0.0"
+     inkscape:pagecheckerboard="0"
+     inkscape:deskcolor="#d1d1d1"
+     inkscape:zoom="0.82832428"
+     inkscape:cx="-194.36832"
+     inkscape:cy="-163.58328"
+     inkscape:window-width="1920"
+     inkscape:window-height="1022"
+     inkscape:window-x="0"
+     inkscape:window-y="128"
+     inkscape:window-maximized="1"
+     inkscape:current-layer="svg4" />
+  <path
+     d="m 118.433,65.10976 c -0.56,-19.83 -12.65,-36.86 -24.78,-44.58 -17.19,-10.93 -31.37,-3.16 -39.38,0.71 -8.94,4.32 -13.63,4.69 -27.53,9.91 -16.51,6.2 -16.62,27.42 -16.62,27.42 0,0 -3.07,27.82 5.18,36.86 8.25,9.04 16.07,11.37 22,12.52 6.01,1.16 16.7,0.65 29.3,3.59 11.62,2.72 31.85,2.67 38.01,-8.05 6.43,-11.19 14.17,-25.64 13.81,-38.37 z"
+     style="fill:none;stroke:#00fe00;stroke-width:8px;stroke-linecap:round;stroke-linejoin:round"
+     id="path1-7" />
+  <line
+     x1="47.433018"
+     y1="45.279747"
+     x2="47.433018"
+     y2="45.279747"
+     style="fill:none;stroke:#00fe00;stroke-width:10px;stroke-linecap:round;stroke-miterlimit:10"
+     id="line1" />
+  <line
+     x1="87.253021"
+     y1="41.719749"
+     x2="87.253021"
+     y2="41.719749"
+     style="fill:none;stroke:#00fe00;stroke-width:10px;stroke-linecap:round;stroke-miterlimit:10"
+     id="line2" />
+  <path
+     d="m 41.353,68.59976 c 0,0 8.66,17.09 21.81,15.29 5.1,-0.7 11.63,-1.69 16.34,-5.88 5.91,-5.26 9.56,-10.57 10.51,-21.04"
+     style="fill:none;stroke:#00fe00;stroke-width:8px;stroke-linecap:round;stroke-miterlimit:10"
+     id="path2-9" />
+</svg>

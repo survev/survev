@@ -265,6 +265,16 @@ export const EmotesDefs: Record<string, EmoteDef> = {
         teamOnly: false,
         category: EmoteCategory.Faces,
     },
+    emote_boffy: {
+        type: "emote",
+        name: "Boffy",
+        rarity: Rarity.Common,
+        texture: "face-boffy.img",
+        sound: "emote_01",
+        channel: "ui",
+        teamOnly: false,
+        category: EmoteCategory.Faces,
+    },
     emote_surviv: {
         type: "emote",
         name: "Surviv Logo",
@@ -1374,6 +1384,16 @@ export const EmotesDefs: Record<string, EmoteDef> = {
         channel: "ui",
         teamOnly: false,
         category: EmoteCategory.Food,
+    },
+    emote_leaf: {
+        type: "emote",
+        name: "Leaf",
+        rarity: Rarity.Common,
+        texture: "leaf.img",
+        sound: "emote_01",
+        channel: "ui",
+        teamOnly: false,
+        category: EmoteCategory.Other,
     },
     emote_trunk: {
         type: "emote",
