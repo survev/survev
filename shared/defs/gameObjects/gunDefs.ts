@@ -58,6 +58,7 @@ export interface GunDef {
         shellOffsetY?: number;
         shellForward?: number;
         shellReverse?: boolean;
+        casing?: string;
     };
     sound: {
         shoot: string;
@@ -3198,7 +3199,11 @@ export const BaseDefs: Record<string, GunDef> = {
             leftHandOffset: { x: 10, y: 0.75 },
             recoil: 5,
         },
-        particle: { shellScale: 1.6, shellOffset: 0.6 },
+        particle: {
+            shellScale: 1.75,
+            shellOffset: 0.6,
+            casing: "50cal",
+        },
         sound: {
             shoot: "barrett_01",
             reload: "barrett_reload_01",
@@ -3293,7 +3298,11 @@ export const BaseDefs: Record<string, GunDef> = {
             leftHandOffset: { x: 7, y: 0.5 },
             recoil: 2.5,
         },
-        particle: { shellScale: 1.2, shellOffset: 0.375 },
+        particle: {
+            shellScale: 1,
+            shellOffset: 0.375,
+            casing: "50cal",
+        },
         sound: {
             shoot: "ash12_01",
             reload: "ash12_reload_01",

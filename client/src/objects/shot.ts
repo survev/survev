@@ -52,7 +52,7 @@ export function createCasingParticle(
             vel = v2.mul(vel, -1);
         }
         particleBarn.addParticle(
-            weapDef.ammo,
+            weapDef.particle.casing ?? weapDef.ammo,
             layer,
             shellPos,
             vel,
