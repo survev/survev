@@ -109,7 +109,7 @@ export class RiverCreator {
         }
     }
 
-    create(isFactionRiver: boolean): Vec2[] {
+    create(riverWidth: number, isFactionRiver: boolean): Vec2[] {
         const start = this.getStartPoint(isFactionRiver);
         const end = this.getEndPoint(start, isFactionRiver);
 
@@ -172,8 +172,8 @@ export class RiverCreator {
         for (let i = 0; i < this.map.riverMasks.length; i++) {
             const mask = this.map.riverMasks[i];
             for (let j = 0; j < riverPoints.length; j++) {
-                const point = riverPoints[j];
-                if (coldet.testCircleCircle(point, 0.01, mask.pos, mask.rad)) {
+                const circle = collider.createCircle(riverPoints[j], riverWidth);
+                if (coldet.test(circle, mask)) {
                     return [];
                 }
             }
@@ -225,6 +225,16 @@ export class RiverCreator {
             points[i] = newNode;
         }
         points.push(v2.copy(points[0]));
+
+        for (let i = 0; i < this.map.riverMasks.length; i++) {
+            const mask = this.map.riverMasks[i];
+            for (let j = 0; j < points.length; j++) {
+                const circle = collider.createCircle(points[j], width);
+                if (coldet.test(circle, mask)) {
+                    return undefined;
+                }
+            }
+        }
 
         // smooth out the lake using the spline logic
         const smoothPoints = new Array(33);

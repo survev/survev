@@ -207,7 +207,7 @@ export class GameMap {
     msg!: net.MapMsg;
     terrain!: ReturnType<typeof generateTerrain>;
     riverDescs!: MapRiverData[];
-    riverMasks!: Array<{ pos: Vec2; rad: number }>;
+    riverMasks!: Array<Collider>;
     normalRivers!: Array<River & { looped: false }>;
     lakes!: Array<River & { looped: true }>;
     lakeObjs!: Array<string>;
@@ -576,10 +576,10 @@ export class GameMap {
 
         for (const mask of this.mapDef.mapGen.map.rivers.masks) {
             if (mask.pos) {
-                this.riverMasks.push({
-                    pos: v2.create(mask.pos.x * this.width, mask.pos.y * this.height),
-                    rad: mask.rad,
-                });
+                this.riverMasks.push(collider.createCircle(
+                    v2.create(mask.pos.x * this.width, mask.pos.y * this.height),
+                    mask.rad,
+                ));
             } else {
                 const spawnMin = v2.create(
                     this.shoreInset + mask.rad,
@@ -601,16 +601,16 @@ export class GameMap {
 
                     for (const mask2 of this.riverMasks) {
                         if (
-                            coldet.testCircleCircle(pos, mask.rad, mask2.pos, mask2.rad)
+                            coldet.test(mask2, collider.createCircle(pos, mask.rad))
                         ) {
                             return false;
                         }
                     }
 
-                    this.riverMasks.push({
+                    this.riverMasks.push(collider.createCircle(
                         pos,
-                        rad: mask.rad,
-                    });
+                        mask.rad,
+                    ));
 
                     return true;
                 });
@@ -633,6 +633,7 @@ export class GameMap {
 
             this.trySpawn(`lake`, () => {
                 const lake = riverCreator.createLake(lakeDef);
+                if (!lake) return false;
 
                 for (const other of this.riverDescs) {
                     if (!other.looped || !other.aabb) continue;
@@ -652,10 +653,10 @@ export class GameMap {
                 this.riverDescs.push(lake);
                 this.lakeObjs.push(lakeDef.centerObj ?? "");
                 if (lakeDef.riverMaskRad) {
-                    this.riverMasks.push({
-                        pos: lake.center,
-                        rad: lakeDef.riverMaskRad,
-                    });
+                    this.riverMasks.push(collider.createCircle(
+                        lake.center,
+                        lakeDef.riverMaskRad,
+                    ));
                 }
                 return true;
             });
@@ -675,7 +676,7 @@ export class GameMap {
             const isFactionRiver = this.factionMode;
 
             this.trySpawn(`river_${widths[i]}`, () => {
-                const riverPoints = riverCreator.create(isFactionRiver);
+                const riverPoints = riverCreator.create(widths[i], isFactionRiver);
                 if (riverPoints.length < 12) return false;
 
                 this.riverDescs.push({
