@@ -1761,11 +1761,11 @@ export class GameMap {
         if (!rivers.length) return;
 
         this.trySpawn(type, () => {
-            river = river ?? rivers[util.randomInt(0, rivers.length - 1)];
+            const selectedRiver = river ?? util.randomItem(rivers)!;
             const t = util.random(0, 1);
             const def = MapObjectDefs.typeToDef(type);
 
-            let width = river.getWaterWidth(t);
+            let width = selectedRiver.getWaterWidth(t);
             if (def.type === "obstacle") {
                 let circle = def.collision.type === collider.Type.Circle
                     ? def.collision
@@ -1773,12 +1773,12 @@ export class GameMap {
                 width -= circle.rad + 1;
             }
             if (def.terrain?.riverShore) {
-                width += river.shoreWidth / 4;
+                width += selectedRiver.shoreWidth / 4;
             }
             const offset = util.random(-width, width);
             const pos = v2.add(
-                river.spline.getPos(t),
-                v2.mul(river.spline.getNormal(t), offset),
+                selectedRiver.spline.getPos(t),
+                v2.mul(selectedRiver.spline.getNormal(t), offset),
             );
 
             const { ori, scale } = this.getOriAndScale(type);
