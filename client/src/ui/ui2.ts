@@ -1401,7 +1401,7 @@ export class UiManager2 {
         if (!icon) {
             return name;
         }
-        return `<img src="img/gui/${icon}" style="height: 1em;">${name}`;
+        return `<img src="img/gui/${icon}" style="height: 1em; vertical-align: -0.125em;">${name}`;
     }
 
     getKillFeedText(
