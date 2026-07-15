@@ -1096,6 +1096,8 @@ export class GameMap {
             for (const river of this.terrain.rivers) {
                 const riverArea = this.riverAreas.get(river)!.water / 1000;
 
+                // HACK: desert lake shouldn't spawn stones and bushes
+                if (river.looped && this.desertMode) continue;
                 for (const type in riverObjs) {
                     const amount = math.min(riverArea * riverObjs[type], 30);
 
