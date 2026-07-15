@@ -33,6 +33,7 @@ class GameProcess {
         aliveCount: 0,
         startedTime: 0,
         stopped: false,
+        timeRunning: 0,
     };
 
     state = ProcState.Idle;

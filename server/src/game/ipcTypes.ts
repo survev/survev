@@ -9,6 +9,7 @@ export interface GameData {
     aliveCount: number;
     startedTime: number;
     stopped: boolean;
+    timeRunning: number;
 }
 
 export enum ProcessMsgType {

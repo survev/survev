@@ -26,6 +26,7 @@ class ServerGame extends Game {
             aliveCount: this.aliveCount,
             startedTime: this.startedTime,
             stopped: this.stopped,
+            timeRunning: this.timeRunning,
         });
         if (this.stopped) {
             game = undefined;

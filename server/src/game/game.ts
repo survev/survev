@@ -42,6 +42,7 @@ export class Game {
     over = false;
     startedTime = 0;
     stopTicker = 0;
+    timeRunning = 0;
     // used to stop the game if theres no connected players
     noPlayersTicker = 0;
 
@@ -148,6 +149,8 @@ export class Game {
         const now = performance.now();
         if (!this.now) this.now = now;
         dt ??= math.clamp((now - this.now) / 1000, 0.001, 1 / 8);
+
+        this.timeRunning += dt;
 
         dt *= this.debugSpeedMulti;
 

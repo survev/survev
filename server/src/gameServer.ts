@@ -170,6 +170,7 @@ app.get("/private/status", (res, req) => {
             return {
                 state: ProcState[p.state],
                 reusedCount: p.reusedCount,
+                avaliableSlots: p.avaliableSlots,
                 gameData: p.gameData,
             };
         }),
