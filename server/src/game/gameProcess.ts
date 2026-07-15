@@ -205,10 +205,6 @@ process.on("message", (msg: ProcessMsg) => {
 
     if (msg.type === ProcessMsgType.Create && !game) {
         game = new ServerGame(msg.id, msg.config);
-
-        sendMsg({
-            type: ProcessMsgType.Created,
-        });
     }
 
     if (!game) return;

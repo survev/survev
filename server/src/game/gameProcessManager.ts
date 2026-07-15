@@ -69,19 +69,20 @@ class GameProcess {
         }
 
         switch (msg.type) {
-            case ProcessMsgType.Created:
-                this.state = ProcState.Running;
-                for (const cb of this.onCreatedCbs) {
-                    cb(this);
-                }
-                this.onCreatedCbs.length = 0;
-                if (this.reusedCount === 1) {
-                    this.manager.logger.info(
-                        `Process ${this.process.pid} created in ${Date.now() - this.createdTime}ms`,
-                    );
-                }
-                break;
             case ProcessMsgType.UpdateData:
+                if (this.state === ProcState.CreatingGame && msg.canJoin) {
+                    this.state = ProcState.Running;
+                    for (const cb of this.onCreatedCbs) {
+                        cb(this);
+                    }
+                    this.onCreatedCbs.length = 0;
+                    if (this.reusedCount === 1) {
+                        this.manager.logger.info(
+                            `Process ${this.process.pid} created in ${Date.now() - this.createdTime}ms`,
+                        );
+                    }
+                }
+
                 if (this.gameData.id !== msg.id) {
                     this.manager.processById.delete(this.gameData.id);
                     this.gameData.id = msg.id;
