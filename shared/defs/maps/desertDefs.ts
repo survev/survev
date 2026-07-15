@@ -214,10 +214,10 @@ const mapDef: PartialMapDef = {
                         innerRad: 10,
                         outerRad: 20,
                         centerObj: "oasis_01",
-                        riverMaskRad: 64,
+                        riverMaskRad: 48,
                         spawnBound: {
                             pos: v2.create(0.5, 0.5),
-                            rad: 200,
+                            rad: 300,
                         },
                     },
                 ],
