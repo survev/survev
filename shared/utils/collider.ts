@@ -1,4 +1,4 @@
-import { type AABB, coldet, type Collider } from "./coldet.ts";
+import { type AABB, type Circle, coldet, type Collider } from "./coldet.ts";
 import { math } from "./math.ts";
 import { v2, type Vec2 } from "./v2.ts";
 
@@ -12,7 +12,7 @@ export const collider = {
         Aabb: 1 as const,
     },
 
-    createCircle(pos: Vec2, rad: number) {
+    createCircle(pos: Vec2, rad: number): Circle {
         return {
             type: collider.Type.Circle,
             pos: v2.copy(pos),
@@ -20,8 +20,7 @@ export const collider = {
         };
     },
 
-    createAabb(min: Vec2, max: Vec2) {
-        // console.log(min, max)
+    createAabb(min: Vec2, max: Vec2): AABB {
         return {
             type: collider.Type.Aabb,
             min: v2.copy(min),
@@ -29,15 +28,15 @@ export const collider = {
         };
     },
 
-    createAabbExtents(pos: Vec2, extent: Vec2) {
+    createAabbExtents(pos: Vec2, extent: Vec2): AABB {
         const min = v2.sub(pos, extent);
         const max = v2.add(pos, extent);
         return collider.createAabb(min, max);
     },
 
-    createBounding(colliders: Collider[]) {
+    createBounding(colliders: Collider[]): AABB {
         if (colliders.length === 1) {
-            return collider.copy(colliders[0]);
+            return collider.copy(collider.toAabb(colliders[0]));
         }
         const aabbs: AABB[] = [];
         for (let i = 0; i < colliders.length; i++) {
@@ -48,7 +47,7 @@ export const collider = {
         return collider.createAabb(bound.min, bound.max);
     },
 
-    toAabb(c: Collider) {
+    toAabb(c: Collider): AABB {
         if (c.type === collider.Type.Aabb) {
             return collider.createAabb(c.min, c.max);
         }
@@ -56,13 +55,13 @@ export const collider = {
         return collider.createAabb(aabb.min, aabb.max);
     },
 
-    copy(c: Collider) {
+    copy<T extends Collider>(c: T): T {
         return c.type === collider.Type.Circle
-            ? collider.createCircle(c.pos, c.rad)
-            : collider.createAabb(c.min, c.max);
+            ? collider.createCircle(c.pos, c.rad) as T
+            : collider.createAabb(c.min, c.max) as T;
     },
 
-    transform(col: Collider, pos: Vec2, rot: number, scale: number) {
+    transform<T extends Collider>(col: T, pos: Vec2, rot: number, scale: number): T {
         if (col.type === collider.Type.Aabb) {
             const e = v2.mul(v2.sub(col.max, col.min), 0.5);
             const c = v2.add(col.min, e);
@@ -82,12 +81,12 @@ export const collider = {
                 max.y = math.max(max.y, p.y);
             }
 
-            return collider.createAabb(min, max);
+            return collider.createAabb(min, max) as T;
         }
         return collider.createCircle(
             v2.add(v2.rotate(v2.mul(col.pos, scale), rot), pos),
             col.rad * scale,
-        );
+        ) as T;
     },
 
     getPoints(aabb: AABB) {

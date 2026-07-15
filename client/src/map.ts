@@ -4,7 +4,7 @@ import type { BuildingDef, ObstacleDef } from "../../shared/defs/mapObjectsTypin
 import { MapObjectDefs } from "../../shared/defs/register.ts";
 import { GameConfig } from "../../shared/gameConfig.ts";
 import type { GroundPatch, MapMsg } from "../../shared/net/mapMsg.ts";
-import { type Circle, coldet, type Collider } from "../../shared/utils/coldet.ts";
+import { coldet, type Collider } from "../../shared/utils/coldet.ts";
 import { collider } from "../../shared/utils/collider.ts";
 import { mapHelpers } from "../../shared/utils/mapHelpers.ts";
 import { math } from "../../shared/utils/math.ts";
@@ -496,7 +496,7 @@ export class Map {
         let shapes: Array<{
             scale?: number;
             color: number;
-            collider: Circle;
+            collider: Collider;
         }> = [];
         if ((def as BuildingDef).map?.shapes !== undefined) {
             // @ts-expect-error stfu
@@ -512,7 +512,7 @@ export class Map {
                     : mapHelpers.getBoundingCollider(obj.type))
             ) {
                 shapes.push({
-                    collider: collider.copy(col) as Circle,
+                    collider: collider.copy(col),
                     scale: def.map!.scale || 1,
                     color: def.map!.color!,
                 });
