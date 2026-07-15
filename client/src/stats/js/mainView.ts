@@ -1,5 +1,4 @@
 import $ from "jquery";
-import { MinGames } from "../../../../shared/constants.ts";
 import type { LeaderboardRequest } from "../../../../shared/types/stats.ts";
 import { api } from "../../api.ts";
 import { device } from "../../device.ts";
@@ -126,16 +125,10 @@ export class MainView {
             content = templates.leaderboardError({});
         } else {
             const statName = TypeToString[this.data.type as keyof typeof TypeToString] || "";
-            let minGames = MinGames[this.data.type as keyof typeof MinGames]
-                // @ts-expect-error go away
-                ? MinGames[this.data.type][this.data.interval]
-                : 1;
-            minGames = minGames || 1;
 
             content = templates.leaderboard({
                 ...this.data,
                 statName: statName,
-                minGames: minGames,
             });
 
             // Set the select options

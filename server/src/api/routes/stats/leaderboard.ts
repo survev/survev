@@ -1,6 +1,5 @@
 import { and, count, eq, gte, inArray, ne, type SQL, sql } from "drizzle-orm";
 import { Hono } from "hono";
-import { MinGames } from "../../../../../shared/constants.ts";
 import { TeamMode } from "../../../../../shared/gameConfig.ts";
 import {
     type LeaderboardRequest,
@@ -15,6 +14,14 @@ import { matchDataTable, usersTable } from "../../db/schema.ts";
 import type { Context } from "../../index.ts";
 
 export const leaderboardRouter = new Hono<Context>();
+
+const MinGames = {
+    kpg: {
+        daily: 15,
+        weekly: 50,
+        alltime: 100,
+    },
+} as Record<LeaderboardRequest["type"], Record<LeaderboardRequest["interval"], number>>;
 
 leaderboardRouter.post(
     "/",
