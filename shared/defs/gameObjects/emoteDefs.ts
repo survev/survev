@@ -1618,7 +1618,7 @@ export const EmotesDefs: Record<string, EmoteDef> = {
     emote_flagyemen: {
         type: "emote",
         name: "Flag Yemen",
-        rarity: 1,
+        rarity: Rarity.Common,
         texture: "flag-yemen.img",
         sound: "emote_01",
         channel: "ui",
