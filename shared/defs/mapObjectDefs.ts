@@ -15852,6 +15852,7 @@ export const RawMapObjectDefs: Record<string, MapObjectDef> = {
             sound: {
                 open: "door_open_02",
                 close: "door_close_02",
+                unlock: "button_press_01",
             },
         },
         img: { tint: 4934475 },

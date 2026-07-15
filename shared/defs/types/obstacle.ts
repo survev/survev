@@ -65,6 +65,7 @@ export interface ObstacleDef {
             close: string;
             change: string;
             error: string;
+            unlock?: string;
         };
         casingImg?: {
             sprite: string;
