@@ -169,10 +169,11 @@ export class RiverCreator {
             }
         }
 
+        // check for collision with river masks
         for (let i = 0; i < this.map.riverMasks.length; i++) {
             const mask = this.map.riverMasks[i];
             for (let j = 0; j < riverPoints.length; j++) {
-                const circle = collider.createCircle(riverPoints[j], riverWidth);
+                const circle = collider.createCircle(riverPoints[j], riverWidth * 2);
                 if (coldet.test(circle, mask)) {
                     return [];
                 }
@@ -226,10 +227,11 @@ export class RiverCreator {
         }
         points.push(v2.copy(points[0]));
 
+        // check for collision with river masks
         for (let i = 0; i < this.map.riverMasks.length; i++) {
             const mask = this.map.riverMasks[i];
             for (let j = 0; j < points.length; j++) {
-                const circle = collider.createCircle(points[j], width);
+                const circle = collider.createCircle(points[j], width * 2);
                 if (coldet.test(circle, mask)) {
                     return undefined;
                 }

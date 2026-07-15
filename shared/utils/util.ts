@@ -60,14 +60,14 @@ export const util = {
         return a & 0x1;
     },
 
-    random(min: number, max: number) {
-        return math.lerp(Math.random(), min, max);
+    random(min: number, max: number, rand = Math.random) {
+        return math.lerp(rand(), min, max);
     },
 
-    randomInt(min: number, max: number) {
+    randomInt(min: number, max: number, rand = Math.random) {
         min = Math.ceil(min);
         max = Math.floor(max);
-        return Math.floor(Math.random() * (max - min + 1)) + min;
+        return Math.floor(rand() * (max - min + 1)) + min;
     },
 
     // Uniformly distributed random point within circle
@@ -87,10 +87,10 @@ export const util = {
         return pos;
     },
 
-    randomPointInAabb(aabb: { min: Vec2; max: Vec2 }) {
+    randomPointInAabb(aabb: { min: Vec2; max: Vec2 }, rand = Math.random) {
         return v2.create(
-            util.random(aabb.min.x, aabb.max.x),
-            util.random(aabb.min.y, aabb.max.y),
+            util.random(aabb.min.x, aabb.max.x, rand),
+            util.random(aabb.min.y, aabb.max.y, rand),
         );
     },
 
@@ -356,9 +356,9 @@ export const util = {
         return items[idx];
     },
 
-    randomItem<T>(array: T[]): T | undefined {
+    randomItem<T>(array: T[], rand = Math.random): T | undefined {
         if (array.length === 0) return undefined;
-        return array[util.randomInt(0, array.length - 1)];
+        return array[util.randomInt(0, array.length - 1, rand)];
     },
 
     weightedRandomObject(items: Record<string, number>) {

@@ -217,7 +217,7 @@ export class GameMap {
     grassArea!: number;
 
     placeSpawns!: string[];
-    placesToSpawn!: Vec2[];
+    placesToSpawn!: { pos: Vec2; type: string; ori: number }[];
 
     /** 0 for horizontal split, 1 for vertical split*/
     factionModeSplitOri: 0 | 1 = 0;
@@ -331,19 +331,12 @@ export class GameMap {
         this.placeSpawns = [...this.mapDef.mapGen.customSpawnRules.placeSpawns];
         this.msg.places = [...this.mapDef.mapGen.places];
 
-        this.placesToSpawn = this.mapDef.mapGen.places
-            .filter((p) => !p.dontSpawnObjects)
-            .map((place) => {
-                return v2.create(
-                    place.pos.x * this.width,
-                    // places Y axis is inverted lol
-                    Math.abs(place.pos.y - 1) * this.height,
-                );
-            });
-
         this.riverMasks = [];
+        this.placesToSpawn = [];
 
         this.generateRiverMasks();
+
+        this.generatePlaceSpawns();
 
         if (this.factionMode) {
             this.factionModeSplitOri = util.randomInt(0, 1) as 0 | 1;
@@ -616,7 +609,72 @@ export class GameMap {
                 });
             }
         }
+
         this.timerEnd("Generating river masks");
+    }
+
+    generatePlaceSpawns() {
+        if (!this.placeSpawns.length) return;
+        this.timerStart();
+
+        const rand = util.seededRand(this.seed);
+
+        const placePositions = this.mapDef.mapGen.places
+            .filter((p) => !p.dontSpawnObjects)
+            .map((place) => {
+                return v2.create(
+                    place.pos.x * this.width,
+                    // places Y axis is inverted lol
+                    Math.abs(place.pos.y - 1) * this.height,
+                );
+            });
+
+        // Reserve positions for place spawns by adding river masks
+        // TODO: rewrite this in favor of a more generic way of reserving positions
+        for (const type of this.mapDef.mapGen.customSpawnRules.placeSpawns) {
+            const bound = collider.toAabb(mapHelpers.getBoundingCollider(type));
+
+            this.trySpawn(`place_${type}`, () => {
+                const placeIdx = util.randomInt(0, placePositions.length - 1, rand);
+                const placePos = placePositions[placeIdx];
+
+                const ori = this.getOriAndScale(type, rand).ori;
+
+                const rotated = collider.transform(bound, v2.create(0, 0), math.oriToRad(ori), 1.15);
+
+                const width = rotated.max.x - rotated.min.x;
+                const height = rotated.max.y - rotated.min.y;
+
+                const half = collider.transform(rotated, v2.create(0, 0), 0, 0.5);
+                const randomPos = v2.add(placePos, util.randomPointInAabb(half, rand));
+                const pos = math.v2Clamp(
+                    randomPos,
+                    v2.create(this.shoreInset + width, this.shoreInset + height),
+                    v2.create(
+                        this.width - this.shoreInset - width,
+                        this.height - this.shoreInset - height,
+                    ),
+                );
+
+                const collision = collider.transform(bound, pos, math.oriToRad(ori), 1.15);
+
+                for (let i = 0; i < this.riverMasks.length; i++) {
+                    if (coldet.test(this.riverMasks[i], collision)) return false;
+                }
+
+                this.placesToSpawn.push({ pos, type, ori });
+
+                this.grid.addCollider({
+                    type: "building",
+                    collision,
+                    layer: 0,
+                });
+                this.riverMasks.push(collision);
+                placePositions.splice(placeIdx, 1);
+                return true;
+            });
+        }
+        this.timerEnd("Generating place spawns");
     }
 
     generateTerrain(): void {
@@ -1402,19 +1460,19 @@ export class GameMap {
         return true;
     }
 
-    getOriAndScale(type: string): { ori: number; scale: number } {
+    getOriAndScale(type: string, rand = Math.random): { ori: number; scale: number } {
         let ori = 0;
         let scale = 1;
 
         const def = MapObjectDefs.typeToDef(type);
         if (def.type === "building" || def.type === "structure") {
-            if ("oris" in def) {
-                ori = def.oris![util.randomInt(0, def.oris!.length - 1)];
+            if ("oris" in def && def.oris?.length) {
+                ori = util.randomItem(def.oris, rand)!;
             } else {
-                ori = def.ori ?? util.randomInt(0, 3);
+                ori = def.ori ?? util.randomInt(0, 3, rand);
             }
         } else if (def.type === "obstacle") {
-            scale = util.random(def.scale.createMin, def.scale.createMax);
+            scale = util.random(def.scale.createMin, def.scale.createMax, rand);
         }
 
         return { ori, scale };
@@ -1585,58 +1643,13 @@ export class GameMap {
         };
 
         if (this.placesToSpawn.length && this.placeSpawns.includes(type)) {
-            let attempts = 0;
-            const spawnedOnPlace = this.trySpawn(
-                type,
-                () => {
-                    attempts++;
+            const placeIdx = this.placesToSpawn.findIndex(p => p.type === type);
+            if (placeIdx !== -1) {
+                const place = this.placesToSpawn[placeIdx];
+                this.genAuto(type, place.pos, 0, place.ori, 1);
 
-                    const placeIdx = Math.floor(Math.random() * this.placeSpawns.length);
-                    const place = this.placesToSpawn[placeIdx];
-
-                    const { ori, scale } = this.getOriAndScale(type);
-                    const rot = math.oriToRad(ori);
-                    const bound = collider.transform(
-                        bounds,
-                        v2.create(0, 0),
-                        rot,
-                        scale,
-                    ) as AABB;
-
-                    const width = bound.max.x - bound.min.x;
-                    const height = bound.max.y - bound.min.y;
-                    const placePos = v2.add(
-                        place,
-                        v2.mulElems(
-                            v2.mul(v2.randomUnit(), 0.5),
-                            v2.create(width + attempts * 2, height + attempts * 2),
-                        ),
-                    );
-
-                    const pos = math.v2Clamp(
-                        placePos,
-                        v2.create(this.shoreInset + width, this.shoreInset + height),
-                        v2.create(
-                            this.width - this.shoreInset - width,
-                            this.height - this.shoreInset - height,
-                        ),
-                    );
-
-                    if (!this.canSpawn(type, pos, ori, scale)) return false;
-                    this.genAuto(type, pos, 0, ori, scale);
-
-                    this.placesToSpawn.splice(placeIdx, 1);
-                    util.removeFrom(this.placeSpawns, type);
-
-                    return true;
-                },
-                200,
-                false,
-            );
-
-            // if couldn't spawn it near a map place
-            // try spawning somewhere else on grass
-            if (spawnedOnPlace) {
+                this.placesToSpawn.splice(placeIdx, 1);
+                util.removeFrom(this.placeSpawns, type);
                 return;
             }
         }

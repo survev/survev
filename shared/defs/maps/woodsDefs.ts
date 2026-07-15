@@ -203,6 +203,10 @@ const mapDef: PartialMapDef = {
                     retryOnFailure: true,
                 },
             ],
+            // since placespawns now create river masks
+            // they can block the lake from spawning...
+            // so remove them from woods for now
+            placeSpawns: [],
         },
         densitySpawns: [
             {
