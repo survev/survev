@@ -2,9 +2,12 @@ import { and, eq, inArray } from "drizzle-orm";
 import { Hono } from "hono";
 import z from "zod";
 import { QuestDefs } from "../../../../../shared/defs/gameObjects/questDefs.ts";
+import { MapDefs } from "../../../../../shared/defs/mapDefs.ts";
+import { MapId, TeamModeToString } from "../../../../../shared/defs/types/misc.ts";
 import { type GetPassResponse } from "../../../../../shared/types/user.ts";
 import { passUtil } from "../../../../../shared/utils/passUtil.ts";
 import { Config } from "../../../config.ts";
+import { server } from "../../apiServer.ts";
 import { validateParams } from "../../auth/middleware.ts";
 import { db } from "../../db/index.ts";
 import { userPassTable, type UserPassTableSelect, userQuestTable, type UserQuestTableSelect } from "../../db/schema.ts";
@@ -292,7 +295,30 @@ const questTypes = Object.keys(QuestDefs);
 const defaultQuestType = questTypes[0] || "quest_kills";
 
 function getRandomQuestType(excluded: Set<string>) {
-    const available = questTypes.filter((questType) => !excluded.has(questType));
+    let available = questTypes.filter((questType) => !excluded.has(questType));
+
+    // for top in solo / squad quests
+    // filter them based on running modes not being normal mode
+    // getting top in solos while a mode is running on squads is really frustrating :)
+    const nonNormalModes = server.modes.filter(m => {
+        if (!m.enabled) return false;
+
+        const def = MapDefs[m.mapName];
+        return def.mapId !== MapId.Main;
+    });
+    if (nonNormalModes.length) {
+        const teamModes = nonNormalModes.map(m => {
+            return TeamModeToString[m.teamMode];
+        });
+        available = available.filter(type => {
+            const def = QuestDefs[type];
+            if (def.event === "placement" && def.where?.mode) {
+                return teamModes.includes(def.where.mode);
+            }
+            return true;
+        });
+    }
+
     const source = available.length > 0 ? available : questTypes;
     const idx = Math.floor(Math.random() * source.length);
     return source[idx] ?? defaultQuestType;
