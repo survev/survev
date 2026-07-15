@@ -1322,6 +1322,7 @@ export class Player extends BaseGameObject {
     groupId = 0;
 
     loadout = {
+        outfit: "outfitBase",
         heal: "heal_basic",
         boost: "boost_basic",
         emotes: [...GameConfig.defaultEmoteLoadout],
@@ -2941,7 +2942,7 @@ export class Player extends BaseGameObject {
 
         if (this.outfit) {
             const def = GameObjectDefs.typeToDef(this.outfit, "outfit");
-            if (!def.noDropOnDeath && !def.noDrop) {
+            if (!def.noDropOnDeath && !def.noDrop && this.outfit !== this.loadout.outfit) {
                 this.game.lootBarn.addLoot(this.outfit, this.pos, this.layer, 1, {
                     pushSpeed: util.random(7.5, 11),
                     dir: v2.randomUnit(),
@@ -4229,6 +4230,7 @@ export class Player extends BaseGameObject {
             && loadout.outfit !== "outfitBase"
         ) {
             this.setOutfit(loadout.outfit);
+            this.loadout.outfit = this.outfit;
         }
 
         if (isItemInLoadout(loadout.melee, "melee") && loadout.melee != "fists") {
