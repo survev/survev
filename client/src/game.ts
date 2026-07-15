@@ -1350,7 +1350,7 @@ export class Game {
                 // Display the kill / downed notification for the active player
                 if (msg.killCreditId == this.m_activeId) {
                     const completeKill = msg.killerId == this.m_activeId;
-                    const suicide = msg.killerId == msg.targetId || msg.killCreditId == msg.targetId;
+                    const suicide = msg.killCreditId == msg.targetId;
                     const killText = this.m_ui2Manager.getKillText(
                         killerName,
                         targetName,
