@@ -8,6 +8,6 @@
   "dependencies": {
     "@types/svg-parser": "^2.0.6",
     "svg-parser": "^2.0.4",
-    "vitest": "^4.1.9"
+    "vitest": "^4.1.10"
   }
 }
