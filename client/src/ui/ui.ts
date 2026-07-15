@@ -901,7 +901,7 @@ export class UiManager {
             if (this.flairId != localPlayerInfo.teamId) {
                 this.flairId = localPlayerInfo.teamId;
                 // Assume red or blue for now
-                const flairColor = this.flairId == 1 ? "red" : "blue";
+                const flairColor = this.flairId == GameConfig.FactionTeam.Red ? "red" : "blue";
                 this.flairElems.css({
                     display: "block",
                     "background-image": `url(../img/gui/player-patch-${flairColor}.svg)`,
@@ -1520,7 +1520,7 @@ export class UiManager {
                             );
                             break;
                         case 3: {
-                            const R = playerInfo.teamId == 1
+                            const R = playerInfo.teamId == GameConfig.FactionTeam.Red
                                 ? "ui-stats-info-player-red-ribbon"
                                 : "ui-stats-info-player-blue-ribbon";
                             B.append(

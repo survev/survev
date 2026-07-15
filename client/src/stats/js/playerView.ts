@@ -1,7 +1,6 @@
 import $ from "jquery";
 import { EmotesDefs } from "../../../../shared/defs/gameObjects/emoteDefs.ts";
-import { TeamModeToString } from "../../../../shared/defs/types/misc.ts";
-import type { TeamMode } from "../../../../shared/gameConfig.ts";
+import { GameConfig, type TeamMode } from "../../../../shared/gameConfig.ts";
 import {
     ALL_MAPS,
     ALL_TEAM_MODES,
@@ -116,7 +115,7 @@ function getPlayerCardData(
     }
 
     // Insert blank cards for all teammodes
-    const keys = Object.keys(TeamModeToString) as unknown as TeamMode[];
+    const keys = Object.keys(GameConfig.TeamModeToString) as unknown as TeamMode[];
 
     for (let i = 0; i < keys.length; i++) {
         const teamMode = keys[i];
@@ -130,7 +129,7 @@ function getPlayerCardData(
     teamModes.sort((a, b) => a.teamMode! - b.teamMode!);
     for (let i = 0; i < teamModes.length; i++) {
         const teamMode = teamModes[i].teamMode!;
-        teamModes[i].name = TeamModeToString[teamMode];
+        teamModes[i].name = GameConfig.TeamModeToString[teamMode];
     }
 
     const gameModes = helpers.getGameModes();
@@ -296,7 +295,7 @@ export class PlayerView {
 
                 for (let i = 0; i < games.length; i++) {
                     // @ts-expect-error string or number, IT STILL WORKS
-                    games[i].team_mode = TeamModeToString[games[i].team_mode as unknown as TeamMode];
+                    games[i].team_mode = GameConfig.TeamModeToString[games[i].team_mode as unknown as TeamMode];
 
                     const gameMode = gameModes.find((x) => x.mapId == games[i].map_id);
                     games[i].icon = gameMode ? gameMode.desc.icon : "";

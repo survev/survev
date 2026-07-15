@@ -1,3 +1,5 @@
+import { TeamMode } from "../../gameConfig.ts";
+
 type QuestEvent =
     | "kill"
     | "damage"
@@ -7,7 +9,7 @@ type QuestEvent =
     | "destruction";
 
 interface QuestWhere {
-    mode?: "solo" | "duo" | "squad";
+    mode?: TeamMode;
     maxRank?: number;
     buildingType?: string;
     ammo?: string;
@@ -34,7 +36,7 @@ export const QuestDefs: Record<string, QuestDef> = {
         target: 2,
         xp: 30,
         where: {
-            mode: "solo",
+            mode: TeamMode.Solo,
             maxRank: 10,
         },
     },
@@ -44,7 +46,7 @@ export const QuestDefs: Record<string, QuestDef> = {
         target: 2,
         xp: 30,
         where: {
-            mode: "duo",
+            mode: TeamMode.Duo,
             maxRank: 8,
         },
     },
@@ -54,7 +56,7 @@ export const QuestDefs: Record<string, QuestDef> = {
         target: 2,
         xp: 30,
         where: {
-            mode: "squad",
+            mode: TeamMode.Squad,
             maxRank: 5,
         },
     },

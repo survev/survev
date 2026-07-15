@@ -3,7 +3,7 @@ import { Hono } from "hono";
 import z from "zod";
 import { QuestDefs } from "../../../../../shared/defs/gameObjects/questDefs.ts";
 import { MapDefs } from "../../../../../shared/defs/mapDefs.ts";
-import { MapId, TeamModeToString } from "../../../../../shared/defs/types/misc.ts";
+import { MapId } from "../../../../../shared/gameConfig.ts";
 import { type GetPassResponse } from "../../../../../shared/types/user.ts";
 import { passUtil } from "../../../../../shared/utils/passUtil.ts";
 import { Config } from "../../../config.ts";
@@ -308,7 +308,7 @@ function getRandomQuestType(excluded: Set<string>) {
     });
     if (nonNormalModes.length) {
         const teamModes = nonNormalModes.map(m => {
-            return TeamModeToString[m.teamMode];
+            return m.teamMode;
         });
         available = available.filter(type => {
             const def = QuestDefs[type];

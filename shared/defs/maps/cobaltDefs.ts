@@ -1,10 +1,10 @@
+import { GameConfig } from "../../gameConfig.ts";
 import { util } from "../../utils/util.ts";
 import { v2 } from "../../utils/v2.ts";
-import { MapId } from "../types/misc.ts";
 import { Main, type PartialMapDef } from "./baseDefs.ts";
 
 const mapDef: PartialMapDef = {
-    mapId: MapId.Cobalt,
+    mapId: GameConfig.MapId.Cobalt,
     desc: {
         name: "Cobalt",
         icon: "img/gui/cobalt.svg",

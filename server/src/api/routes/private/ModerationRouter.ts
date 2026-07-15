@@ -2,7 +2,7 @@ import { and, desc, eq, inArray, lt, ne } from "drizzle-orm";
 import { Hono } from "hono";
 import { createHash } from "node:crypto";
 import { z } from "zod";
-import { MapId, TeamModeToString } from "../../../../../shared/defs/types/misc.ts";
+import { GameConfig } from "../../../../../shared/gameConfig.ts";
 import {
     zBanAccountParams,
     zBanIpParams,
@@ -284,8 +284,8 @@ export const ModerationRouter = new Hono()
 
         const prettyResult = result.map((data) => ({
             ...data,
-            teamMode: TeamModeToString[data.teamMode],
-            mapId: MapId[data.mapId],
+            teamMode: GameConfig.TeamModeToString[data.teamMode],
+            mapId: GameConfig.MapId[data.mapId],
         }));
 
         return c.json(prettyResult, 200);

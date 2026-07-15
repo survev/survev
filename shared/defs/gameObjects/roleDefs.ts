@@ -1,6 +1,5 @@
-import type { InventoryItem } from "../../gameConfig.ts";
+import { FactionTeam, type InventoryItem } from "../../gameConfig.ts";
 import { type DeepPartial, util } from "../../utils/util.ts";
-import { TeamColor } from "../maps/factionDefs.ts";
 
 type BasicRoleWeapon = {
     type: string;
@@ -12,18 +11,18 @@ type BasicRoleWeapon = {
  * a role weapon not only needs to be conditionally defined depending on what team the player with the role is,
  * but it also needs to be able to be randomly chosen to satisfy the requirements of certain roles like marksman
  */
-type RoleWeapon = BasicRoleWeapon | ((teamcolor: TeamColor) => BasicRoleWeapon);
+type RoleWeapon = BasicRoleWeapon | ((teamcolor: FactionTeam) => BasicRoleWeapon);
 
 export function getTeamWeapon(
-    colorToWeaponMap: Record<TeamColor, BasicRoleWeapon>,
-    teamcolor: TeamColor,
+    colorToWeaponMap: Record<FactionTeam, BasicRoleWeapon>,
+    teamcolor: FactionTeam,
 ): BasicRoleWeapon {
     return colorToWeaponMap[teamcolor];
 }
 
 export function getTeamHelmet(
-    colorToHelmetMap: Record<TeamColor, string>,
-    teamcolor: TeamColor,
+    colorToHelmetMap: Record<FactionTeam, string>,
+    teamcolor: FactionTeam,
 ) {
     return colorToHelmetMap[teamcolor];
 }
@@ -31,9 +30,9 @@ export function getTeamHelmet(
 type DefaultItems = {
     weapons: [RoleWeapon, RoleWeapon, RoleWeapon, RoleWeapon];
     backpack: string;
-    helmet: string | ((teamcolor: TeamColor) => string);
+    helmet: string | ((teamcolor: FactionTeam) => string);
     chest: string;
-    outfit: string | ((teamcolor: TeamColor) => string);
+    outfit: string | ((teamcolor: FactionTeam) => string);
     noDropOutfit?: boolean;
     inventory: Partial<Record<InventoryItem, number>>;
 };
@@ -129,20 +128,20 @@ export const RoleDefs: Record<string, RoleDef> = {
         perks: ["leadership"],
         defaultItems: createDefaultItems({
             weapons: [
-                (teamcolor: TeamColor) =>
+                (teamcolor: FactionTeam) =>
                     getTeamWeapon(
                         {
-                            [TeamColor.Red]: { type: "m1014", ammo: 8, fillInv: true },
-                            [TeamColor.Blue]: { type: "an94", ammo: 45, fillInv: true },
+                            [FactionTeam.Red]: { type: "m1014", ammo: 8, fillInv: true },
+                            [FactionTeam.Blue]: { type: "an94", ammo: 45, fillInv: true },
                         },
                         teamcolor,
                     ),
                 { type: "flare_gun", ammo: 1 },
-                (teamcolor: TeamColor) =>
+                (teamcolor: FactionTeam) =>
                     getTeamWeapon(
                         {
-                            [TeamColor.Red]: { type: "machete_taiga", ammo: 0 },
-                            [TeamColor.Blue]: { type: "kukri_trad", ammo: 0 },
+                            [FactionTeam.Red]: { type: "machete_taiga", ammo: 0 },
+                            [FactionTeam.Blue]: { type: "kukri_trad", ammo: 0 },
                         },
                         teamcolor,
                     ),
@@ -151,10 +150,10 @@ export const RoleDefs: Record<string, RoleDef> = {
             backpack: "backpack03",
             helmet: "helmet04_leader",
             chest: "chest03",
-            outfit: (teamcolor: TeamColor) =>
+            outfit: (teamcolor: FactionTeam) =>
                 ({
-                    [TeamColor.Red]: "outfitRedLeader",
-                    [TeamColor.Blue]: "outfitBlueLeader",
+                    [FactionTeam.Red]: "outfitRedLeader",
+                    [FactionTeam.Blue]: "outfitBlueLeader",
                 })[teamcolor],
             noDropOutfit: true,
             inventory: {
@@ -183,10 +182,10 @@ export const RoleDefs: Record<string, RoleDef> = {
             backpack: "backpack03",
             helmet: "helmet04_captain",
             chest: "chest03",
-            outfit: (teamcolor: TeamColor) =>
+            outfit: (teamcolor: FactionTeam) =>
                 ({
-                    [TeamColor.Red]: "outfitRedLeader",
-                    [TeamColor.Blue]: "outfitBlueLeader",
+                    [FactionTeam.Red]: "outfitRedLeader",
+                    [FactionTeam.Blue]: "outfitBlueLeader",
                 })[teamcolor],
             noDropOutfit: true,
             inventory: {
@@ -206,11 +205,11 @@ export const RoleDefs: Record<string, RoleDef> = {
         defaultItems: createDefaultItems({
             weapons: [
                 { type: "", ammo: 0 },
-                (teamcolor: TeamColor) =>
+                (teamcolor: FactionTeam) =>
                     getTeamWeapon(
                         {
-                            [TeamColor.Red]: { type: "m4a1", ammo: 40, fillInv: true },
-                            [TeamColor.Blue]: { type: "grozas", ammo: 40, fillInv: true },
+                            [FactionTeam.Red]: { type: "m4a1", ammo: 40, fillInv: true },
+                            [FactionTeam.Blue]: { type: "grozas", ammo: 40, fillInv: true },
                         },
                         teamcolor,
                     ),
@@ -267,14 +266,14 @@ export const RoleDefs: Record<string, RoleDef> = {
         defaultItems: createDefaultItems({
             weapons: [
                 { type: "", ammo: 0 },
-                (teamcolor: TeamColor) =>
+                (teamcolor: FactionTeam) =>
                     getTeamWeapon(
                         {
-                            [TeamColor.Red]: util.weightedRandom([
+                            [FactionTeam.Red]: util.weightedRandom([
                                 { type: "l86", ammo: 30, fillInv: true, weight: 0.9 },
                                 { type: "scarssr", ammo: 10, fillInv: true, weight: 0.1 },
                             ]),
-                            [TeamColor.Blue]: util.weightedRandom([
+                            [FactionTeam.Blue]: util.weightedRandom([
                                 { type: "svd", ammo: 10, fillInv: true, weight: 0.9 },
                                 { type: "scarssr", ammo: 10, fillInv: true, weight: 0.1 },
                             ]),
@@ -384,14 +383,14 @@ export const RoleDefs: Record<string, RoleDef> = {
         defaultItems: createDefaultItems({
             weapons: [
                 { type: "", ammo: 0 },
-                (teamcolor: TeamColor) =>
+                (teamcolor: FactionTeam) =>
                     getTeamWeapon(
                         {
-                            [TeamColor.Red]: util.weightedRandom([
+                            [FactionTeam.Red]: util.weightedRandom([
                                 { type: "m249", ammo: 100, fillInv: true, weight: 1 },
                                 { type: "pkp", ammo: 200, fillInv: true, weight: 1 },
                             ]),
-                            [TeamColor.Blue]: util.weightedRandom([
+                            [FactionTeam.Blue]: util.weightedRandom([
                                 { type: "m249", ammo: 100, fillInv: true, weight: 1 },
                                 { type: "pkp", ammo: 200, fillInv: true, weight: 1 },
                             ]),
@@ -402,11 +401,11 @@ export const RoleDefs: Record<string, RoleDef> = {
                 { type: "mirv", ammo: 8 },
             ],
             backpack: "backpack03",
-            helmet: (teamcolor: TeamColor) =>
+            helmet: (teamcolor: FactionTeam) =>
                 getTeamHelmet(
                     {
-                        [TeamColor.Red]: "helmet04_last_man_red",
-                        [TeamColor.Blue]: "helmet04_last_man_blue",
+                        [FactionTeam.Red]: "helmet04_last_man_red",
+                        [FactionTeam.Blue]: "helmet04_last_man_blue",
                     },
                     teamcolor,
                 ),

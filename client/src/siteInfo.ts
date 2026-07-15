@@ -1,6 +1,6 @@
 import $ from "jquery";
 import { type MapDefKey, MapDefs } from "../../shared/defs/mapDefs.ts";
-import { TeamModeToString } from "../../shared/defs/types/misc.ts";
+import { GameConfig } from "../../shared/gameConfig.ts";
 import type { SiteInfoRes } from "../../shared/types/api.ts";
 import { api } from "./api.ts";
 import type { ConfigManager } from "./config.ts";
@@ -48,7 +48,7 @@ export class SiteInfo {
                 .desc;
             const buttonText = mapDef.buttonText
                 ? mapDef.buttonText
-                : TeamModeToString[mode.teamMode];
+                : GameConfig.TeamModeToString[mode.teamMode];
             availableModes.push({
                 icon: mapDef.icon,
                 buttonCss: mapDef.buttonCss,

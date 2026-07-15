@@ -6,8 +6,7 @@ import { ExplosionDefs } from "../../shared/defs/gameObjects/explosionsDefs.ts";
 import { GunDefs } from "../../shared/defs/gameObjects/gunDefs.ts";
 import { RoleDefs } from "../../shared/defs/gameObjects/roleDefs.ts";
 import { ThrowableDefs } from "../../shared/defs/gameObjects/throwableDefs.ts";
-import { TeamColor } from "../../shared/defs/maps/factionDefs.ts";
-import { GameConfig } from "../../shared/gameConfig.ts";
+import { FactionTeam, GameConfig } from "../../shared/gameConfig.ts";
 
 describe.for(Object.entries(GunDefs))("Gun $0", ([, def]) => {
     test("Bullet", () => {
@@ -114,8 +113,8 @@ describe.for(Object.entries(RoleDefs))("Role $0", ([, def]) => {
                 if (typeof weapon === "object" && weapon.type) {
                     expect(weapon.type).toBeValidLoot();
                 } else if (typeof weapon === "function") {
-                    expect(weapon(TeamColor.Red).type).toBeValidLoot();
-                    expect(weapon(TeamColor.Blue).type).toBeValidLoot();
+                    expect(weapon(FactionTeam.Red).type).toBeValidLoot();
+                    expect(weapon(FactionTeam.Blue).type).toBeValidLoot();
                 }
             });
 
@@ -128,8 +127,8 @@ describe.for(Object.entries(RoleDefs))("Role $0", ([, def]) => {
                     if (typeof helmet === "string") {
                         expect(helmet).toBeValidLoot("helmet");
                     } else {
-                        expect(helmet(TeamColor.Red)).toBeValidLoot("helmet");
-                        expect(helmet(TeamColor.Blue)).toBeValidLoot("helmet");
+                        expect(helmet(FactionTeam.Red)).toBeValidLoot("helmet");
+                        expect(helmet(FactionTeam.Blue)).toBeValidLoot("helmet");
                     }
                 }
                 if (def.defaultItems!.chest) {
@@ -140,8 +139,8 @@ describe.for(Object.entries(RoleDefs))("Role $0", ([, def]) => {
                     if (typeof outfit === "string") {
                         expect(outfit).toBeValidLoot("outfit");
                     } else {
-                        expect(outfit(TeamColor.Red)).toBeValidLoot("outfit");
-                        expect(outfit(TeamColor.Blue)).toBeValidLoot("outfit");
+                        expect(outfit(FactionTeam.Red)).toBeValidLoot("outfit");
+                        expect(outfit(FactionTeam.Blue)).toBeValidLoot("outfit");
                     }
                 }
             });

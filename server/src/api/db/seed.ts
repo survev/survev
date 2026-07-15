@@ -1,6 +1,5 @@
 import { generateUsername } from "unique-username-generator";
-import { MapId } from "../../../../shared/defs/types/misc.ts";
-import { TeamMode } from "../../../../shared/gameConfig.ts";
+import { MapId, TeamMode } from "../../../../shared/gameConfig.ts";
 import { util } from "../../../../shared/utils/util.ts";
 import type { MatchDataTable } from "../../api/db/schema.ts";
 import { createNewUser, generateId } from "../routes/user/auth/authUtils.ts";

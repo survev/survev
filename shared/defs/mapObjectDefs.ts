@@ -1,3 +1,4 @@
+import { FactionTeam } from "../gameConfig.ts";
 import { collider } from "../utils/collider.ts";
 import { type DeepPartial, util } from "../utils/util.ts";
 import { v2 } from "../utils/v2.ts";
@@ -13006,7 +13007,7 @@ export const RawMapObjectDefs: Record<string, MapObjectDef> = {
         terrain: { grass: true, beach: false },
         img: { sprite: "map-crate-02f.img" },
         sound: { explode: "crate_break_01" },
-        teamId: 1,
+        teamId: FactionTeam.Red,
     } as unknown as Partial<ObstacleDef>),
     crate_02d: createCrate({
         health: 140,
@@ -13550,7 +13551,7 @@ export const RawMapObjectDefs: Record<string, MapObjectDef> = {
         terrain: { grass: true, beach: false },
         img: { sprite: "map-crate-22.img" },
         sound: { explode: "crate_break_01" },
-        teamId: 2,
+        teamId: FactionTeam.Blue,
     }),
     crate_22d: createCrate({
         health: 140,
@@ -14394,29 +14395,29 @@ export const RawMapObjectDefs: Record<string, MapObjectDef> = {
     potato_01: createPotato({}),
     potato_01f: createPotato({
         terrain: { grass: true, beach: true, riverShore: false },
-        teamId: 2,
+        teamId: FactionTeam.Blue,
     }),
     potato_02: createPotato({ img: { sprite: "map-potato-02.img" } }),
     potato_02f: createPotato({
         terrain: { grass: true, beach: true, riverShore: false },
         img: { sprite: "map-potato-02.img" },
-        teamId: 2,
+        teamId: FactionTeam.Blue,
     }),
     potato_03: createPotato({ img: { sprite: "map-potato-03.img" } }),
     potato_03f: createPotato({
         terrain: { grass: true, beach: true, riverShore: false },
         img: { sprite: "map-potato-03.img" },
-        teamId: 2,
+        teamId: FactionTeam.Blue,
     }),
     tomato_01: createTomato({
         terrain: { grass: true, beach: true, riverShore: false },
-        teamId: 1,
+        teamId: FactionTeam.Red,
     }),
     tomato_02: createTomato({
         terrain: { grass: true, beach: true, riverShore: false },
         img: { sprite: "map-tomato-02.img" },
         sound: { explode: "tomato_break_02" },
-        teamId: 1,
+        teamId: FactionTeam.Red,
     }),
     tomato_03: createTomato({
         hitParticle: "tomatoChip_02",
@@ -14426,7 +14427,7 @@ export const RawMapObjectDefs: Record<string, MapObjectDef> = {
             sprite: "map-tomato-03.img",
             residue: "map-tomato-res-02.img",
         },
-        teamId: 1,
+        teamId: FactionTeam.Red,
     }),
     egg_01: createEgg({
         img: { sprite: "map-egg-01.img" },
@@ -19410,7 +19411,7 @@ export const RawMapObjectDefs: Record<string, MapObjectDef> = {
                 ori: 2,
             },
         ],
-        teamId: 2,
+        teamId: FactionTeam.Blue,
     },
     workshop_wall_right: createWall({
         material: "metal",
@@ -21304,7 +21305,7 @@ export const RawMapObjectDefs: Record<string, MapObjectDef> = {
             type: "building",
             map: { display: true, color: 0x317120, scale: 1 },
             terrain: { grass: true, beach: false },
-            teamId: 2,
+            teamId: FactionTeam.Blue,
             mapObstacleBounds: [
                 collider.createAabbExtents(v2.create(0, -1), v2.create(17, 15)),
             ],
@@ -23807,7 +23808,7 @@ export const RawMapObjectDefs: Record<string, MapObjectDef> = {
             collider.createAabbExtents(v2.create(10, -0.1), v2.create(15, 10.1)),
             collider.createAabbExtents(v2.create(17.5, 13.5), v2.create(7.49, 3.49)),
         ],
-        teamId: 1,
+        teamId: FactionTeam.Red,
     },
     mansion_structure_01x: {
         type: "structure",
@@ -23845,7 +23846,7 @@ export const RawMapObjectDefs: Record<string, MapObjectDef> = {
             collider.createAabbExtents(v2.create(10, -0.1), v2.create(15, 10.1)),
             collider.createAabbExtents(v2.create(17.5, 13.5), v2.create(7.49, 3.49)),
         ],
-        teamId: 1,
+        teamId: FactionTeam.Red,
     },
     mansion_structure_02: {
         type: "structure",

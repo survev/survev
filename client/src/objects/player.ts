@@ -1623,7 +1623,7 @@ export class Player implements AbstractObject {
             }
             let helmetTint = helmetSkin.baseTint;
             if (map.factionMode) {
-                helmetTint = playerBarn.getPlayerInfo(this.__id).teamId == 1
+                helmetTint = playerBarn.getPlayerInfo(this.__id).teamId == GameConfig.FactionTeam.Red
                     ? helmetSkin.baseTintRed
                     : helmetSkin.baseTintBlue;
             }

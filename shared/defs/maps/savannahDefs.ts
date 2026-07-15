@@ -1,10 +1,10 @@
+import { GameConfig } from "../../gameConfig.ts";
 import { util } from "../../utils/util.ts";
 import { v2 } from "../../utils/v2.ts";
-import { MapId } from "../types/misc.ts";
 import { Main, type PartialMapDef } from "./baseDefs.ts";
 
 const mapDef: PartialMapDef = {
-    mapId: MapId.Savannah,
+    mapId: GameConfig.MapId.Savannah,
     desc: {
         name: "Savannah",
         icon: "img/gui/player-the-hunted.svg",

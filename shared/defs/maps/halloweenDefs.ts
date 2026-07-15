@@ -1,11 +1,10 @@
 import { GameConfig } from "../../gameConfig.ts";
 import { util } from "../../utils/util.ts";
 import type { MapDef } from "../mapDefs.ts";
-import { MapId } from "../types/misc.ts";
 import { Main, type PartialMapDef } from "./baseDefs.ts";
 
 const mapDef: PartialMapDef = {
-    mapId: MapId.Halloween,
+    mapId: GameConfig.MapId.Halloween,
 
     desc: {
         name: "Halloween",

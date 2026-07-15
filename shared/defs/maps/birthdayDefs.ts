@@ -1,11 +1,11 @@
+import { GameConfig } from "../../gameConfig.ts";
 import { util } from "../../utils/util.ts";
 import { v2 } from "../../utils/v2.ts";
 import type { MapDef } from "../mapDefs.ts";
-import { MapId } from "../types/misc.ts";
 import { Main, type PartialMapDef } from "./baseDefs.ts";
 
 const mapDef: PartialMapDef = {
-    mapId: MapId.Birthday,
+    mapId: GameConfig.MapId.Birthday,
     desc: {
         name: "Birthday",
         icon: "img/gui/birthday.svg",

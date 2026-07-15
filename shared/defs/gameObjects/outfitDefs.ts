@@ -1,4 +1,4 @@
-import { Rarity } from "../../gameConfig.ts";
+import { FactionTeam, Rarity } from "../../gameConfig.ts";
 import { type DeepPartial, util } from "../../utils/util.ts";
 
 export interface OutfitDef {
@@ -33,8 +33,7 @@ export interface OutfitDef {
     baseScale?: number;
     ghillie?: boolean;
     // if on faction mode, the skin will only work for the specified ID
-    // 1 for red team, 2 for blue team
-    teamId?: number;
+    teamId?: FactionTeam;
 }
 
 function defineOutfitSkin(baseType: string, params: DeepPartial<OutfitDef>): OutfitDef {
@@ -94,7 +93,7 @@ const SkinDefs: Record<string, OutfitDef> = {
             sprite: "loot-shirt-01.img",
             tint: 0xffffff,
         },
-        teamId: 1,
+        teamId: FactionTeam.Red,
     }),
     outfitTank: defineOutfitSkin("outfitBase", {
         noDrop: true,
@@ -163,7 +162,7 @@ const SkinDefs: Record<string, OutfitDef> = {
             sprite: "loot-shirt-01.img",
             tint: 0xffffff,
         },
-        teamId: 2,
+        teamId: FactionTeam.Blue,
     }),
     outfitAssault: defineOutfitSkin("outfitBase", {
         noDrop: true,
@@ -258,7 +257,7 @@ const SkinDefs: Record<string, OutfitDef> = {
         },
         rarity: Rarity.Epic,
         lore: "For those who knows.",
-        teamId: 1,
+        teamId: FactionTeam.Red,
     }),
     outfitMod: defineOutfitSkin("outfitBase", {
         name: "Game Moderatr",
@@ -279,7 +278,7 @@ const SkinDefs: Record<string, OutfitDef> = {
         },
         rarity: Rarity.Epic,
         lore: "For those who wield the power of the pan.",
-        teamId: 2,
+        teamId: FactionTeam.Blue,
     }),
     outfitWheat: defineOutfitSkin("outfitBase", {
         name: "Splintered Wheat",
@@ -331,7 +330,7 @@ const SkinDefs: Record<string, OutfitDef> = {
             sprite: "loot-shirt-01.img",
             tint: 0x9a1818,
         },
-        teamId: 1,
+        teamId: FactionTeam.Red,
     }),
     outfitBlueLeaderAged: defineOutfitSkin("outfitBase", {
         name: "Stifled Blue",
@@ -349,7 +348,7 @@ const SkinDefs: Record<string, OutfitDef> = {
             sprite: "loot-shirt-01.img",
             tint: 0x173e99,
         },
-        teamId: 2,
+        teamId: FactionTeam.Blue,
     }),
     outfitRedLeader: defineOutfitSkin("outfitBase", {
         name: "Red Leader",
@@ -368,7 +367,7 @@ const SkinDefs: Record<string, OutfitDef> = {
             sprite: "loot-shirt-01.img",
             tint: 0x840000,
         },
-        teamId: 1,
+        teamId: FactionTeam.Red,
     }),
     outfitBlueLeader: defineOutfitSkin("outfitBase", {
         name: "Blue Leader",
@@ -387,7 +386,7 @@ const SkinDefs: Record<string, OutfitDef> = {
             sprite: "loot-shirt-01.img",
             tint: 13223,
         },
-        teamId: 2,
+        teamId: FactionTeam.Blue,
     }),
     outfitSpetsnaz: defineOutfitSkin("outfitBase", {
         name: "Siberian Assault",
@@ -439,7 +438,7 @@ const SkinDefs: Record<string, OutfitDef> = {
             sprite: "loot-shirt-01.img",
             tint: 0x16b900,
         },
-        teamId: 1,
+        teamId: FactionTeam.Red,
     }),
     outfitImperial: defineOutfitSkin("outfitBase", {
         name: "Imperial Seal",
@@ -457,7 +456,7 @@ const SkinDefs: Record<string, OutfitDef> = {
             sprite: "loot-shirt-01.img",
             tint: 0xbc002d,
         },
-        teamId: 1,
+        teamId: FactionTeam.Red,
     }),
     outfitLumber: defineOutfitSkin("outfitBase", {
         name: "Woodcutter's Wrap",
@@ -475,7 +474,7 @@ const SkinDefs: Record<string, OutfitDef> = {
             sprite: "loot-shirt-outfitLumber.img",
             tint: 0xffffff,
         },
-        teamId: 1,
+        teamId: FactionTeam.Red,
     }),
     outfitVerde: defineOutfitSkin("outfitBase", {
         name: "Poncho Verde",
@@ -510,7 +509,7 @@ const SkinDefs: Record<string, OutfitDef> = {
             sprite: "loot-shirt-01.img",
             tint: 0x990000,
         },
-        teamId: 1,
+        teamId: FactionTeam.Red,
     }),
     outfitTarkhany: defineOutfitSkin("outfitBase", {
         name: "Tarkhany Regal",
@@ -545,7 +544,7 @@ const SkinDefs: Record<string, OutfitDef> = {
             sprite: "loot-shirt-01.img",
             tint: 7143401,
         },
-        teamId: 2,
+        teamId: FactionTeam.Blue,
     }),
     outfitHeaven: defineOutfitSkin("outfitBase", {
         name: "Celestial Garb",
@@ -580,7 +579,7 @@ const SkinDefs: Record<string, OutfitDef> = {
             sprite: "loot-shirt-01.img",
             tint: 0x950000,
         },
-        teamId: 1,
+        teamId: FactionTeam.Red,
     }),
     outfitIslander: defineOutfitSkin("outfitBase", {
         name: "Island Time",
@@ -615,7 +614,7 @@ const SkinDefs: Record<string, OutfitDef> = {
             sprite: "loot-shirt-01.img",
             tint: 0xbaa2,
         },
-        teamId: 2,
+        teamId: FactionTeam.Blue,
     }),
     outfitCoral: defineOutfitSkin("outfitBase", {
         name: "Coral Guise",
@@ -708,7 +707,7 @@ const SkinDefs: Record<string, OutfitDef> = {
             sprite: "loot-shirt-01.img",
             tint: 0x42080c,
         },
-        teamId: 1,
+        teamId: FactionTeam.Red,
     }),
     outfitPrisoner: defineOutfitSkin("outfitBase", {
         name: "The New Black",
@@ -780,7 +779,7 @@ const SkinDefs: Record<string, OutfitDef> = {
             sprite: "loot-shirt-outfitRoyalFortune.img",
             tint: 0xffffff,
         },
-        teamId: 1,
+        teamId: FactionTeam.Red,
     }),
     outfitKeyLime: defineOutfitSkin("outfitBase", {
         name: "Key Lime",
@@ -819,7 +818,7 @@ const SkinDefs: Record<string, OutfitDef> = {
             sprite: "loot-shirt-outfitCobaltShell.img",
             tint: 0xffffff,
         },
-        teamId: 2,
+        teamId: FactionTeam.Blue,
     }),
     outfitFragtastic: defineOutfitSkin("outfitBase", {
         name: "Fragtastic",
@@ -974,7 +973,7 @@ const SkinDefs: Record<string, OutfitDef> = {
             sprite: "loot-shirt-outfitRed.img",
             tint: 0xffffff,
         },
-        teamId: 1,
+        teamId: FactionTeam.Red,
     }),
     outfitWhite: defineOutfitSkin("outfitBase", {
         name: "Arctic Avenger",
@@ -1087,7 +1086,7 @@ const SkinDefs: Record<string, OutfitDef> = {
             sprite: "loot-shirt-outfitWave.img",
             tint: 0xffffff,
         },
-        teamId: 2,
+        teamId: FactionTeam.Blue,
     }),
     outfitParrotfish: defineOutfitSkin("outfitBase", {
         name: "Parrotfish",

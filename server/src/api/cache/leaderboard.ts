@@ -1,4 +1,4 @@
-import { MapId, TeamModeToString } from "../../../../shared/defs/types/misc.ts";
+import { GameConfig } from "../../../../shared/gameConfig.ts";
 import type { LeaderboardRequest, LeaderboardResponse } from "../../../../shared/types/stats.ts";
 import { Config } from "../../config.ts";
 import { server } from "../apiServer.ts";
@@ -48,8 +48,8 @@ class LeaderBoardCache {
 
     getCacheKey(prefix: Prefix, params: LeaderboardRequest) {
         const { teamMode, mapId, type, interval } = params;
-        const mapName = MapId[mapId].toLowerCase();
-        return `${prefix}:${TeamModeToString[teamMode]}:${mapName}:${type}:${interval}`;
+        const mapName = GameConfig.MapId[mapId].toLowerCase();
+        return `${prefix}:${GameConfig.TeamModeToString[teamMode]}:${mapName}:${type}:${interval}`;
     }
 
     async invalidateCache(matchData: MatchDataTable[]) {

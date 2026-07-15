@@ -1,3 +1,4 @@
+import type { FactionTeam } from "../../gameConfig.ts";
 import type { AABB, Collider } from "../../utils/coldet.ts";
 import type { Vec2 } from "../../utils/v2.ts";
 import type { LootSpawnDef, TerrainSpawnDef } from "../mapObjectsTyping.ts";
@@ -174,5 +175,5 @@ export interface ObstacleDef {
     armorPlated?: boolean;
     smartLoot?: boolean;
     createSmoke?: boolean;
-    teamId?: number;
+    teamId?: FactionTeam;
 }

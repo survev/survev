@@ -1,27 +1,3 @@
-export enum TeamMode {
-    Solo = 1,
-    Duo = 2,
-    Squad = 4,
-}
-
-export enum EmoteSlot {
-    Top,
-    Right,
-    Bottom,
-    Left,
-    Win,
-    Death,
-    Count,
-}
-
-export enum DamageType {
-    Player,
-    Bleeding,
-    Gas,
-    Airdrop,
-    Airstrike,
-}
-
 export enum Action {
     None,
     Reload,
@@ -29,29 +5,6 @@ export enum Action {
     UseItem,
     Revive,
     Count,
-}
-
-export enum Rarity {
-    Stock,
-    Common,
-    Uncommon,
-    Rare,
-    Epic,
-    Mythic,
-}
-
-export enum WeaponSlot {
-    Primary,
-    Secondary,
-    Melee,
-    Throwable,
-    Count,
-}
-
-export enum GasMode {
-    Inactive,
-    Waiting,
-    Moving,
 }
 
 export enum Anim {
@@ -65,9 +18,28 @@ export enum Anim {
     Count,
 }
 
-export enum Plane {
+export enum DamageType {
+    Player,
+    Bleeding,
+    Gas,
     Airdrop,
     Airstrike,
+}
+
+export enum EmoteSlot {
+    Top,
+    Right,
+    Bottom,
+    Left,
+    Win,
+    Death,
+    Count,
+}
+
+export enum GasMode {
+    Inactive,
+    Waiting,
+    Moving,
 }
 
 export enum HasteType {
@@ -118,22 +90,77 @@ export enum Input {
     Count,
 }
 
+export enum MapId {
+    Main = 0,
+    Desert = 1,
+    Woods = 2,
+    Faction = 3,
+    Potato = 4,
+    Savannah = 5,
+    Halloween = 6,
+    Cobalt = 7,
+    Birthday = 8,
+    Beach = 9,
+}
+
+export enum Plane {
+    Airdrop,
+    Airstrike,
+}
+
+export enum WeaponSlot {
+    Primary,
+    Secondary,
+    Melee,
+    Throwable,
+    Count,
+}
+
+export enum Rarity {
+    Stock,
+    Common,
+    Uncommon,
+    Rare,
+    Epic,
+    Mythic,
+}
+
+export enum TeamMode {
+    Solo = 1,
+    Duo = 2,
+    Squad = 4,
+}
+
+export enum FactionTeam {
+    Red = 1,
+    Blue = 2,
+}
+
 export const GameConfig = {
     // started with 1000 to distinguish us from the original surviv protocol
     // the protocol we originated from was 78
     // remember to bump this every time a serialization function is changed
     // or a definition item added, removed or moved
     protocolVersion: 1021,
-    Input,
-    EmoteSlot,
-    WeaponSlot,
-    WeaponType: ["gun", "gun", "melee", "throwable"] as const,
-    DamageType,
     Action,
     Anim,
+    DamageType,
+    EmoteSlot,
     GasMode,
-    Plane,
     HasteType,
+    Input,
+    MapId,
+    Plane,
+    Rarity,
+    TeamMode,
+    TeamModeToString: {
+        [TeamMode.Solo]: "solo",
+        [TeamMode.Duo]: "duo",
+        [TeamMode.Squad]: "squad",
+    },
+    FactionTeam,
+    WeaponSlot,
+    WeaponType: ["gun", "gun", "melee", "throwable"] as const,
     gas: {
         damageTickRate: 2,
     },
