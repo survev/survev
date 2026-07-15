@@ -206,6 +206,12 @@ export class PlaneBarn {
             plane ||= this.addPlane(data, map);
             plane.dirty = false;
             plane.actionComplete = data.actionComplete;
+
+            // if the position gets too out of sync
+            // reconcile it with the server
+            if (!v2.eq(plane.pos, data.pos, 8)) {
+                plane.pos = v2.copy(data.pos);
+            }
         }
         // Delete old planes
         for (let i = 0; i < this.planes.length; i++) {
@@ -270,6 +276,7 @@ export class PlaneBarn {
                 }
 
                 // Do we need to reconcile the client plane and the server plane pos?
+                // Turns out we do :) (see updatePlanes)
                 p.pos = v2.add(p.pos, v2.mul(p.planeDir, dt * p.config.planeVel));
 
                 // If the drop is deployed, lerp towards the elevated sprite values
