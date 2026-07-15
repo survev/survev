@@ -448,9 +448,7 @@ export class Obstacle implements AbstractObject {
                 for (let i = 0; i < numParticles; i++) {
                     const vel = v2.mul(v2.randomUnit(), util.random(5, 15));
                     const particle = Array.isArray(this.explodeParticle)
-                        ? this.explodeParticle[
-                            Math.floor(Math.random() * this.explodeParticle.length)
-                        ]
+                        ? util.randomItem(this.explodeParticle)
                         : this.explodeParticle;
                     particleBarn.addParticle(particle, this.layer, center, vel);
                 }

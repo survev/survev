@@ -6,6 +6,7 @@ import { MapDefs } from "../../../../../shared/defs/mapDefs.ts";
 import { MapId } from "../../../../../shared/gameConfig.ts";
 import { type GetPassResponse } from "../../../../../shared/types/user.ts";
 import { passUtil } from "../../../../../shared/utils/passUtil.ts";
+import { util } from "../../../../../shared/utils/util.ts";
 import { Config } from "../../../config.ts";
 import { server } from "../../apiServer.ts";
 import { validateParams } from "../../auth/middleware.ts";
@@ -320,6 +321,5 @@ function getRandomQuestType(excluded: Set<string>) {
     }
 
     const source = available.length > 0 ? available : questTypes;
-    const idx = Math.floor(Math.random() * source.length);
-    return source[idx] ?? defaultQuestType;
+    return util.randomItem(source) ?? defaultQuestType;
 }

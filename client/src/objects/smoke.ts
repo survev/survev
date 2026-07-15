@@ -60,7 +60,7 @@ const particles = ["part-smoke-02.img", "part-smoke-03.img"];
 export class SmokeParticle {
     active = false;
     zIdx = 0;
-    sprite = PIXI.Sprite.from(particles[Math.floor(Math.random() * particles.length)]);
+    sprite = PIXI.Sprite.from(util.randomItem(particles));
 
     pos!: Vec2;
     posTarget!: Vec2;

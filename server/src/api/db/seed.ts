@@ -159,21 +159,16 @@ function generateMatchHistory(
 function getRandomData() {
     const date = new Date();
     return {
-        mapId: getRandomItem([MapId.Desert, MapId.Main, MapId.Woods]),
+        mapId: util.randomItem([MapId.Desert, MapId.Main, MapId.Woods]),
         gameId: crypto.randomUUID(),
         createdAt: new Date(date.setDate(date.getDate() - util.randomInt(0, 20))),
-        region: getRandomItem(["na", "eu", "as"]),
+        region: util.randomItem(["na", "eu", "as"]),
         teamMode: weightedRandom([
             { value: TeamMode.Solo, weight: 0.4 },
             { value: TeamMode.Duo, weight: 0.4 },
             { value: TeamMode.Squad, weight: 0.2 },
         ]),
     };
-}
-
-// Helper functions
-function getRandomItem<const T>(array: T[]): T {
-    return array[Math.floor(Math.random() * array.length)];
 }
 
 function shuffle<T>(array: T[]): T[] {

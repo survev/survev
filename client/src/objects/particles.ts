@@ -112,7 +112,7 @@ export class Particle {
         this.alphaInEnd = this.alphaIn ? getRangeValue(def.alphaIn!.end!) : 0;
         this.emitterIdx = -1;
         const tex = Array.isArray(def.image)
-            ? def.image[Math.floor(Math.random() * def.image.length)]
+            ? util.randomItem(def.image)
             : def.image;
         this.sprite.texture = PIXI.Texture.from(tex);
         this.sprite.visible = false;

@@ -1468,7 +1468,7 @@ export class GameMap {
         const def = MapObjectDefs.typeToDef(type);
         if (def.type === "building" || def.type === "structure") {
             if ("oris" in def && def.oris?.length) {
-                ori = util.randomItem(def.oris, rand)!;
+                ori = util.randomItem(def.oris, rand);
             } else {
                 ori = def.ori ?? util.randomInt(0, 3, rand);
             }
@@ -1722,7 +1722,7 @@ export class GameMap {
             scale = oriAndScale.scale;
 
             const t = util.random(0, 1);
-            let finalRiver = river ?? rivers[util.randomInt(0, rivers.length - 1)];
+            let finalRiver = river ?? util.randomItem(rivers);
 
             let pos = finalRiver.spline.getPos(t);
 
@@ -1776,7 +1776,7 @@ export class GameMap {
         if (!rivers.length) return;
 
         this.trySpawn(type, () => {
-            const selectedRiver = river ?? util.randomItem(rivers)!;
+            const selectedRiver = river ?? util.randomItem(rivers);
             const t = util.random(0, 1);
             const def = MapObjectDefs.typeToDef(type);
 
@@ -1810,7 +1810,7 @@ export class GameMap {
         if (!rivers.length) return;
 
         this.trySpawn(type, () => {
-            river = river ?? rivers[util.randomInt(0, rivers.length - 1)];
+            river = river ?? util.randomItem(rivers);
             const t = util.random(0, 1);
 
             let width = river.getWaterWidth(t);
@@ -1850,7 +1850,7 @@ export class GameMap {
 
         this.trySpawn(type, () => {
             const t = util.random(0.1, 0.9);
-            const river = this.normalRivers[util.randomInt(0, this.normalRivers.length - 1)];
+            const river = util.randomItem(this.normalRivers);
             let pos = river.spline.getPos(t);
 
             const otherSide = Math.random() < 0.5;

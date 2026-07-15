@@ -365,7 +365,7 @@ export class PlayerBarn {
 
                     if (!finalPlayers.length) continue;
 
-                    const randomPlayer = util.randomItem(finalPlayers)!;
+                    const randomPlayer = util.randomItem(finalPlayers);
                     randomPlayer.promoteToRole(scheduledRole.role);
                 }
             }
@@ -1494,8 +1494,7 @@ export class Player extends BaseGameObject {
             if (this.roleMenuTicker <= 0) {
                 this.roleMenuTicker = 0;
                 const roleChoices = this.game.map.mapDef.gameMode.perkModeRoles!;
-                const randomRole = roleChoices[util.randomInt(0, roleChoices.length - 1)];
-                this.roleSelect(randomRole);
+                this.roleSelect(util.randomItem(roleChoices));
             }
         }
 
@@ -1631,7 +1630,7 @@ export class Player extends BaseGameObject {
             const emotes = Object.keys(EmotesDefs);
 
             this.game.playerBarn.addEmote(
-                emotes[Math.floor(Math.random() * emotes.length)],
+                util.randomItem(emotes),
                 this.__id,
             );
         }
@@ -2757,7 +2756,7 @@ export class Player extends BaseGameObject {
 
                 if (!lonePerks) {
                     if (rolePerks.length > 0 && perkPool.length > 0) {
-                        const perkToReplace = rolePerks[util.randomInt(0, rolePerks.length - 1)].type;
+                        const perkToReplace = util.randomItem(rolePerks).type;
                         const candidatePerks = perkPool.filter(
                             (p) => !killCreditSource.hasPerk(p),
                         );
@@ -3947,7 +3946,7 @@ export class Player extends BaseGameObject {
 
         if (playerLootTypes.length == 0) return;
 
-        const item = playerLootTypes[util.randomInt(0, playerLootTypes.length - 1)];
+        const item = util.randomItem(playerLootTypes);
         const weapIdx = this.weapons.findIndex((w) => w.type == item);
 
         const dropMsg = new net.DropItemMsg();
@@ -3984,7 +3983,7 @@ export class Player extends BaseGameObject {
             : ([_type, def]) => !def.noPotatoSwap;
 
         const weaponChoices = enumerableDefs.filter(filterCb);
-        const [chosenWeaponType, chosenWeaponDef] = weaponChoices[util.randomInt(0, weaponChoices.length - 1)];
+        const [chosenWeaponType, chosenWeaponDef] = util.randomItem(weaponChoices);
 
         let index;
         if (this.activeWeapon === oldWeapon) {

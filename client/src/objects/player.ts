@@ -1499,7 +1499,7 @@ export class Player implements AbstractObject {
             const frozenDef = GameObjectDefs.typeToDef(this.m_netData.m_frozenType, "explosion");
             const frozenSprites = frozenDef.frozenSprites || [];
             if (frozenSprites.length > 0) {
-                const sprite = frozenSprites[Math.floor(Math.random() * frozenSprites.length)];
+                const sprite = util.randomItem(frozenSprites);
                 const n = math.oriToRad(this.m_netData.m_frozenOri)
                     + Math.PI * 0.5
                     + (Math.random() - 0.5) * Math.PI * 0.25;
@@ -2114,37 +2114,36 @@ export class Player implements AbstractObject {
     }
 
     selectAnim(type: Anim) {
-        const t = function(e: string, t: boolean) {
+        const anim = function(type: string, mirror: boolean) {
             return {
-                type: e,
-                mirror: !!t && Math.random() < 0.5,
+                type: type,
+                mirror: !!mirror && Math.random() < 0.5,
             };
         };
         switch (type) {
             case Anim.None:
-                return t("none", false);
+                return anim("none", false);
             case Anim.Cook:
-                return t("cook", false);
+                return anim("cook", false);
             case Anim.Throw:
-                return t("throw", false);
+                return anim("throw", false);
             case Anim.Revive:
-                return t("revive", false);
+                return anim("revive", false);
             case Anim.CrawlForward:
-                return t("crawl_forward", true);
+                return anim("crawl_forward", true);
             case Anim.CrawlBackward:
-                return t("crawl_backward", true);
+                return anim("crawl_backward", true);
             case Anim.Melee: {
-                const r = GameObjectDefs.typeToDefSafe(this.m_netData.m_activeWeapon) as MeleeDef;
-                if (!r.anim?.attackAnims) {
-                    return t("fists", true);
+                const def = GameObjectDefs.typeToDefSafe(this.m_netData.m_activeWeapon) as MeleeDef;
+                if (!def.anim?.attackAnims) {
+                    return anim("fists", true);
                 }
-                const a = r.anim.attackAnims;
-                const i = Math.floor(Math.random() * a.length);
-                const o = a[i];
-                return t(o, o == "fists" && a.length == 1);
+                const anims = def.anim.attackAnims;
+                const selected = util.randomItem(anims);
+                return anim(selected, selected == "fists" && anims.length == 1);
             }
             default:
-                return t("none", false);
+                return anim("none", false);
         }
     }
 

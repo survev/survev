@@ -182,7 +182,7 @@ class Bot {
 
         this.ws.binaryType = "arraybuffer";
 
-        const emote = (): string => emotes[util.randomInt(0, emotes.length - 1)];
+        const emote = (): string => util.randomItem(emotes);
 
         this.emotes = [emote(), emote(), emote(), emote(), emote(), emote()];
 
@@ -303,8 +303,8 @@ class Bot {
         joinMsg.protocol = GameConfig.protocolVersion;
 
         joinMsg.loadout = {
-            melee: melees[util.randomInt(0, melees.length - 1)],
-            outfit: outfits[util.randomInt(0, outfits.length - 1)],
+            melee: util.randomItem(melees),
+            outfit: util.randomItem(outfits),
             heal: "heal_basic",
             boost: "boost_basic",
             emotes: this.emotes,
@@ -353,7 +353,7 @@ class Bot {
 
         if (this.emote) {
             const emoteMsg = new net.EmoteMsg();
-            emoteMsg.type = this.emotes[util.randomInt(0, this.emotes.length - 1)];
+            emoteMsg.type = util.randomItem(this.emotes);
         }
     }
 
@@ -402,7 +402,7 @@ class Bot {
 
         if (Math.random() < 0.1) {
             const weaps = this.weapons.filter((weap) => weap.type !== "");
-            const slot = this.weapons.indexOf(weaps[util.randomInt(0, weaps.length - 1)]);
+            const slot = this.weapons.indexOf(util.randomItem(weaps));
 
             let input = null;
             switch (slot) {
