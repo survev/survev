@@ -231,7 +231,7 @@ const mapDef: PartialMapDef = {
                     { weight: 0.1, widths: [4] },
                     { weight: 0.15, widths: [8] },
                     { weight: 0.25, widths: [8, 4] },
-                    { weight: 0.21, widths: [8] },
+                    { weight: 0.21, widths: [8, 6] },
                     { weight: 0.09, widths: [8, 8] },
                     { weight: 0.2, widths: [8, 8, 4] },
                     {
