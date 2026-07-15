@@ -38,6 +38,16 @@ export const QuestDefs: Record<string, QuestDef> = {
             maxRank: 10,
         },
     },
+    quest_top_duo: {
+        type: "quest",
+        event: "placement",
+        target: 2,
+        xp: 30,
+        where: {
+            mode: "duo",
+            maxRank: 8,
+        },
+    },
     quest_top_squad: {
         type: "quest",
         event: "placement",
