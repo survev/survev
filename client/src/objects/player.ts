@@ -2977,7 +2977,7 @@ export class PlayerBarn {
             });
             const numParticles = Math.floor(util.random(30, 35));
             for (let i = 0; i < numParticles; i++) {
-                const vel = v2.mul(v2.randomUnit(), util.random(5, 15));
+                const vel = v2.randomUnit(util.random(5, 15));
                 particleBarn.addParticle(
                     "turkeyFeathersDeath",
                     target.layer,

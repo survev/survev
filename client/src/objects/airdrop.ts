@@ -130,7 +130,7 @@ export class AirdropBarn {
                         for (let j = 0; j < 12; j++) {
                             const ripplePos = v2.add(
                                 airdrop.pos,
-                                v2.mul(v2.randomUnit(), util.random(4.5, 6.0)),
+                                v2.randomUnit(util.random(4.5, 6.0)),
                             );
                             const part = particleBarn.addRippleParticle(
                                 ripplePos,

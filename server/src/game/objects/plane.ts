@@ -268,7 +268,7 @@ export class PlaneBarn {
                 : current;
         }, players[0]);
 
-        const pos = v2.add(furthestLosingTeamPlayer.pos, v2.mul(v2.randomUnit(), 5));
+        const pos = v2.add(furthestLosingTeamPlayer.pos, v2.randomUnit(5));
 
         // Faction golden airdrop
         if (this.game.map.potatoMode) {

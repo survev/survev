@@ -140,11 +140,11 @@ export class Smoke extends BaseGameObject {
         this.emitter = emitter;
         if (startSmoke) {
             this.growTime = 0.1;
-            this.vel = v2.mul(v2.randomUnit(), util.random(0, 1.5));
+            this.vel = v2.randomUnit(util.random(0, 1.5));
             this.drag = 0.3;
         } else {
             this.growTime = 2;
-            this.vel = v2.mul(v2.randomUnit(), util.random(0.5, 1.5));
+            this.vel = v2.randomUnit(util.random(0.5, 1.5));
             this.drag = 0.1;
         }
         this.bounds = collider.createAabbExtents(

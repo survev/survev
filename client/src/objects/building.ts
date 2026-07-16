@@ -627,7 +627,7 @@ export class Building implements AbstractObject {
                     util.random(aabb.min.x, aabb.max.x),
                     util.random(aabb.min.y, aabb.max.y),
                 );
-                const vel = v2.mul(v2.randomUnit(), util.random(0, 15));
+                const vel = v2.randomUnit(util.random(0, 15));
                 particleBarn.addParticle(def.particle, this.layer, pos, vel);
             }
 

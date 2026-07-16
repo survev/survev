@@ -427,7 +427,7 @@ export class BulletBarn {
                         if (!shooterDead) {
                             const Y = col.player!;
                             if (map.turkeyMode && W?.m_hasPerk("turkey_shoot")) {
-                                const J = v2.mul(v2.randomUnit(), util.random(3, 6));
+                                const J = v2.randomUnit(util.random(3, 6));
                                 particleBarn.addParticle(
                                     "turkeyFeathersHit",
                                     Y.layer,

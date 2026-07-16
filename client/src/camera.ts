@@ -61,7 +61,7 @@ export default class Camera {
 
     m_applyShake() {
         if (this.m_shakeEnabled) {
-            this.m_pos = v2.add(this.m_pos, v2.mul(v2.randomUnit(), this.m_shakeInt));
+            this.m_pos = v2.add(this.m_pos, v2.randomUnit(this.m_shakeInt));
         }
         this.m_shakeInt = 0;
     }

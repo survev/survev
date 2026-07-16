@@ -185,10 +185,8 @@ class Explosion {
                         null,
                     );
                     const physPart = explosionBarn.addPhysicsParticle();
-                    const vel = v2.mul(
-                        v2.randomUnit(),
-                        util.random(def.scatter.speed.min, def.scatter.speed.max),
-                    );
+                    const vel = v2.randomUnit(util.random(def.scatter.speed.min, def.scatter.speed.max));
+
                     physPart.init(this.pos, vel, this.layer, particle);
                 }
             }
@@ -222,7 +220,7 @@ class Explosion {
                     const maxRad = def.rippleCount * 0.5;
                     const ripplePos = v2.add(
                         this.pos,
-                        v2.mul(v2.randomUnit(), util.random(0, maxRad)),
+                        v2.randomUnit(util.random(0, maxRad)),
                     );
                     const part = particleBarn.addRippleParticle(
                         ripplePos,
