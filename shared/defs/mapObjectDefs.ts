@@ -8568,7 +8568,7 @@ function createOasis<T extends BuildingDef>(e: Partial<T>): T {
         mapGroundPatches: [
             {
                 bound: collider.createCircle(v2.create(0, 0), 40),
-                color: 0x80af49,
+                color: 0xa6af48,
                 roughness: 0.3,
                 offsetDist: 2,
             },
@@ -20255,7 +20255,7 @@ export const RawMapObjectDefs: Record<string, MapObjectDef> = {
             },
             {
                 bound: collider.createAabbExtents(v2.create(-51, -18), v2.create(13.75, 5.75)),
-                color: 0x80af49,
+                color: 0x7ba865,
                 roughness: 0,
                 offsetDist: 1,
             },
