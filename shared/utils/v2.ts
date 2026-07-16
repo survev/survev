@@ -126,11 +126,8 @@ export const v2 = {
         return { x: max(a.x, b.x), y: max(a.y, b.y) };
     },
 
-    randomUnit(): Vec2 {
-        return v2.normalizeSafe(
-            v2.create(Math.random() - 0.5, Math.random() - 0.5),
-            v2.create(1.0, 0.0),
-        );
+    randomUnit(length = 1, rand = Math.random) {
+        return v2.rotate(v2.create(length, 0), 2 * rand() * Math.PI);
     },
 
     lerp(t: number, a: Vec2, b: Vec2): Vec2 {
