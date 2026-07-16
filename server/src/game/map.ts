@@ -1722,26 +1722,26 @@ export class GameMap {
             scale = oriAndScale.scale;
 
             const t = util.random(0, 1);
-            let finalRiver = river ?? util.randomItem(rivers);
+            const selectedRiver = river ?? util.randomItem(rivers);
 
-            let pos = finalRiver.spline.getPos(t);
+            let pos = selectedRiver.spline.getPos(t);
 
             if (def.terrain?.nearbyRiver) {
                 const otherSide = Math.random() < 0.5;
 
-                const offset = finalRiver.waterWidth * 2 * (otherSide ? -1 : 1);
-                let norm = finalRiver.spline.getNormal(t);
+                const offset = selectedRiver.waterWidth * 2 * (otherSide ? -1 : 1);
+                let norm = selectedRiver.spline.getNormal(t);
                 v2.set(pos, v2.add(pos, v2.mul(norm, offset)));
 
-                const finalT = finalRiver.spline.getClosestTtoPoint(pos);
-                const finalNorm = finalRiver.spline.getNormal(finalT);
+                const finalT = selectedRiver.spline.getClosestTtoPoint(pos);
+                const finalNorm = selectedRiver.spline.getNormal(finalT);
 
                 const riverOri = (math.radToOri(Math.atan2(finalNorm.y, finalNorm.x))
                     + (otherSide ? 2 : 0))
                     % 4;
                 ori = (def.terrain.nearbyRiver.facingOri + riverOri) % 4;
             } else {
-                const norm = finalRiver.spline.getNormal(t);
+                const norm = selectedRiver.spline.getNormal(t);
                 ori = math.radToOri(Math.atan2(norm.y, norm.x));
             }
             if (type === "bunker_structure_05") {
@@ -1810,17 +1810,17 @@ export class GameMap {
         if (!rivers.length) return;
 
         this.trySpawn(type, () => {
-            river = river ?? util.randomItem(rivers);
+            const selectedRiver = river ?? util.randomItem(rivers);
             const t = util.random(0, 1);
 
-            let width = river.getWaterWidth(t);
+            let width = selectedRiver.getWaterWidth(t);
 
-            let offset = util.random(width, width + river.shoreWidth);
+            let offset = util.random(width, width + selectedRiver.shoreWidth);
             if (Math.random() < 0.5) offset *= -1;
 
             const pos = v2.add(
-                river.spline.getPos(t),
-                v2.mul(river.spline.getNormal(t), offset),
+                selectedRiver.spline.getPos(t),
+                v2.mul(selectedRiver.spline.getNormal(t), offset),
             );
 
             const { ori, scale } = this.getOriAndScale(type);
