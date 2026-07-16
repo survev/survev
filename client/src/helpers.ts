@@ -227,6 +227,20 @@ export const helpers = {
         }
         return r32() + r32();
     },
+    abortSignal(timeout: number) {
+        if ("timeout" in AbortSignal) {
+            return AbortSignal.timeout(timeout);
+        }
+        const controller = new AbortController();
+
+        setTimeout(() => {
+            controller.abort(
+                new DOMException("The operation timed out.", "TimeoutError"),
+            );
+        }, timeout);
+
+        return controller.signal;
+    },
     verifyTurnstile: function(enabled: boolean, cb: (token: string) => void) {
         if (!enabled || !window.turnstile || !TURNSTILE_SITE_KEY) {
             cb("");

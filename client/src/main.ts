@@ -740,7 +740,7 @@ export class Application {
                     "Content-Type": "application/json; charset=utf-8",
                 },
                 credentials: proxy.anyLoginSupported() ? "include" : "omit",
-                signal: AbortSignal.timeout(10 * 1000),
+                signal: helpers.abortSignal(10 * 1000),
             }).then(res => res.json()).then((data: FindGameResponse) => {
                 if (data.error === "invalid_captcha") {
                     // captch may have failed because the enabled state has changed since site info was loaded
