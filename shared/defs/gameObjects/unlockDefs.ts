@@ -143,6 +143,7 @@ export const UnlockDefs: Record<UnlockDefKey, UnlockDef> = {
             "emote_flaglithuania",
             "emote_flagmalaysia",
             "emote_flagmexico",
+            "emote_flagmoldova",
             "emote_flagmorocco",
             "emote_flagnetherlands",
             "emote_flagnewzealand",
