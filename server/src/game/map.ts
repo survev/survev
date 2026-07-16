@@ -306,6 +306,7 @@ export class GameMap {
 
     init(seed?: number) {
         this.seed = seed ?? util.randomInt(0, 2 ** 32 - 1);
+        this.game.logger.debug("Generating map with seed", this.seed);
 
         this.obstacles = [];
         this.dynamicObstacles = [];
