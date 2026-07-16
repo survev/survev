@@ -46,7 +46,7 @@ export class Account {
     constructor(public config: ConfigManager) {
         this.router = hc<UserRouterApp>(api.resolveUrl("/api/user"), {
             init: {
-                credentials: proxy.anyLoginSupported() ? "same-origin" : "omit",
+                credentials: proxy.anyLoginSupported() ? "include" : "omit",
             },
         });
     }

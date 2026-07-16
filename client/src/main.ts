@@ -739,7 +739,7 @@ export class Application {
                 headers: {
                     "Content-Type": "application/json; charset=utf-8",
                 },
-                credentials: proxy.anyLoginSupported() ? "same-origin" : "omit",
+                credentials: proxy.anyLoginSupported() ? "include" : "omit",
                 signal: AbortSignal.timeout(10 * 1000),
             }).then(res => res.json()).then((data: FindGameResponse) => {
                 if (data.error === "invalid_captcha") {
