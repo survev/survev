@@ -3563,7 +3563,7 @@ export const BaseDefs: Record<string, GunDef> = {
         projType: "potato_lmgshot",
         noSplinter: true,
         headshotMult: 1.5,
-        speed: { equip: -1.5, attack: -6 },
+        speed: { equip: -2, attack: -6 },
         lootImg: {
             sprite: "loot-weapon-potato-lmg.img",
             tint: 0xff00,
