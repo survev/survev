@@ -21,12 +21,12 @@
   "dependencies": {
     "@hono/node-server": "^1.19.14",
     "@hono/node-ws": "^1.3.1",
-    "@hono/zod-validator": "^0.7.6",
+    "@hono/zod-validator": "^0.8.0",
     "@oslojs/crypto": "^1.0.1",
     "arctic": "^3.7.0",
     "croner": "^10.0.1",
     "drizzle-orm": "^0.45.2",
-    "hono": "^4.12.28",
+    "hono": "^4.12.29",
     "nanotimer": "^0.3.15",
     "obscenity": "^0.4.6",
     "pg": "^8.22.0",
@@ -40,9 +40,9 @@
     "@types/nanotimer": "^0.3.2",
     "@types/node": "~22.12.0",
     "@types/pg": "^8.20.0",
-    "concurrently": "^9.2.3",
+    "concurrently": "^10.0.3",
     "drizzle-kit": "^0.31.10",
-    "esbuild": "^0.27.7",
+    "esbuild": "^0.28.1",
     "tsx": "^4.23.0",
     "unique-username-generator": "^1.5.1"
   }
