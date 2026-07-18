@@ -14,7 +14,7 @@
     "db:migrate": "drizzle-kit migrate --config=src/api/drizzle.config.ts",
     "db:seed": "tsx src/api/db/seed.ts",
     "db:studio": "drizzle-kit studio --config=src/api/drizzle.config.ts",
-    "db:wipe": "rm -rf src/api/db/drizzle && tsx src/api/db/wipe.ts",
+    "db:wipe": "tsx src/api/db/wipe.ts",
     "stressTest": "tsx src/stressTest.ts",
     "lint": "cd .. && pnpm lint"
   },
