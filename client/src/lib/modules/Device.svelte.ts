@@ -1,6 +1,5 @@
 import { isMobile } from "pixi.js-legacy";
 import { devicePixelRatio, innerHeight, innerWidth } from "svelte/reactivity/window";
-import { helpers } from "./helpers.svelte.ts";
 
 function detectMobile() {
     return isMobile.android.device || isMobile.apple.device || isIpad();
@@ -36,26 +35,6 @@ function getOs() {
     return "pc";
 }
 
-function getBrowser() {
-    return "unknown";
-}
-
-function setItem(key: string, value: string) {
-    try {
-        localStorage.setItem(key, value);
-    } catch (_e) {}
-}
-
-function getItem(key: string) {
-    let item = null;
-
-    try {
-        item = localStorage.getItem(key);
-    } catch (_e) {}
-
-    return item;
-}
-
 export class Device {
     readonly UiLayout = {
         Lg: 0,
@@ -63,17 +42,13 @@ export class Device {
     };
 
     readonly os = getOs();
-    readonly browser = getBrowser();
     readonly model = detectiPhoneX() ? "iphonex" : "unknown";
-
-    readonly version = getItem("surviv_version") || "1.0.0";
 
     readonly mobile = detectMobile();
     readonly tablet = isMobile.tablet || isIpad();
     readonly touch = this.mobile || this.tablet;
 
     uiLayout = $state(this.mobile ? this.UiLayout.Sm : this.UiLayout.Lg);
-    debug = false; // unused?
 
     isLandscape = $state(true);
 
@@ -82,11 +57,6 @@ export class Device {
     readonly screenHeight = $derived(innerHeight.current ?? 0);
 
     constructor() {
-        const versionParam = helpers.getParameterByName("version");
-        if (versionParam) setItem("surviv_version", versionParam);
-
-        this.version = getItem("surviv_version") || "1.0.0";
-
         this.onResize();
     }
 
