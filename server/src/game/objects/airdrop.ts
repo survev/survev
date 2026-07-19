@@ -25,9 +25,12 @@ export class AirdropBarn {
         for (let i = 0; i < this.airdrops.length; i++) {
             const airdrop = this.airdrops[i];
             if (airdrop.sentLandedToClients) {
-                this.airdrops.splice(i, 1);
-                i--;
-                airdrop.destroy();
+                airdrop.fallTime -= dt;
+                if (airdrop.fallTime <= -1.0) {
+                    this.airdrops.splice(i, 1);
+                    i--;
+                    airdrop.destroy();
+                }
                 continue;
             }
             airdrop.update(dt);
