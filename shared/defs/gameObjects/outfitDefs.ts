@@ -256,7 +256,7 @@ const SkinDefs: Record<string, OutfitDef> = {
             tint: 0xffffff,
         },
         rarity: Rarity.Epic,
-        lore: "For those who knows.",
+        lore: "'We agreed on this'",
         teamId: FactionTeam.Red,
     }),
     outfitMod: defineOutfitSkin("outfitBase", {
@@ -1128,7 +1128,8 @@ const SkinDefs: Record<string, OutfitDef> = {
         },
     }),
     outfitGold: defineOutfitSkin("outfitBase", {
-        name: "Captial Gains",
+        name: "Capital Gains",
+        lore: "Justice for Chrome",
         skinImg: {
             baseTint: 0xffffff,
             baseSprite: "player-base-outfitGold.img",
