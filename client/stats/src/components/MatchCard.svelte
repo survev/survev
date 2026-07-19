@@ -12,21 +12,19 @@
     const {
         summary,
         data,
-        slug,
         gameModes,
         localization,
         requestMatchData,
         setGameId,
-        autoExpand,
+        expanded,
     }: {
         summary: MatchHistory;
         data: MatchDataResponse | undefined;
-        slug: string;
         gameModes: ReturnType<typeof helpers["getGameModes"]>;
         localization: Localization;
         requestMatchData: (gameId: string) => void;
-        setGameId: (id: string) => void;
-        autoExpand: boolean;
+        setGameId: (expanded: boolean, id: string) => void;
+        expanded: boolean;
     } = $props();
 
     const augmentedData = $derived.by(() => {
@@ -55,7 +53,20 @@
         });
     });
 
-    const localPlayer = $derived(data?.find(x => x.slug === slug));
+    let bodyInner = $state<HTMLElement>();
+
+    $effect(() => {
+        if (expanded && data) {
+            const elm = document.querySelector<HTMLElement>(`.match-row-local[data-player-id="${summary.player_id}"]`);
+            if (elm) {
+                bodyInner?.scrollTo({
+                    top: elm.offsetTop - 100,
+                });
+            }
+        }
+    });
+
+    const localPlayer = $derived(data?.find(x => x.player_id === summary.player_id));
     const timeDiff = $derived.by(() => {
         const now = Date.now();
         const timestamp = new Date(summary.end_time).getTime();
@@ -79,8 +90,6 @@
         }
     });
 
-    let accordionButton = $state<HTMLButtonElement>();
-
     function copyGameId(e: MouseEvent): void {
         e.preventDefault();
 
@@ -93,7 +102,7 @@
     }
 
     onMount(() => {
-        if (autoExpand && !data) {
+        if (expanded && !data) {
             requestMatchData(summary.guid);
         }
     });
@@ -104,17 +113,21 @@
 <!-- TODO: Translations for title attribute. -->
 <div
     id="match-card-{summary.guid}"
-    class="accordion-item match-card-{summary.team_mode}"
-    onclick={e => (accordionButton?.click())}
+    class="match-data-item match-card-{summary.team_mode}"
     oncontextmenu={copyGameId}
     title="Right-click to copy game ID."
 >
-    <div class="accordion-header">
+    <div
+        class="match-data-header"
+        onclick={e => {
+            setGameId(!expanded, summary.guid), !data && requestMatchData(summary.guid);
+        }}
+    >
         <div class="col d-none d-md-flex">
             <div></div>
             <span>{timeDiff}</span>
         </div>
-        <div class="col col-lg-2">
+        <div class="col col-lg-3">
             <span>{localization.translate(`${TeamModeToTranslationKey[summary.team_mode as TeamMode]}-rank`)}</span>
             <div>
                 <span
@@ -145,31 +158,28 @@
             <span>{localization.translate("stats-survived")}</span>
             <span>{helpers.formatTime(summary.time_alive)}</span>
         </div>
-        <div class="col d-none d-lg-flex">
+        <div class="map-icon col d-none d-lg-flex">
             {#if gameModes[summary.map_id].desc.icon}
                 <img src="/{gameModes[summary.map_id].desc.icon}" alt="Map icon">
             {/if}
         </div>
         <button
-            class="accordion-button collapsed"
+            class="match-data-expand-button"
+            class:expanded
             type="button"
-            data-bs-toggle="collapse"
-            data-bs-target="#match-summary-{summary.guid}"
             aria-expanded="false"
             aria-controls="match-summary-{summary.guid}"
             aria-label="Expand statistic"
-            bind:this={accordionButton}
-            onclick={e => (e.stopPropagation(), setGameId(summary.guid), !data && requestMatchData(summary.guid))}
         ></button>
     </div>
     <div
         id="match-summary-{summary.guid}"
-        class='accordion-collapse {autoExpand ? "show" : "collapse"}'
+        class='match-data-collapse {expanded ? "show" : "collapse"}'
         data-bs-parent="#extra-stats-content"
     >
-        <div class="accordion-body" onclick={e => e.stopPropagation()}>
-            <div class="accordion-body-inner">
-                {#if data && localPlayer}
+        <div class="match-data-body" onclick={e => e.stopPropagation()}>
+            {#if data && localPlayer}
+                <div class="match-data-body-inner" bind:this={bodyInner}>
                     <table>
                         <thead>
                             <tr>
@@ -188,6 +198,7 @@
                                     class:match-row-local={player.player_id === localPlayer.player_id}
                                     class:match-row-dark={player.teamIdx % 2 === 0}
                                     class:match-row-light={player.teamIdx % 2 === 1}
+                                    data-player-id={player.player_id}
                                 >
                                     {#if player.showRank}
                                         <td>#{player.rank}</td>
@@ -215,14 +226,14 @@
                             {/each}
                         </tbody>
                     </table>
-                {:else}
-                    <div class="table-preview">
-                        <div class="ui-spinner spinner-sm">
-                            <span class="visually-hidden">Loading...</span>
-                        </div>
+                </div>
+            {:else if expanded}
+                <div class="table-preview">
+                    <div class="ui-spinner spinner-sm">
+                        <span class="visually-hidden">Loading...</span>
                     </div>
-                {/if}
-            </div>
+                </div>
+            {/if}
         </div>
     </div>
 </div>
@@ -235,18 +246,18 @@
             border-left: 10px solid $color !important;
         }
 
-        & > .accordion-header > div:first-child > div {
+        & > .match-data-header > div:first-child > div {
             width: $width;
         }
     }
 
-    .accordion-item {
+    .match-data-item {
         background-color: #00000066;
         padding: 0.5rem;
         border-bottom: none;
-        transition: 0.15s;
+        transition: background-color 0.15s;
 
-        .accordion-header {
+        .match-data-header {
             display: flex;
             align-items: center;
             height: 84px;
@@ -323,7 +334,7 @@
                     }
                 }
 
-                &:nth-child(8) img {
+                &.map-icon img {
                     width: 48px;
                     height: 48px;
 
@@ -334,35 +345,48 @@
             }
         }
 
-        .accordion-button {
+        .match-data-expand-button {
+            text-align: center;
             background-color: #00000080;
-            width: fit-content;
+            background-image: url(../img/ui/expand.svg);
+            background-position: 50%;
+            background-repeat: no-repeat;
+            background-size: 12px;
+            border-radius: 2px;
+            padding: 0.5rem;
+            margin-left: auto;
+            width: 2.5em;
             height: 100% !important;
+
+            border: none;
+            appearance: none;
+            outline: none;
             box-shadow: none;
 
-            padding: 0.5rem;
-
-            &::after {
-                background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='none' stroke=%27%23ffffff%27 stroke-linecap='round' stroke-linejoin='round'%3e%3cpath d='m2 5 6 6 6-6'/%3e%3c/svg%3e");
-                background-size: 16px;
-                background-position: center;
+            &.expanded {
+                transform: rotate(180deg);
             }
         }
 
-        .accordion-collapse {
-            interpolate-size: allow-keywords;
-            transition: height 0.35s;
+        .match-data-collapse {
             overflow: hidden;
+            transition: height 0.2s ease-in;
+            height: 0px;
+            display: block !important;
+
+            &.show {
+                height: 400px;
+            }
         }
 
-        .accordion-body {
+        .match-data-body {
             padding: 0;
 
-            .accordion-body-inner {
+            .match-data-body-inner {
                 margin-top: 0.5rem;
                 padding-right: 0.5rem;
-                height: 400px;
                 overflow-y: auto;
+                height: calc(400px - 0.5rem);
 
                 @include custom-scrollbar;
             }
@@ -457,12 +481,12 @@
             flex-direction: column;
             justify-content: center;
             align-items: center;
-            height: 100%;
+            height: 400px;
         }
     }
 
     @media (min-width: 768px) {
-        .accordion-header > div {
+        .match-data-header > div {
             &:first-child {
                 margin-left: 0.5rem;
             }
@@ -498,7 +522,7 @@
     }
 
     @media (min-width: 992px) {
-        .accordion-header > div:nth-child(2) {
+        .match-data-header > div:nth-child(2) {
             & > span {
                 font-size: 24px !important;
             }
@@ -529,7 +553,7 @@
     }
 
     @media (min-width: 1200px) {
-        .accordion-header > div:first-child span {
+        .match-data-header > div:first-child span {
             font-size: 18px !important;
         }
     }

@@ -45,6 +45,7 @@
     let type = $state(params.get("type") as LeaderboardRequest["type"] || "most_kills");
     let mapId = $state(isNaN(initMapId) ? -1 : initMapId);
     let gameId = $state(params.get("gameId"));
+    let playerId = $state(parseInt(params.get("playerId") || "-1"));
     let teamModeFilter = $state(7);
 
     let data = $state<UserStatsResponse>();
@@ -70,6 +71,7 @@
         if (interval !== "alltime") params.set("t", interval);
         if (mapId !== -1) params.set("mapId", mapId.toString());
         if (gameId) params.set("gameId", gameId);
+        if (playerId !== -1) params.set("playerId", playerId.toString());
 
         window.history.replaceState(
             "",
@@ -79,9 +81,14 @@
         if (!gameIdOnly) reqState = RequestState.Loading;
     }
 
-    function setGameId(id: string) {
-        if (gameId === id) gameId = "";
-        else gameId = id;
+    function setGameId(expanded: boolean, id: string, pId: number) {
+        if (!expanded) {
+            gameId = "";
+            playerId = -1;
+        } else {
+            gameId = id;
+            playerId = pId;
+        }
 
         updateURL(true);
     }
@@ -352,12 +359,13 @@
                     <MatchCard
                         {summary}
                         data={matches.get(summary.guid)}
-                        {slug}
                         {gameModes}
                         {localization}
                         {requestMatchData}
-                        {setGameId}
-                        autoExpand={initGameId === summary.guid}
+                        setGameId={(expanded: boolean, gameid: string) => {
+                            setGameId(expanded, gameid, summary.player_id);
+                        }}
+                        expanded={gameId === summary.guid && playerId === summary.player_id}
                     />
                 {/each}
                 {#if moreGamesAvailable}
@@ -541,7 +549,7 @@
 
     @media (min-width: 768px) {
         .player-name {
-            font-size: 28px;            
+            font-size: 28px;
         }
     }
 </style>
