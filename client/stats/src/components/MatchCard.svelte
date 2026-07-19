@@ -361,7 +361,7 @@
             .accordion-body-inner {
                 margin-top: 0.5rem;
                 padding-right: 0.5rem;
-                max-height: 400px;
+                height: 400px;
                 overflow-y: auto;
 
                 @include custom-scrollbar;
@@ -457,7 +457,7 @@
             flex-direction: column;
             justify-content: center;
             align-items: center;
-            padding: 4rem;
+            height: 100%;
         }
     }
 
