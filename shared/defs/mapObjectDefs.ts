@@ -12685,7 +12685,6 @@ export const RawMapObjectDefs: Record<string, MapObjectDef> = {
         loot: [
             tierLoot("tier_airdrop_crimson", 1, 1),
             autoLoot("backpack03", 1),
-            tierLoot("tier_crimson_perks", 1, 1),
             autoLoot("4xscope", 1),
         ],
         hitParticle: "blackChip",
@@ -12923,6 +12922,7 @@ export const RawMapObjectDefs: Record<string, MapObjectDef> = {
         img: {
             sprite: "map-chair-01.img",
             residue: "map-drawers-res.img",
+            zIdx: 5,
         },
         sound: {
             bullet: "wood_prop_bullet",
@@ -12938,6 +12938,7 @@ export const RawMapObjectDefs: Record<string, MapObjectDef> = {
         img: {
             sprite: "map-chair-02.img",
             residue: "map-drawers-res.img",
+            zIdx: 5,
         },
         sound: {
             bullet: "wood_prop_bullet",
@@ -14567,6 +14568,9 @@ export const RawMapObjectDefs: Record<string, MapObjectDef> = {
         collision: collider.createAabbExtents(v2.create(0, 0), v2.create(0.75, 1.25)),
     } as unknown as Partial<ObstacleDef>),
     safe_01: createSafe({}),
+    safe_01de: createSafe({
+        loot: [tierLoot("tier_crimson_perks", 1, 1), autoLoot("strobe", 1), autoLoot("strobe", 1)],
+    }),
     screen_01: {
         type: "obstacle",
         obstacleType: "furniture",
@@ -28808,11 +28812,10 @@ export const RawMapObjectDefs: Record<string, MapObjectDef> = {
                     inheritOri: false,
                 },
                 {
-                    type: "stone_04",
+                    type: "safe_01de",
                     pos: v2.create(-3.75, -6.5),
-                    scale: 0.75,
-                    ori: 0,
-                    inheritOri: false,
+                    scale: 1,
+                    ori: 2,
                 },
                 {
                     type: "gun_mount_06",
