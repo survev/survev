@@ -55,7 +55,7 @@
                                     <a
                                         class="dropdown-item"
                                         href="#"
-                                        onclick={e => (e.preventDefault(), config.set("language", key as Locale), localization.setLocale(key as Locale))}
+                                        onclick={e => (e.preventDefault(), localization.setLocale(key as Locale))}
                                     >{value}</a>
                                 </li>
                             {/each}

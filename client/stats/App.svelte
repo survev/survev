@@ -69,13 +69,6 @@
 
             statsState = params.get("slug") ? StatsState.Player : StatsState.Leaderboard;
 
-            // leia hasnt realized that i also have a duplicate device.svelte.ts
-            // are you gonna comment on that one too
-            // what;s the real reason
-            // is there a real reason to duplicate the device one
-
-            // lets see if it broke by converting from sveltekit to svelte first
-
             const device = new Device();
             SDK.ensureNitroReady()
                 .catch(() => {})

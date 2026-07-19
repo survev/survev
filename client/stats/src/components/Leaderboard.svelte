@@ -80,10 +80,10 @@
 <div class="container mt-3">
     <div class="container p-0">
         <div class="row">
-            <div class="col-md-8">
+            <div class="col-xl-8">
                 <div
                     class="ad-block-top-center mb-4"
-                    class:d-none={innerWidth.current! < BREAKPOINT || !adMap.get(StatsAds.TopCenterLB)}
+                    class:d-none={innerWidth.current! < 992 || !adMap.get(StatsAds.TopCenterLB)}
                 >
                     <!-- Tag ID: survevio_728x90_leaderboard -->
                     <div id="survevio_728x90_leaderboard_top"></div>
@@ -252,8 +252,8 @@
     }
 
     select {
-        width: 100%;
         font-weight: bold;
+        width: 100%;
     }
 
     table {

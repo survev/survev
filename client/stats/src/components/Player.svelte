@@ -178,7 +178,7 @@
 
 <div class="container d-flex flex-column gap-3">
     <div class="row">
-        <div class="col-xl-10 col-xxl-8 d-flex flex-column justify-content-end gap-3">
+        <div class="col-xl-8 d-flex flex-column justify-content-end gap-3">
             <div
                 class="ad-block-top-center"
                 class:d-none={innerWidth.current! < BREAKPOINT || !adMap.get(StatsAds.TopCenterPlayer)}
@@ -457,8 +457,8 @@
     }
 
     select {
-        width: 100%;
         font-weight: bold;
+        width: 100%;
     }
 
     .match-filter button {
