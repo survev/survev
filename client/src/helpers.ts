@@ -64,6 +64,36 @@ export const helpers = {
         });
         return gameModes;
     },
+    /**
+     * Safely fetch a URL without having to handle errors.
+     * @param url The URL to fetch.
+     * @param init Request options.
+     */
+    async fetchSafe<T>(
+        url: string | URL | Request,
+        init?: RequestInit,
+    ): Promise<{ success: false; data?: T } | { success: true; data: T }> {
+        try {
+            const res = await fetch(url, init);
+
+            const type = res.headers.get("Content-Type");
+            if (!type?.toLowerCase().includes("application/json")) {
+                return {
+                    success: false,
+                };
+            }
+
+            const data = await res.json();
+            return {
+                success: res.ok,
+                data,
+            };
+        } catch (_e) {
+            return {
+                success: false,
+            };
+        }
+    },
     sanitizeNameInput: function(input: string) {
         let name = input.trim();
         if (name.length > net.Constants.PlayerNameMaxLen) {

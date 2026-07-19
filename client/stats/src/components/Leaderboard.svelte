@@ -1,6 +1,6 @@
 <script lang="ts">
     import { untrack } from "svelte";
-    import type { SvelteMap } from "svelte/reactivity";
+    import { type SvelteMap, SvelteURLSearchParams } from "svelte/reactivity";
     import { innerWidth } from "svelte/reactivity/window";
 
     import {
@@ -12,43 +12,44 @@
         TypeToTranslationKey,
     } from "../helpers.ts";
 
-    import { helpers } from "$lib/modules/helpers.svelte.ts";
     import type { Localization } from "$lib/modules/Localization.svelte";
 
     import type { LeaderboardRequest, LeaderboardResponse } from "@/shared/types/stats.ts";
     import { api } from "../../../src/api.ts";
+    import { helpers } from "../../../src/helpers.ts";
 
     const BREAKPOINT = 768;
     const FACTION_MAP_ID = 3;
 
     const defs = helpers.getGameModes();
-    const initMapId = parseInt(helpers.getParameterByName("mapId"));
+    const params = new SvelteURLSearchParams(window.location.search);
+    const initMapId = parseInt(params.get("mapId")!);
 
     const { adMap, localization }: {
         adMap: SvelteMap<StatsAds, boolean>;
         localization: Localization;
     } = $props();
 
-    let teamMode = $state<TeamModeQuery>(helpers.getParameterByName("team") || "solo");
-    let type = $state<LeaderboardRequest["type"]>(helpers.getParameterByName("type") || "most_kills");
-    let interval = $state<LeaderboardRequest["interval"]>(helpers.getParameterByName("t") || "daily");
+    let teamMode = $state(params.get("team") as TeamModeQuery || "solo");
+    let type = $state(params.get("type") as LeaderboardRequest["type"] || "most_kills");
+    let interval = $state(params.get("t") as LeaderboardRequest["interval"] || "daily");
     let mapId = $state(isNaN(initMapId) ? defs[0].mapId : initMapId);
 
     let data = $state<LeaderboardResponse[]>([]);
     let reqState = $state(RequestState.Loading);
 
     function updateURL(): void {
-        let args: string[] = [];
+        const params = new URLSearchParams();
 
-        if (teamMode !== "solo") args.push(`team=${teamMode}`);
-        if (type !== "most_kills") args.push(`type=${type}`);
-        if (interval !== "daily") args.push(`t=${interval}`);
-        if (mapId !== defs[0].mapId) args.push(`mapId=${mapId}`);
+        if (teamMode !== "solo") params.set("team", teamMode);
+        if (type !== "most_kills") params.set("type", type);
+        if (interval !== "daily") params.set("t", interval);
+        if (mapId !== defs[0].mapId) params.set("mapId", mapId.toString());
 
         window.history.replaceState(
             null,
             "",
-            args.length === 0 ? window.location.pathname : `${window.location.pathname}?${args.join("&")}`,
+            params.size === 0 ? window.location.pathname : `${window.location.pathname}?${params.toString()}`,
         );
     }
 

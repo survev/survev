@@ -1,7 +1,7 @@
 <script lang="ts">
+    import { helpers } from "../../../src/helpers.ts";
     import { RequestState, TeamModeToTranslationKey } from "../helpers.ts";
 
-    import { helpers } from "$lib/modules/helpers.svelte.ts";
     import { Localization } from "$lib/modules/Localization.svelte.ts";
 
     import type { TeamMode } from "@/shared/gameConfig.ts";

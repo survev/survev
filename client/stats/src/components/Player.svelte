@@ -1,6 +1,6 @@
 <script lang="ts">
     import { onMount, untrack } from "svelte";
-    import { SvelteMap } from "svelte/reactivity";
+    import { SvelteMap, SvelteURLSearchParams } from "svelte/reactivity";
     import { innerWidth } from "svelte/reactivity/window";
 
     import {
@@ -14,8 +14,8 @@
     import MatchCard from "./MatchCard.svelte";
     import ModeCard from "./ModeCard.svelte";
 
-    import { helpers } from "$lib/modules/helpers.svelte.ts";
     import type { Localization } from "$lib/modules/Localization.svelte.ts";
+    import { helpers } from "../../../src/helpers.ts";
 
     import { EmotesDefs } from "@/shared/defs/gameObjects/emoteDefs.ts";
     import { TeamMode } from "@/shared/gameConfig.ts";
@@ -31,19 +31,20 @@
     const BREAKPOINT = 768;
 
     const defs = helpers.getGameModes();
-    const initMapId = parseInt(helpers.getParameterByName("mapId"));
+    const params = new SvelteURLSearchParams(window.location.search);
+    const initMapId = parseInt(params.get("mapId")!);
 
     const { adMap, localization }: {
         adMap: SvelteMap<StatsAds, boolean>;
         localization: Localization;
     } = $props();
 
-    let slug = $derived(helpers.getParameterByName("slug"));
+    let slug = $derived(params.get("slug") || "");
 
-    let interval = $state<UserStatsRequest["interval"]>(helpers.getParameterByName("t") || "alltime");
-    let type = $state<LeaderboardRequest["type"]>(helpers.getParameterByName("type") || "most_kills");
+    let interval = $state(params.get("t") as UserStatsRequest["interval"] || "alltime");
+    let type = $state(params.get("type") as LeaderboardRequest["type"] || "most_kills");
     let mapId = $state(isNaN(initMapId) ? -1 : initMapId);
-    let gameId = $state(helpers.getParameterByName("gameId"));
+    let gameId = $state(params.get("gameId"));
     let teamModeFilter = $state(7);
 
     let data = $state<UserStatsResponse>();
@@ -54,27 +55,24 @@
     let extraStatTab = $state(ExtraStatsTabs.MatchHistory);
     let moreGamesAvailable = $state(true);
 
-    let ratingContainer = $state<HTMLDivElement>();
-
     const userIconDef = $derived(data ? EmotesDefs[data.player_icon] : undefined);
     const userIcon = $derived(userIconDef ? helpers.emoteImgToSvg(userIconDef.texture) : "/img/gui/player-gui.svg");
 
     const gameModes = helpers.getGameModes();
     const matchHistoryCache = $state<Record<number, MatchHistoryResponse>>({});
 
-    const initGameId = helpers.getParameterByName("gameId");
+    const initGameId = params.get("gameId");
 
     function updateURL(gameIdOnly = false): void {
-        let args: string[] = [`slug=${slug}`];
-
-        if (interval !== "alltime") args.push(`t=${interval}`);
-        if (mapId !== -1) args.push(`mapId=${mapId}`);
-        if (gameId !== "") args.push(`gameId=${gameId}`);
+        const params = new URLSearchParams();
+        if (interval !== "alltime") params.set("t", interval);
+        if (mapId !== -1) params.set("mapId", mapId.toString());
+        if (gameId !== null) params.set("gameId", gameId);
 
         window.history.replaceState(
             "",
             "",
-            args.length === 0 ? window.location.pathname : `${window.location.pathname}?${args.join("&")}`,
+            params.size === 0 ? window.location.pathname : `${window.location.pathname}?${params.toString()}`,
         );
         if (!gameIdOnly) reqState = RequestState.Loading;
     }

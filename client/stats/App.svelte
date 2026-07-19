@@ -1,6 +1,6 @@
 <script lang="ts">
     import { onMount } from "svelte";
-    import { SvelteMap } from "svelte/reactivity";
+    import { SvelteMap, SvelteURLSearchParams } from "svelte/reactivity";
 
     import { StatsAds, StatsState } from "./src/helpers.ts";
 
@@ -10,7 +10,6 @@
     import Player from "./src/components/Player.svelte";
 
     import { ConfigManager } from "$lib/modules/ConfigManager.svelte.ts";
-    import { helpers } from "$lib/modules/helpers.svelte.ts";
     import { type Locale, Localization } from "$lib/modules/Localization.svelte.ts";
 
     import type { SDKManager } from "../src/sdk/sdk-manager.ts";
@@ -26,8 +25,10 @@
     const config = new ConfigManager();
     const localization = new Localization();
 
+    const params = new SvelteURLSearchParams(window.location.search);
+
     let statsState = $derived<StatsState>(
-        helpers.getParameterByName("slug") !== "" ? StatsState.Player : StatsState.Leaderboard,
+        params.get("slug") ? StatsState.Player : StatsState.Leaderboard,
     );
 
     // This is intentionally done to prevent the leaderboard component from flashing while loading a player page.
@@ -66,7 +67,7 @@
                 localization.setLocale(configLang as Locale);
             }
 
-            statsState = helpers.getParameterByName("slug") !== "" ? StatsState.Player : StatsState.Leaderboard;
+            statsState = params.get("slug") ? StatsState.Player : StatsState.Leaderboard;
 
             // leia hasnt realized that i also have a duplicate device.svelte.ts
             // are you gonna comment on that one too

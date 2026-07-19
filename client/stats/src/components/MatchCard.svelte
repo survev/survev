@@ -3,8 +3,8 @@
 
     import { TeamModeToTranslationKey } from "../helpers.ts";
 
-    import { helpers } from "$lib/modules/helpers.svelte.ts";
     import type { Localization } from "$lib/modules/Localization.svelte.ts";
+    import { helpers } from "../../../src/helpers.ts";
 
     import { TeamMode } from "@/shared/gameConfig.ts";
     import type { MatchDataResponse, MatchHistory } from "@/shared/types/stats.ts";
