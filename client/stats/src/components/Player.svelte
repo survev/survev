@@ -230,8 +230,8 @@
     <div class="row gap-2 gap-lg-0">
         <div class="col-lg-4 d-flex justify-content-center gap-2">
             <select
+                class="form-select"
                 class:form-select-sm={innerWidth.current! < BREAKPOINT}
-                class:form-select={innerWidth.current! >= BREAKPOINT}
                 aria-label="Time period"
                 bind:value={interval}
                 onchange={() => updateURL()}
@@ -242,8 +242,8 @@
                 {/each}
             </select>
             <select
+                class="form-select"
                 class:form-select-sm={innerWidth.current! < BREAKPOINT}
-                class:form-select={innerWidth.current! >= BREAKPOINT}
                 aria-label="Map"
                 bind:value={mapId}
                 onchange={() => updateURL()}

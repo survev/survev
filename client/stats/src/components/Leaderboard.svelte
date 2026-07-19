@@ -91,8 +91,8 @@
                 <div class="card">{localization.translate("index-leaderboards")}</div>
                 <div class="d-flex justify-content-center gap-2">
                     <select
+                        class="form-select"
                         class:form-select-sm={innerWidth.current! < BREAKPOINT}
-                        class:form-select={innerWidth.current! >= BREAKPOINT}
                         aria-label="Team mode"
                         bind:value={teamMode}
                         onchange={updateURL}
@@ -102,8 +102,8 @@
                         {/each}
                     </select>
                     <select
+                        class="form-select"
                         class:form-select-sm={innerWidth.current! < BREAKPOINT}
-                        class:form-select={innerWidth.current! >= BREAKPOINT}
                         aria-label="Stat"
                         bind:value={type}
                         onchange={updateURL}
@@ -115,8 +115,8 @@
                         {/each}
                     </select>
                     <select
+                        class="form-select"
                         class:form-select-sm={innerWidth.current! < BREAKPOINT}
-                        class:form-select={innerWidth.current! >= BREAKPOINT}
                         aria-label="Time period"
                         bind:value={interval}
                         onchange={updateURL}
@@ -126,8 +126,8 @@
                         {/each}
                     </select>
                     <select
+                        class="form-select"
                         class:form-select-sm={innerWidth.current! < BREAKPOINT}
-                        class:form-select={innerWidth.current! >= BREAKPOINT}
                         aria-label="Map"
                         bind:value={mapId}
                         onchange={updateURL}
