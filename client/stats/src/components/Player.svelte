@@ -65,9 +65,11 @@
 
     function updateURL(gameIdOnly = false): void {
         const params = new URLSearchParams();
+
+        params.set("slug", slug);
         if (interval !== "alltime") params.set("t", interval);
         if (mapId !== -1) params.set("mapId", mapId.toString());
-        if (gameId !== null) params.set("gameId", gameId);
+        if (gameId) params.set("gameId", gameId);
 
         window.history.replaceState(
             "",
