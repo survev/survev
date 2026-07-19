@@ -1,9 +1,12 @@
-import type { MapDefKey } from "../../shared/defs/mapDefs.ts";
-import { GameConfig } from "../../shared/gameConfig.ts";
-import loadout from "../../shared/utils/loadout.ts";
-import { util } from "../../shared/utils/util.ts";
-import { v2 } from "../../shared/utils/v2.ts";
-import type { Locale } from "./ui/localization.ts";
+import { GameConfig } from "@/shared/gameConfig.ts";
+import loadout from "@/shared/utils/loadout.ts";
+import { util } from "@/shared/utils/util.ts";
+import { v2 } from "@/shared/utils/v2.ts";
+
+import type { MapDefKey } from "@/shared/defs/mapDefs.ts";
+import type { Locale } from "../../ui/localization.ts";
+
+type AimStyle = "locked" | "anywhere";
 
 export const debugToolsConfig = {
     enabled: false,
@@ -29,7 +32,7 @@ export const debugToolsConfig = {
     preventGameStart: false,
 };
 
-export const debugRenderConfig = {
+export const debugRendererConfig = {
     enabled: false,
     players: false,
     obstacles: false,
@@ -77,7 +80,7 @@ export const debugHUDConfig = {
     },
 };
 
-export type DebugRenderOpts = typeof debugRenderConfig;
+export type DebugRendererOpts = typeof debugRendererConfig;
 
 export const BuildingEditorConfig = {
     zoom: 1,
@@ -88,38 +91,55 @@ export const BuildingEditorConfig = {
 };
 
 const defaultConfig = {
+    // Settings widget checkboxes.
     muteAudio: false,
-    masterVolume: 1,
-    soundVolume: 1,
-    musicVolume: 1,
     highResTex: true,
     interpolation: true,
     localRotation: false,
     screenShake: true,
     anonPlayerNames: false,
-    touchMoveStyle: "anywhere" as "locked" | "anywhere",
-    touchAimStyle: "anywhere" as "locked" | "anywhere",
+
+    // Volume sliders.
+    masterVolume: 1,
+    soundVolume: 1,
+    musicVolume: 1,
+
+    // Mobile-specific options.
+    touchMoveStyle: "anywhere" as AimStyle,
+    touchAimStyle: "anywhere" as AimStyle,
     touchAimLine: true,
+
+    // Splash options.
+    regionSelected: false,
+    cachedBgImg: "img/main_splash.png",
     profile: null as { slug: string } | null,
     playerName: "",
     region: "na",
     gameModeIdx: 2,
-    teamAutoFill: true,
     language: "en" as Locale,
-    prerollGamesPlayed: 0,
-    totalGamesPlayed: 0,
-    promptAppRate: true,
-    regionSelected: false,
-    lastNewsTimestamp: 0,
+
+    // Team menu options.
+    teamAutoFill: true,
+
+    // Ingame-related data.
     perkModeRole: "",
     loadout: loadout.defaultLoadout(),
     sessionCookie: "" as string | null,
     binds: "",
-    cachedBgImg: "img/main_splash.png",
+
+    // SVC.
     version: 1,
+
+    // Unused stuff.
+    prerollGamesPlayed: 0,
+    totalGamesPlayed: 0,
+    lastNewsTimestamp: 0,
+    promptAppRate: true,
+
     /* STRIP_FROM_PROD_CLIENT:START */
     debugTools: debugToolsConfig,
-    debugRenderer: debugRenderConfig,
+    debugRenderer: debugRendererConfig,
+
     /* STRIP_FROM_PROD_CLIENT:END */
     debugHUD: debugHUDConfig,
     buildingEditor: BuildingEditorConfig,
@@ -131,71 +151,75 @@ export type ConfigKey = keyof ConfigType;
 export class ConfigManager {
     loaded = false;
     localStorageAvailable = true;
-    config = {} as ConfigType;
+
+    config = $state({} as ConfigType);
+
     onModifiedListeners: Array<(key?: string) => void> = [];
 
-    load(onLoadCompleteCb: () => void) {
-        const onLoaded = (strConfig: string) => {
+    load(cb?: () => void) {
+        const onLoaded = (configStr: string | null) => {
             let data = {};
             try {
-                data = JSON.parse(strConfig);
-            } catch (_e) {}
+                data = JSON.parse(configStr!);
+            } catch (e) {
+                console.warn("Failed to load config.");
+            }
+
             this.config = util.mergeDeep({}, defaultConfig, data);
+
             this.checkUpgradeConfig();
             this.onModified();
+
             this.loaded = true;
-            onLoadCompleteCb();
+            cb?.();
         };
+
         let storedConfig: string | null = "{}";
         try {
-            storedConfig = localStorage.getItem("surviv_config")!;
-        } catch (_err) {
+            storedConfig = localStorage.getItem("surviv_config");
+        } catch (_e) {
             this.localStorageAvailable = false;
         }
+
         onLoaded(storedConfig);
     }
 
     store() {
         const strData = JSON.stringify(this.config);
         if (this.localStorageAvailable) {
-            // In browsers, like Safari, localStorage setItem is
-            // disabled in private browsing mode.
-            // This try/catch is here to handle that situation.
+            // In browsers like Safari, localStorage setItem is disabled in private browsing mode.
+            // This try / catch addresses such a situation.
             try {
                 localStorage.setItem("surviv_config", strData);
-            } catch (_e) {}
+            } catch (_e) {
+                console.warn("Failed writing config. Options will not be persistent.");
+            }
         }
     }
 
     set<T extends ConfigKey>(key: T, value: ConfigType[T]) {
-        if (!key) {
-            return;
-        }
+        if (!key) return;
+
         const path = key.split(".");
 
-        let elem = this.config;
-        while (path.length > 1) {
-            // @ts-expect-error bleh
-            elem = elem[path.shift()];
-        }
-        // @ts-expect-error bleh
-        elem[path.shift()] = value;
+        let el: any = this.config;
+        while (path.length > 1) el = el[path.shift()!];
+
+        el[path.shift()!] = value;
 
         this.store();
         this.onModified(key);
     }
 
     get<T extends ConfigKey>(key: T): ConfigType[T] | undefined {
-        if (!key) {
-            return undefined;
-        }
+        if (!key) return undefined;
 
         const path = key.split(".");
-        let elem = this.config as any;
-        for (let i = 0; i < path.length; i++) {
-            elem = elem[path[i]];
-        }
-        return elem;
+
+        let el: any = this.config;
+        for (let i = 0; i < path.length; i++) el = el[path[i]];
+
+        return el as ConfigType[T] | undefined;
     }
 
     addModifiedListener(e: (key?: string) => void) {
@@ -209,12 +233,8 @@ export class ConfigManager {
     }
 
     checkUpgradeConfig() {
-        // validation logic
         this.config.loadout = loadout.validate(this.config.loadout);
 
-        // seem not to be implemeted yet
-        // this.get("version");
-        // // @TODO: Put upgrade code here
-        // this.set("version", 1);
+        // TODO: Implement the remainder of this.
     }
 }

@@ -1,147 +1,63 @@
-<!doctype html>
-<html lang='en'>
-<head>
-    <!-- Meta Properties -->
-    <meta charset='UTF-8'>
-    <title>survev.io Official Statistics and Leaderboards</title>
-    <meta name="viewport" content="width=device-width, height=device-height, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0, viewport-fit=auto, user-scalable=no">
-    <meta name="mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-title" content="survev.io/stats">
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <meta name="application-name" content="survev.io">
-    <meta name="description" content="survev.io/stats is the official home for survev.io statistics and leaderboards.">
-    <meta property="og:description" content="survev.io/stats is the official home for survev.io statistics and leaderboards.">
-    <meta name="keywords" content="survevio, survev, 2d battle royale, battle royale browser game, 2d battlegrounds, battlegrounds, io, battleroyale, battle, royale, browser game, br, surveval, game, web game, multiplayer">
-    <meta property="og:type" content="website">
-    <meta property="og:title" content="survev.io/stats">
-    <meta property="og:url" content="http://survev.io/stats/">
-    <meta property="og:site_name" content="survev.io stats">
-    <meta content="http://survev.io/stats/img/title.png" property="og:image">
-    <link rel="canonical" href="http://survev.io/stats" />
-    <link rel="apple-touch-icon-precomposed" href="img/icon_app.png">
-    <link rel="icon" href="/favicon.ico" type="image/x-icon">
-    <!-- Cookie consent -->
-    <script>
-     var consented = true;
-     try {
-         var cfg = JSON.parse(localStorage.getItem('survev_config')) || {};
-         if (cfg.cookiesConsented != undefined) {
-             consented = cfg.cookiesConsented;
-         }
-     } catch { }
-     window.cookiesConsented = consented;
-    </script>
-    <!-- Fonts -->
-    <link href="https://fonts.googleapis.com/css?family=Roboto+Condensed:400,700" rel="stylesheet">
-</head>
-<body>
-  <div id='wrapper'>
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta http-equiv="Content-Type" content="text/html;charset=UTF-8" />
+        <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+        <meta
+            name="viewport"
+            content="width=device-width, height=device-height, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0, viewport-fit=cover, user-scalable=no"
+        />
 
-    <!-- Navigation -->
-    <nav class="navbar navbar-expand-md navbar-dark bg-dark">
-      <div class='container'>
-        <button class="btn btn-outline-success my-2 my-sm-0" type="button"><a class="nav-link-bright" href="/" data-l10n='index-play-survevio'>Play survev.io!</a></button>
-        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
-          <span class="navbar-toggler-icon"></span>
-        </button>
+        <title>survev.io - 2d battle royale game</title>
+        <meta
+            name="description"
+            content="Like games such as Player Unknown's Battlegrounds (PUBG), Fortnite or Apex Legends? Play this free 2d battle royale io game in your browser!"
+        />
+        <meta
+            name="keywords"
+            content="survev, resurviv, survivio, surviv, 2d battle royale, io, battle royale browser game, 2d battlegrounds, battlegrounds, battleroyale, battle, royale, browser game, br, survival, game, web game, multiplayer"
+        />
+        <meta name="robots" content="noindex" />
 
-        <div class="collapse navbar-collapse ml-lg-2" id="navbarSupportedContent">
-          <ul class="navbar-nav mr-auto">
-            <li class="nav-item m-lg-auto m-1">
-              <a class="nav-link-bright" href="/stats" data-l10n='index-leaderboards'>Leaderboards</a>
-            </li>
-            <li class='nav-item my-profile m-lg-auto m-1'>
-              <a id="my-profile" class="nav-link-bright" href="/stats" data-l10n='index-my-stats'>My Stats</a>
-            </li>
-          </ul>
-          <ul class="navbar-nav ml-auto mr-1">
-            <li id='language-select' class="nav-item dropdown">
-            </li>
-          </ul>
-          <form id="search-players" class="form-inline my-2 my-lg-0">
-            <input class="form-control mr-sm-2" type="search" placeholder="Search Players" aria-label="Search" data-l10n='index-search-players'>
-            <button class="btn btn-outline-success my-2 my-sm-0" type="submit" data-l10n='index-go'>Go</button>
-          </form>
-        </div>
-      </div>
-    </nav>
-    <div id='contentMain'>
-      <!-- Background -->
-      <div id='leaderboard-bg' class='stats-bg'></div>
+        <meta property="og:type" content="website" />
+        <meta property="og:url" content="https://survev.io" />
+        <meta property="og:title" content="survev.io - 2d battle royale game" />
+        <meta
+            property="og:description"
+            content="Like games such as Player Unknown's Battlegrounds (PUBG), Fortnite or Apex Legends? Play this free 2d battle royale io game in your browser!"
+        />
+        <meta property="og:site_name" content="survev.io" />
+        <meta property="og:image" content="https://survev.io/img/survev_title.png" />
+        <meta property="og:image:alt" content="survev logo" />
+        <meta property="og:locale" content="en_US" />
 
-      <div id='adsLeaderBoardTop' style='display: none'>
-        <!-- Top ad -->
-        <div id='ad-block-top' class='container mt-3'>
-          <div class='ad-block-top-leaderboard'>
-            <!-- Tag ID: survevio_728x90_leaderboard -->
-            <div align="center" id="survevio_728x90_leaderboard_top">
-            </div>
-          </div>
+        <meta name="mobile-web-app-capable" content="yes">
+        <meta name="apple-mobile-web-app-capable" content="yes">
+        <meta name="apple-mobile-web-app-title" content="survev.io">
+        <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+        <meta name="application-name" content="survev.io">
 
-          <div class='ad-block-top-med-rect'>
-            <!-- Tag ID: survevio_300x250_leaderboard -->
-            <div align="center" id="survevio_300x250_leaderboard_top">
-            </div>
-          </div>
-        </div>
-    </div>
+        <meta name="twitter:card" content="summary_large_image" />
+        <meta name="twitter:title" content="survev.io - 2d battle royale game" />
+        <meta
+            name="twitter:description"
+            content="Like games such as Player Unknown's Battlegrounds (PUBG), Fortnite or Apex Legends? Play this free 2d battle royale io game in your browser!"
+        />
+        <meta name="twitter:image" content="/favicon.ico" />
 
-    <div id='adsPlayerTop' style='display: none'>
-      <div id='ad-block-top' class='container mt-3'>
-        <div class='ad-block-top-leaderboard'>
-          <!-- Tag ID: survevio_728x90_playerprofile -->
-          <div align="center" id="survevio_728x90_playerprofile_top">
-        </div>
-        </div>
+        <link rel="canonical" href="https://survev.io" />
+        <link rel="icon" type="image/svg+xml" href="/favicon.ico" />
+        <link rel="manifest" href="/manifest.json">
 
-        <div class='ad-block-top-med-rect'>
-          <!-- Tag ID: survevio_300x250_playerprofile -->
-          <div align="center" id="survevio_300x250_playerprofile_top">
-          </div>
-        </div>
-      </div>
-    </div>
-    <div id='content'></div>
-    <div id='adsLeaderBoardBottom' style='display: none' class='col-12'>
-      <div class='ad-block-bot-med-rect'>
-        <!-- Tag ID: survevio_300x250_leaderboard -->
-        <div align="center" id="survevio_300x250_leaderboard_bottom">
-        </div>
-      </div>
-    </div>
-
-   <div id='adsPlayerBottom' style='display: none' class='col-12'>
-    <div class='ad-block-bot-med-rect'>
-          <!-- Tag ID: survevio_300x250_playerprofile -->
-        <div align="center" id="survevio_300x250_playerprofile_bottom">
-        </div>
-    </div>
-  </div>
-    </div>
-
-  <div id='footer' class='footer'>
-    <div class='container'>
-      <div class='row'>
-        <div id='footer-copyright' class='col-lg-8 col-12'>© 2025 survev.io.</div>
-          <div class='col-lg-4 col-12'>
-            <div id='footer-social-links'>
-              <!--
-              <a href='https://facebook.com/surveviogame' target='_blank' class='btn-social btn-darken btn-facebook'></a>
-              <a href='https://twitter.com/survevio' target='_blank' class='btn-social btn-darken btn-twitter'></a>
-              <a href='https://reddit.com/r/survevio' target='_blank' class='btn-social btn-darken btn-reddit'></a>
-              -->
-              <a href="https://discord.gg/75RAK3p3K2" target="_blank" class="btn-social btn-darken btn-discord"></a>
-              <a href="https://ko-fi.com/survev" target="_blank" class="btn-social btn-darken btn-kofi"></a>
-              <a href="https://survev.wiki.gg/" target="_blank" class="btn-social btn-darken btn-wiki"></a>
-              <!-- <a href='https://www.youtube.com/c/survevio?sub_confirmation=1' target='_blank' class='btn-social btn-darken btn-youtube'></a> -->
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
-
-<script type="module" src="/src/stats/js/app.ts"></script>
-</body>
+        <link rel="preconnect" href="https://fonts.googleapis.com">
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link
+            rel="stylesheet"
+            href="https://fonts.googleapis.com/css2?family=Roboto+Condensed:ital,wght@0,100..900;1,100..900&display=swap"
+        >
+    </head>
+    <body>
+        <div id="app" style="display: contents;"></div>
+        <script type="module" src="./src/main.ts"></script>
+    </body>
 </html>

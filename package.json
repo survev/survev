@@ -33,10 +33,5 @@
     "hjson": "^3.2.2",
     "tsx": "^4.23.0"
   },
-  "workspaces": [
-    "client",
-    "server",
-    "shared"
-  ],
   "packageManager": "pnpm@11.11.0"
 }

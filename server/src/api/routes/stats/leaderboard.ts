@@ -4,7 +4,7 @@ import { TeamMode } from "../../../../../shared/gameConfig.ts";
 import {
     type LeaderboardRequest,
     type LeaderboardResponse,
-    zLeaderboardsRequest,
+    zLeaderboardRequest,
 } from "../../../../../shared/types/stats.ts";
 import { server } from "../../apiServer.ts";
 import { databaseEnabledMiddleware, rateLimitMiddleware, validateParams } from "../../auth/middleware.ts";
@@ -27,7 +27,7 @@ leaderboardRouter.post(
     "/",
     databaseEnabledMiddleware,
     rateLimitMiddleware(40, 60 * 1000),
-    validateParams(zLeaderboardsRequest),
+    validateParams(zLeaderboardRequest),
     async (c) => {
         const params = c.req.valid("json");
         const { type, teamMode } = params;
@@ -110,7 +110,15 @@ async function soloLeaderboardQuery(params: LeaderboardRequest) {
         .orderBy(sql`val DESC`)
         .limit(MAX_RESULT_COUNT);
 
-    return result as LeaderboardResponse[];
+    return result.map(x => ({
+        usernames: [x.username],
+        mapId: x.mapId,
+        region: x.region,
+        teamMode: x.teamMode,
+        games: x.games,
+        slugs: [x.slug],
+        val: x.val,
+    })) as LeaderboardResponse[];
 }
 
 async function multiplePlayersQuery({

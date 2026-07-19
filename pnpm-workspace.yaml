@@ -1,4 +1,5 @@
 allowBuilds:
+  '@parcel/watcher': true
   '@taufik-nurrohman/color-picker': true
   canvas: true
   dprint: true

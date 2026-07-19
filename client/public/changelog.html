@@ -1,23 +1,25 @@
 <html>
-  <head>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <style>html, body { background: white; color: black; }</style>
-  </head>
-  <body>
-    <script>
-     try {
-       var config = JSON.parse(localStorage.getItem("surviv_config"));
-       if (config.webview) {
-         var a = document.createElement("a");
-         var text = document.createTextNode("Go back");
-         a.appendChild(text);
-         a.title = "Go back";
-         a.href = "javascript:history.back()";
-         document.body.appendChild(a);
-       }
-     } catch { }
-    </script>
-    <pre style="word-wrap: break-word; white-space: pre-wrap;"># Changelog
+    <head>
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <style>
+            html, body { background: white; color: black; }
+        </style>
+    </head>
+    <body>
+        <script>
+            try {
+                var config = JSON.parse(localStorage.getItem("surviv_config"));
+                if (config.webview) {
+                    var a = document.createElement("a");
+                    var text = document.createTextNode("Go back");
+                    a.appendChild(text);
+                    a.title = "Go back";
+                    a.href = "javascript:history.back()";
+                    document.body.appendChild(a);
+                }
+            } catch {}
+        </script>
+        <pre style="word-wrap: break-word; white-space: pre-wrap;"># Changelog
 
 ## [Unreleased]
 - Better event mode support.
@@ -726,5 +728,5 @@
 ## [0.0.1] - Oct. 6, 2017
 - Added changelog file.
     </pre>
-  </body>
+    </body>
 </html>

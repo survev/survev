@@ -1,0 +1,29 @@
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+.ui-spinner {
+    display: inline-block;
+
+    border: 3px solid hsla(0, 0%, 100%, 0.25);
+    border-radius: 50%;
+    border-top: 3px solid hsl(0, 0%, 100%);
+    
+    animation: spin 1s linear infinite;
+}
+
+.spinner-xs {
+    width: 1em;
+    height: 1em;
+}
+
+.spinner-sm {
+    width: 2em;
+    height: 2em;
+}
+
+.spinner-md {
+    width: 3em;
+    height: 3em;
+}

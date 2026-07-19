@@ -1,23 +1,25 @@
 <html>
-  <head>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <style>html, body { background: white; color: black; }</style>
-  </head>
-  <body>
-    <script>
-     try {
-       var config = JSON.parse(localStorage.getItem("surviv_config"));
-       if (config.webview) {
-         var a = document.createElement("a");
-         var text = document.createTextNode("Go back");
-         a.appendChild(text);
-         a.title = "Go back";
-         a.href = "javascript:history.back()";
-         document.body.appendChild(a);
-       }
-     } catch { }
-    </script>
-    <pre style="word-wrap: break-word; white-space: pre-wrap;"># Changelog
+    <head>
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <style>
+            html, body { background: white; color: black; }
+        </style>
+    </head>
+    <body>
+        <script>
+            try {
+                var config = JSON.parse(localStorage.getItem("surviv_config"));
+                if (config.webview) {
+                    var a = document.createElement("a");
+                    var text = document.createTextNode("Go back");
+                    a.appendChild(text);
+                    a.title = "Go back";
+                    a.href = "javascript:history.back()";
+                    document.body.appendChild(a);
+                }
+            } catch {}
+        </script>
+        <pre style="word-wrap: break-word; white-space: pre-wrap;"># Changelog
 
 ## [Unreleased]
 - Better loot physics.
@@ -112,7 +114,7 @@
 ### Balance
 - Slightly increased PMG-134 damage and adjusted its spread.
 - Nerfed PMG-134 vision decrease.
-- Decreased Tomato speed & range.
+- Decreased Tomato speed & range.
 - Lone Survivr is now immune to potato swap.
 - Increased the amount of scopes from Military Airdrops.
 - Red zone damage now increases the longer the player is inside it, starting from the third zone.
@@ -456,5 +458,5 @@
 ## [0.0.1] - August 17, 2024
 - First early access release.
     </pre>
-  </body>
+    </body>
 </html>

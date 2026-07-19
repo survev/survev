@@ -1,20 +1,63 @@
-<!doctype html>
-<html lang='en'>
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta http-equiv="Content-Type" content="text/html;charset=UTF-8" />
+        <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+        <meta
+            name="viewport"
+            content="width=device-width, height=device-height, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0, viewport-fit=cover, user-scalable=no"
+        />
 
-<head>
-  <meta charset='UTF-8'>
-  <title>survev.io Building Editor</title>
-  <meta name="viewport"
-    content="width=device-width, height=device-height, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0, viewport-fit=auto, user-scalable=no">
-  <link rel="icon" href="/favicon.ico" type="image/x-icon">
-  <link rel="stylesheet" href="./src/editor.css">
-</head>
+        <title>survev.io - 2d battle royale game</title>
+        <meta
+            name="description"
+            content="Like games such as Player Unknown's Battlegrounds (PUBG), Fortnite or Apex Legends? Play this free 2d battle royale io game in your browser!"
+        />
+        <meta
+            name="keywords"
+            content="survev, resurviv, survivio, surviv, 2d battle royale, io, battle royale browser game, 2d battlegrounds, battlegrounds, battleroyale, battle, royale, browser game, br, survival, game, web game, multiplayer"
+        />
+        <meta name="robots" content="noindex" />
 
-<body>
-  <div id="editor-ui"></div>
-  <canvas tabindex="1" id="cvs"></canvas>
-  <div id="game-touch-area" style="display: none;"></div>
-  <script type="module" src="./src/main.ts"></script>
-</body>
+        <meta property="og:type" content="website" />
+        <meta property="og:url" content="https://survev.io" />
+        <meta property="og:title" content="survev.io - 2d battle royale game" />
+        <meta
+            property="og:description"
+            content="Like games such as Player Unknown's Battlegrounds (PUBG), Fortnite or Apex Legends? Play this free 2d battle royale io game in your browser!"
+        />
+        <meta property="og:site_name" content="survev.io" />
+        <meta property="og:image" content="https://survev.io/img/survev_title.png" />
+        <meta property="og:image:alt" content="survev logo" />
+        <meta property="og:locale" content="en_US" />
 
+        <meta name="mobile-web-app-capable" content="yes">
+        <meta name="apple-mobile-web-app-capable" content="yes">
+        <meta name="apple-mobile-web-app-title" content="survev.io">
+        <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+        <meta name="application-name" content="survev.io">
+
+        <meta name="twitter:card" content="summary_large_image" />
+        <meta name="twitter:title" content="survev.io - 2d battle royale game" />
+        <meta
+            name="twitter:description"
+            content="Like games such as Player Unknown's Battlegrounds (PUBG), Fortnite or Apex Legends? Play this free 2d battle royale io game in your browser!"
+        />
+        <meta name="twitter:image" content="/favicon.ico" />
+
+        <link rel="canonical" href="https://survev.io" />
+        <link rel="icon" type="image/svg+xml" href="/favicon.ico" />
+        <link rel="manifest" href="/manifest.json">
+
+        <link rel="preconnect" href="https://fonts.googleapis.com">
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link
+            rel="stylesheet"
+            href="https://fonts.googleapis.com/css2?family=Roboto+Condensed:ital,wght@0,100..900;1,100..900&display=swap"
+        >
+    </head>
+    <body>
+        <div id="app" style="display: contents;"></div>
+        <script type="module" src="./src/main.ts"></script>
+    </body>
 </html>

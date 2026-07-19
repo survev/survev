@@ -1,3 +1,4 @@
+import { ConfigManager, type ConfigType } from "$lib/modules/ConfigManager.svelte.ts";
 import $ from "jquery";
 import * as PIXI from "pixi.js-legacy";
 import { GameConfig } from "../../shared/gameConfig.ts";
@@ -8,13 +9,12 @@ import { Account } from "./account.ts";
 import { Ambiance } from "./ambiance.ts";
 import { api } from "./api.ts";
 import { AudioManager } from "./audioManager.ts";
-import { ConfigManager, type ConfigType } from "./config.ts";
-import { device } from "./device.ts";
 import { errorLogManager } from "./errorLogs.ts";
 import { Game } from "./game.ts";
 import { helpers } from "./helpers.ts";
 import { InputHandler } from "./input.ts";
 import { InputBinds, InputBindUi } from "./inputBinds.ts";
+import { device } from "./lib/modules/Device.svelte.ts";
 import { PingTest } from "./pingTest.ts";
 import { proxy } from "./proxy.ts";
 import { ResourceManager } from "./resources.ts";
@@ -737,7 +737,7 @@ export class Application {
                 method: "POST",
                 body: JSON.stringify(matchArgs),
                 headers: {
-                    "Content-Type": "application/json; charset=utf-8",
+                    "Content-Type": "application/json;charset=utf-8",
                 },
                 credentials: proxy.anyLoginSupported() ? "include" : "omit",
                 signal: helpers.abortSignal(10 * 1000),
@@ -941,8 +941,6 @@ function onPageLoad() {
     App.tryLoad();
 }
 
-document.addEventListener("DOMContentLoaded", onPageLoad);
-window.addEventListener("load", onPageLoad);
 window.addEventListener("unload", (_e) => {
     App.onUnload();
 });
@@ -1009,3 +1007,5 @@ window.onerror = function(msg, url, lineNo, columnNo, error) {
         errorLogManager.logWindowOnError(errObj);
     }
 };
+
+onPageLoad();

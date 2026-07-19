@@ -1,10 +1,10 @@
+import type { ConfigManager } from "$lib/modules/ConfigManager.svelte.ts";
 import $ from "jquery";
 import { type MapDefKey, MapDefs } from "../../shared/defs/mapDefs.ts";
 import { GameConfig } from "../../shared/gameConfig.ts";
 import type { SiteInfoRes } from "../../shared/types/api.ts";
 import { api } from "./api.ts";
-import type { ConfigManager } from "./config.ts";
-import { device } from "./device.ts";
+import { device } from "./lib/modules/Device.svelte.ts";
 import type { Localization } from "./ui/localization.ts";
 
 export class SiteInfo {
