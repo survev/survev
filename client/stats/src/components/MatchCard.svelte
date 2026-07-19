@@ -167,7 +167,7 @@
         class='accordion-collapse {autoExpand ? "show" : "collapse"}'
         data-bs-parent="#extra-stats-content"
     >
-        <div class="accordion-body">
+        <div class="accordion-body" onclick={e => e.stopPropagation()}>
             <div class="accordion-body-inner">
                 {#if data && localPlayer}
                     <table>
@@ -244,13 +244,13 @@
         background-color: #00000066;
         padding: 0.5rem;
         border-bottom: none;
-        cursor: pointer;
         transition: 0.15s;
 
         .accordion-header {
             display: flex;
             align-items: center;
             height: 84px;
+            cursor: pointer;
 
             & > div {
                 display: flex;
