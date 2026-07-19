@@ -8565,7 +8565,7 @@ function createOasis<T extends BuildingDef>(e: Partial<T>): T {
         type: "building",
         map: { display: true, shapes: [] },
         terrain: { grass: true, beach: false },
-        mapObstacleBounds: [collider.createCircle(v2.create(0, 0), 40)],
+        mapObstacleBounds: [collider.createCircle(v2.create(0, 0), 43)],
         mapGroundPatches: [
             {
                 bound: collider.createCircle(v2.create(0, 0), 40),
@@ -8589,6 +8589,12 @@ function createOasis<T extends BuildingDef>(e: Partial<T>): T {
                 volume: 1,
             },
         ],
+        healRegions: [
+            {
+                collision: collider.createCircle(v2.create(0, 0), 20),
+                healRate: 1,
+            },
+        ],
         mapObjects: [
             //
             // Central Island
@@ -8601,14 +8607,20 @@ function createOasis<T extends BuildingDef>(e: Partial<T>): T {
                 ori: 0,
             },
             {
-                type: "crate_09",
+                type: "tree_02",
+                pos: v2.create(-4.5, -4.5),
+                scale: 1,
+                ori: 0,
+            },
+            {
+                type: "crate_09de",
                 pos: v2.create(5, 0),
                 scale: 1,
                 ori: 0,
             },
             {
                 type: "barrel_05",
-                pos: v2.create(2, 4),
+                pos: v2.create(3, 5),
                 scale: 1,
                 ori: 0,
             },
@@ -8638,6 +8650,18 @@ function createOasis<T extends BuildingDef>(e: Partial<T>): T {
             {
                 type: "crate_01",
                 pos: v2.create(22, 21),
+                scale: 1,
+                ori: 0,
+            },
+            {
+                type: "crate_01",
+                pos: v2.create(-17, 25),
+                scale: 1,
+                ori: 0,
+            },
+            {
+                type: "crate_01",
+                pos: v2.create(-14, -20),
                 scale: 1,
                 ori: 0,
             },
@@ -8732,7 +8756,7 @@ function createOasis<T extends BuildingDef>(e: Partial<T>): T {
                 ori: 0,
             },
             {
-                type: randomObstacleType({ crate_02: 1, crate_01: 3, barrel_01: 1 }),
+                type: "crate_02",
                 pos: v2.create(25, -25),
                 scale: 1,
                 ori: 0,
@@ -8744,7 +8768,7 @@ function createOasis<T extends BuildingDef>(e: Partial<T>): T {
                 ori: 0,
             },
             {
-                type: "crate_01",
+                type: randomObstacleType({ crate_01: 2, barrel_01: 1 }),
                 pos: v2.create(20, -23),
                 scale: 1,
                 ori: 0,
@@ -13151,6 +13175,20 @@ export const RawMapObjectDefs: Record<string, MapObjectDef> = {
         health: 140,
         loot: [tierLoot("tier_soviet", 3, 5), tierLoot("tier_outfits", 1, 1)],
         map: { display: false },
+        img: { sprite: "map-crate-09.img" },
+        sound: { explode: "crate_break_01" },
+    }),
+    crate_09de: createCrate({
+        health: 140,
+        loot: [
+            tierLoot("tier_chest", 2, 2),
+            tierLoot("tier_surviv", 1, 1),
+            autoLoot("backpack02", 1),
+            autoLoot("cutlass", 1),
+            tierLoot("tier_conch", 1, 1),
+        ],
+        map: { display: false },
+        terrain: { grass: true, beach: false },
         img: { sprite: "map-crate-09.img" },
         sound: { explode: "crate_break_01" },
     }),

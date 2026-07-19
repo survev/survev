@@ -206,6 +206,10 @@ const mapDef: PartialMapDef = {
             { name: "amped_explosives", count: 1, weight: 1 },
             { name: "explosive", count: 1, weight: 1 },
         ],
+        tier_crow_case_melee: [
+            { name: "crowbar", count: 1, weight: 1 },
+            { name: "stonehammer", count: 1, weight: 1 },
+        ],
         tier_pirate_rare: [
             { name: "m1911", count: 1, weight: 1 },
             { name: "m4a1", count: 1, weight: 1.25 },
