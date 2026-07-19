@@ -206,6 +206,23 @@ const mapDef: PartialMapDef = {
             { name: "amped_explosives", count: 1, weight: 1 },
             { name: "explosive", count: 1, weight: 1 },
         ],
+        tier_pirate_rare: [
+            { name: "m1911", count: 1, weight: 1 },
+            { name: "m4a1", count: 1, weight: 1.25 },
+            { name: "scar", count: 1, weight: 1.25 },
+            { name: "flare_gun_dual", count: 1, weight: 0.75 },
+            { name: "garand", count: 1, weight: 1 },
+            { name: "mosin", count: 1, weight: 1 },
+            { name: "deagle", count: 1, weight: 1 },
+            { name: "sw500", count: 1, weight: 1 },
+            { name: "saiga", count: 1, weight: 1 },
+            { name: "ash12", count: 1, weight: 0.5 },
+            { name: "deagle_dual", count: 1, weight: 0.5 },
+            { name: "sv98", count: 1, weight: 0.3 },
+            { name: "barrett", count: 1, weight: 0.3 },
+            { name: "awc", count: 1, weight: 0.3 },
+            { name: "m249", count: 1, weight: 0.25 },
+        ],
     },
     mapGen: {
         map: {

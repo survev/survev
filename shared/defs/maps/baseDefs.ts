@@ -569,7 +569,7 @@ export const Main: MapDef = {
             { name: "m4a1", count: 1, weight: 1 },
             { name: "scorpion", count: 1, weight: 1 },
             { name: "scar", count: 1, weight: 1 },
-            { name: "flare", count: 1, weight: 1 },
+            { name: "flare_gun", count: 1, weight: 1 },
             { name: "garand", count: 1, weight: 0.75 },
             { name: "mosin", count: 1, weight: 0.5 },
             { name: "deagle", count: 1, weight: 1 },
