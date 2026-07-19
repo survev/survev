@@ -134,9 +134,6 @@
     }
 
     onMount(async () => {
-        const Tooltip = (await import("bootstrap/js/dist/tooltip.js")).default;
-        new Tooltip(ratingContainer!);
-
         await requestMatchHistory();
 
         if (initGameId) {
@@ -255,20 +252,6 @@
                     <option value={def.mapId}>{def.desc.name}</option>
                 {/each}
             </select>
-        </div>
-        <div class="col-lg-6"></div>
-        <div class="col-lg-2">
-            <div
-                bind:this={ratingContainer}
-                class="card text-white"
-                class:invisible={!data?.slug}
-                data-bs-toggle="tooltip"
-                data-bs-placement="left"
-                data-bs-html="true"
-                data-bs-title="<span class='text-warning fw-bold'>This feature is coming soon!</span> Rating will be based on placement and kills within an individual game mode."
-            >
-                What is Rating?
-            </div>
         </div>
     </div>
     <div class="row gap-3 gap-lg-0">
@@ -465,13 +448,7 @@
 
     select {
         width: 100%;
-    }
-
-    .card.text-white {
-        text-align: center;
-        background: #00000040;
-        padding: 0.5rem 0.25rem;
-        border-radius: 0.375rem;
+        font-weight: bold;
     }
 
     .match-filter button {
@@ -563,10 +540,6 @@
     @media (min-width: 768px) {
         .player-name {
             font-size: 28px;            
-        }
-
-        select {
-            font-weight: bold;
         }
     }
 </style>

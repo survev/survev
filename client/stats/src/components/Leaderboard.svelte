@@ -253,6 +253,7 @@
 
     select {
         width: 100%;
+        font-weight: bold;
     }
 
     table {
@@ -372,10 +373,6 @@
     }
 
     @media (min-width: 768px) {
-        select {
-            font-weight: bold;
-        }
-
         .container .card {
             font-size: 36px;
         }
