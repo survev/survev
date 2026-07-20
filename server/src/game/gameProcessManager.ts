@@ -10,10 +10,14 @@ import { type FindGamePrivateBody, type ServerGameConfig } from "../utils/types.
 import { type GameData, type ProcessMsg, ProcessMsgType } from "./ipcTypes.ts";
 
 let procFile: string;
-if (process.env.NODE_ENV === "production") {
-    procFile = "dist/gameProcess.js";
-} else {
+let procArgv: string[];
+
+if (import.meta.filename.endsWith(".ts")) {
     procFile = "src/game/gameProcess.ts";
+    procArgv = ["--expose-gc", "--import", "tsx"];
+} else {
+    procArgv = [];
+    procFile = "dist/gameProcess.js";
 }
 
 export enum ProcState {
@@ -55,6 +59,7 @@ class GameProcess {
         this.manager = manager;
         this.process = fork(procFile, [], {
             serialization: "advanced",
+            execArgv: procArgv,
         });
 
         this.process.on("message", (msg: ProcessMsg) => {

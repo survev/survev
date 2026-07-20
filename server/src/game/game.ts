@@ -379,8 +379,8 @@ export class Game {
             client.disconnect();
         }
         this.logger.info("Game Ended");
-        this.updateData();
         this._saveGameToDatabase();
+        this.updateData();
     }
 
     // implementation of those is on gameProcess.ts
@@ -388,8 +388,8 @@ export class Game {
     // to make offline mode and unit tests easier to maintain
 
     updateData() {}
-    protected async _saveGameToDatabase() {}
-    async sendQuestProgress(_userId: string, _progress: Array<{ id: string; delta: number }>) {}
+    protected _saveGameToDatabase() {}
+    sendQuestProgress(_userId: string, _progress: Array<{ id: string; delta: number }>) {}
 
     /**
      * Steps the game X seconds in the future

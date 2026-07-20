@@ -1,6 +1,7 @@
 import fs from "node:fs";
 import { platform } from "node:os";
 import path from "node:path";
+import { Logger } from "../../../shared/utils/logger.ts";
 import { Config } from "../config.ts";
 import { apiPrivateRouter } from "../utils/apiRouter.ts";
 import { logErrorToWebhook } from "../utils/logger.ts";
@@ -10,7 +11,89 @@ import { Game } from "./game.ts";
 import { type ProcessMsg, ProcessMsgType } from "./ipcTypes.ts";
 import { ClientSocket } from "./socket.ts";
 
+function sendMsg(msg: ProcessMsg) {
+    process.send!(msg);
+}
+
+process.on("disconnect", () => {
+    process.exit();
+});
+
 let game: ServerGame | undefined;
+let gameWeakRef: WeakRef<ServerGame> | undefined;
+const socketIdToSocket = new Map<string, ProcessSocket<Client>>();
+
+const procLogger = new Logger(Config.logging, `GameProc-${process.pid}`);
+
+function stopGame() {
+    socketIdToSocket.clear();
+    game = undefined;
+
+    // make sure game is properly free'd
+    // we expose the gc on dev builds
+    if (global.gc) {
+        setImmediate(async () => {
+            await global.gc!({
+                execution: "async",
+            });
+            if (gameWeakRef?.deref()) {
+                procLogger.warn("Possible memory leak found, something is keeping a reference to the game object!");
+            }
+        });
+    }
+}
+
+//
+// Keep saveGame and sendQuestProgress separated from the game class
+// This ensures that waiting for the network request doesn't prevent the game instance from being GC'd
+//
+
+async function saveGame(gameId: string, values: SaveGameBody["matchData"]) {
+    let res: Response | undefined = undefined;
+    try {
+        res = await apiPrivateRouter.save_game.$post({
+            json: {
+                matchData: values,
+            },
+        });
+    } catch (err) {
+        procLogger.error(`Failed to fetch API save game:`, err);
+    }
+
+    if (!res || !res.ok) {
+        const region = Config.gameServer.thisRegion.toUpperCase();
+        procLogger.error(
+            `[${region}] Failed to save game data, saving locally instead`,
+        );
+
+        const dir = path.resolve("lost_game_data");
+        if (!fs.existsSync(dir)) {
+            fs.mkdirSync(dir);
+        }
+        fs.writeFileSync(
+            path.join(dir, `${gameId}.json`),
+            JSON.stringify(values),
+            "utf8",
+        );
+    }
+}
+
+async function sendQuestProgress(userId: string, progress: Array<{ id: string; delta: number }>) {
+    try {
+        const req = await apiPrivateRouter.quest_progress.$post({
+            json: {
+                userId,
+                progress,
+            },
+        });
+        const res = await req.json();
+        if (!req.ok || !(res as { success: boolean }).success) {
+            procLogger.error(`Failed to save quest progress`, res);
+        }
+    } catch (err) {
+        procLogger.error(`Failed to save quest progress:`, err);
+    }
+}
 
 /**
  * Implements methods only used when the game is actually running on a server
@@ -29,28 +112,11 @@ class ServerGame extends Game {
             timeRunning: this.timeRunning,
         });
         if (this.stopped) {
-            game = undefined;
+            stopGame();
         }
     }
 
-    override async sendQuestProgress(userId: string, progress: Array<{ id: string; delta: number }>) {
-        try {
-            const req = await apiPrivateRouter.quest_progress.$post({
-                json: {
-                    userId,
-                    progress,
-                },
-            });
-            const res = await req.json();
-            if (!req.ok || !(res as { success: boolean }).success) {
-                this.logger.error(`Failed to save quest progress`, res);
-            }
-        } catch (err) {
-            this.logger.error(`Failed to save quest progress:`, err);
-        }
-    }
-
-    override async _saveGameToDatabase() {
+    override _saveGameToDatabase() {
         // don't save games that never started
         if (!this.started) return;
 
@@ -101,48 +167,13 @@ class ServerGame extends Game {
 
         // only save the game if it has more than 2 players lol
         if (values.length < 2) return;
+        saveGame(this.id, values);
+    }
 
-        // FIXME: maybe move this to the parent game server process?
-        // to avoid blocking the game from being GC'd until this request is done
-        // and opening a database in each process if it fails
-        // etc
-        let res: Response | undefined = undefined;
-        try {
-            res = await apiPrivateRouter.save_game.$post({
-                json: {
-                    matchData: values,
-                },
-            });
-        } catch (err) {
-            this.logger.error(`Failed to fetch API save game:`, err);
-        }
-
-        if (!res || !res.ok) {
-            const region = Config.gameServer.thisRegion.toUpperCase();
-            this.logger.error(
-                `[${region}] Failed to save game data, saving locally instead`,
-            );
-
-            const dir = path.resolve("lost_game_data");
-            if (!fs.existsSync(dir)) {
-                fs.mkdirSync(dir);
-            }
-            fs.writeFileSync(
-                path.join(dir, `${this.id}.json`),
-                JSON.stringify(values),
-                "utf8",
-            );
-        }
+    override sendQuestProgress(userId: string, progress: Array<{ id: string; delta: number }>) {
+        sendQuestProgress(userId, progress);
     }
 }
-
-function sendMsg(msg: ProcessMsg) {
-    process.send!(msg);
-}
-
-process.on("disconnect", () => {
-    process.exit();
-});
 
 const socketMsgs: Array<{
     socketId: string;
@@ -150,10 +181,7 @@ const socketMsgs: Array<{
     ip: string;
 }> = [];
 
-let lastMsgTime = Date.now();
-
-const socketIdToSocket = new Map<string, ProcessSocket<Client | undefined>>();
-class ProcessSocket<T> extends ClientSocket<T> {
+class ProcessSocket<T extends object> extends ClientSocket<T> {
     private _id: string;
     private _ip: string;
     _closed = false;
@@ -187,6 +215,7 @@ class ProcessSocket<T> extends ClientSocket<T> {
             socketId: this._id,
             reason: undefined,
         });
+        socketIdToSocket.delete(this._id);
     }
 
     closeWithReason(reason: string): void {
@@ -196,9 +225,11 @@ class ProcessSocket<T> extends ClientSocket<T> {
             socketId: this._id,
             reason: reason,
         });
+        socketIdToSocket.delete(this._id);
     }
 }
 
+let lastMsgTime = Date.now();
 process.on("message", (msg: ProcessMsg) => {
     if (msg.type) {
         lastMsgTime = Date.now();
@@ -206,6 +237,7 @@ process.on("message", (msg: ProcessMsg) => {
 
     if (msg.type === ProcessMsgType.Create && !game) {
         game = new ServerGame(msg.id, msg.config);
+        gameWeakRef = new WeakRef(game);
     }
 
     if (!game) return;
@@ -215,20 +247,24 @@ process.on("message", (msg: ProcessMsg) => {
             game.addJoinTokens(msg.tokens, msg.autoFill);
             break;
         case ProcessMsgType.SocketOpen: {
-            const socket = new ProcessSocket<Client | undefined>(msg.socketId, msg.ip);
+            const socket = new ProcessSocket<Client>(msg.socketId, msg.ip);
             socketIdToSocket.set(msg.socketId, socket);
             break;
         }
         case ProcessMsgType.ClientSocketMsg: {
-            let socket = socketIdToSocket.get(msg.socketId)!;
-            game.clientBarn.handleMsg(msg.data as ArrayBuffer, socket);
+            const socket = socketIdToSocket.get(msg.socketId);
+            if (socket) {
+                game.clientBarn.handleMsg(msg.data as ArrayBuffer, socket);
+            }
             break;
         }
         case ProcessMsgType.SocketClose: {
-            const socket = socketIdToSocket.get(msg.socketId)!;
-            socket._closed = true;
-            game.clientBarn.handleSocketClose(socket);
-            socketIdToSocket.delete(msg.socketId);
+            const socket = socketIdToSocket.get(msg.socketId);
+            if (socket) {
+                socket._closed = true;
+                game.clientBarn.handleSocketClose(socket);
+                socketIdToSocket.delete(msg.socketId);
+            }
             break;
         }
     }

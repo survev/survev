@@ -49,7 +49,7 @@ export class ClientBarn {
         this.msgsToSend.stream.index = 0;
     }
 
-    addClientWithPlayer(socket: ClientSocket<Client | undefined>, joinMsg: net.JoinMsg) {
+    addClientWithPlayer(socket: ClientSocket<Client>, joinMsg: net.JoinMsg) {
         const joinData = this.game.joinTokens.get(joinMsg.matchPriv);
 
         if (!joinData || joinData.expiresAt < Date.now()) {
@@ -162,7 +162,7 @@ export class ClientBarn {
         };
     }
 
-    handleMsg(buff: ArrayBuffer | Buffer, socket: ClientSocket<Client | undefined>) {
+    handleMsg(buff: ArrayBuffer | Buffer, socket: ClientSocket<Client>) {
         if (!(buff instanceof ArrayBuffer)) return;
 
         let client = socket.getUserData();
@@ -223,7 +223,7 @@ export class ClientBarn {
         client.handleMsg(type, msg);
     }
 
-    handleSocketClose(socket: ClientSocket<Client | undefined>) {
+    handleSocketClose(socket: ClientSocket<Client>) {
         const client = socket.getUserData();
         if (!client) return;
         client.spectating = undefined;
@@ -327,7 +327,7 @@ export class Client {
 
     constructor(
         game: Game,
-        socket: ClientSocket<Client | undefined>,
+        socket: ClientSocket<Client>,
         userId: string | null,
         findGameIp: string,
     ) {
