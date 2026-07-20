@@ -1405,6 +1405,7 @@ export class Game {
                     sourceType,
                     msg.damageType,
                     msg.downed && !msg.killed,
+                    msg.isM9SpecialSelfKill,
                 );
                 const killColor = this.m_ui2Manager.getKillFeedColor(
                     activeTeamId,
