@@ -192,7 +192,7 @@ export class UiManager {
     // Store minimap hidden
     minimapDisplayed = true;
 
-    // Store UI visiblity mode
+    // Store UI visibility mode
     visibilityMode = 0;
     hudVisible = true;
 
