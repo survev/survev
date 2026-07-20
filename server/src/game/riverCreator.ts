@@ -12,9 +12,9 @@ export class RiverCreator {
 
     constructor(
         public map: GameMap,
-        randomGenerator?: (min?: number, max?: number) => number,
+        randomGenerator: (min?: number, max?: number) => number,
     ) {
-        this.randomGenerator = randomGenerator ?? ((min = 0, max = 1) => Math.random() * (max - min) + min);
+        this.randomGenerator = randomGenerator;
     }
 
     private getStartPoint(isFactionRiver: boolean): Vec2 {
