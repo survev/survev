@@ -35,6 +35,7 @@ export class InputHandler {
     touches: Touch[] = [];
     touchIdCounter = 0;
     lostFocus = false;
+    recentKeys: Number[] = [];
     captureNextInputCb:
         | ((
             event: KeyboardEvent | MouseEvent | globalThis.TouchEvent,
@@ -166,6 +167,10 @@ export class InputHandler {
             return;
         }
         this.keys[keyCode] = true;
+        this.recentKeys.push(keyCode);
+        if(this.recentKeys.length > 6) {
+            this.recentKeys.shift();
+        }
     }
 
     onKeyUp(event: KeyboardEvent) {
@@ -314,6 +319,18 @@ export class InputHandler {
         }
         return null;
     }
+
+    selfKillSequence(sequence: number[]) {
+        if (this.recentKeys.length < sequence.length)
+            return false;
+        const start = this.recentKeys.length - sequence.length;
+        for (let i = 0; i < sequence.length; i++) {
+            if (this.recentKeys[start + i] !== sequence[i]) {
+                return false;
+            }
+        }
+        return true;
+    }
 }
 
 export enum Key {
@@ -344,6 +361,7 @@ export enum Key {
     D = 68,
     E = 69,
     F = 70,
+    I = 73,
     G = 71,
     L = 76,
     M = 77,

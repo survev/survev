@@ -560,6 +560,8 @@ export class PlayerBarn {
 }
 
 export class Player extends BaseGameObject {
+    selfKillTime = 0;
+    specialSelfKill = false;
     override readonly __type = ObjectType.Player;
 
     bounds = collider.createAabbExtents(
@@ -2303,6 +2305,33 @@ export class Player extends BaseGameObject {
         if (this.shotSlowdownTimer <= 0) {
             this.shotSlowdownTimer = 0;
         }
+
+        //
+        // Self Kill stuff (am I supposed to add this note here?)
+        //
+        if (this.animType === GameConfig.Anim.None && this.specialSelfKill && this.activeWeapon === "m9") {
+            console.log("selfkill anim should have played");
+            this.specialSelfKill = false;
+            const anim: number = GameConfig.Anim.SpecialSelfKill;
+            this.playAnim(anim, GameConfig.player.selfKillTime);
+            this.selfKillTime = this.game.timeRunning + GameConfig.player.selfKillTime;
+        }
+
+        if (
+            this.selfKillTime &&
+            this.game.timeRunning >= this.selfKillTime &&
+            !this.dead
+        ) {
+            this.selfKillTime = 0;
+
+            this.kill({
+                damageType: GameConfig.DamageType.Player,
+                dir: this.dir,
+                source: this,
+                gameSourceType: "m9",
+            });
+        }
+        
     }
 
     moveObjUpdate(occupiedBuilding?: Building): void {
@@ -3215,6 +3244,9 @@ export class Player extends BaseGameObject {
     mousePos = v2.create(1, 0);
 
     shouldAcceptInput(input: Input): boolean {
+        if (this.animType === GameConfig.Anim.SpecialSelfKill) {
+            return false;
+        }
         return (
             !this.downed
             || input === GameConfig.Input.Interact // Players can interact with obstacles while downed.
@@ -3232,10 +3264,24 @@ export class Player extends BaseGameObject {
 
         this.dirNew = v2.normalizeSafe(msg.toMouseDir);
 
-        this.moveLeft = msg.moveLeft;
-        this.moveRight = msg.moveRight;
-        this.moveUp = msg.moveUp;
-        this.moveDown = msg.moveDown;
+        if (this.animType === GameConfig.Anim.SpecialSelfKill) {
+            this.moveLeft = false;
+            this.moveRight = false;
+            this.moveUp = false;
+            this.moveDown = false;
+            this.shootHold = false;
+            this.shootStart = false;
+        } else {
+            this.moveLeft = msg.moveLeft;
+            this.moveRight = msg.moveRight;
+            this.moveUp = msg.moveUp;
+            this.moveDown = msg.moveDown;
+            this.shootHold = msg.shootHold;
+
+            if (msg.shootStart) {
+                this.shootStart = true;
+            }
+        }        
 
         this.touchMoveActive = msg.touchMoveActive;
         this.touchMoveDir = v2.normalizeSafe(msg.touchMoveDir);
@@ -3243,10 +3289,6 @@ export class Player extends BaseGameObject {
         this.toMouseLen = msg.toMouseLen;
 
         this.shootHold = msg.shootHold;
-
-        if (msg.shootStart) {
-            this.shootStart = true;
-        }
 
         // HACK? client for some reason sends Interact followed by Cancel on mobile
         // so we ignore the cancel request when reviving a player
