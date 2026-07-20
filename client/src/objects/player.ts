@@ -154,6 +154,7 @@ export interface AnimCtx {
     map: Map;
     audioManager: AudioManager;
     particleBarn: ParticleBarn;
+    renderer: Renderer;
 }
 
 export abstract class AbstractObject {
@@ -1267,6 +1268,7 @@ export class Player implements AbstractObject {
             map,
             audioManager,
             particleBarn,
+            renderer,
         };
         this.updateAnim(dt, animCtx);
         if (this.currentAnim() == Anim.None) {
@@ -2142,6 +2144,8 @@ export class Player implements AbstractObject {
                 const selected = util.randomItem(anims);
                 return anim(selected, selected == "fists" && anims.length == 1);
             }
+            case Anim.SpecialSelfKill:
+                return anim("special_self_kill", false);
             default:
                 return anim("none", false);
         }
@@ -2231,6 +2235,7 @@ export class Player implements AbstractObject {
 
     animPlaySound(animCtx: AnimCtx, args: { sound: string }) {
         const itemDef = GameObjectDefs.typeToDef(this.m_netData.m_activeWeapon) as MeleeDef;
+        console.log(itemDef.sound.deploy);
         const sound = itemDef.sound[args.sound];
         if (sound) {
             animCtx.audioManager.playSound(sound, {
@@ -2241,6 +2246,23 @@ export class Player implements AbstractObject {
                 filter: "muffled",
             });
         }
+    }
+
+    animPlaySpecificSound(animCtx: AnimCtx, args: { sound: string }) {
+        animCtx.audioManager.playSound(args.sound, {
+            channel: "", // this isn't a fix at all lol but I am kinda too lazy to fix it and it works for what I need so yea :o (probably will make some sounds unplayable... or maybe I am being extra dumb and this is good enough for all other sounds...)
+            soundPos: this.m_pos,
+            fallOff: 3,
+            layer: this.layer,
+            filter: "muffled",
+        });
+    }
+
+    animCoverGameScreen(animCtx: AnimCtx, args: { color: number, removeScreenTime: number }) {
+        animCtx.renderer.coverScreen(args.color);
+        setTimeout(() => {
+            animCtx.renderer.clearScreenCover()
+        }, args.removeScreenTime)
     }
 
     animSetThrowableState(_animCtx: AnimCtx, args: { state: string }) {

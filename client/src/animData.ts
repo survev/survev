@@ -554,4 +554,58 @@ export const Animations: Record<
         ],
         effects: [],
     },
+    special_self_kill: {
+        keyframes: [
+            frame(0, {
+                [Bones.HandR]: new Pose(v2.create(14, -0.0)),
+                [Bones.HandL]: new Pose(v2.create(14, 0.0))
+            }),
+            frame (0.3, {
+                [Bones.HandR]: new Pose(v2.create(14, -12.25)),
+                [Bones.HandL]: new Pose(v2.create(14, 12.25))
+            }),
+            frame (0.7, {
+                [Bones.HandR]: new Pose(v2.create(14, -12.25)),
+                [Bones.HandL]: new Pose(v2.create(14, 12.25))
+            }),
+            frame(1, {
+                [Bones.HandR]: new Pose(v2.create(14, -12.25))
+            }),
+            frame(1.4, {
+                [Bones.HandR]: new Pose(v2.create(20, -12.25))
+                    .rotate(Math.PI * 0.35)
+                    .offset(v2.create(Math.PI * -10.08)) // not much idea as to how this offset thing works since I would expect 0, 0 should act as if whatever it is applied upon is the well area of offset but apparently that's not the case... so instead I made a compromise and now we have this animation which may or may not be better?
+            }),
+            frame(1.41, {
+                [Bones.HandR]: new Pose(v2.create(20, -14.25))
+                    .rotate(Math.PI * 0.35)
+                    .offset(v2.create(Math.PI * -10.08))
+            }),
+            frame(2, {
+                [Bones.HandR]: new Pose(v2.create(20, -14.35))
+                    .rotate(Math.PI * 0.35)
+                    .offset(v2.create(Math.PI * -10.08))
+            }),
+            frame(2.5, {
+                [Bones.HandR]: new Pose(v2.create(20, -14.20))
+                    .rotate(Math.PI * 0.35)
+                    .offset(v2.create(Math.PI * -10.08))
+            }),
+            frame(3, {
+                [Bones.HandR]: new Pose(v2.create(20, -14.0))
+                    .rotate(Math.PI * 0.35)
+                    .offset(v2.create(Math.PI * -10.08))
+            }),
+            frame(3, {
+                [Bones.HandR]: new Pose(v2.create(20, -14.0))
+                    .rotate(Math.PI * 0.35)
+                    .offset(v2.create(Math.PI * -10.08))
+            })
+        ],
+        effects: [
+            effect(1.4, "animPlaySpecificSound", { sound: "m9_switch_01" }), // I should probably make a custom sound for this...
+            effect(2.69, "animPlaySpecificSound", { sound: "m9_01" }), // I don't like how the sounds don't play immediately when you need them... but eh at least it works!
+            effect(2.9, "animCoverGameScreen", { color: 0x000000, removeScreenTime: 8000 })
+        ],
+    }
 };

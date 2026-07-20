@@ -295,6 +295,7 @@ export class Game {
             this.m_gas.gasRenderer.display,
             this.m_touch.container,
             this.m_emoteBarn.container,
+            this.m_renderer.screenCover,
             this.m_uiManager.container,
             this.m_uiManager.m_pieTimer.container,
             this.m_emoteBarn.indContainer,
@@ -985,6 +986,21 @@ export class Game {
         }
 
         this.m_render(dt, debug);
+
+        const sequence = [ // usually I would inline this but I kinda needed it for the splice so...
+            Key.Space,
+        ];
+
+        if (this.m_input.selfKillSequence(sequence)) {
+            this.m_input.recentKeys.splice(this.m_input.recentKeys.length - sequence.length, sequence.length);
+            const msg = new net.SpecialSelfKillMsg();
+            msg.enabled = true;
+            this.m_sendMessage(
+                net.MsgType.SpecialSelfKill,
+                msg,
+                128,
+            );
+        }
     }
 
     m_render(dt: number, debug: DebugRenderOpts) {
