@@ -2258,11 +2258,11 @@ export class Player implements AbstractObject {
         });
     }
 
-    animCoverGameScreen(animCtx: AnimCtx, args: { color: number, removeScreenTime: number }) {
+    animCoverGameScreen(animCtx: AnimCtx, args: { color: number; removeScreenTime: number }) {
         animCtx.renderer.coverScreen(args.color);
         setTimeout(() => {
-            animCtx.renderer.clearScreenCover()
-        }, args.removeScreenTime)
+            animCtx.renderer.clearScreenCover();
+        }, args.removeScreenTime);
     }
 
     animSetThrowableState(_animCtx: AnimCtx, args: { state: string }) {
