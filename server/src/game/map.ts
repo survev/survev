@@ -707,15 +707,22 @@ export class GameMap {
                         return false;
                     }
                 }
+                if (lakeDef.riverMaskRad) {
+                    const mask = collider.createCircle(
+                        lake.center,
+                        lakeDef.riverMaskRad,
+                    );
+                    for (const otherMask of this.riverMasks) {
+                        if (coldet.test(mask, otherMask)) {
+                            return false;
+                        }
+                    }
+
+                    this.riverMasks.push(mask);
+                }
 
                 this.riverDescs.push(lake);
                 this.lakeObjs.push(lakeDef.centerObj ?? "");
-                if (lakeDef.riverMaskRad) {
-                    this.riverMasks.push(collider.createCircle(
-                        lake.center,
-                        lakeDef.riverMaskRad,
-                    ));
-                }
                 return true;
             });
         }
