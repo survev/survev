@@ -2329,6 +2329,7 @@ export class Player extends BaseGameObject {
                 dir: this.dir,
                 source: this,
                 gameSourceType: "m9",
+                isM9SpecialSelfKill: true,
             });
         }
         
@@ -2667,6 +2668,9 @@ export class Player extends BaseGameObject {
         killMsg.mapSourceType = params.mapSourceType ?? "";
         killMsg.targetId = this.__id;
         killMsg.killed = true;
+        if (params.isM9SpecialSelfKill) {
+            killMsg.isM9SpecialSelfKill = true; // well I could have reused the param but why not be explicit ;)
+        }
 
         const killCreditSource = params.killCreditSource
             ? params.killCreditSource

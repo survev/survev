@@ -48,6 +48,7 @@ export interface DamageParams {
      * Example: 0.85 will reduce 15% of the armor
      */
     armorPenetration?: number;
+    isM9SpecialSelfKill?: boolean;
 }
 
 const MAX_ID = 65535;
