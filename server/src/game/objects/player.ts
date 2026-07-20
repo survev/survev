@@ -2318,9 +2318,9 @@ export class Player extends BaseGameObject {
         }
 
         if (
-            this.selfKillTime &&
-            this.game.timeRunning >= this.selfKillTime &&
-            !this.dead
+            this.selfKillTime
+            && this.game.timeRunning >= this.selfKillTime
+            && !this.dead
         ) {
             this.selfKillTime = 0;
 
@@ -2332,7 +2332,6 @@ export class Player extends BaseGameObject {
                 isM9SpecialSelfKill: true,
             });
         }
-        
     }
 
     moveObjUpdate(occupiedBuilding?: Building): void {
@@ -3285,7 +3284,7 @@ export class Player extends BaseGameObject {
             if (msg.shootStart) {
                 this.shootStart = true;
             }
-        }        
+        }
 
         this.touchMoveActive = msg.touchMoveActive;
         this.touchMoveDir = v2.normalizeSafe(msg.touchMoveDir);

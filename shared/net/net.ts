@@ -327,6 +327,6 @@ export { PerkModeRoleSelectMsg } from "./perkModeRoleSelectMsg.ts";
 export { PickupMsg } from "./pickupMsg.ts";
 export { PlayerStatsMsg } from "./playerStatsMsg.ts";
 export { RoleAnnouncementMsg } from "./roleAnnouncementMsg.ts";
-export { SpectateMsg } from "./spectateMsg.ts";
 export { SpecialSelfKillMsg } from "./specialSelfKillMsg.ts";
+export { SpectateMsg } from "./spectateMsg.ts";
 export { getPlayerStatusUpdateRate, UpdateMsg } from "./updateMsg.ts";
