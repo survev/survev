@@ -296,8 +296,6 @@ export class EditorDisplay {
             ceilingDamaged: false,
             ceilingDead: false,
             hasPuzzle: false,
-            puzzleSolved: false,
-            puzzleErrSeq: 0,
         };
         const obj = this.objectCreator.m_updateObjFull(
             ObjectType.Building,

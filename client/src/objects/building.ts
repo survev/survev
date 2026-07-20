@@ -183,9 +183,9 @@ export class Building implements AbstractObject {
         this.hasPuzzle = data.hasPuzzle;
 
         if (this.hasPuzzle) {
-            this.puzzleErrSeqModified = data.puzzleErrSeq != this.puzzleErrSeq;
-            this.puzzleSolved = data.puzzleSolved;
-            this.puzzleErrSeq = data.puzzleErrSeq;
+            this.puzzleErrSeqModified = data.puzzle!.errSeq != this.puzzleErrSeq;
+            this.puzzleSolved = data.puzzle!.solved;
+            this.puzzleErrSeq = data.puzzle!.errSeq;
         }
 
         const def = MapObjectDefs.typeToDef(this.type, "building");

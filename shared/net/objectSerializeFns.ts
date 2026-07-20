@@ -45,8 +45,10 @@ export interface ObjectsPartialData {
         occupied: boolean;
         ceilingDamaged: boolean;
         hasPuzzle: boolean;
-        puzzleSolved: boolean;
-        puzzleErrSeq: number;
+        puzzle?: {
+            solved: boolean;
+            errSeq: number;
+        };
     };
     [ObjectType.Structure]: unknown;
     [ObjectType.Decal]: unknown;
@@ -417,8 +419,8 @@ export const ObjectSerializeFns: {
             s.writeBoolean(data.ceilingDamaged);
             s.writeBoolean(data.hasPuzzle);
             if (data.hasPuzzle) {
-                s.writeBoolean(data.puzzleSolved);
-                s.writeBits(data.puzzleErrSeq, 7);
+                s.writeBoolean(data.puzzle!.solved);
+                s.writeBits(data.puzzle!.errSeq, 7);
             }
         },
         serializeFull: (s, data) => {
@@ -435,8 +437,10 @@ export const ObjectSerializeFns: {
             data.ceilingDamaged = s.readBoolean();
             data.hasPuzzle = s.readBoolean();
             if (data.hasPuzzle) {
-                data.puzzleSolved = s.readBoolean();
-                data.puzzleErrSeq = s.readBits(7);
+                data.puzzle = {
+                    solved: s.readBoolean(),
+                    errSeq: s.readBits(7),
+                };
             }
         },
         deserializeFull: (s, data) => {

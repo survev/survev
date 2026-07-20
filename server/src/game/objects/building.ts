@@ -6,11 +6,13 @@ import { type AABB, coldet, type Collider } from "../../../../shared/utils/colde
 import { collider } from "../../../../shared/utils/collider.ts";
 import { mapHelpers } from "../../../../shared/utils/mapHelpers.ts";
 import { math } from "../../../../shared/utils/math.ts";
+import { assert, util } from "../../../../shared/utils/util.ts";
 import { v2, type Vec2 } from "../../../../shared/utils/v2.ts";
 import type { Game } from "../game.ts";
 import type { Decal } from "./decal.ts";
 import { BaseGameObject } from "./gameObject.ts";
 import type { Obstacle } from "./obstacle.ts";
+import type { Player } from "./player.ts";
 import type { Structure } from "./structure.ts";
 
 export class Building extends BaseGameObject {
@@ -31,10 +33,27 @@ export class Building extends BaseGameObject {
     occupied = false;
 
     hasPuzzle = false;
-    puzzleSolved = false;
-    puzzleErrSeq = 0;
-    puzzleOrder: string[] = [];
-    puzzleResetTimeout?: NodeJS.Timeout;
+
+    puzzle?: {
+        solved: boolean;
+        errSeq: number;
+        inputCode: string[];
+
+        /**
+         * Reset ticker after error or completion
+         */
+        resetTicker: number;
+        /**
+         * Ticker to execute the action after the puzzle is completed
+         */
+        completeTicker: number;
+        /**
+         * Reset ticker after no new puzzle piece has been pressed
+         */
+        idleResetTicker: number;
+
+        interactedBy?: Player;
+    };
 
     scale = 1;
 
@@ -187,6 +206,105 @@ export class Building extends BaseGameObject {
 
         if (def.puzzle) {
             this.hasPuzzle = true;
+
+            this.puzzle = {
+                solved: false,
+                errSeq: 0,
+                inputCode: [],
+
+                resetTicker: 0,
+                completeTicker: 0,
+                idleResetTicker: 0,
+                interactedBy: undefined,
+            };
+        }
+    }
+
+    update(dt: number) {
+        if (this.hasPuzzle && this.puzzle) {
+            const puzzleDef = MapObjectDefs.typeToDef(this.type, "building").puzzle!;
+
+            if (this.puzzle.resetTicker > 0) {
+                this.puzzle.resetTicker -= dt;
+                if (this.puzzle.resetTicker <= 0) {
+                    this.resetPuzzle();
+                }
+            }
+
+            if (this.puzzle.solved && this.puzzle.completeTicker > 0) {
+                this.puzzle.completeTicker -= dt;
+
+                if (this.puzzle.completeTicker <= 0) {
+                    for (const obj of this.childObjects) {
+                        if (
+                            obj.__type === ObjectType.Obstacle
+                            && obj.type === puzzleDef.completeUseType
+                        ) {
+                            if (obj.isDoor) {
+                                obj.toggleDoor();
+                            } else if (obj.isButton) {
+                                obj.useButton();
+                            } else {
+                                obj.kill({
+                                    damageType: DamageType.Player,
+                                    dir: v2.create(0, 0),
+                                    source: this.puzzle.interactedBy,
+                                });
+                            }
+                        }
+                    }
+                }
+            }
+
+            if (this.puzzle.idleResetTicker > 0) {
+                this.puzzle.idleResetTicker -= dt;
+                if (this.puzzle.idleResetTicker <= 0) {
+                    this.puzzle.errSeq++;
+                    this.setPartDirty();
+                    this.puzzle.resetTicker = puzzleDef.errorResetDelay;
+                }
+            }
+        }
+
+        if (this.hasOccupiedEmitters && !this.occupiedDisabled) {
+            const oldOccupiedState = this.occupied;
+
+            this.occupied = false;
+
+            const livingPlayers = this.game.playerBarn.livingPlayers;
+            const players = livingPlayers.length < 20
+                ? livingPlayers
+                : this.game.grid.intersectCollider(this.emitterBounds);
+
+            for (let i = 0; i < players.length; i++) {
+                const player = players[i];
+                if (player.__type !== ObjectType.Player) continue;
+                if (player.dead) continue;
+                if (!util.sameLayer(player.layer, this.layer)) continue;
+                for (let j = 0; j < this.zoomRegions.length; j++) {
+                    const region = this.zoomRegions[j];
+
+                    if (!region.zoomIn) continue;
+                    if (
+                        coldet.testCircleAabb(
+                            player.pos,
+                            player.rad,
+                            region.zoomIn.min,
+                            region.zoomIn.max,
+                        )
+                    ) {
+                        this.occupied = true;
+                        break;
+                    }
+                }
+                if (this.occupied) {
+                    break;
+                }
+            }
+
+            if (this.occupied !== oldOccupiedState) {
+                this.setPartDirty();
+            }
         }
     }
 
@@ -199,6 +317,7 @@ export class Building extends BaseGameObject {
         }
 
         if (def.disableBuildingOccupied) {
+            this.occupied = false;
             this.occupiedDisabled = true;
         }
 
@@ -290,41 +409,25 @@ export class Building extends BaseGameObject {
     }
 
     puzzlePieceToggled(piece: Obstacle): void {
-        if (this.puzzleResetTimeout) clearTimeout(this.puzzleResetTimeout);
-
-        this.puzzleOrder.push(piece.puzzlePiece!);
+        assert(this.puzzle);
 
         const puzzleDef = MapObjectDefs.typeToDef(this.type, "building").puzzle!;
+
+        this.puzzle.resetTicker = 0;
+        this.puzzle.idleResetTicker = 0;
+
+        this.puzzle.inputCode.push(piece.puzzlePiece!);
 
         let puzzleName = puzzleDef.name;
         if (this.game.map.woodsMode && puzzleName === "bunker_eye_02") {
             puzzleName = "bunker_eye_02_woods";
         }
 
-        const puzzleOrder = Puzzles[puzzleName];
+        const puzzleCode = Puzzles[puzzleName];
 
-        if (this.puzzleOrder.join("-") === puzzleOrder.join("-")) {
-            for (const obj of this.childObjects) {
-                if (
-                    obj.__type === ObjectType.Obstacle
-                    && obj.type === puzzleDef.completeUseType
-                ) {
-                    setTimeout(() => {
-                        if (obj.isDoor) {
-                            obj.toggleDoor();
-                        } else if (obj.isButton) {
-                            obj.useButton();
-                        } else {
-                            obj.kill({
-                                damageType: DamageType.Player,
-                                dir: v2.create(0, 0),
-                                source: piece.interactedBy,
-                            });
-                        }
-                    }, puzzleDef.completeUseDelay * 1000);
-                }
-            }
-            this.puzzleSolved = true;
+        if (this.puzzle.inputCode.join("-") === puzzleCode.join("-")) {
+            this.puzzle.interactedBy = piece?.interactedBy;
+            this.puzzle.solved = true;
             if (this.parentStructure) {
                 const def = MapObjectDefs.typeToDef(this.parentStructure.type, "structure");
                 if (def.interiorSound?.puzzle === puzzleDef.name) {
@@ -332,25 +435,17 @@ export class Building extends BaseGameObject {
                     this.parentStructure.setDirty();
                 }
             }
-            setTimeout(this.resetPuzzle.bind(this), puzzleDef.completeOffDelay * 1000);
             this.setPartDirty();
-        } else if (this.puzzleOrder.length >= puzzleOrder.length) {
-            this.puzzleErrSeq++;
+
+            this.puzzle.resetTicker = puzzleDef.completeOffDelay;
+            this.puzzle.completeTicker = puzzleDef.completeUseDelay;
+        } else if (this.puzzle.inputCode.length >= puzzleCode.length) {
+            this.puzzle.errSeq++;
             this.setPartDirty();
-            this.puzzleResetTimeout = setTimeout(
-                this.resetPuzzle.bind(this),
-                puzzleDef.errorResetDelay * 1000,
-            ) as NodeJS.Timeout;
+
+            this.puzzle.resetTicker = puzzleDef.errorResetDelay;
         } else {
-            this.puzzleResetTimeout = setTimeout(() => {
-                this.puzzleErrSeq++;
-                this.setPartDirty();
-                setTimeout(
-                    this.resetPuzzle.bind(this),
-                    puzzleDef.errorResetDelay * 1000,
-                    this,
-                );
-            }, puzzleDef.pieceResetDelay * 1000) as NodeJS.Timeout;
+            this.puzzle.idleResetTicker = puzzleDef.pieceResetDelay;
         }
     }
 
@@ -364,14 +459,18 @@ export class Building extends BaseGameObject {
     }
 
     resetPuzzle(): void {
-        this.puzzleOrder.length = 0;
+        assert(this.puzzle);
+        this.puzzle.inputCode.length = 0;
+        this.puzzle.idleResetTicker = 0;
+        this.puzzle.resetTicker = 0;
+
         for (const piece of this.childObjects) {
             if (
                 piece.__type === ObjectType.Obstacle
                 && piece.isButton
                 && piece.puzzlePiece
             ) {
-                piece.button.canUse = !this.puzzleSolved;
+                piece.button.canUse = !this.puzzle.solved;
                 piece.button.onOff = false;
                 piece.button.seq++;
                 piece.setDirty();
