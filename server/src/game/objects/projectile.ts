@@ -253,6 +253,11 @@ export class Projectile extends BaseGameObject {
 
         let insideObstacle = false;
 
+        const velLength = math.max(v2.length(this.vel), 0.000001);
+
+        // only do the line collision for projectiles that move more than their radius in a single tick
+        const shouldDoLineCheck = (velLength * dt) > this.rad;
+
         for (const obj of objs) {
             if (
                 obj.__type === ObjectType.Obstacle
@@ -264,11 +269,14 @@ export class Projectile extends BaseGameObject {
                     this.pos,
                     rad,
                 );
-                const lineIntersection = collider.intersectSegment(
-                    obj.collider,
-                    posOld,
-                    this.pos,
-                );
+
+                const lineIntersection = shouldDoLineCheck
+                    ? collider.intersectSegment(
+                        obj.collider,
+                        posOld,
+                        this.pos,
+                    )
+                    : null;
 
                 if (intersection || lineIntersection) {
                     if (obj.height > height) {
@@ -304,8 +312,7 @@ export class Projectile extends BaseGameObject {
                         if (def.explodeOnImpact) {
                             this.explode();
                         } else {
-                            const len = math.max(v2.length(this.vel), 0.000001);
-                            const dir = v2.div(this.vel, len);
+                            const dir = v2.div(this.vel, velLength);
                             const normal = intersection
                                 ? intersection.dir
                                 : lineIntersection!.normal;
@@ -314,7 +321,7 @@ export class Projectile extends BaseGameObject {
 
                             const velocityScale = math.max(1 + dot, 0.15);
 
-                            this.vel = v2.mul(newDir, len * velocityScale);
+                            this.vel = v2.mul(newDir, velLength * velocityScale);
                             this.dir = v2.normalizeSafe(this.vel);
                         }
                     } else if (obj.collidable) {
