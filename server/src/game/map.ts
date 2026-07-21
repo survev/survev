@@ -228,8 +228,10 @@ export class GameMap {
      * Like auto opening doors, regrowing potatos, etc
      */
     dynamicObstacles!: Obstacle[];
+
     buildings!: Building[];
-    buildingsWithEmitters!: Building[];
+    dynamicBuildings!: Building[];
+
     structures!: Structure[];
     bridges!: Structure[];
     grid!: MapGrid;
@@ -311,7 +313,7 @@ export class GameMap {
         this.obstacles = [];
         this.dynamicObstacles = [];
         this.buildings = [];
-        this.buildingsWithEmitters = [];
+        this.dynamicBuildings = [];
         this.structures = [];
         this.bridges = [];
         this.riverDescs = [];
@@ -423,47 +425,8 @@ export class GameMap {
             this.dynamicObstacles[i].update(dt);
         }
 
-        for (let i = 0; i < this.buildingsWithEmitters.length; i++) {
-            const building = this.buildingsWithEmitters[i];
-
-            const oldOccupiedState = building.occupied;
-
-            building.occupied = false;
-
-            const livingPlayers = this.game.playerBarn.livingPlayers;
-            const players = livingPlayers.length < 20
-                ? livingPlayers
-                : this.game.grid.intersectCollider(building.emitterBounds);
-
-            for (let j = 0; j < players.length; j++) {
-                const player = players[j];
-                if (player.__type !== ObjectType.Player) continue;
-                if (player.dead) continue;
-                if (!util.sameLayer(player.layer, building.layer)) continue;
-                for (let k = 0; k < building.zoomRegions.length; k++) {
-                    const region = building.zoomRegions[k];
-
-                    if (!region.zoomIn) continue;
-                    if (
-                        coldet.testCircleAabb(
-                            player.pos,
-                            player.rad,
-                            region.zoomIn.min,
-                            region.zoomIn.max,
-                        )
-                    ) {
-                        building.occupied = true;
-                        break;
-                    }
-                }
-                if (building.occupied) {
-                    break;
-                }
-            }
-
-            if (building.occupied !== oldOccupiedState) {
-                building.setPartDirty();
-            }
+        for (let i = 0; i < this.dynamicBuildings.length; i++) {
+            this.dynamicBuildings[i].update(dt);
         }
 
         for (let i = this.unlocks.length - 1; i >= 0; i--) {
@@ -2004,8 +1967,8 @@ export class GameMap {
 
         this.game.objectRegister.register(building);
         this.buildings.push(building);
-        if (building.hasOccupiedEmitters) {
-            this.buildingsWithEmitters.push(building);
+        if (building.hasOccupiedEmitters || building.hasPuzzle) {
+            this.dynamicBuildings.push(building);
         }
 
         if (def.map?.display && layer === 0 && !hideFromMap) {
