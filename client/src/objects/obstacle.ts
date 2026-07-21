@@ -310,10 +310,12 @@ export class Obstacle implements AbstractObject {
                 return null;
             }
 
+            const def = MapObjectDefs.typeToDef(this.type, "obstacle");
+
             return {
                 rad: this.button.interactionRad,
                 action: this.button.interactionText,
-                object: `game-${this.type}`,
+                object: def.airdropCrate ? "game-airdrop_crate_01" : `game-${this.type}`,
             };
         }
         if (this.isDoor && this.door.canUse && !this.door.autoOpen) {
