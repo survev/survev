@@ -2310,7 +2310,6 @@ export class Player extends BaseGameObject {
         // Self Kill stuff (am I supposed to add this note here?)
         //
         if (this.animType === GameConfig.Anim.None && this.specialSelfKill && this.activeWeapon === "m9") {
-            console.log("selfkill anim should have played");
             this.specialSelfKill = false;
             const anim: number = GameConfig.Anim.SpecialSelfKill;
             this.playAnim(anim, GameConfig.player.selfKillTime);
