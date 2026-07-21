@@ -93,6 +93,7 @@ export interface ObstacleDef {
     button?: {
         interactionRad: number;
         interactionText: string;
+        interactionObject?: string;
         /**
          * Whether the obstacle can only be interacted with once
          */

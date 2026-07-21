@@ -834,6 +834,7 @@ function createAirdrop<T extends ObstacleDef>(e: Partial<T>): T {
         button: {
             interactionRad: 1,
             interactionText: "game-unlock",
+            interactionObject: "game-airdrop_crate_01",
             useOnce: true,
             destroyOnUse: true,
             useDelay: 2.5,
@@ -13775,6 +13776,7 @@ export const RawMapObjectDefs: Record<string, MapObjectDef> = {
         collision: collider.createCircle(v2.create(0, 0), 2.25),
         airdropCrate: false,
         button: {
+            interactionObject: "",
             useImg: "map-class-shell-01b.img",
             useParticle: "classShell01a",
             sound: { on: "airdrop_open_01", off: "" },
@@ -13790,6 +13792,7 @@ export const RawMapObjectDefs: Record<string, MapObjectDef> = {
     class_shell_02: createAirdrop({
         collision: collider.createCircle(v2.create(0, 0), 2.25),
         button: {
+            interactionObject: "",
             useImg: "map-class-shell-02b.img",
             useParticle: "classShell02a",
             sound: { on: "airdrop_open_01", off: "" },
@@ -13805,6 +13808,7 @@ export const RawMapObjectDefs: Record<string, MapObjectDef> = {
     class_shell_03: createAirdrop({
         collision: collider.createCircle(v2.create(0, 0), 2.25),
         button: {
+            interactionObject: "",
             useImg: "map-class-shell-03b.img",
             useParticle: "classShell03a",
             sound: { on: "airdrop_open_01", off: "" },
