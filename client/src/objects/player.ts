@@ -30,7 +30,7 @@ import type { DebugRenderOpts } from "../config.ts";
 import { debugLines } from "../debug/debugLines.ts";
 import { device } from "../device.ts";
 import { errorLogManager } from "../errorLogs.ts";
-import type { Ctx } from "../game.ts";
+import type { Ctx, Game } from "../game.ts";
 import { helpers } from "../helpers.ts";
 import type { InputHandler } from "../input.ts";
 import type { InputBinds } from "./../inputBinds.ts";
@@ -155,6 +155,7 @@ export interface AnimCtx {
     audioManager: AudioManager;
     particleBarn: ParticleBarn;
     renderer: Renderer;
+    activeId: number;
 }
 
 export abstract class AbstractObject {
@@ -1269,6 +1270,7 @@ export class Player implements AbstractObject {
             audioManager,
             particleBarn,
             renderer,
+            activeId,
         };
         this.updateAnim(dt, animCtx);
         if (this.currentAnim() == Anim.None) {
@@ -2259,6 +2261,9 @@ export class Player implements AbstractObject {
     }
 
     animCoverGameScreen(animCtx: AnimCtx, args: { color: number; removeScreenTime: number }) {
+        if (this.__id !== animCtx.activeId) {
+            return;
+        }
         animCtx.renderer.coverScreen(args.color);
         setTimeout(() => {
             animCtx.renderer.clearScreenCover();
