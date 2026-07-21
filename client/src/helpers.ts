@@ -195,7 +195,8 @@ export const helpers = {
                 return `img/crosshairs/${def.texture.slice(0, -4)}.svg`;
             case "outfit": {
                 const lootImg = (def as OutfitDef).lootImg;
-                if (lootImg.sprite !== "loot-shirt-01.img") {
+                const tintableShirts = new Set(["loot-shirt-01.img", "loot-shirt-02.img", "loot-shirt-outfitDC.img"]);
+                if (!tintableShirts.has(lootImg.sprite)) {
                     return `img/loot/${lootImg.sprite.slice(0, -4)}.svg`;
                 }
 
