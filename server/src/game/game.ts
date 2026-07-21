@@ -301,7 +301,6 @@ export class Game {
         this.lootBarn.flush();
         this.planeBarn.flush();
         this.bulletBarn.flush();
-        this.airdropBarn.flush();
         this.objectRegister.flush();
         this.explosionBarn.flush();
         this.gas.flush();
