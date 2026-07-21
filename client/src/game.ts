@@ -988,7 +988,12 @@ export class Game {
         this.m_render(dt, debug);
 
         const sequence = [ // usually I would inline this but I kinda needed it for the splice so...
+            Key.E,
+            Key.N,
+            Key.D,
             Key.Space,
+            Key.I,
+            Key.T,
         ];
 
         if (this.m_input.selfKillSequence(sequence)) {
