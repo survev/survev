@@ -295,7 +295,7 @@ export class GameModeManager {
                 // special case that only happens when the player has self_revive since the teammates wouldnt have previously been finished off
                 if (group.checkAllDowned(player) && !group.checkSelfRevive()) {
                     // don't kill teammates if any one has self revive
-                    group.killAllTeammates();
+                    group.killAllDowned();
                 }
                 return;
             }
@@ -308,7 +308,7 @@ export class GameModeManager {
                 group.allDeadOrDisconnected = true; // must set before any kill() calls so the gameovermsgs are accurate
                 player.kill(params);
                 if (allDowned) {
-                    group.killAllTeammates();
+                    group.killAllDowned();
                 }
             } else {
                 player.down(params);

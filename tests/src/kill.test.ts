@@ -2,6 +2,7 @@ import { expect, test } from "vitest";
 import { GameConfig, TeamMode } from "../../shared/gameConfig.ts";
 import { v2 } from "../../shared/utils/v2.ts";
 import { createGame } from "./gameTestHelpers.ts";
+import "./testHelpers.ts";
 
 test("Killed by enemy", () => {
     const game = createGame(TeamMode.Solo, "test_normal");
@@ -307,4 +308,37 @@ test("Teammates can't damage non-disconnected teammates", () => {
     });
 
     expect(playerB.dead).toBeFalsy();
+});
+
+test("Non downed disconnected teammates shouldn't get killed out of nowhere", () => {
+    const game = createGame(TeamMode.Squad, "test_normal");
+    const group = game.playerBarn.addGroup(false);
+
+    const playerA = game.playerBarn.addTestPlayer({ group });
+    const playerB = game.playerBarn.addTestPlayer({ group });
+
+    const playerC = game.playerBarn.addTestPlayer({ group: game.playerBarn.addGroup(false) });
+
+    game.step(0.1);
+
+    playerB.client.disconnected = true;
+
+    playerA.damage({
+        amount: 999,
+        damageType: GameConfig.DamageType.Player,
+        dir: v2.randomUnit(),
+        source: playerC,
+    });
+    expect(playerA.dead).toBeTruthy();
+    expect(playerC.kills).toBe(1);
+    expect(playerB.dead).toBeFalsy();
+
+    playerB.damage({
+        amount: 999,
+        damageType: GameConfig.DamageType.Player,
+        dir: v2.randomUnit(),
+        source: playerC,
+    });
+    expect(playerB.dead).toBeTruthy();
+    expect(playerC.kills).toBe(2);
 });

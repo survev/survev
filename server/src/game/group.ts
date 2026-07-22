@@ -53,12 +53,10 @@ class BasePlayerGroup {
         return alivePlayers;
     }
 
-    /**
-     * kills all teammates, only called after last player on team thats not knocked gets knocked
-     */
-    killAllTeammates() {
+    killAllDowned() {
         for (const p of this.players) {
             if (p.dead) continue;
+            if (!p.downed) continue;
             p.kill({
                 damageType: GameConfig.DamageType.Bleeding,
                 dir: p.dir,
