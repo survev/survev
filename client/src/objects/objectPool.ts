@@ -10,6 +10,7 @@ type C<T extends AbstractObject> = new() => T;
 
 export class Pool<T extends AbstractObject> {
     m_pool: T[] = [];
+    m_freeList: T[] = [];
     m_activeCount = 0;
     m_creator: {
         type: C<T>;
@@ -23,41 +24,48 @@ export class Pool<T extends AbstractObject> {
     }
 
     m_alloc() {
-        let obj: T | null = null;
-        for (let i = 0; i < this.m_pool.length; i++) {
-            if (!this.m_pool[i].active) {
-                obj = this.m_pool[i];
-                break;
-            }
-        }
+        let obj = this.m_freeList.pop();
         if (!obj) {
             obj = new this.m_creator.type();
-            this.m_pool.push(obj);
         }
         obj.active = true;
+        obj.__poolIdx = this.m_pool.length;
+        this.m_pool.push(obj);
         obj.m_init();
         this.m_activeCount++;
         return obj;
     }
 
-    m_free(obj: AbstractObject) {
+    m_free(obj: T) {
         obj.m_free();
         obj.active = false;
         this.m_activeCount--;
 
-        if (this.m_pool.length > 128 && this.m_activeCount < this.m_pool.length / 2) {
-            const compact = [];
-            for (let i = 0; i < this.m_pool.length; i++) {
-                if (this.m_pool[i].active) {
-                    compact.push(this.m_pool[i]);
-                }
+        const idx = obj.__poolIdx;
+        if (idx !== undefined && idx !== -1) {
+            const last = this.m_pool.pop()!;
+            if (last !== obj) {
+                this.m_pool[idx] = last;
+                last.__poolIdx = idx;
             }
-            this.m_pool = compact;
+            obj.__poolIdx = -1;
+        }
+        this.m_freeList.push(obj);
+
+        if (
+            this.m_freeList.length > 128 &&
+            this.m_activeCount < this.m_freeList.length / 2
+        ) {
+            this.m_freeList.length = Math.floor(this.m_freeList.length / 2);
         }
     }
 
     m_getPool() {
         return this.m_pool;
+    }
+
+    m_getTotalSize() {
+        return this.m_pool.length + this.m_freeList.length;
     }
 }
 

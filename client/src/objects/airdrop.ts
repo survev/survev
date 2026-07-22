@@ -19,6 +19,7 @@ class AirDrop implements AbstractObject {
     __id!: number;
     __type!: ObjectType.Airdrop;
     active!: boolean;
+    __poolIdx!: number;
 
     sprite = new PIXI.Sprite();
 

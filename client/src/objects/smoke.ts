@@ -15,6 +15,7 @@ class Smoke implements AbstractObject {
     __id!: number;
     __type!: ObjectType.Smoke;
     active!: boolean;
+    __poolIdx!: number;
 
     m_particle!: SmokeParticle | null;
     m_pos!: Vec2;
