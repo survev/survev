@@ -57,7 +57,6 @@ export class Obstacle extends BaseGameObject {
         open: boolean;
         canUse: boolean;
         locked: boolean;
-        hinge: Vec2;
         closedOri: number;
         closedPos: Vec2;
         openOneWay: number;
@@ -190,7 +189,6 @@ export class Obstacle extends BaseGameObject {
             this.door = {
                 open: false,
                 canUse: def.door.canUse,
-                hinge: def.hinge!,
                 closedPos: v2.copy(this.pos),
                 closedOri: this.ori,
                 openDelay: def.door.openDelay ?? 0,

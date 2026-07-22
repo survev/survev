@@ -1,7 +1,13 @@
-import type { FactionTeam } from "../../gameConfig.ts";
-import type { AABB, Collider } from "../../utils/coldet.ts";
-import type { Vec2 } from "../../utils/v2.ts";
-import type { LootSpawnDef, TerrainSpawnDef } from "../mapObjectsTyping.ts";
+import type { FactionTeam } from "../../../gameConfig.ts";
+import type { AABB, Collider } from "../../../utils/coldet.ts";
+import type { Vec2 } from "../../../utils/v2.ts";
+import type { LootSpawnDef, TerrainSpawnDef } from "../../mapObjectsTyping.ts";
+import type { Material } from "../mapObjectHelpers.ts";
+import { BuildingObjectDefs } from "./buildingObjsDefs.ts";
+import { CrateDefs } from "./crateDefs.ts";
+import { FurnitureDefs } from "./furnitureDefs.ts";
+import { InteractableDefs } from "./interactableDefs.ts";
+import { MapObstacleDefs } from "./mapObstacleDefs.ts";
 
 export interface ObstacleDef {
     readonly type: "obstacle";
@@ -45,8 +51,7 @@ export interface ObstacleDef {
         enter?: string;
     };
     isWall?: boolean;
-    material?: string;
-    extents?: Vec2;
+    material?: Material;
     mapObstacleBounds?: AABB[];
     door?: {
         interactionRad: number;
@@ -77,7 +82,6 @@ export interface ObstacleDef {
         };
         locked?: boolean;
     };
-    hinge?: Vec2;
     isWindow?: boolean;
     destroyType?: string;
     stonePlated?: boolean;
@@ -177,3 +181,11 @@ export interface ObstacleDef {
     createSmoke?: boolean;
     teamId?: FactionTeam;
 }
+
+export const ObstacleDefs = {
+    ...BuildingObjectDefs,
+    ...CrateDefs,
+    ...FurnitureDefs,
+    ...InteractableDefs,
+    ...MapObstacleDefs,
+};

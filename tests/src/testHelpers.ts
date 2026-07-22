@@ -3,7 +3,7 @@ import { expect } from "vitest";
 import type { GameObjectDef } from "../../shared/defs/gameObjectDefs.ts";
 
 import type { Player } from "../../server/src/game/objects/player.ts";
-import type { MapObjectDef } from "../../shared/defs/mapObjectsTyping.ts";
+import type { MapObjectDef } from "../../shared/defs/mapObjectDefs.ts";
 import { Main } from "../../shared/defs/maps/baseDefs.ts";
 import { GameObjectDefs, MapObjectDefs } from "../../shared/defs/register.ts";
 

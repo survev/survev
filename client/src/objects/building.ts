@@ -1,8 +1,7 @@
 import * as PIXI from "pixi.js-legacy";
 
-import type { BuildingDef } from "../../../shared/defs/mapObjectsTyping.ts";
+import type { BuildingDef, FloorImage } from "../../../shared/defs/mapObjects/buildings/buildingDefs.ts";
 import { MapObjectDefs } from "../../../shared/defs/register.ts";
-import type { FloorImage } from "../../../shared/defs/types/building.ts";
 import type { ObjectData, ObjectType } from "../../../shared/net/objectSerializeFns.ts";
 import type { Collider } from "../../../shared/utils/coldet.ts";
 import { collider } from "../../../shared/utils/collider.ts";

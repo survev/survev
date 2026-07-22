@@ -1,6 +1,7 @@
 import * as PIXI from "pixi.js-legacy";
 import { type MapDef, type MapDefKey, MapDefs } from "../../shared/defs/mapDefs.ts";
-import type { BuildingDef, ObstacleDef } from "../../shared/defs/mapObjectsTyping.ts";
+import type { BuildingDef } from "../../shared/defs/mapObjects/buildings/buildingDefs.ts";
+import type { ObstacleDef } from "../../shared/defs/mapObjects/obstacles/obstacleDefs.ts";
 import { MapObjectDefs } from "../../shared/defs/register.ts";
 import { GameConfig } from "../../shared/gameConfig.ts";
 import type { GroundPatch, MapMsg } from "../../shared/net/mapMsg.ts";

@@ -1,6 +1,8 @@
 import { styleText } from "node:util";
 import { type MapDef, MapDefs } from "../../../shared/defs/mapDefs.ts";
-import type { BuildingDef, ObstacleDef, StructureDef } from "../../../shared/defs/mapObjectsTyping.ts";
+import type { BuildingDef } from "../../../shared/defs/mapObjects/buildings/buildingDefs.ts";
+import type { ObstacleDef } from "../../../shared/defs/mapObjects/obstacles/obstacleDefs.ts";
+import type { StructureDef } from "../../../shared/defs/mapObjects/structureDefs.ts";
 import { MapObjectDefs } from "../../../shared/defs/register.ts";
 import { GameConfig, MapId, TeamMode } from "../../../shared/gameConfig.ts";
 import * as net from "../../../shared/net/net.ts";

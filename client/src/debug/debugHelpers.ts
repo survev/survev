@@ -1,4 +1,6 @@
-import type { BuildingDef, ObstacleDef, StructureDef } from "../../../shared/defs/mapObjectsTyping.ts";
+import type { BuildingDef } from "../../../shared/defs/mapObjects/buildings/buildingDefs.ts";
+import type { ObstacleDef } from "../../../shared/defs/mapObjects/obstacles/obstacleDefs.ts";
+import type { StructureDef } from "../../../shared/defs/mapObjects/structureDefs.ts";
 import { MapObjectDefs } from "../../../shared/defs/register.ts";
 import type { AABB } from "../../../shared/utils/coldet.ts";
 import { collider } from "../../../shared/utils/collider.ts";

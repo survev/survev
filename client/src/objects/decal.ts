@@ -1,6 +1,6 @@
 import * as PIXI from "pixi.js-legacy";
 
-import type { DecalDef } from "../../../shared/defs/mapObjectsTyping.ts";
+import type { DecalDef } from "../../../shared/defs/mapObjects/decalDefs.ts";
 import { MapObjectDefs } from "../../../shared/defs/register.ts";
 import type { ObjectData, ObjectType } from "../../../shared/net/objectSerializeFns.ts";
 import type { Collider } from "../../../shared/utils/coldet.ts";

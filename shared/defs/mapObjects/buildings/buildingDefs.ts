@@ -1,7 +1,11 @@
-import type { FactionTeam } from "../../gameConfig.ts";
-import type { AABB, Collider } from "../../utils/coldet.ts";
-import type { Vec2 } from "../../utils/v2.ts";
-import type { TerrainSpawnDef } from "../mapObjectsTyping.ts";
+import type { FactionTeam } from "../../../gameConfig.ts";
+import type { AABB, Collider } from "../../../utils/coldet.ts";
+import type { Vec2 } from "../../../utils/v2.ts";
+import type { TerrainSpawnDef } from "../../mapObjectsTyping.ts";
+import { BaseBuildingDefs } from "./baseBuildingDefs.ts";
+import { BunkerDefs } from "./bunkerDefs.ts";
+import { CacheDefs } from "./cacheDefs.ts";
+import { ModeBuildingDefs } from "./modeBuildingDefs.ts";
 
 export interface BuildingDef {
     readonly type: "building";
@@ -16,8 +20,16 @@ export interface BuildingDef {
         displayType?: string;
     };
     terrain: TerrainSpawnDef;
-    mapObstacleBounds?: Collider[];
+    oris?: number[];
+    ori?: number;
+    teamId?: FactionTeam;
     zIdx?: number;
+    scale?: {
+        createMin: number;
+        createMax: number;
+        destroy: number;
+    };
+    mapObstacleBounds?: Collider[];
     floor: {
         surfaces: Array<{
             type: string;
@@ -64,16 +76,6 @@ export interface BuildingDef {
         puzzlePiece?: string;
         layer?: number;
     }>;
-    porch_01?: string;
-    stand?: string;
-    tree?: string | Record<string, number>;
-    tree_scale?: number;
-    tree_loot?: string;
-    bush_chance?: number;
-    bush?: string | Record<string, number>;
-    decoration_01?: string;
-    decoration_02?: string;
-    mid_obs_01?: string;
     occupiedEmitters?: Array<{
         type: string;
         pos: Vec2;
@@ -95,11 +97,6 @@ export interface BuildingDef {
             complete: string;
         };
     };
-    ori?: number;
-    topLeftObs?: string;
-    topRightObs?: string;
-    botRightObs?: string;
-    ignoreMapSpawnReplacement?: boolean;
     mapGroundPatches?: Array<{
         bound: Collider;
         color: number;
@@ -109,25 +106,8 @@ export interface BuildingDef {
         useAsMapShape?: boolean;
     }>;
     bridgeLandBounds?: AABB[];
-    groundTintLt?: number;
-    groundTintDk?: number;
     bridgeWaterBounds?: AABB[];
-    bonus_room?: string;
-    bonus_door?: string;
     goreRegion?: AABB;
-    tree_08c?: string;
-    crate?: string | Record<string, number>;
-    oris?: number[];
-    vault?: string;
-    scale?: {
-        createMin: number;
-        createMax: number;
-        destroy: number;
-    };
-    statue?: string;
-    gold_box?: number;
-    floor_loot?: string;
-    cabin_mount?: string;
     soundEmitters?: Array<{
         sound: string;
         channel: string;
@@ -143,28 +123,9 @@ export interface BuildingDef {
         collision: Collider;
         healRate: number;
     }>;
-    center_loot?: string;
-    left_loot?: string;
-    right_loot?: string;
-    entry_loot?: string;
-    obs?: string;
-    ceilingImg?: string;
-    specialLoot?: string | Record<string, number>;
-    basement?: string;
-    grass_color?: number;
-    tree_small?: string;
-    tree_large?: string;
-    floor_images?: FloorImage[];
-    ceiling_images?: Array<{
-        sprite: string;
-        pos?: Vec2;
-        rot?: number;
-        scale: number;
-        alpha: number;
-        tint: number;
-    }>;
-    teamId?: FactionTeam;
 }
+
+export type BuildingChildObjType = BuildingDef["mapObjects"][0]["type"];
 
 export interface FloorImage {
     sprite: string;
@@ -177,3 +138,10 @@ export interface FloorImage {
     mirrorY?: boolean;
     mirrorX?: boolean;
 }
+
+export const BuildingDefs = {
+    ...BaseBuildingDefs,
+    ...ModeBuildingDefs,
+    ...BunkerDefs,
+    ...CacheDefs,
+};
