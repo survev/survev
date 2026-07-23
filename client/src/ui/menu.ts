@@ -17,9 +17,6 @@ export class CopyToast extends LitElement {
     @property({ type: Number })
     y = 0;
 
-    @state()
-    private foo = "";
-
     connectedCallback() {
         super.connectedCallback();
 

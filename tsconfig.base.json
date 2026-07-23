@@ -11,6 +11,7 @@
     "newLine": "lf",
     "noEmit": true,
     "experimentalDecorators": true,
+    "useDefineForClassFields": false,
 
     "allowImportingTsExtensions": true,
     "allowJs": true,
