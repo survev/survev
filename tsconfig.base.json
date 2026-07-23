@@ -10,6 +10,7 @@
     "skipLibCheck": true,
     "newLine": "lf",
     "noEmit": true,
+    "experimentalDecorators": true,
 
     "allowImportingTsExtensions": true,
     "allowJs": true,

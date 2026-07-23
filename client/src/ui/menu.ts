@@ -3,37 +3,76 @@ import { device } from "../device.ts";
 import { helpers } from "../helpers.ts";
 import type { InputBinds, InputBindUi } from "../inputBinds.ts";
 import { MenuModal } from "./menuModal.ts";
+import { LitElement, html, css } from "lit";
+import { customElement, property, state } from "lit/decorators.js";
 
-function createToast(
+@customElement("copy-toast")
+export class CopyToast extends LitElement {
+    @property()
+    text = "";
+
+    @property({ type: Number })
+    x = 0;
+
+    @property({ type: Number })
+    y = 0;
+
+    @state()
+    private foo = "";
+
+    connectedCallback() {
+        super.connectedCallback();
+
+        setTimeout(() => {
+            this.remove();
+        }, 550);
+    }
+
+    render() {
+        return html`
+            <div class="toast" style="left:${this.x}px; top:${this.y}px;">
+                ${this.text}
+            </div>`;
+    }
+
+    static styles = css`
+        @keyframes toast {
+            0% {
+                opacity: 0;
+                transform: translateY(25px);
+            }
+            
+            50% {
+                opacity: 1;
+                transform: translateY(0);
+            }
+
+            100% {
+                opacity: 0;
+                transform: translateY(-25px);
+            }
+        }
+    
+        .toast {
+            position: absolute;
+            animation: toast 550ms forwards;
+        }
+    `;
+}
+
+function createToast( // yes eventually we will get rid of this function (or at the very least the Jquery...) but it is a incremental migration so...
     text: string,
     container: JQuery<HTMLElement>,
     parent: JQuery<HTMLElement>,
     event: JQuery.ClickEvent,
 ) {
-    const copyToast = $("<div/>", {
-        class: "copy-toast",
-        html: text,
-    });
-    container.append(copyToast);
-    copyToast.css({
-        left: event.pageX - parseInt(copyToast.css("width")) / 2,
-        top: parent.offset()!.top,
-    });
-    copyToast.animate(
-        {
-            top: "-=25",
-            opacity: 1,
-        },
-        {
-            queue: false,
-            duration: 300,
-            complete: function() {
-                $(this).fadeOut(250, function() {
-                    $(this).remove();
-                });
-            },
-        },
-    );
+    const toast = document.createElement("copy-toast") as CopyToast;
+
+    toast.text = text;
+    toast.x = event.pageX;
+    toast.y = parent.offset()!.top;
+
+    container[0].appendChild(toast);
 }
 function setupModals(inputBinds: InputBinds, inputBindUi: InputBindUi) {
     const startMenuWrapper = $("#start-menu");
