@@ -34,6 +34,11 @@ function drawRect(gfx: PIXI.Graphics, x: number, y: number, w: number, h: number
 }
 
 export class Renderer {
+    screenCover = new PIXI.Graphics();
+    screenCoverTargetAlpha = 0;
+    screenCoverAlpha = 0;
+    screenWidth = 0;
+    screenHeight = 0;
     zIdx = 0;
     layer = 0;
     layerAlpha = 0;
@@ -55,6 +60,7 @@ export class Renderer {
             this.layers.push(new RenderGroup(`layer_${i}`));
         }
         this.ground.alpha = 0;
+        this.screenCover.alpha = 0;
     }
 
     m_free() {
@@ -127,6 +133,8 @@ export class Renderer {
         this.ground.drawRect(0, 0, camera.m_screenWidth, camera.m_screenHeight);
         this.ground.endFill();
 
+        this.screenWidth = camera.m_screenWidth;
+        this.screenHeight = camera.m_screenHeight;
         this.layerMaskDirty = true;
     }
 
@@ -243,6 +251,15 @@ export class Renderer {
         this.layers[1].visible = this.layerAlpha > 0.0;
         this.ground.visible = this.groundAlpha > 0.0;
 
+        this.screenCoverAlpha += step(
+            this.screenCoverAlpha,
+            this.screenCoverTargetAlpha,
+            dt * 10.0,
+        );
+
+        this.screenCover.alpha = this.screenCoverAlpha;
+        this.screenCover.visible = this.screenCoverAlpha > 0.0;
+
         // Set stairs mask
         this.redrawLayerMask(camera, map);
 
@@ -272,6 +289,25 @@ export class Renderer {
                 sortCount++;
             } */
         }
+    }
+
+    coverScreen(color: number) {
+        this.screenCover.clear();
+        this.screenCover.beginFill(color);
+        this.screenCover.drawRect(
+            0,
+            0,
+            this.screenWidth,
+            this.screenHeight,
+        );
+        this.screenCover.endFill();
+
+        this.screenCoverAlpha = 1;
+        this.screenCoverTargetAlpha = 1;
+    }
+
+    clearScreenCover() {
+        this.screenCoverTargetAlpha = 0;
     }
 }
 

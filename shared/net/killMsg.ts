@@ -11,6 +11,7 @@ export class KillMsg implements AbstractMsg {
     killerKills = 0;
     downed = false;
     killed = false;
+    isM9SpecialSelfKill = false;
 
     serialize(s: BitStream) {
         /* STRIP_FROM_PROD_CLIENT:START */
@@ -23,6 +24,7 @@ export class KillMsg implements AbstractMsg {
         s.writeUint8(this.killerKills);
         s.writeBoolean(this.downed);
         s.writeBoolean(this.killed);
+        s.writeBoolean(this.isM9SpecialSelfKill);
         /* STRIP_FROM_PROD_CLIENT:END */
     }
 
@@ -36,5 +38,6 @@ export class KillMsg implements AbstractMsg {
         this.killerKills = s.readUint8();
         this.downed = s.readBoolean();
         this.killed = s.readBoolean();
+        this.isM9SpecialSelfKill = s.readBoolean();
     }
 }
