@@ -71,6 +71,89 @@ function createToast( // yes eventually we will get rid of this function (or at 
 
     container[0].appendChild(toast);
 }
+
+@customElement("settings-modal")
+export class SettingsModal extends LitElement {
+    createRenderRoot() {
+        return this;
+    }
+    
+    @property({ type: Boolean })
+    open = false;
+
+    private close() {
+        this.open = false;
+        this.dispatchEvent(new CustomEvent("close"));
+    }
+
+    private onBackdropClick() {
+        this.close();
+    }
+
+    private toggleCheckbox(e: MouseEvent) { // in reality you guys really shouldn't even need this just use a <label> and the browser does it for you... but eh maybe you guys have some unknown reason for wanting specifically this so for now here it is :p
+        const label = e.currentTarget as HTMLElement;
+        const checkbox = label.previousElementSibling as HTMLInputElement | null;
+        if (!checkbox) return;
+        checkbox.checked = !checkbox.checked;
+        checkbox.dispatchEvent(new Event("change", { bubbles: true }));
+    }
+
+    render() { // ideally get rid of the inline style later but since you guys have CSS that is essentially geared towards Jquery right now in line styles is the only way this modal is showing without breaking like all other modals :p
+        return html`
+        <div id="modal-settings" class="modal" style=${this.open ? "display:block" : "display:none"} @click=${this.onBackdropClick}>
+        <div class="modal-content modal-close" @click=${(e: MouseEvent) => e.stopPropagation()}>
+          <div class="modal-header">
+            <span class="close close-corner" @click=${this.close}></span>
+            <h2 data-l10n="index-settings">Settings</h2>
+          </div>
+          <div id="modal-settings-body" class="modal-body">
+            <div id="language-select-mobile-wrapper" class="modal-settings-item">
+              <div class="language-select-wrap">
+                <select class="language-select"></select>
+              </div>
+            </div>
+            <div id="modal-settings-high-res" class="modal-settings-item">
+              <input id="highResTex" type="checkbox"><p class="modal-settings-checkbox-text" data-l10n="index-high-resolution" @click${this.toggleCheckbox}>High resolution (check to increase visual quality)</p>
+            </div>
+            <div id="modal-settings-interp" class="modal-settings-item">
+              <input id="interpolation" type="checkbox"><p class="modal-settings-checkbox-text" data-l10n="index-client-side-interp" @click${this.toggleCheckbox}>Client side interpolation</p>
+            </div>
+              <div id="modal-settings-rotation" class="modal-settings-item hide-on-mobile">
+              <input id="localRotation" type="checkbox"><p class="modal-settings-checkbox-text" data-l10n="index-client-side-rotation" @click${this.toggleCheckbox}>Client side player rotation</p>
+            </div>
+            <div class="modal-settings-item hide-on-mobile">
+              <input id="screenShake" type="checkbox"><p class="modal-settings-checkbox-text" data-l10n="index-screen-shake" @click${this.toggleCheckbox}>Screen shake</p>
+            </div>
+            <div class="modal-settings-item">
+              <input id="anonPlayerNames" type="checkbox"><p class="modal-settings-checkbox-text" data-l10n="index-anon-player-names" @click${this.toggleCheckbox}>Anonymize player names</p>
+            </div>
+            <div class="modal-settings-item slider-container main-volume-slider">
+              <p class="modal-slider-text" data-l10n="index-master-volume">Master Volume</p>
+              <input type="range" min="0" max="100" value="50" class="slider sl-master-volume" id="">
+            </div>
+            <div class="modal-settings-item slider-container main-volume-slider">
+              <p class="modal-slider-text" data-l10n="index-sfx-volume">SFX Volume</p>
+              <input type="range" min="0" max="100" value="50" class="slider sl-sound-volume" id="">
+            </div>
+            <div class="modal-settings-item slider-container main-volume-slider">
+              <p class="modal-slider-text" data-l10n="index-music-volume">Music Volume</p>
+              <input type="range" min="0" max="100" value="50" class="slider sl-music-volume" id="">
+            </div>
+            <div id="settings-links">
+              <!--
+              <a href="privacy.html" target="_blank" class="footer-after" data-l10n="index-privacy">privacy</a>
+              -->
+              <a href="attribution.txt" target="_blank" class="footer-after" data-l10n="index-attributions">attributions</a>
+              <a href="hof.html" target="_blank" data-l10n="index-hof">HOF</a>
+            </div>
+          </div>
+          <div class="modal-footer"></div>
+        </div>
+      </div>
+        `;
+    }
+}
+
 function setupModals(inputBinds: InputBinds, inputBindUi: InputBindUi) {
     const startMenuWrapper = $("#start-menu");
     $("#btn-help").on("click", () => {
@@ -133,7 +216,7 @@ function setupModals(inputBinds: InputBinds, inputBindUi: InputBindUi) {
 
     // Scroll to name input on mobile
     if (device.mobile && device.os != "ios") {
-        $("#player-name-input-solo").on("focus", function() {
+        $("#player-name-input-solo").on("focus", function () {
             if (device.isLandscape) {
                 const height = device.screenHeight;
                 const offset = height <= 282 ? 18 : 36;
@@ -206,25 +289,21 @@ function setupModals(inputBinds: InputBinds, inputBindUi: InputBindUi) {
     });
 
     // Settings Modal
-    const modalSettings = new MenuModal($("#modal-settings"));
-    modalSettings.onShow(() => {
-        startBottomRight.fadeOut(200);
-        startTopRight.fadeOut(200);
-    });
-    modalSettings.onHide(() => {
+    const modalSettings = document.querySelector<SettingsModal>("settings-modal")!; 
+    // now to just remove fadeIn and fadeOut...
+    modalSettings.addEventListener("close", () => {
         startBottomRight.fadeIn(200);
         startTopRight.fadeIn(200);
     });
-    $(".btn-settings").on("click", () => {
-        modalSettings.show();
-        return false;
-    });
-    $(".modal-settings-text").on("click", function(_e) {
-        const checkbox = $(this).siblings("input:checkbox");
-        checkbox.prop("checked", !checkbox.is(":checked"));
-        checkbox.trigger("change");
-    });
 
+    document.querySelectorAll(".btn-settings").forEach(btn => {
+        btn.addEventListener("click", e => {
+            e.preventDefault();
+            startBottomRight.fadeOut(200);
+            startTopRight.fadeOut(200);
+            modalSettings.open = true;
+        });
+    });
     // Hamburger Modal
     const modalHamburger = new MenuModal($("#modal-hamburger"));
     modalHamburger.onShow(() => {
@@ -237,7 +316,7 @@ function setupModals(inputBinds: InputBinds, inputBindUi: InputBindUi) {
         modalHamburger.show();
         return false;
     });
-    $(".modal-body-text").on("click", function() {
+    $(".modal-body-text").on("click", function () {
         const checkbox = $(this).siblings("input:checkbox");
         checkbox.prop("checked", !checkbox.is(":checked"));
         checkbox.trigger("change");

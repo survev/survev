@@ -1296,56 +1296,7 @@
           </div>
         </div>
       </div>
-      <div id="modal-settings" class="modal">
-        <div class="modal-content modal-close">
-          <div class="modal-header">
-            <span class="close close-corner"></span>
-            <h2 data-l10n="index-settings">Settings</h2>
-          </div>
-          <div id="modal-settings-body" class="modal-body">
-            <div id="language-select-mobile-wrapper" class="modal-settings-item">
-              <div class="language-select-wrap">
-                <select class="language-select"></select>
-              </div>
-            </div>
-            <div id="modal-settings-high-res" class="modal-settings-item">
-              <input id="highResTex" type="checkbox"><p class="modal-settings-checkbox-text" data-l10n="index-high-resolution">High resolution (check to increase visual quality)</p>
-            </div>
-            <div id="modal-settings-interp" class="modal-settings-item">
-              <input id="interpolation" type="checkbox"><p class="modal-settings-checkbox-text" data-l10n="index-client-side-interp">Client side interpolation</p>
-            </div>
-              <div id="modal-settings-rotation" class="modal-settings-item hide-on-mobile">
-              <input id="localRotation" type="checkbox"><p class="modal-settings-checkbox-text" data-l10n="index-client-side-rotation">Client side player rotation</p>
-            </div>
-            <div class="modal-settings-item hide-on-mobile">
-              <input id="screenShake" type="checkbox"><p class="modal-settings-checkbox-text" data-l10n="index-screen-shake">Screen shake</p>
-            </div>
-            <div class="modal-settings-item">
-              <input id="anonPlayerNames" type="checkbox"><p class="modal-settings-checkbox-text" data-l10n="index-anon-player-names">Anonymize player names</p>
-            </div>
-            <div class="modal-settings-item slider-container main-volume-slider">
-              <p class="modal-slider-text" data-l10n="index-master-volume">Master Volume</p>
-              <input type="range" min="0" max="100" value="50" class="slider sl-master-volume" id="">
-            </div>
-            <div class="modal-settings-item slider-container main-volume-slider">
-              <p class="modal-slider-text" data-l10n="index-sfx-volume">SFX Volume</p>
-              <input type="range" min="0" max="100" value="50" class="slider sl-sound-volume" id="">
-            </div>
-            <div class="modal-settings-item slider-container main-volume-slider">
-              <p class="modal-slider-text" data-l10n="index-music-volume">Music Volume</p>
-              <input type="range" min="0" max="100" value="50" class="slider sl-music-volume" id="">
-            </div>
-            <div id="settings-links">
-              <!--
-              <a href="privacy.html" target="_blank" class="footer-after" data-l10n="index-privacy">privacy</a>
-              -->
-              <a href="attribution.txt" target="_blank" class="footer-after" data-l10n="index-attributions">attributions</a>
-              <a href="hof.html" target="_blank" data-l10n="index-hof">HOF</a>
-            </div>
-          </div>
-          <div class="modal-footer"></div>
-        </div>
-      </div>
+      <settings-modal></settings-modal>
       <div id="modal-hamburger" class="modal">
         <div class="modal-content modal-close">
           <div class="modal-header">
