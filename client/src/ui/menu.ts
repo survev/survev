@@ -1,10 +1,20 @@
 import $ from "jquery";
 import { device } from "../device.ts";
 import { helpers } from "../helpers.ts";
-import type { InputBinds, InputBindUi } from "../inputBinds.ts";
+import type { InputBinds } from "../inputBinds.ts";
 import { MenuModal } from "./menuModal.ts";
 import { LitElement, html, css } from "lit";
 import { customElement, property, state } from "lit/decorators.js";
+import { BindDefs } from "../inputBinds.ts";
+import { type InputHandler, Key, InputType, InputValue } from "../input.ts";
+import { Localization } from "./localization.ts";
+
+type Toast = {
+    id: number;
+    text: string;
+    x: number;
+    y: number;
+};
 
 @customElement("copy-toast")
 export class CopyToast extends LitElement {
@@ -17,17 +27,9 @@ export class CopyToast extends LitElement {
     @property({ type: Number })
     y = 0;
 
-    connectedCallback() {
-        super.connectedCallback();
-
-        setTimeout(() => {
-            this.remove();
-        }, 550);
-    }
-
     render() {
         return html`
-            <div class="toast" style="left:${this.x}px; top:${this.y}px;">
+            <div class="copy-toast toast" style="left:${this.x}px; top:${this.y}px;">
                 ${this.text}
             </div>`;
     }
@@ -36,40 +38,30 @@ export class CopyToast extends LitElement {
         @keyframes toast {
             0% {
                 opacity: 0;
-                transform: translateY(25px);
+                transform: translate(-50%, 0);
             }
-            
-            50% {
+    
+            55% {
                 opacity: 1;
-                transform: translateY(0);
+                transform: translate(-50%, -25px);
             }
-
+    
             100% {
                 opacity: 0;
-                transform: translateY(-25px);
+                transform: translate(-50%, -25px);
             }
         }
     
+    
         .toast {
-            position: absolute;
+            position: fixed;
+            pointer-events: none;
             animation: toast 550ms forwards;
-        }
-    `;
-}
-
-function createToast( // yes eventually we will get rid of this function (or at the very least the Jquery...) but it is a incremental migration so...
-    text: string,
-    container: JQuery<HTMLElement>,
-    parent: JQuery<HTMLElement>,
-    event: JQuery.ClickEvent,
-) {
-    const toast = document.createElement("copy-toast") as CopyToast;
-
-    toast.text = text;
-    toast.x = event.pageX;
-    toast.y = parent.offset()!.top;
-
-    container[0].appendChild(toast);
+            white-space: nowrap;
+            color: #7cfc00;
+            z-index: 10000;
+        }        
+    `; // yea so the z-index thing is kinda a hack... but erm I couldn't really find another way to fix it so yea...
 }
 
 @customElement("settings-modal")
@@ -77,7 +69,7 @@ export class SettingsModal extends LitElement {
     createRenderRoot() {
         return this;
     }
-    
+
     @property({ type: Boolean })
     open = false;
 
@@ -113,19 +105,19 @@ export class SettingsModal extends LitElement {
               </div>
             </div>
             <div id="modal-settings-high-res" class="modal-settings-item">
-              <input id="highResTex" type="checkbox"><p class="modal-settings-checkbox-text" data-l10n="index-high-resolution" @click${this.toggleCheckbox}>High resolution (check to increase visual quality)</p>
+              <input id="highResTex" type="checkbox"><p class="modal-settings-checkbox-text" data-l10n="index-high-resolution" @click=${this.toggleCheckbox}>High resolution (check to increase visual quality)</p>
             </div>
             <div id="modal-settings-interp" class="modal-settings-item">
-              <input id="interpolation" type="checkbox"><p class="modal-settings-checkbox-text" data-l10n="index-client-side-interp" @click${this.toggleCheckbox}>Client side interpolation</p>
+              <input id="interpolation" type="checkbox"><p class="modal-settings-checkbox-text" data-l10n="index-client-side-interp" @click=${this.toggleCheckbox}>Client side interpolation</p>
             </div>
               <div id="modal-settings-rotation" class="modal-settings-item hide-on-mobile">
-              <input id="localRotation" type="checkbox"><p class="modal-settings-checkbox-text" data-l10n="index-client-side-rotation" @click${this.toggleCheckbox}>Client side player rotation</p>
+              <input id="localRotation" type="checkbox"><p class="modal-settings-checkbox-text" data-l10n="index-client-side-rotation" @click=${this.toggleCheckbox}>Client side player rotation</p>
             </div>
             <div class="modal-settings-item hide-on-mobile">
-              <input id="screenShake" type="checkbox"><p class="modal-settings-checkbox-text" data-l10n="index-screen-shake" @click${this.toggleCheckbox}>Screen shake</p>
+              <input id="screenShake" type="checkbox"><p class="modal-settings-checkbox-text" data-l10n="index-screen-shake" @click=${this.toggleCheckbox}>Screen shake</p>
             </div>
             <div class="modal-settings-item">
-              <input id="anonPlayerNames" type="checkbox"><p class="modal-settings-checkbox-text" data-l10n="index-anon-player-names" @click${this.toggleCheckbox}>Anonymize player names</p>
+              <input id="anonPlayerNames" type="checkbox"><p class="modal-settings-checkbox-text" data-l10n="index-anon-player-names" @click=${this.toggleCheckbox}>Anonymize player names</p>
             </div>
             <div class="modal-settings-item slider-container main-volume-slider">
               <p class="modal-slider-text" data-l10n="index-master-volume">Master Volume</p>
@@ -154,7 +146,220 @@ export class SettingsModal extends LitElement {
     }
 }
 
-function setupModals(inputBinds: InputBinds, inputBindUi: InputBindUi) {
+@customElement("keybind-modal")
+export class KeybindModal extends LitElement { // this stuff is why Lit is cool (or dare I say lit?)
+    createRenderRoot() {
+        return this;
+    }
+
+    @property({ type: Boolean })
+    open = false;
+
+    @property({ attribute: false })
+    inputBinds!: InputBinds;
+
+    @property({ attribute: false })
+    input!: InputHandler;
+
+    @property({ attribute: false })
+    localization!: Localization;
+
+    @state()
+    private shareOpen = false;
+
+    @state()
+    private showWarning = false;
+
+    @state()
+    private keybindCode = "";
+
+    @state()
+    private capturingBind: number | null = null;
+
+    @state()
+    private toasts: Toast[] = [];
+
+    @state()
+    private nextToastId = 0;
+
+    private close() {
+        this.input.captureNextInput(null);
+        this.capturingBind = null;
+        this.resetShareSection();
+        this.open = false;
+        this.dispatchEvent(new CustomEvent("close"));
+    }
+
+    private onBackdropClick() {
+        this.close();
+    }
+
+    private resetShareSection() {
+        this.shareOpen = false;
+        this.showWarning = false;
+        this.keybindCode = "";
+    }
+
+    private inputKey(key: Key) {
+        return new InputValue(InputType.Key, key);
+    }
+
+    private captureBind(bindIndex: number) {
+        this.capturingBind = bindIndex;
+        this.input.captureNextInput((event, inputValue) => {
+            event.preventDefault();
+            event.stopPropagation();
+            const disallowKeys: number[] = [
+                Key.Control,
+                Key.Alt,
+                Key.Windows,
+                Key.ContextMenu,
+                Key.F1,
+                Key.F2,
+                Key.F3,
+                Key.F4,
+                Key.F5,
+                Key.F6,
+                Key.F7,
+                Key.F8,
+                Key.F9,
+                Key.F10,
+                Key.F11,
+                Key.F12,
+            ];
+            if (
+                inputValue.type == InputType.Key
+                && disallowKeys.includes(inputValue.code)
+            ) {
+                return false;
+            }
+            this.capturingBind = null;
+            if (!inputValue.equals(this.inputKey(Key.Escape))) {
+                let bindValue: InputValue | null = inputValue;
+                if (inputValue.equals(this.inputKey(Key.Backspace))) {
+                    bindValue = null;
+                }
+                this.inputBinds.setBind(bindIndex, bindValue);
+                this.inputBinds.saveBinds();
+                this.requestUpdate();
+            }
+            return true;
+        });
+    }
+
+    private toggleShare() {
+        this.shareOpen = !this.shareOpen;
+    }
+
+    private showToast(text: string, e: MouseEvent) {
+        const toast = {
+            id: this.nextToastId++,
+            text,
+            x: e.pageX,
+            y: (e.currentTarget as HTMLElement).getBoundingClientRect().top + window.scrollY,
+        };
+        this.toasts = [...this.toasts, toast];
+        setTimeout(() => {
+            this.toasts = this.toasts.filter(t => t.id !== toast.id);
+        }, 550);
+    }
+
+    private loadKeybinds(e: MouseEvent) {
+        const success = this.inputBinds.fromBase64(this.keybindCode);
+        this.keybindCode = "";
+        this.showWarning = !success;
+        if (success) {
+            this.inputBinds.saveBinds();
+            this.requestUpdate();
+            this.showToast("Loaded!", e);
+        }
+    }
+
+    private copyKeybinds(e: MouseEvent) {
+        helpers.copyTextToClipboard(this.inputBinds.toBase64());
+        this.showToast("Copied!", e);
+    }
+
+    private restoreDefaults() {
+        this.inputBinds.loadDefaultBinds();
+        this.inputBinds.saveBinds();
+        this.requestUpdate();
+    }
+
+    render() {
+        if (!this.inputBinds || !this.localization) {
+            return html``;
+        }
+        return html`
+        <div id="ui-modal-keybind" class="ui-modal-keybind modal" oncontextmenu="return false;" style=${this.open ? "display:block" : "display:none"} @click=${this.onBackdropClick}>
+        <div class="ui-modal-keybind-content modal-content modal-close" @click=${(e: MouseEvent) => e.stopPropagation()}>
+          <div id="ui-modal-keybind-header" class="modal-header">
+            <span id="ui-close-keybind" class="close close-corner" @click=${this.close}></span>
+            <h2 data-l10n="index-customize-keybinds">Customize Keybinds</h2>
+          </div>
+          <div id="ui-modal-keybind-body" class="modal-body">
+            <div id="ui-modal-keybind-list" class="js-keybind-list" style=${`height:${this.shareOpen ? 275 : 420}px`}>
+                ${Object.entries(BindDefs).map(([key, def]) => {
+            const bind = this.inputBinds.getBind(Number(key));
+            const nameKey =
+                "bind-" +
+                def.name
+                    .toLowerCase()
+                    .replace(/[^a-z0-9]+/g, "-")
+                    .replace(/-+/g, "-")
+                    .replace(/^-|-$/g, "");
+
+            return html`
+                        <div class="ui-keybind-container">
+                            <a class=${`btn-game-menu btn-darken btn-keybind-desc ${this.capturingBind === Number(key) ? "btn-keybind-desc-selected" : ""}`} @click=${() => this.captureBind(Number(key))}>${this.localization.translate(nameKey) || def.name}</a>
+                            <div class="btn-keybind-display">
+                            ${bind ? this.localization.translate(bind.toString()) || bind.toString() : ""}
+                            </div>
+                        </div>
+            `
+        })}
+            </div>
+            <div id="ui-modal-keybind-share" style=${this.shareOpen ? "display:block" : "display:none"}>
+              <div class="ui-modal-keybind-share-row">
+                <div class="ui-modal-keybind-share-elem">
+                  <span data-l10n="index-keybind-link">Share your keybinds with this code</span>:
+                </div>
+                <div class="ui-modal-keybind-share-elem">
+                  <div id="keybind-link-text">
+                    <div id="keybind-link" @click=${this.copyKeybinds}>${this.inputBinds.toBase64()}</div>
+                    <span id="keybind-copy" class="copy-item btn-darken" @click=${this.copyKeybinds}></span>
+                  </div>
+                </div>
+              </div>
+              <span class="keybind-share-paste-text" data-l10n="index-keybind-paste">Load keybinds using a code here</span><span>:</span>
+              <div id="keybind-warning" class="link-warning" style="display:${this.showWarning ? "block" : "none"}">Invalid code!</div>
+              <div class="ui-modal-keybind-share-row">
+                <input type="text" class="menu-option" contenteditable="false" tabindex="0" autofocus placeholder="Paste a keybind code here" id="keybind-code-input" .value=${this.keybindCode} @input=${(e: Event) => this.keybindCode = (e.target as HTMLInputElement).value} />
+                <a class="btn-game-menu btn-darken" id="btn-keybind-code-load" data-l10n="index-keybind-apply" @click=${this.loadKeybinds}>Load</a>
+              </div>
+            </div>
+          </div>
+          <div id="ui-modal-keybind-footer" class="modal-footer modal-footer-round">
+            <a class="js-btn-keybind-share btn-game-menu btn-darken" data-l10n="game-share" @click=${this.toggleShare}>Share</a>
+            <a class="js-btn-keybind-restore btn-game-menu btn-darken" data-l10n="game-restore-defaults" @click=${this.restoreDefaults}>Restore Defaults</a>
+          </div>
+        </div>
+      </div>
+      ${this.toasts.map(toast => html`
+        <copy-toast .text=${toast.text} .x=${toast.x} .y=${toast.y}></copy-toast>
+        `)};
+      `;
+    }
+
+    show() {
+        this.resetShareSection();
+        this.open = true;
+    }
+}
+
+function setupModals(inputBinds: InputBinds) {
+    const localization = new Localization; // we could just replace the inputBindUI thing with localization and get rid of this const... but eh it is basically the same thing :p
+
     const startMenuWrapper = $("#start-menu");
     $("#btn-help").on("click", () => {
         const e = $("#start-help");
@@ -234,62 +439,24 @@ function setupModals(inputBinds: InputBinds, inputBindUi: InputBindUi) {
     const startTopRight = $("#start-top-right");
 
     // Keybind Modal
-    const modalKeybind = new MenuModal($("#ui-modal-keybind"));
-    modalKeybind.onShow(() => {
-        startBottomRight.fadeOut(200);
-        startTopRight.fadeOut(200);
-
-        // Reset the share section
-        $("#ui-modal-keybind-share").css("display", "none");
-        $("#keybind-warning").css("display", "none");
-        $("#ui-modal-keybind-list").css("height", "420px");
-        $("#keybind-code-input").html("");
-        inputBindUi.refresh();
-    });
-    modalKeybind.onHide(() => {
+    const modalKeybind = document.querySelector<KeybindModal>("keybind-modal")!;
+    modalKeybind.addEventListener("close", () => {
         startBottomRight.fadeIn(200);
         startTopRight.fadeIn(200);
-        inputBindUi.cancelBind();
     });
-    $(".btn-keybind").on("click", () => {
+    // no its never going to be null go away typescript :/
+    document.querySelector(".btn-keybind")!.addEventListener("click", (e) => {
+        e.preventDefault();
+        modalKeybind.inputBinds = inputBinds;
+        modalKeybind.input = inputBinds.input;
+        modalKeybind.localization = localization;
+        startBottomRight.fadeOut(200);
+        startTopRight.fadeOut(200);
         modalKeybind.show();
-        return false;
-    });
-
-    // Share button
-    $(".js-btn-keybind-share").on("click", () => {
-        // Toggle the share screen
-        if ($("#ui-modal-keybind-share").css("display") == "block") {
-            $("#ui-modal-keybind-share").css("display", "none");
-            $("#ui-modal-keybind-list").css("height", "420px");
-        } else {
-            $("#ui-modal-keybind-share").css("display", "block");
-            $("#ui-modal-keybind-list").css("height", "275px");
-        }
-    });
-
-    // Copy keybind code
-    $("#keybind-link, #keybind-copy").on("click", (e) => {
-        createToast("Copied!", modalKeybind.selector, $("#keybind-link"), e);
-        const t = $("#keybind-link").html();
-        helpers.copyTextToClipboard(t);
-    });
-
-    // Apply keybind code
-    $("#btn-keybind-code-load").on("click", (e) => {
-        const code = $("#keybind-code-input").val()!;
-        $("#keybind-code-input").val("");
-        const success = inputBinds.fromBase64(String(code));
-        $("#keybind-warning").css("display", success ? "none" : "block");
-        if (success) {
-            createToast("Loaded!", modalKeybind.selector, $("#btn-keybind-code-load"), e);
-            inputBinds.saveBinds();
-        }
-        inputBindUi.refresh();
     });
 
     // Settings Modal
-    const modalSettings = document.querySelector<SettingsModal>("settings-modal")!; 
+    const modalSettings = document.querySelector<SettingsModal>("settings-modal")!;
     // now to just remove fadeIn and fadeOut...
     modalSettings.addEventListener("close", () => {
         startBottomRight.fadeIn(200);

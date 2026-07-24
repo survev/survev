@@ -23,7 +23,7 @@ function mouseWheel(wheel: MouseWheel) {
     return new InputValue(InputType.MouseWheel, wheel);
 }
 
-const BindDefs = {
+export const BindDefs = {
     [GameInput.MoveLeft]: def("Move Left", inputKey(Key.A)),
     [GameInput.MoveRight]: def("Move Right", inputKey(Key.D)),
     [GameInput.MoveUp]: def("Move Up", inputKey(Key.W)),
@@ -237,7 +237,7 @@ export class InputBinds {
     }
 }
 
-export class InputBindUi {
+export class InputBindUi { // so I would very much prefer to delete this but for whatever reason game.ts and main.ts rely upon it... because for some reason game needs it in its constructor but it is never used so... yea :p then the only other place that uses this is ui.ts to call refresh and cancelBind
     constructor(
         public input: InputHandler,
         public inputBinds: InputBinds,

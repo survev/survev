@@ -387,7 +387,7 @@ export class Application {
             this.loadoutMenu.loadoutDisplay = this.loadoutDisplay;
             this.onResize();
             this.tryJoinTeam(false);
-            Menu.setupModals(this.inputBinds, this.inputBindUi);
+            Menu.setupModals(this.inputBinds);
             this.onConfigModified();
             this.config.addModifiedListener(this.onConfigModified.bind(this));
             loadStaticDomImages();
