@@ -14,7 +14,7 @@
     "base64-js": "^1.5.1",
     "bootstrap": "^4.6.2",
     "ejs": "^4.0.1",
-    "hono": "^4.12.30",
+    "hono": "^4.12.31",
     "jquery": "^3.7.1",
     "pixi.js-legacy": "^7.4.3",
     "slugify": "^1.6.9"
@@ -29,6 +29,6 @@
     "sharp": "^0.35.3",
     "turnstile-types": "^1.2.3",
     "tweakpane": "^4.0.5",
-    "vite": "^8.1.4"
+    "vite": "^8.1.5"
   }
 }
