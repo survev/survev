@@ -2,7 +2,6 @@ import $ from "jquery";
 import { device } from "../device.ts";
 import { helpers } from "../helpers.ts";
 import type { InputBinds } from "../inputBinds.ts";
-import { MenuModal } from "./menuModal.ts";
 import { LitElement, html, css } from "lit";
 import { customElement, property, state } from "lit/decorators.js";
 import { BindDefs } from "../inputBinds.ts";
@@ -357,6 +356,61 @@ export class KeybindModal extends LitElement { // this stuff is why Lit is cool 
     }
 }
 
+@customElement("hamburger-modal")
+export class HamburgerModal extends LitElement {
+    createRenderRoot() {
+        return this;
+    }
+
+    @property({ type: Boolean })
+    open = false;
+
+    private close() {
+        this.open = false;
+        this.dispatchEvent(new CustomEvent("close"));
+    }
+
+    render() {
+        return html`
+        <div id="modal-hamburger" class="modal" style=${this.open ? "display:block" : "display:none"} @click=${this.close}>
+            <div class="modal-content modal-close">
+                <div class="modal-header">
+                    <span class="close close-hamburger icon-hamburger"></span>
+                    <h2>&nbsp;</h2>
+                </div>
+                <div id="modal-hamburger-body" class="modal-body">
+                    <div id="modal-hamburger-leaderboards">
+                        <a href="/stats" target="_blank" class="btn-leaderboard-stats-link menu-option btn-darken" data-l10n="index-leaderboards">Leaderboards</a>
+                        </div>
+                        <div class="modal-divider"></div>
+                        <!-- <div class="btn-social-wrapper">
+                        <a href="https://facebook.com/survev" target="_blank" class="btn-social btn-darken btn-facebook"></a>
+                        <a href="https://twitter.com/survev" target="_blank" class="btn-social btn-darken btn-twitter"></a>
+                        <a href="https://www.instagram.com/survev/" target="_blank" class="btn-social btn-darken btn-instagram"></a>
+                        <a href="https://discord.gg/survev" target="_blank" class="btn-social btn-darken btn-discord"></a>
+                        <a href="https://www.youtube.com/c/survev?sub_confirmation=1" target="_blank" class="btn-social btn-darken btn-youtube"></a>
+                    </div> -->
+                    <div class="modal-divider"></div>
+                    <div id="modal-hamburger-bottom">
+                        <a href="changelogRec.html" class="footer-after">ver ${import.meta.env.VITE_GAME_VERSION}</a>
+                        <!--
+                        <a href="changelog.html" class="footer-after">ver 0.8.82</a>
+                        <a href="#" class="btn-cookie-settings footer-after">cookie settings</a>
+                        <a href="privacy.txt" target="_blank" class="footer-after">privacy</a>
+                        -->
+                        <a href="attribution.txt" target="_blank">attributions</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        `;
+    }
+
+    show() {
+        this.open = true;
+    }
+}
+
 function setupModals(inputBinds: InputBinds) {
     const localization = new Localization; // we could just replace the inputBindUI thing with localization and get rid of this const... but eh it is basically the same thing :p
 
@@ -472,17 +526,17 @@ function setupModals(inputBinds: InputBinds) {
         });
     });
     // Hamburger Modal
-    const modalHamburger = new MenuModal($("#modal-hamburger"));
-    modalHamburger.onShow(() => {
-        startTopLeft.fadeOut(200);
-    });
-    modalHamburger.onHide(() => {
+    const modalHamburger = document.querySelector<HamburgerModal>("hamburger-modal")!;
+    modalHamburger.addEventListener("close", () => {
         startTopLeft.fadeIn(200);
-    });
-    $("#btn-hamburger").on("click", () => {
+    })
+    document.querySelector("#btn-hamburger")!.addEventListener("click", e => {
+        e.preventDefault();
+        startTopLeft.fadeOut(200);
         modalHamburger.show();
-        return false;
-    });
+    })
+
+    // unrelated to the hamburger modal so not sure why it was so close to it...
     $(".modal-body-text").on("click", function () {
         const checkbox = $(this).siblings("input:checkbox");
         checkbox.prop("checked", !checkbox.is(":checked"));
