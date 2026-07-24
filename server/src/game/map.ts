@@ -1204,9 +1204,9 @@ export class GameMap {
     }
 
     /**
-     * Helper to not reapeat the stupid while loop everywhere
+     * Helper to not repeat the stupid while loop everywhere
      * @param type The type of thing you are trying to spawn, used to show a log when it fails
-     * @param cb The callback to spawn it, it should return true on a sucessful spawn attempt to break the loop
+     * @param cb The callback to spawn it, it should return true on a successful spawn attempt to break the loop
      * @param maxAttempts I dont have to explain this one
      * @param logOnFailure I think i also dont have to explain this one
      * @returns True when it spawned successfully, false otherwise
@@ -1221,7 +1221,6 @@ export class GameMap {
         let attempts = 0;
         while (attempts < maxAttempts) {
             if (cb()) {
-                // if (attempts > 50) console.log(type, attempts);
                 return true;
             }
             attempts++;

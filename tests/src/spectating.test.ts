@@ -173,7 +173,7 @@ test("Spectate teammates", () => {
     expect(playerA.client.spectating).toBeSamePlayer(playerE);
 });
 
-test("Spectate faction teammtes", () => {
+test("Spectate faction teammates", () => {
     const game = createGame(TeamMode.Squad, "test_faction");
     game.preventStart = true;
 

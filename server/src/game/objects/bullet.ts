@@ -102,7 +102,7 @@ export class BulletBarn {
     fireBullet(params: BulletParams): Bullet {
         this.game.map.clampToMapBounds(params.pos);
 
-        // sentToClient check to make sure bullets that are created and die immediatly
+        // sentToClient check to make sure bullets that are created and die immediately
         // go through a net-tick first, so their data is not overwritten by the init call
         let bullet = this.bullets.find((b) => !b.active && b.sentToClient);
         if (!bullet) {
