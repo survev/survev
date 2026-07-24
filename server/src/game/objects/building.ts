@@ -352,8 +352,8 @@ export class Building extends BaseGameObject {
                     const bottomFloor = this.game.objectRegister.getById(
                         obj.layerObjIds[1],
                     ) as Building;
-                    dfs(topFloor);
-                    dfs(bottomFloor);
+                    if (topFloor) dfs(topFloor);
+                    if (bottomFloor) dfs(bottomFloor);
                     break;
             }
         };
@@ -400,8 +400,8 @@ export class Building extends BaseGameObject {
                     const bottomFloor = this.game.objectRegister.getById(
                         obj.layerObjIds[1],
                     ) as Building;
-                    dfs(topFloor);
-                    dfs(bottomFloor);
+                    if (topFloor) dfs(topFloor);
+                    if (bottomFloor) dfs(bottomFloor);
                     break;
             }
         };
