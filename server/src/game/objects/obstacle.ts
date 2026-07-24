@@ -4,7 +4,7 @@ import { ObjectType } from "../../../../shared/net/objectSerializeFns.ts";
 import { type AABB, coldet, type Collider } from "../../../../shared/utils/coldet.ts";
 import { collider } from "../../../../shared/utils/collider.ts";
 import { math } from "../../../../shared/utils/math.ts";
-import { util } from "../../../../shared/utils/util.ts";
+import { assert, util } from "../../../../shared/utils/util.ts";
 import { v2, type Vec2 } from "../../../../shared/utils/v2.ts";
 import type { Game } from "../game.ts";
 import type { Building } from "./building.ts";
@@ -72,7 +72,7 @@ export class Obstacle extends BaseGameObject {
     };
 
     isButton: boolean;
-    button!: {
+    button?: {
         onOff: boolean;
         canUse: boolean;
         seq: number;
@@ -307,7 +307,12 @@ export class Obstacle extends BaseGameObject {
             this.interactCooldown -= dt;
 
             if (this.isButton) {
-                this.button.canUse = !this.button.useOnce && this.interactCooldown < 0;
+                assert(this.button);
+                const oldCanUse = this.button.canUse;
+                this.button.canUse = this.interactCooldown < 0;
+                if (this.button.canUse !== oldCanUse) {
+                    this.setDirty();
+                }
 
                 if (this.button.canUse && this.button?.resetAfterCooldown) {
                     this.button.onOff = !this.button.onOff;
@@ -690,16 +695,15 @@ export class Obstacle extends BaseGameObject {
     interact(player?: Player, auto = false): void {
         if (this.dead) return;
 
-        if (player && !auto) {
-            if (this.interactCooldown > 0) return;
-            this.interactCooldown = this.button?.useCooldown ?? 0.1;
+        if (player && !auto && this.interactCooldown > 0) {
+            return;
         }
 
         if (
             player
             && this.isButton
-            && this.button.roleToPromote
-            && player.role === this.button.roleToPromote
+            && this.button!.roleToPromote
+            && player.role === this.button!.roleToPromote
         ) {
             return;
         }
@@ -721,11 +725,17 @@ export class Obstacle extends BaseGameObject {
             } else {
                 this.toggleDoor(player);
             }
+            if (player && !auto) {
+                this.interactCooldown = 0.1;
+            }
         }
 
-        if (this.isButton && this.button.canUse) {
+        if (this.isButton && this.button!.canUse) {
             this.interactedBy = player;
             this.useButton(player);
+            if (player && !this.button!.useOnce) {
+                this.interactCooldown = this.button?.useCooldown ?? 0.1;
+            }
         }
     }
 
@@ -735,6 +745,7 @@ export class Obstacle extends BaseGameObject {
     }
 
     useButton(player?: Player): void {
+        assert(this.button);
         if (!this.button.canUse) return;
 
         this.button.onOff = !this.button.onOff;

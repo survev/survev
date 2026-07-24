@@ -261,7 +261,7 @@ export class Building extends BaseGameObject {
                 if (this.puzzle.idleResetTicker <= 0) {
                     this.puzzle.errSeq++;
                     this.setPartDirty();
-                    this.puzzle.resetTicker = puzzleDef.errorResetDelay;
+                    this.startReset(puzzleDef.errorResetDelay);
                 }
             }
         }
@@ -410,10 +410,11 @@ export class Building extends BaseGameObject {
 
     puzzlePieceToggled(piece: Obstacle): void {
         assert(this.puzzle);
+        // don't accept new inputs while we are running a reset ticker
+        if (this.puzzle.resetTicker > 0) return;
 
         const puzzleDef = MapObjectDefs.typeToDef(this.type, "building").puzzle!;
 
-        this.puzzle.resetTicker = 0;
         this.puzzle.idleResetTicker = 0;
 
         this.puzzle.inputCode.push(piece.puzzlePiece!);
@@ -437,13 +438,13 @@ export class Building extends BaseGameObject {
             }
             this.setPartDirty();
 
-            this.puzzle.resetTicker = puzzleDef.completeOffDelay;
+            this.startReset(puzzleDef.completeOffDelay);
             this.puzzle.completeTicker = puzzleDef.completeUseDelay;
         } else if (this.puzzle.inputCode.length >= puzzleCode.length) {
             this.puzzle.errSeq++;
             this.setPartDirty();
 
-            this.puzzle.resetTicker = puzzleDef.errorResetDelay;
+            this.startReset(puzzleDef.errorResetDelay);
         } else {
             this.puzzle.idleResetTicker = puzzleDef.pieceResetDelay;
         }
@@ -458,6 +459,23 @@ export class Building extends BaseGameObject {
         }
     }
 
+    startReset(time: number) {
+        assert(this.puzzle);
+
+        // lock buttons until the reset is finished
+        for (const piece of this.childObjects) {
+            if (
+                piece.__type === ObjectType.Obstacle
+                && piece.isButton
+                && piece.puzzlePiece
+            ) {
+                piece.button!.canUse = false;
+                piece.setDirty();
+            }
+        }
+        this.puzzle.resetTicker = time;
+    }
+
     resetPuzzle(): void {
         assert(this.puzzle);
         this.puzzle.inputCode.length = 0;
@@ -470,9 +488,9 @@ export class Building extends BaseGameObject {
                 && piece.isButton
                 && piece.puzzlePiece
             ) {
-                piece.button.canUse = !this.puzzle.solved;
-                piece.button.onOff = false;
-                piece.button.seq++;
+                piece.button!.canUse = !this.puzzle.solved;
+                piece.button!.onOff = false;
+                piece.button!.seq++;
                 piece.setDirty();
             }
         }

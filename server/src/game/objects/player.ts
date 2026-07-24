@@ -3479,7 +3479,7 @@ export class Player extends BaseGameObject {
             const obstacle = objs[i];
             if (obstacle.__type !== ObjectType.Obstacle) continue;
             if (!obstacle.dead && util.sameLayer(obstacle.layer, this.layer)) {
-                if (obstacle.isButton && obstacle.button.isVat) {
+                if (obstacle.isButton && obstacle.button!.isVat) {
                     const distance = v2.distance(this.pos, obstacle.pos);
                     if (distance + this.rad < obstacle.interactionRad * obstacle.scale) {
                         obstacles.push({
