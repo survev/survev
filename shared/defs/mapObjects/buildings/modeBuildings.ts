@@ -977,6 +977,181 @@ function createLoggingComplex3<T extends BuildingDef>(e: Partial<T>): T {
     return util.mergeDeep(t, e || {});
 }
 
+function createOasis<T extends BuildingDef>(e: Partial<T>): T {
+    const t = {
+        type: "building",
+        map: { display: true, shapes: [] },
+        terrain: { grass: true, beach: false },
+        mapObstacleBounds: [collider.createCircle(v2.create(0, 0), 40)],
+        mapGroundPatches: [
+            {
+                bound: collider.createCircle(v2.create(0, 0), 40),
+                color: 0x709e59, // 96a750
+                roughness: 0.3,
+                offsetDist: 2,
+            },
+        ],
+        floor: {
+            surfaces: [{ type: "grass", collision: [] }],
+            imgs: [],
+        },
+        ceiling: { zoomRegions: [], imgs: [] },
+        mapObjects: [
+            {
+                type: "tree_14d",
+                pos: v2.create(-1, 0),
+                scale: 1.75,
+                ori: 0,
+            },
+            {
+                type: "crate_09",
+                pos: v2.create(5, 0),
+                scale: 1,
+                ori: 0,
+            },
+            {
+                type: "barrel_05",
+                pos: v2.create(2, 4),
+                scale: 1,
+                ori: 0,
+            },
+            {
+                type: randomObstacleType({ tree_13: 1, tree_14: 1 }),
+                pos: v2.create(25, 25),
+                scale: 1,
+                ori: 0,
+            },
+            {
+                type: randomObstacleType({ tree_13: 1, tree_14: 1 }),
+                pos: v2.create(20, 26),
+                scale: 0.9,
+                ori: 0,
+            },
+            {
+                type: "crate_01",
+                pos: v2.create(22, 21),
+                scale: 1,
+                ori: 0,
+            },
+            {
+                type: randomObstacleType({ tree_13: 1, tree_14: 1 }),
+                pos: v2.create(-29, 14),
+                scale: 1.2,
+                ori: 0,
+            },
+            {
+                type: randomObstacleType({ tree_13: 1, tree_14: 1 }),
+                pos: v2.create(-32, 7),
+                scale: 1,
+                ori: 0,
+            },
+            {
+                type: "bush_03",
+                pos: v2.create(-33, -4),
+                scale: 1.2,
+                ori: 0,
+            },
+            {
+                type: randomObstacleType({ tree_13: 1, tree_14: 1 }),
+                pos: v2.create(-34, -9),
+                scale: 1,
+                ori: 0,
+            },
+            {
+                type: randomObstacleType({ barrel_02: 3, barrel_05: 1 }),
+                pos: v2.create(-28, 9),
+                scale: 1,
+                ori: 0,
+            },
+            {
+                type: randomObstacleType({ tree_13: 5, tree_14: 5, cache_02bh: 1 }),
+                pos: v2.create(-2, -28),
+                scale: 1.2,
+                ori: 0,
+            },
+            {
+                type: randomObstacleType({ tree_13: 1, tree_14: 1 }),
+                pos: v2.create(-7, -31),
+                scale: 1,
+                ori: 0,
+            },
+            {
+                type: randomObstacleType({ tree_13: 1, tree_14: 1 }),
+                pos: v2.create(3, -33),
+                scale: 1.1,
+                ori: 0,
+            },
+            {
+                type: randomObstacleType({ tree_13: 1, tree_14: 1 }),
+                pos: v2.create(5, -27),
+                scale: 1,
+                ori: 0,
+            },
+            {
+                type: randomObstacleType({ barrel_02: 3, barrel_05: 1 }),
+                pos: v2.create(32, 0),
+                scale: 1,
+                ori: 0,
+            },
+            {
+                type: randomObstacleType({ barrel_02: 3, barrel_05: 1 }),
+                pos: v2.create(30, 3.5),
+                scale: 1,
+                ori: 0,
+            },
+            {
+                type: randomObstacleType({ tree_13: 1, tree_14: 1 }),
+                pos: v2.create(30, -4),
+                scale: 1.3,
+                ori: 0,
+            },
+            {
+                type: randomObstacleType({ tree_13: 1, tree_14: 1 }),
+                pos: v2.create(-5, 30),
+                scale: 1,
+                ori: 0,
+            },
+            {
+                type: randomObstacleType({ tree_13: 1, tree_14: 1 }),
+                pos: v2.create(3, 28),
+                scale: 1,
+                ori: 0,
+            },
+            {
+                type: randomObstacleType({ tree_13: 1, tree_14: 1 }),
+                pos: v2.create(-11, 28),
+                scale: 1,
+                ori: 0,
+            },
+            {
+                type: randomObstacleType({ crate_02: 1, crate_01: 3, barrel_01: 1 }),
+                pos: v2.create(25, -25),
+                scale: 1,
+                ori: 0,
+            },
+            {
+                type: "crate_01",
+                pos: v2.create(20, -23),
+                scale: 1,
+                ori: 0,
+            },
+            {
+                type: "barrel_01",
+                pos: v2.create(-20, -20),
+                scale: 1,
+                ori: 0,
+            },
+            {
+                type: "bush_03",
+                pos: v2.create(-24, -21),
+                scale: 1,
+                ori: 0,
+            },
+        ],
+    };
+    return util.mergeDeep(t, e || {});
+}
+
 function createReserve<T extends BuildingDef>(e: Partial<T>): T {
     const t: DeepPartial<BuildingDef> = {
         type: "building",
@@ -4448,6 +4623,7 @@ const ModeBuildingDefs = {
             },
         ],
     },
+    oasis_01: createOasis({}),
     river_town_02: {
         type: "building",
         map: { display: true, shapes: [] },
