@@ -7,7 +7,7 @@ import type {
     MapObjectDef,
 } from "../../mapObjectsTyping";
 
-function createBank<T extends BuildingDef>(e: Partial<T>): T {
+export function createBank<T extends BuildingDef>(e: Partial<T>): T {
     const t = {
         type: "building",
         map: {
@@ -440,7 +440,7 @@ function createBank<T extends BuildingDef>(e: Partial<T>): T {
     };
     return util.mergeDeep(t, e || {});
 }
-function createBankVault<T extends BuildingDef>(e: Partial<T>): T {
+export function createBankVault<T extends BuildingDef>(e: Partial<T>): T {
     const t = {
         type: "building",
         map: { display: false, color: 0x665a4e, scale: 1 },
@@ -608,7 +608,7 @@ function createBankVault<T extends BuildingDef>(e: Partial<T>): T {
     };
     return util.mergeDeep(t, e || {});
 }
-function createBarn<T extends BuildingDef>(e: Partial<T>): T {
+export function createBarn<T extends BuildingDef>(e: Partial<T>): T {
     const t = {
         type: "building",
         map: {
@@ -1088,7 +1088,7 @@ function createBarn<T extends BuildingDef>(e: Partial<T>): T {
     };
     return util.mergeDeep(t, e || {});
 }
-function createBarnBasement<T extends BuildingDef>(e: Partial<T>): T {
+export function createBarnBasement<T extends BuildingDef>(e: Partial<T>): T {
     const t = {
         type: "building",
         map: { display: false, color: 0x665a4e, scale: 1 },
@@ -1219,7 +1219,7 @@ function createBarnBasement<T extends BuildingDef>(e: Partial<T>): T {
     };
     return util.mergeDeep(t, e || {});
 }
-function createBridgeLarge<T extends BuildingDef>(e: Partial<T>): T {
+export function createBridgeLarge<T extends BuildingDef>(e: Partial<T>): T {
     const t = {
         type: "building",
         map: {
@@ -1474,7 +1474,7 @@ function createBridgeLarge<T extends BuildingDef>(e: Partial<T>): T {
     };
     return util.mergeDeep(t, e || {});
 }
-function createContainer(props: {
+export function createContainer(props: {
     tint?: number;
     loot_spawner_01?: string;
     loot_spawner_02?: string;
@@ -1614,7 +1614,7 @@ function createContainer(props: {
 }
 // @HACK:
 type ExtendedBuildingDef = BuildingDef & Record<string, string>;
-function createCabin<T extends ExtendedBuildingDef>(e: Partial<T>): T {
+export function createCabin<T extends ExtendedBuildingDef>(e: Partial<T>): T {
     const t = {
         type: "building",
         map: {
@@ -1957,7 +1957,7 @@ function createCabin<T extends ExtendedBuildingDef>(e: Partial<T>): T {
     };
     return util.mergeDeep(t, e || {});
 }
-function createHut<T extends BuildingDef>(e: Partial<T>): T {
+export function createHut<T extends BuildingDef>(e: Partial<T>): T {
     const t = {
         type: "building",
         map: {
@@ -2112,7 +2112,7 @@ function createHut<T extends BuildingDef>(e: Partial<T>): T {
     };
     return util.mergeDeep(t, e || {});
 }
-function createGreenhouse<T extends BuildingDef>(e: Partial<T>): T {
+export function createGreenhouse<T extends BuildingDef>(e: Partial<T>): T {
     const t = {
         type: "building",
         map: { display: true, color: 0x1e737c, scale: 1 },
@@ -2415,7 +2415,7 @@ function createGreenhouse<T extends BuildingDef>(e: Partial<T>): T {
     };
     return util.mergeDeep(t, e || {});
 }
-function createMansion<T extends ExtendedBuildingDef>(e: Partial<T>): T {
+export function createMansion<T extends ExtendedBuildingDef>(e: Partial<T>): T {
     const t = {
         type: "building",
         map: {
@@ -3182,7 +3182,7 @@ function createMansion<T extends ExtendedBuildingDef>(e: Partial<T>): T {
     };
     return util.mergeDeep(t, e || {});
 }
-function createMansionCellar<T extends BuildingDef>(
+export function createMansionCellar<T extends BuildingDef>(
     e: Partial<
         T & {
             mansion_column_1?: string;
@@ -3462,7 +3462,7 @@ function createMansionCellar<T extends BuildingDef>(
     };
     return util.mergeDeep(t, e || {});
 }
-function createOutHouse<T extends BuildingDef>(e: Partial<T>): T {
+export function createOutHouse<T extends BuildingDef>(e: Partial<T>): T {
     const t = {
         type: "building",
         map: { display: true, color: 0x7c4c38, scale: 1 },
@@ -3562,7 +3562,7 @@ function createOutHouse<T extends BuildingDef>(e: Partial<T>): T {
     return util.mergeDeep(t, e || {});
 }
 
-function createTeahouse(params: { ceilingImgs?: BuildingDef["ceiling_images"] }) {
+export function createTeahouse(params: { ceilingImgs?: BuildingDef["ceiling_images"] }) {
     const t = {
         type: "building",
         map: {
@@ -3758,7 +3758,7 @@ function createTeahouse(params: { ceilingImgs?: BuildingDef["ceiling_images"] })
     return util.mergeDeep(t, params || {});
 }
 
-function createTeaHouseComplex<T extends BuildingDef>(
+export function createTeaHouseComplex<T extends BuildingDef>(
     e: Partial<T> & { tea_house?: string },
 ): T {
     const t = {
@@ -3853,7 +3853,7 @@ function createTeaHouseComplex<T extends BuildingDef>(
     return util.mergeDeep(t, e || {});
 }
 
-function createPoliceStation<T extends BuildingDef>(e: Partial<T>): T {
+export function createPoliceStation<T extends BuildingDef>(e: Partial<T>): T {
     const t = {
         type: "building",
         map: {
@@ -4561,7 +4561,7 @@ function createPoliceStation<T extends BuildingDef>(e: Partial<T>): T {
     return util.mergeDeep(t, e || {});
 }
 
-function createHouseRed<T extends ExtendedBuildingDef>(e: Partial<T>): T {
+export function createHouseRed<T extends ExtendedBuildingDef>(e: Partial<T>): T {
     const t = {
         type: "building",
         map: { display: true, color: 0x621c1c, scale: 1 },
@@ -4904,7 +4904,7 @@ function createHouseRed<T extends ExtendedBuildingDef>(e: Partial<T>): T {
     return util.mergeDeep(t, e || {});
 }
 
-function createHouseRed2<T extends ExtendedBuildingDef>(e: Partial<T>): T {
+export function createHouseRed2<T extends ExtendedBuildingDef>(e: Partial<T>): T {
     const t = {
         type: "building",
         map: { display: true, color: 0x470f0f, scale: 1 },
@@ -5298,7 +5298,7 @@ function createHouseRed2<T extends ExtendedBuildingDef>(e: Partial<T>): T {
     return util.mergeDeep(t, e || {});
 }
 
-function createShack3<T extends BuildingDef>(e: Partial<T>): T {
+export function createShack3<T extends BuildingDef>(e: Partial<T>): T {
     const t = {
         type: "building",
         map: {
@@ -5477,7 +5477,7 @@ function createShack3<T extends BuildingDef>(e: Partial<T>): T {
     return util.mergeDeep(t, e || {});
 }
 
-function createShack2<T extends BuildingDef>(e: Partial<T>): T {
+export function createShack2<T extends BuildingDef>(e: Partial<T>): T {
     const t = {
         type: "building",
         map: { display: true, color: 0x665a4e, scale: 1 },
@@ -5596,7 +5596,7 @@ function createShack2<T extends BuildingDef>(e: Partial<T>): T {
     return util.mergeDeep(t, e || {});
 }
 
-function createShack<T extends BuildingDef>(e: Partial<T>): T {
+export function createShack<T extends BuildingDef>(e: Partial<T>): T {
     const t = {
         type: "building",
         map: { display: true, color: 0x3d432e, scale: 1 },
@@ -5699,7 +5699,7 @@ function createShack<T extends BuildingDef>(e: Partial<T>): T {
     return util.mergeDeep(t, e || {});
 }
 
-function createWarehouse<T extends BuildingDef>(e: Partial<T>): T {
+export function createWarehouse<T extends BuildingDef>(e: Partial<T>): T {
     const t = {
         type: "building",
         map: {
@@ -5929,7 +5929,7 @@ function createWarehouse<T extends BuildingDef>(e: Partial<T>): T {
     return util.mergeDeep(t, e || {});
 }
 
-function createWarehouse2<T extends BuildingDef>(e: Partial<T>): T {
+export function createWarehouse2<T extends BuildingDef>(e: Partial<T>): T {
     const t = {
         type: "building",
         map: {
@@ -6157,7 +6157,7 @@ function createWarehouse2<T extends BuildingDef>(e: Partial<T>): T {
     return util.mergeDeep(t, e || {});
 }
 
-function createWarehouse3<T extends BuildingDef>(e: Partial<T>): T {
+export function createWarehouse3<T extends BuildingDef>(e: Partial<T>): T {
     const t = {
         type: "building",
         map: {
@@ -6415,32 +6415,6 @@ function createWarehouse3<T extends BuildingDef>(e: Partial<T>): T {
     };
     return util.mergeDeep(t, e || {});
 }
-
-export const BaseStructures = { 
-    createBank,
-    createBankVault,
-    createBarn,
-    createBarnBasement,
-    createBridgeLarge,
-    createCabin,
-    createContainer,
-    createGreenhouse,
-    createHouseRed,
-    createHouseRed2, 
-    createHut,
-    createMansion, 
-    createMansionCellar, 
-    createOutHouse,
-    createPoliceStation,
-    createShack,
-    createShack2,
-    createShack3,
-    createTeahouse,
-    createTeaHouseComplex,
-    createWarehouse,
-    createWarehouse2,
-    createWarehouse3,
-} as const;
 
 const BaseBuildingDefs = {
     bank_01: createBank({ teamId: 1 }),
