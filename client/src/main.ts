@@ -448,7 +448,10 @@ export class Application {
     setDOMFromConfig() { // technically now this name is slightly weird... since most of the function is no longer updating the DOM except for the language stuff... so once the language stuff is changed update this function name to something better
         this.startMenu.playerName = this.config.get("playerName") ?? "";
 
-        const spellSyncLang = SDK.isSpellSync && window.spellSync.language;
+        const spellSyncLang = SDK.isSpellSync 
+            ? window.spellSync.language
+            : undefined;
+
         this.startMenu.selectedRegion = spellSyncLang ?? this.config.get("region") ?? "";
 
         if (SDK.isAnySDK && !this.startMenu.playerName) {
