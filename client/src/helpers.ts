@@ -255,4 +255,36 @@ export const helpers = {
             },
         });
     },
+    fadeOut: function(el: HTMLElement, duration: number) { // ideally we turn all of those start<someDirection> divs into lit elements and have them expose their own API so we can get rid of these two but for now here is this :p
+        el.animate(
+            [
+                { opacity: 1 },
+                { opacity: 0 }
+            ],
+            {
+                duration,
+                easing: "ease",
+                fill: "forwards",
+            }
+        ).finished.then(() => {
+            el.style.display = "none";
+            el.style.opacity = "";
+        });
+    },
+    fadeIn: function(el: HTMLElement, display: string, duration: number) {
+        el.style.display = display;
+        el.animate(
+            [
+                { opacity: 0 },
+                { opacity: 1 }
+            ],
+            {
+                duration,
+                easing: "ease",
+                fill: "forwards",
+            }
+        ).finished.then(() => {
+            el.style.opacity = "";
+        });
+    }
 };

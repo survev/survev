@@ -6,10 +6,12 @@ import { api } from "./api.ts";
 import type { ConfigManager } from "./config.ts";
 import { device } from "./device.ts";
 import type { Localization } from "./ui/localization.ts";
+import { StartMenu } from "./ui/menu.ts";
 
 export class SiteInfo {
     info = {} as SiteInfoRes;
     loaded = false;
+    startMenu = document.querySelector<StartMenu>("start-menu")!;
 
     constructor(
         public config: ConfigManager,
@@ -19,17 +21,23 @@ export class SiteInfo {
 
     load() {
         const locale = this.localization.getLocale();
-
-        const mainSelector = $("#server-opts");
         const teamSelector = $("#team-server-opts");
+
+        const regions: { id: string; label: string; }[] = []
 
         for (const region in GAME_REGIONS) {
             const data = GAME_REGIONS[region];
             const name = this.localization.translate(data.l10n);
             const elm = `<option value='${region}' data-l10n='${data.l10n}' data-label='${name}'>${name}</option>`;
-            mainSelector.append(elm);
             teamSelector.append(elm);
+            regions.push({
+                id: region,
+                label: this.localization.translate(data.l10n)
+            });
         }
+
+        this.startMenu.regions = regions;
+        this.startMenu.selectedRegion = regions[0].id ?? "";
 
         const siteInfoUrl = api.resolveUrl(`/api/site_info?language=${locale}`);
         fetch(siteInfoUrl).then(res => res.json()).then((data: SiteInfoRes) => {
@@ -61,55 +69,18 @@ export class SiteInfo {
 
     updatePageFromInfo() {
         if (this.loaded) {
-            const getGameModeStyles = this.getGameModeStyles();
-            for (let i = 0; i < getGameModeStyles.length; i++) {
-                const style = getGameModeStyles[i];
-                const selector = `index-play-${style.buttonText}`;
-                const btn = $(`#btn-start-mode-${i}`);
-                btn.data("l10n", selector);
-                btn.html(this.localization.translate(selector));
-                if (style.icon || style.buttonCss) {
-                    if (i == 0) {
-                        btn.addClass("btn-custom-mode-no-indent");
-                    } else {
-                        btn.addClass("btn-custom-mode-main");
-                    }
-                    btn.addClass(style.buttonCss);
-                    btn.css({
-                        "background-image": `url(${style.icon})`,
-                    });
-                }
-                const l = $(`#btn-team-queue-mode-${i}`);
-                if (l.length) {
-                    const c = `index-${style.buttonText}`;
-                    l.data("l10n", c);
-                    l.html(this.localization.translate(c));
-                    if (style.icon) {
-                        l.addClass("btn-custom-mode-select");
-                        l.css({
-                            "background-image": `url(${style.icon})`,
-                        });
-                    }
-                }
+            this.startMenu.gameModes = this.getGameModeStyles();
 
-                btn.toggle(style.enabled);
-            }
-            const supportsTeam = this.info.modes.some((s) => s.enabled && s.teamMode > 1);
-            $("#btn-join-team, #btn-create-team").toggle(supportsTeam);
+            this.startMenu.supportsTeam = this.info.modes.some((s) => s.enabled && s.teamMode > 1);
 
             // Region pops
-            const pops = this.info.pops;
-            if (pops) {
-                const regions = Object.keys(pops);
+            const pops = this.info.pops ?? {};
 
-                for (let i = 0; i < regions.length; i++) {
-                    const region = regions[i];
-                    const data = pops[region];
-                    const sel = $("#server-opts").children(`option[value="${region}"]`);
-                    const players = this.localization.translate("index-players");
-                    sel.text(`${sel.data("label")} [${data.playerCount} ${players}]`);
-                }
-            }
+            this.startMenu.regions = this.startMenu.regions.map(region => ({
+                ...region,
+                playerCount: pops[region.id]?.playerCount,
+            }));
+
             let hasTwitchStreamers = false;
             const featuredStreamersElem = $("#featured-streamers");
             const streamerList = $(".streamer-list");

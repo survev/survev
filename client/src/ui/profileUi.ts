@@ -9,6 +9,7 @@ import { SDK } from "../sdk/sdk.ts";
 import type { LoadoutMenu } from "./loadoutMenu.ts";
 import type { Localization } from "./localization.ts";
 import { MenuModal } from "./menuModal.ts";
+import { StartMenu } from "./menu.ts";
 
 function createLoginOptions(
     parentElem: JQuery<HTMLElement>,
@@ -80,6 +81,7 @@ function createLoginOptions(
 }
 
 export class ProfileUi {
+    startMenu = document.querySelector<StartMenu>("start-menu")!;
     setNameModal: MenuModal | null = null;
     resetStatsModal: MenuModal | null = null;
     deleteAccountModal: MenuModal | null = null;
@@ -256,7 +258,10 @@ export class ProfileUi {
             });
             return false;
         });
-        $(".account-loadout-link, #btn-customize").on("click", () => {
+        this.startMenu.addEventListener("open-loadout", () => {
+            this.loadoutMenu.show();
+        })
+        $(".account-loadout-link").on("click", () => {
             this.loadoutMenu.show();
             return false;
         });

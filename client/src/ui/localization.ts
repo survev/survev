@@ -47,6 +47,8 @@ export class Localization {
         private readonly isStats = false,
     ) {}
 
+    onLocaleChanged?: () => void;
+
     setLocale(locale: Locale) {
         const newLocale = this.acceptedLocales.includes(locale) ? locale : "en";
         if (newLocale !== this.locale) {
@@ -65,6 +67,7 @@ export class Localization {
             } else {
                 this.locale = newLocale;
                 this.localizeIndex();
+                this.onLocaleChanged?.();
             }
         }
     }

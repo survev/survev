@@ -1085,8 +1085,15 @@ a:active {
   }
 }
 
+/** ideally we move this stuff to its Lit component so it can utilize the shadow DOM instead of relying on global styles but for now it is fine */
 .play-button-container {
+  opacity: 1;
+  transition: opacity 250ms;
   position: relative;
+}
+
+.play-button-container.locked {
+  opacity: 0.5;
 }
 
 .play-loading-outer {
@@ -1098,6 +1105,12 @@ a:active {
   z-index: 5;
   opacity: 0;
   pointer-events: none;
+  transition: opacity 250ms;
+}
+
+.play-loading-outer.locked {
+  opacity: 1;
+  pointer-events: auto;
 }
 
 .play-loading-inner {

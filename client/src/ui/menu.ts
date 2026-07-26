@@ -1,9 +1,8 @@
-import $ from "jquery";
 import { device } from "../device.ts";
 import { helpers } from "../helpers.ts";
 import type { InputBinds } from "../inputBinds.ts";
-import { LitElement, html, css } from "lit";
-import { customElement, property, state } from "lit/decorators.js";
+import { LitElement, html, css, type PropertyValues } from "lit";
+import { customElement, property, state, query } from "lit/decorators.js";
 import { BindDefs } from "../inputBinds.ts";
 import { type InputHandler, Key, InputType, InputValue } from "../input.ts";
 import { Localization } from "./localization.ts";
@@ -61,6 +60,236 @@ export class CopyToast extends LitElement {
             z-index: 10000;
         }        
     `; // yea so the z-index thing is kinda a hack... but erm I couldn't really find another way to fix it so yea...
+}
+
+@customElement("start-menu")
+export class StartMenu extends LitElement {
+    createRenderRoot() {
+        return this;
+    }
+
+    private readonly onLocaleChanged = () => this.requestUpdate();
+
+    protected updated(_changedProperties: PropertyValues): void {
+        if (_changedProperties.has("localization")) {
+            const oldLocalization = _changedProperties.get("localization");
+            if (oldLocalization) {
+                oldLocalization.onLocaleChanged = undefined;
+            }
+
+            if (this.localization) {
+                this.localization.onLocaleChanged = this.onLocaleChanged;
+            }
+        }
+    }
+
+    @property({ type: Boolean })
+    open = true;
+
+    @property({ attribute: false })
+    localization!: Localization;
+
+    @property({ type: String })
+    playerName = "";
+
+    @property({ attribute: false })
+    regions: { id: string; label: string; playerCount?: number; }[] = [];
+
+    @property({ type: String })
+    selectedRegion = "";
+
+    @property({ attribute: false })
+    gameModes: { icon?: string; buttonCss?: string; buttonText: string; enabled: boolean; }[] = [];
+
+    @property({ type: Boolean })
+    supportsTeam = false;
+
+    @property({ type: Number })
+    playerMaxNameLength = 16;
+
+    @property({ type: Boolean })
+    playLocked = false;
+
+    @query("#start-menu")
+    private startMenuContainer!: HTMLElement;
+
+    @query("#player-name-input-solo")
+    private playerNameInput!: HTMLInputElement
+
+    @state()
+    private showingHelp = false;
+
+    @state()
+    private pendingMode: number | null = null;
+
+    private close() {
+        this.open = false;
+    }
+
+    private openHelp() {
+        console.log("help")
+        this.showingHelp = true;
+        this.updateComplete.then(() => {
+            this.startMenuContainer.scrollTo({
+                top: this.startMenuContainer.clientHeight,
+                behavior: "smooth",
+            });
+        });
+    }
+
+    private renderPlayButtonContent(l10nKey: string, mode: number) {
+        if (this.pendingMode === mode) return html`<div class="ui-spinner"></div>`;
+        return this.localization.translate(l10nKey);
+    }
+
+    private onPlay(mode: number) {
+        this.dispatchEvent(new CustomEvent<number>("quick-start", {
+            detail: mode,
+            bubbles: true,
+            composed: true,
+        }));
+    }
+
+    private onJoinTeam() {
+        this.dispatchEvent(new CustomEvent("join-team"));
+        this.close();
+    }
+
+    private onRegionChanged(e: Event) {
+        this.selectedRegion = (e.target as HTMLSelectElement).value;
+        this.dispatchEvent(new CustomEvent("region-change", {
+            detail: this.selectedRegion,
+            bubbles: true,
+            composed: true,
+        }));
+    }
+
+    private onLoadout() {
+        this.dispatchEvent(new CustomEvent("open-loadout"));
+    }
+
+    private onPlayerNameKeyDown(e: KeyboardEvent) {
+        if (e.key === "Enter") {
+            (e.target as HTMLElement).blur();
+        }
+    }
+
+    private onPlayerFocus() {
+        if (device.mobile && device.os !== "ios" && device.isLandscape) {
+            const height = device.screenHeight;
+            const offset = height <= 282 ? 18 : 36;
+            document.body.scrollTop = this.playerNameInput.offsetTop - offset;
+        }
+    }
+
+    private onPlayerBlur() {
+        if (device.mobile && device.os !== "ios") {
+            document.body.scrollTop = 0;
+        }
+    }
+
+    private playLockoutTimer?: number;
+
+    render() {
+        if (!this.localization) {
+            return html``;
+        }
+        const solo = this.gameModes[0];
+        const duo = this.gameModes[1];
+        const squad = this.gameModes[2];
+        return html`
+        <div id="start-menu" class=${`menu-column menu-block ${ this.showingHelp ? "display-help" : "" }`} style=${this.open ? "display:block" : "display:none"}>
+            <div class="play-loading-outer ${this.playLocked ? "locked" : ""}">
+                <div class="play-loading-inner">
+                    <div class="play-loading-spinner"></div>
+                </div>
+            </div>
+            <div class="play-button-container ${this.playLocked ? "locked" : ""}">
+                <div id="player-options">
+                    <input type="text" class="menu-option player-name-input" tabindex="0" placeholder=${this.localization.translate("index-enter-name-here")} id="player-name-input-solo" .value=${this.playerName} @input=${(e: Event) => this.playerName = (e.target as HTMLInputElement).value} @keydown=${this.onPlayerNameKeyDown} @focus=${this.onPlayerFocus} @blur=${this.onPlayerBlur} .maxLength=${this.playerMaxNameLength} />
+                    <a class="btn-darken menu-option player-options-btn" id="btn-customize" @click=${this.onLoadout}></a>
+                </div>
+                <select id="server-select-main" class="server-select menu-option btn-hollow btn-hollow-selected" .value=${this.selectedRegion} @change=${this.onRegionChanged}>
+                    <optgroup id="server-opts" label=${this.localization.translate("index-region")}>
+                        ${this.regions.map(region => html`
+                            <option value=${region.id}>
+                                ${region.label}
+                                ${region.playerCount != null ? `[${region.playerCount} ${this.localization.translate("index-players")}]` : ""}
+                            </option>
+                            `
+                        )}
+                    </optgroup>
+                </select>
+                <a class=${`btn-green btn-darken menu-option ${solo?.icon ? "btn-custom-mode-no-indent" : ""} ${solo?.buttonCss ?? ""}`} id="btn-start-mode-0" style=${`${solo?.icon ? `background-image:url(${solo.icon});` : ""} ${solo?.enabled === false? "display:none;" : ""}`} @click=${() => this.onPlay(0)}>${this.renderPlayButtonContent(`index-play-${solo?.buttonText ?? "solo"}`, 0)}</a>
+                <div id="btns-quick-start">
+                    <a class=${`btn-green btn-darken menu-option ${duo?.icon ? "btn-custom-mode-no-indent" : ""} ${duo?.buttonCss ?? ""}`} id="btn-start-mode-1" style=${`${duo?.icon ? `background-image:url(${duo.icon});` : ""} ${duo?.enabled === false ? "display:none;" : ""}`} @click=${() => this.onPlay(1)}>${this.renderPlayButtonContent(`index-play-${duo?.buttonText ?? "duo"}`, 1)}</a>
+                    <a class=${`btn-green btn-darken menu-option ${squad?.icon ? "btn-custom-mode-no-indent" : ""} ${squad?.buttonCss ?? ""}`} id="btn-start-mode-2" style=${`${squad?.icon ? `background-image:url(${squad.icon});` : ""} ${squad?.enabled === false ? "display:none;" : ""}`} @click=${() => this.onPlay(2)}>${this.renderPlayButtonContent(`index-play-${squad?.buttonText ?? "squad"}`, 2)}</a>
+                </div>
+                <div class="btns-double-row" style=${this.supportsTeam ? "display:flex" : "display:none"}>
+                    <a class="btn-darken menu-option btn-team-option" id="btn-join-team" @click=${this.onJoinTeam}>${this.localization.translate("index-join-team")}</a>
+                    <a class="btn-darken menu-option btn-team-option" id="btn-create-team">${this.localization.translate("index-create-team")}</a>
+                </div>
+                <div id="btn-help" class="menu-option btn-darken" @click=${this.openHelp}>${this.localization.translate("index-how-to-play")}</div>
+                <div id="start-help" style=${this.showingHelp ? "display:block" : "display:none"}>
+                    <h1>${this.localization.translate("index-controls")}</h1>
+                    <p><span class="help-action">${this.localization.translate("index-movement")}</span>: <span class="help-control">${this.localization.translate("index-movement-ctrl")}</span></p>
+                    <p><span class="help-action">${this.localization.translate("index-aim")}</span>: <span class="help-control">${this.localization.translate("index-aim-control")}</span></p>
+                    <p><span class="help-action">${this.localization.translate("index-punch")}</span>/<span class="help-action">${this.localization.translate("index-shoot")}</span>: <span class="help-control">${this.localization.translate("index-shoot-ctrl")}</span></p>
+                    <p><span class="help-action">${this.localization.translate("index-change-weapons")}</span>: <span class="help-control">${this.localization.translate("index-change-weapons-ctrl")}</span></p>
+                    <p class="hide-on-mobile"><span class="help-action">${this.localization.translate("index-stow-weapons")}</span>: <span class="help-control">${this.localization.translate("index-stow-weapons-ctrl")}</span></p>
+                    <p class="hide-on-mobile"><span class="help-action">${this.localization.translate("index-swap-weapons")}</span>: <span class="help-control">${this.localization.translate("index-swap-weapons-ctrl")}</span></p>
+                    <p class="hide-on-mobile"><span class="help-action">${this.localization.translate("index-swap-weapon-slots")}</span>: <span class="help-control">${this.localization.translate("index-swap-weapon-slots-ctrl")}</span></p>
+                    <p><span class="help-action">${this.localization.translate("index-reload")}</span>: <span class="help-control">${this.localization.translate("index-reload-ctrl")}</span></p>
+                    <p><span class="help-action">${this.localization.translate("index-scope-zoom")}</span>: <span class="help-control">${this.localization.translate("index-scope-zoom-ctrl")}</span></p>
+                    <p><span class="help-action"></span>${this.localization.translate("index-pickup")}/<span class="help-action">${this.localization.translate("index-loot")}</span>/<span class="help-action">${this.localization.translate("index-revive")}</span>: <span class="help-control">${this.localization.translate("index-pickup-ctrl")}</span></p>
+                    <p><span class="help-action">${this.localization.translate("index-use-medical")}</span>: <span class="help-control">${this.localization.translate("index-use-medical-ctrl")}</span></p>
+                    <p><span class="help-action">${this.localization.translate("index-drop-item")}</span>: <span class="help-control">${this.localization.translate("index-drop-item-ctrl")}</span></p>
+                    <p><span class="help-action">${this.localization.translate("index-cancel-action")}</span>: <span class="help-control">${this.localization.translate("index-cancel-action-ctrl")}</span></p>
+                    <p><span class="help-action">${this.localization.translate("index-view-map")}</span>: <span class="help-control">${this.localization.translate("index-view-map-ctrl")}</span></p>
+                    <p class="hide-on-mobile"><span class="help-action">${this.localization.translate("index-toggle-minimap")}</span>: <span class="help-control">${this.localization.translate("index-toggle-minimap-ctrl")}</span></p>
+                    <p><span class="help-action">${this.localization.translate("index-use-ping")}</span>: <span class="help-control">${this.localization.translate("index-use-ping-ctrl")}</span></p>
+                    <p><span class="help-action">${this.localization.translate("index-use-emote")}</span>: <span class="help-control">${this.localization.translate("index-use-emote-ctrl")}</span></p>
+                    <h1>${this.localization.translate("index-how-to-play")}</h1>
+                    <p>${this.localization.translate("index-tips-1-desc")}</p>
+                    <h1>${this.localization.translate("index-tips-2")}</h1>
+                    <p>${this.localization.translate("index-tips-2-desc")}</p>
+                    <h1>${this.localization.translate("index-tips-3")}</h1>
+                    <p>${this.localization.translate("index-tips-3-desc")}</p>
+                    <h1>${this.localization.translate("index-tips-4")}</h1>
+                    <p>${this.localization.translate("index-tips-4-desc")}</p>
+                </div>
+            </div>
+        </div>
+        `;
+    }
+
+    show() {
+        this.showingHelp = false;
+        this.open = true;
+    }
+
+    setPendingMode(mode: number | null) {
+        this.pendingMode = mode;
+    }
+
+    setPlayLockout(lock: boolean) {
+        if (this.playLockoutTimer !== undefined) {
+            clearTimeout(this.playLockoutTimer);
+            this.playLockoutTimer = undefined;
+        }
+
+        const delay = IS_DEV ? 0 : (lock ? 0 : 100);
+
+        if (delay === 0) {
+            this.playLocked = lock;
+            return;
+        }
+
+        this.playLockoutTimer = window.setTimeout(() => {
+            this.playLocked = lock;
+            this.playLockoutTimer = undefined;
+        }, delay);
+    }
 }
 
 @customElement("settings-modal")
@@ -414,89 +643,54 @@ export class HamburgerModal extends LitElement {
 function setupModals(inputBinds: InputBinds) {
     const localization = new Localization; // we could just replace the inputBindUI thing with localization and get rid of this const... but eh it is basically the same thing :p
 
-    const startMenuWrapper = $("#start-menu");
-    $("#btn-help").on("click", () => {
-        const e = $("#start-help");
-        startMenuWrapper.addClass("display-help");
-        const height = startMenuWrapper.css("height");
-        e.css("display", "block");
-        startMenuWrapper.animate(
-            {
-                scrollTop: height,
-            },
-            1000,
-        );
-        return false;
-    });
-    const teamMobileLink = $("#team-mobile-link");
-    const teamMobileLinkDesc = $("#team-mobile-link-desc");
-    const teamMobileLinkWarning = $("#team-mobile-link-warning");
-    const teamMobileLinkInput = $("#team-link-input");
-    const socialShareBlock = $("#social-share-block");
-    const newsBlock = $("#news-block");
+    const startMenu = document.querySelector<StartMenu>("start-menu")!;
+
+    const teamMobileLink = document.getElementById("team-mobile-link")!;
+    const teamMobileLinkDesc = document.getElementById("team-mobile-link-desc")!;
+    const teamMobileLinkWarning = document.getElementById("team-mobile-link-warning")!;
+    const teamLinkInput = document.getElementById("team-link-input")! as HTMLInputElement;
+    const socialShareBlock = document.getElementById("social-share-block")!;
+    const newsBlock = document.getElementById("news-block")!;
 
     // Team mobile link
-    $("#btn-join-team").on("click", () => {
-        $("#server-warning").css("display", "none");
-        teamMobileLinkInput.val("");
-        teamMobileLink.css("display", "block");
-        teamMobileLinkDesc.css("display", "block");
-        teamMobileLinkWarning.css("display", "none");
-        startMenuWrapper.css("display", "none");
-        newsBlock.css("display", "none");
-        socialShareBlock.css("display", "none");
-        $("#right-column").css("display", "none");
-        return false;
-    });
-    $("#btn-team-mobile-link-leave").on("click", () => {
-        teamMobileLink.css("display", "none");
-        teamMobileLinkInput.val("");
-        startMenuWrapper.css("display", "block");
-        newsBlock.css("display", "block");
-        socialShareBlock.css("display", "block");
-        $("#right-column").css("display", "block");
-        return false;
+    startMenu.addEventListener("join-team", () => { // once again once more html thingies are turned into Lit components this ideally pretty much disappears :p
+        document.getElementById("server-warning")!.style.display = "none";
+        teamLinkInput.value = "";
+        teamMobileLink.style.display = "block";
+        teamMobileLinkDesc.style.display = "block";
+        teamMobileLinkWarning.style.display = "none";
+        newsBlock.style.display = "none";
+        socialShareBlock.style.display = "none";
+        document.getElementById("right-column")!.style.display = "none";
+    })
+    document.getElementById("btn-team-mobile-link-leave")!.addEventListener("click", () => {
+        startMenu.localization = localization;
+        teamMobileLink.style.display = "none";
+        teamLinkInput.value = "";
+        newsBlock.style.display = "block";
+        socialShareBlock.style.display = "block";
+        document.getElementById("right-column")!.style.display = "block";
+        startMenu.show();
     });
 
     // Auto submit link or code on enter
-    $("#team-link-input").on("keypress", (e) => {
+    teamLinkInput.addEventListener("keydown", (e) => {
         if (e.key === "Enter") {
-            $("#btn-team-mobile-link-join").trigger("click");
-            e.target.blur();
+            document.getElementById("btn-team-mobile-link-join")!.click();
+            teamLinkInput.blur();
         }
     });
-
-    // Blur name input on enter
-    $("#player-name-input-solo").on("keypress", (e) => {
-        if (e.key === "Enter") {
-            e.target.blur();
-        }
-    });
-
-    // Scroll to name input on mobile
-    if (device.mobile && device.os != "ios") {
-        $("#player-name-input-solo").on("focus", function () {
-            if (device.isLandscape) {
-                const height = device.screenHeight;
-                const offset = height <= 282 ? 18 : 36;
-                document.body.scrollTop = $(this).offset()!.top - offset;
-            }
-        });
-        $("#player-name-input-solo").on("blur", () => {
-            document.body.scrollTop = 0;
-        });
-    }
 
     // Modals
-    const startBottomRight = $("#start-bottom-right");
-    const startTopLeft = $("#start-top-left");
-    const startTopRight = $("#start-top-right");
+    const startBottomRight = document.getElementById("start-bottom-right")!;
+    const startTopLeft = document.getElementById("start-top-left")!;
+    const startTopRight = document.getElementById("start-top-right")!;
 
     // Keybind Modal
     const modalKeybind = document.querySelector<KeybindModal>("keybind-modal")!;
     modalKeybind.addEventListener("close", () => {
-        startBottomRight.fadeIn(200);
-        startTopRight.fadeIn(200);
+        helpers.fadeIn(startBottomRight, "block", 200);
+        helpers.fadeIn(startTopRight, "block", 200);
     });
     // no its never going to be null go away typescript :/
     document.querySelector(".btn-keybind")!.addEventListener("click", (e) => {
@@ -504,89 +698,88 @@ function setupModals(inputBinds: InputBinds) {
         modalKeybind.inputBinds = inputBinds;
         modalKeybind.input = inputBinds.input;
         modalKeybind.localization = localization;
-        startBottomRight.fadeOut(200);
-        startTopRight.fadeOut(200);
+        helpers.fadeOut(startBottomRight, 200);
+        helpers.fadeOut(startTopRight, 200);
         modalKeybind.show();
     });
 
     // Settings Modal
     const modalSettings = document.querySelector<SettingsModal>("settings-modal")!;
-    // now to just remove fadeIn and fadeOut...
     modalSettings.addEventListener("close", () => {
-        startBottomRight.fadeIn(200);
-        startTopRight.fadeIn(200);
+        helpers.fadeIn(startBottomRight, "block", 200);
+        helpers.fadeIn(startTopRight, "block", 200);
     });
 
     document.querySelectorAll(".btn-settings").forEach(btn => {
         btn.addEventListener("click", e => {
             e.preventDefault();
-            startBottomRight.fadeOut(200);
-            startTopRight.fadeOut(200);
+            helpers.fadeOut(startBottomRight, 200);
+            helpers.fadeOut(startTopRight, 200);
             modalSettings.open = true;
         });
     });
     // Hamburger Modal
     const modalHamburger = document.querySelector<HamburgerModal>("hamburger-modal")!;
     modalHamburger.addEventListener("close", () => {
-        startTopLeft.fadeIn(200);
+        helpers.fadeIn(startTopLeft, "block", 200);
     })
     document.querySelector("#btn-hamburger")!.addEventListener("click", e => {
         e.preventDefault();
-        startTopLeft.fadeOut(200);
+        helpers.fadeOut(startTopLeft, 200);
         modalHamburger.show();
     })
 
     // unrelated to the hamburger modal so not sure why it was so close to it...
-    $(".modal-body-text").on("click", function () {
-        const checkbox = $(this).siblings("input:checkbox");
-        checkbox.prop("checked", !checkbox.is(":checked"));
-        checkbox.trigger("change");
+    document.querySelectorAll(".modal-body-text").forEach(el => { // after further inspection this appears to be fully unused since nothing in the index.html matches what this would do so yea... I will just leave it for now though :p
+        el.addEventListener("click", () => {
+            const checkbox = el.parentElement?.querySelector<HTMLInputElement>('input[type="checkbox"]');
+            if (!checkbox) return;
+            checkbox.checked = !checkbox.checked;
+            checkbox.dispatchEvent(new Event("change", { bubbles: true }));
+        });
     });
-    $("#force-refresh").on("click", () => {
+    document.getElementById("force-refresh")?.addEventListener("click", () => {
         window.location.href = `/?t=${Date.now()}`;
     });
 }
-function onResize() {
+function onResize() { // ideally we would get rid of this and just mkae everything a Lit component handling its own styles and everything but for now this can stay as is
     // Add styling specific to safari in browser
     if (device.os == "ios") {
         // iPhone X+ specific
         if (device.model == "iphonex") {
-            if (device.isLandscape) {
-                $(".main-volume-slider").css("width", "90%");
-            } else {
-                $(".main-volume-slider").css("width", "");
-            }
+            const slider = document.querySelector<HTMLElement>(".main-volume-slider")!;
+            slider.style.width = device.isLandscape? "90%" : "";
         } else if (!window.navigator.standalone) {
+            const startMainCenter = document.getElementById("start-main-center")!;
+            const modalContent = document.querySelector<HTMLElement>("#modal-customize .modal-content")!;
             if (device.isLandscape) {
-                $("#start-main-center").attr("style", "");
-                $("#modal-customize .modal-content").attr("style", "");
+                startMainCenter.removeAttribute("style");
+                modalContent.removeAttribute("style");
             } else {
-                $("#modal-customize .modal-content").css({
-                    transform: "translate(-50%, -50%) scale(0.45)",
-                    top: "38%",
-                });
+                modalContent.style.transform = "translate(-50%, -50%) scale(0.45)"
+                modalContent.style.top = "38%";
             }
         }
     }
     if (device.tablet) {
         // Temporarily remove the youtube links
-        $("#featured-youtuber").remove();
-        $(".btn-youtube").remove();
+        document.getElementById("featured-youtuber")!.remove();
+        document.querySelector(".btn-youtube")!.remove();
     }
     if (device.touch) {
         // Remove full screen option from main menu
-        $(".btn-start-fullscreen").css("display", "none");
+        document.getElementById("btn-start-fullscreen")!.style.display = "none";
     } else {
-        $(".btn-start-fullscreen").css("display", "block");
+        document.getElementById("btn-start-fullscreen")!.style.display = "inline-block";
     }
     // Set keybind button styling
-    $(".btn-keybind").css("display", device.mobile ? "none" : "inline-block");
+    document.querySelector<HTMLElement>(".btn-keybind")!.style.display = device.mobile ? "none" : "inline-block";
 }
 
 function applyMobileBrowserStyling(isTablet: boolean) {
-    $("#team-hide-url").css("display", "none");
+    document.getElementById("team-hide-url")!.style.display = "none";
     if (isTablet) {
-        $("#start-bottom-middle").addClass("start-bottom-middle-tablet");
+        document.getElementById("start-bottom-middle")!.classList.add("start-bottom-middle-tablet");
     }
 }
 

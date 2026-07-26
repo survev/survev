@@ -29,13 +29,10 @@ import { Pass } from "./ui/pass.ts";
 import { ProfileUi } from "./ui/profileUi.ts";
 import { TeamMenu } from "./ui/teamMenu.ts";
 import { loadStaticDomImages } from "./ui/ui2.ts";
+import { StartMenu } from "./ui/menu.ts";
 
 export class Application {
-    nameInput = $("#player-name-input-solo");
-    serverSelect = $("#server-select-main");
-    playMode0Btn = $("#btn-start-mode-0");
-    playMode1Btn = $("#btn-start-mode-1");
-    playMode2Btn = $("#btn-start-mode-2");
+    startMenu = document.querySelector<StartMenu>("start-menu")!;
     muteBtns = $(".btn-sound-toggle");
     aimLineBtn = $("#btn-game-aim-line");
     masterSliders = $<HTMLInputElement>(".sl-master-volume");
@@ -45,8 +42,6 @@ export class Application {
     languageSelect = $<HTMLSelectElement>(".language-select");
     startMenuWrapper = $("#start-menu-wrapper");
     gameAreaWrapper = $("#game-area-wrapper");
-    playButtons = $(".play-button-container");
-    playLoading = $(".play-loading-outer");
     errorModal = new MenuModal($("#modal-notification"));
     refreshModal = new MenuModal($("#modal-refresh"));
     ipBanModal = new MenuModal($("#modal-ip-banned"));
@@ -156,31 +151,22 @@ export class Application {
             this.localization.localizeIndex();
             this.account.init();
 
-            this.nameInput.attr("maxLength", net.Constants.PlayerNameMaxLen);
+            this.startMenu.playerMaxNameLength = net.Constants.PlayerNameMaxLen;
 
-            this.playMode0Btn.on("click", () => {
+            this.startMenu.localization = this.localization;
+
+            this.startMenu.addEventListener("quick-start", (event) => {
+                const mode = (event as CustomEvent<number>).detail;
                 SDK.requestMidGameAd(() => {
-                    this.tryQuickStartGame(0);
-                });
-            });
-            this.playMode1Btn.on("click", () => {
-                SDK.requestMidGameAd(() => {
-                    this.tryQuickStartGame(1);
-                });
-            });
-            this.playMode2Btn.on("click", () => {
-                SDK.requestMidGameAd(() => {
-                    this.tryQuickStartGame(2);
+                    this.tryQuickStartGame(mode);
                 });
             });
 
-            this.serverSelect.on("change", () => {
-                const t = this.serverSelect.find(":selected").val();
-                this.config.set("region", t as string);
+            this.startMenu.addEventListener("region-change", (e) => {
+                const region = (e as CustomEvent<string>).detail;
+                this.config.set("region", region);
             });
-            this.nameInput.on("blur", (_t) => {
-                this.setConfigFromDOM();
-            });
+
             this.muteBtns.on("click", (_t) => {
                 this.config.set("muteAudio", !this.config.get("muteAudio"));
             });
@@ -351,7 +337,7 @@ export class Application {
                 this.teamMenu.onGameComplete();
                 this.ambience.onGameComplete(this.audioManager);
                 this.setAppActive(true);
-                this.setPlayLockout(false);
+                this.startMenu.setPlayLockout(false);
                 if (errMsg == "index-invalid-protocol") {
                     this.showInvalidProtocolModal();
                 }
@@ -435,38 +421,6 @@ export class Application {
         }
     }
 
-    setPlayLockout(lock: boolean) {
-        let delay = lock ? 0 : 1000;
-        if (IS_DEV) {
-            delay = 0;
-        }
-        this.playButtons
-            .stop()
-            .delay(delay)
-            .animate(
-                {
-                    opacity: lock ? 0.5 : 1,
-                },
-                IS_DEV ? 0 : 250,
-            );
-        this.playLoading
-            .stop()
-            .delay(delay)
-            .animate(
-                {
-                    opacity: lock ? 1 : 0,
-                },
-                {
-                    duration: IS_DEV ? 0 : 250,
-                    start: () => {
-                        this.playLoading.css({
-                            "pointer-events": lock ? "initial" : "none",
-                        });
-                    },
-                },
-            );
-    }
-
     onTeamMenuJoinGame(data: FindGameMatchData) {
         this.waitOnAccount(() => {
             this.joinGame(data);
@@ -485,30 +439,26 @@ export class Application {
     }
 
     // Config
-    setConfigFromDOM() {
-        const playerName = helpers.sanitizeNameInput(this.nameInput.val() as string);
+    syncConfigFromStartMenu() {
+        const playerName = helpers.sanitizeNameInput(this.startMenu.playerName);
         this.config.set("playerName", playerName);
-        const region = this.serverSelect.find(":selected").val();
-        this.config.set("region", region as string);
+        this.config.set("region", this.startMenu.selectedRegion);
     }
 
-    setDOMFromConfig() {
-        if (SDK.isAnySDK && !this.config.get("playerName")) {
+    setDOMFromConfig() { // technically now this name is slightly weird... since most of the function is no longer updating the DOM except for the language stuff... so once the language stuff is changed update this function name to something better
+        this.startMenu.playerName = this.config.get("playerName") ?? "";
+
+        const spellSyncLang = SDK.isSpellSync && window.spellSync.language;
+        this.startMenu.selectedRegion = spellSyncLang ?? this.config.get("region") ?? "";
+
+        if (SDK.isAnySDK && !this.startMenu.playerName) {
             SDK.getPlayerName().then((username) => {
                 if (!username) return;
                 this.config.set("playerName", username);
-                this.nameInput.val(username);
+                this.startMenu.playerName = username;
             });
         }
 
-        this.nameInput.val(this.config.get("playerName")!);
-        this.serverSelect.find("option").each((_i, ele) => {
-            const spellSyncLang = SDK.isSpellSync && window.spellSync.language;
-            const configRegion = this.config.get("region");
-            ele.selected = spellSyncLang
-                ? ele.value === spellSyncLang
-                : ele.value === configRegion;
-        });
         this.languageSelect.val(this.localization.getLocale());
     }
 
@@ -581,17 +531,9 @@ export class Application {
         });
         this.serverWarning.html(this.errorMessage);
 
-        const updateButton = (ele: JQuery<HTMLElement>, gameModeIdx: number) => {
-            ele.html(
-                this.quickPlayPendingModeIdx === gameModeIdx
-                    ? "<div class=\"ui-spinner\"></div>"
-                    : this.localization.translate(ele.data("l10n")),
-            );
-        };
+        this.startMenu.localization = this.localization;
 
-        updateButton(this.playMode0Btn, 0);
-        updateButton(this.playMode1Btn, 1);
-        updateButton(this.playMode2Btn, 2);
+        this.startMenu.setPendingMode(this.quickPlayPendingModeIdx);
     }
 
     waitOnAccount(cb: () => void) {
@@ -628,7 +570,7 @@ export class Application {
                 // DOM elements for input, such as player name and
                 // selected region. We will stash the menu values
                 // into the config so the team menu can read them.
-                this.setConfigFromDOM();
+                this.syncConfigFromStartMenu();
                 this.teamMenu.connect(create, roomUrl);
                 this.refreshUi();
             }
@@ -640,7 +582,7 @@ export class Application {
             // Update UI to display a spinner on the play button
             this.errorMessage = "";
             this.quickPlayPendingModeIdx = gameModeIdx;
-            this.setConfigFromDOM();
+            this.syncConfigFromStartMenu();
             this.refreshUi();
 
             // Wait some amount of time if we've recently attempted to
@@ -907,7 +849,7 @@ export class Application {
         if (this.game?.initialized && this.game.m_playing) {
             if (this.active) {
                 this.setAppActive(false);
-                this.setPlayLockout(true);
+                this.startMenu.setPlayLockout(true);
             }
             this.game.update(dt);
         }
