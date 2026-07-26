@@ -682,16 +682,16 @@ export class Application {
 
             const tryQuickStartGameImpl = () => {
                 this.waitOnAccount(() => {
-                    this.findGame(matchArgs, (err, matchData, ban) => {
-                        if (err) {
+                    this.findGame(matchArgs, {
+                        error: (err) => {
                             this.onJoinGameError(err);
-                            return;
-                        }
-                        if (ban) {
+                        },
+                        success: (data) => {
+                            this.joinGame(data);
+                        },
+                        ban: (ban) => {
                             this.showIpBanModal(ban);
-                            return;
-                        }
-                        this.joinGame(matchData!);
+                        },
                     });
                 });
             };
@@ -710,15 +710,15 @@ export class Application {
 
     findGame(
         matchArgs: FindGameBody,
-        cb: (
-            err?: FindGameError | null,
-            matchData?: FindGameMatchData,
-            ban?: FindGameResponse & { banned: true },
-        ) => void,
+        cbs: {
+            error: (err: FindGameError) => void;
+            success: (matchData: FindGameMatchData) => void;
+            ban: (data: FindGameResponse & { type: "banned" }) => void;
+        },
     ) {
         const findGameImpl = (iter: number, maxAttempts: number, token: string) => {
             if (iter >= maxAttempts) {
-                cb("full");
+                cbs.error("full");
                 return;
             }
             const retry = () => {
@@ -733,7 +733,7 @@ export class Application {
             };
             matchArgs.turnstileToken = token;
 
-            fetch(api.resolveUrl("/api/find_game"), {
+            fetch(api.resolveUrl("/api/find_game_v2"), {
                 method: "POST",
                 body: JSON.stringify(matchArgs),
                 headers: {
@@ -742,29 +742,12 @@ export class Application {
                 credentials: proxy.anyLoginSupported() ? "include" : "omit",
                 signal: helpers.abortSignal(10 * 1000),
             }).then(res => res.json()).then((data: FindGameResponse) => {
-                if (data.error === "invalid_captcha") {
-                    // captch may have failed because the enabled state has changed since site info was loaded
-                    // so force it to true
-                    this.siteInfo.info.captchaEnabled = true;
-                    retry();
-                    return;
-                }
-
-                if (data.error && data.error != "full") {
-                    cb(data.error);
-                    return;
-                }
-
-                if (data.banned) {
-                    cb(null, undefined, data as FindGameResponse & { banned: true });
-                    return;
-                }
-
-                const matchData = data.res ? data.res[0] : null;
-                if (matchData?.hosts && matchData.addrs) {
-                    cb(null, matchData);
-                } else {
-                    retry();
+                if (data.type === "error") {
+                    cbs.error(data.error);
+                } else if (data.type === "banned") {
+                    cbs.ban(data);
+                } else if (data.type === "success") {
+                    cbs.success(data.res);
                 }
             }).catch(() => {
                 retry();
@@ -841,7 +824,7 @@ export class Application {
         this.refreshModal.show(true);
     }
 
-    showIpBanModal(ban: FindGameResponse & { banned: true }) {
+    showIpBanModal(ban: FindGameResponse & { type: "banned" }) {
         $("#modal-ip-banned-reason").text(`Reason: ${ban.reason}`);
 
         let expiration = "Duration: indefinite";

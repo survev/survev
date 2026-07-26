@@ -155,7 +155,7 @@ class Bot {
 
         assert("gameId" in res);
         this.ws = new WebSocket(
-            `${res.useHttps ? "wss" : "ws"}://${res.addrs[0]}/play?gameId=${res.gameId}`,
+            `${res.useHttps ? "wss" : "ws"}://${res.hosts[0]}/play?gameId=${res.gameId}`,
         );
 
         this.data = res.data;
@@ -445,7 +445,7 @@ setInterval(() => {
 
 for (let i = 1; i <= config.botCount; i++) {
     const response = (await (
-        await fetch(`${config.address}/api/find_game`, {
+        await fetch(`${config.address}/api/find_game_v2`, {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",
@@ -462,12 +462,12 @@ for (let i = 1; i <= config.botCount; i++) {
             ),
         })
     ).json()) as FindGameResponse;
-    if ("error" in response || "banned" in response) {
-        console.log("Failed finding game, error:", response.error);
+    if (response.type !== "success") {
+        console.log("Failed finding game, error:", response);
         continue;
     }
 
-    const bot = new Bot(i, response.res[0]);
+    const bot = new Bot(i, response.res);
     bots.add(bot);
 
     await Promise.all([

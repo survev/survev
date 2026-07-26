@@ -19,7 +19,6 @@ export interface FindGameMatchData {
     gameId: string;
     useHttps: boolean;
     hosts: string[];
-    addrs: string[];
     data: string;
 }
 
@@ -53,25 +52,18 @@ export type FindGameError =
 
 export type FindGameResponse =
     | {
-        res: FindGameMatchData[];
-        error?: undefined;
-
-        banned?: undefined;
+        type: "success";
+        res: FindGameMatchData;
     }
     | {
+        type: "error";
         error: FindGameError;
-
-        res?: undefined;
-        banned?: undefined;
     }
     | {
-        banned: true;
+        type: "banned";
         reason: string;
         permanent: boolean;
         expiresIn: Date | string;
-
-        res?: undefined;
-        error?: undefined;
     };
 
 export interface SiteInfoRes {
