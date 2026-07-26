@@ -301,6 +301,9 @@ export class SettingsModal extends LitElement {
     @property({ type: Boolean })
     open = false;
 
+    @property({ attribute: false })
+    localization!: Localization;
+
     private close() {
         this.open = false;
         this.dispatchEvent(new CustomEvent("close"));
@@ -319,12 +322,15 @@ export class SettingsModal extends LitElement {
     }
 
     render() { // ideally get rid of the inline style later but since you guys have CSS that is essentially geared towards Jquery right now in line styles is the only way this modal is showing without breaking like all other modals :p
+        if (!this.localization) {
+            return html``;
+        }
         return html`
         <div id="modal-settings" class="modal" style=${this.open ? "display:block" : "display:none"} @click=${this.onBackdropClick}>
         <div class="modal-content modal-close" @click=${(e: MouseEvent) => e.stopPropagation()}>
           <div class="modal-header">
             <span class="close close-corner" @click=${this.close}></span>
-            <h2 data-l10n="index-settings">Settings</h2>
+            <h2>${this.localization.translate("index-settings")}</h2>
           </div>
           <div id="modal-settings-body" class="modal-body">
             <div id="language-select-mobile-wrapper" class="modal-settings-item">
@@ -333,38 +339,38 @@ export class SettingsModal extends LitElement {
               </div>
             </div>
             <div id="modal-settings-high-res" class="modal-settings-item">
-              <input id="highResTex" type="checkbox"><p class="modal-settings-checkbox-text" data-l10n="index-high-resolution" @click=${this.toggleCheckbox}>High resolution (check to increase visual quality)</p>
+              <input id="highResTex" type="checkbox"><p class="modal-settings-checkbox-text" @click=${this.toggleCheckbox}>${this.localization.translate("index-high-resolution")}</p>
             </div>
             <div id="modal-settings-interp" class="modal-settings-item">
-              <input id="interpolation" type="checkbox"><p class="modal-settings-checkbox-text" data-l10n="index-client-side-interp" @click=${this.toggleCheckbox}>Client side interpolation</p>
+              <input id="interpolation" type="checkbox"><p class="modal-settings-checkbox-text" @click=${this.toggleCheckbox}>${this.localization.translate("index-client-side-interp")}</p>
             </div>
               <div id="modal-settings-rotation" class="modal-settings-item hide-on-mobile">
-              <input id="localRotation" type="checkbox"><p class="modal-settings-checkbox-text" data-l10n="index-client-side-rotation" @click=${this.toggleCheckbox}>Client side player rotation</p>
+              <input id="localRotation" type="checkbox"><p class="modal-settings-checkbox-text" @click=${this.toggleCheckbox}>${this.localization.translate("index-client-side-rotation")}</p>
             </div>
             <div class="modal-settings-item hide-on-mobile">
-              <input id="screenShake" type="checkbox"><p class="modal-settings-checkbox-text" data-l10n="index-screen-shake" @click=${this.toggleCheckbox}>Screen shake</p>
+              <input id="screenShake" type="checkbox"><p class="modal-settings-checkbox-text" @click=${this.toggleCheckbox}>${this.localization.translate("index-screen-shake")}</p>
             </div>
             <div class="modal-settings-item">
-              <input id="anonPlayerNames" type="checkbox"><p class="modal-settings-checkbox-text" data-l10n="index-anon-player-names" @click=${this.toggleCheckbox}>Anonymize player names</p>
+              <input id="anonPlayerNames" type="checkbox"><p class="modal-settings-checkbox-text" @click=${this.toggleCheckbox}>${this.localization.translate("index-anon-player-names")}</p>
             </div>
             <div class="modal-settings-item slider-container main-volume-slider">
-              <p class="modal-slider-text" data-l10n="index-master-volume">Master Volume</p>
+              <p class="modal-slider-text">${this.localization.translate("index-master-volume")}</p>
               <input type="range" min="0" max="100" value="50" class="slider sl-master-volume" id="">
             </div>
             <div class="modal-settings-item slider-container main-volume-slider">
-              <p class="modal-slider-text" data-l10n="index-sfx-volume">SFX Volume</p>
+              <p class="modal-slider-text">${this.localization.translate("index-sfx-volume")}</p>
               <input type="range" min="0" max="100" value="50" class="slider sl-sound-volume" id="">
             </div>
             <div class="modal-settings-item slider-container main-volume-slider">
-              <p class="modal-slider-text" data-l10n="index-music-volume">Music Volume</p>
+              <p class="modal-slider-text">${this.localization.translate("index-music-volume")}</p>
               <input type="range" min="0" max="100" value="50" class="slider sl-music-volume" id="">
             </div>
             <div id="settings-links">
               <!--
-              <a href="privacy.html" target="_blank" class="footer-after" data-l10n="index-privacy">privacy</a>
+              <a href="privacy.html" target="_blank" class="footer-after">${this.localization.translate("index-privacy")}</a>
               -->
-              <a href="attribution.txt" target="_blank" class="footer-after" data-l10n="index-attributions">attributions</a>
-              <a href="hof.html" target="_blank" data-l10n="index-hof">HOF</a>
+              <a href="attribution.txt" target="_blank" class="footer-after">${this.localization.translate("index-attributions")}</a>
+              <a href="hof.html" target="_blank">${this.localization.translate("index-hof") || "HOF"}</a>
             </div>
           </div>
           <div class="modal-footer"></div>
@@ -523,7 +529,7 @@ export class KeybindModal extends LitElement { // this stuff is why Lit is cool 
         <div class="ui-modal-keybind-content modal-content modal-close" @click=${(e: MouseEvent) => e.stopPropagation()}>
           <div id="ui-modal-keybind-header" class="modal-header">
             <span id="ui-close-keybind" class="close close-corner" @click=${this.close}></span>
-            <h2 data-l10n="index-customize-keybinds">Customize Keybinds</h2>
+            <h2>${this.localization.translate("index-customize-keybinds") || "Customize Keybinds"}</h2>
           </div>
           <div id="ui-modal-keybind-body" class="modal-body">
             <div id="ui-modal-keybind-list" class="js-keybind-list" style=${`height:${this.shareOpen ? 275 : 420}px`}>
@@ -550,7 +556,7 @@ export class KeybindModal extends LitElement { // this stuff is why Lit is cool 
             <div id="ui-modal-keybind-share" style=${this.shareOpen ? "display:block" : "display:none"}>
               <div class="ui-modal-keybind-share-row">
                 <div class="ui-modal-keybind-share-elem">
-                  <span data-l10n="index-keybind-link">Share your keybinds with this code</span>:
+                  <span>${this.localization.translate("index-keybind-link")}</span>:
                 </div>
                 <div class="ui-modal-keybind-share-elem">
                   <div id="keybind-link-text">
@@ -559,17 +565,17 @@ export class KeybindModal extends LitElement { // this stuff is why Lit is cool 
                   </div>
                 </div>
               </div>
-              <span class="keybind-share-paste-text" data-l10n="index-keybind-paste">Load keybinds using a code here</span><span>:</span>
+              <span class="keybind-share-paste-text">${this.localization.translate("index-keybind-paste")}</span><span>:</span>
               <div id="keybind-warning" class="link-warning" style="display:${this.showWarning ? "block" : "none"}">Invalid code!</div>
               <div class="ui-modal-keybind-share-row">
                 <input type="text" class="menu-option" contenteditable="false" tabindex="0" autofocus placeholder="Paste a keybind code here" id="keybind-code-input" .value=${this.keybindCode} @input=${(e: Event) => this.keybindCode = (e.target as HTMLInputElement).value} />
-                <a class="btn-game-menu btn-darken" id="btn-keybind-code-load" data-l10n="index-keybind-apply" @click=${this.loadKeybinds}>Load</a>
+                <a class="btn-game-menu btn-darken" id="btn-keybind-code-load" @click=${this.loadKeybinds}>${this.localization.translate("index-keybind-apply")}</a>
               </div>
             </div>
           </div>
           <div id="ui-modal-keybind-footer" class="modal-footer modal-footer-round">
-            <a class="js-btn-keybind-share btn-game-menu btn-darken" data-l10n="game-share" @click=${this.toggleShare}>Share</a>
-            <a class="js-btn-keybind-restore btn-game-menu btn-darken" data-l10n="game-restore-defaults" @click=${this.restoreDefaults}>Restore Defaults</a>
+            <a class="js-btn-keybind-share btn-game-menu btn-darken" @click=${this.toggleShare}>${this.localization.translate("game-share") || "Share"}</a>
+            <a class="js-btn-keybind-restore btn-game-menu btn-darken" @click=${this.restoreDefaults}>${this.localization.translate("game-restore-defaults") || "Restore Defaults"}</a>
           </div>
         </div>
       </div>
@@ -594,12 +600,18 @@ export class HamburgerModal extends LitElement {
     @property({ type: Boolean })
     open = false;
 
+    @property({ attribute: false })
+    localization!: Localization;
+
     private close() {
         this.open = false;
         this.dispatchEvent(new CustomEvent("close"));
     }
 
     render() {
+        if (!this.localization) {
+            return html``;
+        }
         return html`
         <div id="modal-hamburger" class="modal" style=${this.open ? "display:block" : "display:none"} @click=${this.close}>
             <div class="modal-content modal-close">
@@ -609,7 +621,7 @@ export class HamburgerModal extends LitElement {
                 </div>
                 <div id="modal-hamburger-body" class="modal-body">
                     <div id="modal-hamburger-leaderboards">
-                        <a href="/stats" target="_blank" class="btn-leaderboard-stats-link menu-option btn-darken" data-l10n="index-leaderboards">Leaderboards</a>
+                        <a href="/stats" target="_blank" class="btn-leaderboard-stats-link menu-option btn-darken">${this.localization.translate("index-leaderboards")}</a>
                         </div>
                         <div class="modal-divider"></div>
                         <!-- <div class="btn-social-wrapper">
@@ -697,7 +709,7 @@ function setupModals(inputBinds: InputBinds) {
         e.preventDefault();
         modalKeybind.inputBinds = inputBinds;
         modalKeybind.input = inputBinds.input;
-        modalKeybind.localization = localization;
+        modalKeybind.localization = startMenu.localization;
         helpers.fadeOut(startBottomRight, 200);
         helpers.fadeOut(startTopRight, 200);
         modalKeybind.show();
@@ -715,6 +727,7 @@ function setupModals(inputBinds: InputBinds) {
             e.preventDefault();
             helpers.fadeOut(startBottomRight, 200);
             helpers.fadeOut(startTopRight, 200);
+            modalSettings.localization = startMenu.localization;
             modalSettings.open = true;
         });
     });
@@ -726,6 +739,7 @@ function setupModals(inputBinds: InputBinds) {
     document.querySelector("#btn-hamburger")!.addEventListener("click", e => {
         e.preventDefault();
         helpers.fadeOut(startTopLeft, 200);
+        modalHamburger.localization = startMenu.localization;
         modalHamburger.show();
     })
 
