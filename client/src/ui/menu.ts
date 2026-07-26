@@ -653,7 +653,6 @@ export class HamburgerModal extends LitElement {
 }
 
 function setupModals(inputBinds: InputBinds) {
-    const localization = new Localization; // we could just replace the inputBindUI thing with localization and get rid of this const... but eh it is basically the same thing :p
 
     const startMenu = document.querySelector<StartMenu>("start-menu")!;
 
@@ -676,7 +675,6 @@ function setupModals(inputBinds: InputBinds) {
         document.getElementById("right-column")!.style.display = "none";
     })
     document.getElementById("btn-team-mobile-link-leave")!.addEventListener("click", () => {
-        startMenu.localization = localization;
         teamMobileLink.style.display = "none";
         teamLinkInput.value = "";
         newsBlock.style.display = "block";
