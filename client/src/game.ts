@@ -18,6 +18,7 @@ import { Editor } from "./debug/editor.ts";
 
 import { GameObjectDefs } from "../../shared/defs/register.ts";
 import { SpectateAction } from "../../shared/net/spectateMsg.ts";
+import type { GameWsDisconnectReason } from "../../shared/types/api.ts";
 import { device } from "./device.ts";
 import { EmoteBarn } from "./emote.ts";
 import { errorLogManager } from "./errorLogs.ts";
@@ -95,7 +96,6 @@ export class Game {
 
     m_updatePass!: boolean;
     m_updatePassDelay!: number;
-    m_disconnectMsg!: string;
     m_playing!: boolean;
     m_gameOver!: boolean;
     m_spectating!: boolean;
@@ -133,7 +133,7 @@ export class Game {
         public m_ambience: Ambiance,
         public m_resourceManager: ResourceManager,
         public onJoin: () => void,
-        public onQuit: (err?: string) => void,
+        public onQuit: (err?: GameWsDisconnectReason) => void,
     ) {
         if (IS_DEV) {
             this.editor = new Editor(this.m_config);
@@ -190,7 +190,7 @@ export class Game {
                         msgStream.stream.buffer.byteLength,
                     );
                 };
-                this.m_ws.onclose = () => {
+                this.m_ws.onclose = (e) => {
                     const displayingStats = this.m_uiManager?.displayingStats;
                     const connecting = this.connecting;
                     const connected = this.connected;
@@ -199,7 +199,7 @@ export class Game {
                     if (connecting) {
                         onConnectFail();
                     } else if (connected && !this.m_gameOver && !displayingStats) {
-                        const errMsg = this.m_disconnectMsg || "index-host-closed";
+                        const errMsg = (e.reason as GameWsDisconnectReason) || "host_closed";
                         this.onQuit(errMsg);
                     }
                 };
@@ -308,7 +308,6 @@ export class Game {
             }
         }
         // Local vars
-        this.m_disconnectMsg = "";
         this.m_playing = false;
         this.m_gameOver = false;
         this.m_spectating = false;
@@ -1597,11 +1596,6 @@ export class Game {
                     this.m_uiManager.updatePlayersAliveBlue(msg.teamAliveCounts[1]);
                 }
                 break;
-            }
-            case net.MsgType.Disconnect: {
-                const msg = new net.DisconnectMsg();
-                msg.deserialize(stream);
-                this.m_disconnectMsg = msg.reason;
             }
         }
     }

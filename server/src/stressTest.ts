@@ -283,10 +283,6 @@ class Bot {
                 msg.deserialize(stream);
                 break;
             }
-            case net.MsgType.Disconnect: {
-                const msg = new net.DisconnectMsg();
-                msg.deserialize(stream);
-            }
         }
     }
 

@@ -38,17 +38,34 @@ export const loadoutSchema = z.object({
 });
 
 export type FindGameError =
-    | "invalid_ip"
-    | "find_game_failed"
-    | "mode_disabled"
-    | "invalid_region"
-    | "full"
-    | "invalid_protocol"
-    | "join_game_failed"
-    | "rate_limited"
     | "banned"
     | "behind_proxy"
-    | "invalid_captcha";
+    | "find_game_failed"
+    | "full"
+    | "invalid_captcha"
+    | "invalid_ip"
+    | "invalid_protocol"
+    | "invalid_region"
+    | "join_game_failed"
+    | "mode_disabled"
+    | "rate_limited";
+
+export type FindGamePrivateError =
+    | "find_game_failed"
+    | "full"
+    | "invalid_protocol"
+    | "invalid_region";
+
+export type GameWsDisconnectReason =
+    | "behind_proxy"
+    | "full"
+    | "host_closed"
+    | "invalid_packet"
+    | "invalid_protocol"
+    | "ip_banned"
+    | "rate_limited"
+    | "server_crashed"
+    | "server_restart";
 
 export type FindGameResponse =
     | {

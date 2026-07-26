@@ -3,7 +3,7 @@ import { randomUUID } from "node:crypto";
 import type { WebSocket } from "uWebSockets.js";
 import { type MapDefKey, MapDefs } from "../../../shared/defs/mapDefs.ts";
 import type { TeamMode } from "../../../shared/gameConfig.ts";
-import * as net from "../../../shared/net/net.ts";
+import type { GameWsDisconnectReason } from "../../../shared/types/api.ts";
 import { util } from "../../../shared/utils/util.ts";
 import { ServerLogger } from "../utils/logger.ts";
 import { type FindGamePrivateBody, type ServerGameConfig } from "../utils/types.ts";
@@ -113,14 +113,7 @@ class GameProcess {
             case ProcessMsgType.SocketClose:
                 const socket = this.manager.sockets.get(msg.socketId);
                 if (socket && !socket.getUserData().closed) {
-                    if (msg.reason) {
-                        const disconnectMsg = new net.DisconnectMsg();
-                        disconnectMsg.reason = msg.reason;
-                        const stream = new net.MsgStream(new ArrayBuffer(128));
-                        stream.serializeMsg(net.MsgType.Disconnect, disconnectMsg);
-                        socket.send(stream.getBuffer(), true, false);
-                    }
-                    socket.end();
+                    socket.end(msg.reason ? 3000 : undefined, msg.reason);
                 }
                 break;
         }
@@ -188,7 +181,7 @@ export interface GameSocketData {
     closed: boolean;
     rateLimit: Record<symbol, number>;
     ip: string;
-    disconnectReason: string;
+    disconnectReason?: GameWsDisconnectReason;
 }
 
 export class GameProcessManager {
@@ -200,7 +193,12 @@ export class GameProcessManager {
     readonly logger = new ServerLogger("Game Process Manager");
 
     constructor() {
-        process.on("beforeExit", () => {
+        process.on("exit", () => {
+            for (const socket of this.sockets.values()) {
+                if (socket.getUserData().closed) continue;
+                socket.end(3000, "server_restart");
+            }
+
             for (const gameProc of this.processes) {
                 gameProc.process.kill();
             }
@@ -296,7 +294,7 @@ export class GameProcessManager {
             const data = socket.getUserData();
             if (data.closed) continue;
             if (data.gameId !== gameProc.gameData.id) continue;
-            socket.end();
+            socket.end(3000, "server_crashed");
         }
 
         // send SIGTERM, if still hasn't terminated after 5 seconds, send SIGKILL >:3

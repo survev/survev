@@ -4,6 +4,7 @@ import { GameConfig } from "../../../shared/gameConfig.ts";
 import * as net from "../../../shared/net/net.ts";
 import { SpectateAction } from "../../../shared/net/spectateMsg.ts";
 import type { Emote, GroupStatus } from "../../../shared/net/updateMsg.ts";
+import type { GameWsDisconnectReason } from "../../../shared/types/api.ts";
 import { coldet } from "../../../shared/utils/coldet.ts";
 import { collider } from "../../../shared/utils/collider.ts";
 import { math } from "../../../shared/utils/math.ts";
@@ -71,7 +72,7 @@ export class ClientBarn {
                 },
             );
             if (count.length >= 5) {
-                socket.closeWithReason("rate_limited");
+                socket.close("rate_limited");
                 return;
             }
         }
@@ -88,7 +89,7 @@ export class ClientBarn {
     deserializeMsg(buff: ArrayBuffer): {
         type: net.MsgType;
         msg: net.AbstractMsg | undefined;
-        error?: string;
+        error?: GameWsDisconnectReason;
     } {
         const msgStream = new net.MsgStream(buff);
         const stream = msgStream.stream;
@@ -119,7 +120,7 @@ export class ClientBarn {
                     return {
                         type: net.MsgType.Join,
                         msg: undefined,
-                        error: "index-invalid-protocol",
+                        error: "invalid_protocol",
                     };
                 }
                 stream.index = oldIdx;
@@ -169,7 +170,7 @@ export class ClientBarn {
 
         let msg: net.AbstractMsg | undefined = undefined;
         let type = net.MsgType.None;
-        let error: string | undefined;
+        let error: GameWsDisconnectReason | undefined;
 
         try {
             const deserialized = this.deserializeMsg(buff);
@@ -186,21 +187,13 @@ export class ClientBarn {
                 // the slice is to make sure it doesn't overflow the error webhook
                 JSON.stringify([...new Uint8Array(buff.slice(0, 255))]),
             );
-            if (client) {
-                client.disconnect();
-            } else {
-                socket.close();
-            }
+            socket.close("invalid_packet");
             return;
         }
 
         if (error) {
-            this.game.logger.warn("Disconnecting client because of packet error:", error);
-            if (client) {
-                client.disconnect(error);
-            } else {
-                socket.close();
-            }
+            this.game.logger.warn("Disconnecting socket because of packet error:", error);
+            socket.close(error);
             return;
         }
 
@@ -213,7 +206,7 @@ export class ClientBarn {
 
         if (!client) {
             this.game.logger.warn("No client found and we didn't receive a JoinMsg, closing socket");
-            socket.close();
+            socket.close("invalid_packet");
             return;
         }
 
@@ -353,12 +346,8 @@ export class Client {
         this.socket.send(buffer);
     }
 
-    disconnect(reason?: string) {
-        if (reason) {
-            this.socket.closeWithReason(reason);
-        } else {
-            this.socket.close();
-        }
+    disconnect(reason?: GameWsDisconnectReason) {
+        this.socket.close(reason);
     }
 
     update(dt: number) {

@@ -5,6 +5,7 @@ import type { FindGameMatchData } from "../../../shared/types/api.ts";
 import type {
     RoomData,
     ServerToClientTeamMsg,
+    TeamErrorMsg,
     TeamMenuErrorType,
     TeamPlayGameMsg,
     TeamStateMsg,
@@ -19,7 +20,7 @@ import { SDK } from "../sdk/sdk.ts";
 import type { SiteInfo } from "../siteInfo.ts";
 import type { Localization } from "./localization.ts";
 
-function errorTypeToString(type: string, localization: Localization) {
+function errorTypeToString(type: TeamMenuErrorType, localization: Localization) {
     const typeMap = {
         join_full: localization.translate("index-team-is-full"),
         join_not_found: localization.translate("index-failed-joining-team"),
@@ -59,6 +60,8 @@ export class TeamMenu {
     ws: WebSocket | null = null;
     keepAliveTimeout = 0;
 
+    gameError: string | undefined = undefined;
+
     // Ui state
     playerData = {};
     roomData = {} as RoomData;
@@ -84,7 +87,7 @@ export class TeamMenu {
         public localization: Localization,
         public audioManager: AudioManager,
         public joinGameCb: (data: FindGameMatchData) => void,
-        public leaveCb: (err: string) => void,
+        public leaveCb: (err?: string) => void,
     ) {
         // Listen for ui modifications
         this.serverSelect.on("change", () => {
@@ -185,6 +188,7 @@ export class TeamMenu {
             this.create = create;
             this.joiningGame = false;
             this.editingName = false;
+            this.gameError = undefined;
 
             // Load properties from config
             this.playerData = {
@@ -196,7 +200,7 @@ export class TeamMenu {
                 gameModeIdx: this.config.get("gameModeIdx")!,
                 autoFill: this.config.get("teamAutoFill")!,
                 findingGame: false,
-                lastError: "",
+                lastError: undefined,
             } as RoomData;
             this.displayedInvalidProtocolModal = false;
 
@@ -214,7 +218,7 @@ export class TeamMenu {
                     this.ws?.close();
                 };
                 this.ws.onclose = () => {
-                    let errMsg = "";
+                    let errMsg: TeamMenuErrorType | undefined = undefined;
                     if (!this.joiningGame) {
                         errMsg = this.joined
                             ? "lost_conn"
@@ -249,7 +253,7 @@ export class TeamMenu {
         }
     }
 
-    leave(errType = "") {
+    leave(errType?: TeamMenuErrorType) {
         if (this.active) {
             this.ws?.close();
             this.ws = null;
@@ -265,7 +269,7 @@ export class TeamMenu {
                 this.config.set("region", this.roomData.region);
             }
             let errTxt = "";
-            if (errType && errType != "") {
+            if (errType) {
                 errTxt = errorTypeToString(errType, this.localization);
             }
             this.leaveCb(errTxt);
@@ -274,10 +278,12 @@ export class TeamMenu {
         }
     }
 
-    onGameComplete() {
+    onGameComplete(errMessage?: string) {
         if (this.active) {
             this.joiningGame = false;
             this.sendMessage("gameComplete");
+
+            this.gameError = errMessage;
         }
     }
 
@@ -321,7 +327,7 @@ export class TeamMenu {
                 this.leave("kicked");
                 break;
             case "error":
-                this.leave((data as { type: string }).type);
+                this.leave((data as TeamErrorMsg["data"]).type);
         }
     }
 
@@ -370,6 +376,7 @@ export class TeamMenu {
                 this.sendMessage("playGame", matchArgs);
             });
             this.roomData.findingGame = true;
+            this.gameError = undefined;
             this.refreshUi();
         }
     }
@@ -400,10 +407,11 @@ export class TeamMenu {
         $("#social-share-block").css("display", this.active ? "none" : "block");
 
         // Error text
-        const hasError = this.roomData.lastError != "";
-        const errorTxt = errorTypeToString(this.roomData.lastError, this.localization);
-        this.serverWarning.css("opacity", hasError ? 1 : 0);
-        this.serverWarning.html(errorTxt);
+        const errorTxt = this.roomData.lastError
+            ? errorTypeToString(this.roomData.lastError!, this.localization)
+            : this.gameError;
+        this.serverWarning.css("opacity", errorTxt ? 1 : 0);
+        this.serverWarning.html(errorTxt || "");
 
         if (
             this.roomData.lastError == "find_game_invalid_protocol"

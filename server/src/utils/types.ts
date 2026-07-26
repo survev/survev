@@ -1,7 +1,7 @@
 import { z } from "zod";
 import type { MapDefKey } from "../../../shared/defs/mapDefs.ts";
 import { TeamMode } from "../../../shared/gameConfig.ts";
-import { type FindGameError, loadoutSchema } from "../../../shared/types/api.ts";
+import { type FindGamePrivateError, loadoutSchema } from "../../../shared/types/api.ts";
 import type { MatchDataTable } from "../api/db/schema.ts";
 
 export const zUpdateRegionBody = z.object({
@@ -58,4 +58,4 @@ export type FindGamePrivateRes =
         hosts: string[];
         addrs: string[];
     }
-    | { error: FindGameError };
+    | { error: FindGamePrivateError };

@@ -271,10 +271,9 @@ export enum MsgType {
     None,
     // DON'T EVEN THINK ABOUT REORDERING THINGS HERE!!!!
     // JoinMsg should always be ID 1 to not break protocol version check with old clients!
-    // And DisconnectMsg should always be ID 2, so it receives errors from JoinMsg Properly
     // Please add new Msg Types always to the end of the enum to stay as safe as possible
     Join = 1,
-    Disconnect = 2,
+    _Disconnect = 2, // now unused, socket.close has disconnect reasons
     Input,
     Edit,
     Joined,
@@ -314,7 +313,6 @@ export class UpdatePassMsg {
 }
 
 export { AliveCountsMsg } from "./aliveCountsMsg.ts";
-export { DisconnectMsg } from "./disconnectMsg.ts";
 export { DropItemMsg } from "./dropItemMsg.ts";
 export { EditMsg } from "./editMsg.ts";
 export { EmoteMsg } from "./emoteMsg.ts";

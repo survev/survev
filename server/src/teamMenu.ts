@@ -2,7 +2,7 @@ import type { Hono } from "hono";
 import { getCookie } from "hono/cookie";
 import type { UpgradeWebSocket, WSContext } from "hono/ws";
 import { randomUUID } from "node:crypto";
-import type { FindGameError } from "../../shared/types/api.ts";
+import type { FindGamePrivateError } from "../../shared/types/api.ts";
 import {
     type ClientRoomData,
     type ClientToServerTeamMsg,
@@ -101,7 +101,7 @@ class Room {
     data: RoomData = {
         roomUrl: "",
         findingGame: false,
-        lastError: "",
+        lastError: undefined,
         region: "",
         autoFill: true,
         enabledGameModeIdxs: [],
@@ -291,7 +291,7 @@ class Room {
         });
 
         if ("error" in res) {
-            const errMap: Partial<Record<FindGameError, TeamMenuErrorType>> = {
+            const errMap: Partial<Record<FindGamePrivateError, TeamMenuErrorType>> = {
                 full: "find_game_full",
                 invalid_protocol: "find_game_invalid_protocol",
             };
@@ -308,7 +308,7 @@ class Room {
         const joinData = res;
         if (!joinData) return;
 
-        this.data.lastError = "";
+        this.data.lastError = undefined;
 
         for (const player of this.players) {
             player.inGame = true;
@@ -519,8 +519,8 @@ export class TeamMenu {
             assert(data.length < 1024);
             msg = JSON.parse(data);
             zTeamClientMsg.parse(msg);
-        } catch {
-            this.logger.warn("Failed to parse message, closing socket.");
+        } catch (e) {
+            this.logger.warn("Failed to parse message, closing socket.", e);
             ws.close();
             return;
         }

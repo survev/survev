@@ -208,22 +208,12 @@ class ProcessSocket<T extends object> extends ClientSocket<T> {
             ip: "",
         });
     }
-    close(): void {
+    close(reason?: string): void {
         this._closed = true;
         sendMsg({
             type: ProcessMsgType.SocketClose,
             socketId: this._id,
-            reason: undefined,
-        });
-        socketIdToSocket.delete(this._id);
-    }
-
-    closeWithReason(reason: string): void {
-        this._closed = true;
-        sendMsg({
-            type: ProcessMsgType.SocketClose,
-            socketId: this._id,
-            reason: reason,
+            reason,
         });
         socketIdToSocket.delete(this._id);
     }

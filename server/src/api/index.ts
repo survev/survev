@@ -140,6 +140,12 @@ app.post("/api/find_game_v2", validateParams(zFindGameBody), async (c) => {
     }
 
     const body = c.req.valid("json");
+
+    const mode = server.modes[body.gameModeIdx];
+    if (!mode || !mode.enabled) {
+        return c.json<FindGameResponse>({ type: "error", error: "mode_disabled" });
+    }
+
     if (server.captchaEnabled && !user) {
         if (!body.turnstileToken) {
             return c.json<FindGameResponse>({ type: "error", error: "invalid_captcha" });
@@ -153,11 +159,6 @@ app.post("/api/find_game_v2", validateParams(zFindGameBody), async (c) => {
             server.logger.error("/api/find_game: Failed verifying turnstile: ", err);
             return c.json<FindGameResponse>({ type: "error", error: "invalid_captcha" }, 500);
         }
-    }
-
-    const mode = server.modes[body.gameModeIdx];
-    if (!mode || !mode.enabled) {
-        return c.json<FindGameResponse>({ type: "error", error: "full" });
     }
 
     const playerData = await getFindGamePlayerData([
@@ -178,7 +179,7 @@ app.post("/api/find_game_v2", validateParams(zFindGameBody), async (c) => {
     });
 
     if ("error" in data) {
-        return c.json({ type: "error", error: data.error });
+        return c.json<FindGameResponse>({ type: "error", error: data.error });
     }
 
     return c.json<FindGameResponse>({

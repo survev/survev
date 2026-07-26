@@ -6,7 +6,7 @@ import path from "node:path";
 import { App, SSLApp, type WebSocket } from "uWebSockets.js";
 import pkgJson from "../../package.json" with { type: "json" };
 import { GameConfig } from "../../shared/gameConfig.ts";
-import * as net from "../../shared/net/net.ts";
+import type { GameWsDisconnectReason } from "../../shared/types/api.ts";
 import { Config } from "./config.ts";
 import { GameProcessManager, type GameSocketData, ProcState } from "./game/gameProcessManager.ts";
 import { apiPrivateRouter } from "./utils/apiRouter.ts";
@@ -214,7 +214,7 @@ app.ws<GameSocketData>("/play", {
         const ip = uwsHelpers.getIp(res, req, Config.gameServer.proxyIPHeader);
 
         if (!ip) {
-            server.logger.warn(`Invalid IP Found`);
+            server.logger.warn("Invalid IP Found:", ip);
             res.end();
             return;
         }
@@ -254,7 +254,7 @@ app.ws<GameSocketData>("/play", {
         gameWsRateLimit.ipConnected(ip);
 
         const socketId = randomUUID();
-        let disconnectReason = "";
+        let disconnectReason: undefined | GameWsDisconnectReason = undefined;
 
         const ipData = await server.checkIp(ip);
 
@@ -267,7 +267,7 @@ app.ws<GameSocketData>("/play", {
         if (res.aborted) return;
         res.cork(() => {
             if (res.aborted) return;
-            res.upgrade(
+            res.upgrade<GameSocketData>(
                 {
                     gameId,
                     id: socketId,
@@ -288,12 +288,7 @@ app.ws<GameSocketData>("/play", {
         const data = socket.getUserData();
 
         if (data.disconnectReason) {
-            const disconnectMsg = new net.DisconnectMsg();
-            disconnectMsg.reason = data.disconnectReason;
-            const stream = new net.MsgStream(new ArrayBuffer(128));
-            stream.serializeMsg(net.MsgType.Disconnect, disconnectMsg);
-            socket.send(stream.getBuffer(), true, false);
-            socket.end();
+            socket.end(data.disconnectReason ? 3000 : 0, data.disconnectReason);
             return;
         }
 
@@ -303,7 +298,7 @@ app.ws<GameSocketData>("/play", {
     message(socket: WebSocket<GameSocketData>, message) {
         if (gameWsRateLimit.isRateLimited(socket.getUserData().rateLimit)) {
             server.logger.warn("Game websocket rate limited, closing socket.");
-            socket.close();
+            socket.end(3000, "rate_limited");
             return;
         }
         server.manager.onMsg(socket.getUserData().id, message);
@@ -336,7 +331,7 @@ app.ws<pingSocketData>("/ptc", {
         const ip = uwsHelpers.getIp(res, req, Config.gameServer.proxyIPHeader);
 
         if (!ip) {
-            server.logger.warn(`Invalid IP Found`);
+            server.logger.warn("Invalid IP Found:", ip);
             res.end();
             return;
         }
