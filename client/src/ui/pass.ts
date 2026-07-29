@@ -1,6 +1,9 @@
 import $ from "jquery";
 
 import type { EmoteDef } from "../../../shared/defs/gameObjects/emoteDefs.ts";
+import type { HealEffectDef } from "../../../shared/defs/gameObjects/healEffectDefs.ts";
+import type { MeleeDef } from "../../../shared/defs/gameObjects/meleeDefs.ts";
+import type { OutfitDef } from "../../../shared/defs/gameObjects/outfitDefs.ts";
 import { PassDefs } from "../../../shared/defs/gameObjects/passDefs.ts";
 import { QuestDefs } from "../../../shared/defs/gameObjects/questDefs.ts";
 import { GameObjectDefs } from "../../../shared/defs/register.ts";
@@ -325,38 +328,39 @@ export class Pass {
     }
 
     setPassUnlockImage(item: string) {
-        const emoteDef = GameObjectDefs.typeToDefSafe(item) as EmoteDef;
-        const unlockImagePath = emoteDef
+        const def = GameObjectDefs.typeToDefSafe(item) as OutfitDef | EmoteDef | MeleeDef | HealEffectDef;
+        const unlockImagePath = def
             ? helpers.getSvgFromGameType(item)
             : "img/emotes/surviv.svg";
         const unlockImageUrl = `url(${unlockImagePath})`;
         const unlockImageTransform = helpers.getCssTransformFromGameType(item);
         $("#pass-progress-unlock").css({
-            opacity: emoteDef ? 1 : 0.15,
+            opacity: def ? 1 : 0.15,
             transform: `translate(-50%, -50%) ${unlockImageTransform}`,
         });
         $("#pass-progress-unlock-image").css({
             "background-image": unlockImageUrl,
+            filter: def?.type === "outfit" ? helpers.getSvgFilterForTint(def.lootImg.tint) : "",
         });
-        const unlockTypeTitle = emoteDef
+        const unlockTypeTitle = def
             ? this.localization
                 .translate(
-                    `loadout-title-${this.loadoutMenu.getCategory(emoteDef.type)!.loadoutType}`,
+                    `loadout-title-${this.loadoutMenu.getCategory(def.type)!.loadoutType}`,
                 )
                 .toUpperCase()
             : "";
         const tooltipElem = $("#pass-unlock-tooltip");
-        tooltipElem.css("opacity", emoteDef ? 1 : 0);
+        tooltipElem.css("opacity", def ? 1 : 0);
         tooltipElem.find(".tooltip-pass-title").html(unlockTypeTitle);
-        tooltipElem.find(".tooltip-pass-desc").html(emoteDef ? emoteDef.name! : "");
-        const unlockTypeImageUrl = emoteDef
-            ? `url(${this.loadoutMenu.getCategory(emoteDef.type)!.categoryImage})`
+        tooltipElem.find(".tooltip-pass-desc").html(def ? def.name! : "");
+        const unlockTypeImageUrl = def
+            ? `url(${this.loadoutMenu.getCategory(def.type)!.categoryImage})`
             : "";
         $("#pass-progress-unlock-type-image").css({
             "background-image": unlockTypeImageUrl,
         });
         $("#pass-progress-unlock-type-wrapper").css({
-            display: emoteDef ? "block" : "none",
+            display: def ? "block" : "none",
         });
     }
 

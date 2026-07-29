@@ -209,7 +209,7 @@ export const helpers = {
         return transform;
     },
     getSvgFilterForTint(tint: number) {
-        if (tint === 0xffffff) return undefined;
+        if (tint === 0xffffff) return "";
 
         const rgb = util.intToRgb(tint);
         const r = rgb.r / 255;

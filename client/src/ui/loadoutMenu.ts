@@ -551,7 +551,7 @@ export class LoadoutMenu {
         const currentNewItem = this.localPendingConfirm.shift()!;
         if (currentNewItem) {
             this.localConfirmed.push(currentNewItem);
-            const objDef = GameObjectDefs.typeToDef(currentNewItem.type) as EmoteDef;
+            const objDef = GameObjectDefs.typeToDef(currentNewItem.type) as EmoteDef | OutfitDef;
             const itemInfo = {
                 type: currentNewItem.type,
                 rarity: objDef.rarity || Rarity.Stock,
@@ -567,6 +567,7 @@ export class LoadoutMenu {
                 $("#modal-item-confirm-image-inner").css({
                     "background-image": imageUrl,
                     transform,
+                    filter: objDef?.type === "outfit" ? helpers.getSvgFilterForTint(objDef.lootImg.tint) : "",
                 });
                 this.confirmItemModal.show();
             }, 200);
@@ -1006,7 +1007,7 @@ export class LoadoutMenu {
                 css: {
                     "background-image": `url(${svg})`,
                     transform,
-                    filter: objDef.type === "outfit" ? helpers.getSvgFilterForTint(objDef.lootImg.tint) : undefined,
+                    filter: objDef.type === "outfit" ? helpers.getSvgFilterForTint(objDef.lootImg.tint) : "",
                 },
                 "data-img": `url(${svg})`,
                 draggable,
