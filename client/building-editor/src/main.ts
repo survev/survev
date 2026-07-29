@@ -1,4 +1,4 @@
-import * as PIXI from "pixi.js-legacy";
+import * as PIXI from "pixi.js";
 import { math } from "../../../shared/utils/math.ts";
 import { Ambiance } from "../../src/ambiance.ts";
 import { AudioManager } from "../../src/audioManager.ts";
@@ -32,7 +32,7 @@ class Application {
     config = new ConfigManager();
     localization = new Localization();
 
-    pixi?: PIXI.Application<PIXI.ICanvas>;
+    pixi?: PIXI.Application;
     resourceManager?: ResourceManager;
     input?: InputHandler;
     inputBinds?: InputBinds;
@@ -67,7 +67,7 @@ class Application {
         onLoadCompleteCb();
     }
 
-    tryLoad() {
+    async tryLoad() {
         if (this.domContentLoaded && this.configLoaded && !this.initialized) {
             this.initialized = true;
             const language = this.config.get("language") || this.localization.detectLocale();
@@ -80,24 +80,15 @@ class Application {
             const domCanvas = document.querySelector<HTMLCanvasElement>("#cvs")!;
             const rendererRes = window.devicePixelRatio > 1 ? 2 : 1;
 
-            const createPixiApplication = (forceCanvas: boolean) => {
-                return new PIXI.Application({
-                    width: window.innerWidth,
-                    height: window.innerHeight,
-                    view: domCanvas,
-                    antialias: false,
-                    resolution: rendererRes,
-                    hello: true,
-                    forceCanvas,
-                });
-            };
-            let pixi = null;
-            try {
-                pixi = createPixiApplication(false);
-            } catch (_e) {
-                pixi = createPixiApplication(true);
-            }
-            this.pixi = pixi;
+            this.pixi = new PIXI.Application();
+            await this.pixi.init({
+                width: window.innerWidth,
+                height: window.innerHeight,
+                view: domCanvas,
+                antialias: false,
+                resolution: rendererRes,
+                hello: true,
+            });
             this.pixi.renderer.events.destroy();
             this.pixi.ticker.add(this.update, this);
             this.pixi.renderer.background.color = 7378501;
