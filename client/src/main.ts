@@ -1,5 +1,5 @@
 import $ from "jquery";
-import * as PIXI from "pixi.js-legacy";
+import * as PIXI from "pixi.js";
 import { GameConfig } from "../../shared/gameConfig.ts";
 import * as net from "../../shared/net/net.ts";
 import type {
@@ -71,7 +71,7 @@ export class Application {
     siteInfo!: SiteInfo;
     teamMenu!: TeamMenu;
 
-    pixi: PIXI.Application<PIXI.ICanvas> | null = null;
+    pixi: PIXI.Application | null = null;
     resourceManager: ResourceManager | null = null;
     input: InputHandler | null = null;
     inputBinds: InputBinds | null = null;
@@ -139,7 +139,7 @@ export class Application {
         onLoadCompleteCb();
     }
 
-    tryLoad() {
+    async tryLoad() {
         if (this.domContentLoaded && this.configLoaded && !this.initialized) {
             this.initialized = true;
             // this should be this.config.config.teamAutofill = true???
@@ -303,27 +303,17 @@ export class Application {
 
             const rendererRes = window.devicePixelRatio > 1 ? 2 : 1;
 
-            if (device.os == "ios") {
-                PIXI.settings.PRECISION_FRAGMENT = PIXI.PRECISION.HIGH;
-            }
+            const pixi = new PIXI.Application();
+            await pixi.init({
+                width: window.innerWidth,
+                height: window.innerHeight,
+                canvas: domCanvas,
+                antialias: false,
+                preference: "webgl",
+                resolution: rendererRes,
+                hello: true,
+            });
 
-            const createPixiApplication = (forceCanvas: boolean) => {
-                return new PIXI.Application({
-                    width: window.innerWidth,
-                    height: window.innerHeight,
-                    view: domCanvas,
-                    antialias: false,
-                    resolution: rendererRes,
-                    hello: true,
-                    forceCanvas,
-                });
-            };
-            let pixi = null;
-            try {
-                pixi = createPixiApplication(false);
-            } catch (_e) {
-                pixi = createPixiApplication(true);
-            }
             this.pixi = pixi;
             this.pixi.renderer.events.destroy();
             this.pixi.ticker.add(this.update, this);
@@ -927,9 +917,9 @@ export class Application {
 
 const App = new Application();
 
-function onPageLoad() {
+async function onPageLoad() {
     App.domContentLoaded = true;
-    App.tryLoad();
+    await App.tryLoad();
 }
 
 document.addEventListener("DOMContentLoaded", onPageLoad);

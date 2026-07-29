@@ -1,4 +1,4 @@
-import * as PIXI from "pixi.js-legacy";
+import * as PIXI from "pixi.js";
 
 import type { LootDef } from "../../../shared/defs/gameObjectDefs.ts";
 import type { BoostDef, HealDef } from "./../../../shared/defs/gameObjects/gearDefs.ts";
@@ -64,15 +64,18 @@ function createPlayerNameText() {
         fontSize: device.pixelRatio > 1 ? 30 : 22,
         align: "center",
         fill: 65535,
-        stroke: 0,
-        strokeThickness: 0,
-        dropShadow: true,
-        dropShadowColor: "#000000",
-        dropShadowBlur: 1,
-        dropShadowAngle: Math.PI / 3,
-        dropShadowDistance: 1,
-    } satisfies Partial<PIXI.ITextStyle>;
-    const nameText = new PIXI.Text("", nameStyle);
+        stroke: {
+            width: 0,
+            color: 0,
+        },
+        dropShadow: {
+            color: "#000000",
+            blur: 1,
+            angle: Math.PI / 3,
+            distance: 1,
+        },
+    } satisfies Partial<PIXI.TextStyleOptions>;
+    const nameText = new PIXI.Text({ text: "", style: nameStyle });
     nameText.anchor.set(0.5, 0.5);
     nameText.scale.set(0.5, 0.5);
     nameText.position.set(0, 30);
@@ -376,12 +379,6 @@ export class Player implements AbstractObject {
     gunSwitchCooldown!: number;
 
     constructor() {
-        this.bodySprite.addChild(this.bodySubmergeSprite);
-        this.handLSprite.addChild(this.handLSubmergeSprite);
-        this.handRSprite.addChild(this.handRSubmergeSprite);
-        this.footLSprite.addChild(this.footLSubmergeSprite);
-        this.footRSprite.addChild(this.footRSubmergeSprite);
-
         this.handLContainer.addChild(this.gunLSprites.container);
         this.handLContainer.addChild(this.handLSprite);
         this.handLContainer.addChild(this.objectLSprite);
@@ -398,6 +395,7 @@ export class Player implements AbstractObject {
         this.bodyContainer.addChild(this.footRContainer);
         this.bodyContainer.addChild(this.backpackSprite);
         this.bodyContainer.addChild(this.bodySprite);
+        this.bodyContainer.addChild(this.bodySubmergeSprite);
         this.bodyContainer.addChild(this.chestSprite);
         this.bodyContainer.addChild(this.flakSprite);
         this.bodyContainer.addChild(this.steelskinSprite);
@@ -408,6 +406,11 @@ export class Player implements AbstractObject {
         this.bodyContainer.addChild(this.handRContainer);
         this.bodyContainer.addChild(this.visorSprite);
         this.bodyContainer.addChild(this.helmetSprite);
+
+        this.handLContainer.addChild(this.handLSubmergeSprite);
+        this.handRContainer.addChild(this.handRSubmergeSprite);
+        this.footLContainer.addChild(this.footLSubmergeSprite);
+        this.footRContainer.addChild(this.footRSubmergeSprite);
 
         this.container.addChild(this.bodyContainer);
 
@@ -2476,17 +2479,26 @@ export class Player implements AbstractObject {
         initSprite(this.bodySubmergeSprite, "player-wading-01.img");
         initSprite(this.handLSubmergeSprite, "player-hands-01.img");
         initSprite(this.handRSubmergeSprite, "player-hands-01.img");
+        this.handLSubmergeSprite.scale.set(0.175, 0.175);
+        this.handRSubmergeSprite.scale.set(0.175, 0.175);
+
         initSprite(this.footLSubmergeSprite, "player-feet-01.img");
         initSprite(this.footRSubmergeSprite, "player-feet-01.img");
+        this.footLSubmergeSprite.scale.set(0.45, 0.45);
+        this.footLSubmergeSprite.rotation = Math.PI * 0.5;
+
+        this.footRSubmergeSprite.scale.set(0.45, 0.45);
+        this.footRSubmergeSprite.rotation = Math.PI * 0.5;
 
         // submergeMaskScaleFactor reduces the number of verts generated
         // by PIXI.Graphics; we scale it back up to the world size remains
         // the same
         const mask = new PIXI.Graphics();
-        mask.beginFill(0xff0000, 0.5);
-        mask.drawCircle(0, 0, 38.0 * 2.0 * submergeMaskScaleFactor);
+        mask.circle(0, 0, 38.0 * 2.0 * submergeMaskScaleFactor);
+        mask.fill({ color: 0xff0000, alpha: 0.5 });
         mask.position.set(0, 0);
-        this.bodySubmergeSprite.addChild(mask);
+        mask.scale.set(2.5, 2.5);
+        this.bodyContainer.addChild(mask);
         this.bodySubmergeSprite.mask = mask;
         this.bodySubmergeSprite.scale.set(0.5, 0.5);
     }
@@ -2509,10 +2521,8 @@ export class Player implements AbstractObject {
 
         // Update sprites
         const submersionAlpha = this.submersion * 0.8;
-        const submersionScale = (0.9 - this.submersion * 0.4) * 2;
-        const maskScale = 1 / (submersionScale * submergeMaskScaleFactor);
+        const submersionScale = (0.9 - this.submersion * 0.4) * 0.5;
         this.bodySubmergeSprite.scale.set(submersionScale, submersionScale);
-        (this.bodySubmergeSprite.mask as PIXI.Sprite).scale.set(maskScale, maskScale);
         this.bodySubmergeSprite.alpha = submersionAlpha;
         this.bodySubmergeSprite.visible = submersionAlpha > 0.001;
         if (inWater) {
