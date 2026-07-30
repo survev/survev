@@ -114,15 +114,15 @@
 >
     <div
         class="match-data-header"
-        onclick={e => {
+        onclick={() => {
             setGameId(!expanded, summary.guid), !data && requestMatchData(summary.guid);
         }}
     >
-        <div class="col d-none d-md-flex">
-            <div></div>
-            <span>{timeDiff}</span>
+        <div class="col d-none d-md-flex time-col">
+            <div class="player-icon"></div>
+            <span class="time">{timeDiff}</span>
         </div>
-        <div class="col col-lg-3">
+        <div class="col rank-col">
             <span>{localization.translate(`${TeamModeToTranslationKey[summary.team_mode as TeamMode]}-rank`)}</span>
             <div>
                 <span
@@ -133,23 +133,23 @@
                 <span>/{summary.team_total}</span>
             </div>
         </div>
-        <div class="col">
-            <span>{localization.translate("stats-kills")}</span>
-            <span>{summary.kills}</span>
-        </div>
-        <div class="col d-none d-lg-flex" class:invisible={summary.team_mode === TeamMode.Solo}>
+        <div class="col d-none d-lg-flex summary-stat" class:invisible={summary.team_mode === TeamMode.Solo}>
             <span>{localization.translate("stats-team-kills")}</span>
             <span>{summary.team_kills}</span>
         </div>
-        <div class="col">
+        <div class="col summary-stat">
+            <span>{localization.translate("stats-kills")}</span>
+            <span>{summary.kills}</span>
+        </div>
+        <div class="col summary-stat">
             <span>{localization.translate("stats-damage-dealt")}</span>
             <span>{summary.damage_dealt}</span>
         </div>
-        <div class="col">
+        <div class="col summary-stat">
             <span>{localization.translate("stats-damage-taken")}</span>
             <span>{summary.damage_taken}</span>
         </div>
-        <div class="col">
+        <div class="col summary-stat">
             <span>{localization.translate("stats-survived")}</span>
             <span>{helpers.formatTime(summary.time_alive)}</span>
         </div>
@@ -178,9 +178,9 @@
                     <table>
                         <thead>
                             <tr>
-                                <th>{localization.translate("stats-rank")}</th>
-                                <th></th>
-                                <th>{localization.translate("stats-player")}</th>
+                                <th class="player-rank">{localization.translate("stats-rank")}</th>
+                                <th class="player-status"></th>
+                                <th class="player-name">{localization.translate("stats-player")}</th>
                                 <th>{localization.translate("stats-kills")}</th>
                                 <th>{localization.translate("stats-damage-dealt")}</th>
                                 <th>{localization.translate("stats-survived")}</th>
@@ -196,18 +196,19 @@
                                     data-player-id={player.player_id}
                                 >
                                     {#if player.showRank}
-                                        <td>#{player.rank}</td>
+                                        <td class="player-rank">#{player.rank}</td>
                                     {:else}
-                                        <td></td>
+                                        <td class="player-rank"></td>
                                     {/if}
-                                    <td>
+                                    <td class="player-status">
                                         {#if player.killer_id === localPlayer.player_id}
                                             <img src="/img/ui/crosshair.svg" alt="Scope icon">
-                                        {:else if player.player_id === localPlayer.killer_id}
+                                        {/if}
+                                        {#if player.player_id === localPlayer.killer_id}
                                             <img src="/img/ui/skull.svg" alt="Skull icon">
                                         {/if}
                                     </td>
-                                    <td>
+                                    <td class="player-name">
                                         {#if player.slug}
                                             <a href="/stats/?slug={player.slug}">{player.username}</a>
                                         {:else}
@@ -265,71 +266,79 @@
                 align-items: center;
                 font-weight: bold;
                 height: 100%;
+                flex: 0 0 auto;
 
                 color: white;
+            }
 
-                &:nth-child(n + 3) {
+            .time-col {
+                align-items: flex-start;
+                width: 13%;
+
+                .player-icon {
+                    background-image: url("/img/ui/player.svg");
+                    background-position: center;
+                    background-size: 26px;
+                    background-repeat: space;
+                    height: 26px;
+                }
+
+                .time {
+                    color: #c8c8c8;
+                    font-size: 16px;
+                }
+            }
+
+            .rank-col {
+                align-items: flex-start;
+                margin-left: 0.5rem;
+                margin-right: auto;
+
+                & > span {
+                    font-size: 16px;
+                    text-shadow: 1px 1px 1px black;
+                }
+
+                & > div {
                     span:first-child {
-                        color: #c8c8c8;
-                        font-size: 10px;
+                        font-size: 20px;
+
+                        &.text-gold {
+                            color: gold;
+                        }
+
+                        &.text-silver {
+                            color: #78ff00;
+                        }
+
+                        &.text-bronze {
+                            color: #cd7f32;
+                        }
                     }
 
                     span:last-child {
-                        font-size: 20px;
+                        font-size: 12px;
+                        font-weight: normal;
                     }
                 }
+            }
 
-                &:first-child {
-                    align-items: flex-start;
-
-                    div {
-                        background-image: url("/img/ui/player.svg");
-                        background-position: center;
-                        background-size: 26px;
-                        background-repeat: space;
-                        height: 26px;
-                    }
-
-                    span {
-                        color: #c8c8c8;
-                        font-size: 16px;
-                    }
+            .summary-stat {
+                margin-inline: 3%;
+                span:first-child {
+                    color: #c8c8c8;
+                    font-size: 10px;
                 }
 
-                &:nth-child(2) {
-                    align-items: flex-start;
-                    margin-left: 0.5rem;
-
-                    & > span {
-                        font-size: 16px;
-                        text-shadow: 1px 1px 1px black;
-                    }
-
-                    & > div {
-                        span:first-child {
-                            font-size: 20px;
-
-                            &.text-gold {
-                                color: gold;
-                            }
-
-                            &.text-silver {
-                                color: #78ff00;
-                            }
-
-                            &.text-bronze {
-                                color: #cd7f32;
-                            }
-                        }
-
-                        span:last-child {
-                            font-size: 12px;
-                            font-weight: normal;
-                        }
-                    }
+                span:last-child {
+                    font-size: 20px;
                 }
+            }
 
-                &.map-icon img {
+            .map-icon {
+                width: 48px;
+                margin-right: 3%;
+                img {
                     width: 48px;
                     height: 48px;
 
@@ -349,7 +358,6 @@
             background-size: 12px;
             border-radius: 2px;
             padding: 0.5rem;
-            margin-left: auto;
             width: 2.5em;
             height: 100% !important;
 
@@ -397,8 +405,17 @@
                 text-align: center;
                 padding: 0.25rem;
 
-                &:nth-child(3) {
+                &.player-rank {
+                    width: 8%;
+                }
+
+                &.player-status {
+                    width: 10%;
+                }
+
+                &.player-name {
                     text-align: left;
+                    width: 30%;
                 }
             }
 
@@ -422,15 +439,12 @@
             }
 
             td {
-                &:first-child {
+                &.player-rank {
                     color: #ffffff80;
                 }
 
-                &:nth-child(2) {
-                    display: flex;
-                    justify-content: center;
-                    align-items: center;
-                    height: 26px;
+                &.player-status {
+                    text-align: center;
 
                     img {
                         width: 12px;
@@ -481,12 +495,12 @@
     }
 
     @media (min-width: 768px) {
-        .match-data-header > div {
-            &:first-child {
+        .match-data-header {
+            .time-col {
                 margin-left: 0.5rem;
             }
 
-            &:nth-child(2) {
+            .rank-col {
                 margin-left: 1rem !important;
 
                 & > span {
@@ -504,7 +518,7 @@
                 }
             }
 
-            &:nth-child(n + 3) {
+            .summary-stat {
                 span:first-child {
                     font-size: 12px !important;
                 }
@@ -517,12 +531,12 @@
     }
 
     @media (min-width: 992px) {
-        .match-data-header > div:nth-child(2) {
-            & > span {
+        .match-data-header .rank-col {
+            span {
                 font-size: 24px !important;
             }
 
-            & > div {
+            div {
                 span:first-child {
                     font-size: 32px !important;
                 }
@@ -537,7 +551,7 @@
             font-size: 16px !important;
         }
 
-        td:nth-child(2) {
+        td.player-status {
             height: 32px !important;
 
             img {
@@ -548,7 +562,7 @@
     }
 
     @media (min-width: 1200px) {
-        .match-data-header > div:first-child span {
+        .match-data-header .time-col .time {
             font-size: 18px !important;
         }
     }
