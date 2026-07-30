@@ -172,7 +172,7 @@
         class='match-data-collapse {expanded ? "show" : "collapse"}'
         data-bs-parent="#extra-stats-content"
     >
-        <div class="match-data-body" onclick={e => e.stopPropagation()}>
+        <div class="match-data-body">
             {#if data && localPlayer}
                 <div class="match-data-body-inner" bind:this={bodyInner}>
                     <table>
