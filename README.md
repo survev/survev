@@ -12,7 +12,7 @@
 </div>
 <br />
 <div align="center">
-    Open-source recreation of 2D top-down battle royale <a href="surviv.io">surviv.io</a>.
+    Open-source recreation of 2D top-down battle royale surviv.io.
 </div>
 <br />
 
