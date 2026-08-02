@@ -1643,10 +1643,9 @@ export class Player implements AbstractObject {
             this.backpackSprite.scale.set(scale, scale);
             this.backpackSprite.tint = outfitImg.backpackTint;
             this.backpackSprite.visible = true;
-            (function(sprite, img, tint) {
-                sprite.texture = PIXI.Texture.from(img);
-                sprite.tint = tint;
-            })(this.backpackSprite, outfitImg.backpackSprite, outfitImg.backpackTint);
+
+            this.backpackSprite.texture = PIXI.Texture.from(outfitImg.backpackSprite);
+            this.backpackSprite.tint = outfitImg.backpackTint;
         } else {
             this.backpackSprite.visible = false;
         }
@@ -1664,33 +1663,32 @@ export class Player implements AbstractObject {
             this.hipSprite.visible = false;
         }
 
-        const R = GameObjectDefs.typeToDef(this.m_netData.m_activeWeapon) as
+        const activeWeapDef = GameObjectDefs.typeToDef(this.m_netData.m_activeWeapon) as
             | GunDef
             | MeleeDef
             | ThrowableDef;
-        if (R.type == "gun") {
+        if (activeWeapDef.type == "gun") {
             this.gunRSprites.setType(this.m_netData.m_activeWeapon, bodyScale);
             this.gunRSprites.setVisible(true);
-            if (R.isDual) {
+            if (activeWeapDef.isDual) {
                 this.gunLSprites.setType(this.m_netData.m_activeWeapon, bodyScale);
                 this.gunLSprites.setVisible(true);
             } else {
                 this.gunLSprites.setVisible(false);
             }
-            const L = this.bodyContainer.getChildIndex(this.handRContainer);
-            const q = this.bodyContainer.getChildIndex(this.handRContainer);
-            let F = L + 1;
-            if (this.gunRSprites.magTop || R.worldImg.handsBelow) {
-                F = L - 1;
+            const handRIdx = this.bodyContainer.getChildIndex(this.handRContainer);
+            let newHandLIdx = handRIdx + 1;
+            if (this.gunRSprites.magTop || activeWeapDef.worldImg.handsBelow) {
+                newHandLIdx = handRIdx - 1;
             }
-            F = math.max(F, 0);
-            if (q != F) {
-                this.bodyContainer.addChildAt(this.handLContainer, F);
+            newHandLIdx = math.max(newHandLIdx, 0);
+            if (handRIdx != newHandLIdx) {
+                this.bodyContainer.addChildAt(this.handLContainer, newHandLIdx);
             }
-            const j = this.handRContainer.getChildIndex(this.gunRSprites.container);
-            const N = R.worldImg.handsBelow ? this.handRContainer.children.length : 0;
-            if (j != N) {
-                this.handRContainer.addChildAt(this.gunRSprites.container, N);
+            const gunRIdx = this.handRContainer.getChildIndex(this.gunRSprites.container);
+            const newHandRIdx = activeWeapDef.worldImg.handsBelow ? this.handRContainer.children.length : 0;
+            if (gunRIdx != newHandRIdx) {
+                this.handRContainer.addChildAt(this.gunRSprites.container, newHandRIdx);
             }
         } else {
             this.gunLSprites.setVisible(false);
@@ -1699,64 +1697,66 @@ export class Player implements AbstractObject {
         if (this.downed != this.wasDowned) {
             this.wasDowned = this.downed;
             if (this.downed) {
+                // move hands to be under body when downed
                 const footIdx = this.bodyContainer.getChildIndex(this.footLContainer);
                 this.bodyContainer.addChildAt(this.handLContainer, footIdx);
                 this.bodyContainer.addChildAt(this.handRContainer, footIdx);
             } else {
+                // restore their zindex
                 const bodyEffectIdx = this.bodyContainer.getChildIndex(this.bodyEffectSprite);
                 this.bodyContainer.addChildAt(this.handLContainer, bodyEffectIdx);
                 this.bodyContainer.addChildAt(this.handRContainer, bodyEffectIdx);
             }
         }
-        if (R.type == "melee" && this.m_netData.m_activeWeapon != "fists") {
-            const V = R.worldImg!;
-            this.meleeSprite.texture = PIXI.Texture.from(V.sprite);
-            this.meleeSprite.pivot.set(-V.pos.x, -V.pos.y);
-            this.meleeSprite.scale.set(V.scale.x / bodyScale, V.scale.y / bodyScale);
-            this.meleeSprite.rotation = V.rot;
-            this.meleeSprite.tint = V.tint;
+        if (activeWeapDef.type == "melee" && this.m_netData.m_activeWeapon != "fists") {
+            const imgDef = activeWeapDef.worldImg!;
+            this.meleeSprite.texture = PIXI.Texture.from(imgDef.sprite);
+            this.meleeSprite.pivot.set(-imgDef.pos.x, -imgDef.pos.y);
+            this.meleeSprite.scale.set(imgDef.scale.x / bodyScale, imgDef.scale.y / bodyScale);
+            this.meleeSprite.rotation = imgDef.rot;
+            this.meleeSprite.tint = imgDef.tint;
             this.meleeSprite.visible = true;
-            const U = this.handRContainer.getChildIndex(this.handRSprite);
-            const W = math.max(V.renderOnHand ? U + 1 : U - 1, 0);
-            if (this.handRContainer.getChildIndex(this.meleeSprite) != W) {
-                this.handRContainer.addChildAt(this.meleeSprite, W);
+            const handRSpriteIdx = this.handRContainer.getChildIndex(this.handRSprite);
+            const newMeleeIdx = math.max(imgDef.renderOnHand ? handRSpriteIdx + 1 : handRSpriteIdx - 1, 0);
+            if (this.handRContainer.getChildIndex(this.meleeSprite) != newMeleeIdx) {
+                this.handRContainer.addChildAt(this.meleeSprite, newMeleeIdx);
             }
-            const G = this.bodyContainer.getChildIndex(this.handRContainer);
-            const X = math.max(V.leftHandOntop ? G + 1 : G - 1, 0);
-            if (this.bodyContainer.getChildIndex(this.handLContainer) != X) {
-                this.bodyContainer.addChildAt(this.handLContainer, X);
+            const handRIdx = this.bodyContainer.getChildIndex(this.handRContainer);
+            const newHandLIdx = math.max(imgDef.leftHandOntop ? handRIdx + 1 : handRIdx - 1, 0);
+            if (this.bodyContainer.getChildIndex(this.handLContainer) != newHandLIdx) {
+                this.bodyContainer.addChildAt(this.handLContainer, newHandLIdx);
             }
         } else {
             this.meleeSprite.visible = false;
         }
-        if (R.type == "throwable") {
-            const K = function(
-                e: PIXI.Sprite,
-                t: {
+        if (activeWeapDef.type == "throwable") {
+            const setThrowableSprite = function(
+                sprite: PIXI.Sprite,
+                def: {
                     sprite: string;
                     pos?: Vec2;
                     scale?: number;
                 },
             ) {
-                if (t.sprite && t.sprite != "none") {
+                if (def.sprite && def.sprite != "none") {
                     // Setup sprite
-                    let sprite = t.sprite;
+                    let imgKey = def.sprite;
                     // @HACK: halloween sprites
                     if (map.mapDef.gameMode.spookyKillSounds) {
-                        sprite = halloweenSpriteMap[sprite] || sprite;
+                        imgKey = halloweenSpriteMap[imgKey] || imgKey;
                     }
-                    e.texture = PIXI.Texture.from(sprite);
-                    e.position.set(t.pos?.x, t.pos?.y);
-                    e.scale.set(t.scale, t.scale);
-                    e.rotation = Math.PI * 0.5;
-                    e.visible = true;
+                    sprite.texture = PIXI.Texture.from(imgKey);
+                    sprite.position.set(def.pos?.x, def.pos?.y);
+                    sprite.scale.set(def.scale, def.scale);
+                    sprite.rotation = Math.PI * 0.5;
+                    sprite.visible = true;
                 } else {
-                    e.visible = false;
+                    sprite.visible = false;
                 }
             };
-            const Z = R.handImg?.[this.throwableState];
-            K(this.objectLSprite, Z!.left);
-            K(this.objectRSprite, Z!.right);
+            const handImgs = activeWeapDef.handImg?.[this.throwableState];
+            setThrowableSprite(this.objectLSprite, handImgs!.left);
+            setThrowableSprite(this.objectRSprite, handImgs!.right);
         } else {
             this.objectLSprite.visible = false;
             this.objectRSprite.visible = false;
@@ -1871,20 +1871,20 @@ export class Player implements AbstractObject {
         isSpectating: boolean,
         displayingStats: boolean,
     ) {
-        const e = function(e: PIXI.Container, t: Pose) {
+        const updateSprite = function(e: PIXI.Container, t: Pose) {
             e.position.set(t.pos.x, t.pos.y);
             e.pivot.set(-t.pivot.x, -t.pivot.y);
             e.rotation = t.rot;
         };
-        e(this.handLContainer, this.bones[Bones.HandL]);
-        e(this.handRContainer, this.bones[Bones.HandR]);
-        e(this.footLContainer, this.bones[Bones.FootL]);
-        e(this.footRContainer, this.bones[Bones.FootR]);
-        const t = GameObjectDefs.typeToDef(this.m_netData.m_activeWeapon) as GunDef;
-        if (!this.downed && this.currentAnim() != Anim.Revive && t.type == "gun") {
-            if (t.worldImg.leftHandOffset) {
-                this.handLContainer.position.x += t.worldImg.leftHandOffset.x;
-                this.handLContainer.position.y += t.worldImg.leftHandOffset.y;
+        updateSprite(this.handLContainer, this.bones[Bones.HandL]);
+        updateSprite(this.handRContainer, this.bones[Bones.HandR]);
+        updateSprite(this.footLContainer, this.bones[Bones.FootL]);
+        updateSprite(this.footRContainer, this.bones[Bones.FootR]);
+        const activeWeapDef = GameObjectDefs.typeToDef(this.m_netData.m_activeWeapon) as GunDef;
+        if (!this.downed && this.currentAnim() != Anim.Revive && activeWeapDef.type == "gun") {
+            if (activeWeapDef.worldImg.leftHandOffset) {
+                this.handLContainer.position.x += activeWeapDef.worldImg.leftHandOffset.x;
+                this.handLContainer.position.y += activeWeapDef.worldImg.leftHandOffset.y;
             }
         }
         this.handLContainer.position.x -= this.gunRecoilL * 1.125;
