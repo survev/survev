@@ -294,7 +294,7 @@ export const PrivateRouter = new Hono<Context>()
     .post("/clear_cache", async (c) => {
         const client = await getRedisClient();
         await client.flushAll();
-        return c.json({ success: true }, 200);
+        return c.json({ message: "Successfully cleared leaderboard cache" }, 200);
     })
     .post(
         "/check_ip",

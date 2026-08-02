@@ -3,6 +3,7 @@ import {
     type ChatInputCommandInteraction,
     type SlashCommandOptionsOnlyBuilder,
 } from "discord.js";
+import { z } from "zod";
 import { zSetClientThemeBody, zSetGameModeBody } from "../../../server/src/utils/types.ts";
 import {
     zBanAccountParams,
@@ -346,6 +347,14 @@ const commands = {
                 type: ApplicationCommandOptionType.String,
             },
         ],
+    }),
+    [Command.ClearCache]: createCommand({
+        name: Command.ClearCache,
+        description: "Clears the leaderboard cache",
+        optionValidator: z.object(),
+        requiresAdmin: true,
+        isPrivateRoute: true,
+        options: [],
     }),
 } as unknown as Record<
     Exclude<Command, "search_player">,
