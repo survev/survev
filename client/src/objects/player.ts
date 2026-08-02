@@ -1699,12 +1699,13 @@ export class Player implements AbstractObject {
         if (this.downed != this.wasDowned) {
             this.wasDowned = this.downed;
             if (this.downed) {
-                const H = this.bodyContainer.getChildIndex(this.footLContainer);
-                this.bodyContainer.addChildAt(this.handLContainer, H);
-                this.bodyContainer.addChildAt(this.handRContainer, H);
+                const footIdx = this.bodyContainer.getChildIndex(this.footLContainer);
+                this.bodyContainer.addChildAt(this.handLContainer, footIdx);
+                this.bodyContainer.addChildAt(this.handRContainer, footIdx);
             } else {
-                this.bodyContainer.addChild(this.handLContainer);
-                this.bodyContainer.addChild(this.handRContainer);
+                const bodyEffectIdx = this.bodyContainer.getChildIndex(this.bodyEffectSprite);
+                this.bodyContainer.addChildAt(this.handLContainer, bodyEffectIdx);
+                this.bodyContainer.addChildAt(this.handRContainer, bodyEffectIdx);
             }
         }
         if (R.type == "melee" && this.m_netData.m_activeWeapon != "fists") {
