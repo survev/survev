@@ -1916,8 +1916,8 @@ const Sounds: Record<string, Record<string, SoundDef>> = {
     },
     music: {
         menu_music: {
-            path: "audio/ambient/reserve_music_01.mp3",
-            volume: 0.5,
+            path: "audio/ambient/menu_music_01.mp3",
+            volume: 1,
             loadPriority: 2,
         },
     },
