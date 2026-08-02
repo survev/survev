@@ -762,7 +762,7 @@ export class Client {
                 return a.groupId - b.groupId;
             });
         } else {
-            return this.game.playerBarn.livingPlayers.filter(shouldSpectate);
+            return this.game.playerBarn.players.filter(shouldSpectate);
         }
     }
 
