@@ -1391,6 +1391,11 @@ const SkinDefs: Record<string, MeleeDef> = {
         lootImg: { sprite: "loot-melee-naginata-daemon.img" },
         worldImg: { sprite: "loot-melee-naginata-daemon.img" },
     }),
+    naginata_wisteria: defineMeleeSkin("naginata", {
+        name: "Naginata Wisteria",
+        lootImg: { sprite: "loot-melee-naginata-wisteria.img" },
+        worldImg: { sprite: "loot-melee-naginata-wisteria.img" },
+    }),
     cutlass_gold: defineMeleeSkin("cutlass", {
         name: "Gold Cutlass",
         noPotatoSwap: true,
