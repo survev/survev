@@ -1642,11 +1642,14 @@ export class UiManager2 {
                 return this.localization.translate("game-revive-teammate");
             case InteractionType.Object: {
                 const x = (object as Obstacle).getInteraction(player)!;
-                return `${
-                    this.localization.translate(
-                        x.action,
-                    )
-                } ${this.localization.translate(x.object)}`;
+                if (x.object) {
+                    return `${
+                        this.localization.translate(
+                            x.action,
+                        )
+                    } ${this.localization.translate(x.object)}`;
+                }
+                return `${this.localization.translate(x.action)}`;
             }
             case InteractionType.Loot: {
                 const loot = object as Loot;
