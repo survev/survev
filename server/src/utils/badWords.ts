@@ -18,6 +18,8 @@ const badWordsdataSet = new DataSet<{ originalWord: string }>()
             .addPattern(pattern`hitla`)
             .addPattern(pattern`hit.ler`)
             .addPattern(pattern`hitlr`)
+            .addPattern(pattern`h[i][l]t[i][l]er`)
+            .addPattern(pattern`adolf`)
     )
     .addPhrase((phrase) =>
         phrase
