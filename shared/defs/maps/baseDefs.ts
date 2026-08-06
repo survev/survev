@@ -204,7 +204,7 @@ export const Main: MapDef = {
         tier_chrys_case: [
             { name: "", count: 1, weight: 5 }, // ?
             { name: "tier_katanas", count: 1, weight: 3 }, // ?
-            { name: "naginata", count: 1, weight: 1 }, // ?
+            { name: "tier_naginatas", count: 1, weight: 1 }, // ?
         ],
         tier_crow_case_melee: [{ name: "crowbar", count: 1, weight: 1 }],
         tier_crow_case_skin: [
@@ -367,7 +367,7 @@ export const Main: MapDef = {
             { name: "stonehammer", count: 1, weight: 1 }, // ?
         ],
         tier_pavilion: [
-            { name: "naginata", count: 1, weight: 2 }, // ?
+            { name: "tier_naginatas", count: 1, weight: 2 }, // ?
             { name: "pkp", count: 1, weight: 2 }, // ?
             { name: "dp28", count: 1, weight: 1 }, // ?
             { name: "bar", count: 1, weight: 1 }, // ?
@@ -655,6 +655,10 @@ export const Main: MapDef = {
             { name: "katana", count: 1, weight: 4 }, // ?
             { name: "katana_rusted", count: 1, weight: 4 }, // ?
             { name: "katana_orchid", count: 1, weight: 1 }, // ?
+        ],
+        tier_naginatas: [
+            { name: "naginata", count: 1, weight: 8 },
+            { name: "naginata_wisteria", count: 1, weight: 1 },
         ],
         tier_stonehammer: [{ name: "stonehammer", count: 1, weight: 1 }],
         tier_saloon: [
