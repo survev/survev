@@ -5,7 +5,7 @@ import type { TeamMode } from "../../../shared/gameConfig.ts";
 import { util } from "../../../shared/utils/util.ts";
 import { Config } from "../config.ts";
 import { ServerLogger } from "../utils/logger.ts";
-import { type FindGamePrivateBody, type ServerGameConfig } from "../utils/types.ts";
+import { type FindGamePrivateBody, type ServerGameConfig, type SpectateGamePrivateBody } from "../utils/types.ts";
 import { type GameData, type ProcessMsg, ProcessMsgType } from "./ipcTypes.ts";
 
 let procFile: string;
@@ -25,7 +25,7 @@ export enum ProcState {
     Running,
 }
 
-class GameProcess {
+export class GameProcess {
     process: ChildProcess;
     port: number;
 
@@ -38,6 +38,7 @@ class GameProcess {
         startedTime: 0,
         stopped: false,
         timeRunning: 0,
+        livingPlayers: [],
     };
 
     state = ProcState.Idle;
@@ -140,6 +141,14 @@ class GameProcess {
             tokens,
         });
         this.avaliableSlots--;
+    }
+
+    addSpectateToken(token: string, filter: SpectateGamePrivateBody["filter"]) {
+        this.send({
+            type: ProcessMsgType.AddSpectateToken,
+            token,
+            filter,
+        });
     }
 }
 
@@ -308,6 +317,29 @@ export class GameProcessManager {
         }
 
         proc.addJoinTokens(body.playerData, body.autoFill);
+
+        return proc;
+    }
+
+    async findGameWithPlayer(body: SpectateGamePrivateBody): Promise<GameProcess | undefined> {
+        let proc: GameProcess | undefined = this.processes
+            .filter((proc) => {
+                if (proc.state !== ProcState.Running) return false;
+
+                return proc.gameData.livingPlayers.findIndex((p) => {
+                    if (body.filter.type === "user_id") {
+                        return p.userId === body.filter.value;
+                    } else {
+                        return p.name === body.filter.value;
+                    }
+                }) !== -1;
+            })[0];
+
+        if (!proc) {
+            return undefined;
+        }
+
+        proc.addSpectateToken(body.token, body.filter);
 
         return proc;
     }

@@ -86,6 +86,36 @@ export class ClientBarn {
         return client;
     }
 
+    addSpectatorClient(socket: ClientSocket<Client>, joinMsg: net.JoinMsg) {
+        const joinData = this.game.spectateTokens.get(joinMsg.matchPriv);
+        if (!joinData) {
+            socket.close();
+            return;
+        }
+
+        this.game.spectateTokens.delete(joinMsg.matchPriv);
+
+        const player = this.game.playerBarn.livingPlayers.find((p) => {
+            if (joinData.filter.type === "user_id") {
+                return p.userId === joinData.filter.value;
+            } else {
+                return p.name === joinData.filter.value;
+            }
+        });
+
+        if (!player) {
+            socket.close();
+            return;
+        }
+
+        const client = new Client(this.game, socket, null, "");
+        this.clients.push(client);
+
+        client.spectating = player;
+
+        return client;
+    }
+
     deserializeMsg(buff: ArrayBuffer): {
         type: net.MsgType;
         msg: net.AbstractMsg | undefined;
@@ -200,7 +230,13 @@ export class ClientBarn {
         if (!msg) return;
 
         if (type === net.MsgType.Join && !client) {
-            client = this.game.clientBarn.addClientWithPlayer(socket, msg as net.JoinMsg);
+            const jMsg = msg as net.JoinMsg;
+            // TODO: this is kinda ugly...
+            if (this.game.joinTokens.has(jMsg.matchPriv)) {
+                client = this.game.clientBarn.addClientWithPlayer(socket, jMsg);
+            } else if (this.game.spectateTokens.has(jMsg.matchPriv)) {
+                client = this.game.clientBarn.addSpectatorClient(socket, jMsg);
+            }
             return;
         }
 
