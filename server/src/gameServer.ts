@@ -35,6 +35,17 @@ class GameServer {
 
     readonly manager = new GameProcessManager();
 
+    getUrlsForGame(game: GameProcess) {
+        const protocol = this.region.https ? "wss" : "ws";
+        const mainPortUrl = new URL(`${protocol}://${this.region.address}/play`);
+        mainPortUrl.searchParams.set("gameId", game.gameData.id);
+
+        const gamePortUrl = new URL(mainPortUrl.toString());
+        gamePortUrl.port = game.port.toString();
+
+        return [gamePortUrl.toString()];
+    }
+
     async findGame(body: FindGamePrivateBody): Promise<FindGamePrivateRes> {
         if (body.version !== GameConfig.protocolVersion) {
             return { error: "invalid_protocol" };
@@ -58,16 +69,8 @@ class GameServer {
             };
         }
 
-        const protocol = this.region.https ? "wss" : "ws";
-        const mainPortUrl = new URL(`${protocol}://${this.region.address}/play`);
-        mainPortUrl.searchParams.set("gameId", game.gameData.id);
-
-        const gamePortUrl = new URL(mainPortUrl.toString());
-        gamePortUrl.port = game.port.toString();
-
         return {
-            gameId: game.gameData.id,
-            urls: [gamePortUrl.toString()],
+            urls: this.getUrlsForGame(game),
         };
     }
 

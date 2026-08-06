@@ -153,7 +153,6 @@ class Bot {
     constructor(id: number, res: FindGameMatchData) {
         this.id = id;
 
-        assert("gameId" in res);
         this.ws = new WebSocket(res.urls[0]);
 
         this.data = res.data;

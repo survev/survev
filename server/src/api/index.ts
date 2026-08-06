@@ -185,10 +185,8 @@ app.post("/api/find_game_v2", validateParams(zFindGameBody), async (c) => {
     return c.json<FindGameResponse>({
         type: "success",
         res: {
-            zone: "",
             data: token,
             urls: data.urls,
-            gameId: data.gameId,
         },
     });
 });
