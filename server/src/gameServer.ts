@@ -55,11 +55,13 @@ class GameServer {
             playerData: body.playerData,
         });
 
+        const protocol = this.region.https ? "wss" : "ws";
+        const url = new URL(`${protocol}://${this.region.address}/play`);
+        url.searchParams.set("gameId", game.gameData.id);
+
         return {
             gameId: game.gameData.id,
-            useHttps: this.region.https,
-            hosts: [this.region.address],
-            addrs: [this.region.address],
+            urls: [url.toString()],
         };
     }
 

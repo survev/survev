@@ -17,8 +17,7 @@ export type FindGameBody = z.infer<typeof zFindGameBody>;
 export interface FindGameMatchData {
     zone: string;
     gameId: string;
-    useHttps: boolean;
-    hosts: string[];
+    urls: string[];
     data: string;
 }
 

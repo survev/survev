@@ -775,13 +775,8 @@ export class Application {
             }, 250);
             return;
         }
-        const hosts = matchData.hosts || [];
-        const urls: string[] = [];
-        for (let i = 0; i < hosts.length; i++) {
-            urls.push(
-                `ws${matchData.useHttps ? "s" : ""}://${hosts[i]}/play?gameId=${matchData.gameId}`,
-            );
-        }
+        const urls = [...matchData.urls];
+
         const joinGameImpl = (urls: string[], matchData: FindGameMatchData) => {
             const url = urls.shift();
             if (!url) {

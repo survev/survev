@@ -187,8 +187,7 @@ app.post("/api/find_game_v2", validateParams(zFindGameBody), async (c) => {
         res: {
             zone: "",
             data: token,
-            useHttps: data.useHttps,
-            hosts: data.hosts,
+            urls: data.urls,
             gameId: data.gameId,
         },
     });

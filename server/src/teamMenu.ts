@@ -323,8 +323,7 @@ class Room {
                 zone: "",
                 data: token,
                 gameId: res.gameId,
-                hosts: res.hosts,
-                useHttps: res.useHttps,
+                urls: res.urls,
             });
         }
 

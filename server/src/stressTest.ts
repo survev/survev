@@ -154,9 +154,7 @@ class Bot {
         this.id = id;
 
         assert("gameId" in res);
-        this.ws = new WebSocket(
-            `${res.useHttps ? "wss" : "ws"}://${res.hosts[0]}/play?gameId=${res.gameId}`,
-        );
+        this.ws = new WebSocket(res.urls[0]);
 
         this.data = res.data;
 
