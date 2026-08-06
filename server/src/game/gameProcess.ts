@@ -330,21 +330,6 @@ app.ws<GameSocketData>("/play", {
             return;
         }
 
-        const searchParams = new URLSearchParams(req.getQuery());
-        const gameId = searchParams.get("gameId");
-
-        if (!gameId) {
-            game.logger.warn("Websocket upgrade closed: no game ID");
-            uwsHelpers.forbidden(res);
-            return;
-        }
-
-        if (game.id !== gameId) {
-            game.logger.warn("Websocket upgrade closed: invalid game ID");
-            uwsHelpers.forbidden(res);
-            return;
-        }
-
         if (!game.canJoin) {
             game.logger.warn("Websocket upgrade closed: game already started");
             uwsHelpers.forbidden(res);

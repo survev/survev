@@ -53,7 +53,6 @@ export type FindGamePrivateBody = z.infer<typeof zFindGamePrivateBody>;
 
 export type FindGamePrivateRes =
     | {
-        gameId: string;
         urls: string[];
     }
     | { error: FindGamePrivateError };

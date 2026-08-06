@@ -1,4 +1,3 @@
-import assert from "node:assert";
 import { EmotesDefs } from "../../shared/defs/gameObjects/emoteDefs.ts";
 import { MeleeDefs } from "../../shared/defs/gameObjects/meleeDefs.ts";
 import { OutfitDefs } from "../../shared/defs/gameObjects/outfitDefs.ts";
@@ -153,7 +152,6 @@ class Bot {
     constructor(id: number, res: FindGameMatchData) {
         this.id = id;
 
-        assert("gameId" in res);
         this.ws = new WebSocket(res.urls[0]);
 
         this.data = res.data;
