@@ -130,6 +130,14 @@ class ServerGame extends Game {
             startedTime: this.startedTime,
             stopped: this.stopped,
             timeRunning: this.timeRunning,
+            livingPlayers: this.playerBarn.livingPlayers.map(p => {
+                return {
+                    id: p.__id,
+                    userId: p.userId,
+                    name: p.name,
+                    disconnected: p.disconnected,
+                };
+            }),
         });
         if (this.stopped) {
             stopGame();
@@ -209,6 +217,9 @@ process.on("message", (msg: ProcessMsg) => {
     switch (msg.type) {
         case ProcessMsgType.AddJoinToken:
             game.addJoinTokens(msg.tokens, msg.autoFill);
+            break;
+        case ProcessMsgType.AddSpectateToken:
+            game.addSpectateToken(msg.token, msg.data);
             break;
     }
 });
@@ -327,12 +338,6 @@ app.ws<GameSocketData>("/play", {
                 res.write("429 Too Many Requests");
                 res.end();
             });
-            return;
-        }
-
-        if (!game.canJoin) {
-            game.logger.warn("Websocket upgrade closed: game already started");
-            uwsHelpers.forbidden(res);
             return;
         }
 

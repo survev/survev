@@ -18,6 +18,7 @@ export const enum Command {
     FindDiscordUserSlug = "find_discord_user_slug",
     BanAccount = "ban_account",
     SearchPlayer = "search_player",
+    SpectatePlayer = "spectate_player",
     UnbanAccount = "unban_account",
     UnbanIp = "unban_ip",
     SetMatchDataName = "set_match_data_name",

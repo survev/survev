@@ -5,7 +5,8 @@ import type { TeamMode } from "../../../shared/gameConfig.ts";
 import { util } from "../../../shared/utils/util.ts";
 import { Config } from "../config.ts";
 import { ServerLogger } from "../utils/logger.ts";
-import { type FindGamePrivateBody, type ServerGameConfig } from "../utils/types.ts";
+import { type FindGamePrivateBody, type ServerGameConfig, type SpectateGamePrivateBody } from "../utils/types.ts";
+import type { SpectateTokenData } from "./game.ts";
 import { type GameData, type ProcessMsg, ProcessMsgType } from "./ipcTypes.ts";
 
 let procFile: string;
@@ -25,19 +26,20 @@ export enum ProcState {
     Running,
 }
 
-class GameProcess {
+export class GameProcess {
     process: ChildProcess;
     port: number;
 
     gameData: GameData = {
         id: "",
         teamMode: 0 as TeamMode,
-        mapName: "",
+        mapName: "" as MapDefKey,
         canJoin: false,
         aliveCount: 0,
         startedTime: 0,
         stopped: false,
         timeRunning: 0,
+        livingPlayers: [],
     };
 
     state = ProcState.Idle;
@@ -140,6 +142,14 @@ class GameProcess {
             tokens,
         });
         this.avaliableSlots--;
+    }
+
+    addSpectateToken(token: string, data: SpectateTokenData) {
+        this.send({
+            type: ProcessMsgType.AddSpectateToken,
+            token,
+            data,
+        });
     }
 }
 
@@ -310,5 +320,42 @@ export class GameProcessManager {
         proc.addJoinTokens(body.playerData, body.autoFill);
 
         return proc;
+    }
+
+    async findGamesWithPlayer(body: SpectateGamePrivateBody): Promise<{ token: string; game: GameProcess }[]> {
+        const filterFn = (p: GameData["livingPlayers"][0]) => {
+            if (body.filter.type === "user_id") {
+                return p.userId === body.filter.value;
+            } else {
+                return p.name === body.filter.value;
+            }
+        };
+
+        const res = [];
+        for (const proc of this.processes) {
+            if (proc.state !== ProcState.Running) continue;
+
+            for (const player of proc.gameData.livingPlayers) {
+                if (!filterFn(player)) continue;
+
+                const token = crypto.randomUUID();
+                proc.addSpectateToken(token, {
+                    playerId: player.id,
+                    specAnon: true,
+                    noSpecCooldown: true,
+                });
+
+                res.push({
+                    token,
+                    game: proc,
+                });
+
+                if (res.length >= 5) break;
+            }
+
+            if (res.length >= 15) break;
+        }
+
+        return res;
     }
 }

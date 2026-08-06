@@ -59,7 +59,9 @@ export type GameWsDisconnectReason =
     | "host_closed"
     | "invalid_packet"
     | "invalid_protocol"
+    | "invalid_token"
     | "ip_banned"
+    | "player_not_found"
     | "rate_limited"
     | "server_crashed"
     | "server_restart";

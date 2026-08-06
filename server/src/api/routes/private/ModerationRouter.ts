@@ -1,5 +1,6 @@
 import { and, desc, eq, inArray, lt, ne } from "drizzle-orm";
 import { Hono } from "hono";
+import { streamText } from "hono/streaming";
 import { createHash } from "node:crypto";
 import { z } from "zod";
 import { GameConfig } from "../../../../../shared/gameConfig.ts";
@@ -14,13 +15,14 @@ import {
     zResetStatsParams,
     zSetAccountNameParams,
     zSetMatchDataNameParams,
+    zSpectateGameParams,
     zUnbanAccountParams,
     zUnbanIpParams,
 } from "../../../../../shared/types/moderation.ts";
 import { util } from "../../../../../shared/utils/util.ts";
 import { Config } from "../../../config.ts";
 import { validateUserName } from "../../../utils/badWords.ts";
-import type { SaveGameBody } from "../../../utils/types.ts";
+import type { ModRouterSpectateGameRes, SaveGameBody, SpectateGamePrivateRes } from "../../../utils/types.ts";
 import { server } from "../../apiServer.ts";
 import { databaseEnabledMiddleware, validateParams } from "../../auth/middleware.ts";
 import { db } from "../../db/index.ts";
@@ -507,6 +509,57 @@ export const ModerationRouter = new Hono()
             },
             200,
         );
+    })
+    .post("spectate_player", validateParams(zSpectateGameParams), async (c) => {
+        const { filter } = c.req.valid("json");
+
+        if (filter.type === "user_id") {
+            // convert the slug to user id
+            const user = await db.query.usersTable.findFirst({
+                where: eq(usersTable.slug, filter.value),
+                columns: {
+                    id: true,
+                },
+            });
+            if (!user) {
+                return c.json({
+                    message: "No user found with that slug.",
+                });
+            }
+            filter.value = user.id;
+        }
+
+        return streamText(c, async (stream) => {
+            const promises: Promise<unknown>[] = [];
+
+            const count = Object.keys(server.regions).length;
+            let requestsDone = 0;
+            for (const regionId in server.regions) {
+                const region = server.regions[regionId];
+
+                const promise = region.fetch<SpectateGamePrivateRes>("api/spectate_game", {
+                    filter: filter,
+                });
+                promises.push(promise);
+
+                promise.then((res) => {
+                    requestsDone++;
+
+                    stream.writeln(JSON.stringify(
+                        {
+                            region: regionId,
+                            done: requestsDone === count,
+                            ...(res || { players: [] }),
+                        } satisfies ModRouterSpectateGameRes,
+                    ));
+                }).catch((err) => {
+                    console.error(err);
+                });
+            }
+
+            await Promise.all(promises);
+            stream.close();
+        });
     });
 
 async function banAccount(userId: string, banReason: string, executorId: string) {

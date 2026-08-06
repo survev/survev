@@ -1,3 +1,4 @@
+import type { MapDefKey } from "../../../shared/defs/mapDefs.ts";
 import { TeamMode } from "../../../shared/gameConfig.ts";
 import type { Loadout } from "../../../shared/utils/loadout.ts";
 import { math } from "../../../shared/utils/math.ts";
@@ -36,6 +37,12 @@ export interface JoinTokenData {
     };
 }
 
+export interface SpectateTokenData {
+    playerId: number;
+    specAnon: boolean;
+    noSpecCooldown: boolean;
+}
+
 export class Game {
     started = false;
     stopped = false;
@@ -48,7 +55,7 @@ export class Game {
 
     id: string;
     teamMode: TeamMode;
-    mapName: string;
+    mapName: MapDefKey;
     isTeamMode: boolean;
     config: ServerGameConfig;
     modeManager: GameModeManager;
@@ -65,6 +72,7 @@ export class Game {
     netSyncWarnings = 0;
 
     joinTokens = new Map<string, JoinTokenData>();
+    spectateTokens = new Map<string, SpectateTokenData>();
 
     get aliveCount(): number {
         return this.playerBarn.livingPlayers.length;
@@ -369,6 +377,10 @@ export class Game {
                 quests: token.quests,
             });
         }
+    }
+
+    addSpectateToken(token: string, data: SpectateTokenData) {
+        this.spectateTokens.set(token, data);
     }
 
     stop() {

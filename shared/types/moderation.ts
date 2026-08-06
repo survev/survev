@@ -91,3 +91,12 @@ export const zLogoutFromGameParams = z.object({
 export const zResetStatsParams = z.object({
     slug: z.string(),
 });
+
+export const zSpectateFilter = z.object({
+    type: z.union([z.literal("user_id"), z.literal("player_name")]),
+    value: z.string(),
+});
+
+export const zSpectateGameParams = z.object({
+    filter: zSpectateFilter,
+});

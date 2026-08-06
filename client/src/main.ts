@@ -400,6 +400,8 @@ export class Application {
             loadStaticDomImages();
 
             SDK.gameLoadComplete();
+
+            this.tryJoinGameFromParam();
         }
     }
 
@@ -795,6 +797,31 @@ export class Application {
         joinGameImpl(urls, matchData);
     }
 
+    tryJoinGameFromParam() {
+        const params = new URLSearchParams(window.location.search);
+        if (params.has("joinData")) {
+            try {
+                const data = JSON.parse(atob(params.get("joinData")!)) as FindGameMatchData;
+                if ("urls" in data && Array.isArray(data.urls) && "data" in data && typeof data.data === "string") {
+                    this!.joinGame(data);
+                } else {
+                    this.onJoinGameError("join_game_failed");
+                    console.error("Invalid join data:", data);
+                }
+            } catch (e) {
+                console.error("Failed to parse join data:", e);
+                this.onJoinGameError("join_game_failed");
+            }
+
+            params.delete("joinData");
+            window.history.pushState(
+                "",
+                "",
+                params.size ? `${window.location.pathname}?${params.toString()}` : window.location.pathname,
+            );
+        }
+    }
+
     getErrorString(err: FindGameError | GameWsDisconnectReason, fallback: "host_closed" | "full") {
         const errMap: Partial<Record<FindGameError | GameWsDisconnectReason, string>> = {
             banned: this.localization.translate("index-ip-banned"),
@@ -805,8 +832,10 @@ export class Application {
             invalid_captcha: this.localization.translate("index-invalid-captcha"),
             invalid_packet: this.localization.translate("index-invalid-packet"),
             invalid_protocol: this.localization.translate("index-invalid-protocol"),
+            invalid_token: this.localization.translate("index-invalid-token"),
             ip_banned: this.localization.translate("index-ip-banned"),
             join_game_failed: this.localization.translate("index-failed-joining-game"),
+            player_not_found: this.localization.translate("index-player-not-found"),
             rate_limited: this.localization.translate("index-rate-limited"),
             server_crashed: this.localization.translate("index-server-crashed"),
             server_restart: this.localization.translate("index-server-restart"),

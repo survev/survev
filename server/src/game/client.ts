@@ -2,6 +2,7 @@ import type { EmoteDef } from "../../../shared/defs/gameObjects/emoteDefs.ts";
 import { GameObjectDefs } from "../../../shared/defs/register.ts";
 import { GameConfig } from "../../../shared/gameConfig.ts";
 import * as net from "../../../shared/net/net.ts";
+import { ObjectType } from "../../../shared/net/objectSerializeFns.ts";
 import { SpectateAction } from "../../../shared/net/spectateMsg.ts";
 import type { Emote, GroupStatus } from "../../../shared/net/updateMsg.ts";
 import type { GameWsDisconnectReason } from "../../../shared/types/api.ts";
@@ -55,7 +56,7 @@ export class ClientBarn {
 
         if (!joinData || joinData.expiresAt < Date.now()) {
             this.game.logger.warn("Client tried to join without or with expired join token");
-            socket.close();
+            socket.close("invalid_token");
             if (joinData) {
                 this.game.joinTokens.delete(joinMsg.matchPriv);
             }
@@ -82,6 +83,32 @@ export class ClientBarn {
 
         const player = this.game.playerBarn.addPlayer(client, joinMsg, joinData);
         client.player = player;
+
+        return client;
+    }
+
+    addSpectatorClient(socket: ClientSocket<Client>, joinMsg: net.JoinMsg) {
+        const specData = this.game.spectateTokens.get(joinMsg.matchPriv);
+        if (!specData) {
+            socket.close("invalid_token");
+            return;
+        }
+
+        this.game.spectateTokens.delete(joinMsg.matchPriv);
+
+        const player = this.game.objectRegister.getById(specData.playerId);
+
+        if (!player || player.__type !== ObjectType.Player || player.dead) {
+            socket.close("player_not_found");
+            return;
+        }
+
+        const client = new Client(this.game, socket, null, "");
+        this.clients.push(client);
+
+        client.specAnon = specData.specAnon;
+        client.noSpecCooldown = specData.noSpecCooldown;
+        client.spectating = player;
 
         return client;
     }
@@ -200,7 +227,13 @@ export class ClientBarn {
         if (!msg) return;
 
         if (type === net.MsgType.Join && !client) {
-            client = this.game.clientBarn.addClientWithPlayer(socket, msg as net.JoinMsg);
+            const jMsg = msg as net.JoinMsg;
+            // TODO: this is kinda ugly...
+            if (this.game.joinTokens.has(jMsg.matchPriv)) {
+                client = this.game.clientBarn.addClientWithPlayer(socket, jMsg);
+            } else if (this.game.spectateTokens.has(jMsg.matchPriv)) {
+                client = this.game.clientBarn.addSpectatorClient(socket, jMsg);
+            }
             return;
         }
 
@@ -299,6 +332,7 @@ export class Client {
     private _specCooldown = 0;
     private _specAction = SpectateAction.None;
     specAnon = false;
+    noSpecCooldown = false;
 
     spectateNewPlayerTicker = 0;
 
@@ -378,7 +412,7 @@ export class Client {
 
                 // when spectating teammates we can have a lower cooldown
                 // since it cant be abused to know players positions
-                this._specCooldown = this.shouldSpectateTeam() ? 0.1 : 1;
+                this._specCooldown = this.getSpectateCooldown();
                 this._specAction = SpectateAction.None;
             }
 
@@ -718,6 +752,12 @@ export class Client {
                 break;
             }
         }
+    }
+
+    getSpectateCooldown() {
+        if (this.noSpecCooldown) return 0;
+
+        return this.shouldSpectateTeam() ? 0.1 : 1;
     }
 
     shouldSpectateTeam() {
