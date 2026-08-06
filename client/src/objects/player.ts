@@ -1554,10 +1554,11 @@ export class Player implements AbstractObject {
         // Feet
         const setFootSprite = function(
             sprite: PIXI.Sprite,
+            img: string,
             tint: number,
             downed: boolean,
         ) {
-            sprite.texture = PIXI.Texture.from("player-feet-01.img");
+            sprite.texture = PIXI.Texture.from(img);
             sprite.scale.set(0.45, 0.45);
             sprite.rotation = Math.PI * 0.5;
             sprite.tint = tint;
@@ -1567,8 +1568,8 @@ export class Player implements AbstractObject {
         const footTint = outfitDef.ghillie
             ? map.getMapDef().biome.colors.playerGhillie
             : outfitImg.footTint;
-        setFootSprite(this.footLSprite, footTint, this.downed);
-        setFootSprite(this.footRSprite, footTint, this.downed);
+        setFootSprite(this.footLSprite, outfitImg.footSprite, footTint, this.downed);
+        setFootSprite(this.footRSprite, outfitImg.footSprite, footTint, this.downed);
 
         // Flak Jacket
         if (this.m_hasPerk("flak_jacket") && !outfitDef.ghillie) {
