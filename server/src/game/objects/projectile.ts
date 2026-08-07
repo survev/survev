@@ -117,7 +117,6 @@ export class Projectile extends BaseGameObject {
     velZ: number;
     dead = false;
 
-    obstacleBellowId = 0;
     /**
      * 0 if not on top of an obstacle
      * aka on the ground
@@ -325,7 +324,6 @@ export class Projectile extends BaseGameObject {
                             this.dir = v2.normalizeSafe(this.vel);
                         }
                     } else if (obj.collidable) {
-                        this.obstacleBellowId = obj.__id;
                         this.obstacleBellowHeight = math.max(
                             this.obstacleBellowHeight,
                             obj.height,
@@ -347,7 +345,6 @@ export class Projectile extends BaseGameObject {
         }
 
         if (!insideObstacle) {
-            this.obstacleBellowId = 0;
             this.obstacleBellowHeight = 0;
         }
 
