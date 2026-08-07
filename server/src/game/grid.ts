@@ -5,7 +5,8 @@ import { v2, type Vec2 } from "../../../shared/utils/v2.ts";
 import type { Loot } from "./objects/loot.ts";
 
 interface GameObject {
-    __gridCells: Vec2[];
+    __gridBounds: { min: Vec2; max: Vec2 };
+    __onGrid: boolean;
     __gridQueryId: number;
     bounds: AABB;
     pos: Vec2;
@@ -43,9 +44,7 @@ export class Grid<T extends GameObject = GameObject> {
      * Add an object to the grid system
      */
     updateObject(obj: T): void {
-        this.remove(obj);
-
-        const cells = obj.__gridCells;
+        const objBounds = obj.__gridBounds;
 
         const aabb = obj.bounds;
         // Get the bounds of the hitbox
@@ -53,27 +52,43 @@ export class Grid<T extends GameObject = GameObject> {
         const min = this._roundToCells(v2.add(aabb.min, obj.pos));
         const max = this._roundToCells(v2.add(aabb.max, obj.pos));
 
+        if (
+            objBounds.min.x === min.x && objBounds.min.y === min.y && objBounds.max.x === max.x
+            && objBounds.max.y === max.y
+        ) {
+            return;
+        }
+
+        this.remove(obj);
+
         // Add it to all grid cells that it intersects
         for (let x = min.x; x <= max.x; x++) {
             const xRow = this._grid[x];
             for (let y = min.y; y <= max.y; y++) {
                 xRow[y].add(obj);
-                cells.push(v2.create(x, y));
             }
         }
+        v2.set(objBounds.min, min);
+        v2.set(objBounds.max, max);
+        obj.__onGrid = true;
     }
 
     /**
      * Remove an object from the grid system
      */
     remove(obj: T): void {
-        const cells = obj.__gridCells;
+        if (!obj.__onGrid) return;
 
-        for (let i = 0; i < cells.length; i++) {
-            const cell = cells[i];
-            this._grid[cell.x][cell.y].delete(obj);
+        const { min, max } = obj.__gridBounds;
+        for (let x = min.x; x <= max.x; x++) {
+            const xRow = this._grid[x];
+            for (let y = min.y; y <= max.y; y++) {
+                xRow[y].delete(obj);
+            }
         }
-        cells.length = 0;
+        v2.set(min, v2.create(-1, -1));
+        v2.set(max, v2.create(-1, -1));
+        obj.__onGrid = false;
     }
 
     /**
@@ -118,14 +133,17 @@ export class Grid<T extends GameObject = GameObject> {
 
         const queryId = this.nextQueryId++;
 
-        for (let i = 0; i < obj.__gridCells.length; i++) {
-            const pos = obj.__gridCells[i];
-            const cell = this._grid[pos.x][pos.y];
-            for (const object of cell) {
-                if (object.__gridQueryId === queryId) continue;
-                if (object === obj) continue;
-                object.__gridQueryId = queryId;
-                objects.push(object);
+        const { min, max } = obj.__gridBounds;
+
+        for (let x = min.x; x <= max.x; x++) {
+            const xRow = this._grid[x];
+            for (let y = min.y; y <= max.y; y++) {
+                const cell = xRow[y];
+                for (const object of cell) {
+                    if (object.__gridQueryId === queryId) continue;
+                    object.__gridQueryId = queryId;
+                    objects.push(object);
+                }
             }
         }
 

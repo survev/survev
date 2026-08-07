@@ -173,7 +173,8 @@ export abstract class BaseGameObject {
     __id!: number;
     __arrayIdx!: number;
 
-    __gridCells: Vec2[] = [];
+    __gridBounds = { min: v2.create(-1, -1), max: v2.create(-1, -1) };
+    __onGrid = false;
     __gridQueryId = 0;
     abstract bounds: AABB;
 
