@@ -2391,46 +2391,45 @@ export class GameMap {
     isOnWater(pos: Vec2, layer: number) {
         const objs = this.game.grid.intersectPos(pos);
 
-        // Check decals
-        for (let i = 0; i < objs.length; i++) {
-            const decal = objs[i];
-            if (decal.__type !== ObjectType.Decal) continue;
-            if (!decal.surface) {
-                continue;
-            }
-
-            if (
-                util.sameLayer(decal.layer, layer)
-                && collider.intersectCircle(decal.collider!, pos, 0.0001)
-            ) {
-                return decal.surface === "water";
-            }
-        }
-
-        // Check buildings
         let surface = null;
         let zIdx = 0;
         const onStairs = layer & 0x2;
 
         for (let i = 0; i < objs.length; i++) {
-            const building = objs[i];
-            if (building.__type !== ObjectType.Building) continue;
-            if (building.zIdx < zIdx) {
+            const obj = objs[i];
+
+            // Check decals
+            if (obj.__type === ObjectType.Decal) {
+                if (!obj.surface) {
+                    continue;
+                }
+                if (
+                    util.sameLayer(obj.layer, layer)
+                    && collider.intersectCircle(obj.collider!, pos, 0.0001)
+                ) {
+                    return obj.surface === "water";
+                }
+                continue;
+            }
+
+            // Check buildings
+            if (obj.__type !== ObjectType.Building) continue;
+            if (obj.zIdx < zIdx) {
                 continue;
             }
             // Prioritize layer0 building surfaces when on stairs
             if (
-                (building.layer !== layer && !onStairs)
-                || (building.layer === 1 && onStairs)
+                (obj.layer !== layer && !onStairs)
+                || (obj.layer === 1 && onStairs)
             ) {
                 continue;
             }
-            for (let j = 0; j < building.surfaces.length; j++) {
-                const s = building.surfaces[j];
+            for (let j = 0; j < obj.surfaces.length; j++) {
+                const s = obj.surfaces[j];
                 for (let k = 0; k < s.colliders.length; k++) {
                     const res = collider.intersectCircle(s.colliders[k], pos, 0.0001);
                     if (res) {
-                        zIdx = building.zIdx;
+                        zIdx = obj.zIdx;
                         surface = s;
                         break;
                     }
