@@ -1,8 +1,8 @@
+import type { ConfigManager } from "$lib/modules/ConfigManager.svelte.ts";
 import base64 from "base64-js";
 import $ from "jquery";
 import { type Input, Input as GameInput } from "../../shared/gameConfig.ts";
 import { BitStream } from "../../shared/lib/bitBuffer.ts";
-import type { ConfigManager } from "./config.ts";
 import { type InputHandler, InputType, InputValue, Key, MouseButton, MouseWheel } from "./input.ts";
 import { crc16 } from "./lib/crc.ts";
 import type { Localization } from "./ui/localization.ts";

@@ -1,11 +1,9 @@
-import $ from "jquery";
-
 import type { MeleeDef } from "../../shared/defs/gameObjects/meleeDefs.ts";
 import { type MapDefKey, MapDefs } from "../../shared/defs/mapDefs.ts";
 import { GameObjectDefs } from "../../shared/defs/register.ts";
 import * as net from "../../shared/net/net.ts";
 import { util } from "../../shared/utils/util.ts";
-import { device } from "./device.ts";
+import { device } from "./lib/modules/Device.svelte.ts";
 
 const truncateCanvas = document.createElement("canvas");
 
@@ -63,6 +61,36 @@ export const helpers = {
             return a.mapId - b.mapId;
         });
         return gameModes;
+    },
+    /**
+     * Safely fetch a URL without having to handle errors.
+     * @param url The URL to fetch.
+     * @param init Request options.
+     */
+    async fetchSafe<T>(
+        url: string | URL | Request,
+        init?: RequestInit,
+    ): Promise<{ success: false; data?: T } | { success: true; data: T }> {
+        try {
+            const res = await fetch(url, init);
+
+            const type = res.headers.get("Content-Type");
+            if (!type?.toLowerCase().includes("application/json")) {
+                return {
+                    success: false,
+                };
+            }
+
+            const data = await res.json();
+            return {
+                success: res.ok,
+                data,
+            };
+        } catch (_e) {
+            return {
+                success: false,
+            };
+        }
     },
     sanitizeNameInput: function(input: string) {
         let name = input.trim();
@@ -130,30 +158,10 @@ export const helpers = {
     },
     copyTextToClipboard: function(text: string) {
         try {
-            const $temp = $<HTMLInputElement>("<input>");
-            $("body").append($temp);
-            $temp.val(text);
-
-            if (device.os == "ios") {
-                const el = $temp.get(0)!;
-                const editable = el.contentEditable;
-                const readOnly = el.readOnly;
-                el.contentEditable = "true";
-                el.readOnly = true;
-                const range = document.createRange();
-                range.selectNodeContents(el);
-                const sel = window.getSelection()!;
-                sel.removeAllRanges();
-                sel.addRange(range);
-                el.setSelectionRange(0, 999999);
-                el.contentEditable = editable;
-                el.readOnly = readOnly;
-            } else {
-                $temp.trigger("select");
-            }
-            document.execCommand("copy");
-            $temp.remove();
-        } catch (_e) {}
+            navigator.clipboard.writeText(text);
+        } catch (e) {
+            console.warn("Unable to copy to clipboard:", e);
+        }
     },
     formatTime(time: number) {
         const minutes = Math.floor(time / 60) % 60;
