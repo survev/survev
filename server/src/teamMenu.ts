@@ -320,9 +320,7 @@ class Room {
             }
 
             player.send("joinGame", {
-                zone: "",
                 data: token,
-                gameId: res.gameId,
                 urls: res.urls,
             });
         }

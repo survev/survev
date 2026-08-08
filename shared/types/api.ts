@@ -15,8 +15,6 @@ export const zFindGameBody = z.object({
 export type FindGameBody = z.infer<typeof zFindGameBody>;
 
 export interface FindGameMatchData {
-    zone: string;
-    gameId: string;
     urls: string[];
     data: string;
 }

@@ -3,6 +3,7 @@ import { Hono } from "hono";
 import { createHash } from "node:crypto";
 import { z } from "zod";
 import { GameConfig } from "../../../../../shared/gameConfig.ts";
+import type { FindGameMatchData } from "../../../../../shared/types/api.ts";
 import {
     zBanAccountParams,
     zBanIpParams,
@@ -14,13 +15,14 @@ import {
     zResetStatsParams,
     zSetAccountNameParams,
     zSetMatchDataNameParams,
+    zSpectateGameParams,
     zUnbanAccountParams,
     zUnbanIpParams,
 } from "../../../../../shared/types/moderation.ts";
 import { util } from "../../../../../shared/utils/util.ts";
 import { Config } from "../../../config.ts";
 import { validateUserName } from "../../../utils/badWords.ts";
-import type { SaveGameBody } from "../../../utils/types.ts";
+import type { FindGamePrivateRes, SaveGameBody } from "../../../utils/types.ts";
 import { server } from "../../apiServer.ts";
 import { databaseEnabledMiddleware, validateParams } from "../../auth/middleware.ts";
 import { db } from "../../db/index.ts";
@@ -507,6 +509,46 @@ export const ModerationRouter = new Hono()
             },
             200,
         );
+    })
+    .post("spectate_player", validateParams(zSpectateGameParams), async (c) => {
+        const { filter } = c.req.valid("json");
+
+        const token = crypto.randomUUID();
+
+        if (filter.type === "user_id") {
+            // convert the slug to user id
+            const user = await db.query.usersTable.findFirst({
+                where: eq(usersTable.slug, filter.value),
+                columns: {
+                    id: true,
+                },
+            });
+            if (!user) {
+                return c.json({
+                    message: "No user found with that slug.",
+                });
+            }
+            filter.value = user.id;
+        }
+
+        const promises = Object.values(server.regions).map(r => {
+            return r.fetch<FindGamePrivateRes>("api/spectate_game", {
+                token,
+                filter: filter,
+            });
+        });
+        const responses = await Promise.all(promises);
+
+        let final: FindGameMatchData[] = [];
+
+        for (const res of responses) {
+            if (!res || "error" in res) continue;
+            final.push({ data: token, urls: res.urls });
+        }
+
+        return c.json({
+            res: final,
+        });
     });
 
 async function banAccount(userId: string, banReason: string, executorId: string) {

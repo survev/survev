@@ -1,5 +1,5 @@
 import type { TeamMode } from "../../../shared/gameConfig";
-import type { FindGamePrivateBody, ServerGameConfig } from "../utils/types";
+import type { FindGamePrivateBody, ServerGameConfig, SpectateGamePrivateBody } from "../utils/types";
 
 export interface GameData {
     id: string;
@@ -10,6 +10,13 @@ export interface GameData {
     startedTime: number;
     stopped: boolean;
     timeRunning: number;
+
+    livingPlayers: Array<{
+        id: number;
+        userId: string | null;
+        name: string;
+        disconnected: boolean;
+    }>;
 }
 
 export enum ProcessMsgType {
@@ -17,6 +24,7 @@ export enum ProcessMsgType {
     KeepAlive,
     UpdateData,
     AddJoinToken,
+    AddSpectateToken,
 }
 
 export interface CreateGameMsg {
@@ -39,8 +47,15 @@ export interface AddJoinTokenMsg {
     tokens: FindGamePrivateBody["playerData"];
 }
 
+export interface AddSpectateTokenMsg {
+    type: ProcessMsgType.AddSpectateToken;
+    token: string;
+    filter: SpectateGamePrivateBody["filter"];
+}
+
 export type ProcessMsg =
     | CreateGameMsg
     | KeepAliveMsg
     | UpdateDataMsg
-    | AddJoinTokenMsg;
+    | AddJoinTokenMsg
+    | AddSpectateTokenMsg;

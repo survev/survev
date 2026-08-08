@@ -400,6 +400,8 @@ export class Application {
             loadStaticDomImages();
 
             SDK.gameLoadComplete();
+
+            this.tryJoinGameFromParam();
         }
     }
 
@@ -793,6 +795,21 @@ export class Application {
             );
         };
         joinGameImpl(urls, matchData);
+    }
+
+    tryJoinGameFromParam() {
+        const params = new URLSearchParams(window.location.search);
+        if (params.has("joinData")) {
+            try {
+                const data = JSON.parse(atob(params.get("joinData")!));
+                if ("urls" in data && "data" in data) {
+                    this!.joinGame(data);
+                }
+            } catch (e) {
+                console.error(e);
+                this.onJoinGameError("join_game_failed");
+            }
+        }
     }
 
     getErrorString(err: FindGameError | GameWsDisconnectReason, fallback: "host_closed" | "full") {

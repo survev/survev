@@ -3,7 +3,7 @@ import type { Loadout } from "../../../shared/utils/loadout.ts";
 import { math } from "../../../shared/utils/math.ts";
 import { Config } from "../config.ts";
 import { ServerLogger } from "../utils/logger.ts";
-import { type FindGamePrivateBody, type ServerGameConfig } from "../utils/types.ts";
+import { type FindGamePrivateBody, type ServerGameConfig, type SpectateGamePrivateBody } from "../utils/types.ts";
 import { ClientBarn } from "./client.ts";
 import { GameModeManager } from "./gameModeManager.ts";
 import { Grid } from "./grid.ts";
@@ -36,6 +36,10 @@ export interface JoinTokenData {
     };
 }
 
+export interface SpectateTokenData {
+    filter: SpectateGamePrivateBody["filter"];
+}
+
 export class Game {
     started = false;
     stopped = false;
@@ -65,6 +69,7 @@ export class Game {
     netSyncWarnings = 0;
 
     joinTokens = new Map<string, JoinTokenData>();
+    spectateTokens = new Map<string, SpectateTokenData>();
 
     get aliveCount(): number {
         return this.playerBarn.livingPlayers.length;
@@ -369,6 +374,10 @@ export class Game {
                 quests: token.quests,
             });
         }
+    }
+
+    addSpectateToken(token: string, filter: SpectateTokenData["filter"]) {
+        this.spectateTokens.set(token, { filter });
     }
 
     stop() {

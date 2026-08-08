@@ -6,7 +6,7 @@ import { App, SSLApp, type WebSocket } from "uWebSockets.js";
 import pkgJson from "../../package.json" with { type: "json" };
 import { GameConfig } from "../../shared/gameConfig.ts";
 import { Config } from "./config.ts";
-import { GameProcessManager, ProcState } from "./game/gameProcessManager.ts";
+import { GameProcess, GameProcessManager, ProcState } from "./game/gameProcessManager.ts";
 import { apiPrivateRouter } from "./utils/apiRouter.ts";
 import { GIT_VERSION } from "./utils/gitRevision.ts";
 import { logErrorToWebhook, ServerLogger } from "./utils/logger.ts";
@@ -15,7 +15,9 @@ import {
     type FindGamePrivateBody,
     type FindGamePrivateRes,
     type SaveGameBody,
+    type SpectateGamePrivateBody,
     zFindGamePrivateBody,
+    zSpectateGamePrivateBody,
 } from "./utils/types.ts";
 import { uwsHelpers } from "./utils/uwsHelpers.ts";
 
@@ -34,6 +36,17 @@ class GameServer {
     readonly regionId = Config.gameServer.thisRegion;
 
     readonly manager = new GameProcessManager();
+
+    getUrlsForGame(game: GameProcess) {
+        const protocol = this.region.https ? "wss" : "ws";
+        const mainPortUrl = new URL(`${protocol}://${this.region.address}/play`);
+        mainPortUrl.searchParams.set("gameId", game.gameData.id);
+
+        const gamePortUrl = new URL(mainPortUrl.toString());
+        gamePortUrl.port = game.port.toString();
+
+        return [gamePortUrl.toString()];
+    }
 
     async findGame(body: FindGamePrivateBody): Promise<FindGamePrivateRes> {
         if (body.version !== GameConfig.protocolVersion) {
@@ -58,16 +71,21 @@ class GameServer {
             };
         }
 
-        const protocol = this.region.https ? "wss" : "ws";
-        const mainPortUrl = new URL(`${protocol}://${this.region.address}/play`);
-        mainPortUrl.searchParams.set("gameId", game.gameData.id);
+        return {
+            urls: this.getUrlsForGame(game),
+        };
+    }
 
-        const gamePortUrl = new URL(mainPortUrl.toString());
-        gamePortUrl.port = game.port.toString();
+    async findGameToSpectate(body: SpectateGamePrivateBody): Promise<FindGamePrivateRes> {
+        const game = await this.manager.findGameWithPlayer(body);
+        if (!game) {
+            return {
+                error: "full",
+            };
+        }
 
         return {
-            gameId: game.gameData.id,
-            urls: [gamePortUrl.toString()],
+            urls: this.getUrlsForGame(game),
         };
     }
 
@@ -180,6 +198,25 @@ app.post("/api/find_game", async (res, req) => {
         const body = await uwsHelpers.getJsonBody(res, zFindGamePrivateBody);
 
         uwsHelpers.returnJson(res, await server.findGame(body));
+    } catch (error) {
+        server.logger.warn("/api/find_game error: ", error);
+    }
+});
+
+app.post("/api/spectate_game", async (res, req) => {
+    res.onAborted(() => {
+        res.aborted = true;
+    });
+
+    if (req.getHeader("survev-api-key") !== Config.secrets.SURVEV_API_KEY) {
+        uwsHelpers.forbidden(res);
+        return;
+    }
+
+    try {
+        const body = await uwsHelpers.getJsonBody(res, zSpectateGamePrivateBody);
+
+        uwsHelpers.returnJson(res, await server.findGameToSpectate(body));
     } catch (error) {
         server.logger.warn("/api/find_game error: ", error);
     }

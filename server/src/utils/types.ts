@@ -2,6 +2,7 @@ import { z } from "zod";
 import type { MapDefKey } from "../../../shared/defs/mapDefs.ts";
 import { TeamMode } from "../../../shared/gameConfig.ts";
 import { type FindGamePrivateError, loadoutSchema } from "../../../shared/types/api.ts";
+import { zSpectateFilter } from "../../../shared/types/moderation.ts";
 import type { MatchDataTable } from "../api/db/schema.ts";
 
 export const zUpdateRegionBody = z.object({
@@ -53,7 +54,13 @@ export type FindGamePrivateBody = z.infer<typeof zFindGamePrivateBody>;
 
 export type FindGamePrivateRes =
     | {
-        gameId: string;
         urls: string[];
     }
     | { error: FindGamePrivateError };
+
+export const zSpectateGamePrivateBody = z.object({
+    token: z.string(),
+    filter: zSpectateFilter,
+});
+
+export type SpectateGamePrivateBody = z.infer<typeof zSpectateGamePrivateBody>;
