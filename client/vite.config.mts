@@ -1,7 +1,7 @@
 import { resolve } from "node:path";
 import { defineConfig, loadEnv, PluginOption, type ServerOptions } from "vite";
 import { getConfig } from "../config.ts";
-import { version } from "../package.json";
+import { version } from "../package.json" with { type: "json" };
 import { GIT_VERSION } from "../server/src/utils/gitRevision.ts";
 import { stripBlockPlugin } from "../shared/utils/stripBlockPlugin.ts";
 import { atlasBuilderPlugin } from "./atlas-builder/vitePlugin.ts";
