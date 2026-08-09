@@ -1,4 +1,3 @@
-import base64 from "base64-js";
 import $ from "jquery";
 import { type Input, Input as GameInput } from "../../shared/gameConfig.ts";
 import { BitStream } from "../../shared/lib/bitBuffer.ts";
