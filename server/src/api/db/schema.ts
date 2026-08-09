@@ -5,6 +5,7 @@ import {
     integer,
     json,
     pgTable,
+    primaryKey,
     serial,
     text,
     timestamp,
@@ -158,6 +159,7 @@ export const matchDataTable = pgTable(
             table.region,
             table.kills,
         ),
+        primaryKey({ columns: [table.gameId, table.playerId] }),
     ],
 );
 
