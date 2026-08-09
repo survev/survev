@@ -250,7 +250,7 @@ interface GameSocketData {
     ip: string;
     rateLimit: Record<symbol, number>;
     disconnectReason?: GameWsDisconnectReason;
-    clientSocket: UwsSocket;
+    clientSocket?: UwsSocket;
 }
 
 class UwsSocket extends ClientSocket<Client> {
@@ -394,8 +394,12 @@ app.ws<GameSocketData>("/play", {
 
     message(socket: WebSocket<GameSocketData>, message) {
         const data = socket.getUserData();
-        if (!game) {
-            data.clientSocket.close();
+        if (!game || !data.clientSocket) {
+            if (data.clientSocket) {
+                data.clientSocket.close();
+            } else {
+                socket.close();
+            }
             return;
         }
         if (gameWsRateLimit.isRateLimited(socket.getUserData().rateLimit)) {
@@ -408,9 +412,11 @@ app.ws<GameSocketData>("/play", {
 
     close(socket: WebSocket<GameSocketData>) {
         const data = socket.getUserData();
-        data.clientSocket._closed = true;
         gameWsRateLimit.ipDisconnected(data.ip);
-        game?.clientBarn?.handleSocketClose(data.clientSocket);
+        if (data.clientSocket) {
+            data.clientSocket._closed = true;
+            game?.clientBarn?.handleSocketClose(data.clientSocket);
+        }
     },
 });
 
