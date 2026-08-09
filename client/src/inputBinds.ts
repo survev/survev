@@ -6,6 +6,7 @@ import type { ConfigManager } from "./config.ts";
 import { type InputHandler, InputType, InputValue, Key, MouseButton, MouseWheel } from "./input.ts";
 import { crc16 } from "./lib/crc.ts";
 import type { Localization } from "./ui/localization.ts";
+import { util } from "../../shared/utils/util.ts";
 
 function def(name: string, defaultValue: InputValue | null) {
     return {
@@ -128,13 +129,13 @@ export class InputBinds {
     }
 
     toBase64() {
-        return base64.fromByteArray(this.toArray());
+        return util.bytesToBase64(this.toArray());
     }
 
     fromBase64(str: string) {
         let loaded = false;
         try {
-            loaded = this.fromArray(base64.toByteArray(str));
+            loaded = this.fromArray(util.base64ToBytes(str));
         } catch (err) {
             console.error("Error", err);
         }

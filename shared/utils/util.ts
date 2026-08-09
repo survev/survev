@@ -245,6 +245,23 @@ export const util = {
         };
     },
 
+    bytesToBase64(bytes: Uint8Array) {
+        let binary = "";
+        for (const byte of bytes) {
+            binary += String.fromCharCode(byte);
+        }
+        return btoa(binary);
+    },
+
+    base64ToBytes(str: string) {
+        const binary = atob(str);
+        const bytes = new Uint8Array(binary.length);
+        for (let i = 0; i < binary.length; i++) {
+            bytes[i] = binary.charCodeAt(i);
+        }
+        return bytes;
+    },
+
     // https://stackoverflow.com/questions/5623838/rgb-to-hex-and-hex-to-rgb
     rgbToHex(c: { r: number; g: number; b: number }) {
         const rgb = util.rgbToInt(c);
