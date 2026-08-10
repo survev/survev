@@ -12,6 +12,8 @@ const config: RolldownOptions = {
         format: "es",
         polyfillRequire: false,
         sourcemap: true,
+        topLevelVar: true,
+        exports: "none",
         minify: {
             compress: {
                 unused: true,
@@ -21,6 +23,23 @@ const config: RolldownOptions = {
                 removeWhitespace: false,
             },
         },
+    },
+    optimization: {
+        inlineConst: {
+            mode: "all",
+            pass: 3,
+        },
+    },
+    treeshake: {
+        manualPureFunctions: [
+            "z.object",
+            "z.array",
+            "z.string",
+            "z.boolean",
+            "z.number",
+            "z.enum",
+        ],
+        moduleSideEffects: false,
     },
     plugins: [
         stripBlockPlugin({
