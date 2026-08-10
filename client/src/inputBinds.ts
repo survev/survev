@@ -1,7 +1,7 @@
-import base64 from "base64-js";
 import $ from "jquery";
 import { type Input, Input as GameInput } from "../../shared/gameConfig.ts";
 import { BitStream } from "../../shared/lib/bitBuffer.ts";
+import { util } from "../../shared/utils/util.ts";
 import type { ConfigManager } from "./config.ts";
 import { type InputHandler, InputType, InputValue, Key, MouseButton, MouseWheel } from "./input.ts";
 import { crc16 } from "./lib/crc.ts";
@@ -128,13 +128,13 @@ export class InputBinds {
     }
 
     toBase64() {
-        return base64.fromByteArray(this.toArray());
+        return util.bytesToBase64(this.toArray());
     }
 
     fromBase64(str: string) {
         let loaded = false;
         try {
-            loaded = this.fromArray(base64.toByteArray(str));
+            loaded = this.fromArray(util.base64ToBytes(str));
         } catch (err) {
             console.error("Error", err);
         }
