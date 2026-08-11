@@ -13,7 +13,7 @@
     "@taufik-nurrohman/color-picker": "1.4.2",
     "bootstrap": "^4.6.2",
     "ejs": "^4.0.1",
-    "hono": "^4.12.33",
+    "hono": "^4.13.0",
     "jquery": "^3.7.1",
     "pixi.js-legacy": "^7.4.3",
     "slugify": "^1.6.9"

@@ -6,6 +6,6 @@
     "zod": "^4.4.3"
   },
   "devDependencies": {
-    "rolldown": "^1.2.1"
+    "rolldown": "^1.2.2"
   }
 }
