@@ -20,14 +20,8 @@
 Start the client dev server using `pnpm dev:client` and API / game servers with `pnpm dev:server`,  
 or traverse into client and server directories individually to run `pnpm dev` in each.
 
-### Accounts
-Accounts are optional. You can set `accountsEnabled` to `false` in `config.ts` to disable them.  
-If disabled, you can skip the steps below.
-
-First generate a private key and set encryptLoadoutSecret to it, this is used to encrypt loadouts.
-```sh
-openssl rand -base64 10
-```
+### Database and accounts
+Accounts are optional, they require a PostgreSQL database, to disable them add `database: { enabled: false }` to `survev-config.hjson`.
 
 After installing [PostgreSQL](https://www.postgresql.org), start the service and create a database:
 ```sh
