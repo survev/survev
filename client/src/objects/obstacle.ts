@@ -70,6 +70,7 @@ export class Obstacle implements AbstractObject {
         useItem?: string;
         useId?: number;
         canUse?: boolean;
+        interactionObject?: string;
         onOff?: boolean;
         isVat?: boolean;
         roleToPromote?: string;
@@ -215,6 +216,7 @@ export class Obstacle implements AbstractObject {
                 this.button = {
                     interactionRad: def.button.interactionRad,
                     interactionText: def.button.interactionText || "game-use",
+                    interactionObject: def.button.interactionObject ?? `game-${this.type}`,
                     seq: data.button.seq,
                     seqOld: data.button.seq,
                     roleToPromote: def.button.roleToPromote,
@@ -309,11 +311,10 @@ export class Obstacle implements AbstractObject {
             ) {
                 return null;
             }
-
             return {
                 rad: this.button.interactionRad,
                 action: this.button.interactionText,
-                object: `game-${this.type}`,
+                object: this.button.interactionObject,
             };
         }
         if (this.isDoor && this.door.canUse && !this.door.autoOpen) {
