@@ -6,6 +6,7 @@ import { v2, type Vec2 } from "./v2.ts";
 
 interface Obstacle {
     __id: number;
+    active: boolean;
     dead: boolean;
     collidable: boolean;
     isWindow: boolean;
@@ -28,7 +29,8 @@ function intersectSegmentObstacle(
     const o = obstacle;
 
     if (
-        o.dead
+        !o.active
+        || o.dead
         || !o.collidable
         || o.isWindow
         || o.height < height
