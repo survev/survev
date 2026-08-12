@@ -245,10 +245,10 @@ class Room {
 
         const playerData = await getFindGamePlayerData(
             this.players.map((player) => {
-                const token = randomUUID();
-                tokenMap.set(player, token);
+                const joinToken = randomUUID();
+                tokenMap.set(player, joinToken);
                 return {
-                    token,
+                    joinToken,
                     userId: player.userId,
                     ip: player.ip,
                 } satisfies FindGamePrivateBody["playerData"][0];
@@ -320,7 +320,7 @@ class Room {
             }
 
             player.send("joinGame", {
-                data: token,
+                joinToken: token,
                 urls: res.urls,
             });
         }

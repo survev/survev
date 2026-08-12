@@ -86,7 +86,7 @@ class GameServer {
                     mapName: d.game.gameData.mapName,
                     teamMode: d.game.gameData.teamMode,
                     data: {
-                        data: d.token,
+                        joinToken: d.joinToken,
                         urls: this.getUrlsForGame(d.game),
                     },
                 };

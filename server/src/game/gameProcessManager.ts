@@ -322,7 +322,7 @@ export class GameProcessManager {
         return proc;
     }
 
-    async findGamesWithPlayer(body: SpectateGamePrivateBody): Promise<{ token: string; game: GameProcess }[]> {
+    async findGamesWithPlayer(body: SpectateGamePrivateBody): Promise<{ joinToken: string; game: GameProcess }[]> {
         const filterFn = (p: GameData["livingPlayers"][0]) => {
             if (body.filter.type === "user_id") {
                 return p.userId === body.filter.value;
@@ -338,15 +338,15 @@ export class GameProcessManager {
             for (const player of proc.gameData.livingPlayers) {
                 if (!filterFn(player)) continue;
 
-                const token = crypto.randomUUID();
-                proc.addSpectateToken(token, {
+                const joinToken = crypto.randomUUID();
+                proc.addSpectateToken(joinToken, {
                     playerId: player.id,
                     specAnon: true,
                     noSpecCooldown: true,
                 });
 
                 res.push({
-                    token,
+                    joinToken,
                     game: proc,
                 });
 

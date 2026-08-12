@@ -140,11 +140,7 @@ export class Game {
         }
     }
 
-    tryJoinGame(
-        url: string,
-        matchPriv: string,
-        onConnectFail: () => void,
-    ) {
+    tryJoinGame(url: string, joinToken: string, onConnectFail: () => void) {
         if (!this.connecting && !this.connected && !this.initialized) {
             if (this.m_ws) {
                 this.m_ws.onerror = function() {};
@@ -168,7 +164,7 @@ export class Game {
                     const name = this.m_config.get("playerName")!;
                     const joinMessage = new net.JoinMsg();
                     joinMessage.protocol = GameConfig.protocolVersion;
-                    joinMessage.matchPriv = matchPriv;
+                    joinMessage.joinToken = joinToken;
                     joinMessage.name = name;
                     joinMessage.useTouch = device.touch;
                     joinMessage.isMobile = device.mobile || window.mobile!;

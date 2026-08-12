@@ -1,7 +1,6 @@
 import { type ChatInputCommandInteraction, EmbedBuilder, SlashCommandBuilder } from "discord.js";
 import type { ModRouterSpectateGameRes } from "../../../server/src/utils/types.ts";
 import { GameConfig } from "../../../shared/gameConfig.ts";
-import type { FindGameMatchData } from "../../../shared/types/api.ts";
 import { Config } from "../config.ts";
 import { botLogger, Command, hasBotPermission, honoClient } from "../utils.ts";
 import { sendNoPermissionMessage } from "./helpers.ts";
@@ -49,14 +48,7 @@ export const spectateCommandHandler = {
                     const joinData = gameData.data;
 
                     const url = new URL(clientUrl);
-                    url.searchParams.set(
-                        "joinData",
-                        btoa(
-                            JSON.stringify(
-                                { data: joinData.data, urls: joinData.urls } satisfies FindGameMatchData,
-                            ),
-                        ),
-                    );
+                    url.searchParams.set("joinData", btoa(JSON.stringify(joinData)));
 
                     return {
                         region: data.region,

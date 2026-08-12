@@ -25,7 +25,6 @@ import { SmokeBarn } from "./objects/smoke.ts";
 import { Profiler } from "./profiler.ts";
 
 export interface JoinTokenData {
-    expiresAt: number;
     userId: string | null;
     findGameIp: string;
     loadout?: Loadout;
@@ -42,6 +41,16 @@ export interface SpectateTokenData {
     specAnon: boolean;
     noSpecCooldown: boolean;
 }
+
+type JoinToken = {
+    type: "join";
+    expiresAt: number;
+    data: JoinTokenData;
+} | {
+    type: "spectate";
+    expiresAt: number;
+    data: SpectateTokenData;
+};
 
 export class Game {
     started = false;
@@ -71,8 +80,7 @@ export class Game {
     netSyncWarnThreshold = (1000 / Config.netSyncTps) * 4;
     netSyncWarnings = 0;
 
-    joinTokens = new Map<string, JoinTokenData>();
-    spectateTokens = new Map<string, SpectateTokenData>();
+    joinTokens = new Map<string, JoinToken>();
 
     get aliveCount(): number {
         return this.playerBarn.livingPlayers.length;
@@ -368,19 +376,26 @@ export class Game {
         };
 
         for (const token of tokens) {
-            this.joinTokens.set(token.token, {
+            this.joinTokens.set(token.joinToken, {
+                type: "join",
                 expiresAt: Date.now() + 10000,
-                userId: token.userId,
-                groupData,
-                findGameIp: token.ip,
-                loadout: token.loadout,
-                quests: token.quests,
+                data: {
+                    userId: token.userId,
+                    groupData,
+                    findGameIp: token.ip,
+                    loadout: token.loadout,
+                    quests: token.quests,
+                },
             });
         }
     }
 
     addSpectateToken(token: string, data: SpectateTokenData) {
-        this.spectateTokens.set(token, data);
+        this.joinTokens.set(token, {
+            type: "spectate",
+            expiresAt: Date.now() + 20000,
+            data,
+        });
     }
 
     stop() {

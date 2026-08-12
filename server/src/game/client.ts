@@ -13,7 +13,7 @@ import { util } from "../../../shared/utils/util.ts";
 import { v2 } from "../../../shared/utils/v2.ts";
 import { Config } from "../config.ts";
 
-import type { Game } from "./game.ts";
+import type { Game, JoinTokenData, SpectateTokenData } from "./game.ts";
 import type { GameObject } from "./objects/gameObject.ts";
 import type { MapIndicator } from "./objects/mapIndicator.ts";
 import type { Player } from "./objects/player.ts";
@@ -51,19 +51,7 @@ export class ClientBarn {
         this.msgsToSend.stream.index = 0;
     }
 
-    addClientWithPlayer(socket: ClientSocket<Client>, joinMsg: net.JoinMsg) {
-        const joinData = this.game.joinTokens.get(joinMsg.matchPriv);
-
-        if (!joinData || joinData.expiresAt < Date.now()) {
-            this.game.logger.warn("Client tried to join without or with expired join token");
-            socket.close("invalid_token");
-            if (joinData) {
-                this.game.joinTokens.delete(joinMsg.matchPriv);
-            }
-            return;
-        }
-        this.game.joinTokens.delete(joinMsg.matchPriv);
-
+    addClientWithPlayer(socket: ClientSocket<Client>, joinData: JoinTokenData, joinMsg: net.JoinMsg) {
         if (Config.rateLimitsEnabled) {
             const count = this.clients.filter(
                 (c) => {
@@ -87,15 +75,7 @@ export class ClientBarn {
         return client;
     }
 
-    addSpectatorClient(socket: ClientSocket<Client>, joinMsg: net.JoinMsg) {
-        const specData = this.game.spectateTokens.get(joinMsg.matchPriv);
-        if (!specData) {
-            socket.close("invalid_token");
-            return;
-        }
-
-        this.game.spectateTokens.delete(joinMsg.matchPriv);
-
+    addSpectatorClient(socket: ClientSocket<Client>, specData: SpectateTokenData) {
         const player = this.game.objectRegister.getById(specData.playerId);
 
         if (!player || player.__type !== ObjectType.Player || player.dead) {
@@ -227,13 +207,27 @@ export class ClientBarn {
         if (!msg) return;
 
         if (type === net.MsgType.Join && !client) {
-            const jMsg = msg as net.JoinMsg;
-            // TODO: this is kinda ugly...
-            if (this.game.joinTokens.has(jMsg.matchPriv)) {
-                client = this.game.clientBarn.addClientWithPlayer(socket, jMsg);
-            } else if (this.game.spectateTokens.has(jMsg.matchPriv)) {
-                client = this.game.clientBarn.addSpectatorClient(socket, jMsg);
+            const joinMsg = msg as net.JoinMsg;
+
+            const joinData = this.game.joinTokens.get(joinMsg.joinToken);
+            if (!joinData || joinData.expiresAt < Date.now()) {
+                this.game.logger.warn("Client tried to join without or with expired join token");
+                socket.close("invalid_token");
+                if (joinData) {
+                    this.game.joinTokens.delete(joinMsg.joinToken);
+                }
+                return;
             }
+
+            if (joinData) {
+                if (joinData.type === "join") {
+                    client = this.game.clientBarn.addClientWithPlayer(socket, joinData.data, joinMsg);
+                } else {
+                    client = this.game.clientBarn.addSpectatorClient(socket, joinData.data);
+                }
+                this.game.joinTokens.delete(joinMsg.joinToken);
+            }
+
             return;
         }
 

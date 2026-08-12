@@ -790,7 +790,7 @@ export class Application {
             };
             this.game!.tryJoinGame(
                 url,
-                matchData.data,
+                matchData.joinToken,
                 onFailure,
             );
         };
@@ -802,7 +802,10 @@ export class Application {
         if (params.has("joinData")) {
             try {
                 const data = JSON.parse(atob(params.get("joinData")!)) as FindGameMatchData;
-                if ("urls" in data && Array.isArray(data.urls) && "data" in data && typeof data.data === "string") {
+                if (
+                    "urls" in data && Array.isArray(data.urls) && "joinToken" in data
+                    && typeof data.joinToken === "string"
+                ) {
                     this!.joinGame(data);
                 } else {
                     this.onJoinGameError("join_game_failed");

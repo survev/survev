@@ -116,7 +116,7 @@ app.post("/api/find_game_v2", validateParams(zFindGameBody), async (c) => {
         });
     }
 
-    const token = randomUUID();
+    const joinToken = randomUUID();
     let user: UsersTableSelect | null = null;
 
     const sessionId = getCookie(c, "session") ?? null;
@@ -163,7 +163,7 @@ app.post("/api/find_game_v2", validateParams(zFindGameBody), async (c) => {
 
     const playerData = await getFindGamePlayerData([
         {
-            token,
+            joinToken,
             userId: user?.id || null,
             ip,
         },
@@ -185,7 +185,7 @@ app.post("/api/find_game_v2", validateParams(zFindGameBody), async (c) => {
     return c.json<FindGameResponse>({
         type: "success",
         res: {
-            data: token,
+            joinToken,
             urls: data.urls,
         },
     });

@@ -154,7 +154,7 @@ class Bot {
 
         this.ws = new WebSocket(res.urls[0]);
 
-        this.data = res.data;
+        this.data = res.joinToken;
 
         this.connectPromise = new Promise((resolve) => {
             this.ws.addEventListener("error", (e) => {
@@ -302,7 +302,7 @@ class Bot {
             emotes: this.emotes,
         };
 
-        joinMsg.matchPriv = this.data;
+        joinMsg.joinToken = this.data;
 
         this.sendMsg(net.MsgType.Join, joinMsg);
     }

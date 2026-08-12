@@ -41,7 +41,7 @@ export const zFindGamePrivateBody = z.object({
     teamMode: z.number(),
     playerData: z.array(
         z.object({
-            token: z.string(),
+            joinToken: z.string(),
             userId: z.string().nullable(),
             ip: z.string(),
             loadout: loadoutSchema.optional(),
