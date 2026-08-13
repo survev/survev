@@ -877,6 +877,7 @@ export const Main: MapDef = {
                 stone_01: 350,
                 barrel_01: 76,
                 silo_01: 8,
+                nerd_01: 50,
                 crate_01: 50,
                 crate_02: 4,
                 crate_03: 8,

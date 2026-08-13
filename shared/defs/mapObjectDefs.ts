@@ -12984,6 +12984,11 @@ export const RawMapObjectDefs: Record<string, MapObjectDef> = {
         collision: collider.createAabbExtents(v2.create(0, 0), v2.create(1.5, 1.5)),
         img: { sprite: "map-couch-03.img" },
     }),
+    nerd_01: createCrate({
+        collision: collider.createAabbExtents(v2.create(0, 0), v2.create(3.1, 3.1)),
+        img: { sprite: "map-nerd-01.img" },
+        loot: Array.from({ length: 444 }, () => autoLoot("garand", 1)),
+    }),
     crate_01: createCrate({}),
     crate_01x: createCrate({ img: { sprite: "map-crate-01x.img" } }),
     crate_02: createCrate({
