@@ -205,6 +205,9 @@ app.post("/api/find_game", async (res, req) => {
         uwsHelpers.returnJson(res, await server.findGame(body));
     } catch (error) {
         server.logger.warn("/api/find_game error: ", error);
+        if (!res.aborted) {
+            res.writeStatus("500 Internal Server Error").end("500 Internal Server Error");
+        }
     }
 });
 
@@ -220,10 +223,12 @@ app.post("/api/spectate_game", async (res, req) => {
 
     try {
         const body = await uwsHelpers.getJsonBody(res, zSpectateGamePrivateBody);
-
         uwsHelpers.returnJson(res, await server.findGameToSpectate(body));
     } catch (error) {
         server.logger.warn("/api/find_game error: ", error);
+        if (!res.aborted) {
+            res.writeStatus("500 Internal Server Error").end("500 Internal Server Error");
+        }
     }
 });
 
