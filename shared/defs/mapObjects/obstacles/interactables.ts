@@ -1,13 +1,10 @@
 import { collider } from "../../../utils/collider";
 import { util } from "../../../utils/util";
 import { v2 } from "../../../utils/v2";
-import type {
-    MapObjectDef,
-    ObstacleDef,
-} from "../../mapObjectsTyping";
+import type { MapObjectDef, ObstacleDef } from "../../mapObjectsTyping";
 
 //
-// Buttons, Puzzle Pieces, Recorders, etc. 
+// Buttons, Puzzle Pieces, Recorders, etc.
 //
 
 function createButton<T extends ObstacleDef>(e: Partial<T>): T {
@@ -517,4 +514,4 @@ const InteractableDefs = {
     }),
 } as const satisfies Record<string, MapObjectDef>;
 
-export const Interactables = InteractableDefs
+export const Interactables = InteractableDefs;

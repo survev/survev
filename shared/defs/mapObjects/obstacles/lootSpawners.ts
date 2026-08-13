@@ -1,5 +1,5 @@
 import type { MapObjectDef } from "../../mapObjectsTyping";
-import { tierLoot, autoLoot } from "../mapObjectHelpers"
+import { autoLoot, tierLoot } from "../mapObjectHelpers";
 
 const LootSpawnerDefs = {
     loot_tier_1: {
@@ -183,4 +183,4 @@ const LootSpawnerDefs = {
     },
 } as const satisfies Record<string, MapObjectDef>;
 
-export const LootSpawners = LootSpawnerDefs
+export const LootSpawners = LootSpawnerDefs;

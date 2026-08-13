@@ -1,11 +1,8 @@
 import { collider } from "../../../utils/collider";
 import { util } from "../../../utils/util";
 import { v2 } from "../../../utils/v2";
-import type {
-    MapObjectDef,
-    ObstacleDef,
-} from "../../mapObjectsTyping";
-import { tierLoot, autoLoot } from "../mapObjectHelpers"
+import type { MapObjectDef, ObstacleDef } from "../../mapObjectsTyping";
+import { autoLoot, tierLoot } from "../mapObjectHelpers";
 
 //
 // Lootable and non-lootable furniture obstacles
@@ -1386,7 +1383,7 @@ const FurnitureDefs = {
             },
         },
     },
-    vending_01: (function () {
+    vending_01: (function() {
         const t = {
             type: "obstacle",
             obstacleType: "vending",
@@ -1446,4 +1443,4 @@ const FurnitureDefs = {
     wheel_03: createWheel({ img: { sprite: "map-wheel-03.img" } }),
 } as const satisfies Record<string, MapObjectDef>;
 
-export const Furniture = FurnitureDefs
+export const Furniture = FurnitureDefs;

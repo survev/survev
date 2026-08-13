@@ -1,12 +1,8 @@
 import { collider } from "../../../utils/collider";
 import { util } from "../../../utils/util";
 import { v2 } from "../../../utils/v2";
-import type {
-    MapObjectDef,
-    BuildingDef,
-    ObstacleDef,
-} from "../../mapObjectsTyping";
-import { tierLoot, autoLoot } from "../mapObjectHelpers"
+import type { BuildingDef, MapObjectDef, ObstacleDef } from "../../mapObjectsTyping";
+import { autoLoot, tierLoot } from "../mapObjectHelpers";
 
 //
 // Mostly exterior, map spawned objects such as stones and trees
@@ -531,10 +527,10 @@ const MapObstacleDefs = {
         explosion: "",
     }),
     propane_01: createBarrel({
-            collision: collider.createCircle(v2.create(0, 0), 1.25),
-            health: 50,
-            map: { display: true, color: 0x5fc4, scale: 1 },
-            img: { sprite: "map-propane-01.img", scale: 0.4 },
+        collision: collider.createCircle(v2.create(0, 0), 1.25),
+        health: 50,
+        map: { display: true, color: 0x5fc4, scale: 1 },
+        img: { sprite: "map-propane-01.img", scale: 0.4 },
     }),
     bollard_01: {
         type: "obstacle",
@@ -567,153 +563,152 @@ const MapObstacleDefs = {
     bush_01: createBush({}),
     bush_01b: createBush({ img: { alpha: 1 } }),
     bush_01cb: createBush({
-            img: { sprite: "map-bush-01cb.img" },
-            map: { color: 0x266f59 },
+        img: { sprite: "map-bush-01cb.img" },
+        map: { color: 0x266f59 },
     } as unknown as Partial<ObstacleDef>),
     bush_01f: createBush({
-            img: { sprite: "map-bush-01f.img" },
-            map: { color: 0x1b5c08 },
+        img: { sprite: "map-bush-01f.img" },
+        map: { color: 0x1b5c08 },
     } as unknown as Partial<ObstacleDef>),
-        bush_01sv: createBush({
-            hitParticle: "leafPrickly",
-            explodeParticle: "leafPrickly",
-            img: {
-                sprite: "map-bush-01sv.img",
-                residue: "map-bush-res-01sv.img",
-            },
-            map: { color: 0x73802f },
-        } as unknown as Partial<ObstacleDef>),
-        brush_01sv: createBush({
-            scale: {
-                createMin: 1.5,
-                createMax: 1.75,
-                destroy: 0.75,
-            },
-            health: 150,
-            collision: collider.createAabbExtents(v2.create(0, 0), v2.create(1.75, 1.75)),
-            hitParticle: "leaf",
-            explodeParticle: "leaf",
-            img: {
-                sprite: "map-brush-01sv.img",
-                residue: "map-brush-res-02sv.img",
-            },
-            map: { color: 0x4f7624 },
-        } as unknown as Partial<ObstacleDef>),
-        brush_02sv: createBush({
-            scale: {
-                createMin: 1.5,
-                createMax: 1.75,
-                destroy: 0.75,
-            },
-            health: 150,
-            collision: collider.createAabbExtents(v2.create(0, 0), v2.create(1.75, 1.75)),
-            hitParticle: "leaf",
-            explodeParticle: "leaf",
-            img: {
-                sprite: "map-brush-02sv.img",
-                residue: "map-brush-res-02sv.img",
-            },
-            map: { color: 0x4f7624 },
-        } as unknown as Partial<ObstacleDef>),
-        bush_01x: createBush({
-            map: { color: 0x455d30 },
-            img: { sprite: "map-bush-01x.img" },
-        } as unknown as Partial<ObstacleDef>),
-        bush_02: createBush({ img: { residue: "map-bush-res-02.img" } }),
-        bush_03: createBush({
-            img: { sprite: "map-bush-03.img", alpha: 1 },
-        }),
-        bush_04: createBush({
-            hitParticle: "leafRiver",
-            explodeParticle: "leafRiver",
-            img: {
-                sprite: "map-bush-04.img",
-                residue: "map-bush-res-04.img",
-                alpha: 1,
-                scale: 0.5,
-            },
-            terrain: {
-                grass: true,
-                river: { centerWeight: 0.3 },
-                riverShore: true,
-            },
-            sound: { enter: "bush_enter_02" },
-        }),
-        bush_04cb: createBush({
-            hitParticle: "leafRiver",
-            explodeParticle: "leafRiver",
-            img: {
-                sprite: "map-bush-04cb.img",
-                residue: "map-bush-res-04.img",
-                alpha: 1,
-                scale: 0.5,
-            },
-            terrain: {
-                grass: true,
-                river: { centerWeight: 0.3 },
-                riverShore: true,
-            },
-            sound: { enter: "bush_enter_02" },
-            map: { color: 0x2a7b63 },
-        } as unknown as Partial<ObstacleDef>),
-        bush_05: createBush({
-            img: {
-                sprite: "map-bush-05.img",
-                residue: "map-bush-res-05.img",
-            },
-            map: { color: 0x6a623d },
-        } as unknown as Partial<ObstacleDef>),
-        bush_06: createBush({
-            collision: collider.createCircle(v2.create(0, 0), 1.75),
-            map: { display: true, color: 0xfb9c01, scale: 1.5 },
-            img: {
-                sprite: "map-bush-06.img",
-                residue: "map-bush-res-06.img",
-            },
-        }),
-        bush_06tr: createBush({
-            collision: collider.createCircle(v2.create(0, 0), 2.5),
-            map: { display: true, color: 0xe2a51a, scale: 1 },
-            img: {
-                sprite: "map-bush-06tr.img",
-                residue: "map-bush-res-06.img",
-            },
-        }),
-        bush_06b: createBush({
-            scale: { createMin: 1, createMax: 1 },
-            collision: collider.createCircle(v2.create(0, 0), 1.75),
-            img: {
-                sprite: "map-bush-06.img",
-                residue: "map-bush-res-06.img",
-                alpha: 1,
-            },
-            map: { display: true, color: 0xd64100, scale: 1.5 },
-        } as unknown as Partial<ObstacleDef>),
-        bush_07: createBush({
-            hitParticle: "leafRiver",
-            explodeParticle: "leafRiver",
-            img: {
-                sprite: "map-bush-07.img",
-                alpha: 1,
-                scale: 0.5,
-            },
-            sound: { enter: "bush_enter_02" },
-        }),
-        bush_07sp: createBush({
-            hitParticle: "leafRiver",
-            explodeParticle: "leafRiver",
-            map: { display: true, color: 0xa3e0a, scale: 1.5 },
-            img: {
-                sprite: "map-bush-07sp.img",
-                alpha: 1,
-                scale: 0.5,
-            },
-            sound: { enter: "bush_enter_02" },
-        }),
-        bush_07x: createBush({ img: { sprite: "map-bush-07x.img" } }),
-        bush_07cb: createBush({ img: { sprite: "map-bush-07cb.img" } }),
+    bush_01sv: createBush({
+        hitParticle: "leafPrickly",
+        explodeParticle: "leafPrickly",
+        img: {
+            sprite: "map-bush-01sv.img",
+            residue: "map-bush-res-01sv.img",
+        },
+        map: { color: 0x73802f },
+    } as unknown as Partial<ObstacleDef>),
+    brush_01sv: createBush({
+        scale: {
+            createMin: 1.5,
+            createMax: 1.75,
+            destroy: 0.75,
+        },
+        health: 150,
+        collision: collider.createAabbExtents(v2.create(0, 0), v2.create(1.75, 1.75)),
+        hitParticle: "leaf",
+        explodeParticle: "leaf",
+        img: {
+            sprite: "map-brush-01sv.img",
+            residue: "map-brush-res-02sv.img",
+        },
+        map: { color: 0x4f7624 },
+    } as unknown as Partial<ObstacleDef>),
+    brush_02sv: createBush({
+        scale: {
+            createMin: 1.5,
+            createMax: 1.75,
+            destroy: 0.75,
+        },
+        health: 150,
+        collision: collider.createAabbExtents(v2.create(0, 0), v2.create(1.75, 1.75)),
+        hitParticle: "leaf",
+        explodeParticle: "leaf",
+        img: {
+            sprite: "map-brush-02sv.img",
+            residue: "map-brush-res-02sv.img",
+        },
+        map: { color: 0x4f7624 },
+    } as unknown as Partial<ObstacleDef>),
+    bush_01x: createBush({
+        map: { color: 0x455d30 },
+        img: { sprite: "map-bush-01x.img" },
+    } as unknown as Partial<ObstacleDef>),
+    bush_02: createBush({ img: { residue: "map-bush-res-02.img" } }),
+    bush_03: createBush({
+        img: { sprite: "map-bush-03.img", alpha: 1 },
+    }),
+    bush_04: createBush({
+        hitParticle: "leafRiver",
+        explodeParticle: "leafRiver",
+        img: {
+            sprite: "map-bush-04.img",
+            residue: "map-bush-res-04.img",
+            alpha: 1,
+            scale: 0.5,
+        },
+        terrain: {
+            grass: true,
+            river: { centerWeight: 0.3 },
+            riverShore: true,
+        },
+        sound: { enter: "bush_enter_02" },
+    }),
+    bush_04cb: createBush({
+        hitParticle: "leafRiver",
+        explodeParticle: "leafRiver",
+        img: {
+            sprite: "map-bush-04cb.img",
+            residue: "map-bush-res-04.img",
+            alpha: 1,
+            scale: 0.5,
+        },
+        terrain: {
+            grass: true,
+            river: { centerWeight: 0.3 },
+            riverShore: true,
+        },
+        sound: { enter: "bush_enter_02" },
+        map: { color: 0x2a7b63 },
+    } as unknown as Partial<ObstacleDef>),
+    bush_05: createBush({
+        img: {
+            sprite: "map-bush-05.img",
+            residue: "map-bush-res-05.img",
+        },
+        map: { color: 0x6a623d },
+    } as unknown as Partial<ObstacleDef>),
+    bush_06: createBush({
+        collision: collider.createCircle(v2.create(0, 0), 1.75),
+        map: { display: true, color: 0xfb9c01, scale: 1.5 },
+        img: {
+            sprite: "map-bush-06.img",
+            residue: "map-bush-res-06.img",
+        },
+    }),
+    bush_06tr: createBush({
+        collision: collider.createCircle(v2.create(0, 0), 2.5),
+        map: { display: true, color: 0xe2a51a, scale: 1 },
+        img: {
+            sprite: "map-bush-06tr.img",
+            residue: "map-bush-res-06.img",
+        },
+    }),
+    bush_06b: createBush({
+        scale: { createMin: 1, createMax: 1 },
+        collision: collider.createCircle(v2.create(0, 0), 1.75),
+        img: {
+            sprite: "map-bush-06.img",
+            residue: "map-bush-res-06.img",
+            alpha: 1,
+        },
+        map: { display: true, color: 0xd64100, scale: 1.5 },
+    } as unknown as Partial<ObstacleDef>),
+    bush_07: createBush({
+        hitParticle: "leafRiver",
+        explodeParticle: "leafRiver",
+        img: {
+            sprite: "map-bush-07.img",
+            alpha: 1,
+            scale: 0.5,
+        },
+        sound: { enter: "bush_enter_02" },
+    }),
+    bush_07sp: createBush({
+        hitParticle: "leafRiver",
+        explodeParticle: "leafRiver",
+        map: { display: true, color: 0xa3e0a, scale: 1.5 },
+        img: {
+            sprite: "map-bush-07sp.img",
+            alpha: 1,
+            scale: 0.5,
+        },
+        sound: { enter: "bush_enter_02" },
+    }),
+    bush_07x: createBush({ img: { sprite: "map-bush-07x.img" } }),
+    bush_07cb: createBush({ img: { sprite: "map-bush-07cb.img" } }),
 
-    
     campfire_01: createCampfire({}),
 
     cache_01: createCache({}),
@@ -1369,7 +1364,7 @@ const MapObstacleDefs = {
                 inheritOri: false,
             },
         ],
-    }),  
+    }),
 
     hedgehog_01: {
         type: "building",
@@ -1457,58 +1452,58 @@ const MapObstacleDefs = {
         hitParticle: "greenChip",
     }),
 
-        pumpkin_01: createPumpkin({
-            loot: [tierLoot("tier_outfits", 1, 1), tierLoot("tier_pumpkin_candy", 1, 1)],
-        }),
-        pumpkin_02: createPumpkin({
-            health: 140,
-            img: { sprite: "map-pumpkin-02.img" },
-            loot: [
-                tierLoot("tier_guns", 1, 2),
-                tierLoot("tier_pumpkin_candy", 1, 2),
-                tierLoot("tier_outfits", 1, 1),
-            ],
-        }),
-        pumpkin_03: createPumpkin({
-            collision: collider.createCircle(v2.create(0, 0), 1.25),
-            map: { display: false },
-            img: {
-                sprite: "map-pumpkin-04.img",
-                residue: "map-pumpkin-res-04.img",
-            },
-            loot: [tierLoot("tier_pumpkin_perks", 1, 1), tierLoot("tier_fruit_xp", 1, 1)],
-        }),
-        squash_01: createPumpkin({
-            collision: collider.createCircle(v2.create(0, 0), 1),
-            map: { display: true, color: 0x627344, scale: 1.25 },
-            img: {
-                sprite: "map-squash-03.img",
-                residue: "map-squash-res-03.img",
-            },
-            hitParticle: "squashChip",
-            explodeParticle: "squashBreak",
-            loot: [
-                autoLoot("turkey_shoot", 1),
-                // tierLoot("tier_fruit_xp", 1, 1)], // TODO: enable with artifacts
-                tierLoot("tier_world", 0, 1),
-            ],
-        }),
-        squash_02: createPumpkin({
-            collision: collider.createCircle(v2.create(0, 0), 1.5),
-            map: { display: true, color: 0xfcd4b1, scale: 1.25 },
-            health: 200,
-            img: {
-                sprite: "map-squash-02.img",
-                residue: "map-squash-res-02.img",
-            },
-            hitParticle: "squashChip",
-            explodeParticle: "squashBreak",
-            loot: [
-                autoLoot("turkey_shoot", 1),
-                autoLoot("turkey_shoot", 1),
-                // tierLoot("tier_fruit_xp", 1, 1)], // TODO: enable with artifacts
-                tierLoot("tier_soviet", 1, 2),
-            ],
+    pumpkin_01: createPumpkin({
+        loot: [tierLoot("tier_outfits", 1, 1), tierLoot("tier_pumpkin_candy", 1, 1)],
+    }),
+    pumpkin_02: createPumpkin({
+        health: 140,
+        img: { sprite: "map-pumpkin-02.img" },
+        loot: [
+            tierLoot("tier_guns", 1, 2),
+            tierLoot("tier_pumpkin_candy", 1, 2),
+            tierLoot("tier_outfits", 1, 1),
+        ],
+    }),
+    pumpkin_03: createPumpkin({
+        collision: collider.createCircle(v2.create(0, 0), 1.25),
+        map: { display: false },
+        img: {
+            sprite: "map-pumpkin-04.img",
+            residue: "map-pumpkin-res-04.img",
+        },
+        loot: [tierLoot("tier_pumpkin_perks", 1, 1), tierLoot("tier_fruit_xp", 1, 1)],
+    }),
+    squash_01: createPumpkin({
+        collision: collider.createCircle(v2.create(0, 0), 1),
+        map: { display: true, color: 0x627344, scale: 1.25 },
+        img: {
+            sprite: "map-squash-03.img",
+            residue: "map-squash-res-03.img",
+        },
+        hitParticle: "squashChip",
+        explodeParticle: "squashBreak",
+        loot: [
+            autoLoot("turkey_shoot", 1),
+            // tierLoot("tier_fruit_xp", 1, 1)], // TODO: enable with artifacts
+            tierLoot("tier_world", 0, 1),
+        ],
+    }),
+    squash_02: createPumpkin({
+        collision: collider.createCircle(v2.create(0, 0), 1.5),
+        map: { display: true, color: 0xfcd4b1, scale: 1.25 },
+        health: 200,
+        img: {
+            sprite: "map-squash-02.img",
+            residue: "map-squash-res-02.img",
+        },
+        hitParticle: "squashChip",
+        explodeParticle: "squashBreak",
+        loot: [
+            autoLoot("turkey_shoot", 1),
+            autoLoot("turkey_shoot", 1),
+            // tierLoot("tier_fruit_xp", 1, 1)], // TODO: enable with artifacts
+            tierLoot("tier_soviet", 1, 2),
+        ],
     }),
     sandbags_01: createSandBags({}),
     sandbags_02: createSandBags({
@@ -1597,208 +1592,208 @@ const MapObstacleDefs = {
             zIdx: 60,
         },
     }),
-    
+
     stone_01: createStone({}),
     stone_01b: createStone({
         img: { residue: "map-stone-res-01b.img" },
     }),
     stone_01cb: createStone({
-            map: { display: true, color: 0x9ca2a8, scale: 1 },
-            img: {
-                sprite: "map-stone-01cb.img",
-                residue: "map-stone-res-01cb.img",
-            },
-        }),
-        stone_01f: createStone({
-            map: { display: true, color: 0x7d7d7d, scale: 1 },
-        }),
-        stone_01sv: createStone({
-            scale: {
-                createMin: 1.2,
-                createMax: 1.5,
-                destroy: 0.5,
-            },
-        }),
-        stone_01x: createStone({
-            map: { display: true, color: 0x5c5c5c, scale: 1 },
-            img: {
-                sprite: "map-stone-01x.img",
-                residue: "map-stone-res-01x.img",
-            },
-        }),
-        stone_02: createStone({
-            map: { display: false },
-            img: { tint: 0xe5e5e5 },
-            loot: [tierLoot("tier_surviv", 2, 3), autoLoot("ak47", 1)],
-        }),
-        stone_02sv: createStone({
-            map: { display: false },
-            img: { tint: 0xe5e5e5 },
-            loot: [
-                tierLoot("tier_surviv", 2, 3),
-                autoLoot("m39", 1),
-                tierLoot("tier_perks", 1, 1),
-            ],
-        }),
-        stone_02cb: createStone({
-            map: { display: false, color: 0x9ca2a8, scale: 1 },
-            img: {
-                sprite: "map-stone-01cb.img",
-                residue: "map-stone-res-01cb.img",
-                tint: 0xe5e5e5,
-            },
-            loot: [tierLoot("tier_surviv", 2, 3), autoLoot("ak47", 1)],
-        }),
-        stone_02w: createStone({
-            map: { display: false },
-            img: { tint: 0xe5e5e5 },
-            loot: [tierLoot("tier_surviv", 2, 3), autoLoot("dp28", 1)],
-        }),
-        stone_02x: createStone({
-            map: { display: false, color: 0x9ca2a8, scale: 1 },
-            img: {
-                sprite: "map-stone-01x.img",
-                residue: "map-stone-res-01x.img",
-                tint: 0xe5e5e5,
-            },
-            loot: [tierLoot("tier_surviv", 2, 3), autoLoot("ak47", 1)],
-        }),
-        stone_02bh: createStone({
-            map: { display: false },
-            img: { tint: 0xe5e5e5 },
-            loot: [tierLoot("tier_surviv", 2, 3), autoLoot("groza", 1)],
-        }),
-        stone_02f: createStone({
-            map: { display: false },
-            img: { tint: 0xe5e5e5 },
-            loot: [
-                tierLoot("tier_surviv", 1, 1),
-                autoLoot("ak47", 1),
-                autoLoot("helmet02", 1),
-                autoLoot("chest02", 1),
-                autoLoot("bandage", 5),
-                autoLoot("2xscope", 1),
-            ],
-        }),
-        stone_03: createRiverStone({}),
-        stone_03b: createRiverStone({
-            img: {
-                sprite: "map-stone-03b.img",
-                residue: "map-stone-res-01.img",
-            },
-        }),
-        stone_03cb: createRiverStone({
-            img: {
-                sprite: "map-stone-03cb.img",
-                residue: "map-stone-res-02cb.img",
-            },
-        }),
-        stone_03f: createRiverStone({
-            img: {
-                sprite: "map-stone-03f.img",
-                residue: "map-stone-res-02f.img",
-            },
-        }),
-        stone_03sv: createRiverStone({
-            img: {
-                sprite: "map-stone-03sv.img",
-                residue: "map-stone-res-02sv.img",
-            },
-        }),
-        stone_03x: createRiverStone({
-            img: {
-                sprite: "map-stone-03x.img",
-                residue: "map-stone-res-02x.img",
-            },
-        }),
-        stone_03tr: createRiverStone({
-            img: {
-                sprite: "map-stone-03tr.img",
-                residue: "map-stone-res-02x.img",
-            },
-        }),
-        stone_03bh: createRiverStone({
-            img: {
-                sprite: "map-stone-03bh.img",
-            },
-        }),
-        stone_04: createStone({
-            stonePlated: true,
-            scale: {
-                createMin: 0.8,
-                createMax: 0.8,
-                destroy: 0.75,
-            },
-            hitParticle: "rockEyeChip",
-            explodeParticle: "rockEyeBreak",
-            loot: [tierLoot("tier_eye_block", 1, 1)],
-            terrain: { grass: true, beach: true, riverShore: true },
-            map: { display: true, color: 0x171412, scale: 1 },
-            collision: collider.createAabbExtents(v2.create(0, 0), v2.create(1.8, 1.8)),
-            img: {
-                sprite: "map-stone-04.img",
-                residue: "map-stone-res-04.img",
-            },
-        }),
-        stone_04x: createStone({
-            stonePlated: true,
-            scale: {
-                createMin: 0.8,
-                createMax: 0.8,
-                destroy: 0.75,
-            },
-            hitParticle: "rockEyeChip",
-            explodeParticle: "rockEyeBreak",
-            loot: [tierLoot("tier_eye_block", 1, 1)],
-            terrain: { grass: true, beach: true, riverShore: true },
-            map: { display: true, color: 0xb2eaff, scale: 1 },
-            collision: collider.createAabbExtents(v2.create(0, 0), v2.create(1.8, 1.8)),
-            img: {
-                sprite: "map-stone-04x.img",
-                residue: "map-stone-res-04.img",
-            },
-        } as unknown as Partial<ObstacleDef>),
-        stone_05: createStone({
-            stonePlated: true,
-            hitParticle: "rockEyeChip",
-            explodeParticle: "rockEyeBreak",
-            loot: [tierLoot("tier_eye_stone", 1, 1)],
-            terrain: { grass: true, beach: true, riverShore: true },
-            map: { display: true, color: 0x171412, scale: 1 },
-            collision: collider.createCircle(v2.create(0, 0), 1.7),
-            img: {
-                sprite: "map-stone-05.img",
-                residue: "map-stone-res-01b.img",
-            },
-        }),
-        stone_06: createStone({
-            stonePlated: true,
-            scale: { createMin: 1, createMax: 1, destroy: 0.8 },
-            height: 10,
-            terrain: { grass: true, beach: true, riverShore: true },
-            map: { display: true, color: 0x373737, scale: 1 },
-            collision: collider.createAabbExtents(v2.create(0, 0), v2.create(4.5, 2)),
-            img: {
-                sprite: "map-stone-06.img",
-                scale: 0.5,
-                residue: "map-stone-res-06.img",
-            },
-        }),
-        stone_07: createStone({
-            scale: { createMin: 1, createMax: 1, destroy: 0.8 },
-            collision: collider.createCircle(v2.create(0, 0), 7.75),
-            health: 500,
-            map: { display: true, color: 0x978c84, scale: 1 },
-            terrain: { grass: true, beach: false },
-            img: {
-                sprite: "map-stone-07.img",
-                residue: "map-stone-res-07.img",
-                scale: 0.5,
-                alpha: 1,
-                tint: 0xffffff,
-                zIdx: 10,
-            },
-        }),
+        map: { display: true, color: 0x9ca2a8, scale: 1 },
+        img: {
+            sprite: "map-stone-01cb.img",
+            residue: "map-stone-res-01cb.img",
+        },
+    }),
+    stone_01f: createStone({
+        map: { display: true, color: 0x7d7d7d, scale: 1 },
+    }),
+    stone_01sv: createStone({
+        scale: {
+            createMin: 1.2,
+            createMax: 1.5,
+            destroy: 0.5,
+        },
+    }),
+    stone_01x: createStone({
+        map: { display: true, color: 0x5c5c5c, scale: 1 },
+        img: {
+            sprite: "map-stone-01x.img",
+            residue: "map-stone-res-01x.img",
+        },
+    }),
+    stone_02: createStone({
+        map: { display: false },
+        img: { tint: 0xe5e5e5 },
+        loot: [tierLoot("tier_surviv", 2, 3), autoLoot("ak47", 1)],
+    }),
+    stone_02sv: createStone({
+        map: { display: false },
+        img: { tint: 0xe5e5e5 },
+        loot: [
+            tierLoot("tier_surviv", 2, 3),
+            autoLoot("m39", 1),
+            tierLoot("tier_perks", 1, 1),
+        ],
+    }),
+    stone_02cb: createStone({
+        map: { display: false, color: 0x9ca2a8, scale: 1 },
+        img: {
+            sprite: "map-stone-01cb.img",
+            residue: "map-stone-res-01cb.img",
+            tint: 0xe5e5e5,
+        },
+        loot: [tierLoot("tier_surviv", 2, 3), autoLoot("ak47", 1)],
+    }),
+    stone_02w: createStone({
+        map: { display: false },
+        img: { tint: 0xe5e5e5 },
+        loot: [tierLoot("tier_surviv", 2, 3), autoLoot("dp28", 1)],
+    }),
+    stone_02x: createStone({
+        map: { display: false, color: 0x9ca2a8, scale: 1 },
+        img: {
+            sprite: "map-stone-01x.img",
+            residue: "map-stone-res-01x.img",
+            tint: 0xe5e5e5,
+        },
+        loot: [tierLoot("tier_surviv", 2, 3), autoLoot("ak47", 1)],
+    }),
+    stone_02bh: createStone({
+        map: { display: false },
+        img: { tint: 0xe5e5e5 },
+        loot: [tierLoot("tier_surviv", 2, 3), autoLoot("groza", 1)],
+    }),
+    stone_02f: createStone({
+        map: { display: false },
+        img: { tint: 0xe5e5e5 },
+        loot: [
+            tierLoot("tier_surviv", 1, 1),
+            autoLoot("ak47", 1),
+            autoLoot("helmet02", 1),
+            autoLoot("chest02", 1),
+            autoLoot("bandage", 5),
+            autoLoot("2xscope", 1),
+        ],
+    }),
+    stone_03: createRiverStone({}),
+    stone_03b: createRiverStone({
+        img: {
+            sprite: "map-stone-03b.img",
+            residue: "map-stone-res-01.img",
+        },
+    }),
+    stone_03cb: createRiverStone({
+        img: {
+            sprite: "map-stone-03cb.img",
+            residue: "map-stone-res-02cb.img",
+        },
+    }),
+    stone_03f: createRiverStone({
+        img: {
+            sprite: "map-stone-03f.img",
+            residue: "map-stone-res-02f.img",
+        },
+    }),
+    stone_03sv: createRiverStone({
+        img: {
+            sprite: "map-stone-03sv.img",
+            residue: "map-stone-res-02sv.img",
+        },
+    }),
+    stone_03x: createRiverStone({
+        img: {
+            sprite: "map-stone-03x.img",
+            residue: "map-stone-res-02x.img",
+        },
+    }),
+    stone_03tr: createRiverStone({
+        img: {
+            sprite: "map-stone-03tr.img",
+            residue: "map-stone-res-02x.img",
+        },
+    }),
+    stone_03bh: createRiverStone({
+        img: {
+            sprite: "map-stone-03bh.img",
+        },
+    }),
+    stone_04: createStone({
+        stonePlated: true,
+        scale: {
+            createMin: 0.8,
+            createMax: 0.8,
+            destroy: 0.75,
+        },
+        hitParticle: "rockEyeChip",
+        explodeParticle: "rockEyeBreak",
+        loot: [tierLoot("tier_eye_block", 1, 1)],
+        terrain: { grass: true, beach: true, riverShore: true },
+        map: { display: true, color: 0x171412, scale: 1 },
+        collision: collider.createAabbExtents(v2.create(0, 0), v2.create(1.8, 1.8)),
+        img: {
+            sprite: "map-stone-04.img",
+            residue: "map-stone-res-04.img",
+        },
+    }),
+    stone_04x: createStone({
+        stonePlated: true,
+        scale: {
+            createMin: 0.8,
+            createMax: 0.8,
+            destroy: 0.75,
+        },
+        hitParticle: "rockEyeChip",
+        explodeParticle: "rockEyeBreak",
+        loot: [tierLoot("tier_eye_block", 1, 1)],
+        terrain: { grass: true, beach: true, riverShore: true },
+        map: { display: true, color: 0xb2eaff, scale: 1 },
+        collision: collider.createAabbExtents(v2.create(0, 0), v2.create(1.8, 1.8)),
+        img: {
+            sprite: "map-stone-04x.img",
+            residue: "map-stone-res-04.img",
+        },
+    } as unknown as Partial<ObstacleDef>),
+    stone_05: createStone({
+        stonePlated: true,
+        hitParticle: "rockEyeChip",
+        explodeParticle: "rockEyeBreak",
+        loot: [tierLoot("tier_eye_stone", 1, 1)],
+        terrain: { grass: true, beach: true, riverShore: true },
+        map: { display: true, color: 0x171412, scale: 1 },
+        collision: collider.createCircle(v2.create(0, 0), 1.7),
+        img: {
+            sprite: "map-stone-05.img",
+            residue: "map-stone-res-01b.img",
+        },
+    }),
+    stone_06: createStone({
+        stonePlated: true,
+        scale: { createMin: 1, createMax: 1, destroy: 0.8 },
+        height: 10,
+        terrain: { grass: true, beach: true, riverShore: true },
+        map: { display: true, color: 0x373737, scale: 1 },
+        collision: collider.createAabbExtents(v2.create(0, 0), v2.create(4.5, 2)),
+        img: {
+            sprite: "map-stone-06.img",
+            scale: 0.5,
+            residue: "map-stone-res-06.img",
+        },
+    }),
+    stone_07: createStone({
+        scale: { createMin: 1, createMax: 1, destroy: 0.8 },
+        collision: collider.createCircle(v2.create(0, 0), 7.75),
+        health: 500,
+        map: { display: true, color: 0x978c84, scale: 1 },
+        terrain: { grass: true, beach: false },
+        img: {
+            sprite: "map-stone-07.img",
+            residue: "map-stone-res-07.img",
+            scale: 0.5,
+            alpha: 1,
+            tint: 0xffffff,
+            zIdx: 10,
+        },
+    }),
     stone_08: createRiverStone({
         loot: [
             tierLoot("tier_medical", 2, 3),

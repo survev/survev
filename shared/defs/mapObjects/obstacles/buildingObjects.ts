@@ -1,11 +1,8 @@
 import { collider } from "../../../utils/collider";
 import { util } from "../../../utils/util";
 import { v2 } from "../../../utils/v2";
-import type {
-    MapObjectDef,
-    ObstacleDef,
-} from "../../mapObjectsTyping";
-import { MaterialDefs } from "../mapObjectHelpers"
+import type { MapObjectDef, ObstacleDef } from "../../mapObjectsTyping";
+import { MaterialDefs } from "../mapObjectHelpers";
 
 //
 // Walls, Doors, and other building-only obstacles
@@ -239,99 +236,99 @@ function createWindow<T extends ObstacleDef>(e: Partial<T>): T {
 
 const BuildingObjectDefs = {
     house_door_01: createDoor({
-            material: "wood",
-            hinge: v2.create(0, 2),
-            extents: v2.create(0.3, 2),
-        }),
+        material: "wood",
+        hinge: v2.create(0, 2),
+        extents: v2.create(0.3, 2),
+    }),
     house_door_02: createDoor({
-            material: "metal",
-            hinge: v2.create(0, 2),
-            extents: v2.create(0.3, 2),
-            door: {
-                sound: {
-                    open: "door_open_02",
-                    close: "door_close_02",
-                },
+        material: "metal",
+        hinge: v2.create(0, 2),
+        extents: v2.create(0.3, 2),
+        door: {
+            sound: {
+                open: "door_open_02",
+                close: "door_close_02",
             },
-            img: { tint: 4934475 },
-        } as unknown as Partial<ObstacleDef>),
+        },
+        img: { tint: 4934475 },
+    } as unknown as Partial<ObstacleDef>),
     house_door_03: createDoor({
-            material: "wood",
-            hinge: v2.create(0, 2),
-            extents: v2.create(0.5, 1.75),
-            img: { sprite: "map-door-03.img" },
-        }),
+        material: "wood",
+        hinge: v2.create(0, 2),
+        extents: v2.create(0.5, 1.75),
+        img: { sprite: "map-door-03.img" },
+    }),
     house_door_05: createDoor({
-            material: "glass",
-            hinge: v2.create(0, 2),
-            extents: v2.create(0.3, 2),
-            img: { sprite: "map-door-05.img" },
-        }),
+        material: "glass",
+        hinge: v2.create(0, 2),
+        extents: v2.create(0.3, 2),
+        img: { sprite: "map-door-05.img" },
+    }),
     crossing_door_01: createDoor({
-            material: "metal",
-            hinge: v2.create(0, 2),
-            extents: v2.create(0.3, 2),
-            door: {
-                canUse: false,
-                openOnce: true,
-                sound: {
-                    open: "door_open_02",
-                    close: "door_close_02",
-                },
+        material: "metal",
+        hinge: v2.create(0, 2),
+        extents: v2.create(0.3, 2),
+        door: {
+            canUse: false,
+            openOnce: true,
+            sound: {
+                open: "door_open_02",
+                close: "door_close_02",
             },
-            img: { tint: 0x303542 },
-        } as unknown as Partial<ObstacleDef>),
+        },
+        img: { tint: 0x303542 },
+    } as unknown as Partial<ObstacleDef>),
     cell_door_01: createDoor({
-            material: "metal",
-            hinge: v2.create(0, 2),
-            extents: v2.create(0.3, 2),
-            door: {
-                canUse: false,
-                openOnce: true,
-                sound: {
-                    open: "door_open_02",
-                    close: "door_close_02",
-                },
+        material: "metal",
+        hinge: v2.create(0, 2),
+        extents: v2.create(0.3, 2),
+        door: {
+            canUse: false,
+            openOnce: true,
+            sound: {
+                open: "door_open_02",
+                close: "door_close_02",
             },
-            img: { tint: 0x1b1b1b },
-        } as unknown as Partial<ObstacleDef>),
+        },
+        img: { tint: 0x1b1b1b },
+    } as unknown as Partial<ObstacleDef>),
     eye_door_01: createDoor({
-            material: "metal",
-            hinge: v2.create(0, 2),
-            extents: v2.create(0.3, 2),
-            door: {
-                canUse: false,
-                openOnce: true,
-                openOneWay: -1,
-                sound: {
-                    open: "door_open_02",
-                    close: "door_close_02",
-                },
+        material: "metal",
+        hinge: v2.create(0, 2),
+        extents: v2.create(0.3, 2),
+        door: {
+            canUse: false,
+            openOnce: true,
+            openOneWay: -1,
+            sound: {
+                open: "door_open_02",
+                close: "door_close_02",
             },
-            img: { tint: 0xe0e0e },
-        } as unknown as Partial<ObstacleDef>),
+        },
+        img: { tint: 0xe0e0e },
+    } as unknown as Partial<ObstacleDef>),
     lab_door_01: createLabDoor({ img: { tint: 0x520000 } }),
     lab_door_02: createLabDoor({
-            door: {
-                openOneWay: 1,
-                slideOffset: -3.75,
-                casingImg: { pos: v2.create(6, 0) },
-            },
-            img: { tint: 0x520000 },
-        } as unknown as Partial<ObstacleDef>),
+        door: {
+            openOneWay: 1,
+            slideOffset: -3.75,
+            casingImg: { pos: v2.create(6, 0) },
+        },
+        img: { tint: 0x520000 },
+    } as unknown as Partial<ObstacleDef>),
     lab_door_03: createLabDoor({
-            door: { openOneWay: 1 },
-            img: { tint: 0x520000 },
+        door: { openOneWay: 1 },
+        img: { tint: 0x520000 },
     } as unknown as Partial<ObstacleDef>),
     lab_door_locked_01: createLabDoor({
-            door: {
-                locked: true,
-                openOnce: true,
-                autoClose: false,
-                sound: { error: "" },
-            },
-            img: { tint: 0x520000 },
-        } as unknown as Partial<ObstacleDef>),
+        door: {
+            locked: true,
+            openOnce: true,
+            autoClose: false,
+            sound: { error: "" },
+        },
+        img: { tint: 0x520000 },
+    } as unknown as Partial<ObstacleDef>),
     lab_door_chrys: createDoor({
         destructible: false,
         material: "concrete",
@@ -360,7 +357,7 @@ const BuildingObjectDefs = {
             },
         },
         img: { tint: 0x520000 },
-    } as unknown as Partial<ObstacleDef>), 
+    } as unknown as Partial<ObstacleDef>),
     vault_door_main: createDoor({
         material: "metal",
         hinge: v2.create(1, 3.5),
@@ -562,8 +559,8 @@ const BuildingObjectDefs = {
     house_window_broken_01: createLowWall({}),
 
     lab_window_01: createWindow({
-            destroyType: "lab_window_broken_01",
-        }),
+        destroyType: "lab_window_broken_01",
+    }),
     lab_window_broken_01: createLowWall({ img: { tint: 0x14161b } }),
     stairs_01: createStairs({}),
     stairs_02: createStairs({
@@ -753,11 +750,11 @@ const BuildingObjectDefs = {
         extents: v2.create(15.5, 0.5),
     }),
     archway_column_1: createWall({
-            material: "wood",
-            extents: v2.create(1, 1),
-            img: Object.assign(wallImg("map-column-01.img", 0x6f3f14), {
-                residue: "map-drawers-res.img",
-            }),
+        material: "wood",
+        extents: v2.create(1, 1),
+        img: Object.assign(wallImg("map-column-01.img", 0x6f3f14), {
+            residue: "map-drawers-res.img",
+        }),
     }),
     shack_wall_top: createWall({
         material: "wood",
@@ -2255,4 +2252,4 @@ const BuildingObjectDefs = {
     }),
 } as const satisfies Record<string, MapObjectDef>;
 
-export const BuildingObjects = BuildingObjectDefs
+export const BuildingObjects = BuildingObjectDefs;

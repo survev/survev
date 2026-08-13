@@ -1,11 +1,8 @@
 import { collider } from "../../../utils/collider";
 import { util } from "../../../utils/util";
 import { v2 } from "../../../utils/v2";
-import { randomObstacleType } from "../mapObjectHelpers"
-import type {
-    BuildingDef,
-    MapObjectDef,
-} from "../../mapObjectsTyping";
+import type { BuildingDef, MapObjectDef } from "../../mapObjectsTyping";
+import { randomObstacleType } from "../mapObjectHelpers";
 
 function createBunkerStairs<T extends BuildingDef>(e: Partial<T>): T {
     const t = {
@@ -88,7 +85,6 @@ function createBunkerStairs<T extends BuildingDef>(e: Partial<T>): T {
 }
 
 const BunkerDefs = {
-
     bunker_chrys_01: {
         type: "building",
         map: {
@@ -6766,4 +6762,4 @@ const BunkerDefs = {
     },
 } as const satisfies Record<string, MapObjectDef>;
 
-export const Bunkers = BunkerDefs
+export const Bunkers = BunkerDefs;

@@ -1,11 +1,8 @@
 import { collider } from "../../../utils/collider";
 import { util } from "../../../utils/util";
 import { v2 } from "../../../utils/v2";
-import { randomObstacleType } from "../mapObjectHelpers"
-import type {
-    BuildingDef,
-    MapObjectDef,
-} from "../../mapObjectsTyping";
+import type { BuildingDef, MapObjectDef } from "../../mapObjectsTyping";
+import { randomObstacleType } from "../mapObjectHelpers";
 
 export function createBank<T extends BuildingDef>(e: Partial<T>): T {
     const t = {
@@ -1559,13 +1556,13 @@ export function createContainer(props: {
                     collision: [
                         props.open
                             ? collider.createAabbExtents(
-                                  v2.create(0, 0),
-                                  v2.create(2.5, 11),
-                              )
+                                v2.create(0, 0),
+                                v2.create(2.5, 11),
+                            )
                             : collider.createAabbExtents(
-                                  v2.create(0, 0),
-                                  v2.create(2.5, 8),
-                              ),
+                                v2.create(0, 0),
+                                v2.create(2.5, 8),
+                            ),
                     ],
                 },
             ],
@@ -1585,19 +1582,19 @@ export function createContainer(props: {
                 {
                     zoomIn: props.open
                         ? collider.createAabbExtents(
-                              v2.create(0, 0),
-                              v2.create(2.5, 5.75),
-                          )
+                            v2.create(0, 0),
+                            v2.create(2.5, 5.75),
+                        )
                         : collider.createAabbExtents(
-                              v2.create(0, 2.25),
-                              v2.create(2.5, 5.5),
-                          ),
+                            v2.create(0, 2.25),
+                            v2.create(2.5, 5.5),
+                        ),
                     zoomOut: props.open
                         ? collider.createAabbExtents(v2.create(0, 0), v2.create(2.5, 11))
                         : collider.createAabbExtents(
-                              v2.create(0, -0.5),
-                              v2.create(2.5, 8.75),
-                          ),
+                            v2.create(0, -0.5),
+                            v2.create(2.5, 8.75),
+                        ),
                 },
             ],
             imgs: props.ceilingImgs! || [
@@ -1904,9 +1901,8 @@ export function createCabin<T extends ExtendedBuildingDef>(e: Partial<T>): T {
                 ori: 2,
             },
             {
-                type:
-                    e.cabin_mount ||
-                    randomObstacleType({
+                type: e.cabin_mount
+                    || randomObstacleType({
                         gun_mount_01: 50,
                         gun_mount_05: 50,
                         gun_mount_04: 10,
@@ -3084,9 +3080,8 @@ export function createMansion<T extends ExtendedBuildingDef>(e: Partial<T>): T {
                 ori: 0,
             },
             {
-                type:
-                    e.bush ||
-                    randomObstacleType({
+                type: e.bush
+                    || randomObstacleType({
                         bush_01: 25,
                         bush_03: 1,
                         "": e.bush_chance || 0,
@@ -3097,9 +3092,8 @@ export function createMansion<T extends ExtendedBuildingDef>(e: Partial<T>): T {
                 ignoreMapSpawnReplacement: true,
             },
             {
-                type:
-                    e.bush ||
-                    randomObstacleType({
+                type: e.bush
+                    || randomObstacleType({
                         bush_01: 25,
                         bush_03: 1,
                         "": e.bush_chance || 0,
@@ -3110,9 +3104,8 @@ export function createMansion<T extends ExtendedBuildingDef>(e: Partial<T>): T {
                 ignoreMapSpawnReplacement: true,
             },
             {
-                type:
-                    e.bush ||
-                    randomObstacleType({
+                type: e.bush
+                    || randomObstacleType({
                         bush_01: 25,
                         bush_03: 1,
                         "": e.bush_chance || 0,
@@ -3123,9 +3116,8 @@ export function createMansion<T extends ExtendedBuildingDef>(e: Partial<T>): T {
                 ignoreMapSpawnReplacement: true,
             },
             {
-                type:
-                    e.bush ||
-                    randomObstacleType({
+                type: e.bush
+                    || randomObstacleType({
                         bush_01: 25,
                         bush_03: 1,
                         "": e.bush_chance || 0,
@@ -6516,7 +6508,7 @@ const BaseBuildingDefs = {
         bonus_door: "",
         map: { displayType: "barn_01" },
     }),
-    bathhouse_01: (function (e) {
+    bathhouse_01: (function(e) {
         const t = {
             type: "building",
             map: { display: false },
@@ -7045,7 +7037,7 @@ const BaseBuildingDefs = {
         };
         return util.mergeDeep(t, e || {});
     })({}),
-    bathhouse_sideroom_01: (function (e) {
+    bathhouse_sideroom_01: (function(e) {
         const t = {
             type: "building",
             map: { display: true, shapes: [] },
@@ -7164,7 +7156,7 @@ const BaseBuildingDefs = {
         };
         return util.mergeDeep(t, e || {});
     })({}),
-    bathhouse_sideroom_02: (function (e) {
+    bathhouse_sideroom_02: (function(e) {
         const t = {
             type: "building",
             map: { display: true, shapes: [] },
@@ -7362,7 +7354,7 @@ const BaseBuildingDefs = {
             },
         ],
     },
-    bridge_xlg_01: (function (e) {
+    bridge_xlg_01: (function(e) {
         const t = {
             type: "building",
             map: {
@@ -7781,7 +7773,7 @@ const BaseBuildingDefs = {
         ],
     },
     cabin_01: createCabin({}),
-    club_01: (function (e) {
+    club_01: (function(e) {
         const t = {
             type: "building",
             map: {
@@ -10111,8 +10103,8 @@ const BaseBuildingDefs = {
             },
         ],
         teamId: 2,
-    }, 
+    },
     vault_01: createBankVault({}),
 } as const satisfies Record<string, MapObjectDef>;
 
-export const BaseBuildings = BaseBuildingDefs
+export const BaseBuildings = BaseBuildingDefs;

@@ -115,4 +115,4 @@ export const MaterialDefs = {
             enter: "none",
         },
     },
-}; 
+};

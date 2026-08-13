@@ -1,5 +1,6 @@
 import { styleText } from "node:util";
 import { type MapDef, MapDefs } from "../../../shared/defs/mapDefs.ts";
+import type { MapObjectKey } from "../../../shared/defs/mapObjectIndex.ts";
 import type { BuildingDef, ObstacleDef, StructureDef } from "../../../shared/defs/mapObjectsTyping.ts";
 import { MapObjectDefs } from "../../../shared/defs/register.ts";
 import { GameConfig, MapId, TeamMode } from "../../../shared/gameConfig.ts";
@@ -14,7 +15,6 @@ import type { River } from "../../../shared/utils/river.ts";
 import { generateTerrain, type MapRiverData } from "../../../shared/utils/terrainGen.ts";
 import { assert, util } from "../../../shared/utils/util.ts";
 import { v2, type Vec2 } from "../../../shared/utils/v2.ts";
-import type { MapObjectKey } from "../../../shared/defs/mapObjectIndex.ts";
 import { Config } from "../config.ts";
 import type { Game } from "./game.ts";
 import type { Group, Team } from "./group.ts";
@@ -928,9 +928,11 @@ export class GameMap {
             }
         }
 
-        for (const [type, spawnCount] of Object.entries(mapGen.fixedSpawns[0]) as Array<
-            [MapObjectKey, number | { odds: number } | { small: number; large: number }]
-        >) {
+        for (
+            const [type, spawnCount] of Object.entries(mapGen.fixedSpawns[0]) as Array<
+                [MapObjectKey, number | { odds: number } | { small: number; large: number }]
+            >
+        ) {
             let count = spawnCount;
             if (typeof count !== "number") {
                 if ("small" in count) {
@@ -1090,9 +1092,11 @@ export class GameMap {
 
         this.timerStart();
         const densitySpawns = mapGen.densitySpawns[0];
-        for (const [type, density] of Object.entries(densitySpawns) as Array<
-            [MapObjectKey, number]
-        >) {
+        for (
+            const [type, density] of Object.entries(densitySpawns) as Array<
+                [MapObjectKey, number]
+            >
+        ) {
             this.genDensitySpawn(type, density);
         }
         this.timerEnd("Generating density spawns");
@@ -1160,8 +1164,7 @@ export class GameMap {
     ) {
         let def = MapObjectDefs.typeToDef(type);
 
-        const spawnReplacements: Record<string, MapObjectKey | undefined> =
-            this.mapDef.mapGen.spawnReplacements[0];
+        const spawnReplacements: Record<string, MapObjectKey | undefined> = this.mapDef.mapGen.spawnReplacements[0];
         const replacement = spawnReplacements[type];
         if (replacement && !ignoreMapSpawnReplacement) {
             type = replacement;

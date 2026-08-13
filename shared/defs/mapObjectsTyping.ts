@@ -1,19 +1,19 @@
 import type { Vec2 } from "../utils/v2.ts";
+import { BaseBuildings } from "./mapObjects/buildings/baseBuildings";
+import { Bunkers } from "./mapObjects/buildings/bunkers";
+import { ModeBuildings } from "./mapObjects/buildings/modeBuildings";
+import { Structures } from "./mapObjects/buildings/structures";
+import { BuildingObjects } from "./mapObjects/obstacles/buildingObjects";
+import { Crates } from "./mapObjects/obstacles/crates";
+import { Decals } from "./mapObjects/obstacles/decals";
+import { Furniture } from "./mapObjects/obstacles/furniture";
+import { Interactables } from "./mapObjects/obstacles/interactables";
+import { LootSpawners } from "./mapObjects/obstacles/lootSpawners";
+import { MapObstacles } from "./mapObjects/obstacles/mapObstacles";
 import type { BuildingDef } from "./types/building.ts";
 import type { DecalDef } from "./types/decal.ts";
 import type { ObstacleDef } from "./types/obstacle.ts";
 import type { StructureDef } from "./types/structure.ts";
-import { BuildingObjects } from "./mapObjects/obstacles/buildingObjects"
-import { Crates } from "./mapObjects/obstacles/crates"
-import { Decals } from "./mapObjects/obstacles/decals"
-import { Furniture } from "./mapObjects/obstacles/furniture"
-import { Interactables } from "./mapObjects/obstacles/interactables"
-import { LootSpawners } from "./mapObjects/obstacles/lootSpawners"
-import { MapObstacles } from "./mapObjects/obstacles/mapObstacles"
-import { BaseBuildings } from "./mapObjects/buildings/baseBuildings"
-import { ModeBuildings } from "./mapObjects/buildings/modeBuildings"
-import { Bunkers } from "./mapObjects/buildings/bunkers"
-import { Structures } from "./mapObjects/buildings/structures"
 
 interface TerrainSpawnDef {
     grass?: boolean;
@@ -66,15 +66,15 @@ export type MapObjectDef =
     | LootSpawnerDef;
 
 export const ObjectDefs = {
-  ...BuildingObjects,
-  ...BaseBuildings,
-  ...Bunkers,
-  ...Crates,
-  ...Decals,
-  ...Furniture,
-  ...Interactables,
-  ...LootSpawners,
-  ...MapObstacles,
-  ...ModeBuildings,
-  ...Structures
+    ...BuildingObjects,
+    ...BaseBuildings,
+    ...Bunkers,
+    ...Crates,
+    ...Decals,
+    ...Furniture,
+    ...Interactables,
+    ...LootSpawners,
+    ...MapObstacles,
+    ...ModeBuildings,
+    ...Structures,
 } as const satisfies Record<string, MapObjectDef>;

@@ -1,10 +1,7 @@
 import { collider } from "../../../utils/collider";
 import { util } from "../../../utils/util";
 import { v2 } from "../../../utils/v2";
-import type {
-    StructureDef,
-    MapObjectDef,
-} from "../../mapObjectsTyping";
+import type { MapObjectDef, StructureDef } from "../../mapObjectsTyping";
 
 function createBunkerChrys<T extends StructureDef>(e: Partial<T>): T {
     const t = {
@@ -616,7 +613,7 @@ const StructureDefs = {
             puzzle: "club_02",
         },
     },
-    // Bunkers 
+    // Bunkers
     bunker_structure_01: {
         type: "structure",
         terrain: { grass: true, beach: false },
@@ -1032,4 +1029,4 @@ const StructureDefs = {
     },
 } as const satisfies Record<string, MapObjectDef>;
 
-export const Structures = StructureDefs
+export const Structures = StructureDefs;

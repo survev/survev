@@ -1,12 +1,9 @@
 import { collider } from "../../../utils/collider";
-import { util, type DeepPartial } from "../../../utils/util";
+import { type DeepPartial, util } from "../../../utils/util";
 import { v2 } from "../../../utils/v2";
-import { randomObstacleType } from "../mapObjectHelpers"
-import type {
-    BuildingDef,
-    MapObjectDef,
-} from "../../mapObjectsTyping";
-import * as BaseFunctions from "../buildings/baseBuildings"
+import type { BuildingDef, MapObjectDef } from "../../mapObjectsTyping";
+import * as BaseFunctions from "../buildings/baseBuildings";
+import { randomObstacleType } from "../mapObjectHelpers";
 
 type ExtendedBuildingDef = BuildingDef & Record<string, string>;
 
@@ -20,10 +17,10 @@ const {
     createContainer,
     createGreenhouse,
     createHouseRed,
-    createHouseRed2, 
+    createHouseRed2,
     createHut,
-    createMansion, 
-    createMansionCellar, 
+    createMansion,
+    createMansionCellar,
     createOutHouse,
     createPoliceStation,
     createShack,
@@ -34,7 +31,7 @@ const {
     createWarehouse,
     createWarehouse2,
     createWarehouse3,
-} = BaseFunctions 
+} = BaseFunctions;
 
 function createCamp<T extends BuildingDef>(e: Partial<T>): T {
     const t = {
@@ -6151,7 +6148,7 @@ const ModeBuildingDefs = {
     statue_underground_04: createStatueUnderground({ crate: "crate_22d" }),
     statue_building_03: createStatue({ statue: "statue_03" }),
     statue_underground_03: createStatueUnderground({ crate: "crate_02d" }),
-    
+
     // Faction
 
     river_town_01: {
@@ -7129,7 +7126,7 @@ const ModeBuildingDefs = {
     }),
     // Potato
 
-    shilo_01: (function <T extends BuildingDef>(e: Partial<T>): T {
+    shilo_01: (function<T extends BuildingDef>(e: Partial<T>): T {
         const t = {
             type: "building",
             map: { display: true, color: 0x317120, scale: 1 },
@@ -8007,7 +8004,7 @@ const ModeBuildingDefs = {
             },
         ],
     },
-    savannah_patch_01: (function <T extends BuildingDef>(e: Partial<T>): T {
+    savannah_patch_01: (function<T extends BuildingDef>(e: Partial<T>): T {
         const t = {
             type: "building",
             map: { display: true, shapes: [] },
@@ -8105,7 +8102,7 @@ const ModeBuildingDefs = {
         grass_color: 0xebc634,
         terrain: { grass: true, beach: false, spawnPriority: 1 },
     }),
-    kopje_patch_01: (function <T extends BuildingDef>(e: Partial<T>): T {
+    kopje_patch_01: (function<T extends BuildingDef>(e: Partial<T>): T {
         const t = {
             type: "building",
             map: { display: true, shapes: [] },
@@ -8292,7 +8289,7 @@ const ModeBuildingDefs = {
         grass_color: 0x7a9e19,
         terrain: { grass: true, beach: false, spawnPriority: 2 },
     }),
-    perch_01: (function (e) {
+    perch_01: (function(e) {
         const t = {
             type: "building",
             map: { display: true, color: 0x1d3900, scale: 1 },
@@ -8970,7 +8967,7 @@ const ModeBuildingDefs = {
                 },
             ],
         },
-    } as unknown as Partial<BuildingDef>),    
+    } as unknown as Partial<BuildingDef>),
     house_red_01x: createHouseRed({
         ceiling: {
             imgs: [
@@ -9500,4 +9497,4 @@ const ModeBuildingDefs = {
     }),
 } as const satisfies Record<string, MapObjectDef>;
 
-export const ModeBuildings = ModeBuildingDefs
+export const ModeBuildings = ModeBuildingDefs;
