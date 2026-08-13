@@ -98,6 +98,11 @@ const LootSpawnerDefs = {
         type: "loot_spawner",
         loot: [tierLoot("tier_spetsnaz_outfit", 1, 1)],
     },
+    loot_tier_helmet_forest: {
+        type: "loot_spawner",
+        loot: [tierLoot("tier_forest_helmet", 1, 1)],
+        terrain: { grass: true, beach: false },
+    },
     // loot_tier_eye_01: {
     //     type: "loot_spawner",
     //     loot: [tierLoot("tier_eye_01", 1, 1)],

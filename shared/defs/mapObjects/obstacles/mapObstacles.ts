@@ -1963,6 +1963,21 @@ const MapObstacleDefs = {
         img: { sprite: "map-tree-07.img", tint: 0xb1b1b1 },
         loot: [tierLoot("tier_surviv", 2, 3), autoLoot("mosin", 1)],
     } as unknown as Partial<ObstacleDef>),
+    // summer cache
+    tree_03su: createTree({
+        scale: { createMin: 1, createMax: 1.2 },
+        map: { display: false, color: 0x215906, scale: 2.5 },
+        img: { sprite: "map-tree-07su.img", tint: 0xb1b1b1 },
+        loot: [tierLoot("tier_surviv", 2, 3), autoLoot("mosin", 1)],
+    } as unknown as Partial<ObstacleDef>),
+
+    // spring cache
+    tree_03sp: createTree({
+        scale: { createMin: 1, createMax: 1.2 },
+        map: { display: false, color: 0xfec6e1, scale: 2.5 },
+        img: { sprite: "map-tree-07sp.img", tint: 0xb1b1b1 },
+        loot: [tierLoot("tier_surviv", 2, 3), autoLoot("mosin", 1)],
+    } as unknown as Partial<ObstacleDef>),
     // cobalt cache
     tree_03cb: createTree({
         scale: {

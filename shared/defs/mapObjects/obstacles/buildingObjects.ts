@@ -993,6 +993,12 @@ const BuildingObjectDefs = {
         material: "concrete",
         extents: v2.create(0.5, 1),
     }),
+    cobalt_wall_int_4: createWall({
+        material: "cobalt",
+        extents: v2.create(0.6, 2),
+        img: wallImg("map-wall-04-cobalt.img", 0xffffff),
+        explosion: "explosion_cobalt",
+    }),
     concrete_wall_ext_3: createWall({
         material: "concrete",
         extents: v2.create(0.5, 1.5),
@@ -1422,6 +1428,10 @@ const BuildingObjectDefs = {
     metal_wall_ext_thicker_48: createWall({
         material: "metal",
         extents: v2.create(1.5, 24),
+    }),
+    metal_wall_ext_thicker_49: createWall({
+        material: "metal",
+        extents: v2.create(2.5, 7),
     }),
     glass_wall_9: createWall({
         material: "glass",
