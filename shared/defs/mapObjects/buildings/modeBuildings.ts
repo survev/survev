@@ -8713,6 +8713,38 @@ const ModeBuildingDefs = {
             ],
         },
     } as unknown as Partial<BuildingDef>),
+    outhouse_02: createOutHouse({
+        map: { display: true, color: 0x9e4116, scale: 1 },
+        ceiling: {
+            zoomRegions: [
+                {
+                    zoomIn: collider.createAabbExtents(
+                        v2.create(0, 1.45),
+                        v2.create(3.6, 3.2),
+                    ),
+                    zoomOut: collider.createAabbExtents(
+                        v2.create(0, 1.4),
+                        v2.create(3.8, 3.4),
+                    ),
+                },
+            ],
+            imgs: [
+                {
+                    sprite: "map-building-outhouse-ceiling.img",
+                    scale: 0.5,
+                    alpha: 1,
+                    tint: 0xd19698,
+                },
+            ],
+            destroy: {
+                wallCount: 2,
+                particleCount: 15,
+                particle: "outhouseBreak",
+                residue: "map-outhouse-res.img",
+            },
+        },
+        obs: "toilet_02b",
+    }),
     barn_01x: createBarn({
         ceiling: {
             imgs: [
