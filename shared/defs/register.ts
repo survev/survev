@@ -1,6 +1,6 @@
 import { assert } from "../utils/util.ts";
 import { RawGameObjectDefs } from "./gameObjectDefs.ts";
-import { RawMapObjectDefs } from "./mapObjectDefs.ts";
+import { ObjectDefIndex } from "./mapObjectIndex.ts";
 
 class DefinitionRegister<T extends { type: string }> {
     readonly type: string;
@@ -109,4 +109,4 @@ class DefinitionRegister<T extends { type: string }> {
 }
 
 export const GameObjectDefs = new DefinitionRegister("Game", RawGameObjectDefs, 10);
-export const MapObjectDefs = new DefinitionRegister("Map", RawMapObjectDefs, 12);
+export const MapObjectDefs = new DefinitionRegister("Map", ObjectDefIndex, 12);
