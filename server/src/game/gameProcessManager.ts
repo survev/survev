@@ -1,5 +1,5 @@
 import { type ChildProcess, fork } from "node:child_process";
-import { randomUUID } from "node:crypto";
+import { randomBytes } from "node:crypto";
 import { type MapDefKey, MapDefs } from "../../../shared/defs/mapDefs.ts";
 import type { TeamMode } from "../../../shared/gameConfig.ts";
 import { util } from "../../../shared/utils/util.ts";
@@ -229,7 +229,7 @@ export class GameProcessManager {
             }
         }
 
-        const id = randomUUID();
+        const id = crypto.randomUUID();
         if (!gameProc) {
             const port = this.getNextPort();
             if (port === undefined) {
@@ -336,9 +336,12 @@ export class GameProcessManager {
             if (proc.state !== ProcState.Running) continue;
 
             for (const player of proc.gameData.livingPlayers) {
+                if (player.disconnected) continue;
                 if (!filterFn(player)) continue;
 
-                const joinToken = crypto.randomUUID();
+                // use slightly shorter join tokens for this...
+                // since for the discord bot long URLs make the message run out of characters kinda fast
+                const joinToken = randomBytes(16).toString("base64url");
                 proc.addSpectateToken(joinToken, {
                     playerId: player.id,
                     specAnon: true,
@@ -349,11 +352,7 @@ export class GameProcessManager {
                     joinToken,
                     game: proc,
                 });
-
-                if (res.length >= 5) break;
             }
-
-            if (res.length >= 15) break;
         }
 
         return res;

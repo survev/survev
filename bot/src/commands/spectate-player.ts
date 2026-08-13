@@ -48,47 +48,67 @@ export const spectateCommandHandler = {
                     const joinData = gameData.data;
 
                     const url = new URL(clientUrl);
-                    url.searchParams.set("joinData", btoa(JSON.stringify(joinData)));
+                    // shortened because long URLs make the discord message run out of characters faster...
+                    url.searchParams.set("u", btoa(joinData.urls.join(",")));
+                    url.searchParams.set("jt", joinData.joinToken);
 
                     return {
                         region: data.region,
-                        data: `\`${gameData.gameId.slice(0, 6)} - ${
+                        data: `${gameData.gameId.slice(0, 6)} - ${
                             GameConfig.TeamModeToString[gameData.teamMode]
-                        } - ${gameData.mapName}\``,
+                        } - ${gameData.mapName}`,
                         url: `[Join Link](${url.toString()})`,
                     };
                 });
             }).flat();
 
-            const playerCount = playerData.length;
-            let title = "Searching...";
-            if (done) {
-                title = playerCount > 0
-                    ? `Found ${playerCount} player${playerCount > 1 ? "s" : ""} with ${
-                        type === "player_name" ? "name" : "slug"
-                    } \`${value}\`.`
-                    : "No player found matching the filter";
-            }
+            const embed = new EmbedBuilder().setColor(done ? 0x00ff00 : 0xffff00);
 
-            const embed = new EmbedBuilder()
-                .setColor(done ? 0x00ff00 : 0xffff00)
-                .setTitle(title);
+            let title = "Searching...";
 
             if (playerData.length) {
-                embed.addFields([
-                    { name: "Region", inline: true, value: "" },
-                    { name: "| Game info", inline: true, value: "" },
-                    { name: "| URL", inline: true, value: "" },
-                ]);
+                const columnWidths = playerData.reduce((a, b) => {
+                    for (const [key, value] of Object.entries(b)) {
+                        a[key] = Math.max(a[key] ?? 0, value.length);
+                    }
+                    return a;
+                }, { region: 8, data: 25 } as Record<string, number>);
 
+                let playerCount = 0;
+
+                let text = "**";
+                const addRow = (value: { region: string; data: string; url: string }) => {
+                    let newRow = "";
+                    newRow += `\`${value.region.padEnd(columnWidths.region)}`;
+                    newRow += `| ${value.data.padEnd(columnWidths.data)} |\``;
+                    newRow += ` ${value.url}\n`;
+
+                    // i hate discord limits
+                    if (text.length + newRow.length < 4096) {
+                        text += newRow;
+                        playerCount++;
+                    }
+                };
+                addRow({ region: "Region", data: "Game info", url: "URL" });
+                text += "**";
                 for (const data of playerData) {
-                    embed.addFields([
-                        { name: "", inline: true, value: data.region },
-                        { name: "", inline: true, value: `| ${data.data}` },
-                        { name: "", inline: true, value: `| ${data.url}` },
-                    ]);
+                    addRow(data);
                 }
+
+                embed.setDescription(text);
+                embed.setFooter({
+                    text:
+                        "NOTE: Join links are one time use and expire after 1 minute, if the target player died or if the game ended.",
+                });
+                if (done) {
+                    title = `Found ${playerCount} player${playerCount > 1 ? "s" : ""} with ${
+                        type === "player_name" ? "name" : "slug"
+                    } \`${value}\`.`;
+                }
+            } else if (done) {
+                title = "No player found matching the filter";
             }
+            embed.setTitle(title);
 
             await interaction.editReply({
                 embeds: [embed],

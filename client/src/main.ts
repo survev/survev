@@ -799,24 +799,19 @@ export class Application {
 
     tryJoinGameFromParam() {
         const params = new URLSearchParams(window.location.search);
-        if (params.has("joinData")) {
+        if (params.has("u") && params.has("jt")) {
             try {
-                const data = JSON.parse(atob(params.get("joinData")!)) as FindGameMatchData;
-                if (
-                    "urls" in data && Array.isArray(data.urls) && "joinToken" in data
-                    && typeof data.joinToken === "string"
-                ) {
-                    this!.joinGame(data);
-                } else {
-                    this.onJoinGameError("join_game_failed");
-                    console.error("Invalid join data:", data);
-                }
+                const urls = atob(params.get("u")!).split(",");
+                const joinToken = params.get("jt")!;
+
+                this!.joinGame({ urls, joinToken });
             } catch (e) {
                 console.error("Failed to parse join data:", e);
                 this.onJoinGameError("join_game_failed");
             }
 
-            params.delete("joinData");
+            params.delete("u");
+            params.delete("jt");
             window.history.pushState(
                 "",
                 "",

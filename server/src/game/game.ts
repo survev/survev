@@ -393,7 +393,7 @@ export class Game {
     addSpectateToken(token: string, data: SpectateTokenData) {
         this.joinTokens.set(token, {
             type: "spectate",
-            expiresAt: Date.now() + 20000,
+            expiresAt: Date.now() + 60000,
             data,
         });
     }
