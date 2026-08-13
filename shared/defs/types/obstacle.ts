@@ -1,6 +1,7 @@
 import type { FactionTeam } from "../../gameConfig.ts";
 import type { AABB, Collider } from "../../utils/coldet.ts";
 import type { Vec2 } from "../../utils/v2.ts";
+import type { MapObjectKey } from "../mapObjectIndex.ts";
 import type { LootSpawnDef, TerrainSpawnDef } from "../mapObjectsTyping.ts";
 
 export interface ObstacleDef {
@@ -79,7 +80,7 @@ export interface ObstacleDef {
     };
     hinge?: Vec2;
     isWindow?: boolean;
-    destroyType?: string;
+    destroyType?: MapObjectKey;
     stonePlated?: boolean;
     aabb?: AABB;
     isTree?: boolean;
@@ -103,7 +104,7 @@ export interface ObstacleDef {
          * The definition of 'activate' depends on the obstacle in question and the
          * other properties
          */
-        useType?: string;
+        useType?: MapObjectKey;
         /**
          * What to do to doors which are triggered by this obstacle's interaction.
          *

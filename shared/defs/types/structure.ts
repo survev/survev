@@ -1,5 +1,6 @@
 import type { AABB } from "../../utils/coldet.ts";
 import type { Vec2 } from "../../utils/v2.ts";
+import type { MapObjectKey } from "../mapObjectIndex.ts";
 import type { TerrainSpawnDef } from "../mapObjectsTyping.ts";
 
 export interface StructureDef {
@@ -8,7 +9,7 @@ export interface StructureDef {
     ori?: number;
     mapObstacleBounds?: AABB[];
     layers: Array<{
-        type: string;
+        type: MapObjectKey;
         pos: Vec2;
         ori: number;
         underground?: boolean;
