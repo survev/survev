@@ -21,6 +21,7 @@ import { Woods } from "./maps/woodsDefs.ts";
 import { WoodsSnow } from "./maps/woodsSnowDefs.ts";
 import { WoodsSpring } from "./maps/woodsSpringDefs.ts";
 import { WoodsSummer } from "./maps/woodsSummerDefs.ts";
+import type { MapObjectKey } from "./mapObjectIndex.ts";
 
 export type Atlas =
     | "gradient"
@@ -195,7 +196,7 @@ export interface MapDef {
                     odds: number;
                     innerRad: number;
                     outerRad: number;
-                    centerObj?: string;
+                    centerObj?: MapObjectKey;
                     riverMaskRad?: number;
                     spawnBound: {
                         pos: Vec2;
@@ -221,28 +222,28 @@ export interface MapDef {
             dontSpawnObjects?: boolean;
         }>;
         bridgeTypes: {
-            medium: string;
-            large: string;
-            xlarge: string;
+            medium: MapObjectKey | "";
+            large: MapObjectKey | "";
+            xlarge: MapObjectKey | "";
         };
         customSpawnRules: {
             locationSpawns: Array<{
-                type: string;
+                type: MapObjectKey;
                 pos: Vec2;
                 rad: number;
                 retryOnFailure: boolean;
             }>;
-            placeSpawns: string[];
+            placeSpawns: MapObjectKey[];
         };
-        densitySpawns: [Record<string, number>];
+        densitySpawns: [Partial<Record<MapObjectKey, number>>];
         fixedSpawns: [
-            Record<string, number | { odds: number } | { small: number; large: number }>,
+            Partial<Record<MapObjectKey, number | { odds: number } | { small: number; large: number }>>,
         ];
         randomSpawns: Array<{
-            spawns: string[];
+            spawns: MapObjectKey[];
             choose: number;
         }>;
-        spawnReplacements: [Record<string, string>];
-        importantSpawns: string[];
+        spawnReplacements: [Partial<Record<MapObjectKey, MapObjectKey>>];
+        importantSpawns: MapObjectKey[];
     };
 }
