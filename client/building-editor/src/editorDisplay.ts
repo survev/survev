@@ -331,7 +331,7 @@ export class EditorDisplay {
             this.addAuto(
                 partType,
                 partPos,
-                layer,
+                child.layer ?? layer,
                 partOri,
                 child.scale,
                 obj.__id,
