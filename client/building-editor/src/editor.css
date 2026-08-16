@@ -7,12 +7,17 @@ canvas {
   overflow: hidden;
   width: 100%;
 }
-
 #editor-ui {
   position: absolute;
   left: 10px;
   top: 10px;
-
+}
+#screenshot-ui {
+  position: absolute;
+  right: 10px;
+  top: 10px;
+}
+#editor-ui, #screenshot-ui {
   /* Tweakpane theme */
   --tp-base-background-color: hsla(0, 0%, 0%, 0.4);
   --tp-base-shadow-color: hsla(0, 0%, 0%, 0.2);

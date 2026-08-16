@@ -578,6 +578,7 @@ export class EditorDisplay {
             this.canvasMode,
             false,
         );
+        this.renderer.resize(this.map, this.camera);
     }
 
     update(dt: number) {

@@ -1,7 +1,11 @@
 import { type FolderApi, Pane, type TabPageApi } from "tweakpane";
 import { MapDefs } from "../../../shared/defs/mapDefs.ts";
 
+import * as PIXI from "pixi.js-legacy";
 import { MapObjectDefs } from "../../../shared/defs/register.ts";
+import { coldet } from "../../../shared/utils/coldet.ts";
+import { collider } from "../../../shared/utils/collider.ts";
+import { mapHelpers } from "../../../shared/utils/mapHelpers.ts";
 import { math } from "../../../shared/utils/math.ts";
 import { v2 } from "../../../shared/utils/v2.ts";
 import {
@@ -34,6 +38,9 @@ export class EditorUi {
 
     pane: Pane;
     zoomBind: ReturnType<Pane["addBinding"]>;
+
+    screenshotPane: Pane;
+
     constructor(
         public config: ConfigManager,
         public display: EditorDisplay,
@@ -294,6 +301,111 @@ export class EditorUi {
             this.pane,
             "debugRenderer",
         );
+
+        // screenshot UI
+        {
+            this.screenshotPane = new Pane({
+                container: document.getElementById("screenshot-ui") as HTMLDivElement,
+                title: "Screenshot",
+                expanded: true,
+            });
+
+            const screenshotParams = {
+                transparent: false,
+                ceilings: false,
+                resolution: 1,
+                margins: 8,
+            };
+
+            this.screenshotPane.addBinding(screenshotParams, "transparent", {
+                label: "Transparent",
+            });
+            this.screenshotPane.addBinding(screenshotParams, "ceilings", {
+                label: "Show ceilings",
+            });
+            this.screenshotPane.addBinding(screenshotParams, "resolution", {
+                label: "Resolution",
+                min: 0.1,
+                max: 5,
+                step: 0.1,
+            });
+            this.screenshotPane.addBinding(screenshotParams, "margins", {
+                label: "Margins",
+                min: 0,
+                max: 32,
+                step: 1,
+            });
+
+            this.screenshotPane.addButton({
+                title: "Take screenshot",
+            }).on("click", () => {
+                // reset the zoom to the target resolution, then set it back at the end...
+                const zoom = this.params.zoom;
+                this.params.zoom = screenshotParams.resolution;
+                this.config.set("buildingEditor", this.params);
+                this.display.camera.m_targetZoom = screenshotParams.resolution;
+                this.display.camera.m_zoom = screenshotParams.resolution;
+
+                // hide ceilings
+                const buildings = this.display.map.m_buildingPool.m_getPool();
+                for (let i = 0; i < buildings.length; i++) {
+                    buildings[i].ceiling.visionTicker = screenshotParams.ceilings ? 0 : 1;
+                    buildings[i].ceiling.fadeAlpha = screenshotParams.ceilings ? 99 : 0;
+                }
+                // since we change the camera zoom and ceilings, we need to run an update
+                // so everything is positioned correctly and building ceilings get hidden
+                this.display.update(0.01);
+
+                // get the building bounds to use for the screenshot width and height
+                const bounds = collider.toAabb(mapHelpers.getBoundingCollider(this.params.object));
+
+                // expand the bounds by the margins, for some buildings some sprites can go outside the bounding collider
+                // so just let the user deal with it by expanding the screenshot themselves :)
+                v2.set(bounds.min, v2.sub(bounds.min, v2.create(screenshotParams.margins, screenshotParams.margins)));
+                v2.set(bounds.max, v2.add(bounds.max, v2.create(screenshotParams.margins, screenshotParams.margins)));
+
+                const width = this.display.camera.m_scaleToScreen(bounds.max.x - bounds.min.x);
+                const height = this.display.camera.m_scaleToScreen(bounds.max.y - bounds.min.y);
+
+                const { x, y } = this.display.camera.m_pointToScreen(this.display.toWorldPos(bounds.min));
+
+                const rect = new PIXI.Rectangle(x, y - height, width, height);
+
+                const pixi = this.display.pixi;
+                const background = new PIXI.Graphics();
+                pixi.stage.addChildAt(background, 0);
+
+                if (screenshotParams.transparent) {
+                    display.renderer.ground.alpha = 0;
+                    display.map.display.ground.alpha = 0;
+                } else {
+                    background.alpha = 1;
+                    display.map.display.ground.alpha = display.renderer.layer === 0 ? 1 : 0;
+
+                    // ... manually draw a background, this can be removed in pixi v8 because v8 renderer.extract has a clearColor param
+                    const colors = display.map.getMapDef().biome.colors;
+                    const undergroundColor = display.renderer.layer === 1 ? colors.underground : colors.grass;
+                    background.clear();
+                    background.beginFill(undergroundColor);
+                    background.drawRect(rect.x, rect.y, rect.width, rect.height);
+                    background.endFill();
+                }
+
+                const canvas = pixi.renderer.extract.canvas(pixi.stage, rect);
+                canvas.toBlob?.(blob => {
+                    if (blob) window.open(URL.createObjectURL(blob));
+                });
+
+                background.destroy();
+
+                // reset stuff
+                this.params.zoom = zoom;
+                this.config.set("buildingEditor", this.params);
+                this.display.camera.m_targetZoom = zoom;
+                this.display.camera.m_zoom = zoom;
+                display.map.display.ground.alpha = 1;
+            });
+        }
     }
 
     m_update(input: InputHandler) {
