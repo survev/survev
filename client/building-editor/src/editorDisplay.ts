@@ -567,7 +567,7 @@ export class EditorDisplay {
         const center = v2.create(this.map.width / 2, this.map.height / 2);
 
         if (type && MapObjectDefs.typeExists(type)) {
-            this.addAuto(type, center, 0, 0, 1);
+            this.addAuto(type, center, 0, cfg.ori, 1);
         }
 
         // re render the map so ground patches are rendered after the buildings are created

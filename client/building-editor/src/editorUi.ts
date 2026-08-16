@@ -3,7 +3,6 @@ import { MapDefs } from "../../../shared/defs/mapDefs.ts";
 
 import * as PIXI from "pixi.js-legacy";
 import { MapObjectDefs } from "../../../shared/defs/register.ts";
-import { coldet } from "../../../shared/utils/coldet.ts";
 import { collider } from "../../../shared/utils/collider.ts";
 import { mapHelpers } from "../../../shared/utils/mapHelpers.ts";
 import { math } from "../../../shared/utils/math.ts";
@@ -215,6 +214,17 @@ export class EditorUi {
                     this.display.resetObj();
                 }
             });
+
+            this.pane.addBinding(this.params, "ori", {
+                label: "Orientation",
+                min: 0,
+                max: 3,
+                step: 1,
+            }).on("change", () => {
+                this.config.set("buildingEditor", this.params);
+                this.display.resetObj();
+            });
+
             const button = pane.addButton({
                 title: "Spawn",
             });
@@ -357,7 +367,14 @@ export class EditorUi {
                 this.display.update(0.01);
 
                 // get the building bounds to use for the screenshot width and height
-                const bounds = collider.toAabb(mapHelpers.getBoundingCollider(this.params.object));
+                const bounds = collider.toAabb(
+                    collider.transform(
+                        mapHelpers.getBoundingCollider(this.params.object),
+                        v2.create(0, 0),
+                        math.oriToRad(this.params.ori),
+                        1,
+                    ),
+                );
 
                 // expand the bounds by the margins, for some buildings some sprites can go outside the bounding collider
                 // so just let the user deal with it by expanding the screenshot themselves :)

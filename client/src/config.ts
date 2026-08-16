@@ -84,6 +84,7 @@ export const BuildingEditorConfig = {
     pos: v2.create(0, 0),
     layer: 0,
     object: "house_red_01",
+    ori: 0,
     map: "main" as MapDefKey,
     hideCeilings: false,
     showGrid: true,
