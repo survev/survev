@@ -195,14 +195,16 @@ export class EditorDisplay {
     }
 
     updatePlayer() {
-        const pos = this.toWorldPos(this.config.get("buildingEditor")!.pos);
+        const config = this.config.get("buildingEditor")!;
+        const pos = this.toWorldPos(config.pos);
+
         const obj: ObjectData<ObjectType.Player> = {
             outfit: "outfitDev",
             backpack: "backpack02",
             helmet: "helmet01",
             chest: "chest03",
             activeWeapon: "fists",
-            layer: 0,
+            layer: config.layer,
             dead: true,
             downed: false,
             animType: 0,
@@ -225,7 +227,7 @@ export class EditorDisplay {
             dir: v2.create(0, -1),
         };
 
-        const p = this.objectCreator.m_updateObjFull(
+        this.activePlayer = this.objectCreator.m_updateObjFull(
             ObjectType.Player,
             this.activeId,
             obj as unknown as ObjectData<ObjectType.Player>,
@@ -242,6 +244,11 @@ export class EditorDisplay {
                 boost: "boost_basic",
             },
         });
+
+        this.activePlayer.layer = config.layer;
+        this.renderer.setActiveLayer(config.layer);
+        const underground = this.activePlayer.isUnderground(this.map);
+        this.renderer.setUnderground(underground);
     }
 
     setPlayerPos(pos: Vec2) {
@@ -253,6 +260,8 @@ export class EditorDisplay {
             },
             this.getCtx(),
         );
+        const underground = this.activePlayer.isUnderground(this.map);
+        this.renderer.setUnderground(underground);
     }
 
     addStructure(type: string, pos: Vec2, ori: number) {

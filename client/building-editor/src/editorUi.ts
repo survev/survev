@@ -167,6 +167,19 @@ export class EditorUi {
         }
 
         {
+            const toggleLayer = pane.addButton({
+                title: "Switch Layers",
+            });
+
+            toggleLayer.on("click", () => {
+                this.params.layer = this.params.layer === 0 ? 1 : 0;
+                this.display.activePlayer.layer = this.params.layer;
+                this.config.set("buildingEditor", this.params);
+                this.display.updatePlayer();
+            });
+        }
+
+        {
             const avaliableObjects = MapObjectDefs.getAllTypes()
                 .filter((type) => {
                     const def = MapObjectDefs.typeToDef(type);
