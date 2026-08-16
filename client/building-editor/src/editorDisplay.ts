@@ -19,6 +19,7 @@ import type { Game } from "../../src/game.ts";
 import type { InputBinds } from "../../src/inputBinds.ts";
 import { Map } from "../../src/map.ts";
 import { DecalBarn } from "../../src/objects/decal.ts";
+import { LootBarn } from "../../src/objects/loot.ts";
 import { Creator } from "../../src/objects/objectPool.ts";
 import { ParticleBarn } from "../../src/objects/particles.ts";
 import { type Player, PlayerBarn } from "../../src/objects/player.ts";
@@ -39,6 +40,7 @@ export class EditorDisplay {
     map!: Map;
     playerBarn!: PlayerBarn;
     smokeBarn!: SmokeBarn;
+    lootBarn!: LootBarn;
     objectCreator!: Creator;
     debugDisplay!: PIXI.Graphics;
 
@@ -71,11 +73,13 @@ export class EditorDisplay {
         this.map = new Map(this.decalBarn);
         this.playerBarn = new PlayerBarn();
         this.smokeBarn = new SmokeBarn();
+        this.lootBarn = new LootBarn();
 
         // Register types
         const TypeToPool = {
             [ObjectType.Player]: this.playerBarn.playerPool,
             [ObjectType.Obstacle]: this.map.m_obstaclePool,
+            [ObjectType.Loot]: this.lootBarn.lootPool,
             [ObjectType.Building]: this.map.m_buildingPool,
             [ObjectType.Structure]: this.map.m_structurePool,
             [ObjectType.Decal]: this.decalBarn.decalPool,
@@ -436,6 +440,45 @@ export class EditorDisplay {
         return obj;
     }
 
+    addLootspawner(type: string, pos: Vec2, layer: number) {
+        const def = MapObjectDefs.typeToDef(type, "loot_spawner");
+
+        const addLoot = (type: string, pos: Vec2, preloaded?: boolean) => {
+            const data: ObjectData<ObjectType.Loot> = {
+                type,
+                pos,
+                layer,
+                count: 0,
+                isOld: true,
+                isPreloadedGun: preloaded ?? false,
+                hasOwner: false,
+                ownerId: 0,
+            };
+            return this.objectCreator.m_updateObjFull(
+                ObjectType.Loot,
+                this.getNextId(),
+                data,
+                this.getCtx(),
+            );
+        };
+
+        const lootTables = this.map.mapDef.lootTable;
+        const getLootTable = (type: string) => {
+            const item = util.weightedRandom(lootTables[type]);
+            if (item.name.startsWith("tier_")) {
+                return getLootTable(item.name);
+            }
+            return item;
+        };
+
+        for (const lootSpawner of def.loot) {
+            const item = getLootTable(lootSpawner.tier!);
+            if (item.name) {
+                addLoot(item.name, pos, !!item.preload);
+            }
+        }
+    }
+
     addAuto(
         type: string,
         pos: Vec2,
@@ -473,33 +516,24 @@ export class EditorDisplay {
                 return this.addDecal(type, pos, ori, scale, layer);
             }
             case "loot_spawner":
-                // nothing for now
-                break;
+                return this.addLootspawner(type, pos, layer);
         }
     }
 
     clearAllObjs() {
-        for (const obj of this.map.m_structurePool.m_getPool()) {
-            if (obj.active) {
-                this.objectCreator.m_deleteObj(obj.__id);
-            }
-        }
+        const pools = [
+            this.map.m_structurePool.m_getPool(),
+            this.map.m_buildingPool.m_getPool(),
+            this.map.m_obstaclePool.m_getPool(),
+            this.decalBarn.decalPool.m_getPool(),
+            this.lootBarn.lootPool.m_getPool(),
+        ];
 
-        for (const obj of this.map.m_buildingPool.m_getPool()) {
-            if (obj.active) {
-                this.objectCreator.m_deleteObj(obj.__id);
-            }
-        }
-
-        for (const obj of this.map.m_obstaclePool.m_getPool()) {
-            if (obj.active) {
-                this.objectCreator.m_deleteObj(obj.__id);
-            }
-        }
-
-        for (const obj of this.decalBarn.decalPool.m_getPool()) {
-            if (obj.active) {
-                this.objectCreator.m_deleteObj(obj.__id);
+        for (const pool of pools) {
+            for (const obj of pool) {
+                if (obj.active) {
+                    this.objectCreator.m_deleteObj(obj.__id);
+                }
             }
         }
     }
@@ -630,7 +664,14 @@ export class EditorDisplay {
             [],
             debug,
         );
-
+        this.lootBarn.m_update(
+            dt,
+            this.activePlayer,
+            this.map,
+            this.audioManager,
+            this.camera,
+            debug,
+        );
         this.smokeBarn.m_update(
             dt,
             this.camera,
