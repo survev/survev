@@ -85,7 +85,8 @@ export const BuildingEditorConfig = {
     layer: 0,
     object: "house_red_01",
     map: "main" as MapDefKey,
-    grid: true,
+    hideCeilings: false,
+    showGrid: true,
 };
 
 const defaultConfig = {

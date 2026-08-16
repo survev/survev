@@ -561,7 +561,7 @@ export class EditorDisplay {
 
         this.audioManager.cameraPos = v2.copy(this.camera.m_pos);
 
-        if (editorCfg.grid) {
+        if (editorCfg.showGrid) {
             const width = this.camera.m_screenWidth / this.camera.m_z();
             const height = this.camera.m_screenHeight / this.camera.m_z();
 
@@ -610,6 +610,13 @@ export class EditorDisplay {
             false,
             false,
         );
+
+        if (editorCfg.hideCeilings) {
+            const buildings = this.map.m_buildingPool.m_getPool();
+            for (let i = 0; i < buildings.length; i++) {
+                buildings[i].ceiling.visionTicker = 1;
+            }
+        }
 
         this.map.m_update(
             dt,

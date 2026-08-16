@@ -234,6 +234,20 @@ export class EditorUi {
         // Renderer
         //
 
+        const hideCeilings = this.pane.addBinding(this.params, "hideCeilings", {
+            label: "Hide Ceilings",
+        });
+        hideCeilings.on("change", () => {
+            this.config.set("buildingEditor", this.params);
+        });
+
+        const showGrid = this.pane.addBinding(this.params, "showGrid", {
+            label: "Show Grid",
+        });
+        showGrid.on("change", () => {
+            this.config.set("buildingEditor", this.params);
+        });
+
         const addObject = (
             // we pass both the default config object
             // and the one we actually write to / loaded from local storage
@@ -262,7 +276,7 @@ export class EditorUi {
                         configKey,
                     );
                 } else if (typeof entry === "boolean") {
-                    const label = camelCaseToText(key);
+                    const label = key === "enabled" ? "All debug lines" : camelCaseToText(key);
 
                     const bind = folder.addBinding(outObj, key, {
                         label,
