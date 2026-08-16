@@ -17,6 +17,10 @@ export enum ProcessMsgType {
     KeepAlive,
     UpdateData,
     AddJoinToken,
+    SocketOpen,
+    ClientSocketMsg,
+    ServerSocketMsg,
+    SocketClose,
 }
 
 export interface CreateGameMsg {
@@ -39,8 +43,46 @@ export interface AddJoinTokenMsg {
     tokens: FindGamePrivateBody["playerData"];
 }
 
+export interface SocketOpenMsg {
+    type: ProcessMsgType.SocketOpen;
+    socketId: string;
+    ip: string;
+}
+
+export interface SocketClientMsg {
+    type: ProcessMsgType.ClientSocketMsg;
+    socketId: string;
+    data: ArrayBuffer | Uint8Array;
+}
+
+/**
+ * msgs is an array to batch all msgs created in the same game net tick
+ * into the same send call
+ */
+export interface SocketServerMsg {
+    type: ProcessMsgType.ServerSocketMsg;
+    msgs: Array<{
+        socketId: string;
+        data: ArrayBuffer | Uint8Array;
+    }>;
+}
+
+/**
+ * Sent by the server to the game when the socket is closed
+ * Or by the game to the server when the game wants to close the socket
+ */
+export interface SocketCloseMsg {
+    type: ProcessMsgType.SocketClose;
+    socketId: string;
+    reason?: string;
+}
+
 export type ProcessMsg =
     | CreateGameMsg
     | KeepAliveMsg
     | UpdateDataMsg
-    | AddJoinTokenMsg;
+    | AddJoinTokenMsg
+    | SocketOpenMsg
+    | SocketClientMsg
+    | SocketServerMsg
+    | SocketCloseMsg;
