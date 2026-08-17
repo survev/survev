@@ -105,6 +105,7 @@ async function soloLeaderboardQuery(params: LeaderboardRequest) {
             matchDataTable.teamMode,
             usernameQuery,
             sql`${type === "most_kills" ? matchDataTable.kills : ""}`,
+            sql`${type === "most_kills" ? matchDataTable.gameId : ""}`,
         )
         .having(gte(count(sql`DISTINCT(match_data.game_id)`), minGames))
         .orderBy(sql`val DESC`)
