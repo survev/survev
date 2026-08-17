@@ -3,7 +3,6 @@ import { BeachAtlas } from "./defs/beach.ts";
 import { CobaltAtlas } from "./defs/cobalt.ts";
 import { DesertAtlas } from "./defs/desert.ts";
 import { FactionAtlas } from "./defs/faction.ts";
-import { GradientAtlas } from "./defs/gradient.ts";
 import { HalloweenAtlas } from "./defs/halloween.ts";
 import { LoadoutAtlas } from "./defs/loadout.ts";
 import { MainAtlas } from "./defs/main.ts";
@@ -30,7 +29,6 @@ export interface AtlasDef {
 }
 
 export const Atlases: Record<Atlas, AtlasDef> = {
-    gradient: GradientAtlas,
     loadout: LoadoutAtlas,
     shared: SharedAtlas,
     main: MainAtlas,

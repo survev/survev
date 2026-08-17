@@ -11,6 +11,8 @@ export const CobaltAtlas: AtlasDef = {
 
         "map/map-case-twins-01.svg",
 
+        "map/map-bush-01cb.svg",
+        "map/map-bush-04cb.svg",
         "map/map-bush-07cb.svg",
 
         "map/map-button-01.svg",

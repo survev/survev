@@ -87,7 +87,7 @@ const mapDef: PartialMapDef = {
             { name: "vault_change_03", channel: "sfx" },
             { name: "watering_01", channel: "sfx" },
         ],
-        atlases: ["gradient", "loadout", "shared", "faction", "potato"],
+        atlases: ["loadout", "shared", "faction", "potato"],
     },
     biome: {
         particles: { camera: "falling_pvt" },

@@ -59,6 +59,9 @@ export const BuildingSprites = {
         "map/map-building-club-vault-ceiling.svg",
         "map/map-bathhouse-column-01.svg",
         "map/map-bathhouse-pool-01.svg",
+
+        "map/map-decal-flyer-01.png",
+        "map/map-building-club-gradient-01.svg",
     ],
 
     container: [
@@ -115,6 +118,7 @@ export const BuildingSprites = {
         "map/map-building-hut-ceiling-04.svg",
         "map/map-building-hut-floor-03.svg",
         "map/map-hut-res-02.svg",
+        "map/map-gun-mount-06.svg",
     ],
 
     mansion: [
@@ -126,6 +130,7 @@ export const BuildingSprites = {
         "map/map-building-mansion-floor-01b.svg",
         "map/map-building-mansion-floor-01c.svg",
         "map/map-building-mansion-floor-01d.svg",
+        "map/map-building-mansion-gradient-01.svg",
 
         "map/map-building-saferoom-ceiling.svg",
         "map/map-building-saferoom-floor.svg",
@@ -178,6 +183,10 @@ export const BuildingSprites = {
         "map/map-reserve-bar-large.svg",
         "map/map-stairs-broken-02.svg",
         "map/map-stairs-broken-03.svg",
+        "map/map-table-01d.svg",
+        "map/map-table-05.svg",
+        "map/map-decal-pipe.svg",
+        "map/map-gun-mount-06.svg",
     ],
 
     saloon: [
@@ -230,6 +239,7 @@ export const BuildingSprites = {
         "map/map-building-workshop-floor-02.svg",
         "map/map-building-workshop-ceiling-01.svg",
         "map/map-building-workshop-ceiling-02.svg",
+        "map/map-gun-mount-07.svg",
     ],
 
     bunker_hydra: [
@@ -304,6 +314,12 @@ export const BuildingSprites = {
         "map/map-bunker-twins-chamber-ceiling-01.svg",
         "map/map-bunker-twins-chamber-floor-01.svg",
         "map/map-bunker-twins-compartment-floor-01.svg",
+
+        "map/map-button-01b.svg",
+        "map/map-button-01g.svg",
+        "map/map-switch-01o.svg",
+        "map/map-switch-01p.svg",
+        "map/map-switch-01y.svg",
     ],
 
     bunker_conch: [

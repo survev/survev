@@ -29,7 +29,7 @@ export const Main: MapDef = {
             { name: "vault_change_03", channel: "sfx" },
             { name: "watering_01", channel: "sfx" },
         ],
-        atlases: ["gradient", "loadout", "shared", "main"],
+        atlases: ["loadout", "shared", "main"],
     },
     biome: {
         colors: {

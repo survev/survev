@@ -79,7 +79,7 @@ const mapDef: PartialMapDef = {
                 channel: "sfx",
             },
         ],
-        atlases: ["gradient", "loadout", "shared", "halloween"],
+        atlases: ["loadout", "shared", "halloween"],
     },
     biome: {
         colors: {

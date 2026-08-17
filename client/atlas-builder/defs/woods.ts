@@ -9,6 +9,8 @@ export const WoodsAtlas: AtlasDef = {
         ...BuildingSprites.bunker_hatchet,
         ...BuildingSprites.workshop,
 
+        "map/map-light-01.svg",
+
         "map/map-bush-01x.svg",
         "map/map-bush-06.svg",
         "map/map-bush-07sp.svg",

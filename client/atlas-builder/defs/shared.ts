@@ -22,6 +22,10 @@ export const SharedAtlas: AtlasDef = {
         ...BuildingSprites.bunker_egg,
         ...BuildingSprites.bunker_storm,
 
+        // planes
+        "map/map-plane-01.svg",
+        "map/map-plane-02.svg",
+
         // generic bunker sprites
         "map/map-bunker-generic-ceiling-01.svg",
         "map/map-bunker-generic-ceiling-02.svg",
@@ -43,8 +47,13 @@ export const SharedAtlas: AtlasDef = {
         "map/map-barrel-02.svg",
         "map/map-barrel-03.svg",
         "map/map-barrel-04.svg",
+        "map/map-barrel-res-01.svg",
         "map/map-barrel-res-02.svg",
         "map/map-barrel-res-03.svg",
+
+        "map/map-bush-01.svg",
+        "map/map-bush-03.svg",
+        "map/map-bush-04.svg",
 
         "map/map-bathrocks-01.svg",
         "map/map-bed-01.svg",
@@ -158,6 +167,12 @@ export const SharedAtlas: AtlasDef = {
         "map/map-fire-ext-res.svg",
 
         "map/map-grill-01.svg",
+
+        "map/map-gun-mount-01.svg",
+        "map/map-gun-mount-02.svg",
+        "map/map-gun-mount-03.svg",
+        "map/map-gun-mount-04.svg",
+        "map/map-gun-mount-05.svg",
 
         "map/map-hedgehog-01.svg",
         "map/map-hut-res-01.svg",

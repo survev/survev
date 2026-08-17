@@ -16,7 +16,7 @@ const mapDef: PartialMapDef = {
             { name: "coconut_01", channel: "sfx" },
             { name: "potato_pickup_01", channel: "ui" },
         ],
-        atlases: ["gradient", "loadout", "shared", "main", "beach"],
+        atlases: ["loadout", "shared", "main", "beach"],
     },
     biome: {
         colors: {

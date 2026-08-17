@@ -23,7 +23,6 @@ import { WoodsSpring } from "./maps/woodsSpringDefs.ts";
 import { WoodsSummer } from "./maps/woodsSummerDefs.ts";
 
 export type Atlas =
-    | "gradient"
     | "loadout"
     | "shared"
     | "main"

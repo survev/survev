@@ -23,7 +23,7 @@ const mapDef: PartialMapDef = {
             { name: "potato_pickup_01", channel: "ui" },
             { name: "piano_music_01", channel: "ambient" },
         ],
-        atlases: ["gradient", "loadout", "shared", "desert"],
+        atlases: ["loadout", "shared", "desert"],
     },
     biome: {
         colors: {

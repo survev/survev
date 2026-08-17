@@ -17,7 +17,7 @@ const mapDef: PartialMapDef = {
             { name: "bells_01", channel: "ui" },
             { name: "snowball_pickup_01", channel: "ui" },
         ],
-        atlases: ["gradient", "loadout", "shared", "snow"],
+        atlases: ["loadout", "shared", "snow"],
     },
     biome: {
         colors: {

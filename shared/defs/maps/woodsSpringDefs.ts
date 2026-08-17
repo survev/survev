@@ -20,7 +20,7 @@ const mapDef: PartialMapDef = {
             { name: "ability_stim_01", channel: "sfx" },
             { name: "leader_dead_01", channel: "ui" },
         ],
-        atlases: ["gradient", "loadout", "shared", "woods"],
+        atlases: ["loadout", "shared", "woods"],
     },
     biome: {
         colors: {

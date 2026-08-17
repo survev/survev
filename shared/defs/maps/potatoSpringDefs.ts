@@ -21,7 +21,7 @@ const mapDef: PartialMapDef = {
             { name: "egg_hit_01", channel: "hits" },
             { name: "egg_break_01", channel: "sfx" },
         ],
-        atlases: ["gradient", "loadout", "shared", "main", "potato"],
+        atlases: ["loadout", "shared", "main", "potato"],
     },
     biome: {
         colors: {
