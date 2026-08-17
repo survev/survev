@@ -28,7 +28,7 @@ export default defineConfig(({ mode }) => {
     process.env.VITE_SPELLSYNC_PROJECT_ID = Config.secrets.SPELLSYNC_PROJECT_ID;
     process.env.VITE_SPELLSYNC_PUBLIC_TOKEN = Config.secrets.SPELLSYNC_PUBLIC_TOKEN;
 
-    const plugins: PluginOption[] = [ejsPlugin(), ...atlasBuilderPlugin()];
+    const plugins: PluginOption[] = [ejsPlugin(), ...atlasBuilderPlugin(mode === "production")];
 
     if (!isDev) {
         plugins.push(codefendPlugin());

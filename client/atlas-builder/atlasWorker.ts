@@ -3,7 +3,7 @@ import { type Bin, MaxRectsPacker, type Rectangle } from "maxrects-packer";
 import type { ISpritesheetData } from "pixi.js-legacy";
 import sharp from "sharp";
 import type { Atlas } from "../../shared/defs/mapDefs.ts";
-import { atlasLogger, ImageManager } from "./atlasBuilder.ts";
+import { atlasFormat, atlasLogger, ImageManager } from "./atlasBuilder.ts";
 import { type AtlasDef, Atlases, type AtlasRes, AtlasResolutions } from "./atlasDefs.ts";
 import type { Edges } from "./detectEdges.ts";
 
@@ -15,7 +15,10 @@ interface ImageData {
     height: number;
 }
 
-export type MainToWorkerMsg = Array<{ name: Atlas; hash: string }>;
+export type MainToWorkerMsg = {
+    isProduction: boolean;
+    atlases: Array<{ name: Atlas; hash: string }>;
+};
 
 export type WorkerToMainMsg = Array<{
     name: Atlas;
@@ -44,9 +47,11 @@ export class AtlasBuilder {
 
     name: Atlas;
     def: AtlasDef;
+    isProduction: boolean;
 
-    constructor(name: Atlas) {
+    constructor(name: Atlas, isProduction: boolean) {
         this.name = name;
+        this.isProduction = isProduction;
         this.def = Atlases[name];
         this.packer = new MaxRectsPacker(4096, 4096, 8, {
             border: 8,
@@ -142,7 +147,7 @@ export class AtlasBuilder {
 
         const sheetData: ISpritesheetData = {
             meta: {
-                image: `${name}-${100 * scale}.png`,
+                image: `${name}-${100 * scale}.${atlasFormat}`,
                 size: {
                     w: bin.width * scale,
                     h: bin.height * scale,
@@ -195,27 +200,43 @@ export class AtlasBuilder {
         }
 
         let buff: Buffer;
-
-        // see comment on the atlasDef interface
-        if (this.def.compress) {
-            buff = await sharp(canvas.toBuffer("image/png"))
-                .png({
-                    compressionLevel: 9,
-                    quality: 99,
-                    dither: 0,
-                })
-                .toBuffer();
-        } else {
-            buff = Buffer.from(
-                canvas.toBuffer("image/png", {
-                    compressionLevel: 9,
-                }),
-            );
+        if (atlasFormat === "webp") {
+            const rawBuff = await new Promise<Buffer>((resolve, reject) => {
+                canvas.toBuffer((err, buff) => {
+                    if (err) {
+                        reject(err);
+                        return;
+                    }
+                    resolve(buff);
+                });
+            });
+            buff = await sharp(rawBuff).webp({
+                lossless: true,
+                preset: "icon",
+                effort: this.isProduction ? 6 : 0,
+            }).toBuffer();
+        } else if (atlasFormat === "png") {
+            // see comment on the atlasDef interface
+            if (this.def.compress) {
+                buff = await sharp(canvas.toBuffer("image/png"))
+                    .png({
+                        compressionLevel: 9,
+                        quality: 99,
+                        dither: 0,
+                    })
+                    .toBuffer();
+            } else {
+                buff = Buffer.from(
+                    canvas.toBuffer("image/png", {
+                        compressionLevel: 9,
+                    }),
+                );
+            }
         }
         this.atlases.push({
             res: res,
             data: sheetData,
-            buff,
+            buff: buff!,
         });
     }
 }
@@ -223,8 +244,8 @@ export class AtlasBuilder {
 process.on("message", async (msg: MainToWorkerMsg) => {
     const res: WorkerToMainMsg = [];
 
-    for (const atlas of msg) {
-        const builder = new AtlasBuilder(atlas.name);
+    for (const atlas of msg.atlases) {
+        const builder = new AtlasBuilder(atlas.name, msg.isProduction);
         await builder.build();
         res.push({
             name: atlas.name,

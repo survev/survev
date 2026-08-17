@@ -33,6 +33,8 @@ export const atlasLogger = new Logger(
 export const imagesCacheFolder = Path.join(cacheFolder, "img");
 export const atlasesCacheFolder = Path.join(cacheFolder, "atlases");
 
+export const atlasFormat: "webp" | "png" = "webp";
+
 export const imageFolder = Path.resolve(import.meta.dirname, "../public/img");
 
 if (!fs.existsSync(imagesCacheFolder)) {
@@ -200,6 +202,11 @@ export class AtlasManager {
 
     imageCache = new ImageManager();
 
+    isProduction: boolean;
+    constructor(isProduction: boolean) {
+        this.isProduction = isProduction;
+    }
+
     loadFromDisk() {
         this.imageCache.loadFromDisk();
     }
@@ -234,7 +241,7 @@ export class AtlasManager {
             images.set(image, true);
         }
 
-        let atlasHash = `${ATLAS_HASH_VERSION}`;
+        let atlasHash = `${ATLAS_HASH_VERSION}-${atlasFormat}-${this.isProduction}`;
         for (const file of atlasDef.images) {
             const imagePath = Path.join(imageFolder, file);
             if (!fs.existsSync(imagePath)) {
@@ -315,7 +322,7 @@ export class AtlasManager {
                     }
                 });
 
-                proc.send(atlases satisfies MainToWorkerMsg);
+                proc.send({ isProduction: this.isProduction, atlases } satisfies MainToWorkerMsg);
 
                 proc.on("message", (msg: WorkerToMainMsg) => {
                     const data = msg;
