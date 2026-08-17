@@ -2,7 +2,6 @@ import type { AtlasDef } from "../atlasDefs.ts";
 import { BuildingSprites } from "./buildings.ts";
 
 export const PotatoAtlas: AtlasDef = {
-    compress: true,
     images: [
         ...BuildingSprites.shilo,
 

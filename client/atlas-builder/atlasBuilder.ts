@@ -33,7 +33,7 @@ export const atlasLogger = new Logger(
 export const imagesCacheFolder = Path.join(cacheFolder, "img");
 export const atlasesCacheFolder = Path.join(cacheFolder, "atlases");
 
-export const atlasFormat: "webp" | "png" = "webp";
+export const atlasFormat = "webp" as const;
 
 export const imageFolder = Path.resolve(import.meta.dirname, "../public/img");
 

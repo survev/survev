@@ -2,7 +2,6 @@ import type { AtlasDef } from "../atlasDefs.ts";
 import { BuildingSprites } from "./buildings.ts";
 
 export const CobaltAtlas: AtlasDef = {
-    compress: true,
     images: [
         ...BuildingSprites.bunker_crossing,
         ...BuildingSprites.bunker_hydra,

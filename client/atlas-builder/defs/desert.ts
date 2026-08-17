@@ -2,7 +2,6 @@ import type { AtlasDef } from "../atlasDefs.ts";
 import { BuildingSprites } from "./buildings.ts";
 
 export const DesertAtlas: AtlasDef = {
-    compress: true,
     images: [
         ...BuildingSprites.reserve,
         ...BuildingSprites.saloon,

@@ -199,44 +199,25 @@ export class AtlasBuilder {
             );
         }
 
-        let buff: Buffer;
-        if (atlasFormat === "webp") {
-            const rawBuff = await new Promise<Buffer>((resolve, reject) => {
-                canvas.toBuffer((err, buff) => {
-                    if (err) {
-                        reject(err);
-                        return;
-                    }
-                    resolve(buff);
-                });
+        const rawBuff = await new Promise<Buffer>((resolve, reject) => {
+            canvas.toBuffer((err, buff) => {
+                if (err) {
+                    reject(err);
+                    return;
+                }
+                resolve(buff);
             });
-            buff = await sharp(rawBuff).webp({
-                lossless: true,
-                preset: "icon",
-                effort: this.isProduction ? 6 : 0,
-            }).toBuffer();
-        } else if (atlasFormat === "png") {
-            // see comment on the atlasDef interface
-            if (this.def.compress) {
-                buff = await sharp(canvas.toBuffer("image/png"))
-                    .png({
-                        compressionLevel: 9,
-                        quality: 99,
-                        dither: 0,
-                    })
-                    .toBuffer();
-            } else {
-                buff = Buffer.from(
-                    canvas.toBuffer("image/png", {
-                        compressionLevel: 9,
-                    }),
-                );
-            }
-        }
+        });
+        const buff = await sharp(rawBuff).webp({
+            lossless: true,
+            preset: "icon",
+            effort: this.isProduction ? 6 : 0,
+        }).toBuffer();
+
         this.atlases.push({
             res: res,
             data: sheetData,
-            buff: buff!,
+            buff,
         });
     }
 }

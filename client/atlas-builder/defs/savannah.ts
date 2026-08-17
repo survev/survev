@@ -1,7 +1,6 @@
 import type { AtlasDef } from "../atlasDefs.ts";
 
 export const SavannahAtlas: AtlasDef = {
-    compress: true,
     images: [
         "map/map-brush-01sv.svg",
         "map/map-brush-02sv.svg",

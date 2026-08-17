@@ -2,7 +2,6 @@ import type { AtlasDef } from "../atlasDefs.ts";
 import { BuildingSprites } from "./buildings.ts";
 
 export const TurkeyAtlas: AtlasDef = {
-    compress: true,
     images: [
         ...BuildingSprites.greenhouse,
         ...BuildingSprites.bunker_chrys,
