@@ -3,10 +3,11 @@ import { MeleeDefs } from "../../shared/defs/gameObjects/meleeDefs.ts";
 import { OutfitDefs } from "../../shared/defs/gameObjects/outfitDefs.ts";
 import { UnlockDefs } from "../../shared/defs/gameObjects/unlockDefs.ts";
 import { GameConfig, type Input } from "../../shared/gameConfig.ts";
+import { Connection, WebsocketConnection } from "../../shared/net/connection.ts";
 import * as net from "../../shared/net/net.ts";
 import { type ObjectData, type ObjectsPartialData, ObjectType } from "../../shared/net/objectSerializeFns.ts";
 import type { LocalData } from "../../shared/net/updateMsg.ts";
-import type { FindGameBody, FindGameMatchData, FindGameResponse } from "../../shared/types/api.ts";
+import type { FindGameBody, FindGameResponse } from "../../shared/types/api.ts";
 import { util } from "../../shared/utils/util.ts";
 import { v2 } from "../../shared/utils/v2.ts";
 import { Config } from "./config.ts";
@@ -93,7 +94,7 @@ class ObjectCreator {
         if (obj) {
             for (const dataKey in data) {
                 // @ts-expect-error too lazy;
-                obj.data[dataKey] = data;
+                obj.data[dataKey] = data[dataKey];
             }
         } else {
             console.error("updateObjPart, missing object", id);
@@ -137,11 +138,9 @@ class Bot {
 
     id: number;
 
-    ws: WebSocket;
+    connection: Connection;
 
     objectCreator = new ObjectCreator();
-
-    data: string;
 
     inputs: Input[] = [];
 
@@ -149,41 +148,56 @@ class Bot {
 
     connectPromise: Promise<void>;
 
-    constructor(id: number, res: FindGameMatchData) {
+    constructor(id: number, connection: Connection, joinToken: string) {
         this.id = id;
 
-        this.ws = new WebSocket(res.urls[0]);
-
-        this.data = res.joinToken;
+        this.connection = connection;
 
         this.connectPromise = new Promise((resolve) => {
-            this.ws.addEventListener("error", (e) => {
-                console.error(`Bot ${this.id} websocket error:`, e);
+            this.connection.onError = () => {
+                console.error(`Bot ${this.id} connection error`);
                 // we dont actually care if it failed to connect
                 // because we dont want to prevent other bots from joining
                 // and retrying for a single bot feels pointless
                 // so dont reject the promise
                 resolve();
-            });
-            this.ws.addEventListener("open", () => {
-                this.join();
+            };
+            this.connection.onOpen = () => {
+                const joinMsg = new net.JoinMsg();
+
+                joinMsg.bot = true;
+                joinMsg.name = `BOT_${this.id}`;
+                joinMsg.isMobile = false;
+                joinMsg.protocol = GameConfig.protocolVersion;
+
+                joinMsg.loadout = {
+                    melee: util.randomItem(melees),
+                    outfit: util.randomItem(outfits),
+                    heal: "heal_basic",
+                    boost: "boost_basic",
+                    emotes: this.emotes,
+                };
+                joinMsg.joinToken = joinToken;
+
+                this.sendMsg(net.MsgType.Join, joinMsg);
+
+                this.connected = true;
+
                 resolve();
-            });
+            };
         });
 
-        this.ws.addEventListener("close", () => {
+        this.connection.onClose = () => {
             this.disconnect = true;
             this.connected = false;
-        });
-
-        this.ws.binaryType = "arraybuffer";
+        };
 
         const emote = (): string => util.randomItem(emotes);
 
         this.emotes = [emote(), emote(), emote(), emote(), emote(), emote()];
 
-        this.ws.onmessage = (message: MessageEvent): void => {
-            const stream = new net.MsgStream(message.data as ArrayBuffer);
+        this.connection.onMessage = (data): void => {
+            const stream = new net.MsgStream(data as ArrayBuffer);
             while (true) {
                 const type = stream.deserializeMsgType();
                 if (type == net.MsgType.None) {
@@ -261,7 +275,7 @@ class Bot {
                 if (!msg.gameOver) {
                     this.disconnect = true;
                     this.connected = false;
-                    this.ws.close();
+                    this.connection.close();
                 }
                 break;
             }
@@ -284,34 +298,11 @@ class Bot {
 
     stream = new net.MsgStream(new ArrayBuffer(1024));
 
-    join(): void {
-        this.connected = true;
-
-        const joinMsg = new net.JoinMsg();
-
-        joinMsg.bot = true;
-        joinMsg.name = `BOT_${this.id}`;
-        joinMsg.isMobile = false;
-        joinMsg.protocol = GameConfig.protocolVersion;
-
-        joinMsg.loadout = {
-            melee: util.randomItem(melees),
-            outfit: util.randomItem(outfits),
-            heal: "heal_basic",
-            boost: "boost_basic",
-            emotes: this.emotes,
-        };
-
-        joinMsg.joinToken = this.data;
-
-        this.sendMsg(net.MsgType.Join, joinMsg);
-    }
-
     sendMsg(type: net.MsgType, msg: net.Msg): void {
         this.stream.stream.index = 0;
         this.stream.serializeMsg(type, msg);
 
-        this.ws.send(this.stream.getBuffer());
+        this.connection.send(this.stream.getBuffer());
     }
 
     sendInputs(): void {
@@ -458,8 +449,8 @@ for (let i = 1; i <= config.botCount; i++) {
         console.log("Failed finding game, error:", response);
         continue;
     }
-
-    const bot = new Bot(i, response.res);
+    const con = new WebsocketConnection(response.res.urls[0]);
+    const bot = new Bot(i, con, response.res.joinToken);
     bots.add(bot);
 
     await Promise.all([
