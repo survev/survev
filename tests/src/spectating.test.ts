@@ -213,7 +213,11 @@ test("Spectate teammates", () => {
         });
     }
     // now that all teammates are dead we should be able to spectate non teammates :)
+    // but only after sending another spectate msg, since we need to show the game over screen for the entire team
     game.step(spectateDeathCooldown);
+    expect(playerA.client.spectating).toBeSamePlayer(playerD);
+
+    playerA.client.handleMsg(MsgType.Spectate, specBegin);
     expect(playerA.client.spectating).toBeSamePlayer(playerE);
 });
 

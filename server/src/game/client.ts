@@ -383,7 +383,14 @@ export class Client {
             let newPlayerToSpectate: Player | undefined = undefined;
 
             // switch to a new spectator after 2 seconds if the player we are spectating has died
-            if (this.spectating.dead && !this.game.over) {
+            // but don't do it if we are spectating a teammate and our entire team has died
+            // since we need to show the "team eliminated" screen in the client, and switching will hide it
+            const ourTeam = this.player?.team || this.player?.group;
+            const spectatingTeam = this.spectating.team || this.spectating.group;
+            const noAutoSwitch = ourTeam && spectatingTeam && ourTeam.id === spectatingTeam.id
+                && ourTeam.allDeadOrDisconnected;
+
+            if (this.spectating.dead && !noAutoSwitch && !this.game.over) {
                 this.spectateNewPlayerTicker += dt;
                 if (this.spectateNewPlayerTicker > 2) {
                     newPlayerToSpectate = this.getNewPlayerToSpectate();
@@ -816,7 +823,7 @@ export class Client {
 
         switch (spectateMsg.action) {
             case SpectateAction.Begin:
-                if (this.spectating) break;
+                if (this.spectating && !this.spectating.dead) break;
                 this.spectating = this.getNewPlayerToSpectate();
                 break;
             case SpectateAction.Next:
