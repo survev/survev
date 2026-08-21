@@ -803,8 +803,9 @@ export class Client {
     getNewPlayerToSpectate(): Player {
         const spectateTeam = this.shouldSpectateTeam();
         let killer: Player | undefined = undefined;
-        if (this.player && !spectateTeam) {
-            killer = this.player.getAliveKiller();
+        const player = this.spectating || this.player;
+        if (player && !spectateTeam) {
+            killer = player.getAliveKiller();
         }
         if (killer) return killer;
         return this.getSpectablePlayers()[0];

@@ -59,6 +59,50 @@ test("Spectate killer", () => {
     expect(playerA.client.spectating).toBeSamePlayer(playerD);
 });
 
+test("Spectate killer of spectating", () => {
+    const game = createGame(TeamMode.Solo, "test_normal");
+    game.preventStart = true;
+
+    const playerA = game.playerBarn.addTestPlayer({});
+    const playerB = game.playerBarn.addTestPlayer({});
+    const playerC = game.playerBarn.addTestPlayer({});
+    const playerD = game.playerBarn.addTestPlayer({});
+
+    playerA.damage({
+        damageType: GameConfig.DamageType.Player,
+        source: playerB,
+        amount: 999,
+        dir: v2.randomUnit(),
+    });
+    playerA.client.handleMsg(MsgType.Spectate, specBegin);
+    expect(playerA.client.spectating).toBeSamePlayer(playerB);
+
+    playerA.client.handleMsg(MsgType.Spectate, specNext);
+    game.step(spectateSoloCooldown);
+    expect(playerA.client.spectating).toBeSamePlayer(playerC);
+
+    playerC.damage({
+        damageType: GameConfig.DamageType.Player,
+        source: playerD,
+        amount: 999,
+        dir: v2.randomUnit(),
+    });
+    expect(playerA.client.spectating).toBeSamePlayer(playerC);
+
+    game.step(spectateDeathCooldown);
+    expect(playerA.client.spectating).toBeSamePlayer(playerD);
+
+    playerC.damage({
+        damageType: GameConfig.DamageType.Player,
+        source: playerC,
+        amount: 999,
+        dir: v2.randomUnit(),
+    });
+
+    game.step(spectateDeathCooldown);
+    expect(playerA.client.spectating).toBeSamePlayer(playerD);
+});
+
 test("Spectate solo", () => {
     const game = createGame(TeamMode.Solo, "test_normal");
     game.preventStart = true;
