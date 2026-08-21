@@ -926,7 +926,7 @@ export const MapObstacleDefs: Record<string, ObstacleDef> = {
     stone_02w: createStone({
         map: { display: false },
         img: { tint: 0xe5e5e5 },
-        loot: [tierLoot("tier_surviv", 2, 3), autoLoot("dp28", 1)],
+        loot: [tierLoot("tier_surviv", 2, 3), autoLoot("ak47", 1)],
     }),
     stone_02x: createStone({
         map: { display: false, color: 0x9ca2a8, scale: 1 },
