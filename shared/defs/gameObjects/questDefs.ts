@@ -19,6 +19,11 @@ interface QuestWhere {
     obstacleType?: string;
 }
 
+export enum QuestDifficulty {
+    Normal,
+    Hard,
+}
+
 export interface QuestDef {
     readonly type: "quest";
     event: QuestEvent;
@@ -27,6 +32,10 @@ export interface QuestDef {
     icon?: string;
     timed?: boolean;
     where?: QuestWhere;
+    /**
+     * @default {QuestDifficulty.Normal}
+     */
+    difficulty?: QuestDifficulty;
 }
 
 export const QuestDefs: Record<string, QuestDef> = {

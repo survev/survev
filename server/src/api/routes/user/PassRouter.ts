@@ -1,7 +1,7 @@
 import { and, eq, inArray } from "drizzle-orm";
 import { Hono } from "hono";
 import z from "zod";
-import { QuestDefs } from "../../../../../shared/defs/gameObjects/questDefs.ts";
+import { QuestDefs, QuestDifficulty } from "../../../../../shared/defs/gameObjects/questDefs.ts";
 import { MapDefs } from "../../../../../shared/defs/mapDefs.ts";
 import { MapId } from "../../../../../shared/gameConfig.ts";
 import { type GetPassResponse } from "../../../../../shared/types/user.ts";
@@ -77,7 +77,7 @@ async function getPassAndQuests(
 
         const blockedTypes = new Set<string>();
         const inserts = questSlotIndexes.map((slot) => {
-            const questType = getRandomQuestType(blockedTypes);
+            const questType = getRandomQuestType(blockedTypes, false);
             blockedTypes.add(questType);
 
             return {
@@ -130,7 +130,7 @@ async function rerollSlot(
     transaction?: Parameters<Parameters<typeof db.transaction>[0]>[0],
 ) {
     const excludedTypes = new Set(loadedQuests.map((quest) => quest.questType));
-    const questType = getRandomQuestType(excludedTypes);
+    const questType = getRandomQuestType(excludedTypes, rerolled);
 
     await (transaction ?? db)
         .update(userQuestTable)
@@ -295,7 +295,7 @@ export const PassRouter = new Hono<Context>()
 const questTypes = Object.keys(QuestDefs);
 const defaultQuestType = questTypes[0] || "quest_kills";
 
-function getRandomQuestType(excluded: Set<string>) {
+function getRandomQuestType(excluded: Set<string>, rerolled: boolean) {
     let available = questTypes.filter((questType) => !excluded.has(questType));
 
     // for top in solo / squad quests
@@ -318,6 +318,10 @@ function getRandomQuestType(excluded: Set<string>) {
             }
             return true;
         });
+    }
+
+    if (rerolled) {
+        available = available.filter(type => QuestDefs[type].difficulty !== QuestDifficulty.Hard);
     }
 
     const source = available.length > 0 ? available : questTypes;
