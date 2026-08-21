@@ -2749,7 +2749,7 @@ export class Player extends BaseGameObject {
             killMsg.killerKills = killCreditSource.kills;
         }
 
-        if (params.damageType === GameConfig.DamageType.Player && params.source?.__type === ObjectType.Player) {
+        if (params.damageType !== GameConfig.DamageType.Bleeding && params.source?.__type === ObjectType.Player) {
             killMsg.killerId = params.source.__id;
         }
 
