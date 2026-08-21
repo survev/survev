@@ -1,4 +1,4 @@
-import { TeamMode } from "../../gameConfig.ts";
+import { type MapId, TeamMode } from "../../gameConfig.ts";
 
 type QuestEvent =
     | "kill"
@@ -36,6 +36,7 @@ export interface QuestDef {
      * @default {QuestDifficulty.Normal}
      */
     difficulty?: QuestDifficulty;
+    availableOn?: MapId | MapId[];
 }
 
 export const QuestDefs: Record<string, QuestDef> = {

@@ -296,19 +296,22 @@ const questTypes = Object.keys(QuestDefs);
 const defaultQuestType = questTypes[0] || "quest_kills";
 
 function getRandomQuestType(excluded: Set<string>, rerolled: boolean) {
-    let available = questTypes.filter((questType) => !excluded.has(questType));
+    const serverModes = server.modes.filter(m => m.enabled);
+    const serverMapIds = serverModes.map(mode => MapDefs[mode.mapName].mapId);
+
+    let available = questTypes.filter((questType) => {
+        if (excluded.has(questType)) return false;
+
+        const availableOn = QuestDefs[questType].availableOn;
+        return availableOn === undefined || hasCompatibleMap(serverMapIds, availableOn);
+    });
 
     // for top in solo / squad quests
     // filter them based on running modes not being normal mode
     // getting top in solos while a mode is running on squads is really frustrating :)
-    const nonNormalModes = server.modes.filter(m => {
-        if (!m.enabled) return false;
-
-        const def = MapDefs[m.mapName];
-        return def.mapId !== MapId.Main;
-    });
+    const nonNormalModes = serverMapIds.filter(m => m !== MapId.Main);
     if (nonNormalModes.length) {
-        const teamModes = nonNormalModes.map(m => {
+        const teamModes = serverModes.map(m => {
             return m.teamMode;
         });
         available = available.filter(type => {
@@ -326,4 +329,12 @@ function getRandomQuestType(excluded: Set<string>, rerolled: boolean) {
 
     const source = available.length > 0 ? available : questTypes;
     return util.randomItem(source) ?? defaultQuestType;
+}
+
+function hasCompatibleMap(serverMapIds: MapId[], available: MapId | MapId[]): boolean {
+    if (Array.isArray(available)) {
+        return serverMapIds.some(mapId => available.includes(mapId));
+    }
+
+    return serverMapIds.includes(available);
 }
