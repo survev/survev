@@ -63,7 +63,7 @@ test("Players shouldn't get placement progress for just disconnecting", () => {
         },
     ];
 
-    expect(playerA.questManager.quests[0].delta).toBe(0);
+    expect(playerA.questManager.quests[0].totalDelta).toBe(0);
 
     playerA.client.socket.close();
 
@@ -295,7 +295,7 @@ test("Survived time on death", () => {
         },
     ];
 
-    expect(playerA.questManager.quests[0].delta).toBe(0);
+    expect(playerA.questManager.quests[0].totalDelta).toBe(0);
 
     game.step(10);
     playerA.damage({
@@ -322,7 +322,7 @@ test("Survived time on win", () => {
 
     game.step(15);
     expect(game.started).toBe(true);
-    expect(playerA.questManager.quests[0].delta).toBe(0);
+    expect(playerA.questManager.quests[0].totalDelta).toBe(0);
 
     playerB.damage({
         amount: 999,
