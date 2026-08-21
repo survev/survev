@@ -1013,7 +1013,7 @@ export const StructureDefs: Record<string, StructureDef> = {
         mapObstacleBounds: [
             collider.createAabbExtents(v2.create(1, 15.4), v2.create(3.5, 6)),
             collider.createAabbExtents(v2.create(-1, -15.4), v2.create(3.5, 6)),
-            collider.createAabbExtents(v2.create(20.5, 0), v2.create(6, 3.5)),
+            collider.createAabbExtents(v2.create(20.5, 2.5), v2.create(6, 6)),
             collider.createAabbExtents(v2.create(-20.5, 0), v2.create(6, 3.5)),
             collider.createAabbExtents(v2.create(8, -12.25), v2.create(6, 6)),
             collider.createAabbExtents(v2.create(-12, 8.5), v2.create(6, 6)),
