@@ -4156,11 +4156,19 @@ a:active {
 .pass-quest-xp {
   color: gray;
   font-size: 14px;
-  font-weight: 400;
+  font-weight: bold;
   position: absolute;
   text-align: center;
   top: 2px;
   right: 30px;
+}
+
+.pass-quest-xp[data-xp="40"] {
+  color: #ff9900;
+}
+
+.pass-quest-xp[data-xp="50"] {
+  color: #B30000;
 }
 
 .pass-quest-refresh {

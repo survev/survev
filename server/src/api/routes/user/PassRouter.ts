@@ -2,12 +2,11 @@ import { and, eq, inArray } from "drizzle-orm";
 import { Hono } from "hono";
 import z from "zod";
 import { QuestDefs } from "../../../../../shared/defs/gameObjects/questDefs.ts";
-import { MapDefs } from "../../../../../shared/defs/mapDefs.ts";
-import { MapId } from "../../../../../shared/gameConfig.ts";
 import { type GetPassResponse } from "../../../../../shared/types/user.ts";
 import { passUtil } from "../../../../../shared/utils/passUtil.ts";
 import { util } from "../../../../../shared/utils/util.ts";
 import { Config } from "../../../config.ts";
+import { questHelpers } from "../../../utils/questHelpers.ts";
 import { server } from "../../apiServer.ts";
 import { validateParams } from "../../auth/middleware.ts";
 import { db } from "../../db/index.ts";
@@ -75,10 +74,10 @@ async function getPassAndQuests(
                 ),
             );
 
-        const blockedTypes = new Set<string>();
+        const currentQuests = new Set<string>();
         const inserts = questSlotIndexes.map((slot) => {
-            const questType = getRandomQuestType(blockedTypes);
-            blockedTypes.add(questType);
+            const questType = getRandomQuestType(currentQuests);
+            currentQuests.add(questType);
 
             return {
                 userId,
@@ -129,8 +128,8 @@ async function rerollSlot(
     loadedQuests: UserQuestTableSelect[],
     transaction?: Parameters<Parameters<typeof db.transaction>[0]>[0],
 ) {
-    const excludedTypes = new Set(loadedQuests.map((quest) => quest.questType));
-    const questType = getRandomQuestType(excludedTypes);
+    const currentQuests = new Set(loadedQuests.map((quest) => quest.questType));
+    const questType = getRandomQuestType(currentQuests, rerolled ? loadedQuests[idx].questType : undefined);
 
     await (transaction ?? db)
         .update(userQuestTable)
@@ -269,11 +268,16 @@ export const PassRouter = new Hono<Context>()
 
             const now = Date.now();
             const expired = quest.nextRefreshAt - now < 0;
-            const refreshEnabled = (!quest.rerolled && !quest.complete) || expired;
+
+            const questDef = QuestDefs[quest.questType];
+            const serverMaps = server.modes.filter(m => m.enabled).map(m => m.mapName);
+            const badMap = !questHelpers.satisfiesMapFilter(serverMaps, questDef);
+
+            const refreshEnabled = (!quest.rerolled && !quest.complete) || expired || badMap;
             if (!refreshEnabled) {
                 return false;
             }
-            await rerollSlot(user.id, idx, now, !expired, quests, transaction);
+            await rerollSlot(user.id, idx, now, !expired && !badMap, quests, transaction);
             return true;
         });
 
@@ -295,30 +299,8 @@ export const PassRouter = new Hono<Context>()
 const questTypes = Object.keys(QuestDefs);
 const defaultQuestType = questTypes[0] || "quest_kills";
 
-function getRandomQuestType(excluded: Set<string>) {
-    let available = questTypes.filter((questType) => !excluded.has(questType));
-
-    // for top in solo / squad quests
-    // filter them based on running modes not being normal mode
-    // getting top in solos while a mode is running on squads is really frustrating :)
-    const nonNormalModes = server.modes.filter(m => {
-        if (!m.enabled) return false;
-
-        const def = MapDefs[m.mapName];
-        return def.mapId !== MapId.Main;
-    });
-    if (nonNormalModes.length) {
-        const teamModes = nonNormalModes.map(m => {
-            return m.teamMode;
-        });
-        available = available.filter(type => {
-            const def = QuestDefs[type];
-            if (def.event === "placement" && def.where?.mode) {
-                return teamModes.includes(def.where.mode);
-            }
-            return true;
-        });
-    }
+function getRandomQuestType(currentQuests: Set<string>, rerollingId?: string) {
+    const available = questHelpers.getAvailableQuestsForModes(server.modes, currentQuests, rerollingId);
 
     const source = available.length > 0 ? available : questTypes;
     return util.randomItem(source) ?? defaultQuestType;

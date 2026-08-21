@@ -14,7 +14,7 @@ import type { MeleeDef } from "../../../../shared/defs/gameObjects/meleeDefs.ts"
 import { PerkProperties } from "../../../../shared/defs/gameObjects/perkDefs.ts";
 import type { ThrowableDef } from "../../../../shared/defs/gameObjects/throwableDefs.ts";
 import { UnlockDefs } from "../../../../shared/defs/gameObjects/unlockDefs.ts";
-import { GameObjectDefs, MapObjectDefs } from "../../../../shared/defs/register.ts";
+import { GameObjectDefs } from "../../../../shared/defs/register.ts";
 import {
     type Action,
     type Anim,
@@ -124,6 +124,12 @@ export class PlayerBarn {
     nextMatchDataId = 1;
 
     nextKilledNumber = 0;
+
+    /**
+     * Assigned once at game end
+     */
+    factionsMvp?: Player = undefined;
+    sentMvpQuestUpdate = false;
 
     constructor(readonly game: Game) {
         this.bagSizes = util.mergeDeep(
@@ -286,6 +292,12 @@ export class PlayerBarn {
             }
         }
 
+        if (!this.sentMvpQuestUpdate && this.game.over) {
+            this.sentMvpQuestUpdate = true;
+            const mvp = this.factionsMvp;
+            mvp?.questManager.trackEvent("be_mvp", { role: mvp.role });
+        }
+
         if (this.game.isTeamMode || this.game.map.factionMode) {
             this.playerStatusTicker += dt;
         }
@@ -298,7 +310,7 @@ export class PlayerBarn {
                 player.emoteFromSlot(EmoteSlot.Win);
             }
 
-            if (this.game.over && !player.dead && !player.sentgameOverMsg) {
+            if (this.game.over && !player.dead && !player.sentGameOverMsg) {
                 player.addGameOverMsg();
             }
         }
@@ -1050,6 +1062,8 @@ export class Player extends BaseGameObject {
                 this.weaponManager.setWeapon(i, trueWeapon.type, trueWeapon.ammo);
             }
         }
+
+        this.questManager.trackEvent("promote", { role });
     }
 
     roleSelect(role: string): void {
@@ -1309,7 +1323,6 @@ export class Player extends BaseGameObject {
 
     damageTaken = 0;
     damageDealt = 0;
-    currentBuildingType = "";
     questManager = new QuestManager(this);
 
     // infinity since we aren't dead yet ;)
@@ -1672,6 +1685,9 @@ export class Player extends BaseGameObject {
                     this.invManager.take(this.actionItem as InventoryItem, 1);
                     this.questManager.trackEvent("item_used", {
                         itemType: this.actionItem,
+                        mode: this.game.teamMode,
+                        role: this.role,
+                        itemCategory: itemDef.type,
                     });
                 } else if (this.isReloading()) {
                     this.weaponManager.reload();
@@ -2199,13 +2215,6 @@ export class Player extends BaseGameObject {
             }
         }
 
-        // guh, works for the club, might need testing for other buildings idk
-        const parentStructureType = occupiedBuilding?.parentStructure
-            ? (MapObjectDefs.typeToDef(occupiedBuilding.parentStructure.type, "structure"))
-                .structureType
-            : undefined;
-        this.currentBuildingType = parentStructureType ?? occupiedBuilding?.type ?? "";
-
         // only dirty if healEffect changed from last tick to current tick (leaving or entering a heal region)
         if (oldHealEffect != this.healEffect) {
             this.setDirty();
@@ -2485,7 +2494,9 @@ export class Player extends BaseGameObject {
                 playerSource.damageDealt += finalDamage;
                 playerSource.questManager.trackEvent("damage", {
                     amount: finalDamage,
-                    weaponType: params.gameSourceType ?? "",
+                    weaponType: params.weaponSourceType ?? params.gameSourceType ?? "",
+                    mode: this.game.teamMode,
+                    role: playerSource.role,
                 });
             }
             this.lastDamagedBy = playerSource;
@@ -2506,12 +2517,12 @@ export class Player extends BaseGameObject {
         }
     }
 
-    sentgameOverMsg = false;
+    sentGameOverMsg = false;
     /**
      * adds gameover message to "this.msgsToSend" for the player and all their spectators
      */
     addGameOverMsg(): void {
-        if (this.sentgameOverMsg) return;
+        if (this.sentGameOverMsg) return;
 
         const winningTeamId = this.game.winningTeamId;
 
@@ -2525,7 +2536,7 @@ export class Player extends BaseGameObject {
             statsMsg.playerStats = this;
             this.client.sendMsg(net.MsgType.PlayerStats, statsMsg);
         } else {
-            this.sentgameOverMsg = true;
+            this.sentGameOverMsg = true;
 
             const gameOverMsg = new net.GameOverMsg();
 
@@ -2666,9 +2677,19 @@ export class Player extends BaseGameObject {
             if (killCreditSource !== this && killCreditSource.teamId !== this.teamId) {
                 killCreditSource.killedIds.push(this.matchDataId);
                 killCreditSource.kills++;
+
+                let buildingType: Set<string> = new Set();
+                const wantsBuilding = killCreditSource.questManager.hasQuestWithFilter("building");
+                if (wantsBuilding) {
+                    // if no quests are interested in filtering by building, then don't calculate them
+                    buildingType = this.getIntersectingBuildings();
+                }
+
                 killCreditSource.questManager.trackEvent("kill", {
-                    weaponType: params.gameSourceType ?? "",
-                    buildingType: killCreditSource.currentBuildingType,
+                    weaponType: params.weaponSourceType ?? params.gameSourceType ?? "",
+                    intersectingBuildings: [...buildingType],
+                    mode: this.game.teamMode,
+                    role: killCreditSource.role,
                 });
 
                 if (killCreditSource.isKillLeader) {
@@ -2984,6 +3005,67 @@ export class Player extends BaseGameObject {
         this.game.updateData();
 
         this.questManager.flushProgress();
+    }
+
+    getIntersectingBuildings(): Set<string> {
+        const objs = this.game.grid.intersectGameObject(this);
+        const buildings = new Set<Building>();
+
+        objLoop:
+        for (let i = 0; i < objs.length; i++) {
+            const obj = objs[i];
+            if (obj.__type !== ObjectType.Building) continue;
+            if (
+                this.layer < 2
+                && !util.sameLayer(obj.layer, this.layer)
+            ) continue;
+
+            for (let j = 0; j < obj.zoomRegions.length; j++) {
+                const zoomIn = obj.zoomRegions[j].zoomIn;
+                if (!zoomIn) continue;
+                if (coldet.test(zoomIn, this.collider)) {
+                    buildings.add(obj);
+                    continue objLoop;
+                }
+            }
+
+            for (let j = 0; j < obj.surfaces.length; j++) {
+                const colliders = obj.surfaces[j].colliders;
+                for (let k = 0; k < colliders.length; k++) {
+                    if (coldet.test(colliders[k], this.collider)) {
+                        buildings.add(obj);
+                        continue objLoop;
+                    }
+                }
+            }
+
+            if (obj.groundPatches !== undefined) {
+                for (let j = 0; j < obj.groundPatches.length; j++) {
+                    const groundPatch = obj.groundPatches[j];
+                    if (coldet.test(groundPatch.bound, this.collider)) {
+                        buildings.add(obj);
+                        continue objLoop;
+                    }
+                }
+            }
+        }
+
+        function withAllParents(building: Building): string[] {
+            const hierarchy: string[] = [];
+            let current: Building | undefined = building;
+            do {
+                hierarchy.push(current.type);
+                current = current.parentBuilding;
+            } while (current !== undefined);
+
+            if (building.parentStructure?.parentBuilding !== undefined) {
+                hierarchy.push(...withAllParents(building.parentStructure.parentBuilding));
+            }
+
+            return hierarchy;
+        }
+
+        return new Set([...buildings].flatMap(withAllParents));
     }
 
     getAliveKiller(): Player | undefined {

@@ -84,7 +84,7 @@ const structures = mapObjects.filter((type) => {
 
 describe.for(structures)("Structure %s", ([, def]) => {
     test.for(def.layers)("Layer %$", (layer) => {
-        expect(layer.type).toBeValidMapObj("building");
+        expect(layer.type).toBeValidMapObj(["building"]);
     });
 });
 

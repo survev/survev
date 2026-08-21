@@ -30,6 +30,9 @@ export type DeepPartial<T> = T extends object ? {
     }
     : T;
 
+export type UnionToIntersection<U> = (U extends unknown ? (x: U) => void : never) extends ((x: infer I) => void) ? I
+    : never;
+
 export const util = {
     //
     // Game objects can belong to the following layers:

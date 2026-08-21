@@ -204,6 +204,7 @@ export class Pass {
             quest.elems.desc.html(title);
             quest.elems.cur.html(Math.round(quest.current));
             quest.elems.xp.html(`${questDef.xp} XP`);
+            quest.elems.xp.attr("data-xp", questDef.xp);
             quest.elems.barFill.css({
                 width: `${pct}%`,
             });
