@@ -246,7 +246,7 @@ const mapDef: PartialMapDef = {
                 },
                 chest_03: { odds: 0.5 },
                 crate_19: 12,
-                stone_04: 6,
+                stone_04: { small: 6, large: 8 },
                 tree_02: 6,
                 tree_07: 1100,
                 tree_08: 1100,
