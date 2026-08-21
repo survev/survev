@@ -297,6 +297,10 @@ export class PlayerBarn {
             if (!player.dead && sendWinEmotes) {
                 player.emoteFromSlot(EmoteSlot.Win);
             }
+
+            if (this.game.over && !player.dead && !player.sentgameOverMsg) {
+                player.addGameOverMsg();
+            }
         }
 
         // doing this after updates ensures that gameover msgs sent are always accurate
@@ -2495,10 +2499,15 @@ export class Player extends BaseGameObject {
         }
     }
 
+    sentgameOverMsg = false;
     /**
      * adds gameover message to "this.msgsToSend" for the player and all their spectators
      */
-    addGameOverMsg(winningTeamId: number = 0): void {
+    addGameOverMsg(): void {
+        if (this.sentgameOverMsg) return;
+
+        const winningTeamId = this.game.winningTeamId;
+
         this.questManager.flushProgress(winningTeamId);
 
         const aliveCount = this.game.modeManager.aliveCount();
@@ -2509,6 +2518,8 @@ export class Player extends BaseGameObject {
             statsMsg.playerStats = this;
             this.client.sendMsg(net.MsgType.PlayerStats, statsMsg);
         } else {
+            this.sentgameOverMsg = true;
+
             const gameOverMsg = new net.GameOverMsg();
 
             const statsArr: net.PlayerStatsMsg["playerStats"][] = this.game.modeManager.getGameoverPlayers(this);

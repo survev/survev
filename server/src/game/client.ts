@@ -383,7 +383,7 @@ export class Client {
             let newPlayerToSpectate: Player | undefined = undefined;
 
             // switch to a new spectator after 2 seconds if the player we are spectating has died
-            if (this.spectating.dead) {
+            if (this.spectating.dead && !this.game.over) {
                 this.spectateNewPlayerTicker += dt;
                 if (this.spectateNewPlayerTicker > 2) {
                     newPlayerToSpectate = this.getNewPlayerToSpectate();

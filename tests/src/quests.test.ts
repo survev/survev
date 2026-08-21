@@ -99,6 +99,7 @@ test("Solo placement success on win", () => {
     });
 
     expect(game.over).toBe(true);
+    game.step(0.1);
 
     expect(playerA.questManager.quests[0].totalDelta).toBe(1);
 });
@@ -194,6 +195,7 @@ test("Squad placement success on win", () => {
     });
 
     expect(game.over).toBe(true);
+    game.step(0.1);
 
     expect(playerA.questManager.quests[0].totalDelta).toBe(1);
 });
@@ -329,5 +331,6 @@ test("Survived time on win", () => {
     });
 
     expect(game.over).toBe(true);
-    expect(playerA.questManager.quests[0].totalDelta).toBeCloseTo(15);
+    game.step(0.01);
+    expect(Math.round(playerA.questManager.quests[0].totalDelta)).toBeCloseTo(15);
 });

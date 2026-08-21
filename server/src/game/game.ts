@@ -56,6 +56,7 @@ export class Game {
     started = false;
     stopped = false;
     over = false;
+    winningTeamId = 0;
     startedTime = 0;
     stopTicker = 0;
     timeRunning = 0;
@@ -363,7 +364,7 @@ export class Game {
             // stop game after 1.8s
             this.stopTicker = 1.8;
 
-            this.modeManager.sendGameOverMsgs();
+            this.winningTeamId = this.modeManager.getWinningTeamId();
             this.updateData();
         }
     }
