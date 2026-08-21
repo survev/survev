@@ -269,11 +269,20 @@ export const PassRouter = new Hono<Context>()
 
             const now = Date.now();
             const expired = quest.nextRefreshAt - now < 0;
-            const refreshEnabled = (!quest.rerolled && !quest.complete) || expired;
+
+            const questDef = QuestDefs[quest.questType];
+            let badMap = false;
+            if (questDef.availableOn !== undefined) {
+                const serverMapIds = server.modes.filter(m => m.enabled).map(m => MapDefs[m.mapName].mapId);
+
+                badMap = !hasCompatibleMap(serverMapIds, questDef.availableOn);
+            }
+
+            const refreshEnabled = (!quest.rerolled && !quest.complete) || expired || badMap;
             if (!refreshEnabled) {
                 return false;
             }
-            await rerollSlot(user.id, idx, now, !expired, quests, transaction);
+            await rerollSlot(user.id, idx, now, !expired && !badMap, quests, transaction);
             return true;
         });
 
