@@ -688,6 +688,14 @@ export class Obstacle extends BaseGameObject {
                 }
             }
         }
+
+        if (def.isDecalAnchor && this.parentBuilding) {
+            for (const obj of this.parentBuilding.childObjects) {
+                if (obj.__type === ObjectType.Decal && v2.eq(obj.pos, this.pos, 0.01)) {
+                    obj.lifeTime = 0;
+                }
+            }
+        }
     }
 
     interact(player?: Player, auto = false): void {
