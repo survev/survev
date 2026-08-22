@@ -997,6 +997,9 @@ export class Player extends BaseGameObject {
 
                 this.helmet = roleHelmet;
                 this.hasRoleHelmet = true;
+            } else if (this.hasRoleHelmet) {
+                this.helmet = "";
+                this.hasRoleHelmet = false;
             }
 
             if (roleDef.defaultItems.chest) {
@@ -1071,6 +1074,10 @@ export class Player extends BaseGameObject {
     removeRole(): void {
         if (!this.role) return;
         this.role = "";
+        if (this.hasRoleHelmet) {
+            this.hasRoleHelmet = false;
+            this.helmet = "";
+        }
 
         this.mapIndicator?.kill();
         for (let i = 0; i < this.perks.length; i++) {
@@ -4059,7 +4066,6 @@ export class Player extends BaseGameObject {
 
         if (armorDef.type == "helmet" && armorDef.role && this.role == armorDef.role) {
             this.removeRole();
-            this.hasRoleHelmet = false;
         }
 
         if (armorDef.type == "helmet" && armorDef.perk && this.hasPerk(armorDef.perk)) {
