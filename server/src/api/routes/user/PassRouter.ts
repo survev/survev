@@ -325,8 +325,12 @@ function getRandomQuestType(excluded: Set<string>, rerolled: boolean) {
         });
         available = available.filter(type => {
             const def = QuestDefs[type];
-            if (def.event === "placement" && def.where?.mode) {
-                return teamModes.includes(def.where.mode);
+            if (def.event === "placement") {
+                const modeFilter = def.filters?.find(f => f.type === "team_mode");
+
+                if (modeFilter !== undefined) {
+                    return teamModes.includes(modeFilter.mode);
+                }
             }
             return true;
         });

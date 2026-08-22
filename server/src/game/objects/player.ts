@@ -1673,7 +1673,11 @@ export class Player extends BaseGameObject {
                     }
                     this.invManager.take(this.actionItem as InventoryItem, 1);
                     this.questManager.trackEvent("item_used", {
+                        buildingType: this.currentBuildingType,
                         itemType: this.actionItem,
+                        mode: this.game.teamMode,
+                        role: this.role,
+                        itemCategory: itemDef.type,
                     });
                 } else if (this.isReloading()) {
                     this.weaponManager.reload();
@@ -2488,7 +2492,9 @@ export class Player extends BaseGameObject {
                 playerSource.questManager.trackEvent("damage", {
                     amount: finalDamage,
                     weaponType: params.gameSourceType ?? "",
-                    sourceRole: this.role,
+                    buildingType: this.currentBuildingType,
+                    mode: this.game.teamMode,
+                    role: this.role,
                 });
             }
             this.lastDamagedBy = playerSource;
@@ -2672,7 +2678,8 @@ export class Player extends BaseGameObject {
                 killCreditSource.questManager.trackEvent("kill", {
                     weaponType: params.gameSourceType ?? "",
                     buildingType: killCreditSource.currentBuildingType,
-                    killerRole: this.role,
+                    mode: this.game.teamMode,
+                    role: this.role,
                 });
 
                 if (killCreditSource.isKillLeader) {
