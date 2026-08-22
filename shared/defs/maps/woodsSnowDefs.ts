@@ -45,9 +45,11 @@ const mapDef: PartialMapDef = {
             { name: "mirv", count: 2, weight: 0.75 },
             { name: "smoke", count: 1, weight: 0.75 },
             { name: "snowball", count: 5, weight: 0.5 },
+            { name: "strobe", count: 1, weight: 0.2 },
         ],
         tier_airdrop_throwables: [
             { name: "mirv", count: 2, weight: 1 },
+            { name: "strobe", count: 1, weight: 0.5 },
             { name: "snowball", count: 20, weight: 0.25 },
         ],
         tier_airdrop_melee: [
