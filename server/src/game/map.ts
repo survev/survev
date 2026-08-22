@@ -1920,7 +1920,7 @@ export class GameMap {
         return obstacle;
     }
 
-    genOutfitObstacle(type: string, player: Player) {
+    genOutfitObstacle(type: string, player: Player, scale?: number) {
         const def = MapObjectDefs.typeToDef(type, "obstacle");
 
         const obstacle = new Obstacle(
@@ -1929,7 +1929,7 @@ export class GameMap {
             type,
             player.layer,
             0,
-            def.scale.createMax,
+            scale ?? def.scale.createMax,
             undefined,
             undefined,
             true,

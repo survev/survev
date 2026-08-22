@@ -745,7 +745,7 @@ export class Player extends BaseGameObject {
         this.obstacleOutfit = undefined;
 
         if (def.obstacleType) {
-            this.obstacleOutfit = this.game.map.genOutfitObstacle(def.obstacleType, this);
+            this.obstacleOutfit = this.game.map.genOutfitObstacle(def.obstacleType, this, def.baseScale);
         }
         this.setDirty();
     }
