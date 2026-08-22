@@ -234,6 +234,26 @@ const SkinDefs: Record<string, OutfitDef> = {
         rarity: Rarity.Mythic,
         lore: "The limited edition print.",
     }),
+    outfitMaintainer: defineOutfitSkin("outfitBase", {
+        name: "Maintainer Swag",
+        noDropOnDeath: true,
+        skinImg: {
+            baseTint: 0x926ee4,
+            baseSprite: "player-base-outfitDC.img",
+            handTint: 0x926ee4,
+            handSprite: "player-hands-02.img",
+            footTint: 0x926ee4,
+            footSprite: "player-feet-02.img",
+            backpackTint: 0x624a99,
+            backpackSprite: "player-circle-base-02.img",
+        },
+        lootImg: {
+            sprite: "loot-shirt-outfitDC.img",
+            tint: 0x926ee4,
+        },
+        rarity: Rarity.Mythic,
+        lore: "// TODO: Come up with something funny",
+    }),
     outfitGD: defineOutfitSkin("outfitBase", {
         name: "Game Designr",
         noDropOnDeath: true,
