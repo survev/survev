@@ -1,1 +1,24 @@
-<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="160" height="128" viewBox="0 0 42.333 33.867"><defs><pattern xlink:href="#a" id="c" patternTransform="rotate(45 -382.625 182.436) scale(.34612)"/><clipPath id="b"><rect width="42.333" height="33.867" x="-4.233" y="267.367" rx="4.233" ry="4.233" fill="#9b4c00" stroke-width="3.098"/></clipPath><pattern patternUnits="userSpaceOnUse" width="159.999" height="159.999" patternTransform="translate(19.05 305.467) scale(.26458)" id="a"><path fill="none" stroke-width="3.78" d="M0 0h159.999v159.999H0z"/><path d="M0 0h80v80H0zm80 80h79.999v79.999h-80z" fill="#81431e"/><path d="M80 0h79.999v80h-80zM0 80h80v79.999H0z" fill="#572b11"/></pattern></defs><g transform="translate(4.233 -267.367)" stroke="#191919"><rect ry="4.233" rx="4.233" y="267.367" x="-4.233" height="33.867" width="42.333" clip-path="url(#b)" fill="url(#c)" stroke-width="3.175"/><g transform="translate(40.746 -4.233)"><circle r="5.821" cy="282.712" cx="-14.817" fill="#4d2600" stroke-width="1.587"/><circle cx="-13.229" cy="282.712" r="1.587" fill="#ff7800" stroke-width=".794"/><path d="M-17.462 280.067s-.864 2.7-.53 3.704c.28.836 2.646 2.646 2.646 2.646s-1.894-3.59-2.116-6.35z" fill="#f7ff00" stroke-width=".794"/></g></g></svg>
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg width="160" height="128" viewBox="0 0 42.333 33.867" version="1.1" id="svg5" sodipodi:docname="map-table-01.svg" inkscape:version="1.4.4 (dcaf3e7d9e, 2026-05-05)" xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape" xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns="http://www.w3.org/2000/svg" xmlns:svg="http://www.w3.org/2000/svg">
+  <sodipodi:namedview id="namedview5" pagecolor="#ffffff" bordercolor="#000000" borderopacity="0.25" inkscape:showpageshadow="2" inkscape:pageopacity="0.0" inkscape:pagecheckerboard="0" inkscape:deskcolor="#d1d1d1" inkscape:zoom="4.3586504" inkscape:cx="64.469497" inkscape:cy="74.449651" inkscape:current-layer="g5" />
+  <defs id="defs3">
+    <pattern xlink:href="#a" id="c" patternTransform="rotate(45 -382.625 182.436) scale(.34612)" />
+    <clipPath id="b">
+      <rect width="42.333" height="33.867" x="-4.233" y="267.367" rx="4.233" ry="4.233" fill="#9b4c00" stroke-width="3.098" id="rect1" />
+    </clipPath>
+    <pattern patternUnits="userSpaceOnUse" width="159.999" height="159.999" patternTransform="translate(19.05 305.467) scale(.26458)" id="a">
+      <path fill="none" stroke-width="3.78" d="M0 0h159.999v159.999H0z" id="path1" />
+      <path d="M0 0h80v80H0zm80 80h79.999v79.999h-80z" fill="#81431e" id="path2" />
+      <path d="M80 0h79.999v80h-80zM0 80h80v79.999H0z" fill="#572b11" id="path3" />
+    </pattern>
+  </defs>
+  <g transform="translate(4.233 -267.367)" stroke="#191919" id="g5">
+    <rect style="fill:#572b11;stroke:none;stroke-width:1.63302;stroke-linecap:round;stroke-linejoin:round;fill-opacity:1" id="rect5" width="33.867001" height="33.33783" x="-2.8991698e-07" y="267.63159" rx="0" ry="0" />
+    <rect ry="4.233" rx="4.233" y="267.367" x="-4.233" height="33.867" width="42.333" clip-path="url(#b)" fill="url(#c)" stroke-width="3.175" id="rect3" />
+    <g transform="translate(40.746 -4.233)" id="g4">
+      <circle r="5.821" cy="282.712" cx="-14.817" fill="#4d2600" stroke-width="1.587" id="circle3" />
+      <circle cx="-13.229" cy="282.712" r="1.587" fill="#ff7800" stroke-width=".794" id="circle4" />
+      <path d="M-17.462 280.067s-.864 2.7-.53 3.704c.28.836 2.646 2.646 2.646 2.646s-1.894-3.59-2.116-6.35z" fill="#f7ff00" stroke-width=".794" id="path4" />
+    </g>
+  </g>
+</svg>
