@@ -6,7 +6,8 @@ type QuestEvent =
     | "survived"
     | "placement"
     | "item_used"
-    | "destruction";
+    | "destruction"
+    | "promote";
 
 interface QuestWhere {
     mode?: TeamMode;
@@ -17,6 +18,7 @@ interface QuestWhere {
     itemType?: string;
     itemClass?: "heal" | "boost";
     obstacleType?: string;
+    role?: string | string[];
 }
 
 export enum QuestDifficulty {

@@ -1050,6 +1050,8 @@ export class Player extends BaseGameObject {
                 this.weaponManager.setWeapon(i, trueWeapon.type, trueWeapon.ammo);
             }
         }
+
+        this.questManager.trackEvent("promote", { role });
     }
 
     roleSelect(role: string): void {

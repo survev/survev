@@ -121,6 +121,7 @@ export interface QuestEventPayloads {
     placement: { rank: number; mode: TeamMode };
     item_used: { itemType: string };
     destruction: { objectType: string };
+    promote: { role: string };
 }
 
 export function questDelta<E extends keyof QuestEventPayloads>(
@@ -233,6 +234,17 @@ export function questDelta<E extends keyof QuestEventPayloads>(
                 break;
             }
 
+            break;
+        }
+
+        case "promote": {
+            const p = payload as QuestEventPayloads["promote"];
+
+            if (where?.role !== p.role) {
+                return 0;
+            }
+
+            value = 1;
             break;
         }
     }
