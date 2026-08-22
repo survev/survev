@@ -22,7 +22,7 @@ export interface StructureDef {
         lootOnly?: boolean;
     }>;
     mask: AABB[];
-    structureType?: string;
+    category?: string;
     interiorSound?: {
         sound: string;
         soundAlt: string;
@@ -597,7 +597,7 @@ export const StructureDefs: Record<string, StructureDef> = {
     },
     club_structure_01: {
         type: "structure",
-        structureType: "club",
+        category: "club",
         terrain: {
             grass: true,
             beach: false,

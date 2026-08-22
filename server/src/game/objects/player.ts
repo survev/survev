@@ -2204,7 +2204,7 @@ export class Player extends BaseGameObject {
         // guh, works for the club, might need testing for other buildings idk
         const parentStructureType = occupiedBuilding?.parentStructure
             ? (MapObjectDefs.typeToDef(occupiedBuilding.parentStructure.type, "structure"))
-                .structureType
+                .category
             : undefined;
         this.currentBuildingType = parentStructureType ?? occupiedBuilding?.type ?? "";
 
