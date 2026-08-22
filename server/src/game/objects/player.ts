@@ -2486,6 +2486,7 @@ export class Player extends BaseGameObject {
                 playerSource.questManager.trackEvent("damage", {
                     amount: finalDamage,
                     weaponType: params.gameSourceType ?? "",
+                    sourceRole: this.role,
                 });
             }
             this.lastDamagedBy = playerSource;
@@ -2669,6 +2670,7 @@ export class Player extends BaseGameObject {
                 killCreditSource.questManager.trackEvent("kill", {
                     weaponType: params.gameSourceType ?? "",
                     buildingType: killCreditSource.currentBuildingType,
+                    killerRole: this.role,
                 });
 
                 if (killCreditSource.isKillLeader) {

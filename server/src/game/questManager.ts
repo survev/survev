@@ -115,8 +115,8 @@ export class QuestManager {
 }
 
 export interface QuestEventPayloads {
-    kill: { weaponType: string; buildingType: string };
-    damage: { amount: number; weaponType: string };
+    kill: { weaponType: string; buildingType: string; killerRole: string };
+    damage: { amount: number; weaponType: string; sourceRole: string };
     survived: { seconds: number };
     placement: { rank: number; mode: TeamMode };
     item_used: { itemType: string };
@@ -141,6 +141,16 @@ export function questDelta<E extends keyof QuestEventPayloads>(
             if (where?.buildingType && p.buildingType !== where.buildingType) {
                 return 0;
             }
+
+            if (where?.role !== undefined) {
+                if (
+                    Array.isArray(where.role)
+                        ? !where.role.includes(p.killerRole)
+                        : where.role !== p.killerRole
+                ) {
+                    return 0;
+                }
+            }
             value = 1;
             break;
         }
@@ -156,6 +166,16 @@ export function questDelta<E extends keyof QuestEventPayloads>(
 
             if (where?.weaponClass && weapDef?.type !== where.weaponClass) {
                 return 0;
+            }
+
+            if (where?.role !== undefined) {
+                if (
+                    Array.isArray(where.role)
+                        ? !where.role.includes(p.sourceRole)
+                        : where.role !== p.sourceRole
+                ) {
+                    return 0;
+                }
             }
 
             value = p.amount;
