@@ -248,6 +248,7 @@ const mapDef: PartialMapDef = {
                 bunker_structure_03: 1,
                 bunker_structure_07: 1,
                 mil_crate_02: { odds: 0.25 },
+                tree_02h: { small: 6, large: 8 },
                 tree_05: 72,
                 tree_07: 700,
                 tree_08: 200,
