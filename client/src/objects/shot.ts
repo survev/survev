@@ -1,5 +1,5 @@
 import { GameObjectDefs } from "../../../shared/defs/register.ts";
-import { GameConfig } from "../../../shared/gameConfig.ts";
+import { FactionTeam, GameConfig } from "../../../shared/gameConfig.ts";
 import type { Bullet } from "../../../shared/net/updateMsg.ts";
 import { v2, type Vec2 } from "../../../shared/utils/v2.ts";
 import type { AudioManager } from "../audioManager.ts";
@@ -117,7 +117,7 @@ export class ShotBarn {
                     // Play shot sound
                     let shotSound = weaponDef.sound.shoot;
                     if (weaponDef.sound.shootTeam) {
-                        const teamId = playerBarn.getPlayerInfo(shot.playerId).teamId;
+                        const teamId = playerBarn.getPlayerInfo(shot.playerId).teamId as FactionTeam;
                         if (weaponDef.sound.shootTeam[teamId]) {
                             shotSound = weaponDef.sound.shootTeam[teamId];
                         }

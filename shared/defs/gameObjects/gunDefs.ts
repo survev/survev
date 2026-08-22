@@ -1,3 +1,4 @@
+import { FactionTeam } from "../../gameConfig.ts";
 import { type DeepPartial, util } from "../../utils/util.ts";
 import type { Vec2 } from "../../utils/v2.ts";
 
@@ -69,7 +70,7 @@ export interface GunDef {
         cycle?: string;
         pull?: string;
         shootLast?: string;
-        shootTeam?: Record<string, string>;
+        shootTeam?: Record<FactionTeam, string>;
         shootAlt?: string;
         fallOff?: number;
         reloadAlt?: string;
@@ -3642,7 +3643,7 @@ export const BaseDefs: Record<string, GunDef> = {
         },
         sound: {
             shoot: "bugle_01",
-            shootTeam: { 1: "bugle_01", 2: "bugle_02" },
+            shootTeam: { [FactionTeam.Red]: "bugle_01", [FactionTeam.Blue]: "bugle_02" },
             shootAlt: "bugle_03",
             reload: "",
             pickup: "stow_weapon_01",
