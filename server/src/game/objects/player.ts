@@ -979,7 +979,7 @@ export class Player extends BaseGameObject {
                 newOutfit = newOutfit(clampedTeamId);
             }
             if (newOutfit) {
-                if (!oldOutfit.noDropOnDeath && !oldOutfit.noDrop) {
+                if (!oldOutfit.noDropOnDeath && !oldOutfit.noDrop && this.outfit !== this.loadout.outfit) {
                     this.dropLoot(this.outfit);
                 }
                 this.setOutfit(newOutfit);
