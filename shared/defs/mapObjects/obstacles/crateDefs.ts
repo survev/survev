@@ -12,7 +12,7 @@ import type { ObstacleDef } from "./obstacleDefs.ts";
 function createCrate(overrides: DeepPartial<ObstacleDef>): ObstacleDef {
     const baseDef: ObstacleDef = {
         type: "obstacle",
-        obstacleType: "crate",
+        category: "crate",
         scale: { createMin: 1, createMax: 1, destroy: 0.5 },
         collision: collider.createAabbExtents(v2.create(0, 0), v2.create(2.25, 2.25)),
         height: 0.5,
@@ -46,7 +46,7 @@ function createCrate(overrides: DeepPartial<ObstacleDef>): ObstacleDef {
 function createCase(overrides: DeepPartial<ObstacleDef>): ObstacleDef {
     const baseDef: ObstacleDef = {
         type: "obstacle",
-        obstacleType: "crate",
+        category: "crate",
         scale: { createMin: 1, createMax: 1, destroy: 0.8 },
         collision: collider.createAabbExtents(v2.create(0, 0), v2.create(2.25, 1.6)),
         height: 0.5,
@@ -80,7 +80,7 @@ function createCase(overrides: DeepPartial<ObstacleDef>): ObstacleDef {
 function createChest(overrides: DeepPartial<ObstacleDef>): ObstacleDef {
     const baseDef: ObstacleDef = {
         type: "obstacle",
-        obstacleType: "crate",
+        category: "crate",
         scale: { createMin: 1, createMax: 1, destroy: 0.75 },
         collision: collider.createAabbExtents(v2.create(0, 0), v2.create(2.25, 1.6)),
         height: 0.5,
@@ -124,7 +124,7 @@ function createRiverChest(overrides: DeepPartial<ObstacleDef>): ObstacleDef {
 
 function createAirdrop(overrides: DeepPartial<ObstacleDef>): ObstacleDef {
     const baseDef: DeepPartial<ObstacleDef> = {
-        obstacleType: "airdrop",
+        category: "airdrop",
         dropCollision: collider.createAabbExtents(v2.create(0, 0), v2.create(2.5, 2.5)),
         collision: collider.createAabbExtents(v2.create(0, 0), v2.create(2.5, 2.5)),
         airdropCrate: true,
@@ -159,7 +159,7 @@ function createAirdrop(overrides: DeepPartial<ObstacleDef>): ObstacleDef {
 function createClassCrate(overrides: DeepPartial<ObstacleDef>): ObstacleDef {
     const baseDef: ObstacleDef = {
         type: "obstacle",
-        obstacleType: "crate",
+        category: "crate",
         scale: { createMin: 1, createMax: 1, destroy: 0.75 },
         collision: collider.createCircle(v2.create(0, 0), 2.1),
         height: 0.5,
@@ -1185,7 +1185,7 @@ export const CrateDefs: Record<string, ObstacleDef> = {
         explodeParticle: "airdropCrate02x",
     }),
     class_shell_01: createAirdrop({
-        obstacleType: undefined,
+        category: undefined,
         terrain: {
             minDistanceFromSameType: 32,
         },

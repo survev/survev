@@ -222,15 +222,15 @@ export function questDelta<E extends keyof QuestEventPayloads>(
 
         case "destruction": {
             const p = payload as QuestEventPayloads["destruction"];
-            const obstacleType = where?.obstacleType;
+            const obstacleCategory = where?.obstacleCategory;
 
-            if (!obstacleType) {
+            if (!obstacleCategory) {
                 return 0;
             }
 
             const objectDef = MapObjectDefs.typeToDefSafe(p.objectType);
-            if (objectDef?.type === "obstacle" && objectDef.obstacleType) {
-                value = objectDef.obstacleType === obstacleType ? 1 : 0;
+            if (objectDef?.type === "obstacle" && objectDef.category) {
+                value = objectDef.category === obstacleCategory ? 1 : 0;
                 break;
             }
 

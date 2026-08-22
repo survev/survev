@@ -17,7 +17,7 @@ interface QuestWhere {
     weaponClass?: "melee" | "throwable";
     itemType?: string;
     itemClass?: "heal" | "boost";
-    obstacleType?: string;
+    obstacleCategory?: string;
     role?: string | string[];
 }
 
@@ -194,7 +194,7 @@ export const QuestDefs: Record<string, QuestDef> = {
         target: 25,
         xp: 30,
         where: {
-            obstacleType: "crate",
+            obstacleCategory: "crate",
         },
     },
     quest_toilets: {
@@ -203,7 +203,7 @@ export const QuestDefs: Record<string, QuestDef> = {
         target: 5,
         xp: 30,
         where: {
-            obstacleType: "toilet",
+            obstacleCategory: "toilet",
         },
     },
     quest_furniture: {
@@ -212,7 +212,7 @@ export const QuestDefs: Record<string, QuestDef> = {
         target: 10,
         xp: 30,
         where: {
-            obstacleType: "furniture",
+            obstacleCategory: "furniture",
         },
     },
     quest_barrels: {
@@ -221,7 +221,7 @@ export const QuestDefs: Record<string, QuestDef> = {
         target: 10,
         xp: 30,
         where: {
-            obstacleType: "barrel",
+            obstacleCategory: "barrel",
         },
     },
     quest_lockers: {
@@ -230,7 +230,7 @@ export const QuestDefs: Record<string, QuestDef> = {
         target: 10,
         xp: 30,
         where: {
-            obstacleType: "locker",
+            obstacleCategory: "locker",
         },
     },
     quest_pots: {
@@ -239,7 +239,7 @@ export const QuestDefs: Record<string, QuestDef> = {
         target: 8,
         xp: 30,
         where: {
-            obstacleType: "pot",
+            obstacleCategory: "pot",
         },
     },
     quest_vending: {
@@ -248,7 +248,7 @@ export const QuestDefs: Record<string, QuestDef> = {
         target: 1,
         xp: 40,
         where: {
-            obstacleType: "vending",
+            obstacleCategory: "vending",
         },
     },
     quest_club_kills: {

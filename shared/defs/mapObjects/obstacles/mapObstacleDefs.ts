@@ -11,7 +11,7 @@ import type { ObstacleDef } from "./obstacleDefs.ts";
 function createBarrel(overrides: DeepPartial<ObstacleDef>): ObstacleDef {
     const baseDef: ObstacleDef = {
         type: "obstacle",
-        obstacleType: "barrel",
+        category: "barrel",
         scale: { createMin: 1, createMax: 1, destroy: 0.6 },
         collision: collider.createCircle(v2.create(0, 0), 1.75),
         height: 0.5,

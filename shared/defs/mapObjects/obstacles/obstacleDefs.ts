@@ -11,7 +11,7 @@ import { MapObstacleDefs } from "./mapObstacleDefs.ts";
 
 export interface ObstacleDef {
     readonly type: "obstacle";
-    obstacleType?: string;
+    category?: string;
     scale: {
         createMin: number;
         createMax: number;
