@@ -125,6 +125,11 @@ export class PlayerBarn {
 
     nextKilledNumber = 0;
 
+    /**
+     * Assigned once at game end
+     */
+    factionsSpecialPlayers: [redLeader: Player, blueLeader: Player, mvp: Player] | [] = [];
+
     constructor(readonly game: Game) {
         this.bagSizes = util.mergeDeep(
             {},
