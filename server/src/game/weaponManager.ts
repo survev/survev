@@ -830,6 +830,10 @@ export class WeaponManager {
             distanceMult *= PerkProperties.high_velocity.distanceMult;
         }
 
+        if (this.player.hasPerk("bonus_assault")) {
+            speedMult *= PerkProperties.bonus_assault.speedMult;
+        }
+
         const bulletCount = itemDef.bulletCount;
         const jitter = itemDef.jitter ?? 0.25;
 
