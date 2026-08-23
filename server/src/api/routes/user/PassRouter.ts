@@ -1,7 +1,7 @@
 import { and, eq, inArray } from "drizzle-orm";
 import { Hono } from "hono";
 import z from "zod";
-import { exclusivityGroups, QuestDefs, QuestDifficulty } from "../../../../../shared/defs/gameObjects/questDefs.ts";
+import { exclusivityGroups, QuestDefs, QuestDifficulty, type MapFilter } from "../../../../../shared/defs/gameObjects/questDefs.ts";
 import { MapDefs } from "../../../../../shared/defs/mapDefs.ts";
 import { MapId } from "../../../../../shared/gameConfig.ts";
 import { type GetPassResponse } from "../../../../../shared/types/user.ts";
@@ -271,12 +271,8 @@ export const PassRouter = new Hono<Context>()
             const expired = quest.nextRefreshAt - now < 0;
 
             const questDef = QuestDefs[quest.questType];
-            let badMap = false;
-            if (questDef.availableOn !== undefined) {
-                const serverMapIds = server.modes.filter(m => m.enabled).map(m => MapDefs[m.mapName].mapId);
-
-                badMap = !hasCompatibleMap(serverMapIds, questDef.availableOn);
-            }
+            const serverMapIds = server.modes.filter(m => m.enabled).map(m => MapDefs[m.mapName].mapId);
+            const badMap = !satisfiesMapFilter(serverMapIds, questDef);
 
             const refreshEnabled = (!quest.rerolled && !quest.complete) || expired || badMap;
             if (!refreshEnabled) {
@@ -329,8 +325,8 @@ function getRandomQuestType(currentQuests: Set<string>, rerolled: boolean) {
     let available = questTypes.filter((questType) => {
         if (currentQuests.has(questType)) return false;
 
-        const availableOn = QuestDefs[questType].availableOn;
-        if (availableOn !== undefined && !hasCompatibleMap(serverMapIds, availableOn)) {
+        const questDef = QuestDefs[questType];
+        if (!satisfiesMapFilter(serverMapIds, questDef)) {
             return false;
         }
 
@@ -367,7 +363,15 @@ function getRandomQuestType(currentQuests: Set<string>, rerolled: boolean) {
     return util.randomItem(source) ?? defaultQuestType;
 }
 
-function hasCompatibleMap(serverMapIds: MapId[], available: MapId | MapId[]): boolean {
+function satisfiesMapFilter(serverMapIds: MapId[], mapFilter: MapFilter): boolean {
+    if (mapFilter.mapFilterType === undefined) {
+        return true;
+    }
+
+    return (mapFilter.mapFilterType === "only_on") === hasMapMatch(serverMapIds, mapFilter.maps);
+}
+
+function hasMapMatch(serverMapIds: MapId[], available: MapId | MapId[]): boolean {
     if (Array.isArray(available)) {
         return serverMapIds.some(mapId => available.includes(mapId));
     }

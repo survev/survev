@@ -1,4 +1,4 @@
-import { type MapId, TeamMode } from "../../gameConfig.ts";
+import { MapId, TeamMode } from "../../gameConfig.ts";
 
 export type QuestEvent =
     | "kill"
@@ -93,6 +93,16 @@ export enum QuestDifficulty {
     Hard,
 }
 
+export type MapFilter = {
+    mapFilterType?: undefined;
+} | {
+    mapFilterType: "only_on";
+    maps: MapId | MapId[];
+} | {
+    mapFilterType: "all_except";
+    maps: MapId | MapId[];
+};
+
 type QuestDefForEvent<E extends QuestEvent> = {
     readonly type: "quest";
     event: E;
@@ -105,8 +115,7 @@ type QuestDefForEvent<E extends QuestEvent> = {
      * @default {QuestDifficulty.Normal}
      */
     difficulty?: QuestDifficulty;
-    availableOn?: MapId | MapId[];
-};
+} & MapFilter;
 
 export type QuestDef = { [E in QuestEvent]: QuestDefForEvent<E> }[QuestEvent];
 
