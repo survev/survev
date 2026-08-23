@@ -983,7 +983,7 @@ const BaseDefs: Record<string, MeleeDef> = {
         autoAttack: false,
         switchDelay: 0.25,
         damage: 40,
-        obstacleDamage: 1,
+        obstacleDamage: 1.3,
         noPotatoSwap: true,
         attack: {
             offset: {
@@ -992,7 +992,7 @@ const BaseDefs: Record<string, MeleeDef> = {
             },
             rad: 1.5,
             damageTimes: [0.12],
-            cooldownTime: 0.35,
+            cooldownTime: 0.3,
         },
         speed: {
             equip: 1,

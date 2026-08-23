@@ -285,3 +285,9 @@ Turkey Cache Changes (2025/11/01):
 ~ Tier Saloon: Added tier_airdrop_crimson (weight of 0.22).
 ~ Adjusted desert airdrops (added airdrop_crate_05 with weight 1, increased airdrop_crate_01 from 10 -> 12)
 + Tier Perks (desert): Added amped_explosives, explosive (weights of 1 and 1).
+
+0.3.13 (Cobalt) (2026/08/23):
++ Medic Common: Added Bandages (weight of 0.4).
+~ Medic Common: Adjusted Medkit weight (1 -> 0.6).
+~ Hollow-Points now speeds up bullet velocity by 10%.
+~ Spade now deals 1.3x obstacle damage (from 1x) and has 0.3s attack delay (from 0.35).

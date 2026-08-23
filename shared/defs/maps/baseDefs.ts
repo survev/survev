@@ -527,6 +527,10 @@ export const Main: MapDef = {
             { name: "frag", count: 3, weight: 1 },
             { name: "mirv", count: 2, weight: 1 },
         ],
+        tier_health_healer: [
+            { name: "bandage", count: 5, weight: 4 },
+            { name: "healthkit", count: 1, weight: 6 },
+        ],
         tier_scavenger_adv: [
             { name: "m9", count: 1, weight: 1 },
             { name: "ots38_dual", count: 1, weight: 1 },

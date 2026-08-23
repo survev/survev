@@ -1260,7 +1260,7 @@ export const CrateDefs: Record<string, ObstacleDef> = {
             autoLoot("bonesaw_healer", 1),
             autoLoot("helmet01", 1),
             autoLoot("backpack01", 1),
-            autoLoot("healthkit", 1),
+            tierLoot("tier_health_healer", 1, 1),
             autoLoot("painkiller", 1),
             autoLoot("smoke", 3),
         ],
