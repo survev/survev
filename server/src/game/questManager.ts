@@ -146,6 +146,7 @@ interface QuestEventExtraPayload {
     obstacle_used: object;
     destruction: object;
     promote: object;
+    be_mvp: object;
 }
 
 export type QuestEventPayloads = { [E in QuestEvent]: RequiredPayload<E> & QuestEventExtraPayload[E] };
@@ -209,6 +210,8 @@ export function questDelta<E extends QuestEvent>(
     for (const filter of def.filters ?? []) {
         type FilterFn = (_0: PayloadByFilter[typeof filter.type], _1: FilterParams[typeof filter.type]) => boolean;
 
+        assert(Object.hasOwn(filters, filter.type), `Unhandled filter type '${filter.type}'. Did you forget to add a validator for a new filter?`);
+
         if (
             !(filters[filter.type] as FilterFn)(
                 payload as PayloadByFilter[typeof filter.type],
@@ -226,7 +229,8 @@ export function questDelta<E extends QuestEvent>(
         case "placement":
         case "item_used":
         case "destruction":
-        case "promote": {
+        case "promote":
+        case "be_mvp": {
             value = 1;
             break;
         }
@@ -241,6 +245,10 @@ export function questDelta<E extends QuestEvent>(
             const p = payload as QuestEventPayloads["survived"];
             value = p.seconds;
             break;
+        }
+
+        default: {
+            assert(false, `Unhandled quest event type '${event}'. Did you forget to add a handler for a new type?`);
         }
     }
 

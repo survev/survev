@@ -8,7 +8,8 @@ export type QuestEvent =
     | "item_used"
     | "obstacle_used"
     | "destruction"
-    | "promote";
+    | "promote"
+    | "be_mvp";
 
 export interface QuestWhere {
     mode?: TeamMode;
@@ -82,6 +83,9 @@ export type SupportedFiltersMap = {
         Filter<"obstacle">,
     ];
     promote: [
+        Filter<"role">,
+    ];
+    be_mvp: [
         Filter<"role">,
     ];
 };

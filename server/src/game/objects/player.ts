@@ -129,6 +129,7 @@ export class PlayerBarn {
      * Assigned once at game end
      */
     factionsSpecialPlayers: [redLeader: Player, blueLeader: Player, mvp: Player] | [] = [];
+    sentMvpQuestUpdate = false;
 
     constructor(readonly game: Game) {
         this.bagSizes = util.mergeDeep(
@@ -289,6 +290,12 @@ export class PlayerBarn {
                 sendWinEmotes = true;
                 this.sentWinEmotes = true;
             }
+        }
+
+        if (!this.sentMvpQuestUpdate && this.game.over) {
+            this.sentMvpQuestUpdate = true;
+            const mvp = this.factionsSpecialPlayers[2];
+            mvp?.questManager.trackEvent("be_mvp", { role: mvp.role });
         }
 
         if (this.game.isTeamMode || this.game.map.factionMode) {
