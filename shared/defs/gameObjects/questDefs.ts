@@ -414,3 +414,8 @@ export const QuestDefs: Record<string, QuestDef> = {
         ],
     },
 };
+
+export const exclusivityGroups: string[][] = [
+    ["quest_kills", "quest_kills_hard"],
+    ["quest_damage", "quest_damage_hard"],
+];

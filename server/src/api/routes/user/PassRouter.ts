@@ -1,7 +1,7 @@
 import { and, eq, inArray } from "drizzle-orm";
 import { Hono } from "hono";
 import z from "zod";
-import { QuestDefs, QuestDifficulty } from "../../../../../shared/defs/gameObjects/questDefs.ts";
+import { exclusivityGroups, QuestDefs, QuestDifficulty } from "../../../../../shared/defs/gameObjects/questDefs.ts";
 import { MapDefs } from "../../../../../shared/defs/mapDefs.ts";
 import { MapId } from "../../../../../shared/gameConfig.ts";
 import { type GetPassResponse } from "../../../../../shared/types/user.ts";
@@ -75,10 +75,10 @@ async function getPassAndQuests(
                 ),
             );
 
-        const blockedTypes = new Set<string>();
+        const currentQuests = new Set<string>();
         const inserts = questSlotIndexes.map((slot) => {
-            const questType = getRandomQuestType(blockedTypes, false);
-            blockedTypes.add(questType);
+            const questType = getRandomQuestType(currentQuests, false);
+            currentQuests.add(questType);
 
             return {
                 userId,
@@ -129,8 +129,8 @@ async function rerollSlot(
     loadedQuests: UserQuestTableSelect[],
     transaction?: Parameters<Parameters<typeof db.transaction>[0]>[0],
 ) {
-    const excludedTypes = new Set(loadedQuests.map((quest) => quest.questType));
-    const questType = getRandomQuestType(excludedTypes, rerolled);
+    const currentQuests = new Set(loadedQuests.map((quest) => quest.questType));
+    const questType = getRandomQuestType(currentQuests, rerolled);
 
     await (transaction ?? db)
         .update(userQuestTable)
@@ -304,15 +304,38 @@ export const PassRouter = new Hono<Context>()
 const questTypes = Object.keys(QuestDefs);
 const defaultQuestType = questTypes[0] || "quest_kills";
 
-function getRandomQuestType(excluded: Set<string>, rerolled: boolean) {
+const incompatibleQuestMap = new Map(
+    questTypes
+        .map<[string, Set<string>]>(quest => {
+            const incompatibleQuests = new Set(
+                exclusivityGroups
+                    .filter(g => g.includes(quest))
+                    .flat(),
+            );
+            incompatibleQuests.delete(quest);
+
+            return [
+                quest,
+                incompatibleQuests,
+            ];
+        })
+        .filter(([, groups]) => groups.size > 0),
+);
+
+function getRandomQuestType(currentQuests: Set<string>, rerolled: boolean) {
     const serverModes = server.modes.filter(m => m.enabled);
     const serverMapIds = serverModes.map(mode => MapDefs[mode.mapName].mapId);
 
     let available = questTypes.filter((questType) => {
-        if (excluded.has(questType)) return false;
+        if (currentQuests.has(questType)) return false;
 
         const availableOn = QuestDefs[questType].availableOn;
-        return availableOn === undefined || hasCompatibleMap(serverMapIds, availableOn);
+        if (availableOn !== undefined && !hasCompatibleMap(serverMapIds, availableOn)) {
+            return false;
+        }
+
+        const incompatibleQuests = incompatibleQuestMap.get(questType);
+        return incompatibleQuests?.has(questType);
     });
 
     // for top in solo / squad quests
