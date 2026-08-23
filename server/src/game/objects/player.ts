@@ -3951,20 +3951,16 @@ export class Player extends BaseGameObject {
 
         if (oldWeaponDef.noPotatoSwap) return;
         const weaponDefs = WeaponTypeToDefs[oldWeaponDef.type];
+
         // necessary for type safety since Object.entries() is not type safe and just returns "any"
-        const enumerableDefs = Object.entries(weaponDefs) as [
-            string,
-            GunDef | ThrowableDef | MeleeDef,
-        ][];
-
-        const filterCb: ([_type, def]: [
-            string,
-            GunDef | ThrowableDef | MeleeDef,
-        ]) => boolean = this.hasPerk("rare_potato")
-            ? ([_type, def]) => !def.noPotatoSwap && def.quality == PerkProperties.rare_potato.quality
-            : ([_type, def]) => !def.noPotatoSwap;
-
-        const weaponChoices = enumerableDefs.filter(filterCb);
+        const enumerableDefs = Object.entries(weaponDefs) as [string, GunDef | ThrowableDef | MeleeDef][];
+        const hasRarePotato = this.hasPerk("rare_potato");
+        const weaponChoices = enumerableDefs.filter(([type, def]) => {
+            if (def.noPotatoSwap) return false;
+            if (!this.game.map.factionMode && type === "tomato") return false;
+            if (hasRarePotato && def.quality !== PerkProperties.rare_potato.quality) return false;
+            return true;
+        });
         const [chosenWeaponType, chosenWeaponDef] = util.randomItem(weaponChoices);
 
         let index;

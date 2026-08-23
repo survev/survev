@@ -383,4 +383,4 @@ const mapDef: PartialMapDef = {
     /* STRIP_FROM_PROD_CLIENT:END */
 };
 
-export const factionPotato = util.mergeDeep({}, Faction, mapDef) as MapDef;
+export const FactionPotato = util.mergeDeep({}, Faction, mapDef) as MapDef;
