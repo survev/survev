@@ -507,7 +507,7 @@ export class Obstacle extends BaseGameObject {
                 mode: this.game.teamMode,
                 role: params.source.role,
                 buildingType: params.source.currentBuildingType,
-                weaponType: params.gameSourceType ?? "",
+                weaponType: params.weaponSourceType ?? params.gameSourceType ?? "",
             });
         }
 

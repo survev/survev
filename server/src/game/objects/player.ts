@@ -2503,7 +2503,7 @@ export class Player extends BaseGameObject {
                 playerSource.damageDealt += finalDamage;
                 playerSource.questManager.trackEvent("damage", {
                     amount: finalDamage,
-                    weaponType: params.gameSourceType ?? "",
+                    weaponType: params.weaponSourceType ?? params.gameSourceType ?? "",
                     buildingType: this.currentBuildingType,
                     mode: this.game.teamMode,
                     role: this.role,
@@ -2688,7 +2688,7 @@ export class Player extends BaseGameObject {
                 killCreditSource.killedIds.push(this.matchDataId);
                 killCreditSource.kills++;
                 killCreditSource.questManager.trackEvent("kill", {
-                    weaponType: params.gameSourceType ?? "",
+                    weaponType: params.weaponSourceType ?? params.gameSourceType ?? "",
                     buildingType: killCreditSource.currentBuildingType,
                     mode: this.game.teamMode,
                     role: this.role,
