@@ -955,6 +955,7 @@ export class WeaponManager {
                     projDef.fuseTime,
                     GameConfig.DamageType.Player,
                     shotDir,
+                    this.activeWeapon,
                 );
             }
 
