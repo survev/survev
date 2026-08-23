@@ -298,7 +298,7 @@ export class PlayerBarn {
                 player.emoteFromSlot(EmoteSlot.Win);
             }
 
-            if (this.game.over && !player.dead && !player.sentgameOverMsg) {
+            if (this.game.over && !player.dead && !player.sentGameOverMsg) {
                 player.addGameOverMsg();
             }
         }
@@ -2515,12 +2515,12 @@ export class Player extends BaseGameObject {
         }
     }
 
-    sentgameOverMsg = false;
+    sentGameOverMsg = false;
     /**
      * adds gameover message to "this.msgsToSend" for the player and all their spectators
      */
     addGameOverMsg(): void {
-        if (this.sentgameOverMsg) return;
+        if (this.sentGameOverMsg) return;
 
         const winningTeamId = this.game.winningTeamId;
 
@@ -2534,7 +2534,7 @@ export class Player extends BaseGameObject {
             statsMsg.playerStats = this;
             this.client.sendMsg(net.MsgType.PlayerStats, statsMsg);
         } else {
-            this.sentgameOverMsg = true;
+            this.sentGameOverMsg = true;
 
             const gameOverMsg = new net.GameOverMsg();
 
