@@ -1,8 +1,15 @@
 import { and, eq, inArray } from "drizzle-orm";
 import { Hono } from "hono";
 import z from "zod";
-import { exclusivityGroups, QuestDefs, QuestDifficulty, type MapFilter } from "../../../../../shared/defs/gameObjects/questDefs.ts";
-import { MapDefs } from "../../../../../shared/defs/mapDefs.ts";
+import {
+    exclusivityGroups,
+    type MapFilter,
+    type MapFilterEntry,
+    QuestDefs,
+    QuestDifficulty,
+    type QuestMapFilter,
+} from "../../../../../shared/defs/gameObjects/questDefs.ts";
+import { type MapDefKey, MapDefs } from "../../../../../shared/defs/mapDefs.ts";
 import { MapId } from "../../../../../shared/gameConfig.ts";
 import { type GetPassResponse } from "../../../../../shared/types/user.ts";
 import { passUtil } from "../../../../../shared/utils/passUtil.ts";
@@ -271,8 +278,8 @@ export const PassRouter = new Hono<Context>()
             const expired = quest.nextRefreshAt - now < 0;
 
             const questDef = QuestDefs[quest.questType];
-            const serverMapIds = server.modes.filter(m => m.enabled).map(m => MapDefs[m.mapName].mapId);
-            const badMap = !satisfiesMapFilter(serverMapIds, questDef);
+            const serverMaps = server.modes.filter(m => m.enabled).map(m => m.mapName);
+            const badMap = !satisfiesMapFilter(serverMaps, questDef);
 
             const refreshEnabled = (!quest.rerolled && !quest.complete) || expired || badMap;
             if (!refreshEnabled) {
@@ -320,13 +327,14 @@ const incompatibleQuestMap = new Map(
 
 function getRandomQuestType(currentQuests: Set<string>, rerolled: boolean) {
     const serverModes = server.modes.filter(m => m.enabled);
-    const serverMapIds = serverModes.map(mode => MapDefs[mode.mapName].mapId);
+    const serverMapNames = serverModes.map(mode => mode.mapName);
+    const serverMapIds = serverMapNames.map(mapName => MapDefs[mapName].mapId);
 
     let available = questTypes.filter((questType) => {
         if (currentQuests.has(questType)) return false;
 
         const questDef = QuestDefs[questType];
-        if (!satisfiesMapFilter(serverMapIds, questDef)) {
+        if (!satisfiesMapFilter(serverMapNames, questDef)) {
             return false;
         }
 
@@ -363,18 +371,22 @@ function getRandomQuestType(currentQuests: Set<string>, rerolled: boolean) {
     return util.randomItem(source) ?? defaultQuestType;
 }
 
-function satisfiesMapFilter(serverMapIds: MapId[], mapFilter: MapFilter): boolean {
+function satisfiesMapFilter(serverMaps: MapDefKey[], mapFilter: QuestMapFilter): boolean {
     if (mapFilter.mapFilterType === undefined) {
         return true;
     }
 
-    return (mapFilter.mapFilterType === "only_on") === hasMapMatch(serverMapIds, mapFilter.maps);
+    return (mapFilter.mapFilterType === "only_on") === hasMapMatch(serverMaps, mapFilter.maps);
 }
 
-function hasMapMatch(serverMapIds: MapId[], available: MapId | MapId[]): boolean {
+function hasMapMatch(serverMaps: MapDefKey[], available: MapFilter): boolean {
     if (Array.isArray(available)) {
-        return serverMapIds.some(mapId => available.includes(mapId));
+        return serverMaps.some(map => available.some(a => matchesFilter(map, a)));
     }
 
-    return serverMapIds.includes(available);
+    return serverMaps.some(map => matchesFilter(map, available));
+}
+
+function matchesFilter(map: MapDefKey, filter: MapFilterEntry): boolean {
+    return typeof filter === "string" ? filter === map : filter === MapDefs[map].mapId;
 }

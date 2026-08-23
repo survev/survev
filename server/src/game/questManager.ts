@@ -210,7 +210,10 @@ export function questDelta<E extends QuestEvent>(
     for (const filter of def.filters ?? []) {
         type FilterFn = (_0: PayloadByFilter[typeof filter.type], _1: FilterParams[typeof filter.type]) => boolean;
 
-        assert(Object.hasOwn(filters, filter.type), `Unhandled filter type '${filter.type}'. Did you forget to add a validator for a new filter?`);
+        assert(
+            Object.hasOwn(filters, filter.type),
+            `Unhandled filter type '${filter.type}'. Did you forget to add a validator for a new filter?`,
+        );
 
         if (
             !(filters[filter.type] as FilterFn)(
