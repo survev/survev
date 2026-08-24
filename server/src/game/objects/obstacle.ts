@@ -512,8 +512,9 @@ export class Obstacle extends BaseGameObject {
         }
 
         if (def.airdropCrate && this.interactedBy) {
-            this.interactedBy.questManager.trackEvent("obstacle_used", {
-                obstacleType: "airdrop_crate",
+            this.interactedBy.questManager.trackEvent("airdrop_unlocked", {
+                obstacleType: this.type,
+                obstacleCategory: def.category,
                 mode: this.game.teamMode,
                 role: this.interactedBy.role,
                 buildingType: this.interactedBy.currentBuildingType,

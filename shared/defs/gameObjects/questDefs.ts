@@ -7,7 +7,7 @@ export type QuestEvent =
     | "survived"
     | "placement"
     | "item_used"
-    | "obstacle_used"
+    | "airdrop_unlocked"
     | "destruction"
     | "promote"
     | "be_mvp";
@@ -70,7 +70,7 @@ export type SupportedFiltersMap = {
         Filter<"role">,
         Filter<"item">,
     ];
-    obstacle_used: [
+    airdrop_unlocked: [
         Filter<"team_mode">,
         Filter<"building">,
         Filter<"role">,
@@ -312,7 +312,7 @@ export const QuestDefs: Record<string, QuestDef> = {
     },
     quest_airdrop: {
         type: "quest",
-        event: "obstacle_used",
+        event: "airdrop_unlocked",
         target: 1,
         xp: 30,
         filters: [

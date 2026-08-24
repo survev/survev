@@ -143,7 +143,7 @@ interface QuestEventExtraPayload {
     survived: { seconds: number };
     placement: object;
     item_used: object;
-    obstacle_used: object;
+    airdrop_unlocked: object;
     destruction: object;
     promote: object;
     be_mvp: object;
@@ -231,6 +231,7 @@ export function questDelta<E extends QuestEvent>(
         case "kill":
         case "placement":
         case "item_used":
+        case "airdrop_unlocked":
         case "destruction":
         case "promote":
         case "be_mvp": {
