@@ -62,6 +62,8 @@ export class GridInterest<T> {
     private readonly recomputeScratch: Uint32Array;
     private readonly objects: Array<T | undefined>;
     private readonly clients: Array<ClientState<T> | undefined>;
+    private readonly pendingObjectFlags: Uint8Array;
+    private readonly pendingObjectIds: number[] = [];
     private readonly affectedStamps: Uint32Array;
     private readonly affectedObjects: T[] = [];
     private readonly getObjectId: (object: T) => number;
@@ -95,6 +97,7 @@ export class GridInterest<T> {
         this.recomputeScratch = new Uint32Array(this.clientWordCount);
         this.objects = new Array(this.maxObjectId);
         this.clients = new Array(this.maxClients);
+        this.pendingObjectFlags = new Uint8Array(this.maxObjectId);
         this.affectedStamps = new Uint32Array(this.maxObjectId);
     }
 
@@ -116,10 +119,24 @@ export class GridInterest<T> {
         return true;
     }
 
-    updateObject(object: T, bounds: GridCellBounds): void {
-        if (this.rememberObject(object) === undefined) return;
+    updateObject(object: T): void {
+        const id = this.rememberObject(object);
+        if (id === undefined) return;
         if (this.activeClientCount === 0) return;
-        this.recomputeObjectClientMask(object, bounds);
+        if (this.pendingObjectFlags[id]) return;
+        this.pendingObjectFlags[id] = 1;
+        this.pendingObjectIds.push(id);
+    }
+
+    /** Resolves movement once at the network-sync boundary using each object's final grid bounds. */
+    flushObjectUpdates(): void {
+        for (let index = 0; index < this.pendingObjectIds.length; index++) {
+            const id = this.pendingObjectIds[index];
+            this.pendingObjectFlags[id] = 0;
+            const object = this.objects[id];
+            if (object) this.recomputeObjectClientMask(object, this.objectBounds(object));
+        }
+        this.pendingObjectIds.length = 0;
     }
 
     removeObject(object: T): void {
@@ -134,6 +151,8 @@ export class GridInterest<T> {
     }
 
     updateClientView(clientSlot: number, aabb: AABB): boolean {
+        // Subscriber masks must only change against fully resolved object positions.
+        this.flushObjectUpdates();
         clientSlot = this.validateClientSlot(clientSlot);
         const newBounds = this.aabbBounds(aabb);
         let client = this.clients[clientSlot];
@@ -178,6 +197,8 @@ export class GridInterest<T> {
     }
 
     removeClient(clientSlot: number): boolean {
+        // A disconnect can happen between network syncs; resolve movement before clearing its bit.
+        this.flushObjectUpdates();
         clientSlot = this.validateClientSlot(clientSlot);
         const client = this.clients[clientSlot];
         if (!client) return false;

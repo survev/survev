@@ -309,6 +309,9 @@ export class Game {
 
         const start = performance.now();
 
+        // Interest is consumed only by network messages, so coalesce movement to final positions.
+        this.gridInterest.flushObjectUpdates();
+
         // serialize objects and send msgs
         this.objectRegister.serializeObjs();
         this.clientBarn.sendMsgs();

@@ -214,6 +214,7 @@ function incrementalFrame(
         moveObject(moving, scenario.objectSpeed);
         if (grid.updateObject(moving.object) && collect) work.objectCellChanges++;
     }
+    index.flushObjectUpdates();
 
     for (let clientSlot = 0; clientSlot < clients.length; clientSlot++) {
         const client = clients[clientSlot];

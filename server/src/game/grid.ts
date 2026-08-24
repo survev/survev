@@ -76,12 +76,7 @@ export class Grid<T extends GameObject = GameObject> {
             && objBounds.max.y === max.y
         ) {
             if (newlyTracked) {
-                this._interest!.updateObject(obj, {
-                    minX: min.x,
-                    minY: min.y,
-                    maxX: max.x,
-                    maxY: max.y,
-                });
+                this._interest!.updateObject(obj);
             }
             return false;
         }
@@ -105,12 +100,7 @@ export class Grid<T extends GameObject = GameObject> {
         v2.set(objBounds.min, min);
         v2.set(objBounds.max, max);
         obj.__onGrid = true;
-        this._interest?.updateObject(obj, {
-            minX: min.x,
-            minY: min.y,
-            maxX: max.x,
-            maxY: max.y,
-        });
+        this._interest?.updateObject(obj);
         return true;
     }
 

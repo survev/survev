@@ -39,11 +39,15 @@ describe("Grid integrated interest", () => {
         // Crossing from one subscribed cell into another must not emit a false remove/add pair.
         first.pos.x = 40;
         grid.updateObject(first);
+        index.flushObjectUpdates();
         expect(changeIds(index.drainChanges(0))).toEqual({ added: [], removed: [] });
 
         first.pos.x = 120;
         first.pos.y = 120;
         grid.updateObject(first);
+        expect(ids(index.visibleObjects(0))).toEqual([1]);
+        expect(changeIds(index.drainChanges(0))).toEqual({ added: [], removed: [] });
+        index.flushObjectUpdates();
         expect(ids(index.visibleObjects(0))).toEqual([]);
         expect(changeIds(index.drainChanges(0))).toEqual({ added: [], removed: [1] });
 
@@ -67,6 +71,7 @@ describe("Grid integrated interest", () => {
 
         grid.remove(large);
         grid.addObject(large);
+        index.flushObjectUpdates();
         expect(ids(index.visibleObjects(0))).toEqual([1]);
         expect(changeIds(index.drainChanges(0))).toEqual({ added: [], removed: [] });
 
@@ -91,11 +96,31 @@ describe("Grid integrated interest", () => {
         index.drainChanges(0);
         grid.remove(oldObject);
         grid.addObject(replacement);
+        index.flushObjectUpdates();
 
         const changes = index.drainChanges(0);
         expect(changes.removed).toEqual([oldObject]);
         expect(changes.added).toEqual([replacement]);
         expect([...index.visibleObjects(0)]).toEqual([replacement]);
+    });
+
+    test("resolves pending movement before a client slot is removed and reused", () => {
+        const grid = new Grid<ReferenceObject>(256, 256);
+        const index = grid.enableInterest({ maxObjectId: 16, maxClients: 1 });
+        const object = gridObject(1, 32, 32);
+
+        grid.addObject(object);
+        index.updateClientView(0, aabb(0, 0, 64, 64));
+        index.drainChanges(0);
+
+        object.pos.x = 160;
+        object.pos.y = 160;
+        grid.updateObject(object);
+        index.removeClient(0);
+        index.updateClientView(0, aabb(128, 128, 192, 192));
+
+        expect(ids(index.visibleObjects(0))).toEqual([1]);
+        expect(changeIds(index.drainChanges(0))).toEqual({ added: [1], removed: [] });
     });
 
     test("backfills objects that entered the grid before registration assigned an ID", () => {
@@ -128,6 +153,7 @@ describe("Grid integrated interest", () => {
         forced.pos.x = 32;
         forced.pos.y = 32;
         grid.updateObject(forced);
+        index.flushObjectUpdates();
         expect(changeIds(index.drainChanges(0))).toEqual({ added: [], removed: [] });
 
         index.setForcedObject(0, spatial);
@@ -137,6 +163,7 @@ describe("Grid integrated interest", () => {
         forced.pos.x = 160;
         forced.pos.y = 160;
         grid.updateObject(forced);
+        index.flushObjectUpdates();
         expect(ids(index.visibleObjects(0))).toEqual([1]);
         expect(changeIds(index.drainChanges(0))).toEqual({ added: [], removed: [2] });
     });
@@ -211,7 +238,7 @@ describe("Grid integrated interest", () => {
                 }
             }
 
-            if (step % 10 === 0) assertEquivalent(reference, incremental, views);
+            if (step % 10 === 0) assertEquivalent(reference, incremental, views, `step ${step}`);
         }
 
         assertEquivalent(reference, incremental, views);
@@ -222,11 +249,13 @@ function assertEquivalent(
     reference: Grid<ReferenceObject>,
     incremental: ReturnType<Grid<ReferenceObject>["enableInterest"]>,
     views: Array<AABB | undefined>,
+    context = "final",
 ): void {
+    incremental.flushObjectUpdates();
     for (let client = 0; client < views.length; client++) {
         const view = views[client];
         if (!view) continue;
-        expect(ids(incremental.visibleObjects(client)), `client ${client}`).toEqual(
+        expect(ids(incremental.visibleObjects(client)), `${context}, client ${client}`).toEqual(
             ids(reference.intersectAABBSet(view)),
         );
     }
