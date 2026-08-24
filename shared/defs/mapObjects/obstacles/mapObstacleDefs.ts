@@ -109,6 +109,7 @@ function createCampfire(overrides: DeepPartial<ObstacleDef>): ObstacleDef {
 function createPotato(overrides: DeepPartial<ObstacleDef>): ObstacleDef {
     const baseDef: ObstacleDef = {
         type: "obstacle",
+        category: "potato",
         scale: { createMin: 1, createMax: 1, destroy: 0.8 },
         collision: collider.createCircle(v2.create(0, 0), 1.1),
         height: 0.5,
@@ -679,32 +680,38 @@ export const MapObstacleDefs: Record<string, ObstacleDef> = {
 
     potato_01: createPotato({}),
     potato_01f: createPotato({
+        category: "pvt_swapper",
         terrain: { grass: true, beach: true, riverShore: false },
         teamId: 2,
     }),
     potato_02: createPotato({ img: { sprite: "map-potato-02.img" } }),
     potato_02f: createPotato({
+        category: "pvt_swapper",
         terrain: { grass: true, beach: true, riverShore: false },
         img: { sprite: "map-potato-02.img" },
         teamId: 2,
     }),
     potato_03: createPotato({ img: { sprite: "map-potato-03.img" } }),
     potato_03f: createPotato({
+        category: "pvt_swapper",
         terrain: { grass: true, beach: true, riverShore: false },
         img: { sprite: "map-potato-03.img" },
         teamId: 2,
     }),
     tomato_01: createTomato({
+        category: "pvt_swapper",
         terrain: { grass: true, beach: true, riverShore: false },
         teamId: 1,
     }),
     tomato_02: createTomato({
+        category: "pvt_swapper",
         terrain: { grass: true, beach: true, riverShore: false },
         img: { sprite: "map-tomato-02.img" },
         sound: { explode: "tomato_break_02" },
         teamId: 1,
     }),
     tomato_03: createTomato({
+        category: "pvt_swapper",
         hitParticle: "tomatoChip_02",
         explodeParticle: "tomatoBreak_02",
         terrain: { grass: true, beach: true, riverShore: false },
