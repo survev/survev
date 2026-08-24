@@ -12,18 +12,6 @@ export type QuestEvent =
     | "promote"
     | "be_mvp";
 
-export interface QuestWhere {
-    mode?: TeamMode;
-    maxRank?: number;
-    buildingType?: string;
-    ammo?: string;
-    weaponClass?: "melee" | "throwable";
-    itemType?: string;
-    itemClass?: "heal" | "boost";
-    obstacleCategory?: string;
-    role?: string | string[];
-}
-
 export interface FilterParams {
     team_mode: { mode: TeamMode };
     max_rank: { maxRank: number };
