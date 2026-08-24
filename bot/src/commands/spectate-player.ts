@@ -55,7 +55,7 @@ export const spectateCommandHandler = {
                     return {
                         region: data.region,
                         data: `${gameData.gameId.slice(0, 6)} - ${
-                            GameConfig.TeamModeToString[gameData.teamMode]
+                            GameConfig.TeamModeToString[gameData.teamMode].padEnd(5)
                         } - ${gameData.mapName}`,
                         url: `[Join Link](${url.toString()})`,
                     };
