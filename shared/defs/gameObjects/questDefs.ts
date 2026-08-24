@@ -32,7 +32,11 @@ export interface FilterParams {
         buildingType: string | string[];
     };
     role: { role: string | string[] };
-    weapon: { weaponClass: "gun"; ammo?: string | string[] } | { weaponClass: "melee" | "throwable" };
+    weapon: {
+        weaponClass: "gun";
+        weaponType?: string;
+        ammo?: string | string[];
+    } | { weaponClass: "melee" | "throwable"; weaponType?: string };
     obstacle: { subType: "category"; obstacleCategory: string | string[] } | {
         subType: "type";
         obstacleType: string | string[];

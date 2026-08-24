@@ -181,6 +181,10 @@ const filters: { [F in FilterTypes]: (payload: PayloadByFilter[F], filter: Filte
             return false;
         }
 
+        if (filter.weaponType !== undefined && payload.weaponType !== filter.weaponType) {
+            return false;
+        }
+
         if (filter.weaponClass === "gun" && weapDef.type === "gun" && filter.ammo !== undefined) {
             if (!util.valueMatches(weapDef.ammo, filter.ammo)) {
                 return false;
