@@ -8,6 +8,7 @@ import { type FindGamePrivateBody, type ServerGameConfig } from "../utils/types.
 import { ClientBarn } from "./client.ts";
 import { GameModeManager } from "./gameModeManager.ts";
 import { Grid } from "./grid.ts";
+import type { GridInterest } from "./gridInterest.ts";
 import { GameMap } from "./map.ts";
 import { AirdropBarn } from "./objects/airdrop.ts";
 import { BulletBarn } from "./objects/bullet.ts";
@@ -88,6 +89,7 @@ export class Game {
     }
 
     grid: Grid<GameObject>;
+    gridInterest: GridInterest<GameObject>;
     map: GameMap;
     gas: Gas;
     objectRegister: ObjectRegister;
@@ -125,6 +127,7 @@ export class Game {
 
         this.map = new GameMap(this);
         this.grid = new Grid(this.map.width, this.map.height);
+        this.gridInterest = this.grid.enableInterest({ maxClients: 256 });
         this.objectRegister = new ObjectRegister(this.grid);
 
         this.clientBarn = new ClientBarn(this);

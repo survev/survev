@@ -2,6 +2,7 @@ import type { AABB, Collider } from "../../../shared/utils/coldet.ts";
 import { collider } from "../../../shared/utils/collider.ts";
 import { math } from "../../../shared/utils/math.ts";
 import { v2, type Vec2 } from "../../../shared/utils/v2.ts";
+import { GridInterest, type GridInterestOptions } from "./gridInterest.ts";
 import type { Loot } from "./objects/loot.ts";
 
 interface GameObject {
@@ -23,6 +24,7 @@ export class Grid<T extends GameObject = GameObject> {
     //                        X     Y     Object
     //                      __^__ __^__   __^__
     private readonly _grid: Array<Array<Set<T>>>;
+    private _interest?: GridInterest<T>;
 
     private nextQueryId = 1;
 
@@ -40,10 +42,27 @@ export class Grid<T extends GameObject = GameObject> {
         this.updateObject(obj);
     }
 
+    /** Enables persistent client visibility tracking on this grid. */
+    enableInterest(options: GridInterestOptions<T> = {}): GridInterest<T> {
+        if (this._interest) return this._interest;
+        this._interest = new GridInterest<T>(this.width, this.height, this.cellSize, {
+            ...options,
+            objectsAt: (x, y) => this._grid[x][y],
+            objectBounds: object => ({
+                minX: object.__gridBounds.min.x,
+                minY: object.__gridBounds.min.y,
+                maxX: object.__gridBounds.max.x,
+                maxY: object.__gridBounds.max.y,
+            }),
+        });
+        return this._interest;
+    }
+
     /**
      * Add an object to the grid system
      */
-    updateObject(obj: T): void {
+    updateObject(obj: T): boolean {
+        const newlyTracked = this._interest?.prepareObject(obj) ?? false;
         const objBounds = obj.__gridBounds;
 
         const aabb = obj.bounds;
@@ -56,10 +75,25 @@ export class Grid<T extends GameObject = GameObject> {
             objBounds.min.x === min.x && objBounds.min.y === min.y && objBounds.max.x === max.x
             && objBounds.max.y === max.y
         ) {
-            return;
+            if (newlyTracked) {
+                this._interest!.updateObject(obj, {
+                    minX: min.x,
+                    minY: min.y,
+                    maxX: max.x,
+                    maxY: max.y,
+                });
+            }
+            return false;
         }
 
-        this.remove(obj);
+        if (obj.__onGrid) {
+            for (let x = objBounds.min.x; x <= objBounds.max.x; x++) {
+                const xRow = this._grid[x];
+                for (let y = objBounds.min.y; y <= objBounds.max.y; y++) {
+                    xRow[y].delete(obj);
+                }
+            }
+        }
 
         // Add it to all grid cells that it intersects
         for (let x = min.x; x <= max.x; x++) {
@@ -71,6 +105,13 @@ export class Grid<T extends GameObject = GameObject> {
         v2.set(objBounds.min, min);
         v2.set(objBounds.max, max);
         obj.__onGrid = true;
+        this._interest?.updateObject(obj, {
+            minX: min.x,
+            minY: min.y,
+            maxX: max.x,
+            maxY: max.y,
+        });
+        return true;
     }
 
     /**
@@ -78,6 +119,7 @@ export class Grid<T extends GameObject = GameObject> {
      */
     remove(obj: T): void {
         if (!obj.__onGrid) return;
+        this._interest?.prepareObject(obj);
 
         const { min, max } = obj.__gridBounds;
         for (let x = min.x; x <= max.x; x++) {
@@ -86,6 +128,7 @@ export class Grid<T extends GameObject = GameObject> {
                 xRow[y].delete(obj);
             }
         }
+        this._interest?.removeObject(obj);
         v2.set(min, v2.create(-1, -1));
         v2.set(max, v2.create(-1, -1));
         obj.__onGrid = false;

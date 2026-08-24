@@ -65,7 +65,7 @@ export class ObjectRegister {
     idNext = 1;
     freeLists = {} as Record<ObjectType, number[]>;
 
-    constructor(readonly grid: Grid) {
+    constructor(readonly grid: Grid<GameObject>) {
         for (let i = 0; i < MAX_ID; i++) {
             this.idToObj[i] = null;
         }

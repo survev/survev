@@ -257,7 +257,15 @@ export class PlayerBarn {
             team = this.getSmallestTeam();
         }
 
-        const client = new Client(this.game, new NoOpSocket(), params.userId || null, "");
+        const interestSlot = this.game.clientBarn.allocateInterestSlot();
+        assert(interestSlot !== undefined, "Ran out of grid interest client slots");
+        const client = new Client(
+            this.game,
+            new NoOpSocket(),
+            params.userId || null,
+            "",
+            interestSlot,
+        );
         this.game.clientBarn.clients.push(client);
 
         const player = new Player(

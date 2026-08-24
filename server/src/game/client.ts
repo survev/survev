@@ -21,6 +21,8 @@ import type { ClientSocket } from "./socket.ts";
 
 export class ClientBarn {
     clients: Client[] = [];
+    private readonly freeInterestSlots: number[] = [];
+    private nextInterestSlot = 0;
 
     /**
      * All msgs created this tick that will be sent to all players
@@ -51,6 +53,20 @@ export class ClientBarn {
         this.msgsToSend.stream.index = 0;
     }
 
+    allocateInterestSlot(): number | undefined {
+        const reused = this.freeInterestSlots.pop();
+        if (reused !== undefined) return reused;
+        if (this.nextInterestSlot >= this.game.gridInterest.maxClients) return undefined;
+        return this.nextInterestSlot++;
+    }
+
+    releaseInterestSlot(client: Client): void {
+        if (client.interestSlot < 0) return;
+        this.game.gridInterest.removeClient(client.interestSlot);
+        this.freeInterestSlots.push(client.interestSlot);
+        client.interestSlot = -1;
+    }
+
     addClientWithPlayer(socket: ClientSocket<Client>, joinData: JoinTokenData, joinMsg: net.JoinMsg) {
         if (Config.rateLimitsEnabled) {
             const count = this.clients.filter(
@@ -66,7 +82,18 @@ export class ClientBarn {
             }
         }
 
-        const client = new Client(this.game, socket, joinData.userId, joinData.findGameIp);
+        const interestSlot = this.allocateInterestSlot();
+        if (interestSlot === undefined) {
+            socket.close("full");
+            return;
+        }
+        const client = new Client(
+            this.game,
+            socket,
+            joinData.userId,
+            joinData.findGameIp,
+            interestSlot,
+        );
         this.clients.push(client);
 
         const player = this.game.playerBarn.addPlayer(client, joinMsg, joinData);
@@ -83,7 +110,12 @@ export class ClientBarn {
             return;
         }
 
-        const client = new Client(this.game, socket, null, "");
+        const interestSlot = this.allocateInterestSlot();
+        if (interestSlot === undefined) {
+            socket.close("full");
+            return;
+        }
+        const client = new Client(this.game, socket, null, "", interestSlot);
         this.clients.push(client);
 
         client.specAnon = specData.specAnon;
@@ -246,8 +278,10 @@ export class ClientBarn {
     handleSocketClose(socket: ClientSocket<Client>) {
         const client = socket.getUserData();
         if (!client) return;
+        if (client.disconnected) return;
         client.spectating = undefined;
         client.disconnected = true;
+        this.releaseInterestSlot(client);
         util.removeFrom(this.clients, client);
 
         if (!client.player) return;
@@ -331,7 +365,7 @@ export class Client {
     spectateNewPlayerTicker = 0;
 
     private _firstUpdate = true;
-    visibleObjects = new Set<GameObject>();
+    visibleObjects: ReadonlySet<GameObject> = new Set();
     visibleMapIndicators = new Set<MapIndicator>();
 
     // zoom used for the area in which the server will send objects to the client
@@ -351,6 +385,7 @@ export class Client {
         socket: ClientSocket<Client>,
         userId: string | null,
         findGameIp: string,
+        public interestSlot: number,
     ) {
         this.userId = userId;
         this.ip = socket.ip();
@@ -494,29 +529,27 @@ export class Client {
         }
         const rect = collider.createAabbExtents(player.pos, v2.create(width, height));
 
-        const newVisibleObjects = game.grid.intersectAABBSet(rect);
-        // client crashes if active player is not visible
-        // so make sure its always added to visible objects
-        newVisibleObjects.add(player);
-
-        for (const obj of this.visibleObjects) {
-            if (!newVisibleObjects.has(obj)) {
+        game.gridInterest.updateClientView(this.interestSlot, rect);
+        // The client crashes if its active player is not visible, so preserve the old forced insert.
+        game.gridInterest.setForcedObject(this.interestSlot, player);
+        game.gridInterest.consumeChanges(this.interestSlot, snapshot => {
+            for (const obj of snapshot.removed) {
                 updateMsg.delObjIds.push(obj.__id);
             }
-        }
 
-        for (const obj of newVisibleObjects) {
-            if (
-                !this.visibleObjects.has(obj)
-                || game.objectRegister.dirtyFull[obj.__id]
-            ) {
-                updateMsg.fullObjects.push(obj);
-            } else if (game.objectRegister.dirtyPart[obj.__id]) {
-                updateMsg.partObjects.push(obj);
+            for (const obj of snapshot.visible) {
+                if (
+                    snapshot.added.has(obj)
+                    || game.objectRegister.dirtyFull[obj.__id]
+                ) {
+                    updateMsg.fullObjects.push(obj);
+                } else if (game.objectRegister.dirtyPart[obj.__id]) {
+                    updateMsg.partObjects.push(obj);
+                }
             }
-        }
 
-        this.visibleObjects = newVisibleObjects;
+            this.visibleObjects = snapshot.visible;
+        });
 
         updateMsg.activePlayerId = player.__id;
         if (this.startedSpectating) {
