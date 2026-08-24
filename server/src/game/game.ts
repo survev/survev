@@ -364,7 +364,7 @@ export class Game {
             // stop game after 1.8s
             this.stopTicker = 1.8;
 
-            this.playerBarn.factionsSpecialPlayers = this.modeManager.getSpecialPlayers();
+            this.playerBarn.factionsMvp = this.modeManager.getFactionMvp();
             this.winningTeamId = this.modeManager.getWinningTeamId();
             this.updateData();
         }

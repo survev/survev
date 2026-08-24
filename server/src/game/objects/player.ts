@@ -128,7 +128,7 @@ export class PlayerBarn {
     /**
      * Assigned once at game end
      */
-    factionsSpecialPlayers: [redLeader: Player, blueLeader: Player, mvp: Player] | [] = [];
+    factionsMvp?: Player = undefined;
     sentMvpQuestUpdate = false;
 
     constructor(readonly game: Game) {
@@ -294,7 +294,7 @@ export class PlayerBarn {
 
         if (!this.sentMvpQuestUpdate && this.game.over) {
             this.sentMvpQuestUpdate = true;
-            const mvp = this.factionsSpecialPlayers[2];
+            const mvp = this.factionsMvp;
             mvp?.questManager.trackEvent("be_mvp", { role: mvp.role });
         }
 

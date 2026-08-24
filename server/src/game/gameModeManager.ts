@@ -233,18 +233,30 @@ export class GameModeManager {
                 return [player];
             case GameMode.Team:
                 return player.group!.players;
-            case GameMode.Faction:
-                return [player, ...this.game.playerBarn.factionsSpecialPlayers];
+            case GameMode.Faction: {
+                const redLeader = this.game.playerBarn.teams[GameConfig.FactionTeam.Red - 1].leader;
+                const blueLeader = this.game.playerBarn.teams[GameConfig.FactionTeam.Blue - 1].leader;
+
+                if (!redLeader || !blueLeader) {
+                    return [player];
+                }
+
+                if (this.game.playerBarn.factionsMvp === undefined) {
+                    return [player, redLeader, blueLeader];
+                }
+
+                return [player, redLeader, blueLeader, this.game.playerBarn.factionsMvp];
+            }
         }
     }
 
-    getSpecialPlayers(): [redLeader: Player, blueLeader: Player, mvp: Player] | [] {
-        if (this.mode !== GameMode.Faction) return [];
+    getFactionMvp(): Player | undefined {
+        if (this.mode !== GameMode.Faction) return;
         const redLeader = this.game.playerBarn.teams[GameConfig.FactionTeam.Red - 1].leader;
         const blueLeader = this.game.playerBarn.teams[GameConfig.FactionTeam.Blue - 1].leader;
 
         if (!redLeader || !blueLeader) {
-            return [];
+            return;
         }
 
         const highestKiller = this.game.playerBarn.players.reduce(
@@ -259,7 +271,7 @@ export class GameModeManager {
             },
         );
 
-        return [redLeader, blueLeader, highestKiller];
+        return highestKiller;
     }
 
     handlePlayerDeath(player: Player, params: DamageParams): void {
