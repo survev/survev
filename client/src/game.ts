@@ -1281,7 +1281,7 @@ export class Game {
                 this.m_bulletBarn.onMapLoad(this.m_map);
                 this.m_particleBarn.onMapLoad(this.m_map);
                 this.m_uiManager.onMapLoad(this.m_map, this.m_camera);
-                if (this.m_map.perkMode) {
+                if (this.m_map.perkMode && this.m_localId) {
                     const player = this.m_activePlayer as Player | undefined;
                     if (!player?.m_netData.m_role) {
                         const role = this.m_config.get("perkModeRole")!;
