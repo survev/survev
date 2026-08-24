@@ -121,12 +121,16 @@ export class QuestManager {
             quest.totalDelta += delta;
         }
     }
+
+    hasQuestWithFilter(filter: FilterTypes): boolean {
+        return this.quests.some(q => QuestDefs[q.id].filters?.some(f => f.type === filter));
+    }
 }
 
 type PayloadByFilter = {
     team_mode: { mode: TeamMode };
     max_rank: { rank: number };
-    building: { buildingType: string };
+    building: { intersectingBuildings: string[] };
     role: { role: string };
     weapon: { weaponType: string };
     obstacle: { obstacleCategory?: string; obstacleType: string };
@@ -162,11 +166,7 @@ const filters: { [F in FilterTypes]: (payload: PayloadByFilter[F], filter: Filte
         return payload.rank <= filter.maxRank;
     },
     building(payload, filter) {
-        if (filter.subType === "type") {
-            return util.valueMatches(payload.buildingType, filter.buildingType);
-        } else {
-            return util.valueMatches(payload.buildingType, filter.structureCategory);
-        }
+        return payload.intersectingBuildings.some(b => util.valueMatches(b, filter.buildingType));
     },
     obstacle(payload, filter) {
         if (filter.subType === "type") {

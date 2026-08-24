@@ -14,7 +14,7 @@ import type { MeleeDef } from "../../../../shared/defs/gameObjects/meleeDefs.ts"
 import { PerkProperties } from "../../../../shared/defs/gameObjects/perkDefs.ts";
 import type { ThrowableDef } from "../../../../shared/defs/gameObjects/throwableDefs.ts";
 import { UnlockDefs } from "../../../../shared/defs/gameObjects/unlockDefs.ts";
-import { GameObjectDefs, MapObjectDefs } from "../../../../shared/defs/register.ts";
+import { GameObjectDefs } from "../../../../shared/defs/register.ts";
 import {
     type Action,
     type Anim,
@@ -1323,7 +1323,6 @@ export class Player extends BaseGameObject {
 
     damageTaken = 0;
     damageDealt = 0;
-    currentBuildingType = "";
     questManager = new QuestManager(this);
 
     // infinity since we aren't dead yet ;)
@@ -1685,7 +1684,6 @@ export class Player extends BaseGameObject {
                     }
                     this.invManager.take(this.actionItem as InventoryItem, 1);
                     this.questManager.trackEvent("item_used", {
-                        buildingType: this.currentBuildingType,
                         itemType: this.actionItem,
                         mode: this.game.teamMode,
                         role: this.role,
@@ -2217,13 +2215,6 @@ export class Player extends BaseGameObject {
             }
         }
 
-        // guh, works for the club, might need testing for other buildings idk
-        const parentStructureType = occupiedBuilding?.parentStructure
-            ? (MapObjectDefs.typeToDef(occupiedBuilding.parentStructure.type, "structure"))
-                .category
-            : undefined;
-        this.currentBuildingType = parentStructureType ?? occupiedBuilding?.type ?? "";
-
         // only dirty if healEffect changed from last tick to current tick (leaving or entering a heal region)
         if (oldHealEffect != this.healEffect) {
             this.setDirty();
@@ -2332,6 +2323,8 @@ export class Player extends BaseGameObject {
         if (this.shotSlowdownTimer <= 0) {
             this.shotSlowdownTimer = 0;
         }
+
+        console.log([...this.getIntersectingBuildings()]);
     }
 
     moveObjUpdate(occupiedBuilding?: Building): void {
@@ -2504,7 +2497,6 @@ export class Player extends BaseGameObject {
                 playerSource.questManager.trackEvent("damage", {
                     amount: finalDamage,
                     weaponType: params.weaponSourceType ?? params.gameSourceType ?? "",
-                    buildingType: this.currentBuildingType,
                     mode: this.game.teamMode,
                     role: this.role,
                 });
@@ -2687,9 +2679,17 @@ export class Player extends BaseGameObject {
             if (killCreditSource !== this && killCreditSource.teamId !== this.teamId) {
                 killCreditSource.killedIds.push(this.matchDataId);
                 killCreditSource.kills++;
+
+                let buildingType: Set<string> = new Set();
+                const wantsBuilding = killCreditSource.questManager.hasQuestWithFilter("building");
+                if (wantsBuilding) {
+                    // if no quests are interested in filtering by building, then don't calculate them
+                    buildingType = this.getIntersectingBuildings();
+                }
+
                 killCreditSource.questManager.trackEvent("kill", {
                     weaponType: params.weaponSourceType ?? params.gameSourceType ?? "",
-                    buildingType: killCreditSource.currentBuildingType,
+                    intersectingBuildings: [...buildingType],
                     mode: this.game.teamMode,
                     role: this.role,
                 });
@@ -3007,6 +3007,67 @@ export class Player extends BaseGameObject {
         this.game.updateData();
 
         this.questManager.flushProgress();
+    }
+
+    getIntersectingBuildings(): Set<string> {
+        const objs = this.game.grid.intersectGameObject(this);
+        const buildings = new Set<Building>();
+
+        objLoop:
+        for (let i = 0; i < objs.length; i++) {
+            const obj = objs[i];
+            if (obj.__type !== ObjectType.Building) continue;
+            if (
+                this.layer < 2
+                && !util.sameLayer(obj.layer, this.layer)
+            ) continue;
+
+            for (let j = 0; j < obj.zoomRegions.length; j++) {
+                const zoomIn = obj.zoomRegions[j].zoomIn;
+                if (!zoomIn) continue;
+                if (coldet.test(zoomIn, this.collider)) {
+                    buildings.add(obj);
+                    continue objLoop;
+                }
+            }
+
+            for (let j = 0; j < obj.surfaces.length; j++) {
+                const colliders = obj.surfaces[j].colliders;
+                for (let k = 0; k < colliders.length; k++) {
+                    if (coldet.test(colliders[k], this.collider)) {
+                        buildings.add(obj);
+                        continue objLoop;
+                    }
+                }
+            }
+
+            if (obj.groundPatches !== undefined) {
+                for (let j = 0; j < obj.groundPatches.length; j++) {
+                    const groundPatch = obj.groundPatches[j];
+                    if (coldet.test(groundPatch.bound, this.collider)) {
+                        buildings.add(obj);
+                        continue objLoop;
+                    }
+                }
+            }
+        }
+
+        function withAllParents(building: Building): string[] {
+            const hierarchy: string[] = [];
+            let current: Building | undefined = building;
+            do {
+                hierarchy.push(current.type);
+                current = current.parentBuilding;
+            } while (current !== undefined);
+
+            if (building.parentStructure?.parentBuilding !== undefined) {
+                hierarchy.push(...withAllParents(building.parentStructure.parentBuilding));
+            }
+
+            return hierarchy;
+        }
+
+        return new Set([...buildings].flatMap(withAllParents));
     }
 
     getAliveKiller(): Player | undefined {

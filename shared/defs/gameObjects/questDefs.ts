@@ -15,10 +15,7 @@ export type QuestEvent =
 export interface FilterParams {
     team_mode: { mode: TeamMode };
     max_rank: { maxRank: number };
-    building: { subType: "category"; structureCategory: string | string[] } | {
-        subType: "type";
-        buildingType: string | string[];
-    };
+    building: { buildingType: string | string[]; };
     role: { role: string | string[] };
     weapon: {
         weaponClass: "gun";
@@ -45,7 +42,6 @@ export type SupportedFiltersMap = {
     ];
     damage: [
         Filter<"team_mode">,
-        Filter<"building">,
         Filter<"role">,
         Filter<"weapon">,
     ];
@@ -58,19 +54,16 @@ export type SupportedFiltersMap = {
     ];
     item_used: [
         Filter<"team_mode">,
-        Filter<"building">,
         Filter<"role">,
         Filter<"item">,
     ];
     airdrop_unlocked: [
         Filter<"team_mode">,
-        Filter<"building">,
         Filter<"role">,
         Filter<"obstacle">,
     ];
     destruction: [
         Filter<"team_mode">,
-        Filter<"building">,
         Filter<"role">,
         Filter<"weapon">,
         Filter<"obstacle">,
@@ -585,8 +578,7 @@ export const QuestDefs: Record<string, QuestDef> = {
         filters: [
             {
                 type: "building",
-                subType: "category",
-                structureCategory: "club",
+                buildingType: ["club_01", "bathhouse_01"],
             },
         ],
         mapFilterType: "only_on",
@@ -600,7 +592,6 @@ export const QuestDefs: Record<string, QuestDef> = {
         filters: [
             {
                 type: "building",
-                subType: "type",
                 buildingType: "warehouse_complex_01",
             },
         ],
@@ -615,7 +606,6 @@ export const QuestDefs: Record<string, QuestDef> = {
         filters: [
             {
                 type: "building",
-                subType: "type",
                 buildingType: "river_town_01",
             },
         ],
@@ -630,7 +620,6 @@ export const QuestDefs: Record<string, QuestDef> = {
         filters: [
             {
                 type: "building",
-                subType: "type",
                 buildingType: ["desert_town_01", "desert_town_02"],
             },
         ],
@@ -645,8 +634,7 @@ export const QuestDefs: Record<string, QuestDef> = {
         filters: [
             {
                 type: "building",
-                subType: "type",
-                buildingType: "reserve_01",
+                buildingType: ["reserve_01", "reserve_basement_01"],
             },
         ],
         mapFilterType: "only_on",
@@ -660,7 +648,6 @@ export const QuestDefs: Record<string, QuestDef> = {
         filters: [
             {
                 type: "building",
-                subType: "type",
                 buildingType: [
                     "logging_complex_01",
                     "logging_complex_01sp",

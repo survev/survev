@@ -506,7 +506,6 @@ export class Obstacle extends BaseGameObject {
                 obstacleCategory: def.category,
                 mode: this.game.teamMode,
                 role: params.source.role,
-                buildingType: params.source.currentBuildingType,
                 weaponType: params.weaponSourceType ?? params.gameSourceType ?? "",
             });
         }
@@ -517,7 +516,6 @@ export class Obstacle extends BaseGameObject {
                 obstacleCategory: def.category,
                 mode: this.game.teamMode,
                 role: this.interactedBy.role,
-                buildingType: this.interactedBy.currentBuildingType,
             });
         }
 
