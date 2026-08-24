@@ -29,6 +29,7 @@ export const uwsHelpers = {
                 if (res.aborted) return;
 
                 if (!fullBody) {
+                    res.aborted = true;
                     res.writeStatus("413 Content Too Large");
                     res.write("413 Content Too Large");
                     res.end();
@@ -41,6 +42,7 @@ export const uwsHelpers = {
                     const parsed = validator.parse(body);
                     resolve(parsed);
                 } catch (error) {
+                    res.aborted = true;
                     res.writeStatus("400 Bad Request");
                     res.write("400 Bad Request");
                     res.end();
