@@ -168,6 +168,42 @@ describe("Grid integrated interest", () => {
         expect(changeIds(index.drainChanges(0))).toEqual({ added: [], removed: [2] });
     });
 
+    test("routes only spatial clients and preserves Set order after re-entry", () => {
+        const grid = new Grid<ReferenceObject>(256, 256);
+        const index = grid.enableInterest({ maxObjectId: 16, maxClients: 4 });
+        const first = gridObject(1, 32, 32);
+        const second = gridObject(2, 36, 32);
+        const third = gridObject(3, 40, 32);
+        const forced = gridObject(4, 160, 160);
+
+        grid.addObject(first);
+        grid.addObject(second);
+        grid.addObject(third);
+        grid.addObject(forced);
+        index.updateClientView(0, aabb(0, 0, 64, 64));
+        index.setForcedObject(0, forced);
+        index.drainChanges(0);
+
+        const spatialClients: number[] = [];
+        index.forEachSpatialClient(second, client => spatialClients.push(client));
+        expect(spatialClients).toEqual([0]);
+
+        const forcedClients: number[] = [];
+        index.forEachSpatialClient(forced, client => forcedClients.push(client));
+        expect(forcedClients).toEqual([]);
+        expect(index.isSpatiallyVisible(forced, 0)).toBe(false);
+
+        grid.remove(second);
+        grid.addObject(second);
+        index.flushObjectUpdates();
+
+        const visible = [...index.visibleObjects(0)];
+        expect(visible.map(object => object.__id)).toEqual([1, 3, 4, 2]);
+        expect(visible.map(object => index.visibilityOrder(0, object))).toEqual(
+            [...visible].map(object => index.visibilityOrder(0, object)).toSorted((a, b) => a - b),
+        );
+    });
+
     test("matches Grid.intersectAABBSet through randomized movement and lifecycle changes", () => {
         const random = mulberry32(0x5eed1234);
         const worldSize = 256;

@@ -313,7 +313,9 @@ export class Game {
         this.gridInterest.flushObjectUpdates();
 
         // serialize objects and send msgs
+        this.clientBarn.prepareMsgs();
         this.objectRegister.serializeObjs();
+        this.clientBarn.routeDirtyObjects();
         this.clientBarn.sendMsgs();
 
         //

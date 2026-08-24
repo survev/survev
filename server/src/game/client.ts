@@ -6,7 +6,7 @@ import { ObjectType } from "../../../shared/net/objectSerializeFns.ts";
 import { SpectateAction } from "../../../shared/net/spectateMsg.ts";
 import type { Emote, GroupStatus } from "../../../shared/net/updateMsg.ts";
 import type { GameWsDisconnectReason } from "../../../shared/types/api.ts";
-import { coldet } from "../../../shared/utils/coldet.ts";
+import { type AABB, coldet } from "../../../shared/utils/coldet.ts";
 import { collider } from "../../../shared/utils/collider.ts";
 import { math } from "../../../shared/utils/math.ts";
 import { util } from "../../../shared/utils/util.ts";
@@ -22,6 +22,8 @@ import type { ClientSocket } from "./socket.ts";
 export class ClientBarn {
     clients: Client[] = [];
     private readonly freeInterestSlots: number[] = [];
+    private readonly clientsByInterestSlot: Array<Client | undefined> = [];
+    private readonly preparedClients: Client[] = [];
     private nextInterestSlot = 0;
 
     /**
@@ -41,10 +43,39 @@ export class ClientBarn {
         }
     }
 
-    sendMsgs() {
+    prepareMsgs() {
+        this.preparedClients.length = 0;
         for (let i = 0; i < this.clients.length; i++) {
             const client = this.clients[i];
             if (client.socket.closed()) continue;
+            if (client.prepareMsg()) this.preparedClients.push(client);
+        }
+    }
+
+    routeDirtyObjects() {
+        const register = this.game.objectRegister;
+        register.forEachDirtyObject((object, full) => {
+            this.game.gridInterest.forEachSpatialClient(object, clientSlot => {
+                this.clientsByInterestSlot[clientSlot]?.routeDirtyObject(object, full);
+            });
+        });
+
+        // Forced visibility is intentionally separate from the spatial object mask.
+        for (let i = 0; i < this.preparedClients.length; i++) {
+            const client = this.preparedClients[i];
+            const forced = client.preparedPlayer;
+            if (
+                register.isDirty(forced)
+                && !this.game.gridInterest.isSpatiallyVisible(forced, client.interestSlot)
+            ) {
+                client.routeDirtyObject(forced, register.isFullDirty(forced));
+            }
+        }
+    }
+
+    sendMsgs() {
+        for (let i = 0; i < this.preparedClients.length; i++) {
+            const client = this.preparedClients[i];
             client.sendMsgs();
         }
     }
@@ -60,9 +91,14 @@ export class ClientBarn {
         return this.nextInterestSlot++;
     }
 
+    registerInterestClient(client: Client): void {
+        this.clientsByInterestSlot[client.interestSlot] = client;
+    }
+
     releaseInterestSlot(client: Client): void {
         if (client.interestSlot < 0) return;
         this.game.gridInterest.removeClient(client.interestSlot);
+        this.clientsByInterestSlot[client.interestSlot] = undefined;
         this.freeInterestSlots.push(client.interestSlot);
         client.interestSlot = -1;
     }
@@ -378,6 +414,13 @@ export class Client {
     msgStream = new net.MsgStream(new ArrayBuffer(65536));
     msgsToSend: Array<{ type: number; msg: net.Msg }> = [];
 
+    private msgPrepared = false;
+    private msgPlayer?: Player;
+    private msgRect?: AABB;
+    private msgRadius = 0;
+    private readonly routedFullObjects: GameObject[] = [];
+    private readonly routedPartObjects: GameObject[] = [];
+
     ack = 0;
 
     constructor(
@@ -393,6 +436,7 @@ export class Client {
         this.game = game;
         socket.setUserData(this);
         this.socket = socket as ClientSocket<Client>;
+        game.clientBarn.registerInterestClient(this);
     }
 
     sendMsg(type: net.MsgType, msg: net.AbstractMsg): void {
@@ -474,14 +518,59 @@ export class Client {
         }
     }
 
+    get preparedPlayer(): Player {
+        if (!this.msgPrepared || !this.msgPlayer) {
+            throw new Error("Client message routing used before preparation");
+        }
+        return this.msgPlayer;
+    }
+
+    prepareMsg(): boolean {
+        this.msgPrepared = false;
+        this.routedFullObjects.length = 0;
+        this.routedPartObjects.length = 0;
+
+        const player = this.spectating ?? this.player;
+        if (!player) return false;
+
+        const radius = this._cullingZoom + 4;
+        let width = radius;
+        // client zoom tries to keep a 16/9 aspect ratio, mirror it here
+        let height = width / (16 / 9);
+        if (this._cullingPortrait) {
+            const tmp = width;
+            width = height;
+            height = tmp;
+        }
+        const rect = collider.createAabbExtents(player.pos, v2.create(width, height));
+
+        this.game.gridInterest.updateClientView(this.interestSlot, rect);
+        // The client crashes if its active player is not visible, so preserve the old forced insert.
+        this.game.gridInterest.setForcedObject(this.interestSlot, player);
+
+        this.msgPlayer = player;
+        this.msgRect = rect;
+        this.msgRadius = radius;
+        this.msgPrepared = true;
+        return true;
+    }
+
+    routeDirtyObject(object: GameObject, full: boolean): void {
+        if (!this.msgPrepared) return;
+        if (full) this.routedFullObjects.push(object);
+        else this.routedPartObjects.push(object);
+    }
+
     sendMsgs(): void {
         const msgStream = this.msgStream;
         const game = this.game;
         const playerBarn = game.playerBarn;
         msgStream.stream.index = 0;
 
-        const player = this.spectating ?? this.player;
-        if (!player) return;
+        if (!this.msgPrepared || !this.msgPlayer || !this.msgRect) return;
+        const player = this.msgPlayer;
+        const rect = this.msgRect;
+        const radius = this.msgRadius;
 
         if (this._firstUpdate) {
             const joinedMsg = new net.JoinedMsg();
@@ -518,34 +607,32 @@ export class Client {
             updateMsg.gasT = game.gas.gasT;
         }
 
-        const radius = this._cullingZoom + 4;
-        let width = this._cullingZoom + 4;
-        // client zoom tries to keep a 16/9 aspect ratio, mirror it here
-        let height = width / (16 / 9);
-        if (this._cullingPortrait) {
-            let tmp = width;
-            width = height;
-            height = tmp;
-        }
-        const rect = collider.createAabbExtents(player.pos, v2.create(width, height));
-
-        game.gridInterest.updateClientView(this.interestSlot, rect);
-        // The client crashes if its active player is not visible, so preserve the old forced insert.
-        game.gridInterest.setForcedObject(this.interestSlot, player);
         game.gridInterest.consumeChanges(this.interestSlot, snapshot => {
             for (const obj of snapshot.removed) {
                 updateMsg.delObjIds.push(obj.__id);
             }
 
-            for (const obj of snapshot.visible) {
-                if (
-                    snapshot.added.has(obj)
-                    || game.objectRegister.dirtyFull[obj.__id]
-                ) {
-                    updateMsg.fullObjects.push(obj);
-                } else if (game.objectRegister.dirtyPart[obj.__id]) {
-                    updateMsg.partObjects.push(obj);
-                }
+            for (const obj of snapshot.added) {
+                updateMsg.fullObjects.push(obj);
+            }
+            for (let i = 0; i < this.routedFullObjects.length; i++) {
+                const obj = this.routedFullObjects[i];
+                if (!snapshot.added.has(obj)) updateMsg.fullObjects.push(obj);
+            }
+            for (let i = 0; i < this.routedPartObjects.length; i++) {
+                const obj = this.routedPartObjects[i];
+                if (!snapshot.added.has(obj)) updateMsg.partObjects.push(obj);
+            }
+
+            const visibilityOrder = (first: GameObject, second: GameObject) => {
+                return game.gridInterest.visibilityOrder(this.interestSlot, first)
+                    - game.gridInterest.visibilityOrder(this.interestSlot, second);
+            };
+            if (updateMsg.fullObjects.length > 1) {
+                (updateMsg.fullObjects as GameObject[]).sort(visibilityOrder);
+            }
+            if (updateMsg.partObjects.length > 1) {
+                (updateMsg.partObjects as GameObject[]).sort(visibilityOrder);
             }
 
             this.visibleObjects = snapshot.visible;
@@ -741,6 +828,7 @@ export class Client {
 
         this.sendData(msgStream.getBuffer());
         this._firstUpdate = false;
+        this.msgPrepared = false;
     }
 
     handleMsg(type: net.MsgType, msg: net.Msg) {

@@ -12,6 +12,8 @@ interface ClientState<T> {
     bounds?: GridCellBounds;
     forced?: T;
     visible: Set<T>;
+    visibleOrder: Map<T, number>;
+    nextVisibleOrder: number;
     added: Set<T>;
     removed: Set<T>;
 }
@@ -50,7 +52,8 @@ export interface InterestMemoryEstimate {
  * Persistent client visibility derived from an existing Grid's cells.
  *
  * Grid owns object membership and bounds. This tracker stores only cell subscribers, each object's
- * client mask, and per-client visible/change sets. Ordering is intentionally not part of its contract.
+ * client mask, and per-client visible/change sets. Visibility order follows Set insertion order so
+ * callers can reproduce the existing network object order without scanning the visible set.
  */
 export class GridInterest<T> {
     readonly maxObjectId: number;
@@ -157,7 +160,13 @@ export class GridInterest<T> {
         const newBounds = this.aabbBounds(aabb);
         let client = this.clients[clientSlot];
         if (!client) {
-            client = { visible: new Set(), added: new Set(), removed: new Set() };
+            client = {
+                visible: new Set(),
+                visibleOrder: new Map(),
+                nextVisibleOrder: 0,
+                added: new Set(),
+                removed: new Set(),
+            };
             this.clients[clientSlot] = client;
             this.activeClientCount++;
             this.highestActiveClientSlot = Math.max(this.highestActiveClientSlot, clientSlot);
@@ -226,6 +235,36 @@ export class GridInterest<T> {
 
     visibleObjects(clientSlot: number): ReadonlySet<T> {
         return this.client(clientSlot).visible;
+    }
+
+    /** Iterates clients that can see an object spatially. Forced visibility is handled separately. */
+    forEachSpatialClient(object: T, consumer: (clientSlot: number) => void): void {
+        const id = this.registeredObjectId(object);
+        if (id === undefined) return;
+        const objectMaskOffset = id * this.clientWordCount;
+        for (let word = 0; word < this.activeWordCount; word++) {
+            let clients = this.objectClientMasks[objectMaskOffset + word] >>> 0;
+            while (clients !== 0) {
+                const lowestBit = (clients & -clients) >>> 0;
+                const bit = 31 - Math.clz32(lowestBit);
+                const clientSlot = word * 32 + bit;
+                if (this.clients[clientSlot]) consumer(clientSlot);
+                clients = (clients & (clients - 1)) >>> 0;
+            }
+        }
+    }
+
+    isSpatiallyVisible(object: T, clientSlot: number): boolean {
+        clientSlot = this.validateClientSlot(clientSlot);
+        const id = this.registeredObjectId(object);
+        if (id === undefined) return false;
+        const word = clientSlot >>> 5;
+        const bit = 1 << (clientSlot & 31);
+        return (this.objectClientMasks[id * this.clientWordCount + word] & bit) !== 0;
+    }
+
+    visibilityOrder(clientSlot: number, object: T): number {
+        return this.client(clientSlot).visibleOrder.get(object) ?? Number.MAX_SAFE_INTEGER;
     }
 
     drainChanges(clientSlot: number): InterestChanges<T> {
@@ -312,20 +351,14 @@ export class GridInterest<T> {
     private addVisibleObject(client: ClientState<T>, object: T): void {
         if (client.visible.has(object)) return;
         client.visible.add(object);
+        client.visibleOrder.set(object, client.nextVisibleOrder++);
         if (!client.removed.delete(object)) client.added.add(object);
     }
 
     private removeVisibleObject(client: ClientState<T>, object: T): void {
         if (!client.visible.delete(object)) return;
+        client.visibleOrder.delete(object);
         if (!client.added.delete(object)) client.removed.add(object);
-    }
-
-    private isSpatiallyVisible(object: T, clientSlot: number): boolean {
-        const id = this.getObjectId(object);
-        if (!Number.isInteger(id) || id <= 0 || id >= this.maxObjectId) return false;
-        const word = clientSlot >>> 5;
-        const bit = 1 << (clientSlot & 31);
-        return (this.objectClientMasks[id * this.clientWordCount + word] & bit) !== 0;
     }
 
     private beginAffectedObjects(): void {

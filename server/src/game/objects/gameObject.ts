@@ -57,8 +57,10 @@ export class ObjectRegister {
     idToObj: Array<GameObject | null> = [];
 
     idToType = new Uint8Array(MAX_ID);
-    dirtyPart = new Uint8Array(MAX_ID);
-    dirtyFull = new Uint8Array(MAX_ID);
+    private readonly dirtyPart = new Uint8Array(MAX_ID);
+    private readonly dirtyFull = new Uint8Array(MAX_ID);
+    private readonly dirtyQueued = new Uint8Array(MAX_ID);
+    private readonly dirtyIds: number[] = [];
 
     deletedObjs: GameObject[] = [];
 
@@ -120,8 +122,7 @@ export class ObjectRegister {
         this.objects[obj.__arrayIdx] = obj;
         this.idToObj[id] = obj;
         this.idToType[id] = type;
-        this.dirtyPart[id] = 1;
-        this.dirtyFull[id] = 1;
+        this.markDirtyId(id, true);
         this.grid.addObject(obj);
     }
 
@@ -140,6 +141,7 @@ export class ObjectRegister {
         this.idToType[obj.__id] = 0;
         this.dirtyPart[obj.__id] = 0;
         this.dirtyFull[obj.__id] = 0;
+        this.dirtyQueued[obj.__id] = 0;
 
         obj.__id = 0;
         // @ts-expect-error type is readonly for proper type to object class casting
@@ -147,9 +149,10 @@ export class ObjectRegister {
     }
 
     serializeObjs() {
-        for (let i = 0; i < this.objects.length; i++) {
-            const obj = this.objects[i]!;
-            const id = obj.__id;
+        for (let i = 0; i < this.dirtyIds.length; i++) {
+            const id = this.dirtyIds[i];
+            const obj = this.idToObj[id];
+            if (!obj) continue;
             if (this.dirtyFull[id]) {
                 obj.serializeFull();
             } else if (this.dirtyPart[id]) {
@@ -158,13 +161,56 @@ export class ObjectRegister {
         }
     }
 
+    forEachDirtyObject(callback: (obj: GameObject, full: boolean) => void): void {
+        for (let i = 0; i < this.dirtyIds.length; i++) {
+            const id = this.dirtyIds[i];
+            const obj = this.idToObj[id];
+            if (!obj) continue;
+            if (this.dirtyFull[id]) callback(obj, true);
+            else if (this.dirtyPart[id]) callback(obj, false);
+        }
+    }
+
+    isDirty(obj: GameObject): boolean {
+        return this.dirtyFull[obj.__id] !== 0 || this.dirtyPart[obj.__id] !== 0;
+    }
+
+    isFullDirty(obj: GameObject): boolean {
+        return this.dirtyFull[obj.__id] !== 0;
+    }
+
+    markDirty(obj: GameObject, full: boolean): void {
+        this.markDirtyId(obj.__id, full);
+    }
+
+    clearDirty(obj: GameObject): void {
+        const id = obj.__id;
+        this.dirtyPart[id] = 0;
+        this.dirtyFull[id] = 0;
+    }
+
+    private markDirtyId(id: number, full: boolean): void {
+        if (id <= 0 || id >= MAX_ID) return;
+        if (!this.dirtyQueued[id]) {
+            this.dirtyQueued[id] = 1;
+            this.dirtyIds.push(id);
+        }
+        if (full) this.dirtyFull[id] = 1;
+        else this.dirtyPart[id] = 1;
+    }
+
     flush() {
         for (let i = 0; i < this.deletedObjs.length; i++) {
             this.unregister(this.deletedObjs[i]);
         }
         this.deletedObjs.length = 0;
-        this.dirtyFull.fill(0);
-        this.dirtyPart.fill(0);
+        for (let i = 0; i < this.dirtyIds.length; i++) {
+            const id = this.dirtyIds[i];
+            this.dirtyFull[id] = 0;
+            this.dirtyPart[id] = 0;
+            this.dirtyQueued[id] = 0;
+        }
+        this.dirtyIds.length = 0;
     }
 }
 
@@ -249,11 +295,11 @@ export abstract class BaseGameObject {
     }
 
     setDirty() {
-        this.game.objectRegister.dirtyFull[this.__id] = 1;
+        this.game.objectRegister.markDirty(this as unknown as GameObject, true);
     }
 
     setPartDirty() {
-        this.game.objectRegister.dirtyPart[this.__id] = 1;
+        this.game.objectRegister.markDirty(this as unknown as GameObject, false);
     }
 
     checkStairs(objs: GameObject[], rad: number): Structure["stairs"][0] | undefined {
@@ -325,8 +371,7 @@ export abstract class BaseGameObject {
         }
         this.game.grid.remove(this as unknown as GameObject);
         this.game.objectRegister.deletedObjs.push(this as unknown as GameObject);
-        this.game.objectRegister.dirtyPart[this.__id] = 0;
-        this.game.objectRegister.dirtyFull[this.__id] = 0;
+        this.game.objectRegister.clearDirty(this as unknown as GameObject);
         this.destroyed = true;
     }
 }
