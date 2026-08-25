@@ -2323,8 +2323,6 @@ export class Player extends BaseGameObject {
         if (this.shotSlowdownTimer <= 0) {
             this.shotSlowdownTimer = 0;
         }
-
-        console.log([...this.getIntersectingBuildings()]);
     }
 
     moveObjUpdate(occupiedBuilding?: Building): void {
