@@ -15,7 +15,7 @@ export type QuestEvent =
 export interface FilterParams {
     team_mode: { mode: TeamMode };
     max_rank: { maxRank: number };
-    building: { buildingType: string | string[]; };
+    building: { buildingType: string | string[] };
     role: { role: string | string[] };
     weapon: {
         weaponClass: "gun";
@@ -231,6 +231,24 @@ export const QuestDefs: Record<string, QuestDef> = {
                 ammo: "9mm",
             },
         ],
+        mapFilterType: "all_except",
+        maps: MapId.Savannah,
+    },
+    quest_damage_9mm_ltm: {
+        type: "quest",
+        event: "damage",
+        target: 500,
+        xp: 30,
+        icon: "img/emotes/ammo-9mm.svg",
+        filters: [
+            {
+                type: "weapon",
+                weaponClass: "gun",
+                ammo: "9mm",
+            },
+        ],
+        mapFilterType: "only_on",
+        maps: MapId.Savannah,
     },
     quest_damage_762mm: {
         type: "quest",
@@ -245,6 +263,24 @@ export const QuestDefs: Record<string, QuestDef> = {
                 ammo: "762mm",
             },
         ],
+        mapFilterType: "all_except",
+        maps: [MapId.Savannah, MapId.Woods],
+    },
+    quest_damage_762mm_ltm: {
+        type: "quest",
+        event: "damage",
+        target: 350,
+        xp: 30,
+        icon: "img/emotes/ammo-762mm.svg",
+        filters: [
+            {
+                type: "weapon",
+                weaponClass: "gun",
+                ammo: "762mm",
+            },
+        ],
+        mapFilterType: "only_on",
+        maps: [MapId.Savannah, MapId.Woods],
     },
     quest_damage_556mm: {
         type: "quest",
@@ -259,6 +295,24 @@ export const QuestDefs: Record<string, QuestDef> = {
                 ammo: "556mm",
             },
         ],
+        mapFilterType: "all_except",
+        maps: [MapId.Savannah, MapId.Woods],
+    },
+    quest_damage_556mm_ltm: {
+        type: "quest",
+        event: "damage",
+        target: 350,
+        xp: 30,
+        icon: "img/emotes/ammo-762mm.svg",
+        filters: [
+            {
+                type: "weapon",
+                weaponClass: "gun",
+                ammo: "762mm",
+            },
+        ],
+        mapFilterType: "only_on",
+        maps: [MapId.Savannah, MapId.Woods],
     },
     quest_damage_12gauge: {
         type: "quest",
@@ -273,6 +327,24 @@ export const QuestDefs: Record<string, QuestDef> = {
                 ammo: "12gauge",
             },
         ],
+        mapFilterType: "all_except",
+        maps: MapId.Woods,
+    },
+    quest_damage_12gauge_ltm: {
+        type: "quest",
+        event: "damage",
+        target: 700,
+        xp: 30,
+        icon: "img/emotes/ammo-12gauge.svg",
+        filters: [
+            {
+                type: "weapon",
+                weaponClass: "gun",
+                ammo: "12gauge",
+            },
+        ],
+        mapFilterType: "only_on",
+        maps: MapId.Woods,
     },
     quest_damage_45acp: {
         type: "quest",
@@ -320,6 +392,25 @@ export const QuestDefs: Record<string, QuestDef> = {
             },
         ],
         difficulty: QuestDifficulty.Hard,
+        mapFilterType: "all_except",
+        maps: [MapId.Faction, MapId.Desert, MapId.Savannah, MapId.Potato],
+    },
+    quest_damage_rare_ammo_ltm: {
+        type: "quest",
+        event: "damage",
+        target: 500,
+        xp: 50,
+        icon: "img/emotes/ammo-50AE.svg",
+        filters: [
+            {
+                type: "weapon",
+                weaponClass: "gun",
+                ammo: ["50AE", "308sub"],
+            },
+        ],
+        difficulty: QuestDifficulty.Hard,
+        mapFilterType: "only_on",
+        maps: [MapId.Faction, MapId.Desert, MapId.Savannah, MapId.Potato],
     },
     quest_damage_woods_king: {
         type: "quest",
@@ -345,8 +436,38 @@ export const QuestDefs: Record<string, QuestDef> = {
                 weaponClass: "throwable",
             },
         ],
+        mapFilterType: "all_except",
+        maps: MapId.Cobalt,
+    },
+    quest_damage_grenade_ltm: {
+        type: "quest",
+        event: "damage",
+        target: 400,
+        xp: 40,
+        filters: [
+            {
+                type: "weapon",
+                weaponClass: "throwable",
+            },
+        ],
+        mapFilterType: "only_on",
+        maps: MapId.Cobalt,
     },
     quest_damage_melee: {
+        type: "quest",
+        event: "damage",
+        target: 500,
+        xp: 40,
+        filters: [
+            {
+                type: "weapon",
+                weaponClass: "melee",
+            },
+        ],
+        mapFilterType: "all_except",
+        maps: MapId.Cobalt,
+    },
+    quest_damage_melee_ltm: {
         type: "quest",
         event: "damage",
         target: 250,
@@ -357,6 +478,8 @@ export const QuestDefs: Record<string, QuestDef> = {
                 weaponClass: "melee",
             },
         ],
+        mapFilterType: "only_on",
+        maps: MapId.Cobalt,
     },
     quest_heal: {
         type: "quest",
@@ -389,7 +512,24 @@ export const QuestDefs: Record<string, QuestDef> = {
         event: "airdrop_unlocked",
         target: 1,
         xp: 30,
-        filters: [],
+        mapFilterType: "all_except",
+        maps: [MapId.Desert, "faction_potato", MapId.Potato],
+    },
+    quest_airdrop_ltm_1: {
+        type: "quest",
+        event: "airdrop_unlocked",
+        target: 5,
+        xp: 30,
+        mapFilterType: "only_on",
+        maps: [MapId.Desert, "faction_potato", MapId.Potato],
+    },
+    quest_airdrop_ltm_2: {
+        type: "quest",
+        event: "airdrop_unlocked",
+        target: 10,
+        xp: 40,
+        mapFilterType: "only_on",
+        maps: [MapId.Desert, "faction_potato", MapId.Potato],
     },
     quest_airdrop_rare: {
         type: "quest",
