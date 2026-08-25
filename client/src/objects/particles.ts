@@ -1,6 +1,6 @@
 import * as PIXI from "pixi.js-legacy";
 import { math } from "../../../shared/utils/math.ts";
-import { util } from "../../../shared/utils/util.ts";
+import { type DeepPartial, util } from "../../../shared/utils/util.ts";
 import { v2, type Vec2 } from "../../../shared/utils/v2.ts";
 import type { Camera } from "../camera.ts";
 import type { Map } from "../map.ts";
@@ -422,7 +422,7 @@ export class ParticleBarn {
 
 const ParticleDefs: Record<string, ParticleDef> = {
     archwayBreak: {
-        image: ["part-panel-01.img"],
+        image: ["part-plank-01.img"],
         life: new Range(0.5, 1.5),
         drag: new Range(1, 5),
         rotVel: new Range(0, Math.PI * 3),
@@ -479,7 +479,7 @@ const ParticleDefs: Record<string, ParticleDef> = {
         },
     },
     barrelChip: {
-        image: ["part-spark-02.img"],
+        image: ["part-spark-01.img"],
         life: 0.5,
         drag: new Range(1, 10),
         rotVel: 0,
@@ -498,7 +498,7 @@ const ParticleDefs: Record<string, ParticleDef> = {
         },
     },
     barrelBreak: {
-        image: ["part-spark-02.img"],
+        image: ["part-spark-01.img"],
         life: new Range(0.8, 1),
         drag: new Range(1, 5),
         rotVel: 0,
@@ -536,7 +536,7 @@ const ParticleDefs: Record<string, ParticleDef> = {
         },
     },
     blueChip: {
-        image: ["part-spark-02.img"],
+        image: ["part-spark-01.img"],
         life: 0.5,
         drag: new Range(1, 10),
         rotVel: 0,
@@ -574,7 +574,7 @@ const ParticleDefs: Record<string, ParticleDef> = {
         },
     },
     bottleBrownChip: {
-        image: ["part-spark-02.img"],
+        image: ["part-spark-01.img"],
         life: 0.5,
         drag: new Range(1, 5),
         rotVel: new Range(Math.PI * 1, Math.PI * 6),
@@ -591,7 +591,7 @@ const ParticleDefs: Record<string, ParticleDef> = {
         color: 0x783808,
     },
     bottleBrownBreak: {
-        image: ["part-spark-02.img"],
+        image: ["part-spark-01.img"],
         life: new Range(0.4, 0.8),
         drag: new Range(1, 4),
         rotVel: new Range(Math.PI * 1, Math.PI * 6),
@@ -608,7 +608,7 @@ const ParticleDefs: Record<string, ParticleDef> = {
         color: 0x783808,
     },
     bottleBlueChip: {
-        image: ["part-spark-02.img"],
+        image: ["part-spark-01.img"],
         life: 0.5,
         drag: new Range(1, 5),
         rotVel: new Range(Math.PI * 1, Math.PI * 6),
@@ -625,7 +625,7 @@ const ParticleDefs: Record<string, ParticleDef> = {
         color: 0x4c58,
     },
     bottleWhiteBreak: {
-        image: ["part-spark-02.img"],
+        image: ["part-spark-01.img"],
         life: new Range(0.4, 0.8),
         drag: new Range(1, 4),
         rotVel: new Range(Math.PI * 1, Math.PI * 6),
@@ -642,7 +642,7 @@ const ParticleDefs: Record<string, ParticleDef> = {
         color: 0xffffff,
     },
     bottleWhiteChip: {
-        image: ["part-spark-02.img"],
+        image: ["part-spark-01.img"],
         life: 0.5,
         drag: new Range(1, 5),
         rotVel: new Range(Math.PI * 1, Math.PI * 6),
@@ -659,7 +659,7 @@ const ParticleDefs: Record<string, ParticleDef> = {
         color: 0xffffff,
     },
     bottleBlueBreak: {
-        image: ["part-spark-02.img"],
+        image: ["part-spark-01.img"],
         life: new Range(0.4, 0.8),
         drag: new Range(1, 4),
         rotVel: new Range(Math.PI * 1, Math.PI * 6),
@@ -676,7 +676,7 @@ const ParticleDefs: Record<string, ParticleDef> = {
         color: 0x4c58,
     },
     brickChip: {
-        image: ["part-spark-02.img"],
+        image: ["part-spark-01.img"],
         life: 0.5,
         drag: new Range(1, 10),
         rotVel: 0,
@@ -790,7 +790,7 @@ const ParticleDefs: Record<string, ParticleDef> = {
         },
     },
     glassChip: {
-        image: ["part-spark-02.img"],
+        image: ["part-spark-01.img"],
         life: 0.5,
         drag: new Range(1, 5),
         rotVel: new Range(Math.PI * 1, Math.PI * 6),
@@ -824,7 +824,7 @@ const ParticleDefs: Record<string, ParticleDef> = {
         color: 0x80d9ff,
     },
     goldChip: {
-        image: ["part-spark-02.img"],
+        image: ["part-spark-01.img"],
         life: 0.5,
         drag: new Range(1, 10),
         rotVel: 0,
@@ -843,7 +843,7 @@ const ParticleDefs: Record<string, ParticleDef> = {
         },
     },
     pinkChip: {
-        image: ["part-spark-02.img"],
+        image: ["part-spark-01.img"],
         life: new Range(0.5, 1),
         drag: new Range(1, 5),
         rotVel: new Range(Math.PI * 3, Math.PI * 3),
@@ -862,7 +862,7 @@ const ParticleDefs: Record<string, ParticleDef> = {
         },
     },
     ltblueChip: {
-        image: ["part-spark-02.img"],
+        image: ["part-spark-01.img"],
         life: new Range(0.5, 1),
         drag: new Range(1, 5),
         rotVel: new Range(Math.PI * 3, Math.PI * 3),
@@ -881,7 +881,7 @@ const ParticleDefs: Record<string, ParticleDef> = {
         },
     },
     yellowChip: {
-        image: ["part-spark-02.img"],
+        image: ["part-spark-01.img"],
         life: new Range(0.5, 1),
         drag: new Range(1, 5),
         rotVel: new Range(Math.PI * 3, Math.PI * 3),
@@ -900,7 +900,7 @@ const ParticleDefs: Record<string, ParticleDef> = {
         },
     },
     greenChip: {
-        image: ["part-spark-02.img"],
+        image: ["part-spark-01.img"],
         life: 0.5,
         drag: new Range(1, 10),
         rotVel: 0,
@@ -936,7 +936,7 @@ const ParticleDefs: Record<string, ParticleDef> = {
         color: 0x3b452f,
     },
     greenhouseBreak: {
-        image: ["part-spark-02.img", "part-plate-01.img", "part-panel-01.img"],
+        image: ["part-spark-01.img", "part-plate-01.img", "part-plank-01.img"],
         life: new Range(0.5, 1.5),
         drag: new Range(1, 5),
         rotVel: new Range(Math.PI * 1, Math.PI * 6),
@@ -953,7 +953,7 @@ const ParticleDefs: Record<string, ParticleDef> = {
         color: 0x80d9ff,
     },
     hutBreak: {
-        image: ["part-panel-01.img"],
+        image: ["part-plank-01.img"],
         life: new Range(0.5, 1.5),
         drag: new Range(1, 5),
         rotVel: new Range(0, Math.PI * 3),
@@ -1086,7 +1086,7 @@ const ParticleDefs: Record<string, ParticleDef> = {
         },
     },
     outhouseBreak: {
-        image: ["part-panel-01.img"],
+        image: ["part-plank-01.img"],
         life: new Range(0.5, 1.5),
         drag: new Range(1, 5),
         rotVel: new Range(0, Math.PI * 3),
@@ -1124,7 +1124,7 @@ const ParticleDefs: Record<string, ParticleDef> = {
         },
     },
     potChip: {
-        image: ["part-spark-02.img"],
+        image: ["part-spark-01.img"],
         life: 0.5,
         drag: new Range(1, 10),
         rotVel: 0,
@@ -1162,7 +1162,7 @@ const ParticleDefs: Record<string, ParticleDef> = {
         },
     },
     potatoChip: {
-        image: ["part-spark-02.img"],
+        image: ["part-spark-01.img"],
         life: 0.5,
         drag: new Range(1, 10),
         rotVel: 0,
@@ -1200,7 +1200,7 @@ const ParticleDefs: Record<string, ParticleDef> = {
         },
     },
     tomatoChip_01: {
-        image: ["part-spark-02.img"],
+        image: ["part-spark-01.img"],
         life: 0.5,
         drag: new Range(1, 10),
         rotVel: 0,
@@ -1219,7 +1219,7 @@ const ParticleDefs: Record<string, ParticleDef> = {
         },
     },
     tomatoChip_02: {
-        image: ["part-spark-02.img"],
+        image: ["part-spark-01.img"],
         life: 0.5,
         drag: new Range(1, 10),
         rotVel: 0,
@@ -1276,7 +1276,7 @@ const ParticleDefs: Record<string, ParticleDef> = {
         },
     },
     pumpkinChip: {
-        image: ["part-spark-02.img"],
+        image: ["part-spark-01.img"],
         life: 0.5,
         drag: new Range(1, 10),
         rotVel: 0,
@@ -1314,7 +1314,7 @@ const ParticleDefs: Record<string, ParticleDef> = {
         },
     },
     squashChip: {
-        image: ["part-spark-02.img"],
+        image: ["part-spark-01.img"],
         life: 0.5,
         drag: new Range(1, 10),
         rotVel: 0,
@@ -1352,7 +1352,7 @@ const ParticleDefs: Record<string, ParticleDef> = {
         },
     },
     redChip: {
-        image: ["part-spark-02.img"],
+        image: ["part-spark-01.img"],
         life: 0.5,
         drag: new Range(1, 10),
         rotVel: 0,
@@ -1371,7 +1371,7 @@ const ParticleDefs: Record<string, ParticleDef> = {
         },
     },
     redBreak: {
-        image: ["part-spark-02.img"],
+        image: ["part-spark-01.img"],
         life: new Range(0.8, 1),
         drag: new Range(1, 5),
         rotVel: 0,
@@ -1481,7 +1481,7 @@ const ParticleDefs: Record<string, ParticleDef> = {
         color: 0x292421,
     },
     shackBreak: {
-        image: ["part-panel-01.img"],
+        image: ["part-plank-01.img"],
         life: new Range(0.5, 1.5),
         drag: new Range(1, 5),
         rotVel: new Range(0, Math.PI * 3),
@@ -1500,7 +1500,7 @@ const ParticleDefs: Record<string, ParticleDef> = {
         },
     },
     shackGreenBreak: {
-        image: ["part-panel-01.img"],
+        image: ["part-plank-01.img"],
         life: new Range(0.5, 1.5),
         drag: new Range(1, 5),
         rotVel: new Range(0, Math.PI * 3),
@@ -1536,7 +1536,7 @@ const ParticleDefs: Record<string, ParticleDef> = {
         },
     },
     teahouseBreak: {
-        image: ["part-panel-01.img"],
+        image: ["part-plank-01.img"],
         life: new Range(0.5, 1.5),
         drag: new Range(1, 5),
         rotVel: new Range(0, Math.PI * 3),
@@ -1555,7 +1555,7 @@ const ParticleDefs: Record<string, ParticleDef> = {
         },
     },
     teapavilionBreak: {
-        image: ["part-panel-01.img"],
+        image: ["part-plank-01.img"],
         life: new Range(0.5, 1.5),
         drag: new Range(1, 5),
         rotVel: new Range(0, Math.PI * 3),
@@ -1574,7 +1574,7 @@ const ParticleDefs: Record<string, ParticleDef> = {
         },
     },
     toiletBreak: {
-        image: ["part-spark-02.img"],
+        image: ["part-spark-01.img"],
         life: new Range(0.8, 1),
         drag: new Range(1, 5),
         rotVel: 0,
@@ -1593,7 +1593,7 @@ const ParticleDefs: Record<string, ParticleDef> = {
         },
     },
     toiletGoldChip: {
-        image: ["part-spark-02.img"],
+        image: ["part-spark-01.img"],
         life: 0.5,
         drag: new Range(1, 10),
         rotVel: 0,
@@ -1612,7 +1612,7 @@ const ParticleDefs: Record<string, ParticleDef> = {
         },
     },
     toiletGoldBreak: {
-        image: ["part-spark-02.img"],
+        image: ["part-spark-01.img"],
         life: new Range(0.8, 1),
         drag: new Range(4, 5),
         rotVel: 0,
@@ -1631,7 +1631,7 @@ const ParticleDefs: Record<string, ParticleDef> = {
         },
     },
     toiletMetalBreak: {
-        image: ["part-spark-02.img"],
+        image: ["part-spark-01.img"],
         life: new Range(0.8, 1),
         drag: new Range(4, 5),
         rotVel: 0,
@@ -1688,7 +1688,7 @@ const ParticleDefs: Record<string, ParticleDef> = {
         },
     },
     whiteChip: {
-        image: ["part-spark-02.img"],
+        image: ["part-spark-01.img"],
         life: 0.5,
         drag: new Range(1, 10),
         rotVel: 0,
@@ -1726,7 +1726,7 @@ const ParticleDefs: Record<string, ParticleDef> = {
         },
     },
     windowBreak: {
-        image: ["part-spark-02.img"],
+        image: ["part-spark-01.img"],
         life: new Range(0.4, 0.8),
         drag: new Range(1, 4),
         rotVel: new Range(Math.PI * 1, Math.PI * 6),
@@ -1800,7 +1800,7 @@ const ParticleDefs: Record<string, ParticleDef> = {
         },
     },
     woodShard: {
-        image: ["part-spark-02.img"],
+        image: ["part-spark-01.img"],
         life: new Range(1, 1.5),
         drag: new Range(3, 5),
         rotVel: new Range(Math.PI * 3, Math.PI * 3),
