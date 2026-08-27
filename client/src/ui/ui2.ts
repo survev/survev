@@ -1167,56 +1167,58 @@ export class UiManager2 {
                 ? "block"
                 : "none";
         }
-        for (let E = 0; E < patch.weapons.length; E++) {
-            const B = patch.weapons[E];
-            const R = dom.weapons[E];
-            const L = state.weapons[E];
-            if (B.type) {
-                let q = "";
-                let F = "";
-                const j = GameObjectDefs.typeToDefSafe(L.type);
-                if (j) {
-                    q = this.localization.translate(`game-hud-${L.type}`)
-                        || this.localization.translate(`game-${L.type}`);
-                    F = helpers.getCssTransformFromGameType(L.type);
+
+        for (let weaponIndex = 0; weaponIndex < patch.weapons.length; weaponIndex++) {
+            const weaponPatch = patch.weapons[weaponIndex];
+            const weaponDom = dom.weapons[weaponIndex];
+            const weaponState = state.weapons[weaponIndex];
+            if (weaponPatch.type) {
+                let weaponName = "";
+                let weaponTransformCss = "";
+                const weaponDef = GameObjectDefs.typeToDefSafe(weaponState.type);
+                if (weaponDef) {
+                    weaponName = this.localization.translate(`game-hud-${weaponState.type}`)
+                        || this.localization.translate(`game-${weaponState.type}`);
+                    weaponTransformCss = helpers.getCssTransformFromGameType(weaponState.type);
                 }
-                R.type.innerHTML = q;
-                R.image.src = helpers.getSvgFromGameType(L.type);
-                R.image.style.display = j ? "inline" : "none";
-                R.image.style.transform = F;
+
+                weaponDom.type.innerHTML = weaponName;
+                weaponDom.image.src = helpers.getSvgFromGameType(weaponState.type);
+                weaponDom.image.style.display = weaponDef ? "inline" : "none";
+                weaponDom.image.style.transform = weaponTransformCss;
             }
-            if (B.equipped) {
-                R.div.style.backgroundColor = L.equipped
+            if (weaponPatch.equipped) {
+                weaponDom.div.style.backgroundColor = weaponState.equipped
                     ? "rgba(0, 0, 0, 0.4)"
                     : "rgba(0, 0, 0, 0)";
             }
-            if (B.selectable) {
-                R.div.style.pointerEvents = L.type != "" || L.selectable ? "auto" : "none";
+            if (weaponPatch.selectable) {
+                weaponDom.div.style.pointerEvents = weaponState.type !== "" || weaponState.selectable ? "auto" : "none";
             }
-            if (B.width) {
-                const N = math.lerp(L.width, 83.33, 100);
-                R.div.style.width = `${N}%`;
+            if (weaponPatch.width) {
+                const weaponWidth = math.lerp(weaponState.width, 83.33, 100);
+                weaponDom.div.style.width = `${weaponWidth}%`;
             }
-            if (B.opacity) {
-                R.div.style.opacity = String(L.opacity);
+            if (weaponPatch.opacity) {
+                weaponDom.div.style.opacity = String(weaponState.opacity);
             }
-            if (B.ammo && R.ammo) {
-                R.ammo.innerHTML = String(L.ammo);
-                R.ammo.style.display = L.ammo > 0 ? "block" : "none";
+            if (weaponPatch.ammo && weaponDom.ammo) {
+                weaponDom.ammo.innerHTML = String(weaponState.ammo);
+                weaponDom.ammo.style.display = weaponState.ammo > 0 ? "block" : "none";
             }
-            if (B.bindStr) {
-                R.number.innerHTML = L.bindStr[0] || "";
+            if (weaponPatch.bindStr) {
+                weaponDom.number.innerHTML = weaponState.bindStr[0] || "";
             }
         }
         if (patch.ammo.current) {
-            const H = state.ammo.current;
-            dom.ammo.current.innerHTML = String(H);
-            dom.ammo.current.style.color = H > 0 ? "white" : "red";
+            const currentAmmo = state.ammo.current;
+            dom.ammo.current.innerHTML = String(currentAmmo);
+            dom.ammo.current.style.color = currentAmmo > 0 ? "white" : "red";
         }
         if (patch.ammo.remaining) {
-            const V = state.ammo.remaining;
-            dom.ammo.remaining.innerHTML = String(V == Number.MAX_VALUE ? "&#8734;" : V);
-            dom.ammo.remaining.style.color = V != 0 ? "white" : "red";
+            const remainingAmmo = state.ammo.remaining;
+            dom.ammo.remaining.innerHTML = String(remainingAmmo === Number.MAX_VALUE ? "&#8734;" : remainingAmmo);
+            dom.ammo.remaining.style.color = remainingAmmo !== 0 ? "white" : "red";
         }
         if (patch.ammo.displayCurrent) {
             dom.ammo.current.style.opacity = String(state.ammo.displayCurrent ? 1 : 0);
@@ -1229,117 +1231,119 @@ export class UiManager2 {
                 state.ammo.displayRemaining ? 1 : 0,
             );
         }
-        for (let U = 0; U < patch.scopes.length; U++) {
-            const W = patch.scopes[U];
-            const G = dom.scopes[U];
-            const X = state.scopes[U];
-            if (W.visible) {
-                if (X.visible) {
-                    G.div.classList.remove("ui-hidden");
+
+        for (let scopeIndex = 0; scopeIndex < patch.scopes.length; scopeIndex++) {
+            const scopePatch = patch.scopes[scopeIndex];
+            const scopeDom = dom.scopes[scopeIndex];
+            const scopeState = state.scopes[scopeIndex];
+            if (scopePatch.visible) {
+                if (scopeState.visible) {
+                    scopeDom.div.classList.remove("ui-hidden");
                 } else {
-                    G.div.classList.add("ui-hidden");
+                    scopeDom.div.classList.add("ui-hidden");
                 }
             }
-            if (W.equipped) {
-                if (X.equipped) {
-                    G.div.classList.add("ui-zoom-active");
-                    G.div.classList.remove("ui-zoom-inactive");
+            if (scopePatch.equipped) {
+                if (scopeState.equipped) {
+                    scopeDom.div.classList.add("ui-zoom-active");
+                    scopeDom.div.classList.remove("ui-zoom-inactive");
                 } else {
-                    G.div.classList.remove("ui-zoom-active");
-                    G.div.classList.add("ui-zoom-inactive");
+                    scopeDom.div.classList.remove("ui-zoom-active");
+                    scopeDom.div.classList.add("ui-zoom-inactive");
                 }
             }
-            if (W.selectable) {
-                G.div.style.pointerEvents = X.selectable ? "auto" : "none";
+            if (scopePatch.selectable) {
+                scopeDom.div.style.pointerEvents = scopeState.selectable ? "auto" : "none";
             }
         }
-        for (let K = 0; K < patch.loot.length; K++) {
-            const Z = patch.loot[K];
-            const Y = dom.loot[K];
-            const J = state.loot[K];
-            if (Z && Y && J) {
-                if (Z.count || Z.maximum) {
-                    Y.count.innerHTML = String(J.count);
-                    Y.div.style.opacity = String(
-                        (GameObjectDefs.typeToDef(Y.lootType) as AmmoDef).special && J.count == 0
+
+        for (let lootIndex = 0; lootIndex < patch.loot.length; lootIndex++) {
+            const lootPatch = patch.loot[lootIndex];
+            const lootDom = dom.loot[lootIndex];
+            const lootState = state.loot[lootIndex];
+            if (lootPatch && lootDom && lootState) {
+                if (lootPatch.count || lootPatch.maximum) {
+                    lootDom.count.innerHTML = String(lootState.count);
+                    lootDom.div.style.opacity = String(
+                        (GameObjectDefs.typeToDef(lootDom.lootType) as AmmoDef).special && lootState.count == 0
                             ? 0
-                            : J.count > 0
+                            : lootState.count > 0
                             ? 1
                             : 0.25,
                     );
-                    Y.div.style.color = J.count == J.maximum ? "#ff9900" : "#ffffff";
+                    lootDom.div.style.color = lootState.count === lootState.maximum ? "#ff9900" : "#ffffff";
                 }
-                if (Z.width) {
-                    const Q = 1 + J.width * 0.33;
-                    const $ = `scale(${Q}, ${Q})`;
-                    Y.image.style.transform = $;
-                    if (Y.overlay) {
-                        Y.overlay.style.transform = $;
+                if (lootPatch.width) {
+                    const scale = 1 + lootState.width * 0.33;
+                    const transform = `scale(${scale}, ${scale})`;
+                    lootDom.image.style.transform = transform;
+                    if (lootDom.overlay) {
+                        lootDom.overlay.style.transform = transform;
                     }
                 }
-                if (Z.selectable) {
-                    Y.div.style.pointerEvents = J.selectable ? "auto" : "none";
+                if (lootPatch.selectable) {
+                    lootDom.div.style.pointerEvents = lootState.selectable ? "auto" : "none";
                 }
             }
         }
-        for (let ee = 0; ee < patch.gear.length; ee++) {
-            const te = patch.gear[ee];
-            const re = dom.gear[ee];
-            const ae = state.gear[ee];
-            if (te.item) {
-                // GearDef?
-                const ie = ae.item ? (GameObjectDefs.typeToDef(ae.item) as ChestDef) : null;
-                const oe = ie ? ie.level : 0;
-                re.div.style.display = ie ? "block" : "none";
-                re.level.innerHTML = this.localization.translate(`game-level-${oe}`);
-                re.level.style.color = oe === 4 ? "#b30000" : oe === 3 ? "#ff9900" : "#ffffff";
-                re.image.src = helpers.getSvgFromGameType(ae.item);
+
+        for (let gearIndex = 0; gearIndex < patch.gear.length; gearIndex++) {
+            const gearPatch = patch.gear[gearIndex];
+            const gearDom = dom.gear[gearIndex];
+            const gearState = state.gear[gearIndex];
+            if (gearPatch.item) {
+                // GearDef? | new comment from the future answering this -> yes! or well I think :p (I should probably delete this)
+                const gearDef = gearState.item ? (GameObjectDefs.typeToDef(gearState.item) as ChestDef) : null;
+                const gearLevel = gearDef ? gearDef.level : 0;
+                gearDom.div.style.display = gearDef ? "block" : "none";
+                gearDom.level.innerHTML = this.localization.translate(`game-level-${gearLevel}`);
+                gearDom.level.style.color = gearLevel === 4 ? "#b30000" : gearLevel === 3 ? "#ff9900" : "#ffffff";
+                gearDom.image.src = helpers.getSvgFromGameType(gearState.item);
             }
-            if (te.selectable) {
-                re.div.style.pointerEvents = ae.selectable ? "auto" : "none";
+            if (gearPatch.selectable) {
+                gearDom.div.style.pointerEvents = gearState.selectable ? "auto" : "none";
             }
-            if (te.width) {
-                const se = 1 + ae.width * 0.33;
-                let ne = `scale(${se}, ${se})`;
-                const le = GameObjectDefs.typeToDefSafe(ae.item) as MeleeDef;
-                if (le?.lootImg.rot !== undefined) {
-                    ne += ` rotate(${le.lootImg.rot}rad)`;
+            if (gearPatch.width) {
+                const scale = 1 + gearState.width * 0.33;
+                let transform = `scale(${scale}, ${scale})`;
+                const meleeGearDef = GameObjectDefs.typeToDefSafe(gearState.item) as MeleeDef;
+                if (meleeGearDef?.lootImg.rot !== undefined) {
+                    transform += ` rotate(${meleeGearDef.lootImg.rot}rad)`;
                 }
-                re.image.style.transform = ne;
+                gearDom.image.style.transform = transform;
             }
         }
-        for (let ce = 0; ce < patch.perks.length; ce++) {
-            const me = patch.perks[ce];
-            const pe = dom.perks[ce];
-            const he = state.perks[ce];
-            if (me.type) {
-                pe.perkType = he.type;
-                pe.divTitle.innerHTML = this.localization.translate(`game-${he.type}`);
-                pe.divDesc.innerHTML = this.localization.translate(
-                    `game-${he.type}-desc`,
-                );
-                pe.div.style.display = he.type ? "block" : "none";
-                pe.image.src = he.type ? helpers.getSvgFromGameType(he.type) : "";
+
+        for (let perkIndex = 0; perkIndex < patch.perks.length; perkIndex++) {
+            const perkPatch = patch.perks[perkIndex];
+            const perkDom = dom.perks[perkIndex];
+            const perkState = state.perks[perkIndex];
+            if (perkPatch.type) {
+                perkDom.perkType = perkState.type;
+                perkDom.divTitle.innerHTML = this.localization.translate(`game-${perkState.type}`);
+                perkDom.divDesc.innerHTML = this.localization.translate(`game-${perkState.type}-desc`,);
+                perkDom.div.style.display = perkState.type ? "block" : "none";
+                perkDom.image.src = perkState.type ? helpers.getSvgFromGameType(perkState.type) : "";
             }
-            if (me.droppable) {
-                if (he.droppable) {
-                    pe.div.classList.add("ui-outline-hover");
-                    pe.div.classList.remove("ui-perk-no-drop");
+            if (perkPatch.droppable) {
+                if (perkState.droppable) {
+                    perkDom.div.classList.add("ui-outline-hover");
+                    perkDom.div.classList.remove("ui-perk-no-drop");
                 } else {
-                    pe.div.classList.remove("ui-outline-hover");
-                    pe.div.classList.add("ui-perk-no-drop");
+                    perkDom.div.classList.remove("ui-outline-hover");
+                    perkDom.div.classList.add("ui-perk-no-drop");
                 }
             }
-            if (me.pulse) {
-                if (he.pulse) {
-                    pe.div.classList.add("ui-perk-pulse");
+            if (perkPatch.pulse) {
+                if (perkState.pulse) {
+                    perkDom.div.classList.add("ui-perk-pulse");
                 } else {
-                    pe.div.classList.remove("ui-perk-pulse");
+                    perkDom.div.classList.remove("ui-perk-pulse");
                 }
             }
-            if (me.width) {
-                const de = 1 + he.width * 0.33;
-                pe.image.style.transform = `scale(${de}, ${de})`;
+            if (perkPatch.width) {
+                const scale = 1 + perkState.width * 0.33;
+                perkDom.image.style.transform = `scale(${scale}, ${scale})`; // well that is interesting... the minifier got rid of the `transform` variable... actually no it isn't because the `transform` variable is only used once here the minifier sees this as less code and whatnot :p
             }
         }
     }
