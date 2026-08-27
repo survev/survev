@@ -1,4 +1,3 @@
-import { kill } from "node:process";
 import type { LootDef } from "../../../shared/defs/gameObjectDefs.ts";
 import {
     type AmmoDef,
