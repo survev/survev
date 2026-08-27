@@ -380,7 +380,7 @@ export class UiManager2 {
         }
 
         for (const lootType of getUiInventoryItemTypes()) {
-            const lootDiv = domElemById(`ui-loot-${lootType}`); // I think this should be the same
+            const lootDiv = domElemById(`ui-loot-${lootType}`);
             if (lootDiv) {
                 const lootData = {
                     lootType,
@@ -625,42 +625,47 @@ export class UiManager2 {
             state.rareLootMessage.opacity = 0;
         }
 
-        // Update displayed message message
-        state.rareLootMessage.ticker += dt;
-        const rareLootMessageTime = state.rareLootMessage.ticker;
-        const rareLootMessageDuration = state.rareLootMessage.duration;
-        state.rareLootMessage.opacity = 1
-            - math.smoothstep(rareLootMessageTime, rareLootMessageDuration - 0.2, rareLootMessageDuration);
+        {
+            // Update displayed message message
+            state.rareLootMessage.ticker += dt;
+            const ticker = state.rareLootMessage.ticker;
+            const duration = state.rareLootMessage.duration;
+            state.rareLootMessage.opacity = 1
+                - math.smoothstep(ticker, duration - 0.2, duration);
+        }
 
-        // Pickup message
-        state.pickupMessage.ticker += dt;
-        const pickupMessageTime = state.pickupMessage.ticker;
-        const pickupMessageDuration = state.pickupMessage.duration;
-        state.pickupMessage.opacity = math.smoothstep(pickupMessageTime, 0, 0.2)
-            * (1 - math.smoothstep(pickupMessageTime, pickupMessageDuration, pickupMessageDuration + 0.2))
-            * (1 - state.rareLootMessage.opacity);
+        {
+            // Pickup message
+            state.pickupMessage.ticker += dt;
+            const ticker = state.pickupMessage.ticker;
+            const duration = state.pickupMessage.duration;
+            state.pickupMessage.opacity = math.smoothstep(ticker, 0, 0.2)
+                * (1 - math.smoothstep(ticker, duration, duration + 0.2))
+                * (1 - state.rareLootMessage.opacity);
+        }
 
-        // Kill message
-        state.killMessage.ticker += dt;
-        const killMessageTime = state.killMessage.ticker;
-        const killMessageDuration = state.killMessage.duration;
-        state.killMessage.opacity =
-            (1 - math.smoothstep(killMessageTime, killMessageDuration - 0.2, killMessageDuration))
-            * (1 - state.rareLootMessage.opacity);
+        {
+            // Kill message
+            state.killMessage.ticker += dt;
+            const ticker = state.killMessage.ticker;
+            const duration = state.killMessage.duration;
+            state.killMessage.opacity = (1 - math.smoothstep(ticker, duration - 0.2, duration))
+                * (1 - state.rareLootMessage.opacity);
+        }
 
         // KillFeed
         let offset = 0;
         for (let i = 0; i < state.killFeed.length; i++) {
             const line = state.killFeed[i];
             line.ticker += dt;
-            const lineTime = line.ticker;
+            const ticker = line.ticker;
             line.offset = offset;
-            line.opacity = math.smoothstep(lineTime, 0, 0.25) * (1 - math.smoothstep(lineTime, 6, 6.5));
-            offset += math.min(lineTime / 0.25, 1);
+            line.opacity = math.smoothstep(ticker, 0, 0.25) * (1 - math.smoothstep(ticker, 6, 6.5));
+            offset += math.min(ticker / 0.25, 1);
 
             // Shorter animation on mobile
             if (device.mobile) {
-                line.opacity = lineTime < 6.5 ? 1 : 0;
+                line.opacity = ticker < 6.5 ? 1 : 0;
             }
         }
 
@@ -837,7 +842,7 @@ export class UiManager2 {
                 return;
             }
 
-            const animationTime = math.min(item.ticker / duration, Math.PI); // still not fully set on that variable name... but I can't think of anything else to call it...
+            const animationTime = math.min(item.ticker / duration, Math.PI);
             const animationWidth = Math.sin(animationTime);
             item.width = animationWidth < 0.001 ? 0 : animationWidth;
         }
@@ -854,7 +859,7 @@ export class UiManager2 {
             const wasEquipped = weaponState.equipped;
             weaponState.equipped = weaponIndex == activePlayer.m_localData.m_curWeapIdx;
             weaponState.selectable = (playerWeapon.type != "" || weaponIndex == GameConfig.WeaponSlot.Primary
-                || weaponIndex == GameConfig.WeaponSlot.Secondary) && !spectating; // more "code" but more semantic
+                || weaponIndex == GameConfig.WeaponSlot.Secondary) && !spectating;
             const targetOpacity = weaponState.equipped ? 1 : 0.6;
             const opacityDelta = targetOpacity - weaponState.opacity;
             const opacityStep = math.min(opacityDelta, (math.sign(opacityDelta) * dt) / 0.15);
@@ -903,7 +908,7 @@ export class UiManager2 {
             scopeState.selectable = scopeState.visible && !spectating;
         }
 
-        const playerBagLevel = activePlayer.m_getBagLevel(); // weird minifier putting this in the loop... or maybe I am wrong and this should be in there...
+        const playerBagLevel = activePlayer.m_getBagLevel();
 
         for (let lootIndex = 0; lootIndex < state.loot.length; lootIndex++) {
             const lootState = state.loot[lootIndex];
@@ -1283,7 +1288,7 @@ export class UiManager2 {
             const gearDom = dom.gear[gearIndex];
             const gearState = state.gear[gearIndex];
             if (gearPatch.item) {
-                // GearDef? | new comment from the future answering this -> yes! or well I think :p (I should probably delete this)
+                // GearDef?
                 const gearDef = gearState.item ? (GameObjectDefs.typeToDef(gearState.item) as ChestDef) : null;
                 const gearLevel = gearDef ? gearDef.level : 0;
                 gearDom.div.style.display = gearDef ? "block" : "none";
@@ -1325,7 +1330,7 @@ export class UiManager2 {
             }
             if (perkPatch.width) {
                 const scale = 1 + perkState.width * 0.33;
-                perkDom.image.style.transform = `scale(${scale}, ${scale})`; // well that is interesting... the minifier got rid of the `transform` variable... actually no it isn't because the `transform` variable is only used once here the minifier sees this as less code and whatnot :p
+                perkDom.image.style.transform = `scale(${scale}, ${scale})`;
             }
         }
     }
