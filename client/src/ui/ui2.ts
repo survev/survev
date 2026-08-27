@@ -463,10 +463,10 @@ export class UiManager2 {
             );
         }
         for (let i = 0; i < this.dom.scopes.length; i++) {
-            const W = this.dom.scopes[i];
-            addItemAction("use", "scope", W.scopeType, W.div);
-            if (W.scopeType != "1xscope") {
-                addItemAction("drop", "loot", W.scopeType, W.div);
+            const scope = this.dom.scopes[i];
+            addItemAction("use", "scope", scope.scopeType, scope.div);
+            if (scope.scopeType != "1xscope") {
+                addItemAction("drop", "loot", scope.scopeType, scope.div);
             }
         }
         for (let i = 0; i < this.dom.loot.length; i++) {
@@ -627,37 +627,37 @@ export class UiManager2 {
 
         // Update displayed message message
         state.rareLootMessage.ticker += dt;
-        const g = state.rareLootMessage.ticker;
-        const f = state.rareLootMessage.duration;
-        state.rareLootMessage.opacity = 1 - math.smoothstep(g, f - 0.2, f);
+        const rareLootMessageTime = state.rareLootMessage.ticker;
+        const rareLootMessageDuration = state.rareLootMessage.duration;
+        state.rareLootMessage.opacity = 1 - math.smoothstep(rareLootMessageTime, rareLootMessageDuration - 0.2, rareLootMessageDuration);
 
         // Pickup message
         state.pickupMessage.ticker += dt;
-        const x = state.pickupMessage.ticker;
-        const z = state.pickupMessage.duration;
-        state.pickupMessage.opacity = math.smoothstep(x, 0, 0.2)
-            * (1 - math.smoothstep(x, z, z + 0.2))
+        const pickupMessageTime = state.pickupMessage.ticker;
+        const pickupMessageDuration = state.pickupMessage.duration;
+        state.pickupMessage.opacity = math.smoothstep(pickupMessageTime, 0, 0.2)
+            * (1 - math.smoothstep(pickupMessageTime, pickupMessageDuration, pickupMessageDuration + 0.2))
             * (1 - state.rareLootMessage.opacity);
 
         // Kill message
         state.killMessage.ticker += dt;
-        const I = state.killMessage.ticker;
-        const T = state.killMessage.duration;
-        state.killMessage.opacity = (1 - math.smoothstep(I, T - 0.2, T)) * (1 - state.rareLootMessage.opacity);
+        const killMessageTime = state.killMessage.ticker;
+        const killMessageDuration = state.killMessage.duration;
+        state.killMessage.opacity = (1 - math.smoothstep(killMessageTime, killMessageDuration - 0.2, killMessageDuration)) * (1 - state.rareLootMessage.opacity);
 
         // KillFeed
         let offset = 0;
         for (let i = 0; i < state.killFeed.length; i++) {
             const line = state.killFeed[i];
             line.ticker += dt;
-            const E = line.ticker;
+            const lineTime = line.ticker;
             line.offset = offset;
-            line.opacity = math.smoothstep(E, 0, 0.25) * (1 - math.smoothstep(E, 6, 6.5));
-            offset += math.min(E / 0.25, 1);
+            line.opacity = math.smoothstep(lineTime, 0, 0.25) * (1 - math.smoothstep(lineTime, 6, 6.5));
+            offset += math.min(lineTime / 0.25, 1);
 
             // Shorter animation on mobile
             if (device.mobile) {
-                line.opacity = E < 6.5 ? 1 : 0;
+                line.opacity = lineTime < 6.5 ? 1 : 0;
             }
         }
 
@@ -728,14 +728,14 @@ export class UiManager2 {
                 // unless we're on a small screen
                 const itemDef = GameObjectDefs.typeToDef(loot.type) as LootDef;
 
-                const X = activePlayer.m_hasWeaponInSlot(GameConfig.WeaponSlot.Primary);
-                const K = activePlayer.m_hasWeaponInSlot(GameConfig.WeaponSlot.Secondary);
-                const Z = X && K;
+                const hasPrimaryWeapon = activePlayer.m_hasWeaponInSlot(GameConfig.WeaponSlot.Primary);
+                const hasSecondaryWeapon = activePlayer.m_hasWeaponInSlot(GameConfig.WeaponSlot.Secondary);
+                const hasBothWeapons = hasPrimaryWeapon && hasSecondaryWeapon;
                 const usable = itemDef.type != "gun"
-                    || !Z
+                    || !hasBothWeapons
                     || activePlayer.m_equippedWeaponType() == "gun";
 
-                let J = false;
+                let canReplaceArmor = false;
                 if (
                     (state.touch
                         && itemDef.type == "helmet"
@@ -745,7 +745,7 @@ export class UiManager2 {
                         && activePlayer.m_getChestLevel() == itemDef.level
                         && loot.type != activePlayer.m_netData.m_chest)
                 ) {
-                    J = true;
+                    canReplaceArmor = true;
                 }
 
                 if (usable || device.uiLayout == device.UiLayout.Sm) {
@@ -758,7 +758,7 @@ export class UiManager2 {
                         || itemDef.type == "melee"
                         || itemDef.type == "outfit"
                         || itemDef.type == "perk"
-                        || J);
+                        || canReplaceArmor);
             }
 
             // Reviving
@@ -772,25 +772,25 @@ export class UiManager2 {
                 const players = playerBarn.playerPool.m_getPool();
 
                 for (let i = 0; i < players.length; i++) {
-                    const p = players[i];
-                    if (p.active) {
-                        const theirTeamId = playerBarn.getPlayerInfo(p.__id).teamId;
+                    const player = players[i];
+                    if (player.active) {
+                        const theirTeamId = playerBarn.getPlayerInfo(player.__id).teamId;
                         if (
-                            (p.__id != activePlayer.__id || canSelfRevive)
+                            (player.__id != activePlayer.__id || canSelfRevive)
                             && ourTeamId == theirTeamId
-                            && p.m_netData.m_downed
-                            && !p.m_netData.m_dead
-                            && p.m_action.type != Action.Revive
+                            && player.m_netData.m_downed
+                            && !player.m_netData.m_dead
+                            && player.m_action.type != Action.Revive
                         ) {
                             const dist = v2.length(
-                                v2.sub(p.m_netData.m_pos, activePlayer.m_netData.m_pos),
+                                v2.sub(player.m_netData.m_pos, activePlayer.m_netData.m_pos),
                             );
                             if (
                                 dist < GameConfig.player.reviveRange
-                                && util.sameLayer(p.layer, activePlayer.layer)
+                                && util.sameLayer(player.layer, activePlayer.layer)
                             ) {
                                 interactionType = InteractionType.Revive;
-                                interactionObject = p;
+                                interactionObject = player;
                                 interactionUsable = true;
                             }
                         }
