@@ -372,43 +372,39 @@ export class UiManager2 {
 
         for (let i = 0; i < SCOPE_LEVELS.length; i++) {
             const scopeType = SCOPE_LEVELS[i];
-            const x = {
+            const scopeData = {
                 scopeType,
                 div: domElemById(`ui-scope-${scopeType}`),
             };
-            this.dom.scopes.push(x);
+            this.dom.scopes.push(scopeData);
         }
-        for (let S = getUiInventoryItemTypes(), v = 0; v < S.length; v++) {
-            const I = S[v];
-            const T = domElemById(`ui-loot-${I}`);
-            if (T) {
-                const P = {
-                    lootType: I,
-                    div: T,
-                    count: T.getElementsByClassName("ui-loot-count")[0] as HTMLElement,
-                    image: T.getElementsByClassName(
-                        "ui-loot-image",
-                    )[0] as HTMLImageElement,
-                    overlay: T.getElementsByClassName(
-                        "ui-loot-overlay",
-                    )[0] as HTMLElement,
+
+        for (const lootType of getUiInventoryItemTypes()) {
+            const lootDiv = domElemById(`ui-loot-${lootType}`); // I think this should be the same
+            if (lootDiv) {
+                const lootData = {
+                    lootType,
+                    div: lootDiv,
+                    count: lootDiv.getElementsByClassName("ui-loot-count")[0] as HTMLElement,
+                    image: lootDiv.getElementsByClassName("ui-loot-image")[0] as HTMLImageElement,
+                    overlay: lootDiv.getElementsByClassName("ui-loot-overlay")[0] as HTMLElement,
                 };
-                this.dom.loot.push(P);
+                this.dom.loot.push(lootData);
             }
         }
+
         for (let i = 0; i < GEAR_TYPES.length; i++) {
             const gearType = GEAR_TYPES[i];
             const div = domElemById(`ui-armor-${gearType}`);
-            const L = {
+            const gearData = {
                 gearType,
                 div,
                 level: div.getElementsByClassName("ui-armor-level")[0] as HTMLElement,
-                image: div.getElementsByClassName(
-                    "ui-armor-image",
-                )[0] as HTMLImageElement,
+                image: div.getElementsByClassName("ui-armor-image")[0] as HTMLImageElement,
             };
-            this.dom.gear.push(L);
+            this.dom.gear.push(gearData);
         }
+
         for (let i = 0; i < perkUiCount; i++) {
             const perk = domElemById(`ui-perk-${i}`);
             const perkData = {
@@ -416,9 +412,7 @@ export class UiManager2 {
                 div: perk,
                 divTitle: perk.getElementsByClassName("tooltip-title")[0] as HTMLElement,
                 divDesc: perk.getElementsByClassName("tooltip-desc")[0] as HTMLElement,
-                image: perk.getElementsByClassName(
-                    "ui-armor-image",
-                )[0] as HTMLImageElement,
+                image: perk.getElementsByClassName("ui-armor-image")[0] as HTMLImageElement,
             };
             this.dom.perks.push(perkData);
         }
