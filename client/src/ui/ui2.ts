@@ -97,20 +97,22 @@ function diff(a: any, b: any, all: boolean): any {
     return a != b || all;
 }
 
-function m() {
-    const e = GameObjectDefs.getAllTypes();
-    const t = [];
-    for (let r = 0; r < e.length; r++) {
-        const a = e[r];
-        const i = GameObjectDefs.typeToDef(a) as AmmoDef | HealDef | BoostDef;
+function getUiInventoryItemTypes() {
+    const allTypes = GameObjectDefs.getAllTypes();
+    const visibleItemTypes = [];
+
+    for (let typeIndex = 0; typeIndex < allTypes.length; typeIndex++) {
+        const itemType = allTypes[typeIndex];
+        const itemDef = GameObjectDefs.typeToDef(itemType) as AmmoDef | HealDef | BoostDef;
         if (
-            !(i as AmmoDef).hideUi
-            && (i.type == "heal" || i.type == "boost" || i.type == "ammo")
+            !(itemDef as AmmoDef).hideUi
+            && (itemDef.type == "heal" || itemDef.type == "boost" || itemDef.type == "ammo")
         ) {
-            t.push(a);
+            visibleItemTypes.push(itemType);
         }
     }
-    return t;
+
+    return visibleItemTypes;
 }
 
 class UiState {
@@ -180,7 +182,7 @@ class UiState {
         selectable: false,
     }));
 
-    loot = m().map((type) => ({
+    loot = getUiInventoryItemTypes().map((type) => ({
         type,
         count: 0,
         maximum: 0,
@@ -376,7 +378,7 @@ export class UiManager2 {
             };
             this.dom.scopes.push(x);
         }
-        for (let S = m(), v = 0; v < S.length; v++) {
+        for (let S = getUiInventoryItemTypes(), v = 0; v < S.length; v++) {
             const I = S[v];
             const T = domElemById(`ui-loot-${I}`);
             if (T) {
