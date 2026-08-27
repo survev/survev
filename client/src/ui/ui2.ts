@@ -629,7 +629,8 @@ export class UiManager2 {
         state.rareLootMessage.ticker += dt;
         const rareLootMessageTime = state.rareLootMessage.ticker;
         const rareLootMessageDuration = state.rareLootMessage.duration;
-        state.rareLootMessage.opacity = 1 - math.smoothstep(rareLootMessageTime, rareLootMessageDuration - 0.2, rareLootMessageDuration);
+        state.rareLootMessage.opacity = 1
+            - math.smoothstep(rareLootMessageTime, rareLootMessageDuration - 0.2, rareLootMessageDuration);
 
         // Pickup message
         state.pickupMessage.ticker += dt;
@@ -643,7 +644,9 @@ export class UiManager2 {
         state.killMessage.ticker += dt;
         const killMessageTime = state.killMessage.ticker;
         const killMessageDuration = state.killMessage.duration;
-        state.killMessage.opacity = (1 - math.smoothstep(killMessageTime, killMessageDuration - 0.2, killMessageDuration)) * (1 - state.rareLootMessage.opacity);
+        state.killMessage.opacity =
+            (1 - math.smoothstep(killMessageTime, killMessageDuration - 0.2, killMessageDuration))
+            * (1 - state.rareLootMessage.opacity);
 
         // KillFeed
         let offset = 0;
@@ -837,7 +840,7 @@ export class UiManager2 {
             const animationTime = math.min(item.ticker / duration, Math.PI); // still not fully set on that variable name... but I can't think of anything else to call it...
             const animationWidth = Math.sin(animationTime);
             item.width = animationWidth < 0.001 ? 0 : animationWidth;
-        }        
+        }
 
         for (let weaponIndex = 0; weaponIndex < activePlayer.m_localData.m_weapons.length; weaponIndex++) {
             const playerWeapon = activePlayer.m_localData.m_weapons[weaponIndex];
@@ -850,7 +853,8 @@ export class UiManager2 {
 
             const wasEquipped = weaponState.equipped;
             weaponState.equipped = weaponIndex == activePlayer.m_localData.m_curWeapIdx;
-            weaponState.selectable = (playerWeapon.type != "" || weaponIndex == GameConfig.WeaponSlot.Primary || weaponIndex == GameConfig.WeaponSlot.Secondary) && !spectating; // more "code" but more semantic
+            weaponState.selectable = (playerWeapon.type != "" || weaponIndex == GameConfig.WeaponSlot.Primary
+                || weaponIndex == GameConfig.WeaponSlot.Secondary) && !spectating; // more "code" but more semantic
             const targetOpacity = weaponState.equipped ? 1 : 0.6;
             const opacityDelta = targetOpacity - weaponState.opacity;
             const opacityStep = math.min(opacityDelta, (math.sign(opacityDelta) * dt) / 0.15);
@@ -881,11 +885,11 @@ export class UiManager2 {
         const currentAmmo = playerWeaponState.ammo;
         let remainingWeaponAmmo = 0;
         if (weaponDef.type === "gun") {
-            const infiniteAmmo = weaponDef.ammoInfinite || (activePlayer.m_hasPerk("endless_ammo") && !weaponDef.ignoreEndlessAmmo);
-            remainingWeaponAmmo = infiniteAmmo 
-                ? Number.MAX_VALUE 
+            const infiniteAmmo = weaponDef.ammoInfinite
+                || (activePlayer.m_hasPerk("endless_ammo") && !weaponDef.ignoreEndlessAmmo);
+            remainingWeaponAmmo = infiniteAmmo
+                ? Number.MAX_VALUE
                 : activePlayer.m_localData.m_inventory[weaponDef.ammo];
-
         }
         state.ammo.current = currentAmmo;
         state.ammo.remaining = remainingWeaponAmmo;
@@ -1308,7 +1312,7 @@ export class UiManager2 {
             if (perkPatch.type) {
                 perkDom.perkType = perkState.type;
                 perkDom.divTitle.innerHTML = this.localization.translate(`game-${perkState.type}`);
-                perkDom.divDesc.innerHTML = this.localization.translate(`game-${perkState.type}-desc`,);
+                perkDom.divDesc.innerHTML = this.localization.translate(`game-${perkState.type}-desc`);
                 perkDom.div.style.display = perkState.type ? "block" : "none";
                 perkDom.image.src = perkState.type ? helpers.getSvgFromGameType(perkState.type) : "";
             }
