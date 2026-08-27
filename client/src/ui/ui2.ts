@@ -1237,20 +1237,11 @@ export class UiManager2 {
             const scopeDom = dom.scopes[scopeIndex];
             const scopeState = state.scopes[scopeIndex];
             if (scopePatch.visible) {
-                if (scopeState.visible) {
-                    scopeDom.div.classList.remove("ui-hidden");
-                } else {
-                    scopeDom.div.classList.add("ui-hidden");
-                }
+                scopeDom.div.classList.toggle("ui-hidden", !scopeState.visible);
             }
             if (scopePatch.equipped) {
-                if (scopeState.equipped) {
-                    scopeDom.div.classList.add("ui-zoom-active");
-                    scopeDom.div.classList.remove("ui-zoom-inactive");
-                } else {
-                    scopeDom.div.classList.remove("ui-zoom-active");
-                    scopeDom.div.classList.add("ui-zoom-inactive");
-                }
+                scopeDom.div.classList.toggle("ui-zoom-active", scopeState.equipped);
+                scopeDom.div.classList.toggle("ui-zoom-inactive", !scopeState.equipped);
             }
             if (scopePatch.selectable) {
                 scopeDom.div.style.pointerEvents = scopeState.selectable ? "auto" : "none";
@@ -1326,20 +1317,11 @@ export class UiManager2 {
                 perkDom.image.src = perkState.type ? helpers.getSvgFromGameType(perkState.type) : "";
             }
             if (perkPatch.droppable) {
-                if (perkState.droppable) {
-                    perkDom.div.classList.add("ui-outline-hover");
-                    perkDom.div.classList.remove("ui-perk-no-drop");
-                } else {
-                    perkDom.div.classList.remove("ui-outline-hover");
-                    perkDom.div.classList.add("ui-perk-no-drop");
-                }
+                perkDom.div.classList.toggle("ui-outline-hover", perkState.droppable);
+                perkDom.div.classList.toggle("ui-perk-no-drop", !perkState.droppable);
             }
             if (perkPatch.pulse) {
-                if (perkState.pulse) {
-                    perkDom.div.classList.add("ui-perk-pulse");
-                } else {
-                    perkDom.div.classList.remove("ui-perk-pulse");
-                }
+                perkDom.div.classList.toggle("ui-perk-pulse", perkState.pulse);
             }
             if (perkPatch.width) {
                 const scale = 1 + perkState.width * 0.33;
