@@ -1,3 +1,4 @@
+import { kill } from "node:process";
 import type { LootDef } from "../../../shared/defs/gameObjectDefs.ts";
 import {
     type AmmoDef,
@@ -1331,18 +1332,18 @@ export class UiManager2 {
     }
 
     displayPickupMessage(type: PickupMsgType) {
-        const p = this.newState.pickupMessage;
-        p.message = this.getPickupMessageText(type);
-        p.ticker = 0;
-        p.duration = 3;
+        const pickupMessage = this.newState.pickupMessage;
+        pickupMessage.message = this.getPickupMessageText(type);
+        pickupMessage.ticker = 0;
+        pickupMessage.duration = 3;
     }
 
     displayKillMessage(text: string, count: string) {
-        const p = this.newState.killMessage;
-        p.text = text;
-        p.count = count;
-        p.ticker = 0;
-        p.duration = 7;
+        const killMessage = this.newState.killMessage;
+        killMessage.text = text;
+        killMessage.count = count;
+        killMessage.ticker = 0;
+        killMessage.duration = 7;
     }
 
     hideKillMessage() {
