@@ -831,138 +831,158 @@ export class UiManager2 {
         );
         state.interaction.key = this.getInteractionKey(interactionType);
         state.interaction.usable = interactionUsable && !spectating;
-        for (let oe = 0; oe < activePlayer.m_localData.m_weapons.length; oe++) {
-            const se = activePlayer.m_localData.m_weapons[oe];
-            const ne = state.weapons[oe];
-            ne.type = se.type;
-            ne.ammo = se.ammo;
-            if (oe == GameConfig.WeaponSlot.Throwable) {
-                ne.ammo = activePlayer.m_localData.m_inventory[se.type] || 0;
+        for (let weaponIndex = 0; weaponIndex < activePlayer.m_localData.m_weapons.length; weaponIndex++) {
+            const playerWeapon = activePlayer.m_localData.m_weapons[weaponIndex];
+            const weaponState = state.weapons[weaponIndex];
+            weaponState.type = playerWeapon.type;
+            weaponState.ammo = playerWeapon.ammo;
+            if (weaponIndex == GameConfig.WeaponSlot.Throwable) {
+                weaponState.ammo = activePlayer.m_localData.m_inventory[playerWeapon.type] || 0;
             }
-            const le = ne.equipped;
-            ne.equipped = oe == activePlayer.m_localData.m_curWeapIdx;
-            ne.selectable = (se.type != "" || oe == 0 || oe == 1) && !spectating;
-            const ce = ne.equipped ? 1 : 0.6;
-            const me = ce - ne.opacity;
-            const pe = math.min(me, (math.sign(me) * dt) / 0.15);
-            ne.opacity = math.clamp(ne.opacity + pe, 0, 1);
+
+            const wasEquipped = weaponState.equipped;
+            weaponState.equipped = weaponIndex == activePlayer.m_localData.m_curWeapIdx;
+            weaponState.selectable = (playerWeapon.type != "" || weaponIndex == 0 || weaponIndex == 1) && !spectating;
+            const targetOpacity = weaponState.equipped ? 1 : 0.6;
+            const opacityDelta = targetOpacity - weaponState.opacity;
+            const opacityStep = math.min(opacityDelta, (math.sign(opacityDelta) * dt) / 0.15);
+            weaponState.opacity = math.clamp(weaponState.opacity + opacityStep, 0, 1);
+
             if (device.mobile) {
-                ne.opacity = ce;
+                weaponState.opacity = targetOpacity;
             }
-            if (ne.type == "bugle" && ne.ammo == 0) {
-                ne.opacity = 0.25;
+            if (weaponState.type == "bugle" && weaponState.ammo == 0) {
+                weaponState.opacity = 0.25;
             }
-            ne.ticker += dt;
-            if (!ne.equipped || !le) {
-                ne.ticker = 0;
+            weaponState.ticker += dt;
+            if (!weaponState.equipped || !wasEquipped) {
+                weaponState.ticker = 0;
             }
             if (this.frameCount < 2) {
-                ne.ticker = 1;
+                weaponState.ticker = 1;
             }
-            const he = math.min(ne.ticker / 0.09, Math.PI);
-            const de = Math.sin(he);
-            ne.width = de < 0.001 ? 0 : de;
+
+            const animationTime = math.min(weaponState.ticker / 0.09, Math.PI); // I feel this name might be wrong...
+            const animationWidth = Math.sin(animationTime);
+            weaponState.width = animationWidth < 0.001 ? 0 : animationWidth;
             if (device.mobile) {
-                ne.width = 0;
+                weaponState.width = 0;
             }
-            const ue = inputBinds.getBind(ne.bind);
-            ne.bindStr = ue ? ue.toString() : "";
+
+            const weaponInputBind = inputBinds.getBind(weaponState.bind);
+            weaponState.bindStr = weaponInputBind ? weaponInputBind.toString() : "";
         }
-        const ge = state.weapons[activePlayer.m_localData.m_curWeapIdx];
-        const weaponDef = GameObjectDefs.typeToDef(ge.type) as GunDef | MeleeDef;
-        const we = ge.ammo;
-        const fe = weaponDef.type == "gun"
+
+        const playerWeaponState = state.weapons[activePlayer.m_localData.m_curWeapIdx];
+        const weaponDef = GameObjectDefs.typeToDef(playerWeaponState.type) as GunDef | MeleeDef;
+        const weaponAmmo = playerWeaponState.ammo;
+        const remainingWeaponAmmo = weaponDef.type === "gun" // there has to be a better way than this... not that is is bad exactly... but it is kinda ugly :p
             ? weaponDef.ammoInfinite
                     || (activePlayer.m_hasPerk("endless_ammo") && !weaponDef.ignoreEndlessAmmo)
                 ? Number.MAX_VALUE
                 : activePlayer.m_localData.m_inventory[weaponDef.ammo]
             : 0;
-        state.ammo.current = we;
-        state.ammo.remaining = fe;
+        
+        state.ammo.current = weaponAmmo;
+        state.ammo.remaining = remainingWeaponAmmo;
         state.ammo.displayCurrent = weaponDef.type != "melee";
-        state.ammo.displayRemaining = fe > 0;
-        for (let _e = 0; _e < state.scopes.length; _e++) {
-            const be = state.scopes[_e];
-            be.visible = activePlayer.m_localData.m_inventory[be.type] > 0;
-            be.equipped = be.visible && activePlayer.m_localData.m_scope == be.type;
-            be.selectable = be.visible && !spectating;
+        state.ammo.displayRemaining = remainingWeaponAmmo > 0;
+
+        for (let scopeIndex = 0; scopeIndex < state.scopes.length; scopeIndex++) {
+            const scopeState = state.scopes[scopeIndex];
+            scopeState.visible = activePlayer.m_localData.m_inventory[scopeState.type] > 0;
+            scopeState.equipped = scopeState.visible && activePlayer.m_localData.m_scope == scopeState.type;
+            scopeState.selectable = scopeState.visible && !spectating;
         }
-        for (
-            let xe = activePlayer.m_getBagLevel(), Se = 0;
-            Se < state.loot.length;
-            Se++
-        ) {
-            const ve = state.loot[Se];
-            const ke = ve.count;
-            ve.count = activePlayer.m_localData.m_inventory[ve.type] || 0;
-            ve.maximum = GameConfig.bagSizes[ve.type as InventoryItem][xe];
-            ve.selectable = ve.count > 0 && !spectating;
-            if (ve.count > ke) {
-                ve.ticker = 0;
+
+        const playerBagLevel = activePlayer.m_getBagLevel(); // weird minifier putting this in the loop... or maybe I am wrong and this should be in there...
+
+        for (let lootIndex = 0; lootIndex < state.loot.length; lootIndex++) {
+            const lootState = state.loot[lootIndex];
+            const previousLootCount = lootState.count;
+            lootState.count = activePlayer.m_localData.m_inventory[lootState.type] || 0;
+            lootState.maximum = GameConfig.bagSizes[lootState.type as InventoryItem][playerBagLevel];
+            lootState.selectable = lootState.count > 0 && !spectating;
+            if (lootState.count > previousLootCount) {
+                lootState.ticker = 0;
             }
             if (this.frameCount < 2) {
-                ve.ticker = 1;
+                lootState.ticker = 1;
             }
-            ve.ticker += dt;
-            const ze = math.min(ve.ticker / 0.05, Math.PI);
-            const Ie = Math.sin(ze);
-            ve.width = Ie < 0.001 ? 0 : Ie;
+            lootState.ticker += dt;
+
+            const animationTime = math.min(lootState.ticker / 0.05, Math.PI);
+            const animationWidth = Math.sin(animationTime);
+            lootState.width = animationWidth < 0.001 ? 0 : animationWidth;
             if (device.mobile) {
-                ve.width = 0;
+                lootState.width = 0;
             }
         }
-        for (let Te = 0; Te < state.gear.length; Te++) {
-            const Me = state.gear[Te];
-            let Pe = "";
-            if (Me.type == "chest") {
-                Pe = activePlayer.m_netData.m_chest;
-            } else if (Me.type == "helmet") {
-                Pe = activePlayer.m_netData.m_helmet;
-            } else if (
-                Me.type == "backpack"
-                && (Pe = activePlayer.m_netData.m_backpack) == "backpack00"
-            ) {
-                Pe = "";
+
+        for (let gearIndex = 0; gearIndex < state.gear.length; gearIndex++) {
+            const gearState = state.gear[gearIndex];
+            let equippedItem = "";
+            switch (gearState.type) {
+                case "chest": {
+                    equippedItem = activePlayer.m_netData.m_chest;
+                    break;
+                }
+                case "helmet": {
+                    equippedItem = activePlayer.m_netData.m_helmet;
+                    break;
+                }
+                case "backpack": {
+                    if ((equippedItem = activePlayer.m_netData.m_backpack) === "backpack00") {
+                        equippedItem = "";
+                        break;
+                    }
+                    break;
+                }
             }
-            const Ce = Me.item;
-            Me.item = Pe;
-            Me.selectable = Pe != "" && !spectating;
-            if (Ce != Me.item) {
-                Me.ticker = 0;
+
+            const previousGearItem = gearState.item;
+            gearState.item = equippedItem;
+            gearState.selectable = equippedItem != "" && !spectating;
+            if (previousGearItem != gearState.item) {
+                gearState.ticker = 0;
             }
             if (this.frameCount < 2) {
-                Me.ticker = 1;
+                gearState.ticker = 1;
             }
-            Me.ticker += dt;
-            const Ae = math.min(Me.ticker / 0.05, Math.PI);
-            const Oe = Math.sin(Ae);
-            Me.width = Oe < 0.001 ? 0 : Oe;
+            gearState.ticker += dt;
+
+            const animationTime = math.min(gearState.ticker / 0.05, Math.PI);
+            const animationWidth = Math.sin(animationTime);
+            gearState.width = animationWidth < 0.001 ? 0 : animationWidth;
             if (device.mobile) {
-                Me.width = 0;
+                gearState.width = 0;
             }
         }
-        for (let De = 0; De < state.perks.length; De++) {
-            const Ee = state.perks[De];
-            if (activePlayer.perks.length > De) {
-                const Be = activePlayer.perks[De];
-                Ee.type = Be.type;
-                Ee.droppable = Be.droppable;
-                if (Be.isNew) {
-                    Ee.ticker = 0;
+
+        for (let perkIndex = 0; perkIndex < state.perks.length; perkIndex++) {
+            const perkState = state.perks[perkIndex];
+            if (activePlayer.perks.length > perkIndex) {
+                const playerPerk = activePlayer.perks[perkIndex];
+                perkState.type = playerPerk.type;
+                perkState.droppable = playerPerk.droppable;
+                if (playerPerk.isNew) {
+                    perkState.ticker = 0;
                 }
                 if (this.frameCount < 2) {
-                    Ee.ticker = 1;
+                    perkState.ticker = 1;
                 }
-                Ee.ticker += dt;
-                const Re = math.min(Ee.ticker / 0.05, Math.PI);
-                const Le = Math.sin(Re);
-                Ee.width = Le < 0.001 ? 0 : Le;
+                perkState.ticker += dt;
+
+                const animationTime = math.min(perkState.ticker / 0.05, Math.PI);
+                const animationWidth = Math.sin(animationTime);
+                perkState.width = animationWidth < 0.001 ? 0 : animationWidth;
                 if (device.mobile) {
-                    Ee.width = 0;
+                    perkState.width = 0;
                 }
-                Ee.pulse = !device.mobile && Ee.ticker < 4;
+
+                perkState.pulse = !device.mobile && perkState.ticker < 4;
             } else {
-                Ee.type = "";
+                perkState.type = "";
             }
         }
 
