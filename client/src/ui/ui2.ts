@@ -831,6 +831,18 @@ export class UiManager2 {
         );
         state.interaction.key = this.getInteractionKey(interactionType);
         state.interaction.usable = interactionUsable && !spectating;
+
+        function updateAnimationWidth(item: { ticker: number; width: number }, duration: number) {
+            if (device.mobile) {
+                item.width = 0;
+                return;
+            }
+
+            const animationTime = math.min(item.ticker / duration, Math.PI); // still not fully set on that variable name... but I can't think of anything else to call it...
+            const animationWidth = Math.sin(animationTime);
+            item.width = animationWidth < 0.001 ? 0 : animationWidth;
+        }        
+
         for (let weaponIndex = 0; weaponIndex < activePlayer.m_localData.m_weapons.length; weaponIndex++) {
             const playerWeapon = activePlayer.m_localData.m_weapons[weaponIndex];
             const weaponState = state.weapons[weaponIndex];
@@ -842,7 +854,7 @@ export class UiManager2 {
 
             const wasEquipped = weaponState.equipped;
             weaponState.equipped = weaponIndex == activePlayer.m_localData.m_curWeapIdx;
-            weaponState.selectable = (playerWeapon.type != "" || weaponIndex == 0 || weaponIndex == 1) && !spectating;
+            weaponState.selectable = (playerWeapon.type != "" || weaponIndex == GameConfig.WeaponSlot.Primary || weaponIndex == GameConfig.WeaponSlot.Secondary) && !spectating; // more "code" but more semantic
             const targetOpacity = weaponState.equipped ? 1 : 0.6;
             const opacityDelta = targetOpacity - weaponState.opacity;
             const opacityStep = math.min(opacityDelta, (math.sign(opacityDelta) * dt) / 0.15);
@@ -862,12 +874,7 @@ export class UiManager2 {
                 weaponState.ticker = 1;
             }
 
-            const animationTime = math.min(weaponState.ticker / 0.09, Math.PI); // I feel this name might be wrong...
-            const animationWidth = Math.sin(animationTime);
-            weaponState.width = animationWidth < 0.001 ? 0 : animationWidth;
-            if (device.mobile) {
-                weaponState.width = 0;
-            }
+            updateAnimationWidth(weaponState, 0.09);
 
             const weaponInputBind = inputBinds.getBind(weaponState.bind);
             weaponState.bindStr = weaponInputBind ? weaponInputBind.toString() : "";
@@ -875,15 +882,16 @@ export class UiManager2 {
 
         const playerWeaponState = state.weapons[activePlayer.m_localData.m_curWeapIdx];
         const weaponDef = GameObjectDefs.typeToDef(playerWeaponState.type) as GunDef | MeleeDef;
-        const weaponAmmo = playerWeaponState.ammo;
-        const remainingWeaponAmmo = weaponDef.type === "gun" // there has to be a better way than this... not that is is bad exactly... but it is kinda ugly :p
-            ? weaponDef.ammoInfinite
-                    || (activePlayer.m_hasPerk("endless_ammo") && !weaponDef.ignoreEndlessAmmo)
-                ? Number.MAX_VALUE
-                : activePlayer.m_localData.m_inventory[weaponDef.ammo]
-            : 0;
-        
-        state.ammo.current = weaponAmmo;
+        const currentAmmo = playerWeaponState.ammo;
+        let remainingWeaponAmmo = 0;
+        if (weaponDef.type === "gun") {
+            const infiniteAmmo = weaponDef.ammoInfinite || (activePlayer.m_hasPerk("endless_ammo") && !weaponDef.ignoreEndlessAmmo);
+            remainingWeaponAmmo = infiniteAmmo 
+                ? Number.MAX_VALUE 
+                : activePlayer.m_localData.m_inventory[weaponDef.ammo];
+
+        }
+        state.ammo.current = currentAmmo;
         state.ammo.remaining = remainingWeaponAmmo;
         state.ammo.displayCurrent = weaponDef.type != "melee";
         state.ammo.displayRemaining = remainingWeaponAmmo > 0;
@@ -911,12 +919,7 @@ export class UiManager2 {
             }
             lootState.ticker += dt;
 
-            const animationTime = math.min(lootState.ticker / 0.05, Math.PI);
-            const animationWidth = Math.sin(animationTime);
-            lootState.width = animationWidth < 0.001 ? 0 : animationWidth;
-            if (device.mobile) {
-                lootState.width = 0;
-            }
+            updateAnimationWidth(lootState, 0.05);
         }
 
         for (let gearIndex = 0; gearIndex < state.gear.length; gearIndex++) {
@@ -951,12 +954,7 @@ export class UiManager2 {
             }
             gearState.ticker += dt;
 
-            const animationTime = math.min(gearState.ticker / 0.05, Math.PI);
-            const animationWidth = Math.sin(animationTime);
-            gearState.width = animationWidth < 0.001 ? 0 : animationWidth;
-            if (device.mobile) {
-                gearState.width = 0;
-            }
+            updateAnimationWidth(gearState, 0.05);
         }
 
         for (let perkIndex = 0; perkIndex < state.perks.length; perkIndex++) {
@@ -973,12 +971,7 @@ export class UiManager2 {
                 }
                 perkState.ticker += dt;
 
-                const animationTime = math.min(perkState.ticker / 0.05, Math.PI);
-                const animationWidth = Math.sin(animationTime);
-                perkState.width = animationWidth < 0.001 ? 0 : animationWidth;
-                if (device.mobile) {
-                    perkState.width = 0;
-                }
+                updateAnimationWidth(perkState, 0.05);
 
                 perkState.pulse = !device.mobile && perkState.ticker < 4;
             } else {
