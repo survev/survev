@@ -8,7 +8,7 @@ export interface OutfitDef {
         baseTint: number;
         baseSprite: string;
         handTint: number;
-        handSprite: string;
+        handSprite: string | { left: string; right: string };
         footTint: number;
         footSprite: string;
         backpackTint: number;
@@ -47,7 +47,10 @@ const BaseDefs: Record<string, OutfitDef> = {
             baseTint: 0xf8c574,
             baseSprite: "player-base-01.img",
             handTint: 0xf8c574,
-            handSprite: "player-hands-01.img",
+            handSprite: {
+                left: "player-hands-01.img",
+                right: "player-hands-01.img",
+            },
             footTint: 0xf8c574,
             footSprite: "player-feet-01.img",
             backpackTint: 0x816537,
