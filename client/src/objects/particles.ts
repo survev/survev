@@ -152,7 +152,7 @@ interface EmitterOptions {
     radius?: number;
     rateMult?: number;
     parent?: PIXI.Container | null;
-    color?: number;
+    color?: number | (() => number);
 }
 
 export class Emitter {
@@ -172,7 +172,7 @@ export class Emitter {
     alpha!: number;
     rateMult!: number;
     zOrd!: number;
-    color?: number;
+    color?: number | (() => number);
 
     init(type: string, options = {} as EmitterOptions) {
         const def = EmitterDefs[type];
@@ -334,7 +334,9 @@ export class ParticleBarn {
                         e.zOrd,
                     );
                     if (e.color !== undefined) {
-                        particle.setColor(e.color);
+                        particle.setColor(
+                            e.color instanceof Function ? e.color() : e.color,
+                        );
                     }
                     particle.emitterIdx = i;
                     let rate = getRangeValue(def.rate);
