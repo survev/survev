@@ -259,10 +259,12 @@ export class LoadoutDisplay {
         };
 
         // HACK: clear the player particle emitter and reset the anim counter
-        if (this.activePlayer?.useItemEmitter) {
-            this.activePlayer.useItemEmitter.stop();
-            this.activePlayer.useItemEmitter = null;
-            this.animIdleTicker = 0;
+        if (this.activePlayer?.useItemEmitters.length) {
+            for (const emitter of this.activePlayer.useItemEmitters) {
+                emitter.stop();
+            }
+
+            this.activePlayer.useItemEmitters = [];
         }
 
         const obj: ObjectData<ObjectType.Player> = {
