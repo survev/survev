@@ -1803,7 +1803,7 @@ export const EmotesDefs: Record<string, EmoteDef> = {
         sound: "emote_01",
         channel: "ui",
         teamOnly: false,
-        category: EmoteCategory.Other
+        category: EmoteCategory.Other,
     },
 
     // Pass 2
