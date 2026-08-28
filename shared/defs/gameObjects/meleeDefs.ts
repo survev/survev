@@ -1199,9 +1199,22 @@ const SkinDefs: Record<string, MeleeDef> = {
             sprite: "loot-melee-knuckles-heroic.img",
         },
     }),
+    karambit_borealis: defineMeleeSkin("karambit", {
+        name: "Karambit Borealis",
+        rarity: Rarity.Epic,
+        lore: "Rend the skies asunder.",
+        noPotatoSwap: true,
+        lootImg: {
+            sprite: "loot-melee-karambit-borealis.img",
+        },
+        worldImg: {
+            sprite: "loot-melee-karambit-borealis.img",
+        },
+    }),
     karambit_rugged: defineMeleeSkin("karambit", {
         name: "Karambit Rugged",
         rarity: Rarity.Rare,
+        lore: "What's your favourite knife trick?",
         noPotatoSwap: false,
         lootImg: {
             sprite: "loot-melee-karambit-rugged.img",
@@ -1235,6 +1248,7 @@ const SkinDefs: Record<string, MeleeDef> = {
     bayonet_rugged: defineMeleeSkin("bayonet", {
         name: "Bayonet Rugged",
         rarity: Rarity.Rare,
+        lore: "Can't go wrong with the ol' reliable.",
         noPotatoSwap: false,
         lootImg: {
             sprite: "loot-melee-bayonet-rugged.img",
@@ -1246,6 +1260,7 @@ const SkinDefs: Record<string, MeleeDef> = {
     bayonet_woodland: defineMeleeSkin("bayonet", {
         name: "Bayonet Woodland",
         rarity: Rarity.Epic,
+        lore: "The woods have left their mark on a lethal weapon.",
         noPotatoSwap: false,
         lootImg: {
             sprite: "loot-melee-bayonet-woodland.img",
@@ -1257,6 +1272,7 @@ const SkinDefs: Record<string, MeleeDef> = {
     huntsman_rugged: defineMeleeSkin("huntsman", {
         name: "Huntsman Rugged",
         rarity: Rarity.Rare,
+        lore: "Always bet on black.",
         noPotatoSwap: false,
         lootImg: {
             sprite: "loot-melee-huntsman-rugged.img",
@@ -1268,6 +1284,7 @@ const SkinDefs: Record<string, MeleeDef> = {
     huntsman_burnished: defineMeleeSkin("huntsman", {
         name: "Huntsman Burnished",
         rarity: Rarity.Epic,
+        lore: "Bury them with style.",
         noPotatoSwap: false,
         lootImg: {
             sprite: "loot-melee-huntsman-burnished.img",
