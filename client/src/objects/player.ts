@@ -2006,6 +2006,7 @@ export class Player implements AbstractObject {
             rateMult: number;
             layer: number;
             pos: Vec2;
+            color?: number | (() => number);
         };
 
         switch (this.m_action.type) {
@@ -2037,9 +2038,17 @@ export class Player implements AbstractObject {
                 break;
             }
             case Action.Revive: {
-                if (this.m_netData.m_downed) {
-                    emitterType = "revive_basic";
-                }
+                const effect = GameObjectDefs.typeToDef(
+                    playerInfo.loadout.heal,
+                    "heal_effect",
+                );
+
+                emitterTypes = Array.isArray(effect.emitter)
+                    ? effect.emitter
+                    : [effect.emitter];
+
+                // Keep the revive particles purple.
+                emitterProps.color = () => util.rgbToInt(util.hsvToRgb(0.83, 1, util.random(0.7, 1)));
                 break;
             }
         }
