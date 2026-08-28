@@ -1795,4 +1795,14 @@ export const EmotesDefs: Record<string, EmoteDef> = {
         teamOnly: false,
         category: EmoteCategory.Logos,
     },
+    emote_antisocial: {
+        type: "emote",
+        name: "Antisocial",
+        rarity: Rarity.Common,
+        texture: "antisocial.img",
+        sound: "emote_01",
+        channel: "ui",
+        teamOnly: false,
+        category: EmoteCategory.Other
+    },
 };
