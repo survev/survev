@@ -350,9 +350,18 @@ export class WeaponManager {
             this.tryReload();
         }
 
+        if (!player.shootHold && weapon.ammo > 0 && weapon.cooldown < 0) {
+            weapon.cooldown = 0;
+        }
+
         switch (itemDef.fireMode) {
             case "auto":
-                if (player.shootHold && weapon.cooldown <= 0) {
+                while (player.shootHold && weapon.cooldown <= 0) {
+                    if (weapon.ammo > 0) {
+                        weapon.cooldown += itemDef.fireDelay;
+                    } else {
+                        break;
+                    }
                     this.fireWeapon(this.offHand);
                     this.offHand = !this.offHand;
                 }
@@ -360,6 +369,7 @@ export class WeaponManager {
             case "single":
                 if (player.shootStart) {
                     if (weapon.cooldown < 0) {
+                        weapon.cooldown = itemDef.fireDelay;
                         this.fireWeapon(this.offHand);
                         this.offHand = !this.offHand;
                     } else if (weapon.cooldown < 0.1) {
@@ -369,7 +379,6 @@ export class WeaponManager {
                 break;
             case "burst":
                 if (player.shootHold && weapon.cooldown < 0) {
-                    weapon.cooldown = 0;
                     for (let i = 0; i < itemDef.burstCount!; i++) {
                         this.bursts.push(weapon.cooldown);
                         weapon.cooldown += itemDef.burstDelay!;
@@ -689,7 +698,6 @@ export class WeaponManager {
 
         const firstShotAccuracy = weapon.recoilTime <= 0;
 
-        weapon.cooldown = itemDef.fireDelay;
         weapon.recoilTime = itemDef.recoilTime;
 
         // Check firing location
