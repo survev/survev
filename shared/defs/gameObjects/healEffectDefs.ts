@@ -5,7 +5,7 @@ export interface HealEffectDef {
     name: string;
     rarity: Rarity;
     texture: string;
-    emitter: string;
+    emitter: string | string[];
 }
 
 export const HealEffectDefs: Record<string, HealEffectDef> = {
