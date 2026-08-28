@@ -1805,4 +1805,57 @@ export const EmotesDefs: Record<string, EmoteDef> = {
         teamOnly: false,
         category: EmoteCategory.Other
     },
+
+    // Pass 2
+
+    emote_bruh: {
+        type: "emote",
+        name: "b r u h",
+        rarity: Rarity.Uncommon,
+        texture: "bruh.img",
+        sound: "emote_01",
+        channel: "ui",
+        teamOnly: false,
+        category: EmoteCategory.Other,
+    },
+    emote_timeout: {
+        type: "emote",
+        name: "Timeout!",
+        rarity: Rarity.Uncommon,
+        texture: "timeout.img",
+        sound: "emote_01",
+        channel: "ui",
+        teamOnly: false,
+        category: EmoteCategory.Other,
+    },
+    emote_flatteredface: {
+        type: "emote",
+        name: "Flattered Face",
+        rarity: Rarity.Rare,
+        texture: "face-flattered.img",
+        sound: "emote_01",
+        channel: "ui",
+        teamOnly: false,
+        category: EmoteCategory.Faces,
+    },
+    emote_saluteface: {
+        type: "emote",
+        name: "Saluting Face",
+        rarity: Rarity.Rare,
+        texture: "face-salute.img",
+        sound: "emote_01",
+        channel: "ui",
+        teamOnly: false,
+        category: EmoteCategory.Faces,
+    },
+    emote_traumatizedface: {
+        type: "emote",
+        name: "Traumatized Face",
+        rarity: Rarity.Rare,
+        texture: "face-traumatized.img",
+        sound: "emote_01",
+        channel: "ui",
+        teamOnly: false,
+        category: EmoteCategory.Faces,
+    },
 };

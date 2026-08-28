@@ -1167,9 +1167,22 @@ const SkinDefs: Record<string, MeleeDef> = {
             sprite: "loot-melee-knuckles-heroic.img",
         },
     }),
+    karambit_borealis: defineMeleeSkin("karambit", {
+        name: "Karambit Borealis",
+        lore: "Rend the skies asunder.",
+        rarity: Rarity.Epic,
+        noPotatoSwap: true,
+        lootImg: {
+            sprite: "loot-melee-karambit-borealis.img",
+        },
+        worldImg: {
+            sprite: "loot-melee-karambit-borealis.img",
+        },
+    }),
     karambit_rugged: defineMeleeSkin("karambit", {
         name: "Karambit Rugged",
         rarity: Rarity.Rare,
+        lore: "What's your favourite knife trick?",
         noPotatoSwap: false,
         anim: {
             idlePose: "slash",
@@ -1229,6 +1242,7 @@ const SkinDefs: Record<string, MeleeDef> = {
     huntsman_rugged: defineMeleeSkin("huntsman", {
         name: "Huntsman Rugged",
         rarity: Rarity.Rare,
+        lore: "Always bet on black.",
         noPotatoSwap: false,
         lootImg: {
             sprite: "loot-melee-huntsman-rugged.img",
@@ -1240,6 +1254,7 @@ const SkinDefs: Record<string, MeleeDef> = {
     huntsman_burnished: defineMeleeSkin("huntsman", {
         name: "Huntsman Burnished",
         rarity: Rarity.Epic,
+        lore: "Bury them with style.",
         noPotatoSwap: false,
         lootImg: {
             sprite: "loot-melee-huntsman-burnished.img",
