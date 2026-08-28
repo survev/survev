@@ -30,6 +30,7 @@ export const UnlockDefs: Record<UnlockDefKey, UnlockDef> = {
             "crosshair_136",
             "crosshair_160",
             "crosshair_176",
+            "emote_antisocial",
             "emote_thumbsup",
             "emote_sadface",
             "emote_happyface",
