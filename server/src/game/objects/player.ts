@@ -2496,7 +2496,7 @@ export class Player extends BaseGameObject {
                     amount: finalDamage,
                     weaponType: params.weaponSourceType ?? params.gameSourceType ?? "",
                     mode: this.game.teamMode,
-                    role: this.role,
+                    role: playerSource.role,
                 });
             }
             this.lastDamagedBy = playerSource;
@@ -2689,7 +2689,7 @@ export class Player extends BaseGameObject {
                     weaponType: params.weaponSourceType ?? params.gameSourceType ?? "",
                     intersectingBuildings: [...buildingType],
                     mode: this.game.teamMode,
-                    role: this.role,
+                    role: killCreditSource.role,
                 });
 
                 if (killCreditSource.isKillLeader) {
