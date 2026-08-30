@@ -222,10 +222,10 @@ export class ClientBarn {
             if (joinData) {
                 if (joinData.type === "join") {
                     client = this.game.clientBarn.addClientWithPlayer(socket, joinData.data, joinMsg);
+                    this.game.joinTokens.delete(joinMsg.joinToken);
                 } else {
                     client = this.game.clientBarn.addSpectatorClient(socket, joinData.data);
                 }
-                this.game.joinTokens.delete(joinMsg.joinToken);
             }
 
             return;
