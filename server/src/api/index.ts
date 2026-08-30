@@ -41,7 +41,7 @@ process.on("uncaughtException", async (err) => {
 });
 
 const app = new Hono();
-const { injectWebSocket, upgradeWebSocket } = createNodeWebSocket({ app });
+const wsApp = createNodeWebSocket({ app });
 
 app.onError((err: unknown, c) => {
     server.logger.error(`${c.req.path} Error:`, err);
@@ -70,7 +70,8 @@ app.route("/api/auth/", AuthRouter);
 app.route("/api/", StatsRouter);
 app.route("/private/", PrivateRouter);
 
-server.init(app, upgradeWebSocket);
+// oxlint-disable-next-line typescript/unbound-method
+server.init(app, wsApp.upgradeWebSocket);
 
 app.get("/api/site_info", (c) => {
     return c.json<SiteInfoRes>(server.getSiteInfo(), 200);
@@ -218,7 +219,7 @@ const honoServer = serve({
     fetch: app.fetch,
     port: Config.apiServer.port,
 });
-injectWebSocket(honoServer);
+wsApp.injectWebSocket(honoServer);
 
 // run clean up scripts every midnight
 new Cron("0 0 * * *", async () => {

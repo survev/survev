@@ -99,6 +99,7 @@ class Application {
             }
             this.pixi = pixi;
             this.pixi.renderer.events.destroy();
+            // oxlint-disable-next-line typescript/unbound-method
             this.pixi.ticker.add(this.update, this);
             this.pixi.renderer.background.color = 7378501;
             this.resourceManager = new ResourceManager(

@@ -42,7 +42,7 @@ export const loadout = {
     validate: (userLoadout: Loadout): Loadout => {
         const getGameType = (type: string, gameType: string, defaultValue: string) => {
             const def = GameObjectDefs.typeToDefSafe(gameType);
-            if (def && def.type == type) {
+            if (def?.type == type) {
                 return gameType;
             }
             return defaultValue;

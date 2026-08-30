@@ -158,7 +158,7 @@ export class ExplosionBarn {
         const shrapnelCount = Math.ceil((def.shrapnelCount ?? 0) * shrapnelCountMult);
 
         const bulletDef = GameObjectDefs.typeToDefSafe(def.shrapnelType);
-        if (bulletDef && bulletDef.type === "bullet") {
+        if (bulletDef?.type === "bullet") {
             for (let i = 0, count = shrapnelCount; i < count; i++) {
                 this.game.bulletBarn.fireBullet({
                     bulletType: def.shrapnelType,

@@ -16,11 +16,37 @@
     "foo": "readonly"
   },
   "settings": {},
+  "options": {
+    "typeAware": true
+  },
   "rules": {
     "eqeqeq": "off",
     "import/no-cycle": "off",
     "eslint/no-unused-vars": "off",
     "typescript/no-this-alias": "off",
+    "typescript/no-floating-promises": "off",
+    "typescript/unbound-method": "error",
+    "typescript/restrict-template-expressions": [
+      "error",
+      {
+        "allowNever": true
+      }
+    ],
+    "typescript/return-await": "error",
+    "typescript/require-await": "error",
+    "typescript/related-getter-setter-pairs": "error",
+    "typescript/prefer-optional-chain": "error",
+    "typescript/prefer-literal-enum-member": [
+      "error",
+      {
+        "allowBitwiseExpressions": true
+      }
+    ],
+    "typescript/prefer-includes": "error",
+    "typescript/prefer-function-type": "error",
+    "typescript/prefer-find": "error",
+    "typescript/only-throw-error": "error",
+    "typescript/non-nullable-type-assertion-style": "error",
     "import/extensions": [
       "error",
       "always",

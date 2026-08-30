@@ -555,7 +555,7 @@ export class UiManager2 {
             // "requestFullscreen() must be called from inside a short running user-generated event handler."
             const keyCode = e.which || e.keyCode;
             const bind = this.inputBinds.getBind(Input.Fullscreen);
-            if (bind && keyCode == bind.code) {
+            if (keyCode == bind?.code) {
                 helpers.toggleFullScreen();
             }
         };
@@ -996,7 +996,7 @@ export class UiManager2 {
         if (patch.rareLootMessage.lootType) {
             const lootType = state.rareLootMessage.lootType;
             const lootDef = GameObjectDefs.typeToDefSafe(lootType) as LootDef;
-            if (lootDef && lootDef.type == "xp") {
+            if (lootDef?.type == "xp") {
                 const lootDesc = this.localization.translate("game-xp-drop-desc");
                 dom.rareLootMessage.desc.innerHTML = `+${lootDef.xp} ${lootDesc}`;
             } else {

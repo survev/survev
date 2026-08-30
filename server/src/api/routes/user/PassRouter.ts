@@ -283,7 +283,7 @@ PassRouter.post("/refresh_quest", validateParams(zRefreshQuestRequest), async (c
 PassRouter.post(
     "/set_quest",
     validateParams(zSetQuestRequest),
-    async (c) => {
+    (c) => {
         return c.json({ success: true }, 200);
     },
 );

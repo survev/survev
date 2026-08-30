@@ -31,7 +31,7 @@ function emoteSlotToDomElem(e: Exclude<EmoteSlot, EmoteSlot.Count>) {
     return $(`#${domId}`);
 }
 
-function itemSort(sortFn: (a: Item, b: Item) => void) {
+function itemSort(sortFn: (a: Item, b: Item) => number) {
     return function(a: Item, b: Item) {
         // Always put stock items at the front of the list;
         // if not stock, sort by the given sort routine
@@ -814,7 +814,7 @@ export class LoadoutMenu {
 
         if (this.selectedItem.loadoutType == "crosshair") {
             const objDef = GameObjectDefs.typeToDefSafe(this.selectedItem.type);
-            if (objDef && objDef.type == "crosshair" && objDef.cursor) {
+            if (objDef?.type == "crosshair" && objDef.cursor) {
                 $("#modal-content-right-crosshair").css("display", "none");
             } else {
                 $("#modal-content-right-crosshair").css("display", "block");

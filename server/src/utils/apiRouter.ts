@@ -3,14 +3,19 @@ import type { PrivateRouteApp } from "../api/routes/private/private.ts";
 import { Config } from "../config.ts";
 import { defaultLogger } from "./logger.ts";
 
-function fetchWithRetry(input: RequestInfo | URL, init?: RequestInit): Promise<Response> {
+async function fetchWithRetry(input: RequestInfo | URL, init?: RequestInit): Promise<Response> {
     return new Promise((resolve, reject) => {
         const tryFetch = (attempts: number) => {
             fetch(input, init)
                 .then(resolve)
                 .catch((err) => {
                     if (attempts < 3) {
-                        defaultLogger.warn(`Failed to fetch ${input}, retrying`);
+                        const url = typeof input === "string"
+                            ? input
+                            : "url" in input
+                            ? input.url
+                            : input.toString();
+                        defaultLogger.warn(`Failed to fetch ${url}, retrying`);
                         setTimeout(
                             () => {
                                 tryFetch(++attempts);

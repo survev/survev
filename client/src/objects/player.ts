@@ -1965,7 +1965,7 @@ export class Player implements AbstractObject {
             || this.m_action.type == Action.ReloadAlt
         ) {
             const actionItemDef = GameObjectDefs.typeToDef(this.m_action.item, "gun");
-            if (actionItemDef && actionItemDef.caseTiming == "reload") {
+            if (actionItemDef?.caseTiming == "reload") {
                 for (let n = 0; n < actionItemDef.maxReload; n++) {
                     const shellDir = n % 2 == 0 ? -1 : 1;
                     const shellAngle = Math.PI + (Math.PI / 4) * shellDir;
@@ -2288,7 +2288,7 @@ export class Player implements AbstractObject {
 
     animMeleeCollision(animCtx: Partial<AnimCtx>, args: { playerHit?: string }) {
         const meleeDef = GameObjectDefs.typeToDef(this.m_netData.m_activeWeapon, "melee");
-        if (meleeDef && meleeDef.type == "melee") {
+        if (meleeDef?.type == "melee") {
             const meleeCol = this.getMeleeCollider();
             const meleeDist = meleeCol.rad + v2.length(v2.sub(this.m_pos, meleeCol.pos));
             const hits = [];

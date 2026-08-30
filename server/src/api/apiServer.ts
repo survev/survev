@@ -107,7 +107,7 @@ export class ApiServer {
 
     async findGame(body: FindGamePrivateBody): Promise<FindGamePrivateRes> {
         if (body.region in this.regions) {
-            return await this.regions[body.region].findGame(body);
+            return this.regions[body.region].findGame(body);
         }
         return { error: "find_game_failed" };
     }

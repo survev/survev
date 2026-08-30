@@ -191,7 +191,7 @@ export class Renderer {
     }
 
     redrawDebugLayerMask(camera: Camera, map: Map) {
-        const mask = this.debugLayerMask as PIXI.Graphics;
+        const mask = this.debugLayerMask!;
         mask.clear();
         mask.beginFill(16711935, 1);
         const structures = map.m_structurePool.m_getPool();

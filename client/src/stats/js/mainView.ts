@@ -97,10 +97,11 @@ export class MainView {
         this.render();
     }
     onChangedParams() {
-        const type = $("#leaderboard-type").val();
-        const time = $("#leaderboard-time").val();
-        const teamMode = $("#leaderboard-team-mode").val();
-        const mapId = $("#leaderboard-map-id").val();
+        type Selector = HTMLSelectElement & { type: "select-one" };
+        const type = $<Selector>("#leaderboard-type").val();
+        const time = $<Selector>("#leaderboard-time").val();
+        const teamMode = $<Selector>("#leaderboard-team-mode").val();
+        const mapId = $<Selector>("#leaderboard-map-id").val();
         window.history.pushState(
             "",
             "",
@@ -125,8 +126,8 @@ export class MainView {
         } else if (this.error || !this.data.data) {
             content = templates.leaderboardError({});
         } else {
-            const statName = TypeToString[this.data.type as keyof typeof TypeToString] || "";
-            let minGames = MinGames[this.data.type as keyof typeof MinGames]
+            const statName = TypeToString[this.data.type!] || "";
+            let minGames = MinGames[this.data.type!]
                 // @ts-expect-error go away
                 ? MinGames[this.data.type][this.data.interval]
                 : 1;

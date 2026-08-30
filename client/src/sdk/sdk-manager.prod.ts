@@ -322,7 +322,7 @@ export class SDKManager implements BaseSDKManager {
         );
 
         if (this.nitroLoadPromise) {
-            return await this.nitroLoadPromise;
+            return this.nitroLoadPromise;
         }
 
         if (!window.nitroAds) {
@@ -367,7 +367,7 @@ export class SDKManager implements BaseSDKManager {
             }
         });
 
-        return await this.nitroLoadPromise;
+        return this.nitroLoadPromise;
     }
 
     showNitroPlacements(placementIDs: string[]) {
@@ -540,7 +540,7 @@ export class SDKManager implements BaseSDKManager {
     }
 
     private requestGameMonetizeMidgameAd(callback: () => void) {
-        if (window.sdk && window.sdk.showBanner) {
+        if (window.sdk?.showBanner) {
             window.sdk.showBanner();
             callback();
         } else {

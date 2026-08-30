@@ -5,7 +5,7 @@ declare const PROXY_DEFS: Record<string, ProxyDef>;
 export const proxy = {
     getProxyDef() {
         for (const proxy in PROXY_DEFS) {
-            if (window.location.hostname.indexOf(proxy) !== -1) {
+            if (window.location.hostname.includes(proxy)) {
                 return { proxy: proxy, def: PROXY_DEFS[proxy] };
             }
         }

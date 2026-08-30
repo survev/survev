@@ -500,7 +500,7 @@ export class GameMap {
 
                 const unlockObject = this.buildings.find((b) => b.type == scheduledUnlock.type)
                     || this.obstacles.find(
-                        (o) => o.type == scheduledUnlock.type && o.door && o.door.locked,
+                        (o) => o.type == scheduledUnlock.type && o.door?.locked,
                     );
                 if (!unlockObject) continue;
 
@@ -511,7 +511,7 @@ export class GameMap {
 
                 // building
                 const unlockables = unlockObject.childObjects.filter(
-                    (o) => o.__type === ObjectType.Obstacle && o.door && o.door.locked,
+                    (o) => o.__type === ObjectType.Obstacle && o.door?.locked,
                 ) as Obstacle[];
                 this.unlocks.push({
                     unlockables: unlockables,

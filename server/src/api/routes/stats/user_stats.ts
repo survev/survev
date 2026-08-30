@@ -135,7 +135,7 @@ async function userStatsSqlQuery(
 
     const userStats = res[0] as UserStatsResponse;
 
-    if (!userStats || !userStats.slug) return emptyState as unknown as UserStatsResponse;
+    if (!userStats?.slug) return emptyState as unknown as UserStatsResponse;
 
     const modes = userStats?.modes;
     const formatedData: UserStatsResponse = {

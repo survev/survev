@@ -39,7 +39,7 @@ export const searchPlayersHandler = {
                 .setRequired(false)
         ),
 
-    async execute(interaction: ChatInputCommandInteraction) {
+    execute: async (interaction: ChatInputCommandInteraction) => {
         const searchName = interaction.options.getString("name")!;
         const useSlug = interaction.options.getBoolean("use_account_slug") || false;
         const gameId = interaction.options.getString("game_id") || undefined;

@@ -287,8 +287,7 @@ export class GameModeManager {
         for (const spectator of player.spectators) {
             // If all group members have died, they need to be sent a game over message instead.
             if (
-                player.group
-                && player.group.allDeadOrDisconnected
+                player.group?.allDeadOrDisconnected
                 && player.group.players.includes(spectator)
             ) {
                 continue;

@@ -15,7 +15,7 @@ export async function getRedisClient() {
     const cacheInstance = createClient();
 
     cacheInstance.on("connect", () => server.logger.info("Connected to redis"));
-    process.on("exit", () => cleanupRedis);
+    process.on("exit", () => cleanupRedis());
 
     await cacheInstance.connect();
     redisClient = cacheInstance;

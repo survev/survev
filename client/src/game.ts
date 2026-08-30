@@ -1582,7 +1582,7 @@ export class Game {
                         this.m_audioManager,
                     );
                     const itemDef = GameObjectDefs.typeToDefSafe(msg.item);
-                    if (itemDef && itemDef.type == "xp") {
+                    if (itemDef?.type == "xp") {
                         this.m_ui2Manager.addRareLootMessage(msg.item, true);
                     }
                 } else {

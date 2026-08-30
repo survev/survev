@@ -31,6 +31,7 @@ export class SDKManager {
         callback();
     }
 
+    // oxlint-disable-next-line typescript/require-await
     async getPlayerName(): Promise<string | undefined> {
         return undefined;
     }
@@ -43,6 +44,7 @@ export class SDKManager {
         return false;
     }
 
+    // oxlint-disable-next-line typescript/require-await
     async getInviteLink(_roomID: string): Promise<string | undefined> {
         return undefined;
     }

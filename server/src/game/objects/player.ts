@@ -1058,7 +1058,7 @@ export class Player extends BaseGameObject {
                 }
 
                 const trueWeapDef = GameObjectDefs.typeToDefSafe(trueWeapon.type);
-                if (trueWeapDef && trueWeapDef.type == "gun") {
+                if (trueWeapDef?.type == "gun") {
                     if (this.weapons[i].type) this.weaponManager.dropGun(i);
 
                     if (trueWeapon.fillInv) {
@@ -1066,7 +1066,7 @@ export class Player extends BaseGameObject {
                         const maxSize = this.invManager.getMaxCapacity(ammoType);
                         this.invManager.set(ammoType, maxSize);
                     }
-                } else if (trueWeapDef && trueWeapDef.type == "melee") {
+                } else if (trueWeapDef?.type == "melee") {
                     if (this.weapons[i].type) {
                         const curMelee = GameObjectDefs.typeToDef(this.weapons[i].type, "melee");
                         if (!curMelee.noDropOnDeath) {
@@ -3275,7 +3275,7 @@ export class Player extends BaseGameObject {
                 && newKillLeader === killCreditSource
                 && newKillLeader.kills > killLeaderKills
             ) {
-                if (killLeader && killLeader.role === "the_hunted") {
+                if (killLeader?.role === "the_hunted") {
                     killLeader.removeRole();
                 }
 
@@ -4205,8 +4205,8 @@ export class Player extends BaseGameObject {
                     if (
                         def.type == "helmet"
                         && (this.hasRoleHelmet
-                            || (thisDef && (thisDef as HelmetDef).perk)
-                            || (thisDef && (thisDef as HelmetDef).role))
+                            || ((thisDef as HelmetDef)?.perk)
+                            || ((thisDef as HelmetDef)?.role))
                     ) {
                         amountLeft = 1;
                         lootToAdd = obj.type;
@@ -4223,11 +4223,11 @@ export class Player extends BaseGameObject {
                         pickupMsg.type = net.PickupMsgType.Success;
 
                         // removes roles/perks associated with the dropped role/perk helmet
-                        if (thisDef && thisDef.type == "helmet" && thisDef.perk) {
+                        if (thisDef?.type == "helmet" && thisDef.perk) {
                             this.removePerk(thisDef.perk);
                         }
 
-                        if (thisDef && thisDef.type == "helmet" && thisDef.role) {
+                        if (thisDef?.type == "helmet" && thisDef.role) {
                             this.removeRole();
                         }
 
@@ -4451,7 +4451,7 @@ export class Player extends BaseGameObject {
             | GunDef
             | MeleeDef
             | ThrowableDef;
-        if (slotDef && slotDef.noPotatoSwap) return;
+        if (slotDef?.noPotatoSwap) return;
 
         if (index === this.curWeapIdx && this.isReloading()) {
             this.cancelAction();

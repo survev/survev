@@ -56,6 +56,7 @@ export class AudioManager {
 
     constructor() {
         CreateJS.Sound.volume = 0.5;
+        // oxlint-disable-next-line typescript/unbound-method
         CreateJS.Sound.on("fileload", this.loadHandler, this);
     }
 

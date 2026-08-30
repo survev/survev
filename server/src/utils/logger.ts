@@ -9,7 +9,7 @@ export async function logErrorToWebhook(from: "server" | "client", ...messages: 
         const msg = messages
             .map((msg) => {
                 if (msg instanceof Error) {
-                    return `\`\`\`${msg.cause}\n${msg.stack}\`\`\``;
+                    return `\`\`\`${String(msg.cause)}\n${msg.stack}\`\`\``;
                 }
                 if (typeof msg === "object") {
                     return `\`\`\`json\n${JSON.stringify(msg, null, 2).replaceAll("`", "\\`")}\`\`\``;

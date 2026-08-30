@@ -2436,14 +2436,13 @@ export class UiManager {
                 class: "ui-role-body-perk-name",
             });
 
-            const perkImg = helpers.getSvgFromGameType(
-                perk instanceof Function ? perk() : perk,
-            );
+            const perkType = perk instanceof Function ? perk() : perk;
+            const perkImg = helpers.getSvgFromGameType(perkType);
             perkElemImg.find(".ui-role-body-perk-image-icon").css({
                 "background-image": `url('${perkImg}')`,
             });
 
-            const perkName = this.localization.translate(`game-${perk}`);
+            const perkName = this.localization.translate(`game-${perkType}`);
             perkElemName.html(perkName);
             perkElem.append(perkElemImg).append(perkElemName);
             roleBodyRight.append(perkElem);

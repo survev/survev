@@ -311,7 +311,7 @@ export class GameProcessManager {
         // if the game has not finished creating
         // wait for it to be created to send the find game response
         if (proc.state !== ProcState.Running) {
-            return await new Promise((resolve) => {
+            return new Promise((resolve) => {
                 proc.onCreatedCbs.push((proc) => {
                     proc.addJoinTokens(body.playerData, body.autoFill);
                     resolve(proc);

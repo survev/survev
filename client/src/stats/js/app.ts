@@ -45,7 +45,7 @@ export class App {
         // Load slug for "My Profile" link
         try {
             const config = JSON.parse(localStorage.getItem("survev_config")!);
-            if (config.profile && config.profile.slug) {
+            if (config.profile?.slug) {
                 $("#my-profile")
                     .css("display", "block")
                     .attr("href", `/stats/?slug=${config.profile.slug}`);

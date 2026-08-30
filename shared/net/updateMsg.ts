@@ -2,6 +2,7 @@ import { GameConfig, type Plane as PlaneType } from "../gameConfig.ts";
 import { v2, type Vec2 } from "./../utils/v2.ts";
 import { type AbstractMsg, BitSizes, type BitStream, Constants } from "./net.ts";
 import {
+    type ObjectData,
     ObjectSerializeFns,
     type ObjectsFullData,
     type ObjectsPartialData,
@@ -247,19 +248,15 @@ export const UpdateExtFlags = {
 
 export class UpdateMsg implements AbstractMsg {
     delObjIds: number[] = [];
-    fullObjects: Array<
-        & ObjectsFullData[ObjectType]
-        & ObjectsPartialData[ObjectType]
-        & {
-            __id: number;
-            __type: ObjectType;
-            partialStream: BitStream;
-            fullStream: BitStream;
-        }
-    > = [];
+    fullObjects: Array<{
+        __id: number;
+        __type: ObjectType;
+        partialStream: BitStream;
+        fullStream: BitStream;
+    }> = [];
 
     partObjects: Array<
-        ObjectsPartialData[ObjectType] & {
+        {
             __id: number;
             __type: ObjectType;
             partialStream: BitStream;

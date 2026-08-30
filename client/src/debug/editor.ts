@@ -147,7 +147,7 @@ export class Editor {
             const loot = folder.addBinding(this.toolParams, "loot", {
                 label: "Type",
             });
-            const input = loot.element.querySelector("input") as HTMLInputElement;
+            const input = loot.element.querySelector("input")!;
 
             // don't want to trigger keybinds (like L to fullscreen) while typing
             input.addEventListener("keyup", (e) => e.stopPropagation());

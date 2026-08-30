@@ -956,7 +956,7 @@ export class EmoteBarn {
                         const equippedWeapon = player.m_localData.m_weapons[player.m_localData.m_curWeapIdx];
                         const weapDef = GameObjectDefs.typeToDefSafe(equippedWeapon.type) as GunDef | undefined;
                         let ammoType = "";
-                        if (weapDef && weapDef.ammo) {
+                        if (weapDef?.ammo) {
                             ammoType = weapDef.ammo;
                         }
 
@@ -989,7 +989,7 @@ export class EmoteBarn {
 
                             const highlight = s.ping || s.emote;
                             const emoteData = EmotesDefs[s.emote];
-                            const teamOnly = emoteData && emoteData.teamOnly;
+                            const teamOnly = emoteData?.teamOnly;
 
                             const disableInSolo = teamOnly && teamMode == 1;
                             if (

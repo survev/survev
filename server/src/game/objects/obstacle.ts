@@ -218,8 +218,7 @@ export class Obstacle extends BaseGameObject {
                 // to avoid it closing for a single tick to open again
                 if (
                     !(
-                        this.door
-                        && this.door.open
+                        this.door?.open
                         && this.door.autoClose
                         && this.checkNearByPlayers()
                     )

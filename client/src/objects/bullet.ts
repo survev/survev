@@ -153,7 +153,7 @@ export class BulletBarn {
 
         b.layer = bullet.layer;
         const player = playerBarn.getPlayerById(b.playerId);
-        if (player && player.layer & 2) {
+        if (player?.layer & 2) {
             b.layer |= 2;
         }
 
