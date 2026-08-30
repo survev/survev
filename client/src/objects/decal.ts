@@ -94,13 +94,13 @@ class Decal implements AbstractObject {
             const def = MapObjectDefs.typeToDef(this.type, "decal");
             let goreTarget = math.delerp(
                 this.goreKills,
-                def.gore?.fade.start!,
-                def.gore?.fade.end!,
+                def.gore!.fade.start,
+                def.gore!.fade.end,
             );
-            goreTarget = Math.pow(goreTarget, def.gore?.fade.pow!);
+            goreTarget = Math.pow(goreTarget, def.gore!.fade.pow);
             this.goreT = this.isNew
                 ? goreTarget
-                : math.lerp(dt * def.gore?.fade.speed!, this.goreT, goreTarget);
+                : math.lerp(dt * def.gore!.fade.speed, this.goreT, goreTarget);
 
             // Adjust properties based on the gore level
             if (def.gore?.tint !== undefined) {
@@ -117,14 +117,14 @@ class Decal implements AbstractObject {
             if (def.gore?.waterColor !== undefined && this.surface) {
                 this.surface.data.waterColor = lerpColor(
                     this.goreT,
-                    def.surface?.data.waterColor!,
+                    def.surface!.data.waterColor,
                     def.gore.waterColor,
                 );
             }
             if (def.gore?.rippleColor !== undefined && this.surface) {
                 this.surface.data.rippleColor = lerpColor(
                     this.goreT,
-                    def.surface?.data.rippleColor!,
+                    def.surface!.data.rippleColor,
                     def.gore.rippleColor,
                 );
             }

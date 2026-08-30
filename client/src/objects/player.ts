@@ -929,7 +929,7 @@ export class Player implements AbstractObject {
         ) {
             const obstacleDef = MapObjectDefs.typeToDef(this.insideObstacleType, "obstacle");
             this.lastInsideObstacleTime = 0.2;
-            audioManager.playSound(obstacleDef?.sound.enter!, {
+            audioManager.playSound(obstacleDef.sound.enter!, {
                 channel: "sfx",
                 soundPos: this.m_pos,
                 fallOff: 1,
@@ -969,7 +969,7 @@ export class Player implements AbstractObject {
             this.doorErrorTicker = 0.5;
 
             const doorDef = MapObjectDefs.typeToDef(doorErrorObstacle!.type, "obstacle");
-            const doorSfx = doorDef.door?.sound.error!;
+            const doorSfx = doorDef.door!.sound.error;
             audioManager.playSound(doorSfx, {
                 channel: "sfx",
                 soundPos: this.m_pos,
@@ -993,7 +993,7 @@ export class Player implements AbstractObject {
                 particleBarn.addRippleParticle(
                     this.m_pos,
                     this.layer,
-                    this.surface?.data.rippleColor!,
+                    this.surface.data.rippleColor!,
                 );
                 audioManager.playGroup("footstep_water", {
                     soundPos: this.m_pos,
@@ -2516,7 +2516,7 @@ export class Player implements AbstractObject {
         this.bodySubmergeSprite.alpha = submersionAlpha;
         this.bodySubmergeSprite.visible = submersionAlpha > 0.001;
         if (inWater) {
-            this.bodySubmergeSprite.tint = this.surface?.data.waterColor!;
+            this.bodySubmergeSprite.tint = this.surface!.data.waterColor!;
         }
 
         const limbs = [
@@ -2530,7 +2530,7 @@ export class Player implements AbstractObject {
             limb.alpha = this.downed ? submersionAlpha : 0;
             limb.visible = limb.alpha > 0.001;
             if (inWater) {
-                limb.tint = this.surface?.data.waterColor!;
+                limb.tint = this.surface!.data.waterColor!;
             }
         }
     }

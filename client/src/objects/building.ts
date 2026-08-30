@@ -404,7 +404,7 @@ export class Building implements AbstractObject {
                         }
                     }
                 }
-                audioManager.playSound(def.puzzle?.sound.fail!, {
+                audioManager.playSound(def.puzzle!.sound.fail, {
                     channel: "sfx",
                     soundPos: nearestObj.pos,
                     layer: nearestObj.layer,
@@ -417,7 +417,7 @@ export class Building implements AbstractObject {
                 map.solvedPuzzleIds.push(this.__id);
                 this.playedSolvedPuzzleFx = true;
                 if (!this.isNew && def.puzzle?.sound.complete != "none") {
-                    audioManager.playSound(def.puzzle?.sound.complete!, {
+                    audioManager.playSound(def.puzzle!.sound.complete, {
                         channel: "sfx",
                         soundPos: this.pos,
                         layer: this.layer,

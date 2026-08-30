@@ -1024,7 +1024,7 @@ export class Game {
             wavesWeight = math.delerp(dist, 50, 0);
             riverWeight = 0;
             for (let i = 0; i < this.m_map.terrain!.rivers.length; i++) {
-                const river = this.m_map.terrain?.rivers[i]!;
+                const river = this.m_map.terrain!.rivers[i];
                 const closestPointT = river.spline.getClosestTtoPoint(playerPos);
                 const closestPoint = river.spline.getPos(closestPointT);
                 const distanceToRiver = v2.length(v2.sub(closestPoint, playerPos));

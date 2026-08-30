@@ -407,7 +407,7 @@ export class Obstacle implements AbstractObject {
 
             // Open/close sounds
             if (door.open != door.wasOpen) {
-                const sound = door.open ? def.door?.sound.open! : def.door?.sound.close!;
+                const sound = door.open ? def.door!.sound.open : def.door!.sound.close;
                 audioManager.playSound(sound, {
                     channel: "sfx",
                     soundPos: this.pos,

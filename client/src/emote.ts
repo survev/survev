@@ -293,8 +293,8 @@ export class EmoteBarn {
             this.bigmapCollision.on("touchend", (e) => {
                 e.stopPropagation();
                 this.bigmapPingPos = {
-                    x: e.originalEvent?.changedTouches[0].pageX!,
-                    y: e.originalEvent?.changedTouches[0].pageY!,
+                    x: e.originalEvent!.changedTouches[0].pageX,
+                    y: e.originalEvent!.changedTouches[0].pageY,
                 };
                 this.emoteScreenPos = v2.create(
                     this.camera.m_screenWidth / 2,
@@ -318,8 +318,8 @@ export class EmoteBarn {
             this.emoteElems.on("touchstart", (e) => {
                 e.stopPropagation();
                 this.emoteTouchedPos = {
-                    x: e.originalEvent?.changedTouches[0].pageX!,
-                    y: e.originalEvent?.changedTouches[0].pageY!,
+                    x: e.originalEvent!.changedTouches[0].pageX,
+                    y: e.originalEvent!.changedTouches[0].pageY,
                 };
             });
             // Reset wheel
