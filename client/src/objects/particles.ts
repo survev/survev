@@ -152,7 +152,7 @@ interface EmitterOptions {
     radius?: number;
     rateMult?: number;
     parent?: PIXI.Container | null;
-    color?: number;
+    color?: number | (() => number);
 }
 
 export class Emitter {
@@ -172,7 +172,7 @@ export class Emitter {
     alpha!: number;
     rateMult!: number;
     zOrd!: number;
-    color?: number;
+    color?: number | (() => number);
 
     init(type: string, options = {} as EmitterOptions) {
         const def = EmitterDefs[type];
@@ -334,7 +334,9 @@ export class ParticleBarn {
                         e.zOrd,
                     );
                     if (e.color !== undefined) {
-                        particle.setColor(e.color);
+                        particle.setColor(
+                            e.color instanceof Function ? e.color() : e.color,
+                        );
                     }
                     particle.emitterIdx = i;
                     let rate = getRangeValue(def.rate);
@@ -2872,6 +2874,11 @@ const ParticleDefs: Record<string, ParticleDef> = {
             return util.rgbToInt(util.hsvToRgb(0, 0, util.random(0.9, 0.95)));
         },
     },
+
+    //
+    // Healing Particles
+    //
+
     heal_basic: {
         image: ["part-heal-basic.img"],
         life: new Range(0.75, 1),
@@ -2897,6 +2904,9 @@ const ParticleDefs: Record<string, ParticleDef> = {
         },
         ignoreValueAdjust: true,
     },
+
+    // Pass 1
+
     heal_heart: {
         image: ["part-heal-heart.img"],
         life: new Range(0.75, 1),
@@ -2972,6 +2982,89 @@ const ParticleDefs: Record<string, ParticleDef> = {
         },
         ignoreValueAdjust: true,
     },
+
+    // Pass 2
+
+    heal_diamond: {
+        image: ["part-heal-diamond.img"],
+        life: new Range(0.75, 1),
+        drag: 0.25,
+        rotVel: 0,
+        scale: {
+            start: new Range(0.1, 0.12),
+            end: new Range(0.05, 0.07),
+            lerp: new Range(0, 1),
+        },
+        alpha: {
+            start: 1,
+            end: 0,
+            lerp: new Range(0.7, 1),
+        },
+        alphaIn: {
+            start: 0,
+            end: 1,
+            lerp: new Range(0, 0.05),
+        },
+        color: function() {
+            return util.rgbToInt(util.hsvToRgb(0, 1, util.random(0.7, 1)));
+        },
+        ignoreValueAdjust: true,
+    },
+    heal_ankh: {
+        image: ["part-heal-ankh.img"],
+        life: new Range(0.75, 1),
+        drag: 0.25,
+        rotVel: new Range(Math.PI * 0.5, Math.PI * 1),
+        scale: {
+            start: new Range(0.1, 0.12),
+            end: new Range(0.05, 0.07),
+            lerp: new Range(0, 1),
+        },
+        alpha: {
+            start: 1,
+            end: 0,
+            lerp: new Range(0.7, 1),
+        },
+        alphaIn: {
+            start: 0,
+            end: 1,
+            lerp: new Range(0, 0.05),
+        },
+        color: function() {
+            return util.rgbToInt(util.hsvToRgb(0, 1, util.random(0.7, 1)));
+        },
+        ignoreValueAdjust: true,
+    },
+    heal_menacing: {
+        image: ["part-heal-menacing.img"],
+        life: new Range(0.75, 1),
+        drag: 0.25,
+        rotVel: 0,
+        scale: {
+            start: new Range(0.1, 0.12),
+            end: new Range(0.05, 0.07),
+            lerp: new Range(0, 1),
+        },
+        alpha: {
+            start: 1,
+            end: 0,
+            lerp: new Range(0.7, 1),
+        },
+        alphaIn: {
+            start: 0,
+            end: 1,
+            lerp: new Range(0, 0.05),
+        },
+        color: function() {
+            return util.rgbToInt(util.hsvToRgb(0, 1, util.random(0.7, 1)));
+        },
+        ignoreValueAdjust: true,
+    },
+
+    //
+    // Boost Particles
+    //
+
     boost_basic: {
         image: ["part-boost-basic.img"],
         life: new Range(0.75, 1),
@@ -2997,6 +3090,9 @@ const ParticleDefs: Record<string, ParticleDef> = {
         },
         ignoreValueAdjust: true,
     },
+
+    // Pass 1
+
     boost_star: {
         image: ["part-boost-star.img"],
         life: new Range(0.75, 1),
@@ -3072,6 +3168,135 @@ const ParticleDefs: Record<string, ParticleDef> = {
         },
         ignoreValueAdjust: true,
     },
+
+    // Pass 2
+
+    boost_club: {
+        image: ["part-boost-club.img"],
+        life: new Range(0.75, 1),
+        drag: 0,
+        rotVel: new Range(Math.PI * 0.25, Math.PI * 0.5),
+        scale: {
+            start: new Range(0.12, 0.14),
+            end: new Range(0.06, 0.08),
+            lerp: new Range(0, 1),
+        },
+        alpha: {
+            start: 1,
+            end: 0,
+            lerp: new Range(0.7, 1),
+        },
+        alphaIn: {
+            start: 0,
+            end: 1,
+            lerp: new Range(0, 0.05),
+        },
+        color: function() {
+            return util.rgbToInt(util.hsvToRgb(0.3, 1, util.random(0.7, 1)));
+        },
+        ignoreValueAdjust: true,
+    },
+    boost_lightning: {
+        image: ["part-boost-lightning.img"],
+        life: new Range(0.75, 1),
+        drag: 0,
+        rotVel: new Range(Math.PI * 0.25, Math.PI * 0.5),
+        scale: {
+            start: new Range(0.12, 0.14),
+            end: new Range(0.06, 0.08),
+            lerp: new Range(0, 1),
+        },
+        alpha: {
+            start: 1,
+            end: 0,
+            lerp: new Range(0.7, 1),
+        },
+        alphaIn: {
+            start: 0,
+            end: 1,
+            lerp: new Range(0, 0.05),
+        },
+        color: function() {
+            return util.rgbToInt(util.hsvToRgb(0.3, 1, util.random(0.7, 1)));
+        },
+        ignoreValueAdjust: true,
+    },
+    boost_hermes: {
+        image: ["part-boost-hermes.img"],
+        life: new Range(0.75, 1),
+        drag: 0,
+        rotVel: new Range(Math.PI * 0.25, Math.PI * 0.5),
+        scale: {
+            start: new Range(0.12, 0.14),
+            end: new Range(0.06, 0.08),
+            lerp: new Range(0, 1),
+        },
+        alpha: {
+            start: 1,
+            end: 0,
+            lerp: new Range(0.7, 1),
+        },
+        alphaIn: {
+            start: 0,
+            end: 1,
+            lerp: new Range(0, 0.05),
+        },
+        color: function() {
+            return util.rgbToInt(util.hsvToRgb(0.3, 1, util.random(0.7, 1)));
+        },
+        ignoreValueAdjust: true,
+    },
+    boost_gearshift_01: {
+        image: ["part-boost-gearshift-01.img"],
+        life: new Range(0.75, 1),
+        drag: 0,
+        rotVel: 0,
+        scale: {
+            start: new Range(0.12, 0.14),
+            end: new Range(0.06, 0.08),
+            lerp: new Range(0, 1),
+        },
+        alpha: {
+            start: 1,
+            end: 0,
+            lerp: new Range(0.7, 1),
+        },
+        alphaIn: {
+            start: 0,
+            end: 1,
+            lerp: new Range(0, 0.05),
+        },
+        color: function() {
+            return util.rgbToInt(util.hsvToRgb(0.3, 1, util.random(0.7, 1)));
+        },
+        ignoreValueAdjust: true,
+    },
+    boost_gearshift_02: {
+        image: ["part-boost-gearshift-02.img"],
+        life: new Range(0.75, 1),
+        drag: 0,
+        rotVel: new Range(Math.PI, Math.PI * 2),
+        scale: {
+            start: new Range(0.12, 0.14),
+            end: new Range(0.06, 0.08),
+            lerp: new Range(0, 1),
+        },
+        alpha: {
+            start: 1,
+            end: 0,
+            lerp: new Range(0.7, 1),
+        },
+        alphaIn: {
+            start: 0,
+            end: 1,
+            lerp: new Range(0, 0.05),
+        },
+        color: function() {
+            return util.rgbToInt(util.hsvToRgb(0.3, 1, util.random(0.7, 1)));
+        },
+        ignoreValueAdjust: true,
+    },
+
     revive_basic: {
         image: ["part-heal-basic.img"],
         life: new Range(0.75, 1),
@@ -3402,6 +3627,9 @@ const EmitterDefs: Record<string, EmitterDef> = {
         maxCount: Number.MAX_VALUE,
         zOrd: 999,
     },
+
+    // Healing Particles
+
     heal_basic: {
         particle: "heal_basic",
         rate: new Range(0.3, 0.35),
@@ -3438,6 +3666,36 @@ const EmitterDefs: Record<string, EmitterDef> = {
         rot: 0,
         maxCount: Number.MAX_VALUE,
     },
+    heal_diamond: {
+        particle: "heal_diamond",
+        rate: new Range(0.3, 0.35),
+        radius: 1.5,
+        speed: new Range(1, 1.5),
+        angle: 0,
+        rot: 0,
+        maxCount: Number.MAX_VALUE,
+    },
+    heal_ankh: {
+        particle: "heal_ankh",
+        rate: new Range(0.3, 0.35),
+        radius: 1.5,
+        speed: new Range(1, 1.5),
+        angle: 0,
+        rot: 0,
+        maxCount: Number.MAX_VALUE,
+    },
+    heal_menacing: {
+        particle: "heal_menacing",
+        rate: new Range(0.3, 0.35),
+        radius: 1.5,
+        speed: new Range(1, 1.5),
+        angle: 0,
+        rot: 0,
+        maxCount: Number.MAX_VALUE,
+    },
+
+    // Boost Particles
+
     boost_basic: {
         particle: "boost_basic",
         rate: new Range(0.3, 0.35),
@@ -3467,6 +3725,51 @@ const EmitterDefs: Record<string, EmitterDef> = {
     },
     boost_shuriken: {
         particle: "boost_shuriken",
+        rate: new Range(0.3, 0.35),
+        radius: 1.5,
+        speed: new Range(1, 1.5),
+        angle: 0,
+        rot: new Range(0, Math.PI * 2),
+        maxCount: Number.MAX_VALUE,
+    },
+    boost_club: {
+        particle: "boost_club",
+        rate: new Range(0.3, 0.35),
+        radius: 1.5,
+        speed: new Range(1, 1.5),
+        angle: 0,
+        rot: new Range(0, Math.PI * 2),
+        maxCount: Number.MAX_VALUE,
+    },
+    boost_lightning: {
+        particle: "boost_lightning",
+        rate: new Range(0.3, 0.35),
+        radius: 1.5,
+        speed: new Range(1, 1.5),
+        angle: 0,
+        rot: new Range(0, Math.PI * 2),
+        maxCount: Number.MAX_VALUE,
+    },
+    boost_hermes: {
+        particle: "boost_hermes",
+        rate: new Range(0.3, 0.35),
+        radius: 1.5,
+        speed: new Range(1, 1.5),
+        angle: 0,
+        rot: new Range(0, Math.PI * 2),
+        maxCount: Number.MAX_VALUE,
+    },
+    boost_gearshift_01: {
+        particle: "boost_gearshift_01",
+        rate: new Range(0.99, 1),
+        radius: 1.5,
+        speed: new Range(1, 1.5),
+        angle: 0,
+        rot: -(Math.PI * 0.25),
+        maxCount: Number.MAX_VALUE,
+    },
+    boost_gearshift_02: {
+        particle: "boost_gearshift_02",
         rate: new Range(0.3, 0.35),
         radius: 1.5,
         speed: new Range(1, 1.5),

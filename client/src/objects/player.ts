@@ -258,7 +258,7 @@ export class Player implements AbstractObject {
     hasteSeq = -1;
     cycleSoundInstance: SoundHandle | null = null;
     actionSoundInstance: SoundHandle | null = null;
-    useItemEmitter: Emitter | null = null;
+    useItemEmitters: Emitter[] = [];
     hasteEmitter: Emitter | null = null;
     passiveHealEmitter: Emitter | null = null;
     adrenalineEmitter: Emitter | null = null;
@@ -505,10 +505,10 @@ export class Player implements AbstractObject {
     m_free() {
         this.container.visible = false;
         this.auraContainer.visible = false;
-        if (this.useItemEmitter) {
-            this.useItemEmitter.stop();
-            this.useItemEmitter = null;
+        for (const emitter of this.useItemEmitters) {
+            emitter.stop();
         }
+        this.useItemEmitters = [];
         if (this.hasteEmitter) {
             this.hasteEmitter.stop();
             this.hasteEmitter = null;
@@ -1206,9 +1206,12 @@ export class Player implements AbstractObject {
             this.passiveHealEmitter.zOrd = this.renderZOrd + 1;
         }
 
-        const adrenalineEmitterType = (
+        const adrenalineEmitter = (
             GameObjectDefs.typeToDef(playerInfo.loadout.boost, "boost_effect")
         ).emitter;
+        const adrenalineEmitterType = Array.isArray(adrenalineEmitter)
+            ? adrenalineEmitter[0]
+            : adrenalineEmitter;
         if (
             this.m_netData.m_adrenalineEffect
             && (!this.adrenalineEmitter
@@ -1548,8 +1551,9 @@ export class Player implements AbstractObject {
         const handTint = outfitDef.ghillie
             ? map.getMapDef().biome.colors.playerGhillie
             : outfitImg.handTint;
-        setHandSprite(this.handLSprite, outfitImg.handSprite, handTint);
-        setHandSprite(this.handRSprite, outfitImg.handSprite, handTint);
+        const hSprite = outfitImg.handSprite;
+        setHandSprite(this.handLSprite, typeof hSprite === "string" ? hSprite : hSprite.left, handTint);
+        setHandSprite(this.handRSprite, typeof hSprite === "string" ? hSprite : hSprite.right, handTint);
 
         // Feet
         const setFootSprite = function(
@@ -1995,13 +1999,14 @@ export class Player implements AbstractObject {
         audioManager: AudioManager,
     ) {
         // Determine if we should have an emitter
-        let emitterType = "";
+        let emitterTypes: string[] = [];
         const emitterProps = {} as {
             scale: number;
             radius: number;
             rateMult: number;
             layer: number;
             pos: Vec2;
+            color?: number | (() => number);
         };
 
         switch (this.m_action.type) {
@@ -2009,9 +2014,21 @@ export class Player implements AbstractObject {
                 const actionItemDef = GameObjectDefs.typeToDef(this.m_action.item);
                 const loadout = playerInfo.loadout;
                 if (actionItemDef.type == "heal") {
-                    emitterType = GameObjectDefs.typeToDef(loadout.heal, "heal_effect").emitter;
+                    const effect = GameObjectDefs.typeToDef(
+                        loadout.heal,
+                        "heal_effect",
+                    );
+                    emitterTypes = Array.isArray(effect.emitter)
+                        ? effect.emitter
+                        : [effect.emitter];
                 } else if (actionItemDef.type == "boost") {
-                    emitterType = GameObjectDefs.typeToDef(loadout.boost, "boost_effect").emitter;
+                    const effect = GameObjectDefs.typeToDef(
+                        loadout.boost,
+                        "boost_effect",
+                    );
+                    emitterTypes = Array.isArray(effect.emitter)
+                        ? effect.emitter
+                        : [effect.emitter];
                 }
                 if (this.m_hasPerk("aoe_heal")) {
                     emitterProps.scale = 1.5;
@@ -2021,35 +2038,58 @@ export class Player implements AbstractObject {
                 break;
             }
             case Action.Revive: {
-                if (this.m_netData.m_downed) {
-                    emitterType = "revive_basic";
-                }
+                const effect = GameObjectDefs.typeToDef(
+                    playerInfo.loadout.heal,
+                    "heal_effect",
+                );
+
+                emitterTypes = Array.isArray(effect.emitter)
+                    ? effect.emitter
+                    : [effect.emitter];
+
+                // Keep the revive particles purple.
+                emitterProps.color = () => util.rgbToInt(util.hsvToRgb(0.83, 1, util.random(0.7, 1)));
                 break;
             }
         }
 
         // Add emitter
+        const emittersChanged = this.useItemEmitters.length != emitterTypes.length
+            || emitterTypes.some(
+                (type, i) => this.useItemEmitters[i]?.type != type,
+            );
+
+        // Update existing emitters
         if (
-            !!emitterType
-            && (!this.useItemEmitter || this.useItemEmitter.type != emitterType)
+            emitterTypes.length > 0
+            && emittersChanged
         ) {
-            this.useItemEmitter?.stop();
-            emitterProps.pos = this.m_pos;
-            emitterProps.layer = this.layer;
-            this.useItemEmitter = particleBarn.addEmitter(emitterType, emitterProps);
+            for (const emitter of this.useItemEmitters) {
+                emitter.stop();
+            }
+
+            this.useItemEmitters = emitterTypes.map((type) => {
+                return particleBarn.addEmitter(type, {
+                    ...emitterProps,
+                    pos: this.m_pos,
+                    layer: this.layer,
+                });
+            });
         }
 
-        // Update existing emitter
-        if (this.useItemEmitter) {
-            this.useItemEmitter.pos = v2.add(this.m_pos, v2.create(0, 0.1));
-            this.useItemEmitter.layer = this.renderLayer;
-            this.useItemEmitter.zOrd = this.renderZOrd + 1;
+        for (const emitter of this.useItemEmitters) {
+            emitter.pos = v2.add(this.m_pos, v2.create(0, 0.1));
+            emitter.layer = this.renderLayer;
+            emitter.zOrd = this.renderZOrd + 1;
+            emitter.color = emitterProps.color;
         }
 
-        // Stop emitter
-        if (this.useItemEmitter && !emitterType) {
-            this.useItemEmitter.stop();
-            this.useItemEmitter = null;
+        // Stop emitters
+        if (emitterTypes.length == 0 && this.useItemEmitters.length > 0) {
+            for (const emitter of this.useItemEmitters) {
+                emitter.stop();
+            }
+            this.useItemEmitters = [];
         }
 
         // Update action sound effect position
