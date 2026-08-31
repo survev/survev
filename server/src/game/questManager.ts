@@ -158,6 +158,10 @@ export function questDelta<E extends keyof QuestEventPayloads>(
                 return 0;
             }
 
+            if (weapDef?.type === "throwable" && !weapDef.isGrenade) {
+                return 0;
+            }
+
             value = p.amount;
             break;
         }

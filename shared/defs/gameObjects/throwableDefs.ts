@@ -12,6 +12,7 @@ export interface ThrowableDef {
     fuseTime: number;
     aimDistance: number;
     rad: number;
+    isGrenade: boolean;
     throwPhysics: {
         playerVelMult: number;
         velZ: number;
@@ -84,6 +85,7 @@ export const ThrowableDefs: Record<string, ThrowableDef> = {
         playerCollision: false,
         fuseTime: 4,
         aimDistance: 0,
+        isGrenade: true,
         rad: 1,
         throwPhysics: {
             playerVelMult: 0.6,
@@ -150,6 +152,7 @@ export const ThrowableDefs: Record<string, ThrowableDef> = {
         playerCollision: false,
         fuseTime: 4,
         aimDistance: 0,
+        isGrenade: true,
         rad: 1,
         throwPhysics: {
             playerVelMult: 0.6,
@@ -220,6 +223,7 @@ export const ThrowableDefs: Record<string, ThrowableDef> = {
         fuseTime: 1.8,
         fuseVariance: 0.3,
         aimDistance: 0,
+        isGrenade: true,
         rad: 1,
         throwPhysics: {
             playerVelMult: 0.6,
@@ -262,6 +266,7 @@ export const ThrowableDefs: Record<string, ThrowableDef> = {
         fuseTime: 3,
         fuseVariance: 0.3,
         aimDistance: 0,
+        isGrenade: true,
         rad: 1,
         throwPhysics: {
             playerVelMult: 0.6,
@@ -302,6 +307,7 @@ export const ThrowableDefs: Record<string, ThrowableDef> = {
         playerCollision: false,
         fuseTime: 2.5,
         aimDistance: 0,
+        isGrenade: true,
         rad: 1,
         throwPhysics: {
             playerVelMult: 0.6,
@@ -369,6 +375,7 @@ export const ThrowableDefs: Record<string, ThrowableDef> = {
         fuseTime: 13.5,
         strikeDelay: 3, // Changed this from 2.5 to 3, but it might have been used somewhere else
         aimDistance: 0,
+        isGrenade: true,
         rad: 1,
         throwPhysics: {
             playerVelMult: 0.6,
@@ -439,6 +446,7 @@ export const ThrowableDefs: Record<string, ThrowableDef> = {
         playerCollision: true,
         fuseTime: 9999,
         aimDistance: 32,
+        isGrenade: true,
         rad: 1,
         throwPhysics: {
             playerVelMult: 0,
@@ -504,6 +512,7 @@ export const ThrowableDefs: Record<string, ThrowableDef> = {
         playerCollision: true,
         fuseTime: 9999,
         aimDistance: 32,
+        isGrenade: true,
         rad: 1.25,
         throwPhysics: {
             playerVelMult: 0,
@@ -550,6 +559,7 @@ export const ThrowableDefs: Record<string, ThrowableDef> = {
         playerCollision: true,
         fuseTime: 9999,
         aimDistance: 32,
+        isGrenade: true,
         rad: 1,
         throwPhysics: {
             playerVelMult: 0,
@@ -616,6 +626,7 @@ export const ThrowableDefs: Record<string, ThrowableDef> = {
         playerCollision: true,
         fuseTime: 9999,
         aimDistance: 32,
+        isGrenade: true,
         rad: 1.25,
         throwPhysics: {
             playerVelMult: 0,
@@ -661,6 +672,7 @@ export const ThrowableDefs: Record<string, ThrowableDef> = {
         playerCollision: true,
         fuseTime: 999,
         aimDistance: 32,
+        isGrenade: false,
         rad: 1,
         throwPhysics: {
             playerVelMult: 0,
@@ -712,6 +724,7 @@ export const ThrowableDefs: Record<string, ThrowableDef> = {
         playerCollision: true,
         fuseTime: 999,
         aimDistance: 32,
+        isGrenade: false,
         rad: 0.1,
         throwPhysics: {
             playerVelMult: 0,
@@ -763,6 +776,7 @@ export const ThrowableDefs: Record<string, ThrowableDef> = {
         playerCollision: true,
         fuseTime: 999,
         aimDistance: 32,
+        isGrenade: false,
         rad: 0.1,
         throwPhysics: {
             playerVelMult: 0,
@@ -813,6 +827,7 @@ export const ThrowableDefs: Record<string, ThrowableDef> = {
         playerCollision: false,
         fuseTime: 4,
         aimDistance: 0,
+        isGrenade: true,
         rad: 1,
         throwPhysics: {
             playerVelMult: 0.6,
@@ -859,6 +874,7 @@ export const ThrowableDefs: Record<string, ThrowableDef> = {
         playerCollision: true,
         fuseTime: 9999,
         aimDistance: 32,
+        isGrenade: true,
         rad: 1.15,
         throwPhysics: {
             playerVelMult: 0,
@@ -925,6 +941,7 @@ export const ThrowableDefs: Record<string, ThrowableDef> = {
         playerCollision: true,
         fuseTime: 9999,
         aimDistance: 32,
+        isGrenade: true,
         rad: 1,
         throwPhysics: {
             playerVelMult: 0,
