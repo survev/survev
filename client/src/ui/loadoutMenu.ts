@@ -933,15 +933,15 @@ export class LoadoutMenu {
 
         this.loadoutDisplay?.setView(category.loadoutType);
 
-        const _ = $(`.modal-customize-cat[data-idx='${this.selectedCatIdx}']`);
+        const catModal = $(`.modal-customize-cat[data-idx='${this.selectedCatIdx}']`);
         this.selectableCats.removeClass("modal-customize-cat-selected");
         this.selectableCatConnects.removeClass("modal-customize-cat-connect-selected");
         this.selectableCatImages.removeClass("modal-customize-cat-image-selected");
-        _.addClass("modal-customize-cat-selected");
-        _.find(".modal-customize-cat-connect").addClass(
+        catModal.addClass("modal-customize-cat-selected");
+        catModal.find(".modal-customize-cat-connect").addClass(
             "modal-customize-cat-connect-selected",
         );
-        _.find(".modal-customize-cat-image").addClass(
+        catModal.find(".modal-customize-cat-image").addClass(
             "modal-customize-cat-image-selected",
         );
         const localizedTitle = this.localization

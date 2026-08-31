@@ -2211,21 +2211,21 @@ export class Player implements AbstractObject {
                     }
                 }
             }
-            const w = frameBIdx == frames.length - 1 && math.eqAbs(t, 1);
-            let f = this.anim.ticker;
-            if (w) {
-                f += 1;
+            const isOver = frameBIdx == frames.length - 1 && math.eqAbs(t, 1);
+            let adjustedTicker = this.anim.ticker;
+            if (isOver) {
+                adjustedTicker += 1;
             }
             for (let i = 0; i < anim.effects.length; i++) {
                 const effect = anim.effects[i];
-                if (effect.time >= ticker && effect.time < f) {
+                if (effect.time >= ticker && effect.time < adjustedTicker) {
                     (this[effect.fn] as (ctx: AnimCtx, args: unknown) => void)(
                         animCtx,
                         effect.args,
                     );
                 }
             }
-            if (w) {
+            if (isOver) {
                 this.playAnim(Anim.None, this.anim.seq);
             }
         }
