@@ -83,6 +83,22 @@ export const PerkProperties = {
     tree_climbing: {
         waterSpeedBoost: 2,
     },
+    scavenger: {
+        lootTableConf: {
+            tier: "tier_world",
+            min: 1,
+            max: 1,
+            props: {},
+        },
+    },
+    scavenger_adv: {
+        lootTableConf: {
+            tier: "tier_scavenger_adv",
+            min: 1,
+            max: 1,
+            props: {},
+        },
+    },
     bonus_9mm: {
         spreadMul: 1.1,
         speedMult: 1.25,
