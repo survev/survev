@@ -239,12 +239,12 @@ export class Obstacle implements AbstractObject {
             this.door.canUse = data.door.canUse;
             this.door.open = data.door.open;
             this.door.seq = data.door.seq;
-            const u = v2.rotate(
+            const offset = v2.rotate(
                 v2.create(def.door?.slideOffset, 0),
                 this.rot + Math.PI * 0.5,
             );
             this.door.closedPos = data.door.open
-                ? v2.add(data.pos, u)
+                ? v2.add(data.pos, offset)
                 : v2.copy(data.pos);
         }
         if (this.isButton && fullUpdate) {
@@ -259,45 +259,46 @@ export class Obstacle implements AbstractObject {
             && data.healthT < 0.5
             && !data.dead
         ) {
-            const g = v2.normalize(v2.create(1, 1));
+            const dir = v2.normalize(v2.create(1, 1));
             this.smokeEmitter = ctx.particleBarn.addEmitter("smoke_barrel", {
                 pos: this.pos,
-                dir: g,
+                dir,
                 layer: this.layer,
             });
         }
-        let y = false;
-        let w = this.dead ? def.img.residue! : def.img.sprite!;
+        let doTint = false;
+        let currentImg = this.dead ? def.img.residue! : def.img.sprite!;
         if (this.isButton && this.button.onOff && !this.dead && def.button?.useImg) {
-            w = def.button.useImg;
+            currentImg = def.button.useImg;
         } else if (this.isButton && !this.button.canUse && def.button?.offImg) {
-            w = def.button.offImg;
+            currentImg = def.button.offImg;
         }
-        if (w != this.img) {
-            let f = v2.create(0.5, 0.5);
+        if (currentImg != this.img) {
+            let anchor = v2.create(0.5, 0.5);
             if (this.isDoor) {
-                f = def.door!.spriteAnchor;
+                anchor = def.door!.spriteAnchor;
             }
-            const _ = w !== undefined;
-            if (!_) {
-                this.sprite.parent?.removeChild(this.sprite);
-            }
-            if (_) {
-                this.sprite.texture = w == "none" || !w ? PIXI.Texture.EMPTY : PIXI.Texture.from(w);
-                this.sprite.anchor.set(f.x, f.y);
+            const hasImage = currentImg !== undefined;
+            if (hasImage) {
+                this.sprite.texture = currentImg == "none" || !currentImg
+                    ? PIXI.Texture.EMPTY
+                    : PIXI.Texture.from(currentImg);
+                this.sprite.anchor.set(anchor.x, anchor.y);
                 this.sprite.tint = def.img.tint!;
                 this.sprite.imgAlpha = this.dead ? 0.75 : def.img.alpha!;
                 this.sprite.zOrd = def.img.zIdx!;
                 this.sprite.zIdx = Math.floor(this.scale * 1000) * 65535 + this.__id;
                 this.sprite.alpha = this.sprite.imgAlpha;
-                y = true;
+                doTint = true;
+            } else {
+                this.sprite.parent?.removeChild(this.sprite);
             }
-            this.sprite.visible = _;
-            this.img = w;
+            this.sprite.visible = hasImage;
+            this.img = currentImg;
         }
-        const b = ctx.map.getMapDef().biome.valueAdjust;
-        if (y && b < 1) {
-            this.sprite.tint = util.adjustValue(this.sprite.tint as number, b);
+        const biomeValueAdjust = ctx.map.getMapDef().biome.valueAdjust;
+        if (doTint && biomeValueAdjust < 1) {
+            this.sprite.tint = util.adjustValue(this.sprite.tint as number, biomeValueAdjust);
         }
     }
 
