@@ -1675,7 +1675,7 @@ export class Player extends BaseGameObject {
                             target.health += itemDef.heal;
                             if (this.hasPerk("combat_stims")) {
                                 this.combatStimsActive = true;
-                                this._combatStimsTicker = 5;
+                                this._combatStimsTicker = PerkProperties.combat_stims.effectDuration;
                             }
                         });
                     }
@@ -1684,7 +1684,7 @@ export class Player extends BaseGameObject {
                             target.boost += itemDef.boost;
                             if (this.hasPerk("combat_stims")) {
                                 this.combatStimsActive = true;
-                                this._combatStimsTicker = 5;
+                                this._combatStimsTicker = PerkProperties.combat_stims.effectDuration;
                             }
                         });
                     }
