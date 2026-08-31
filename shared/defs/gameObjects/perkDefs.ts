@@ -79,6 +79,7 @@ export const PerkProperties = {
     combat_stims: {
         bonusDamageMult: 1.12,
         healPercent: 0.06,
+        effectDuration: 5,
     },
     tree_climbing: {
         waterSpeedBoost: 2,
