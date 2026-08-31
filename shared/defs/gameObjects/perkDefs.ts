@@ -113,6 +113,10 @@ export const PerkProperties = {
         speedMult: 1.4,
         distanceMult: 1.3,
     },
+    trick_chatty: {
+        minInterval: 5,
+        maxInterval: 15,
+    },
     trick_drain: {
         bleedTickRateMult: 3,
     },
