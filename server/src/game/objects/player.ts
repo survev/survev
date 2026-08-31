@@ -2689,9 +2689,9 @@ export class Player extends BaseGameObject {
                 // Pirate's Bounty (Cutlass-specific)
                 const weaponDef = GameObjectDefs.typeToDefSafe(params.gameSourceType || "");
                 if (killCreditSource.hasPerk("pirate") && weaponDef?.type == "melee") {
-                    const count = util.randomInt(3, 4);
+                    const count = util.randomInt(PerkProperties.pirate.minCount, PerkProperties.pirate.maxCount);
                     for (let i = 0; i < count; i++) {
-                        const item = this.game.lootBarn.getLootTable("tier_pirate");
+                        const item = this.game.lootBarn.getLootTable(PerkProperties.pirate.tier);
                         if (!item) continue;
 
                         this.game.lootBarn.addLoot(
@@ -2707,8 +2707,8 @@ export class Player extends BaseGameObject {
                     }
 
                     // rare gun
-                    if (Math.random() < 0.12) {
-                        const item = this.game.lootBarn.getLootTable("tier_pirate_rare");
+                    if (Math.random() < PerkProperties.pirate.rareChance) {
+                        const item = this.game.lootBarn.getLootTable(PerkProperties.pirate.rareTier);
                         if (item) {
                             this.game.lootBarn.addLoot(
                                 item.name,

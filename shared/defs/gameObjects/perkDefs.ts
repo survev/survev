@@ -104,6 +104,13 @@ export const PerkProperties = {
             props: {},
         },
     },
+    pirate: {
+        minCount: 3,
+        maxCount: 4,
+        tier: "tier_pirate",
+        rareChance: 0.12,
+        rareTier: "tier_pirate_rare",
+    },
     bonus_9mm: {
         spreadMul: 1.1,
         speedMult: 1.25,
