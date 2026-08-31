@@ -4441,14 +4441,14 @@ export class Player extends BaseGameObject {
 
         const affectedPlayers = this.game.modeManager.getNearbyAlivePlayersContext(
             this,
-            60,
+            PerkProperties.final_bugle.effectRange,
         );
 
         for (const player of affectedPlayers) {
             player.lastBreathActive = true;
             player._lastBreathTicker = 5;
 
-            player.giveHaste(GameConfig.HasteType.Inspire, 5);
+            player.giveHaste(GameConfig.HasteType.Inspire, PerkProperties.final_bugle.hasteDuration);
             if (player.teamId == GameConfig.FactionTeam.Red && player.__id != this.__id) {
                 this.game.playerBarn.addEmote("emote_bugle_final_red", player.__id);
             }

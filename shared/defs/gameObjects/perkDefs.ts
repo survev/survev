@@ -44,6 +44,8 @@ export const PerkProperties = {
     final_bugle: {
         bonusDamageMult: 1.08,
         scaleOnDeath: 0.2,
+        effectRange: 60,
+        hasteDuration: 5,
     },
     targeting: {
         incomingDamageMult: 1.25,
