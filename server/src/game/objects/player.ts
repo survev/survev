@@ -1575,9 +1575,11 @@ export class Player extends BaseGameObject {
             && this.bleedTicker < 0
         ) {
             const hasDrain = this.hasPerk("trick_drain");
-            this.bleedTicker = hasDrain
-                ? GameConfig.player.bleedTickRate * 3
-                : GameConfig.player.bleedTickRate;
+            this.bleedTicker = GameConfig.player.bleedTickRate;
+
+            if (hasDrain) {
+                this.bleedTicker *= PerkProperties.trick_drain.bleedTickRateMult;
+            }
 
             const mapConfig = this.game.map.mapDef.gameConfig;
 

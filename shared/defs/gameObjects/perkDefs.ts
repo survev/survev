@@ -111,6 +111,9 @@ export const PerkProperties = {
         speedMult: 1.4,
         distanceMult: 1.3,
     },
+    trick_drain: {
+        bleedTickRateMult: 3,
+    },
     bonus_assault: {
         speedMult: 1.1,
         // bonusDamageMult: 1.08
