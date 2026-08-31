@@ -1,4 +1,6 @@
 import { MapId, TeamMode } from "../../gameConfig.ts";
+import type { ValueOrArray } from "../../utils/util.ts";
+import type { GameObjectDef } from "../gameObjectDefs.ts";
 import type { MapDefKey } from "../mapDefs.ts";
 
 export type QuestEvent =
@@ -15,18 +17,21 @@ export type QuestEvent =
 export interface FilterParams {
     team_mode: { mode: TeamMode };
     max_rank: { maxRank: number };
-    building: { buildingType: string | string[] };
-    role: { role: string | string[] };
+    building: { buildingType: ValueOrArray<string> };
+    role: { role: ValueOrArray<string> };
     weapon: {
         weaponClass: "gun";
         weaponType?: string;
-        ammo?: string | string[];
+        ammo?: ValueOrArray<string>;
     } | { weaponClass: "melee" | "throwable"; weaponType?: string };
-    obstacle: { subType: "category"; obstacleCategory: string | string[] } | {
+    obstacle: { subType: "category"; obstacleCategory: ValueOrArray<string> } | {
         subType: "type";
-        obstacleType: string | string[];
+        obstacleType: ValueOrArray<string>;
     };
-    item: { subType: "category"; itemCategory: string | string[] } | { subType: "type"; itemType: string | string[] };
+    item: { subType: "category"; itemCategory: ValueOrArray<string> } | {
+        subType: "type";
+        itemType: ValueOrArray<GameObjectDef["type"]>;
+    };
 }
 
 export type FilterTypes = keyof FilterParams;

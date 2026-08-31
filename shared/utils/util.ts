@@ -33,6 +33,8 @@ export type DeepPartial<T> = T extends object ? {
 export type UnionToIntersection<U> = (U extends unknown ? (x: U) => void : never) extends ((x: infer I) => void) ? I
     : never;
 
+export type ValueOrArray<T> = T | T[];
+
 export const util = {
     //
     // Game objects can belong to the following layers:
@@ -422,7 +424,7 @@ export const util = {
         return days * dayInMs;
     },
 
-    valueMatches<T>(value: NoInfer<T>, options: T | T[]): value is T {
+    valueMatches<T>(value: NoInfer<T>, options: ValueOrArray<T>): value is T {
         return value === options || (Array.isArray(options) && options.includes(value as T));
     },
 };
