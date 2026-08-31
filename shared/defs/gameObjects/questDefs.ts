@@ -30,7 +30,7 @@ export interface FilterParams {
     };
     item: { subType: "category"; itemCategory: ValueOrArray<string> } | {
         subType: "type";
-        itemType: ValueOrArray<GameObjectDef["type"]>;
+        itemType: ValueOrArray<string>;
     };
 }
 
