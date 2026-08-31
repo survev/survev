@@ -1602,7 +1602,10 @@ export class Player extends BaseGameObject {
         this.chattyTicker -= dt;
 
         if (this.hasPerk("trick_chatty") && this.chattyTicker < 0) {
-            this.chattyTicker = util.random(5, 15);
+            this.chattyTicker = util.random(
+                PerkProperties.trick_chatty.minInterval,
+                PerkProperties.trick_chatty.maxInterval,
+            );
 
             const emotes = Object.keys(EmotesDefs);
 
