@@ -58,6 +58,10 @@ export const PerkProperties = {
             strobe: 5,
         } as const,
     },
+    windwalk: {
+        maxTriggerDistance: 5, // max distance at which a bullet can trigger windwalk
+        hasteDuration: 3,
+    },
     gotw: {
         scale: 0.2,
         healthRegen: 1, // per second
