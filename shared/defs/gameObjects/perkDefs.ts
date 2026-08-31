@@ -69,6 +69,10 @@ export const PerkProperties = {
         scale: 0.2,
         healthRegen: 1, // per second
     },
+    takedown: {
+        hpReward: 25,
+        boostReward: 25,
+    },
     lifeline: {
         decayMult: 0.75, // Adrenaline decay multiplier
         conversionRate: 2, // How much adrenaline used per health

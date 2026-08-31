@@ -2681,8 +2681,8 @@ export class Player extends BaseGameObject {
                 }
 
                 if (killCreditSource.hasPerk("takedown")) {
-                    killCreditSource.health += 25;
-                    killCreditSource.boost += 25;
+                    killCreditSource.health += PerkProperties.takedown.hpReward;
+                    killCreditSource.boost += PerkProperties.takedown.boostReward;
                     killCreditSource.giveHaste(GameConfig.HasteType.Takedown, 3);
                 }
 
