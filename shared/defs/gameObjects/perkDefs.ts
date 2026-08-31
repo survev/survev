@@ -15,8 +15,10 @@ export const PerkProperties = {
         scale: 0.1,
         damageReduction: 0.1,
         explosionDamageReduction: 0.9,
-        fragBonus: 3,
-        mirvBonus: 2,
+        bonuses: {
+            frag: 3,
+            mirv: 2,
+        } as Record<string, number | undefined>,
     },
     amped_explosives: {
         throwableRangeMult: 1.75,
