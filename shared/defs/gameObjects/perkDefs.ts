@@ -47,6 +47,10 @@ export const PerkProperties = {
         effectRange: 60,
         hasteDuration: 5,
     },
+    martyrdom: {
+        projectileCount: 12,
+        projectileMaxVel: 5,
+    },
     targeting: {
         incomingDamageMult: 1.25,
     },

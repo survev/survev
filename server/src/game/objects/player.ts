@@ -2780,8 +2780,8 @@ export class Player extends BaseGameObject {
                 this.pos,
                 this.layer,
                 v2.create(0, 0),
-                12,
-                5,
+                PerkProperties.martyrdom.projectileCount,
+                PerkProperties.martyrdom.projectileMaxVel,
             );
         }
 
