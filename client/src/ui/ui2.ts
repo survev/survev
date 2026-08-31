@@ -1397,9 +1397,13 @@ export class UiManager2 {
         sourceType: string,
         damageType: DamageType,
         downed: boolean,
+        isM9SpecialSelfKill: boolean,
     ) {
         switch (damageType) {
             case DamageType.Player:
+                if (isM9SpecialSelfKill) {
+                    return `${targetName} ${this.localization.translate("game-m9-special-self-kill")}`;
+                }
                 return `${killerName} ${
                     this.localization.translate(
                         downed ? "game-knocked-out" : "game-killed",

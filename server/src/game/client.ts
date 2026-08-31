@@ -111,6 +111,7 @@ export class ClientBarn {
             | net.SpectateMsg
             | net.PerkModeRoleSelectMsg
             | net.EditMsg
+            | net.SpecialSelfKillMsg
             | undefined = undefined;
 
         switch (type) {
@@ -160,6 +161,10 @@ export class ClientBarn {
             case net.MsgType.Edit:
                 if (!Config.debug.allowEditMsg) break;
                 msg = new net.EditMsg();
+                msg.deserialize(stream);
+                break;
+            case net.MsgType.SpecialSelfKill:
+                msg = new net.SpecialSelfKillMsg();
                 msg.deserialize(stream);
                 break;
         }
@@ -750,6 +755,14 @@ export class Client {
             case net.MsgType.Edit: {
                 if (!player) break;
                 player.processEditMsg(msg as net.EditMsg);
+                break;
+            }
+            case net.MsgType.SpecialSelfKill: {
+                if (!player) break;
+                const selfKillMsg = msg as net.SpecialSelfKillMsg;
+                if (player.activeWeapon === "m9") {
+                    player.specialSelfKill = selfKillMsg.enabled;
+                }
                 break;
             }
         }
