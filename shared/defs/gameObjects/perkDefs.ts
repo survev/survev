@@ -45,6 +45,9 @@ export const PerkProperties = {
         bonusDamageMult: 1.08,
         scaleOnDeath: 0.2,
     },
+    targeting: {
+        incomingDamageMult: 1.25,
+    },
     broken_arrow: {
         bonusAirstrikes: 2,
     },
