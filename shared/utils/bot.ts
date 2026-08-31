@@ -1,0 +1,396 @@
+import { EmotesDefs } from "../../shared/defs/gameObjects/emoteDefs.ts";
+import { MeleeDefs } from "../../shared/defs/gameObjects/meleeDefs.ts";
+import { OutfitDefs } from "../../shared/defs/gameObjects/outfitDefs.ts";
+import { UnlockDefs } from "../../shared/defs/gameObjects/unlockDefs.ts";
+import { GameConfig, type Input } from "../../shared/gameConfig.ts";
+import type { Connection } from "../net/connection.ts";
+import * as net from "../net/net.ts";
+import { type ObjectData, type ObjectsPartialData, ObjectType } from "../net/objectSerializeFns.ts";
+import type { LocalData } from "../net/updateMsg.ts";
+import { util } from "./util.ts";
+import { v2 } from "./v2.ts";
+
+//
+// Cache random loadout types
+//
+
+const outfits: string[] = [];
+for (const outfit in OutfitDefs) {
+    if (!UnlockDefs.unlock_default.unlocks.includes(outfit)) continue;
+    outfits.push(outfit);
+}
+
+const emotes: string[] = [];
+for (const emote in EmotesDefs) {
+    if (!UnlockDefs.unlock_default.unlocks.includes(emote)) continue;
+    emotes.push(emote);
+}
+
+const melees: string[] = [];
+for (const melee in MeleeDefs) {
+    if (!UnlockDefs.unlock_default.unlocks.includes(melee)) continue;
+    melees.push(melee);
+}
+
+interface GameObject {
+    __id: number;
+    __type: ObjectType;
+    data: ObjectData<ObjectType>;
+}
+
+class ObjectCreator {
+    idToObj: Record<number, GameObject> = {};
+
+    getObjById(id: number) {
+        return this.idToObj[id];
+    }
+
+    m_getTypeById(id: number, s: net.BitStream) {
+        const obj = this.getObjById(id);
+        if (!obj) {
+            const err = {
+                id,
+                ids: Object.keys(this.idToObj),
+                stream: s.view.view,
+            };
+            console.error("objectPoolErr", `getTypeById${JSON.stringify(err)}`);
+            return ObjectType.Invalid;
+        }
+        return obj.__type;
+    }
+
+    updateObjFull<Type extends ObjectType>(
+        type: Type,
+        id: number,
+        data: ObjectData<Type>,
+    ) {
+        let obj = this.getObjById(id);
+        if (obj === undefined) {
+            obj = {} as GameObject;
+            obj.__id = id;
+            obj.__type = type;
+            this.idToObj[id] = obj;
+        }
+        obj.data = data;
+        return obj;
+    }
+
+    updateObjPart<Type extends ObjectType>(id: number, data: ObjectsPartialData[Type]) {
+        const obj = this.getObjById(id);
+        if (obj) {
+            for (const dataKey in data) {
+                // @ts-expect-error too lazy;
+                obj.data[dataKey] = data[dataKey];
+            }
+        } else {
+            console.error("updateObjPart, missing object", id);
+        }
+    }
+
+    deleteObj(id: number) {
+        const obj = this.getObjById(id);
+        if (obj === undefined) {
+            console.error("deleteObj, missing object", id);
+        } else {
+            delete this.idToObj[id];
+        }
+    }
+}
+
+export class Bot {
+    moving = {
+        up: false,
+        down: false,
+        left: false,
+        right: false,
+    };
+
+    shootStart = false;
+
+    interact = false;
+
+    emotes: string[];
+
+    emote = false;
+
+    angle = util.random(-Math.PI, Math.PI);
+    angularSpeed = util.random(0, 0.1);
+
+    toMouseLen = 50;
+
+    connected = false;
+
+    disconnect = false;
+
+    id: number;
+
+    connection: Connection;
+
+    objectCreator = new ObjectCreator();
+
+    inputs: Input[] = [];
+
+    weapons: LocalData["weapons"] = [];
+
+    connectPromise: Promise<void>;
+
+    constructor(id: number, connection: Connection, joinToken: string) {
+        this.id = id;
+
+        this.connection = connection;
+
+        this.connectPromise = new Promise((resolve) => {
+            this.connection.onError = () => {
+                console.error(`Bot ${this.id} connection error`);
+                // we dont actually care if it failed to connect
+                // because we dont want to prevent other bots from joining
+                // and retrying for a single bot feels pointless
+                // so dont reject the promise
+                resolve();
+            };
+            this.connection.onOpen = () => {
+                const joinMsg = new net.JoinMsg();
+
+                joinMsg.bot = true;
+                joinMsg.name = `BOT_${this.id}`;
+                joinMsg.isMobile = false;
+                joinMsg.protocol = GameConfig.protocolVersion;
+
+                joinMsg.loadout = {
+                    melee: util.randomItem(melees),
+                    outfit: util.randomItem(outfits),
+                    heal: "heal_basic",
+                    boost: "boost_basic",
+                    emotes: this.emotes,
+                };
+                joinMsg.joinToken = joinToken;
+
+                this.sendMsg(net.MsgType.Join, joinMsg);
+
+                this.connected = true;
+
+                resolve();
+            };
+        });
+
+        this.connection.onClose = () => {
+            this.disconnect = true;
+            this.connected = false;
+        };
+
+        const emote = (): string => util.randomItem(emotes);
+
+        this.emotes = [emote(), emote(), emote(), emote(), emote(), emote()];
+
+        this.connection.onMessage = (data): void => {
+            const stream = new net.MsgStream(data as ArrayBuffer);
+            while (true) {
+                const type = stream.deserializeMsgType();
+                if (type == net.MsgType.None) {
+                    break;
+                }
+                this.onMsg(type, stream.getStream());
+                stream.stream.readAlignToNextByte();
+            }
+        };
+    }
+
+    onMsg(type: number, stream: net.BitStream): void {
+        switch (type) {
+            case net.MsgType.Joined: {
+                const msg = new net.JoinedMsg();
+                msg.deserialize(stream);
+                this.emotes = msg.emotes;
+                break;
+            }
+            case net.MsgType.Map: {
+                const msg = new net.MapMsg();
+                msg.deserialize(stream);
+                break;
+            }
+            case net.MsgType.Update: {
+                const msg = new net.UpdateMsg();
+                msg.deserialize(stream, this.objectCreator);
+
+                if (msg.activePlayerData.weapsDirty) {
+                    this.weapons = msg.activePlayerData.weapons;
+                }
+
+                // Delete objects
+                for (let i = 0; i < msg.delObjIds.length; i++) {
+                    this.objectCreator.deleteObj(msg.delObjIds[i]);
+                }
+
+                // Update full objects
+                for (let i = 0; i < msg.fullObjects.length; i++) {
+                    const obj = msg.fullObjects[i];
+                    this.objectCreator.updateObjFull(obj.__type, obj.__id, obj);
+                }
+
+                // Update partial objects
+                for (let i = 0; i < msg.partObjects.length; i++) {
+                    const obj = msg.partObjects[i];
+                    this.objectCreator.updateObjPart(obj.__id, obj);
+                }
+
+                break;
+            }
+            case net.MsgType.Kill: {
+                const msg = new net.KillMsg();
+                msg.deserialize(stream);
+                break;
+            }
+            case net.MsgType.RoleAnnouncement: {
+                const msg = new net.RoleAnnouncementMsg();
+                msg.deserialize(stream);
+                break;
+            }
+            case net.MsgType.PlayerStats: {
+                const msg = new net.PlayerStatsMsg();
+                msg.deserialize(stream);
+                break;
+            }
+            case net.MsgType.GameOver: {
+                const msg = new net.GameOverMsg();
+                msg.deserialize(stream);
+                console.log(
+                    `Bot ${this.id} ${msg.gameOver ? "won" : "died"} | kills: ${
+                        msg.playerStats[0].kills
+                    } | rank: ${msg.teamRank}`,
+                );
+                if (!msg.gameOver) {
+                    this.disconnect = true;
+                    this.connected = false;
+                    this.connection.close();
+                }
+                break;
+            }
+            case net.MsgType.Pickup: {
+                const msg = new net.PickupMsg();
+                msg.deserialize(stream);
+                break;
+            }
+            case net.MsgType.UpdatePass: {
+                new net.UpdatePassMsg().deserialize(stream);
+                break;
+            }
+            case net.MsgType.AliveCounts: {
+                const msg = new net.AliveCountsMsg();
+                msg.deserialize(stream);
+                break;
+            }
+        }
+    }
+
+    stream = new net.MsgStream(new ArrayBuffer(1024));
+
+    sendMsg(type: net.MsgType, msg: net.Msg): void {
+        this.stream.stream.index = 0;
+        this.stream.serializeMsg(type, msg);
+
+        this.connection.send(this.stream.getBuffer());
+    }
+
+    sendInputs(): void {
+        if (!this.connected) return;
+
+        const inputPacket = new net.InputMsg();
+
+        inputPacket.moveDown = this.moving.down;
+        inputPacket.moveUp = this.moving.up;
+        inputPacket.moveLeft = this.moving.left;
+        inputPacket.moveRight = this.moving.right;
+
+        inputPacket.shootStart = this.shootStart;
+
+        inputPacket.toMouseDir = v2.create(Math.cos(this.angle), Math.sin(this.angle));
+        inputPacket.toMouseLen = this.toMouseLen;
+
+        this.angle += this.angularSpeed;
+        if (this.angle > Math.PI) this.angle = -Math.PI;
+
+        if (this.interact) {
+            inputPacket.addInput(GameConfig.Input.Interact);
+        }
+
+        for (const input of this.inputs) {
+            inputPacket.addInput(input);
+        }
+        this.inputs.length = 0;
+
+        this.sendMsg(net.MsgType.Input, inputPacket);
+
+        if (this.emote) {
+            const emoteMsg = new net.EmoteMsg();
+            emoteMsg.type = util.randomItem(this.emotes);
+        }
+    }
+
+    updateInputs(): void {
+        this.moving = {
+            up: false,
+            down: false,
+            left: false,
+            right: false,
+        };
+
+        this.shootStart = Math.random() < 0.5;
+        this.interact = Math.random() < 0.5;
+        this.emote = Math.random() < 0.5;
+
+        switch (util.randomInt(1, 8)) {
+            case 1:
+                this.moving.up = true;
+                break;
+            case 2:
+                this.moving.down = true;
+                break;
+            case 3:
+                this.moving.left = true;
+                break;
+            case 4:
+                this.moving.right = true;
+                break;
+            case 5:
+                this.moving.up = true;
+                this.moving.left = true;
+                break;
+            case 6:
+                this.moving.up = true;
+                this.moving.right = true;
+                break;
+            case 7:
+                this.moving.down = true;
+                this.moving.left = true;
+                break;
+            case 8:
+                this.moving.down = true;
+                this.moving.right = true;
+                break;
+        }
+
+        if (Math.random() < 0.1) {
+            const weaps = this.weapons.filter((weap) => weap.type !== "");
+            const slot = this.weapons.indexOf(util.randomItem(weaps));
+
+            let input = null;
+            switch (slot) {
+                case 0:
+                    input = GameConfig.Input.EquipPrimary;
+                    break;
+                case 1:
+                    input = GameConfig.Input.EquipSecondary;
+                    break;
+                case 2:
+                    input = GameConfig.Input.EquipMelee;
+                    break;
+                case 3:
+                    input = GameConfig.Input.EquipThrowable;
+                    break;
+            }
+            if (input) {
+                this.inputs.push(input);
+            }
+        }
+    }
+}
