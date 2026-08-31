@@ -50,6 +50,9 @@ export const PerkProperties = {
         effectRange: 60,
         hasteDuration: 5,
     },
+    chambered: {
+        damageMult: 1.25,
+    },
     martyrdom: {
         projectileCount: 12,
         projectileMaxVel: 5,
