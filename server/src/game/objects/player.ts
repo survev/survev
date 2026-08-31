@@ -4613,7 +4613,7 @@ export class Player extends BaseGameObject {
         if (this.weaponManager.meleeAttacks.length == 0) {
             let equipSpeed = weaponDef.speed.equip;
             if (this.hasPerk("small_arms") && weaponDef.type == "gun") {
-                equipSpeed = 1;
+                equipSpeed = PerkProperties.small_arms.gunEquipSpeed;
             }
 
             this.speed += equipSpeed;
