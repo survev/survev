@@ -1,20 +1,14 @@
 import { and, eq, inArray } from "drizzle-orm";
 import { Hono } from "hono";
 import z from "zod";
-import {
-    exclusivityGroups,
-    type MapFilter,
-    type MapFilterEntry,
-    QuestDefs,
-    QuestDifficulty,
-    type QuestMapFilter,
-} from "../../../../../shared/defs/gameObjects/questDefs.ts";
-import { type MapDefKey, MapDefs } from "../../../../../shared/defs/mapDefs.ts";
+import { exclusivityGroups, QuestDefs, QuestDifficulty } from "../../../../../shared/defs/gameObjects/questDefs.ts";
+import { MapDefs } from "../../../../../shared/defs/mapDefs.ts";
 import { MapId } from "../../../../../shared/gameConfig.ts";
 import { type GetPassResponse } from "../../../../../shared/types/user.ts";
 import { passUtil } from "../../../../../shared/utils/passUtil.ts";
 import { util } from "../../../../../shared/utils/util.ts";
 import { Config } from "../../../config.ts";
+import { satisfiesMapFilter } from "../../../utils/questHelpers.ts";
 import { server } from "../../apiServer.ts";
 import { validateParams } from "../../auth/middleware.ts";
 import { db } from "../../db/index.ts";
@@ -327,66 +321,39 @@ const incompatibleQuestMap = new Map(
 
 function getRandomQuestType(currentQuests: Set<string>, rerolled: boolean) {
     const serverModes = server.modes.filter(m => m.enabled);
-    const serverMapNames = serverModes.map(mode => mode.mapName);
-    const serverMapIds = serverMapNames.map(mapName => MapDefs[mapName].mapId);
 
-    let available = questTypes.filter((questType) => {
+    const serverMapNames = serverModes.map(mode => mode.mapName);
+
+    // for top in solo / squad quests
+    // filter them based on running modes not being normal mode
+    // getting top in solos while a mode is running on squads is really frustrating :)
+    const nonNormalModes = serverMapNames.map(mapName => MapDefs[mapName].mapId).filter(m => m !== MapId.Main);
+    const teamModes = serverModes.map(m => m.teamMode);
+
+    const available = questTypes.filter(questType => {
         if (currentQuests.has(questType)) return false;
 
         const questDef = QuestDefs[questType];
+        if (rerolled && questDef.difficulty === QuestDifficulty.Hard) {
+            return false;
+        }
+
         if (!satisfiesMapFilter(serverMapNames, questDef)) {
             return false;
+        }
+
+        if (nonNormalModes.length > 0) {
+            const modeFilter = questDef.filters?.find(f => f.type === "team_mode");
+
+            if (modeFilter !== undefined && !teamModes.includes(modeFilter.mode)) {
+                return false;
+            }
         }
 
         const incompatibleQuests = incompatibleQuestMap.get(questType);
         return incompatibleQuests?.has(questType);
     });
 
-    // for top in solo / squad quests
-    // filter them based on running modes not being normal mode
-    // getting top in solos while a mode is running on squads is really frustrating :)
-    const nonNormalModes = serverMapIds.filter(m => m !== MapId.Main);
-    if (nonNormalModes.length) {
-        const teamModes = serverModes.map(m => {
-            return m.teamMode;
-        });
-        available = available.filter(type => {
-            const def = QuestDefs[type];
-            if (def.event === "placement") {
-                const modeFilter = def.filters?.find(f => f.type === "team_mode");
-
-                if (modeFilter !== undefined) {
-                    return teamModes.includes(modeFilter.mode);
-                }
-            }
-            return true;
-        });
-    }
-
-    if (rerolled) {
-        available = available.filter(type => QuestDefs[type].difficulty !== QuestDifficulty.Hard);
-    }
-
     const source = available.length > 0 ? available : questTypes;
     return util.randomItem(source) ?? defaultQuestType;
-}
-
-function satisfiesMapFilter(serverMaps: MapDefKey[], mapFilter: QuestMapFilter): boolean {
-    if (mapFilter.mapFilterType === undefined) {
-        return true;
-    }
-
-    return (mapFilter.mapFilterType === "only_on") === hasMapMatch(serverMaps, mapFilter.maps);
-}
-
-function hasMapMatch(serverMaps: MapDefKey[], available: MapFilter): boolean {
-    if (Array.isArray(available)) {
-        return serverMaps.some(map => available.some(a => matchesFilter(map, a)));
-    }
-
-    return serverMaps.some(map => matchesFilter(map, available));
-}
-
-function matchesFilter(map: MapDefKey, filter: MapFilterEntry): boolean {
-    return typeof filter === "string" ? filter === map : filter === MapDefs[map].mapId;
 }
