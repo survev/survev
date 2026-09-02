@@ -97,20 +97,22 @@ function diff(a: any, b: any, all: boolean): any {
     return a != b || all;
 }
 
-function m() {
-    const e = GameObjectDefs.getAllTypes();
-    const t = [];
-    for (let r = 0; r < e.length; r++) {
-        const a = e[r];
-        const i = GameObjectDefs.typeToDef(a) as AmmoDef | HealDef | BoostDef;
+function getUiInventoryItemTypes() {
+    const allTypes = GameObjectDefs.getAllTypes();
+    const visibleItemTypes = [];
+
+    for (let typeIndex = 0; typeIndex < allTypes.length; typeIndex++) {
+        const itemType = allTypes[typeIndex];
+        const itemDef = GameObjectDefs.typeToDef(itemType) as AmmoDef | HealDef | BoostDef;
         if (
-            !(i as AmmoDef).hideUi
-            && (i.type == "heal" || i.type == "boost" || i.type == "ammo")
+            !(itemDef as AmmoDef).hideUi
+            && (itemDef.type == "heal" || itemDef.type == "boost" || itemDef.type == "ammo")
         ) {
-            t.push(a);
+            visibleItemTypes.push(itemType);
         }
     }
-    return t;
+
+    return visibleItemTypes;
 }
 
 class UiState {
@@ -180,7 +182,7 @@ class UiState {
         selectable: false,
     }));
 
-    loot = m().map((type) => ({
+    loot = getUiInventoryItemTypes().map((type) => ({
         type,
         count: 0,
         maximum: 0,
@@ -370,43 +372,39 @@ export class UiManager2 {
 
         for (let i = 0; i < SCOPE_LEVELS.length; i++) {
             const scopeType = SCOPE_LEVELS[i];
-            const x = {
+            const scopeData = {
                 scopeType,
                 div: domElemById(`ui-scope-${scopeType}`),
             };
-            this.dom.scopes.push(x);
+            this.dom.scopes.push(scopeData);
         }
-        for (let S = m(), v = 0; v < S.length; v++) {
-            const I = S[v];
-            const T = domElemById(`ui-loot-${I}`);
-            if (T) {
-                const P = {
-                    lootType: I,
-                    div: T,
-                    count: T.getElementsByClassName("ui-loot-count")[0] as HTMLElement,
-                    image: T.getElementsByClassName(
-                        "ui-loot-image",
-                    )[0] as HTMLImageElement,
-                    overlay: T.getElementsByClassName(
-                        "ui-loot-overlay",
-                    )[0] as HTMLElement,
+
+        for (const lootType of getUiInventoryItemTypes()) {
+            const lootDiv = domElemById(`ui-loot-${lootType}`);
+            if (lootDiv) {
+                const lootData = {
+                    lootType,
+                    div: lootDiv,
+                    count: lootDiv.getElementsByClassName("ui-loot-count")[0] as HTMLElement,
+                    image: lootDiv.getElementsByClassName("ui-loot-image")[0] as HTMLImageElement,
+                    overlay: lootDiv.getElementsByClassName("ui-loot-overlay")[0] as HTMLElement,
                 };
-                this.dom.loot.push(P);
+                this.dom.loot.push(lootData);
             }
         }
+
         for (let i = 0; i < GEAR_TYPES.length; i++) {
             const gearType = GEAR_TYPES[i];
             const div = domElemById(`ui-armor-${gearType}`);
-            const L = {
+            const gearData = {
                 gearType,
                 div,
                 level: div.getElementsByClassName("ui-armor-level")[0] as HTMLElement,
-                image: div.getElementsByClassName(
-                    "ui-armor-image",
-                )[0] as HTMLImageElement,
+                image: div.getElementsByClassName("ui-armor-image")[0] as HTMLImageElement,
             };
-            this.dom.gear.push(L);
+            this.dom.gear.push(gearData);
         }
+
         for (let i = 0; i < perkUiCount; i++) {
             const perk = domElemById(`ui-perk-${i}`);
             const perkData = {
@@ -414,9 +412,7 @@ export class UiManager2 {
                 div: perk,
                 divTitle: perk.getElementsByClassName("tooltip-title")[0] as HTMLElement,
                 divDesc: perk.getElementsByClassName("tooltip-desc")[0] as HTMLElement,
-                image: perk.getElementsByClassName(
-                    "ui-armor-image",
-                )[0] as HTMLImageElement,
+                image: perk.getElementsByClassName("ui-armor-image")[0] as HTMLImageElement,
             };
             this.dom.perks.push(perkData);
         }
@@ -467,10 +463,10 @@ export class UiManager2 {
             );
         }
         for (let i = 0; i < this.dom.scopes.length; i++) {
-            const W = this.dom.scopes[i];
-            addItemAction("use", "scope", W.scopeType, W.div);
-            if (W.scopeType != "1xscope") {
-                addItemAction("drop", "loot", W.scopeType, W.div);
+            const scope = this.dom.scopes[i];
+            addItemAction("use", "scope", scope.scopeType, scope.div);
+            if (scope.scopeType != "1xscope") {
+                addItemAction("drop", "loot", scope.scopeType, scope.div);
             }
         }
         for (let i = 0; i < this.dom.loot.length; i++) {
@@ -629,39 +625,47 @@ export class UiManager2 {
             state.rareLootMessage.opacity = 0;
         }
 
-        // Update displayed message message
-        state.rareLootMessage.ticker += dt;
-        const g = state.rareLootMessage.ticker;
-        const f = state.rareLootMessage.duration;
-        state.rareLootMessage.opacity = 1 - math.smoothstep(g, f - 0.2, f);
+        {
+            // Update displayed message message
+            state.rareLootMessage.ticker += dt;
+            const ticker = state.rareLootMessage.ticker;
+            const duration = state.rareLootMessage.duration;
+            state.rareLootMessage.opacity = 1
+                - math.smoothstep(ticker, duration - 0.2, duration);
+        }
 
-        // Pickup message
-        state.pickupMessage.ticker += dt;
-        const x = state.pickupMessage.ticker;
-        const z = state.pickupMessage.duration;
-        state.pickupMessage.opacity = math.smoothstep(x, 0, 0.2)
-            * (1 - math.smoothstep(x, z, z + 0.2))
-            * (1 - state.rareLootMessage.opacity);
+        {
+            // Pickup message
+            state.pickupMessage.ticker += dt;
+            const ticker = state.pickupMessage.ticker;
+            const duration = state.pickupMessage.duration;
+            state.pickupMessage.opacity = math.smoothstep(ticker, 0, 0.2)
+                * (1 - math.smoothstep(ticker, duration, duration + 0.2))
+                * (1 - state.rareLootMessage.opacity);
+        }
 
-        // Kill message
-        state.killMessage.ticker += dt;
-        const I = state.killMessage.ticker;
-        const T = state.killMessage.duration;
-        state.killMessage.opacity = (1 - math.smoothstep(I, T - 0.2, T)) * (1 - state.rareLootMessage.opacity);
+        {
+            // Kill message
+            state.killMessage.ticker += dt;
+            const ticker = state.killMessage.ticker;
+            const duration = state.killMessage.duration;
+            state.killMessage.opacity = (1 - math.smoothstep(ticker, duration - 0.2, duration))
+                * (1 - state.rareLootMessage.opacity);
+        }
 
         // KillFeed
         let offset = 0;
         for (let i = 0; i < state.killFeed.length; i++) {
             const line = state.killFeed[i];
             line.ticker += dt;
-            const E = line.ticker;
+            const ticker = line.ticker;
             line.offset = offset;
-            line.opacity = math.smoothstep(E, 0, 0.25) * (1 - math.smoothstep(E, 6, 6.5));
-            offset += math.min(E / 0.25, 1);
+            line.opacity = math.smoothstep(ticker, 0, 0.25) * (1 - math.smoothstep(ticker, 6, 6.5));
+            offset += math.min(ticker / 0.25, 1);
 
             // Shorter animation on mobile
             if (device.mobile) {
-                line.opacity = E < 6.5 ? 1 : 0;
+                line.opacity = ticker < 6.5 ? 1 : 0;
             }
         }
 
@@ -732,14 +736,14 @@ export class UiManager2 {
                 // unless we're on a small screen
                 const itemDef = GameObjectDefs.typeToDef(loot.type) as LootDef;
 
-                const X = activePlayer.m_hasWeaponInSlot(GameConfig.WeaponSlot.Primary);
-                const K = activePlayer.m_hasWeaponInSlot(GameConfig.WeaponSlot.Secondary);
-                const Z = X && K;
+                const hasPrimaryWeapon = activePlayer.m_hasWeaponInSlot(GameConfig.WeaponSlot.Primary);
+                const hasSecondaryWeapon = activePlayer.m_hasWeaponInSlot(GameConfig.WeaponSlot.Secondary);
+                const hasBothWeapons = hasPrimaryWeapon && hasSecondaryWeapon;
                 const usable = itemDef.type != "gun"
-                    || !Z
+                    || !hasBothWeapons
                     || activePlayer.m_equippedWeaponType() == "gun";
 
-                let J = false;
+                let canReplaceArmor = false;
                 if (
                     (state.touch
                         && itemDef.type == "helmet"
@@ -749,7 +753,7 @@ export class UiManager2 {
                         && activePlayer.m_getChestLevel() == itemDef.level
                         && loot.type != activePlayer.m_netData.m_chest)
                 ) {
-                    J = true;
+                    canReplaceArmor = true;
                 }
 
                 if (usable || device.uiLayout == device.UiLayout.Sm) {
@@ -762,7 +766,7 @@ export class UiManager2 {
                         || itemDef.type == "melee"
                         || itemDef.type == "outfit"
                         || itemDef.type == "perk"
-                        || J);
+                        || canReplaceArmor);
             }
 
             // Reviving
@@ -776,25 +780,25 @@ export class UiManager2 {
                 const players = playerBarn.playerPool.m_getPool();
 
                 for (let i = 0; i < players.length; i++) {
-                    const p = players[i];
-                    if (p.active) {
-                        const theirTeamId = playerBarn.getPlayerInfo(p.__id).teamId;
+                    const player = players[i];
+                    if (player.active) {
+                        const theirTeamId = playerBarn.getPlayerInfo(player.__id).teamId;
                         if (
-                            (p.__id != activePlayer.__id || canSelfRevive)
+                            (player.__id != activePlayer.__id || canSelfRevive)
                             && ourTeamId == theirTeamId
-                            && p.m_netData.m_downed
-                            && !p.m_netData.m_dead
-                            && p.m_action.type != Action.Revive
+                            && player.m_netData.m_downed
+                            && !player.m_netData.m_dead
+                            && player.m_action.type != Action.Revive
                         ) {
                             const dist = v2.length(
-                                v2.sub(p.m_netData.m_pos, activePlayer.m_netData.m_pos),
+                                v2.sub(player.m_netData.m_pos, activePlayer.m_netData.m_pos),
                             );
                             if (
                                 dist < GameConfig.player.reviveRange
-                                && util.sameLayer(p.layer, activePlayer.layer)
+                                && util.sameLayer(player.layer, activePlayer.layer)
                             ) {
                                 interactionType = InteractionType.Revive;
-                                interactionObject = p;
+                                interactionObject = player;
                                 interactionUsable = true;
                             }
                         }
@@ -831,138 +835,152 @@ export class UiManager2 {
         );
         state.interaction.key = this.getInteractionKey(interactionType);
         state.interaction.usable = interactionUsable && !spectating;
-        for (let oe = 0; oe < activePlayer.m_localData.m_weapons.length; oe++) {
-            const se = activePlayer.m_localData.m_weapons[oe];
-            const ne = state.weapons[oe];
-            ne.type = se.type;
-            ne.ammo = se.ammo;
-            if (oe == GameConfig.WeaponSlot.Throwable) {
-                ne.ammo = activePlayer.m_localData.m_inventory[se.type] || 0;
-            }
-            const le = ne.equipped;
-            ne.equipped = oe == activePlayer.m_localData.m_curWeapIdx;
-            ne.selectable = (se.type != "" || oe == 0 || oe == 1) && !spectating;
-            const ce = ne.equipped ? 1 : 0.6;
-            const me = ce - ne.opacity;
-            const pe = math.min(me, (math.sign(me) * dt) / 0.15);
-            ne.opacity = math.clamp(ne.opacity + pe, 0, 1);
+
+        function updateAnimationWidth(item: { ticker: number; width: number }, duration: number) {
             if (device.mobile) {
-                ne.opacity = ce;
+                item.width = 0;
+                return;
             }
-            if (ne.type == "bugle" && ne.ammo == 0) {
-                ne.opacity = 0.25;
+
+            const animationTime = math.min(item.ticker / duration, Math.PI);
+            const animationWidth = Math.sin(animationTime);
+            item.width = animationWidth < 0.001 ? 0 : animationWidth;
+        }
+
+        for (let weaponIndex = 0; weaponIndex < activePlayer.m_localData.m_weapons.length; weaponIndex++) {
+            const playerWeapon = activePlayer.m_localData.m_weapons[weaponIndex];
+            const weaponState = state.weapons[weaponIndex];
+            weaponState.type = playerWeapon.type;
+            weaponState.ammo = playerWeapon.ammo;
+            if (weaponIndex == GameConfig.WeaponSlot.Throwable) {
+                weaponState.ammo = activePlayer.m_localData.m_inventory[playerWeapon.type] || 0;
             }
-            ne.ticker += dt;
-            if (!ne.equipped || !le) {
-                ne.ticker = 0;
+
+            const wasEquipped = weaponState.equipped;
+            weaponState.equipped = weaponIndex == activePlayer.m_localData.m_curWeapIdx;
+            weaponState.selectable = (playerWeapon.type != "" || weaponIndex == GameConfig.WeaponSlot.Primary
+                || weaponIndex == GameConfig.WeaponSlot.Secondary) && !spectating;
+            const targetOpacity = weaponState.equipped ? 1 : 0.6;
+            const opacityDelta = targetOpacity - weaponState.opacity;
+            const opacityStep = math.min(opacityDelta, (math.sign(opacityDelta) * dt) / 0.15);
+            weaponState.opacity = math.clamp(weaponState.opacity + opacityStep, 0, 1);
+
+            if (device.mobile) {
+                weaponState.opacity = targetOpacity;
+            }
+            if (weaponState.type == "bugle" && weaponState.ammo == 0) {
+                weaponState.opacity = 0.25;
+            }
+            weaponState.ticker += dt;
+            if (!weaponState.equipped || !wasEquipped) {
+                weaponState.ticker = 0;
             }
             if (this.frameCount < 2) {
-                ne.ticker = 1;
+                weaponState.ticker = 1;
             }
-            const he = math.min(ne.ticker / 0.09, Math.PI);
-            const de = Math.sin(he);
-            ne.width = de < 0.001 ? 0 : de;
-            if (device.mobile) {
-                ne.width = 0;
-            }
-            const ue = inputBinds.getBind(ne.bind);
-            ne.bindStr = ue ? ue.toString() : "";
+
+            updateAnimationWidth(weaponState, 0.09);
+
+            const weaponInputBind = inputBinds.getBind(weaponState.bind);
+            weaponState.bindStr = weaponInputBind ? weaponInputBind.toString() : "";
         }
-        const ge = state.weapons[activePlayer.m_localData.m_curWeapIdx];
-        const weaponDef = GameObjectDefs.typeToDef(ge.type) as GunDef | MeleeDef;
-        const we = ge.ammo;
-        const fe = weaponDef.type == "gun"
-            ? weaponDef.ammoInfinite
-                    || (activePlayer.m_hasPerk("endless_ammo") && !weaponDef.ignoreEndlessAmmo)
+
+        const playerWeaponState = state.weapons[activePlayer.m_localData.m_curWeapIdx];
+        const weaponDef = GameObjectDefs.typeToDef(playerWeaponState.type) as GunDef | MeleeDef;
+        const currentAmmo = playerWeaponState.ammo;
+        let remainingWeaponAmmo = 0;
+        if (weaponDef.type === "gun") {
+            const infiniteAmmo = weaponDef.ammoInfinite
+                || (activePlayer.m_hasPerk("endless_ammo") && !weaponDef.ignoreEndlessAmmo);
+            remainingWeaponAmmo = infiniteAmmo
                 ? Number.MAX_VALUE
-                : activePlayer.m_localData.m_inventory[weaponDef.ammo]
-            : 0;
-        state.ammo.current = we;
-        state.ammo.remaining = fe;
+                : activePlayer.m_localData.m_inventory[weaponDef.ammo];
+        }
+        state.ammo.current = currentAmmo;
+        state.ammo.remaining = remainingWeaponAmmo;
         state.ammo.displayCurrent = weaponDef.type != "melee";
-        state.ammo.displayRemaining = fe > 0;
-        for (let _e = 0; _e < state.scopes.length; _e++) {
-            const be = state.scopes[_e];
-            be.visible = activePlayer.m_localData.m_inventory[be.type] > 0;
-            be.equipped = be.visible && activePlayer.m_localData.m_scope == be.type;
-            be.selectable = be.visible && !spectating;
+        state.ammo.displayRemaining = remainingWeaponAmmo > 0;
+
+        for (let scopeIndex = 0; scopeIndex < state.scopes.length; scopeIndex++) {
+            const scopeState = state.scopes[scopeIndex];
+            scopeState.visible = activePlayer.m_localData.m_inventory[scopeState.type] > 0;
+            scopeState.equipped = scopeState.visible && activePlayer.m_localData.m_scope == scopeState.type;
+            scopeState.selectable = scopeState.visible && !spectating;
         }
-        for (
-            let xe = activePlayer.m_getBagLevel(), Se = 0;
-            Se < state.loot.length;
-            Se++
-        ) {
-            const ve = state.loot[Se];
-            const ke = ve.count;
-            ve.count = activePlayer.m_localData.m_inventory[ve.type] || 0;
-            ve.maximum = GameConfig.bagSizes[ve.type as InventoryItem][xe];
-            ve.selectable = ve.count > 0 && !spectating;
-            if (ve.count > ke) {
-                ve.ticker = 0;
+
+        const playerBagLevel = activePlayer.m_getBagLevel();
+
+        for (let lootIndex = 0; lootIndex < state.loot.length; lootIndex++) {
+            const lootState = state.loot[lootIndex];
+            const previousLootCount = lootState.count;
+            lootState.count = activePlayer.m_localData.m_inventory[lootState.type] || 0;
+            lootState.maximum = GameConfig.bagSizes[lootState.type as InventoryItem][playerBagLevel];
+            lootState.selectable = lootState.count > 0 && !spectating;
+            if (lootState.count > previousLootCount) {
+                lootState.ticker = 0;
             }
             if (this.frameCount < 2) {
-                ve.ticker = 1;
+                lootState.ticker = 1;
             }
-            ve.ticker += dt;
-            const ze = math.min(ve.ticker / 0.05, Math.PI);
-            const Ie = Math.sin(ze);
-            ve.width = Ie < 0.001 ? 0 : Ie;
-            if (device.mobile) {
-                ve.width = 0;
-            }
+            lootState.ticker += dt;
+
+            updateAnimationWidth(lootState, 0.05);
         }
-        for (let Te = 0; Te < state.gear.length; Te++) {
-            const Me = state.gear[Te];
-            let Pe = "";
-            if (Me.type == "chest") {
-                Pe = activePlayer.m_netData.m_chest;
-            } else if (Me.type == "helmet") {
-                Pe = activePlayer.m_netData.m_helmet;
-            } else if (
-                Me.type == "backpack"
-                && (Pe = activePlayer.m_netData.m_backpack) == "backpack00"
-            ) {
-                Pe = "";
+
+        for (let gearIndex = 0; gearIndex < state.gear.length; gearIndex++) {
+            const gearState = state.gear[gearIndex];
+            let equippedItem = "";
+            switch (gearState.type) {
+                case "chest": {
+                    equippedItem = activePlayer.m_netData.m_chest;
+                    break;
+                }
+                case "helmet": {
+                    equippedItem = activePlayer.m_netData.m_helmet;
+                    break;
+                }
+                case "backpack": {
+                    if ((equippedItem = activePlayer.m_netData.m_backpack) === "backpack00") {
+                        equippedItem = "";
+                        break;
+                    }
+                    break;
+                }
             }
-            const Ce = Me.item;
-            Me.item = Pe;
-            Me.selectable = Pe != "" && !spectating;
-            if (Ce != Me.item) {
-                Me.ticker = 0;
+
+            const previousGearItem = gearState.item;
+            gearState.item = equippedItem;
+            gearState.selectable = equippedItem != "" && !spectating;
+            if (previousGearItem != gearState.item) {
+                gearState.ticker = 0;
             }
             if (this.frameCount < 2) {
-                Me.ticker = 1;
+                gearState.ticker = 1;
             }
-            Me.ticker += dt;
-            const Ae = math.min(Me.ticker / 0.05, Math.PI);
-            const Oe = Math.sin(Ae);
-            Me.width = Oe < 0.001 ? 0 : Oe;
-            if (device.mobile) {
-                Me.width = 0;
-            }
+            gearState.ticker += dt;
+
+            updateAnimationWidth(gearState, 0.05);
         }
-        for (let De = 0; De < state.perks.length; De++) {
-            const Ee = state.perks[De];
-            if (activePlayer.perks.length > De) {
-                const Be = activePlayer.perks[De];
-                Ee.type = Be.type;
-                Ee.droppable = Be.droppable;
-                if (Be.isNew) {
-                    Ee.ticker = 0;
+
+        for (let perkIndex = 0; perkIndex < state.perks.length; perkIndex++) {
+            const perkState = state.perks[perkIndex];
+            if (activePlayer.perks.length > perkIndex) {
+                const playerPerk = activePlayer.perks[perkIndex];
+                perkState.type = playerPerk.type;
+                perkState.droppable = playerPerk.droppable;
+                if (playerPerk.isNew) {
+                    perkState.ticker = 0;
                 }
                 if (this.frameCount < 2) {
-                    Ee.ticker = 1;
+                    perkState.ticker = 1;
                 }
-                Ee.ticker += dt;
-                const Re = math.min(Ee.ticker / 0.05, Math.PI);
-                const Le = Math.sin(Re);
-                Ee.width = Le < 0.001 ? 0 : Le;
-                if (device.mobile) {
-                    Ee.width = 0;
-                }
-                Ee.pulse = !device.mobile && Ee.ticker < 4;
+                perkState.ticker += dt;
+
+                updateAnimationWidth(perkState, 0.05);
+
+                perkState.pulse = !device.mobile && perkState.ticker < 4;
             } else {
-                Ee.type = "";
+                perkState.type = "";
             }
         }
 
@@ -1154,56 +1172,58 @@ export class UiManager2 {
                 ? "block"
                 : "none";
         }
-        for (let E = 0; E < patch.weapons.length; E++) {
-            const B = patch.weapons[E];
-            const R = dom.weapons[E];
-            const L = state.weapons[E];
-            if (B.type) {
-                let q = "";
-                let F = "";
-                const j = GameObjectDefs.typeToDefSafe(L.type);
-                if (j) {
-                    q = this.localization.translate(`game-hud-${L.type}`)
-                        || this.localization.translate(`game-${L.type}`);
-                    F = helpers.getCssTransformFromGameType(L.type);
+
+        for (let weaponIndex = 0; weaponIndex < patch.weapons.length; weaponIndex++) {
+            const weaponPatch = patch.weapons[weaponIndex];
+            const weaponDom = dom.weapons[weaponIndex];
+            const weaponState = state.weapons[weaponIndex];
+            if (weaponPatch.type) {
+                let weaponName = "";
+                let weaponTransformCss = "";
+                const weaponDef = GameObjectDefs.typeToDefSafe(weaponState.type);
+                if (weaponDef) {
+                    weaponName = this.localization.translate(`game-hud-${weaponState.type}`)
+                        || this.localization.translate(`game-${weaponState.type}`);
+                    weaponTransformCss = helpers.getCssTransformFromGameType(weaponState.type);
                 }
-                R.type.innerHTML = q;
-                R.image.src = helpers.getSvgFromGameType(L.type);
-                R.image.style.display = j ? "inline" : "none";
-                R.image.style.transform = F;
+
+                weaponDom.type.innerHTML = weaponName;
+                weaponDom.image.src = helpers.getSvgFromGameType(weaponState.type);
+                weaponDom.image.style.display = weaponDef ? "inline" : "none";
+                weaponDom.image.style.transform = weaponTransformCss;
             }
-            if (B.equipped) {
-                R.div.style.backgroundColor = L.equipped
+            if (weaponPatch.equipped) {
+                weaponDom.div.style.backgroundColor = weaponState.equipped
                     ? "rgba(0, 0, 0, 0.4)"
                     : "rgba(0, 0, 0, 0)";
             }
-            if (B.selectable) {
-                R.div.style.pointerEvents = L.type != "" || L.selectable ? "auto" : "none";
+            if (weaponPatch.selectable) {
+                weaponDom.div.style.pointerEvents = weaponState.type !== "" || weaponState.selectable ? "auto" : "none";
             }
-            if (B.width) {
-                const N = math.lerp(L.width, 83.33, 100);
-                R.div.style.width = `${N}%`;
+            if (weaponPatch.width) {
+                const weaponWidth = math.lerp(weaponState.width, 83.33, 100);
+                weaponDom.div.style.width = `${weaponWidth}%`;
             }
-            if (B.opacity) {
-                R.div.style.opacity = String(L.opacity);
+            if (weaponPatch.opacity) {
+                weaponDom.div.style.opacity = String(weaponState.opacity);
             }
-            if (B.ammo && R.ammo) {
-                R.ammo.innerHTML = String(L.ammo);
-                R.ammo.style.display = L.ammo > 0 ? "block" : "none";
+            if (weaponPatch.ammo && weaponDom.ammo) {
+                weaponDom.ammo.innerHTML = String(weaponState.ammo);
+                weaponDom.ammo.style.display = weaponState.ammo > 0 ? "block" : "none";
             }
-            if (B.bindStr) {
-                R.number.innerHTML = L.bindStr[0] || "";
+            if (weaponPatch.bindStr) {
+                weaponDom.number.innerHTML = weaponState.bindStr[0] || "";
             }
         }
         if (patch.ammo.current) {
-            const H = state.ammo.current;
-            dom.ammo.current.innerHTML = String(H);
-            dom.ammo.current.style.color = H > 0 ? "white" : "red";
+            const currentAmmo = state.ammo.current;
+            dom.ammo.current.innerHTML = String(currentAmmo);
+            dom.ammo.current.style.color = currentAmmo > 0 ? "white" : "red";
         }
         if (patch.ammo.remaining) {
-            const V = state.ammo.remaining;
-            dom.ammo.remaining.innerHTML = String(V == Number.MAX_VALUE ? "&#8734;" : V);
-            dom.ammo.remaining.style.color = V != 0 ? "white" : "red";
+            const remainingAmmo = state.ammo.remaining;
+            dom.ammo.remaining.innerHTML = String(remainingAmmo === Number.MAX_VALUE ? "&#8734;" : remainingAmmo);
+            dom.ammo.remaining.style.color = remainingAmmo !== 0 ? "white" : "red";
         }
         if (patch.ammo.displayCurrent) {
             dom.ammo.current.style.opacity = String(state.ammo.displayCurrent ? 1 : 0);
@@ -1216,134 +1236,118 @@ export class UiManager2 {
                 state.ammo.displayRemaining ? 1 : 0,
             );
         }
-        for (let U = 0; U < patch.scopes.length; U++) {
-            const W = patch.scopes[U];
-            const G = dom.scopes[U];
-            const X = state.scopes[U];
-            if (W.visible) {
-                if (X.visible) {
-                    G.div.classList.remove("ui-hidden");
-                } else {
-                    G.div.classList.add("ui-hidden");
-                }
+
+        for (let scopeIndex = 0; scopeIndex < patch.scopes.length; scopeIndex++) {
+            const scopePatch = patch.scopes[scopeIndex];
+            const scopeDom = dom.scopes[scopeIndex];
+            const scopeState = state.scopes[scopeIndex];
+            if (scopePatch.visible) {
+                scopeDom.div.classList.toggle("ui-hidden", !scopeState.visible);
             }
-            if (W.equipped) {
-                if (X.equipped) {
-                    G.div.classList.add("ui-zoom-active");
-                    G.div.classList.remove("ui-zoom-inactive");
-                } else {
-                    G.div.classList.remove("ui-zoom-active");
-                    G.div.classList.add("ui-zoom-inactive");
-                }
+            if (scopePatch.equipped) {
+                scopeDom.div.classList.toggle("ui-zoom-active", scopeState.equipped);
+                scopeDom.div.classList.toggle("ui-zoom-inactive", !scopeState.equipped);
             }
-            if (W.selectable) {
-                G.div.style.pointerEvents = X.selectable ? "auto" : "none";
+            if (scopePatch.selectable) {
+                scopeDom.div.style.pointerEvents = scopeState.selectable ? "auto" : "none";
             }
         }
-        for (let K = 0; K < patch.loot.length; K++) {
-            const Z = patch.loot[K];
-            const Y = dom.loot[K];
-            const J = state.loot[K];
-            if (Z && Y && J) {
-                if (Z.count || Z.maximum) {
-                    Y.count.innerHTML = String(J.count);
-                    Y.div.style.opacity = String(
-                        (GameObjectDefs.typeToDef(Y.lootType) as AmmoDef).special && J.count == 0
+
+        for (let lootIndex = 0; lootIndex < patch.loot.length; lootIndex++) {
+            const lootPatch = patch.loot[lootIndex];
+            const lootDom = dom.loot[lootIndex];
+            const lootState = state.loot[lootIndex];
+            if (lootPatch && lootDom && lootState) {
+                if (lootPatch.count || lootPatch.maximum) {
+                    lootDom.count.innerHTML = String(lootState.count);
+                    lootDom.div.style.opacity = String(
+                        (GameObjectDefs.typeToDef(lootDom.lootType) as AmmoDef).special && lootState.count == 0
                             ? 0
-                            : J.count > 0
+                            : lootState.count > 0
                             ? 1
                             : 0.25,
                     );
-                    Y.div.style.color = J.count == J.maximum ? "#ff9900" : "#ffffff";
+                    lootDom.div.style.color = lootState.count === lootState.maximum ? "#ff9900" : "#ffffff";
                 }
-                if (Z.width) {
-                    const Q = 1 + J.width * 0.33;
-                    const $ = `scale(${Q}, ${Q})`;
-                    Y.image.style.transform = $;
-                    if (Y.overlay) {
-                        Y.overlay.style.transform = $;
+                if (lootPatch.width) {
+                    const scale = 1 + lootState.width * 0.33;
+                    const transform = `scale(${scale}, ${scale})`;
+                    lootDom.image.style.transform = transform;
+                    if (lootDom.overlay) {
+                        lootDom.overlay.style.transform = transform;
                     }
                 }
-                if (Z.selectable) {
-                    Y.div.style.pointerEvents = J.selectable ? "auto" : "none";
+                if (lootPatch.selectable) {
+                    lootDom.div.style.pointerEvents = lootState.selectable ? "auto" : "none";
                 }
             }
         }
-        for (let ee = 0; ee < patch.gear.length; ee++) {
-            const te = patch.gear[ee];
-            const re = dom.gear[ee];
-            const ae = state.gear[ee];
-            if (te.item) {
+
+        for (let gearIndex = 0; gearIndex < patch.gear.length; gearIndex++) {
+            const gearPatch = patch.gear[gearIndex];
+            const gearDom = dom.gear[gearIndex];
+            const gearState = state.gear[gearIndex];
+            if (gearPatch.item) {
                 // GearDef?
-                const ie = ae.item ? (GameObjectDefs.typeToDef(ae.item) as ChestDef) : null;
-                const oe = ie ? ie.level : 0;
-                re.div.style.display = ie ? "block" : "none";
-                re.level.innerHTML = this.localization.translate(`game-level-${oe}`);
-                re.level.style.color = oe === 4 ? "#b30000" : oe === 3 ? "#ff9900" : "#ffffff";
-                re.image.src = helpers.getSvgFromGameType(ae.item);
+                const gearDef = gearState.item ? (GameObjectDefs.typeToDef(gearState.item) as ChestDef) : null;
+                const gearLevel = gearDef ? gearDef.level : 0;
+                gearDom.div.style.display = gearDef ? "block" : "none";
+                gearDom.level.innerHTML = this.localization.translate(`game-level-${gearLevel}`);
+                gearDom.level.style.color = gearLevel === 4 ? "#b30000" : gearLevel === 3 ? "#ff9900" : "#ffffff";
+                gearDom.image.src = helpers.getSvgFromGameType(gearState.item);
             }
-            if (te.selectable) {
-                re.div.style.pointerEvents = ae.selectable ? "auto" : "none";
+            if (gearPatch.selectable) {
+                gearDom.div.style.pointerEvents = gearState.selectable ? "auto" : "none";
             }
-            if (te.width) {
-                const se = 1 + ae.width * 0.33;
-                let ne = `scale(${se}, ${se})`;
-                const le = GameObjectDefs.typeToDefSafe(ae.item) as MeleeDef;
-                if (le?.lootImg.rot !== undefined) {
-                    ne += ` rotate(${le.lootImg.rot}rad)`;
+            if (gearPatch.width) {
+                const scale = 1 + gearState.width * 0.33;
+                let transform = `scale(${scale}, ${scale})`;
+                const meleeGearDef = GameObjectDefs.typeToDefSafe(gearState.item) as MeleeDef;
+                if (meleeGearDef?.lootImg.rot !== undefined) {
+                    transform += ` rotate(${meleeGearDef.lootImg.rot}rad)`;
                 }
-                re.image.style.transform = ne;
+                gearDom.image.style.transform = transform;
             }
         }
-        for (let ce = 0; ce < patch.perks.length; ce++) {
-            const me = patch.perks[ce];
-            const pe = dom.perks[ce];
-            const he = state.perks[ce];
-            if (me.type) {
-                pe.perkType = he.type;
-                pe.divTitle.innerHTML = this.localization.translate(`game-${he.type}`);
-                pe.divDesc.innerHTML = this.localization.translate(
-                    `game-${he.type}-desc`,
-                );
-                pe.div.style.display = he.type ? "block" : "none";
-                pe.image.src = he.type ? helpers.getSvgFromGameType(he.type) : "";
+
+        for (let perkIndex = 0; perkIndex < patch.perks.length; perkIndex++) {
+            const perkPatch = patch.perks[perkIndex];
+            const perkDom = dom.perks[perkIndex];
+            const perkState = state.perks[perkIndex];
+            if (perkPatch.type) {
+                perkDom.perkType = perkState.type;
+                perkDom.divTitle.innerHTML = this.localization.translate(`game-${perkState.type}`);
+                perkDom.divDesc.innerHTML = this.localization.translate(`game-${perkState.type}-desc`);
+                perkDom.div.style.display = perkState.type ? "block" : "none";
+                perkDom.image.src = perkState.type ? helpers.getSvgFromGameType(perkState.type) : "";
             }
-            if (me.droppable) {
-                if (he.droppable) {
-                    pe.div.classList.add("ui-outline-hover");
-                    pe.div.classList.remove("ui-perk-no-drop");
-                } else {
-                    pe.div.classList.remove("ui-outline-hover");
-                    pe.div.classList.add("ui-perk-no-drop");
-                }
+            if (perkPatch.droppable) {
+                perkDom.div.classList.toggle("ui-outline-hover", perkState.droppable);
+                perkDom.div.classList.toggle("ui-perk-no-drop", !perkState.droppable);
             }
-            if (me.pulse) {
-                if (he.pulse) {
-                    pe.div.classList.add("ui-perk-pulse");
-                } else {
-                    pe.div.classList.remove("ui-perk-pulse");
-                }
+            if (perkPatch.pulse) {
+                perkDom.div.classList.toggle("ui-perk-pulse", perkState.pulse);
             }
-            if (me.width) {
-                const de = 1 + he.width * 0.33;
-                pe.image.style.transform = `scale(${de}, ${de})`;
+            if (perkPatch.width) {
+                const scale = 1 + perkState.width * 0.33;
+                perkDom.image.style.transform = `scale(${scale}, ${scale})`;
             }
         }
     }
 
     displayPickupMessage(type: PickupMsgType) {
-        const p = this.newState.pickupMessage;
-        p.message = this.getPickupMessageText(type);
-        p.ticker = 0;
-        p.duration = 3;
+        const pickupMessage = this.newState.pickupMessage;
+        pickupMessage.message = this.getPickupMessageText(type);
+        pickupMessage.ticker = 0;
+        pickupMessage.duration = 3;
     }
 
     displayKillMessage(text: string, count: string) {
-        const p = this.newState.killMessage;
-        p.text = text;
-        p.count = count;
-        p.ticker = 0;
-        p.duration = 7;
+        const killMessage = this.newState.killMessage;
+        killMessage.text = text;
+        killMessage.count = count;
+        killMessage.ticker = 0;
+        killMessage.duration = 7;
     }
 
     hideKillMessage() {
