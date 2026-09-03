@@ -2,7 +2,7 @@ import { expect } from "vitest";
 
 import type { GameObjectDef } from "../../shared/defs/gameObjectDefs.ts";
 
-import type { Player } from "../../server/src/game/objects/player.ts";
+import { Player } from "../../server/src/game/objects/player.ts";
 import type { MapObjectDef } from "../../shared/defs/mapObjectDefs.ts";
 import { Main } from "../../shared/defs/maps/baseDefs.ts";
 import { GameObjectDefs, MapObjectDefs } from "../../shared/defs/register.ts";
@@ -18,7 +18,7 @@ interface GameTestHelpers<R = unknown> {
     /**
      * Does not work if `R` is an array type
      */
-    toEitherSatisfyOrAllSatisfy: (predicate: (value: IterableElement<R>, index: number, iterable: R) => unknown) => R;
+    toEitherSatisfyOrAllSatisfy: (predicate: (value: IterableElement<R>) => unknown) => R;
 
     toBeValidMapObj: (type?: ValueOrArray<MapObjectDef["type"]>) => R;
     toBeValidMapObjOrNone: (type?: ValueOrArray<MapObjectDef["type"]>) => R;
@@ -26,7 +26,7 @@ interface GameTestHelpers<R = unknown> {
     toBeValidLoot: (type?: ValueOrArray<GameObjectDef["type"]>) => R;
     toBeValidLootTier: () => R;
 
-    toBeSamePlayer: (obj?: Player) => R;
+    toBeSamePlayer: (expected: Player) => R;
 }
 
 declare module "vitest" {
@@ -34,8 +34,20 @@ declare module "vitest" {
     interface AsymmetricMatchersContaining extends GameTestHelpers {}
 }
 
-expect.extend({
-    toBeInRange: (received: number, expected: { min: number; max: number }) => {
+export const predicates: {
+    [K in keyof GameTestHelpers]: (
+        received: unknown,
+        ...params: Parameters<GameTestHelpers[K]>
+    ) => { pass: boolean; message: () => string };
+} = {
+    toBeInRange: (received, expected: { min: number; max: number }) => {
+        if (typeof received !== "number") {
+            return {
+                message: () => `Expected ${received} to be a number`,
+                pass: false,
+            };
+        }
+
         if (received > expected.max || received < expected.min) {
             return {
                 message: () => `Expected ${received} to be a in range [${expected.min}, ${expected.max}]`,
@@ -147,6 +159,13 @@ expect.extend({
     },
 
     toBeValidMapObj: (received, expected?: ValueOrArray<MapObjectDef["type"]>) => {
+        if (typeof received !== "string") {
+            return {
+                message: () => `Expected '${received}' to be a string`,
+                pass: false,
+            };
+        }
+
         if (!MapObjectDefs.typeExists(received)) {
             return {
                 message: () => `Expected '${received}' to be a valid map object type`,
@@ -168,14 +187,28 @@ expect.extend({
     },
 
     toBeValidMapObjOrNone: (received, expected?: ValueOrArray<MapObjectDef["type"]>) => {
-        if (received && !MapObjectDefs.typeExists(received)) {
+        if (received === undefined || received === "") {
+            return {
+                pass: true,
+                message: () => "",
+            };
+        }
+
+        if (typeof received !== "string") {
+            return {
+                message: () => `Expected '${received}' to be a string`,
+                pass: false,
+            };
+        }
+
+        if (!MapObjectDefs.typeExists(received)) {
             return {
                 message: () => `Expected '${received}' to be a valid map object type`,
                 pass: false,
             };
         }
 
-        if (received && expected) {
+        if (expected !== undefined) {
             const def = MapObjectDefs.typeToDef(received);
             if (!util.valueMatches(def.type, expected)) {
                 return {
@@ -189,6 +222,13 @@ expect.extend({
     },
 
     toBeValidGameObj: (received, expected?: ValueOrArray<GameObjectDef["type"]>) => {
+        if (typeof received !== "string") {
+            return {
+                message: () => `Expected '${received}' to be a string`,
+                pass: false,
+            };
+        }
+
         if (!GameObjectDefs.typeExists(received)) {
             return {
                 message: () => `Expected '${received}' to be a valid game object type`,
@@ -210,6 +250,13 @@ expect.extend({
     },
 
     toBeValidLoot: (received, expected?: ValueOrArray<GameObjectDef["type"]>) => {
+        if (typeof received !== "string") {
+            return {
+                message: () => `Expected '${received}' to be a string`,
+                pass: false,
+            };
+        }
+
         const def = GameObjectDefs.typeToDefSafe(received);
         if (!def || !("lootImg" in def)) {
             return {
@@ -231,7 +278,14 @@ expect.extend({
         return { pass: true, message: () => "" };
     },
 
-    toBeValidLootTier: (received, _expected) => {
+    toBeValidLootTier: (received) => {
+        if (typeof received !== "string") {
+            return {
+                message: () => `Expected '${received}' to be a string`,
+                pass: false,
+            };
+        }
+
         if (!(received in Main.lootTable)) {
             return {
                 message: () => `Expected '${received}' to be a valid loot table`,
@@ -242,13 +296,14 @@ expect.extend({
         return { pass: true, message: () => "" };
     },
 
-    toBeSamePlayer: (received: Player | undefined, expected: Player) => {
-        if (!received) {
+    toBeSamePlayer: (received, expected: Player) => {
+        if (received === undefined || !(received instanceof Player)) {
             return {
                 message: () => `Expected a player instance, received '${expected}'`,
                 pass: false,
             };
         }
+
         if (received.__id !== expected.__id) {
             return {
                 message: () => `Expected player '${received.name}' to be '${expected.name}'`,
@@ -258,4 +313,6 @@ expect.extend({
 
         return { pass: true, message: () => "" };
     },
-});
+};
+
+expect.extend(predicates);

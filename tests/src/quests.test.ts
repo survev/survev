@@ -1,12 +1,13 @@
 import { describe, expect, test } from "vitest";
 import { hasMapMatch, matchesFilter, satisfiesMapFilter } from "../../server/src/utils/questHelpers.ts";
-import { type Filter, type FilterTypes, QuestDefs } from "../../shared/defs/gameObjects/questDefs.ts";
+import { QuestDefs } from "../../shared/defs/gameObjects/questDefs.ts";
 import { RoleDefs } from "../../shared/defs/gameObjects/roleDefs.ts";
 import { ObstacleDefs } from "../../shared/defs/mapObjects/obstacles/obstacleDefs.ts";
 import { GameObjectDefs, MapObjectDefs } from "../../shared/defs/register.ts";
-import { DamageType, GameConfig, type InventoryItem, MapId, TeamMode, WeaponSlot } from "../../shared/gameConfig.ts";
+import { DamageType, GameConfig, MapId, TeamMode, WeaponSlot } from "../../shared/gameConfig.ts";
 import { v2 } from "../../shared/utils/v2.ts";
 import { createGame } from "./gameTestHelpers.ts";
+import { predicates } from "./testHelpers.ts";
 
 const allObstacleCategories = Object.values(ObstacleDefs).map(def => def.category).filter(cat => cat !== undefined);
 GameConfig.player.headshotChance = 0;
@@ -1291,22 +1292,19 @@ describe("Quest definition tests", () => {
             test.for(quest.filters.map(f => [f, f.type] as const))("Filter $1", ([filter]) => {
                 switch (filter.type) {
                     case "building": {
-                        expect(filter.buildingType, "Building types should exist").toEitherSatisfyOrAllSatisfy(type => {
-                            return MapObjectDefs.typeExists(type)
-                                && MapObjectDefs.typeToDef(type).type === "building";
-                        });
+                        expect(filter.buildingType, "Building types should exist")
+                            .toEitherSatisfyOrAllSatisfy(type => {
+                                return predicates.toBeValidMapObj(type, "building");
+                            });
                         break;
                     }
                     case "item": {
                         if (filter.subType !== "type") break;
 
-                        expect(filter.itemType, "Item types should exist").toEitherSatisfyOrAllSatisfy(type => {
-                            if (!GameObjectDefs.typeExists(type)) return false;
-
-                            const defType = GameObjectDefs.typeToDef(type).type;
-                            return defType === "boost"
-                                || defType === "heal";
-                        });
+                        expect(filter.itemType, "Item types should exist")
+                            .toEitherSatisfyOrAllSatisfy(type => {
+                                return predicates.toBeValidGameObj(type, ["boost", "heal"]);
+                            });
                         break;
                     }
                     case "max_rank": {
@@ -1315,12 +1313,10 @@ describe("Quest definition tests", () => {
                     }
                     case "obstacle": {
                         if (filter.subType === "type") {
-                            expect(filter.obstacleType, "Obstacle types should exist").toEitherSatisfyOrAllSatisfy(
-                                type => {
-                                    return MapObjectDefs.typeExists(type)
-                                        && MapObjectDefs.typeToDef(type).type === "obstacle";
-                                },
-                            );
+                            expect(filter.obstacleType, "Obstacle types should exist")
+                                .toEitherSatisfyOrAllSatisfy(type => {
+                                    return predicates.toBeValidMapObj(type, "obstacle");
+                                });
                         } else {
                             expect(filter.obstacleCategory, "Obstacle category should match at least 1 obstacle")
                                 .toEitherSatisfyOrAllSatisfy(category => {
@@ -1330,9 +1326,8 @@ describe("Quest definition tests", () => {
                         break;
                     }
                     case "role": {
-                        expect(filter.role, "Role should exist").toEitherSatisfyOrAllSatisfy(role =>
-                            Object.hasOwn(RoleDefs, role)
-                        );
+                        expect(filter.role, "Role should exist")
+                            .toEitherSatisfyOrAllSatisfy(role => Object.hasOwn(RoleDefs, role));
                         break;
                     }
                     case "team_mode": {
@@ -1346,10 +1341,10 @@ describe("Quest definition tests", () => {
 
                         if (filter.weaponClass === "gun") {
                             if (filter.ammo !== undefined) {
-                                expect(filter.ammo).toEitherSatisfyOrAllSatisfy(type => {
-                                    return GameObjectDefs.typeExists(type)
-                                        && GameObjectDefs.typeToDef(type).type === "ammo";
-                                });
+                                expect(filter.ammo)
+                                    .toEitherSatisfyOrAllSatisfy(type => {
+                                        return predicates.toBeValidGameObj(type, "ammo");
+                                    });
                             }
 
                             expect(
