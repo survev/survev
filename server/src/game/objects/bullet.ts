@@ -622,7 +622,7 @@ export class Bullet {
 
                     let multiplier = 1;
                     if (isHighValueTarget) {
-                        multiplier *= PerkProperties.targeting.incomingDamageMult;
+                        multiplier *= PerkProperties.targeting.damageMult;
                     }
 
                     this.bulletManager.damages.push({

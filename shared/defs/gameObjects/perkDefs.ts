@@ -56,7 +56,7 @@ export const PerkProperties = {
         projectileMaxVel: 5,
     },
     targeting: {
-        incomingDamageMult: 1.25,
+        damageMult: 1.25,
     },
     broken_arrow: {
         bonusAirstrikes: 2,
