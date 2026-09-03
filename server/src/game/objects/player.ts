@@ -1575,9 +1575,11 @@ export class Player extends BaseGameObject {
             && this.bleedTicker < 0
         ) {
             const hasDrain = this.hasPerk("trick_drain");
-            this.bleedTicker = hasDrain
-                ? GameConfig.player.bleedTickRate * 3
-                : GameConfig.player.bleedTickRate;
+            this.bleedTicker = GameConfig.player.bleedTickRate;
+
+            if (hasDrain) {
+                this.bleedTicker *= PerkProperties.trick_drain.bleedTickRateMult;
+            }
 
             const mapConfig = this.game.map.mapDef.gameConfig;
 
@@ -1600,7 +1602,10 @@ export class Player extends BaseGameObject {
         this.chattyTicker -= dt;
 
         if (this.hasPerk("trick_chatty") && this.chattyTicker < 0) {
-            this.chattyTicker = util.random(5, 15);
+            this.chattyTicker = util.random(
+                PerkProperties.trick_chatty.minInterval,
+                PerkProperties.trick_chatty.maxInterval,
+            );
 
             const emotes = Object.keys(EmotesDefs);
 
@@ -1656,7 +1661,7 @@ export class Player extends BaseGameObject {
                             target.health += itemDef.heal;
                             if (this.hasPerk("combat_stims")) {
                                 this.combatStimsActive = true;
-                                this._combatStimsTicker = 5;
+                                this._combatStimsTicker = PerkProperties.combat_stims.effectDuration;
                             }
                         });
                     }
@@ -1665,7 +1670,7 @@ export class Player extends BaseGameObject {
                             target.boost += itemDef.boost;
                             if (this.hasPerk("combat_stims")) {
                                 this.combatStimsActive = true;
-                                this._combatStimsTicker = 5;
+                                this._combatStimsTicker = PerkProperties.combat_stims.effectDuration;
                             }
                         });
                     }
@@ -2676,17 +2681,17 @@ export class Player extends BaseGameObject {
                 }
 
                 if (killCreditSource.hasPerk("takedown")) {
-                    killCreditSource.health += 25;
-                    killCreditSource.boost += 25;
-                    killCreditSource.giveHaste(GameConfig.HasteType.Takedown, 3);
+                    killCreditSource.health += PerkProperties.takedown.hpReward;
+                    killCreditSource.boost += PerkProperties.takedown.boostReward;
+                    killCreditSource.giveHaste(GameConfig.HasteType.Takedown, PerkProperties.takedown.hasteDuration);
                 }
 
                 // Pirate's Bounty (Cutlass-specific)
                 const weaponDef = GameObjectDefs.typeToDefSafe(params.gameSourceType || "");
                 if (killCreditSource.hasPerk("pirate") && weaponDef?.type == "melee") {
-                    const count = util.randomInt(3, 4);
+                    const count = util.randomInt(PerkProperties.pirate.minCount, PerkProperties.pirate.maxCount);
                     for (let i = 0; i < count; i++) {
-                        const item = this.game.lootBarn.getLootTable("tier_pirate");
+                        const item = this.game.lootBarn.getLootTable(PerkProperties.pirate.tier);
                         if (!item) continue;
 
                         this.game.lootBarn.addLoot(
@@ -2702,8 +2707,8 @@ export class Player extends BaseGameObject {
                     }
 
                     // rare gun
-                    if (Math.random() < 0.12) {
-                        const item = this.game.lootBarn.getLootTable("tier_pirate_rare");
+                    if (Math.random() < PerkProperties.pirate.rareChance) {
+                        const item = this.game.lootBarn.getLootTable(PerkProperties.pirate.rareTier);
                         if (item) {
                             this.game.lootBarn.addLoot(
                                 item.name,
@@ -2775,8 +2780,8 @@ export class Player extends BaseGameObject {
                 this.pos,
                 this.layer,
                 v2.create(0, 0),
-                12,
-                5,
+                PerkProperties.martyrdom.projectileCount,
+                PerkProperties.martyrdom.projectileMaxVel,
             );
         }
 
@@ -4436,14 +4441,14 @@ export class Player extends BaseGameObject {
 
         const affectedPlayers = this.game.modeManager.getNearbyAlivePlayersContext(
             this,
-            60,
+            PerkProperties.final_bugle.effectRange,
         );
 
         for (const player of affectedPlayers) {
             player.lastBreathActive = true;
             player._lastBreathTicker = 5;
 
-            player.giveHaste(GameConfig.HasteType.Inspire, 5);
+            player.giveHaste(GameConfig.HasteType.Inspire, PerkProperties.final_bugle.hasteDuration);
             if (player.teamId == GameConfig.FactionTeam.Red && player.__id != this.__id) {
                 this.game.playerBarn.addEmote("emote_bugle_final_red", player.__id);
             }
@@ -4608,7 +4613,7 @@ export class Player extends BaseGameObject {
         if (this.weaponManager.meleeAttacks.length == 0) {
             let equipSpeed = weaponDef.speed.equip;
             if (this.hasPerk("small_arms") && weaponDef.type == "gun") {
-                equipSpeed = 1;
+                equipSpeed = PerkProperties.small_arms.gunEquipSpeed;
             }
 
             this.speed += equipSpeed;

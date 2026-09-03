@@ -1,3 +1,4 @@
+import { PerkProperties } from "../../../../shared/defs/gameObjects/perkDefs.ts";
 import { GameObjectDefs, MapObjectDefs } from "../../../../shared/defs/register.ts";
 import { DamageType, GameConfig } from "../../../../shared/gameConfig.ts";
 import { ObjectType } from "../../../../shared/net/objectSerializeFns.ts";
@@ -560,24 +561,14 @@ export class Obstacle extends BaseGameObject {
             params.source?.__type === ObjectType.Player
             && params.source.hasPerk("scavenger")
         ) {
-            lootTablesOrItems.push({
-                tier: "tier_world",
-                min: 1,
-                max: 1,
-                props: {},
-            });
+            lootTablesOrItems.push(PerkProperties.scavenger.lootTableConf);
         }
 
         if (
             params.source?.__type === ObjectType.Player
             && params.source.hasPerk("scavenger_adv")
         ) {
-            lootTablesOrItems.push({
-                tier: "tier_scavenger_adv",
-                min: 1,
-                max: 1,
-                props: {},
-            });
+            lootTablesOrItems.push(PerkProperties.scavenger_adv.lootTableConf);
         }
 
         // cobalt class pod logic
