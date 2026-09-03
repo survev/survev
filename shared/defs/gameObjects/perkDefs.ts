@@ -82,6 +82,7 @@ export const PerkProperties = {
     takedown: {
         hpReward: 25,
         boostReward: 25,
+        hasteDuration: 3,
     },
     lifeline: {
         decayMult: 0.75, // Adrenaline decay multiplier
