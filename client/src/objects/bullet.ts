@@ -269,8 +269,8 @@ export class BulletBarn {
 
                 // Obstacles
                 const obstacles = map.m_obstaclePool.m_getPool();
-                for (let i = 0; i < obstacles.length; i++) {
-                    const obstacle = obstacles[i];
+                for (let j = 0; j < obstacles.length; j++) {
+                    const obstacle = obstacles[j];
                     if (
                         !!obstacle.active
                         && !obstacle.dead
@@ -294,8 +294,8 @@ export class BulletBarn {
                         }
                     }
                 }
-                for (let C = 0; C < players.length; C++) {
-                    const player = players[C];
+                for (let j = 0; j < players.length; j++) {
+                    const player = players[j];
                     if (
                         player.active
                         && !player.m_netData.m_dead
@@ -305,19 +305,18 @@ export class BulletBarn {
                     ) {
                         let panCollision = null;
                         if (player.m_hasActivePan()) {
-                            const p = player;
-                            const panSeg = p.m_getPanSegment()!;
+                            const panSeg = player.m_getPanSegment()!;
                             const oldSegment = math.transformSegment(
                                 panSeg.p0,
                                 panSeg.p1,
-                                p.m_posOld,
-                                p.m_dirOld,
+                                player.m_posOld,
+                                player.m_dirOld,
                             );
                             const newSegment = math.transformSegment(
                                 panSeg.p0,
                                 panSeg.p1,
-                                p.m_pos,
-                                p.m_dir,
+                                player.m_pos,
+                                player.m_dir,
                             );
                             const newIntersection = coldet.intersectSegmentSegment(
                                 posOld,
@@ -389,8 +388,8 @@ export class BulletBarn {
                     }
                 }
 
-                for (let i = 0; i < colObjs.length; i++) {
-                    const col = colObjs[i];
+                for (let j = 0; j < colObjs.length; j++) {
+                    const col = colObjs[j];
                     col.dist = v2.length(v2.sub(col.point, posOld));
                 }
 
@@ -399,13 +398,13 @@ export class BulletBarn {
                 });
 
                 let shooterDead = false;
-                const W = playerBarn.getPlayerById(b.playerId);
-                if (W && (W.m_netData.m_dead || W.m_netData.m_downed)) {
+                const shooter = playerBarn.getPlayerById(b.playerId);
+                if (shooter && (shooter.m_netData.m_dead || shooter.m_netData.m_downed)) {
                     shooterDead = true;
                 }
                 let hit = false;
-                for (let i = 0; i < colObjs.length; i++) {
-                    const col = colObjs[i];
+                for (let j = 0; j < colObjs.length; j++) {
+                    const col = colObjs[j];
                     if (col.type == "obstacle") {
                         const mapDef = MapObjectDefs.typeToDef(col.obstacleType!, "obstacle");
                         playHitFx(
@@ -425,31 +424,31 @@ export class BulletBarn {
                         // player is dead; this helps avoid confusion around
                         // bullets being inactivated when a player dies.
                         if (!shooterDead) {
-                            const Y = col.player!;
-                            if (map.turkeyMode && W?.m_hasPerk("turkey_shoot")) {
-                                const J = v2.randomUnit(util.random(3, 6));
+                            const collidedPlayer = col.player!;
+                            if (map.turkeyMode && shooter?.m_hasPerk("turkey_shoot")) {
+                                const vel = v2.randomUnit(util.random(3, 6));
                                 particleBarn.addParticle(
                                     "turkeyFeathersHit",
-                                    Y.layer,
-                                    Y.m_pos,
-                                    J,
+                                    collidedPlayer.layer,
+                                    collidedPlayer.m_pos,
+                                    vel,
                                 );
                             }
-                            const Q = v2.sub(col.point, Y?.m_pos);
-                            Q.y *= -1;
+                            const diff = v2.sub(col.point, collidedPlayer?.m_pos);
+                            diff.y *= -1;
                             particleBarn.addParticle(
                                 "bloodSplat",
-                                Y.layer,
-                                v2.mul(Q, camera.m_ppu),
+                                collidedPlayer.layer,
+                                v2.mul(diff, camera.m_ppu),
                                 v2.create(0, 0),
                                 1,
                                 1,
-                                Y.container,
+                                collidedPlayer.container,
                             );
                             audioManager.playGroup("player_bullet_hit", {
-                                soundPos: Y.m_pos,
+                                soundPos: collidedPlayer.m_pos,
                                 fallOff: 1,
-                                layer: Y.layer,
+                                layer: collidedPlayer.layer,
                                 filter: "muffled",
                             });
                         }
@@ -472,42 +471,42 @@ export class BulletBarn {
                     }
                 }
                 if (!(b.layer & 2)) {
-                    const $ = map.m_structurePool.m_getPool();
-                    let ee = b.layer;
-                    for (let te = 0; te < $.length; te++) {
-                        const re = $[te];
-                        if (re.active) {
-                            let ae = false;
-                            let ie = false;
-                            for (let oe = 0; oe < re.stairs.length; oe++) {
-                                const se = re.stairs[oe];
+                    const structures = map.m_structurePool.m_getPool();
+                    let targetLayer = b.layer;
+                    for (let j = 0; j < structures.length; j++) {
+                        const struct = structures[j];
+                        if (struct.active) {
+                            let onStair = false;
+                            let onMask = false;
+                            for (let k = 0; k < struct.stairs.length; k++) {
+                                const stair = struct.stairs[k];
                                 if (
-                                    !se?.lootOnly
+                                    !stair?.lootOnly
                                     && collider.intersectSegment(
-                                        se?.collision,
+                                        stair?.collision,
                                         b.pos,
                                         posOld,
                                     )
                                 ) {
-                                    ae = true;
+                                    onStair = true;
                                     break;
                                 }
                             }
-                            for (let ne = 0; ne < re.mask.length; ne++) {
+                            for (let k = 0; k < struct.mask.length; k++) {
                                 if (
-                                    collider.intersectSegment(re.mask[ne], b.pos, posOld)
+                                    collider.intersectSegment(struct.mask[k], b.pos, posOld)
                                 ) {
-                                    ie = true;
+                                    onMask = true;
                                     break;
                                 }
                             }
-                            if (ae && !ie) {
-                                ee |= 2;
+                            if (onStair && !onMask) {
+                                targetLayer |= 2;
                             }
                         }
                     }
-                    if (ee != b.layer) {
-                        b.layer = ee;
+                    if (targetLayer != b.layer) {
+                        b.layer = targetLayer;
                         renderer.addPIXIObj(b.container, b.layer, 20);
                     }
                 }
