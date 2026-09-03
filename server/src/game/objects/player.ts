@@ -2705,7 +2705,7 @@ export class Player extends BaseGameObject {
                 if (killCreditSource.hasPerk("takedown")) {
                     killCreditSource.health += PerkProperties.takedown.hpReward;
                     killCreditSource.boost += PerkProperties.takedown.boostReward;
-                    killCreditSource.giveHaste(GameConfig.HasteType.Takedown, 3);
+                    killCreditSource.giveHaste(GameConfig.HasteType.Takedown, PerkProperties.takedown.hasteDuration);
                 }
 
                 // Pirate's Bounty (Cutlass-specific)
