@@ -269,8 +269,8 @@ export class BulletBarn {
 
                 // Obstacles
                 const obstacles = map.m_obstaclePool.m_getPool();
-                for (let i = 0; i < obstacles.length; i++) {
-                    const obstacle = obstacles[i];
+                for (let j = 0; j < obstacles.length; j++) {
+                    const obstacle = obstacles[j];
                     if (
                         !!obstacle.active
                         && !obstacle.dead
@@ -294,8 +294,8 @@ export class BulletBarn {
                         }
                     }
                 }
-                for (let i = 0; i < players.length; i++) {
-                    const player = players[i];
+                for (let j = 0; j < players.length; j++) {
+                    const player = players[j];
                     if (
                         player.active
                         && !player.m_netData.m_dead
@@ -388,8 +388,8 @@ export class BulletBarn {
                     }
                 }
 
-                for (let i = 0; i < colObjs.length; i++) {
-                    const col = colObjs[i];
+                for (let j = 0; j < colObjs.length; j++) {
+                    const col = colObjs[j];
                     col.dist = v2.length(v2.sub(col.point, posOld));
                 }
 
@@ -403,8 +403,8 @@ export class BulletBarn {
                     shooterDead = true;
                 }
                 let hit = false;
-                for (let i = 0; i < colObjs.length; i++) {
-                    const col = colObjs[i];
+                for (let j = 0; j < colObjs.length; j++) {
+                    const col = colObjs[j];
                     if (col.type == "obstacle") {
                         const mapDef = MapObjectDefs.typeToDef(col.obstacleType!, "obstacle");
                         playHitFx(
@@ -473,13 +473,13 @@ export class BulletBarn {
                 if (!(b.layer & 2)) {
                     const structures = map.m_structurePool.m_getPool();
                     let targetLayer = b.layer;
-                    for (let i = 0; i < structures.length; i++) {
-                        const struct = structures[i];
+                    for (let j = 0; j < structures.length; j++) {
+                        const struct = structures[j];
                         if (struct.active) {
                             let onStair = false;
                             let onMask = false;
-                            for (let i = 0; i < struct.stairs.length; i++) {
-                                const stair = struct.stairs[i];
+                            for (let k = 0; k < struct.stairs.length; k++) {
+                                const stair = struct.stairs[k];
                                 if (
                                     !stair?.lootOnly
                                     && collider.intersectSegment(
@@ -492,9 +492,9 @@ export class BulletBarn {
                                     break;
                                 }
                             }
-                            for (let i = 0; i < struct.mask.length; i++) {
+                            for (let k = 0; k < struct.mask.length; k++) {
                                 if (
-                                    collider.intersectSegment(struct.mask[i], b.pos, posOld)
+                                    collider.intersectSegment(struct.mask[k], b.pos, posOld)
                                 ) {
                                     onMask = true;
                                     break;
