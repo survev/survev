@@ -502,13 +502,20 @@ export class Obstacle extends BaseGameObject {
 
         if (params.source?.__type === ObjectType.Player) {
             params.source.questManager.trackEvent("destruction", {
-                objectType: this.type,
+                obstacleType: this.type,
+                obstacleCategory: def.category,
+                mode: this.game.teamMode,
+                role: params.source.role,
+                weaponType: params.weaponSourceType ?? params.gameSourceType ?? "",
             });
         }
 
         if (def.airdropCrate && this.interactedBy) {
-            this.interactedBy.questManager.trackEvent("item_used", {
-                itemType: "airdrop_crate",
+            this.interactedBy.questManager.trackEvent("airdrop_unlocked", {
+                obstacleType: this.type,
+                obstacleCategory: def.category,
+                mode: this.game.teamMode,
+                role: this.interactedBy.role,
             });
         }
 

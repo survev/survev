@@ -6,6 +6,7 @@ import { mapHelpers } from "../../../../shared/utils/mapHelpers.ts";
 import { math } from "../../../../shared/utils/math.ts";
 import { v2, type Vec2 } from "../../../../shared/utils/v2.ts";
 import type { Game } from "../game.ts";
+import type { Building } from "./building.ts";
 import { BaseGameObject } from "./gameObject.ts";
 
 interface Stair {
@@ -36,13 +37,28 @@ export class Structure extends BaseGameObject {
     scale = 1;
     rot: number;
 
-    constructor(game: Game, type: string, pos: Vec2, layer: number, ori: number) {
+    parentBuilding?: Building;
+
+    constructor(
+        game: Game,
+        type: string,
+        pos: Vec2,
+        layer: number,
+        ori: number,
+        parentId?: number,
+    ) {
         super(game, pos);
         this.layer = layer;
         this.type = type;
         this.ori = ori;
 
         this.rot = math.oriToRad(ori);
+
+        const parent = this.game.objectRegister.getById(parentId ?? 0);
+
+        if (parent?.__type === ObjectType.Building) {
+            this.parentBuilding = parent;
+        }
 
         this.bounds = collider.transform(
             mapHelpers.getBoundingCollider(type),

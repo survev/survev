@@ -5,7 +5,7 @@ import type { HealEffectDef } from "../../../shared/defs/gameObjects/healEffectD
 import type { MeleeDef } from "../../../shared/defs/gameObjects/meleeDefs.ts";
 import type { OutfitDef } from "../../../shared/defs/gameObjects/outfitDefs.ts";
 import { PassDefs } from "../../../shared/defs/gameObjects/passDefs.ts";
-import { QuestDefs } from "../../../shared/defs/gameObjects/questDefs.ts";
+import { QuestDefs, QuestDifficulty } from "../../../shared/defs/gameObjects/questDefs.ts";
 import { GameObjectDefs } from "../../../shared/defs/register.ts";
 import type { PassState, QuestState } from "../../../shared/types/user.ts";
 import { math } from "../../../shared/utils/math.ts";
@@ -204,6 +204,7 @@ export class Pass {
             quest.elems.desc.html(title);
             quest.elems.cur.html(Math.round(quest.current));
             quest.elems.xp.html(`${questDef.xp} XP`);
+            quest.elems.xp.toggleClass("difficult", questDef.difficulty === QuestDifficulty.Hard);
             quest.elems.barFill.css({
                 width: `${pct}%`,
             });

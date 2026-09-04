@@ -233,26 +233,45 @@ export class GameModeManager {
                 return [player];
             case GameMode.Team:
                 return player.group!.players;
-            case GameMode.Faction:
+            case GameMode.Faction: {
                 const redLeader = this.game.playerBarn.teams[GameConfig.FactionTeam.Red - 1].leader;
                 const blueLeader = this.game.playerBarn.teams[GameConfig.FactionTeam.Blue - 1].leader;
-                const highestKiller = this.game.playerBarn.players.reduce(
-                    (highestKiller, p) => {
-                        if (highestKiller.kills === p.kills) {
-                            return highestKiller.damageDealt > p.damageDealt
-                                ? highestKiller
-                                : p;
-                        }
 
-                        return highestKiller.kills > p.kills ? highestKiller : p;
-                    },
-                );
+                if (!redLeader || !blueLeader) {
+                    return [player];
+                }
 
-                // if game ends before leaders are promoted, just show the player by himself
-                return !redLeader || !blueLeader
-                    ? [player]
-                    : [player, redLeader, blueLeader, highestKiller];
+                if (this.game.playerBarn.factionsMvp === undefined) {
+                    return [player, redLeader, blueLeader];
+                }
+
+                return [player, redLeader, blueLeader, this.game.playerBarn.factionsMvp];
+            }
         }
+    }
+
+    getFactionMvp(): Player | undefined {
+        if (this.mode !== GameMode.Faction) return;
+        const redLeader = this.game.playerBarn.teams[GameConfig.FactionTeam.Red - 1].leader;
+        const blueLeader = this.game.playerBarn.teams[GameConfig.FactionTeam.Blue - 1].leader;
+
+        if (!redLeader || !blueLeader) {
+            return;
+        }
+
+        const highestKiller = this.game.playerBarn.players.reduce(
+            (highestKiller, p) => {
+                if (highestKiller.kills === p.kills) {
+                    return highestKiller.damageDealt > p.damageDealt
+                        ? highestKiller
+                        : p;
+                }
+
+                return highestKiller.kills > p.kills ? highestKiller : p;
+            },
+        );
+
+        return highestKiller;
     }
 
     handlePlayerDeath(player: Player, params: DamageParams): void {

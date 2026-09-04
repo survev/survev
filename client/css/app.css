@@ -4163,6 +4163,10 @@ a:active {
   right: 30px;
 }
 
+.pass-quest-xp.difficult {
+  color: #B30000;
+}
+
 .pass-quest-refresh {
   background-image: url(/img/gui/reload.svg);
   background-repeat: no-repeat;
@@ -4208,7 +4212,7 @@ a:active {
   font-size: 14px;
 }
 
-.pass-quest-counter-goal {
+.pass-quest-counter-target {
   font-size: 14px;
 }
 

@@ -2012,30 +2012,8 @@ export class GameMap {
             if (obj) building.childObjects.push(obj);
         }
 
-        for (const patch of def.mapGroundPatches ?? []) {
-            if (patch.bound.type === collider.Type.Circle) {
-                const worldCenter = math.addAdjust(pos, patch.bound.pos, ori);
-                this.msg.groundPatches.push({
-                    bound: collider.createCircle(worldCenter, patch.bound.rad),
-                    color: patch.color,
-                    roughness: patch.roughness ?? 0,
-                    offsetDist: patch.offsetDist ?? 0,
-                    order: patch.order ?? 0,
-                    useAsMapShape: patch.useAsMapShape ?? true,
-                });
-            } else {
-                this.msg.groundPatches.push({
-                    bound: collider.createAabb(
-                        math.addAdjust(pos, patch.bound.min, ori),
-                        math.addAdjust(pos, patch.bound.max, ori),
-                    ),
-                    color: patch.color,
-                    roughness: patch.roughness ?? 0,
-                    offsetDist: patch.offsetDist ?? 0,
-                    order: patch.order ?? 0,
-                    useAsMapShape: patch.useAsMapShape ?? true,
-                });
-            }
+        if (building.groundPatches !== undefined) {
+            this.msg.groundPatches.push(...building.groundPatches);
         }
 
         this.addBounds(building, !!parentId);
@@ -2054,7 +2032,7 @@ export class GameMap {
 
         ori = ori ?? def.ori ?? util.randomInt(0, 3);
 
-        const structure = new Structure(this.game, type, pos, layer, ori);
+        const structure = new Structure(this.game, type, pos, layer, ori, parentId);
         this.game.objectRegister.register(structure);
         this.structures.push(structure);
 
