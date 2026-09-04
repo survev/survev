@@ -1,4 +1,4 @@
-import * as PIXI from "pixi.js-legacy";
+import * as PIXI from "pixi.js";
 
 import { GameConfig, Input, TeamMode, WeaponSlot } from "../../shared/gameConfig.ts";
 import * as net from "../../shared/net/net.ts";
@@ -209,7 +209,7 @@ export class Game {
     }
 
     init() {
-        this.m_canvasMode = this.m_pixi.renderer.type == PIXI.RENDERER_TYPE.CANVAS;
+        this.m_canvasMode = this.m_pixi.renderer.type == PIXI.RendererType.CANVAS;
 
         // Modules
         this.m_touch = new Touch(this.m_input, this.m_config);
@@ -228,14 +228,13 @@ export class Game {
         this.m_smokeBarn = new SmokeBarn();
         this.m_deadBodyBarn = new DeadBodyBarn();
         this.m_lootBarn = new LootBarn();
-        this.m_gas = new Gas(this.m_canvasMode);
+        this.m_gas = new Gas();
         this.m_uiManager = new UiManager(
             this,
             this.m_audioManager,
             this.m_particleBarn,
             this.m_planeBarn,
             this.m_localization,
-            this.m_canvasMode,
             this.m_touch,
             this.m_inputBinds,
             this.m_inputBindUi,
@@ -250,10 +249,6 @@ export class Game {
         );
         this.m_shotBarn = new ShotBarn();
         this.debugHUD = new DebugHUD(this.m_config);
-
-        // this.particleBarn,
-        // this.audioManager,
-        // this.uiManager
 
         // Register types
         const TypeToPool = {
@@ -1050,8 +1045,7 @@ export class Game {
     resize() {
         this.m_camera.m_screenWidth = device.screenWidth;
         this.m_camera.m_screenHeight = device.screenHeight;
-        this.m_map.resize(this.m_pixi.renderer, this.m_canvasMode);
-        this.m_gas.resize();
+        this.m_map.resize(this.m_pixi.renderer);
         this.m_uiManager.resize(this.m_map, this.m_camera);
         this.m_touch.resize();
         this.m_renderer.resize(this.m_map, this.m_camera);
@@ -1272,11 +1266,10 @@ export class Game {
                 this.m_map.loadMap(
                     msg,
                     this.m_camera,
-                    this.m_canvasMode,
                     this.m_particleBarn,
                 );
                 this.m_resourceManager.loadMapAssets(this.m_map.mapName);
-                this.m_map.renderMap(this.m_pixi.renderer, this.m_canvasMode);
+                this.m_map.renderMap(this.m_pixi.renderer);
                 this.m_renderer.resize(this.m_map, this.m_camera);
                 this.m_bulletBarn.onMapLoad(this.m_map);
                 this.m_particleBarn.onMapLoad(this.m_map);

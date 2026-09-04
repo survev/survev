@@ -1,4 +1,4 @@
-import * as PIXI from "pixi.js-legacy";
+import * as PIXI from "pixi.js";
 
 import type { BuildingDef, FloorImage } from "../../../shared/defs/mapObjects/buildings/buildingDefs.ts";
 import { MapObjectDefs } from "../../../shared/defs/register.ts";
@@ -448,7 +448,6 @@ export class Building implements AbstractObject {
                 r.rotation = 0;
                 r.tint = 0xffffff;
                 r.visible = true;
-                this.imgs[0].sprite.addChild(r);
                 this.residue = r;
             }
         }
@@ -565,13 +564,17 @@ export class Building implements AbstractObject {
         }
 
         // Position sprites for rendering
-        for (let F = 0; F < this.imgs.length; F++) {
-            const img = this.imgs[F];
+        let residueZidx = this.__id * 200;
+        for (let i = 0; i < this.imgs.length; i++) {
+            const img = this.imgs[i];
             const alpha = img.isCeiling ? this.ceiling.fadeAlpha : 1;
             this.positionSprite(img.sprite, alpha, camera);
 
             if (img.removeOnDamaged && this.ceilingDamaged) {
                 img.sprite.visible = !this.ceilingDamaged;
+            }
+            if (!img.isCeiling) {
+                residueZidx = math.max(img.zIdx, residueZidx);
             }
 
             // Determine zOrder of ceilings
@@ -587,6 +590,14 @@ export class Building implements AbstractObject {
                 layer |= 2;
             }
             renderer.addPIXIObj(img.sprite, layer, img.zOrd, img.zIdx);
+        }
+        if (this.residue) {
+            const firstSprite = this.imgs[0].sprite;
+
+            this.residue.position = firstSprite.position;
+            this.residue.scale = firstSprite.scale;
+            this.residue.rotation = firstSprite.rotation;
+            renderer.addPIXIObj(this.residue, this.layer, this.zIdx, residueZidx + 1);
         }
     }
 
