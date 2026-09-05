@@ -277,8 +277,8 @@ export class LoadoutDisplay {
         const obj: ObjectData<ObjectType.Player> = {
             outfit: this.loadout.outfit,
             backpack: "backpack02",
-            helmet: "helmet01",
-            chest: "chest03",
+            helmet: "",
+            chest: "",
             activeWeapon: this.loadout.melee,
             layer: 0,
             dead: false,
