@@ -26,7 +26,7 @@ import { v2, type Vec2 } from "../../../shared/utils/v2.ts";
 import { Animations, Bones, IdlePoses, Pose } from "../animData.ts";
 import type { AudioManager } from "../audioManager.ts";
 import type { Camera } from "../camera.ts";
-import type { DebugRenderOpts } from "../config.ts";
+import type { DebugRendererOpts } from "../config.ts";
 import { debugLines } from "../debug/debugLines.ts";
 import { device } from "../device.ts";
 import { errorLogManager } from "../errorLogs.ts";
@@ -1346,7 +1346,7 @@ export class Player implements AbstractObject {
         this.isNew = false;
     }
 
-    render(camera: Camera, debug: DebugRenderOpts) {
+    render(camera: Camera, debug: DebugRendererOpts) {
         const screenPos = camera.m_pointToScreen(this.m_visualPos);
         const screenScale = camera.m_pixels(1);
         this.container.position.set(screenPos.x, screenPos.y);
@@ -2740,7 +2740,7 @@ export class PlayerBarn {
         }
     }
 
-    m_render(camera: Camera, debug: DebugRenderOpts) {
+    m_render(camera: Camera, debug: DebugRendererOpts) {
         const players = this.playerPool.m_getPool();
         for (let i = 0; i < players.length; i++) {
             const p = players[i];

@@ -9,7 +9,7 @@ import { assert, util } from "../../../shared/utils/util.ts";
 import { v2, type Vec2 } from "../../../shared/utils/v2.ts";
 import type { AudioManager } from "../audioManager.ts";
 import type { Camera } from "../camera.ts";
-import type { DebugRenderOpts } from "../config.ts";
+import type { DebugRendererOpts } from "../config.ts";
 import { debugLines } from "../debug/debugLines.ts";
 import type { Ctx } from "../game.ts";
 import type { Map } from "../map.ts";
@@ -501,7 +501,7 @@ export class Obstacle implements AbstractObject {
         this.isNew = false;
     }
 
-    render(dt: number, camera: Camera, debug: DebugRenderOpts, layer: number) {
+    render(dt: number, camera: Camera, debug: DebugRendererOpts, layer: number) {
         let pos = this.isDoor ? this.door.interpPos : this.pos;
 
         if (this.isSkin && camera.m_interpEnabled) {

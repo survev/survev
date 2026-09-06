@@ -12,7 +12,7 @@ import {
     type ConfigKey,
     type ConfigManager,
     type ConfigType,
-    debugRenderConfig,
+    debugRendererConfig,
 } from "../../src/config.ts";
 import { type InputHandler, Key, MouseWheel } from "../../src/input.ts";
 import type { EditorDisplay } from "./editorDisplay.ts";
@@ -33,7 +33,7 @@ const ZOOM_STEP = 0.2;
 
 export class EditorUi {
     params: typeof BuildingEditorConfig;
-    renderParams: typeof debugRenderConfig;
+    rendererParams: typeof debugRendererConfig;
 
     pane: Pane;
     zoomBind: ReturnType<Pane["addBinding"]>;
@@ -45,7 +45,7 @@ export class EditorUi {
         public display: EditorDisplay,
     ) {
         this.params = this.config.get("buildingEditor")!;
-        this.renderParams = this.config.get("debugRenderer")!;
+        this.rendererParams = this.config.get("debugRenderer")!;
 
         const container = document.getElementById("editor-ui") as HTMLDivElement;
 
@@ -305,9 +305,9 @@ export class EditorUi {
             }
         };
         addObject(
-            debugRenderConfig,
-            this.renderParams,
-            this.renderParams,
+            debugRendererConfig,
+            this.rendererParams,
+            this.rendererParams,
             this.pane,
             "debugRenderer",
         );
@@ -443,6 +443,6 @@ export class EditorUi {
             this.config.set("buildingEditor", this.params);
         }
 
-        this.config.config.debugRenderer = this.renderParams;
+        this.config.config.debugRenderer = this.rendererParams;
     }
 }

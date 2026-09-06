@@ -12,7 +12,7 @@ import { v2 } from "../../../shared/utils/v2.ts";
 import type { Account } from "../account.ts";
 import type { AudioManager } from "../audioManager.ts";
 import { Camera } from "../camera.ts";
-import type { ConfigManager, DebugRenderOpts } from "../config.ts";
+import type { ConfigManager, DebugRendererOpts } from "../config.ts";
 import { debugLines } from "../debug/debugLines.ts";
 import { device } from "../device.ts";
 import type { Game } from "../game.ts";
@@ -382,7 +382,7 @@ export class LoadoutDisplay {
     }
 
     update(dt: number, hasFocus: boolean) {
-        const debug = {} as DebugRenderOpts;
+        const debug = {} as DebugRendererOpts;
 
         // Camera
         this.camera.m_pos = v2.sub(this.activePlayer.m_pos, this.cameraOffset);
@@ -494,7 +494,7 @@ export class LoadoutDisplay {
         this.render(dt, debug);
     }
 
-    render(_dt: number, debug: DebugRenderOpts) {
+    render(_dt: number, debug: DebugRendererOpts) {
         const grassColor = this.map.mapLoaded
             ? this.map.getMapDef().biome.colors.grass
             : 0x80af49;

@@ -29,7 +29,7 @@ export const debugToolsConfig = {
     preventGameStart: false,
 };
 
-export const debugRenderConfig = {
+export const debugRendererConfig = {
     enabled: false,
     players: false,
     obstacles: false,
@@ -77,7 +77,7 @@ export const debugHUDConfig = {
     },
 };
 
-export type DebugRenderOpts = typeof debugRenderConfig;
+export type DebugRendererOpts = typeof debugRendererConfig;
 
 export const BuildingEditorConfig = {
     zoom: 1,
@@ -122,7 +122,7 @@ const defaultConfig = {
     version: 1,
     /* STRIP_FROM_PROD_CLIENT:START */
     debugTools: debugToolsConfig,
-    debugRenderer: debugRenderConfig,
+    debugRenderer: debugRendererConfig,
     /* STRIP_FROM_PROD_CLIENT:END */
     debugHUD: debugHUDConfig,
     buildingEditor: BuildingEditorConfig,
