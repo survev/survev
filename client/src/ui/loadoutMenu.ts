@@ -1,6 +1,7 @@
 import "@taufik-nurrohman/color-picker";
 import $ from "jquery";
 
+import { device } from "$lib/modules/Device.svelte.ts";
 import type { GameObjectDef } from "../../../shared/defs/gameObjectDefs.ts";
 import { EmoteCategory, type EmoteDef } from "../../../shared/defs/gameObjects/emoteDefs.ts";
 import type { MeleeDef } from "../../../shared/defs/gameObjects/meleeDefs.ts";
@@ -14,7 +15,6 @@ import { util } from "../../../shared/utils/util.ts";
 import type { Account } from "../account.ts";
 import { crosshair } from "../crosshair.ts";
 import { helpers } from "../helpers.ts";
-import { device } from "../lib/modules/Device.svelte.ts";
 import { SDK } from "../sdk/sdk.ts";
 import type { Localization } from "./localization.ts";
 import { MenuModal } from "./menuModal.ts";

@@ -1,5 +1,6 @@
 import * as PIXI from "pixi.js-legacy";
 
+import type { DebugRendererOpts } from "$lib/modules/ConfigManager.svelte.ts";
 import type { DecalDef } from "../../../shared/defs/mapObjects/decalDefs.ts";
 import { MapObjectDefs } from "../../../shared/defs/register.ts";
 import type { ObjectData, ObjectType } from "../../../shared/net/objectSerializeFns.ts";
@@ -10,7 +11,6 @@ import { util } from "../../../shared/utils/util.ts";
 import { v2, type Vec2 } from "../../../shared/utils/v2.ts";
 import type { Camera } from "../camera.ts";
 import type { Ctx } from "../game.ts";
-import type { DebugRendererOpts } from "../lib/modules/ConfigManager.svelte.ts";
 import type { Map } from "../map.ts";
 import type { Renderer } from "../renderer.ts";
 import { Pool } from "./objectPool.ts";

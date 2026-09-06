@@ -1,5 +1,6 @@
 import * as PIXI from "pixi.js-legacy";
 
+import type { DebugRendererOpts } from "$lib/modules/ConfigManager.svelte.ts";
 import { MapObjectDefs } from "../../../shared/defs/register.ts";
 import type { ObjectData, ObjectType } from "../../../shared/net/objectSerializeFns.ts";
 import type { Collider } from "../../../shared/utils/coldet.ts";
@@ -11,7 +12,6 @@ import type { AudioManager } from "../audioManager.ts";
 import type { Camera } from "../camera.ts";
 import { debugLines } from "../debug/debugLines.ts";
 import type { Ctx } from "../game.ts";
-import type { DebugRendererOpts } from "../lib/modules/ConfigManager.svelte.ts";
 import type { Map } from "../map.ts";
 import type { Renderer } from "../renderer.ts";
 import type { Emitter, ParticleBarn } from "./particles.ts";

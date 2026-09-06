@@ -1,11 +1,11 @@
 import $ from "jquery";
 
+import { device } from "$lib/modules/Device.svelte.ts";
 import type { MeleeDef } from "../../shared/defs/gameObjects/meleeDefs.ts";
 import { type MapDefKey, MapDefs } from "../../shared/defs/mapDefs.ts";
 import { GameObjectDefs } from "../../shared/defs/register.ts";
 import * as net from "../../shared/net/net.ts";
 import { util } from "../../shared/utils/util.ts";
-import { device } from "./lib/modules/Device.svelte.ts";
 
 const truncateCanvas = document.createElement("canvas");
 

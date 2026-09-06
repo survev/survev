@@ -1,7 +1,7 @@
+import { CreateJS, type SoundHandle } from "$lib/createJS.ts";
 import { math } from "../../shared/utils/math.ts";
 import { util } from "../../shared/utils/util.ts";
 import { v2, type Vec2 } from "../../shared/utils/v2.ts";
-import { CreateJS, type SoundHandle } from "./lib/createJS.ts";
 import soundDefs from "./soundDefs.ts";
 
 const AudioManagerMinAllowedVolume = 0.003;

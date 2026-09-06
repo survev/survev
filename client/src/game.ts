@@ -1,5 +1,6 @@
 import * as PIXI from "pixi.js-legacy";
 
+import type { ConfigManager, DebugRendererOpts } from "$lib/modules/ConfigManager.svelte.ts";
 import { GameConfig, Input, TeamMode, WeaponSlot } from "../../shared/gameConfig.ts";
 import * as net from "../../shared/net/net.ts";
 import { ObjectType } from "../../shared/net/objectSerializeFns.ts";
@@ -10,12 +11,13 @@ import type { AudioManager } from "./audioManager.ts";
 import { Camera } from "./camera.ts";
 import { DebugHUD } from "./debug/debugHUD.ts";
 import { debugLines } from "./debug/debugLines.ts";
-import type { ConfigManager, DebugRendererOpts } from "./lib/modules/ConfigManager.svelte.ts";
 
 /* STRIP_FROM_PROD_CLIENT:START */
 import { Editor } from "./debug/editor.ts";
 /* STRIP_FROM_PROD_CLIENT:END */
 
+import type { SoundHandle } from "$lib/createJS.ts";
+import { device } from "$lib/modules/Device.svelte.ts";
 import { GameObjectDefs } from "../../shared/defs/register.ts";
 import { SpectateAction } from "../../shared/net/spectateMsg.ts";
 import type { GameWsDisconnectReason } from "../../shared/types/api.ts";
@@ -25,8 +27,6 @@ import { Gas } from "./gas.ts";
 import { helpers } from "./helpers.ts";
 import { type InputHandler, Key } from "./input.ts";
 import type { InputBinds, InputBindUi } from "./inputBinds.ts";
-import type { SoundHandle } from "./lib/createJS.ts";
-import { device } from "./lib/modules/Device.svelte.ts";
 import { Map } from "./map.ts";
 import { AirdropBarn } from "./objects/airdrop.ts";
 import { BulletBarn, createBullet } from "./objects/bullet.ts";
