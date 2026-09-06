@@ -1,6 +1,6 @@
 import $ from "jquery";
-import { device } from "../lib/modules/Device.svelte.ts";
 import english from "../en.json";
+import { device } from "../lib/modules/Device.svelte.ts";
 
 export function downloadFile(
     file: string,

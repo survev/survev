@@ -13,8 +13,8 @@ import { type Crosshair, type Loadout, loadout } from "../../../shared/utils/loa
 import { util } from "../../../shared/utils/util.ts";
 import type { Account } from "../account.ts";
 import { crosshair } from "../crosshair.ts";
-import { device } from "../lib/modules/Device.svelte.ts";
 import { helpers } from "../helpers.ts";
+import { device } from "../lib/modules/Device.svelte.ts";
 import { SDK } from "../sdk/sdk.ts";
 import type { Localization } from "./localization.ts";
 import { MenuModal } from "./menuModal.ts";

@@ -6,6 +6,7 @@ import { GameObjectDefs } from "../../../shared/defs/register.ts";
 import { EditMsg } from "../../../shared/net/editMsg.ts";
 import { math } from "../../../shared/utils/math.ts";
 import { util } from "../../../shared/utils/util.ts";
+import { type InputHandler, Key } from "../input.ts";
 import {
     type ConfigKey,
     type ConfigManager,
@@ -14,7 +15,6 @@ import {
     debugRendererConfig,
     type debugToolsConfig,
 } from "../lib/modules/ConfigManager.svelte.ts";
-import { type InputHandler, Key } from "../input.ts";
 
 const availableLoot = GameObjectDefs.getAllTypes()
     .filter((type) => !!("lootImg" in GameObjectDefs.typeToDef(type)));
