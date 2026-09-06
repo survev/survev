@@ -8,7 +8,7 @@ import { v2 } from "../../shared/utils/v2.ts";
 import type { Ambiance } from "./ambiance.ts";
 import type { AudioManager } from "./audioManager.ts";
 import { Camera } from "./camera.ts";
-import type { ConfigManager, DebugRenderOpts } from "./config.ts";
+import type { ConfigManager, DebugRendererOpts } from "./config.ts";
 import { DebugHUD } from "./debug/debugHUD.ts";
 import { debugLines } from "./debug/debugLines.ts";
 
@@ -395,14 +395,14 @@ export class Game {
             }
         }
 
-        let debug: DebugRenderOpts;
+        let debug: DebugRendererOpts;
         if (IS_DEV) {
             debug = this.m_config.get("debugRenderer")!;
             dt *= this.editor.toolParams.gameSpeedEnabled
                 ? this.editor.toolParams.gameSpeed
                 : 1;
         } else {
-            debug = {} as DebugRenderOpts;
+            debug = {} as DebugRendererOpts;
         }
 
         const smokeParticles = this.m_smokeBarn.m_particles;
@@ -982,7 +982,7 @@ export class Game {
         this.m_render(dt, debug);
     }
 
-    m_render(dt: number, debug: DebugRenderOpts) {
+    m_render(dt: number, debug: DebugRendererOpts) {
         const grassColor = this.m_map.mapLoaded
             ? this.m_map.getMapDef().biome.colors.grass
             : 0x80af49;

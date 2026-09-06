@@ -13,7 +13,7 @@ import { util } from "../../../shared/utils/util.ts";
 import { v2, type Vec2 } from "../../../shared/utils/v2.ts";
 import type { AudioManager } from "../audioManager.ts";
 import type { Camera } from "../camera.ts";
-import type { DebugRenderOpts } from "../config.ts";
+import type { DebugRendererOpts } from "../config.ts";
 import { debugLines } from "../debug/debugLines.ts";
 import { device } from "../device.ts";
 import type { Map } from "../map.ts";
@@ -170,7 +170,7 @@ export class LootBarn {
         map: Map,
         audioManager: AudioManager,
         camera: Camera,
-        debug: DebugRenderOpts,
+        debug: DebugRendererOpts,
     ) {
         this.closestLoot = null;
         let closestDist = Number.MAX_VALUE;
