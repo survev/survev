@@ -19,7 +19,7 @@ import { collider } from "../../../shared/utils/collider.ts";
 import { math } from "../../../shared/utils/math.ts";
 import { util } from "../../../shared/utils/util.ts";
 import { v2 } from "../../../shared/utils/v2.ts";
-import { device } from "../device.ts";
+import { device } from "../lib/modules/Device.svelte.ts";
 import { helpers } from "../helpers.ts";
 import type { InputBinds } from "../inputBinds.ts";
 import type { Map } from "../map.ts";

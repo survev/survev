@@ -8,7 +8,7 @@ import { assert } from "../../../shared/utils/util.ts";
 import { v2, type Vec2 } from "../../../shared/utils/v2.ts";
 import type { Ambiance } from "../ambiance.ts";
 import type Camera from "../camera.ts";
-import type { DebugRendererOpts } from "../config.ts";
+import type { DebugRendererOpts } from "../lib/modules/ConfigManager.svelte.ts";
 import {
     renderBridge,
     renderMapBuildingBounds,
