@@ -3,9 +3,9 @@
   "private": true,
   "type": "module",
   "dependencies": {
-    "zod": "^4.4.3"
+    "zod": "^4.5.4"
   },
   "devDependencies": {
-    "rolldown": "^1.2.5"
+    "rolldown": "^1.2.6"
   }
 }
