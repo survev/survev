@@ -14,7 +14,7 @@ import { math } from "../../../shared/utils/math.ts";
 import { v2, type Vec2 } from "../../../shared/utils/v2.ts";
 import type { AudioManager } from "../audioManager.ts";
 import type { Camera } from "../camera.ts";
-import { device } from "../device.ts";
+import { device } from "../lib/modules/Device.svelte.ts";
 import { errorLogManager } from "../errorLogs.ts";
 import type { Game } from "../game.ts";
 import { type Gas, GasRenderer, GasSafeZoneRenderer } from "../gas.ts";

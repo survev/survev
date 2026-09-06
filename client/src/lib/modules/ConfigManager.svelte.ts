@@ -1,10 +1,10 @@
-import { GameConfig } from "../../shared/gameConfig.ts";
-import loadout from "../../shared/utils/loadout.ts";
-import { util } from "../../shared/utils/util.ts";
-import { v2 } from "../../shared/utils/v2.ts";
+import { GameConfig } from "../../../../shared/gameConfig.ts";
+import loadout from "../../../../shared/utils/loadout.ts";
+import { util } from "../../../../shared/utils/util.ts";
+import { v2 } from "../../../../shared/utils/v2.ts";
 
-import type { MapDefKey } from "../../shared/defs/mapDefs.ts";
-import type { Locale } from "./ui/localization.ts";
+import type { MapDefKey } from "../../../../shared/defs/mapDefs.ts";
+import type { Locale } from "../../ui/localization.ts";
 
 type AimStyle = "locked" | "anywhere";
 
@@ -147,7 +147,7 @@ export class ConfigManager {
     loaded = false;
     localStorageAvailable = true;
 
-    config = {} as ConfigType;
+    config = $state({} as ConfigType);
 
     onModifiedListeners: Array<(key?: string) => void> = [];
 

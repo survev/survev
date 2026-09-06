@@ -13,7 +13,7 @@ import {
     type ConfigManager,
     type ConfigType,
     debugRendererConfig,
-} from "../../src/config.ts";
+} from "$lib/modules/ConfigManager.svelte.ts";
 import { type InputHandler, Key, MouseWheel } from "../../src/input.ts";
 import type { EditorDisplay } from "./editorDisplay.ts";
 

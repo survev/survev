@@ -9,7 +9,7 @@ import { assert, util } from "../../../shared/utils/util.ts";
 import { v2, type Vec2 } from "../../../shared/utils/v2.ts";
 import type { AudioManager } from "../audioManager.ts";
 import type { Camera } from "../camera.ts";
-import type { DebugRendererOpts } from "../config.ts";
+import type { DebugRendererOpts } from "../lib/modules/ConfigManager.svelte.ts";
 import { debugLines } from "../debug/debugLines.ts";
 import type { Ctx } from "../game.ts";
 import type { Map } from "../map.ts";

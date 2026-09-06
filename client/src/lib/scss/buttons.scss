@@ -1,0 +1,56 @@
+/* Darken */
+.btn-darken {
+    border: none;
+}
+
+.btn-darken:hover:not(.active), .btn-darken:active:not(.active) {
+    color: inherit;
+
+    filter: brightness(80%);
+    transition: all 0.25s ease;
+}
+
+/* Socials */
+.btn-social {
+    display: inline-block;
+
+    height: 45px;
+    width: 45px;
+
+    margin: 4px 0px;
+
+    font-size: large;
+    text-align: center;
+
+    border: none;
+    border-radius: 12px;
+
+    background-size: 65%;
+    background-position: center;
+    background-repeat: no-repeat;
+    text-align: center;
+}
+
+.btn-reddit {
+    background-image: url("/img/icons/reddit.svg");
+    background-color: $reddit !important;
+    box-shadow: inset 0 -4px $reddit-bg;
+}
+
+.btn-discord {
+    background-image: url("/img/icons/discord.svg");
+    background-color: $discord !important;
+    box-shadow: inset 0 -4px $discord-bg;
+}
+
+.btn-kofi {
+    background-image: url("/img/icons/kofi.svg");
+    background-color: $kofi !important;
+    box-shadow: inset 0 -4px $kofi-bg;
+}
+
+.btn-wiki {
+    background-image: url("/img/icons/wikidotgg.svg");
+    background-color: $wiki !important;
+    box-shadow: inset 0 -4px $wiki-bg;
+}

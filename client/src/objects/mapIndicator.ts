@@ -6,7 +6,7 @@ import type { MapIndicator } from "../../../shared/net/updateMsg.ts";
 import { math } from "../../../shared/utils/math.ts";
 import { assert } from "../../../shared/utils/util.ts";
 import { v2, type Vec2 } from "../../../shared/utils/v2.ts";
-import { device } from "../device.ts";
+import { device } from "../lib/modules/Device.svelte.ts";
 import type { MapSprite, MapSpriteBarn } from "./mapSprite.ts";
 
 interface Indicator {

@@ -33,7 +33,7 @@ function getOs() {
     return "pc";
 }
 
-class Device {
+export class Device {
     readonly UiLayout = {
         Lg: 0,
         Sm: 1,
@@ -46,7 +46,7 @@ class Device {
     readonly tablet = isMobile.tablet || isIpad();
     readonly touch = this.mobile || this.tablet;
 
-    uiLayout = this.mobile ? this.UiLayout.Sm : this.UiLayout.Lg;
+    uiLayout = $state(this.mobile ? this.UiLayout.Sm : this.UiLayout.Lg);
     pixelRatio = window.devicePixelRatio;
     isLandscape = true;
 

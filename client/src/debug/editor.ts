@@ -13,7 +13,7 @@ import {
     debugHUDConfig,
     debugRendererConfig,
     type debugToolsConfig,
-} from "../config.ts";
+} from "../lib/modules/ConfigManager.svelte.ts";
 import { type InputHandler, Key } from "../input.ts";
 
 const availableLoot = GameObjectDefs.getAllTypes()
