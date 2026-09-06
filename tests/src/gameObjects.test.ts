@@ -4,6 +4,7 @@ import "./testHelpers.ts";
 import { BulletDefs } from "../../shared/defs/gameObjects/bulletDefs.ts";
 import { ExplosionDefs } from "../../shared/defs/gameObjects/explosionsDefs.ts";
 import { GunDefs } from "../../shared/defs/gameObjects/gunDefs.ts";
+import { PassDefs } from "../../shared/defs/gameObjects/passDefs.ts";
 import { QuestDefs } from "../../shared/defs/gameObjects/questDefs.ts";
 import { RoleDefs } from "../../shared/defs/gameObjects/roleDefs.ts";
 import { ThrowableDefs } from "../../shared/defs/gameObjects/throwableDefs.ts";
@@ -240,4 +241,10 @@ describe.for(Object.entries(QuestDefs))("Quest %s", ([, quest]) => {
             }
         });
     }
+});
+
+describe.for(Object.entries(PassDefs))("Pass $0", ([, def]) => {
+    test.for(def.items)("Item $0", (item) => {
+        expect(item.item).toBeValidGameObj(["outfit", "melee", "emote", "heal_effect", "boost_effect"]);
+    });
 });
