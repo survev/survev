@@ -1,12 +1,6 @@
 import { type FolderApi, Pane, type TabPageApi } from "tweakpane";
 import { MapDefs } from "../../../shared/defs/mapDefs.ts";
 
-import * as PIXI from "pixi.js-legacy";
-import { MapObjectDefs } from "../../../shared/defs/register.ts";
-import { collider } from "../../../shared/utils/collider.ts";
-import { mapHelpers } from "../../../shared/utils/mapHelpers.ts";
-import { math } from "../../../shared/utils/math.ts";
-import { v2 } from "../../../shared/utils/v2.ts";
 import {
     type BuildingEditorConfig,
     type ConfigKey,
@@ -14,6 +8,12 @@ import {
     type ConfigType,
     debugRendererConfig,
 } from "$lib/modules/ConfigManager.svelte.ts";
+import * as PIXI from "pixi.js-legacy";
+import { MapObjectDefs } from "../../../shared/defs/register.ts";
+import { collider } from "../../../shared/utils/collider.ts";
+import { mapHelpers } from "../../../shared/utils/mapHelpers.ts";
+import { math } from "../../../shared/utils/math.ts";
+import { v2 } from "../../../shared/utils/v2.ts";
 import { type InputHandler, Key, MouseWheel } from "../../src/input.ts";
 import type { EditorDisplay } from "./editorDisplay.ts";
 

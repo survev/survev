@@ -12,9 +12,9 @@ import type {
 } from "../../../shared/types/team.ts";
 import { api } from "../api.ts";
 import type { AudioManager } from "../audioManager.ts";
+import { helpers } from "../helpers.ts";
 import type { ConfigManager } from "../lib/modules/ConfigManager.svelte.ts";
 import { device } from "../lib/modules/Device.svelte.ts";
-import { helpers } from "../helpers.ts";
 import type { PingTest } from "../pingTest.ts";
 import { SDK } from "../sdk/sdk.ts";
 import type { SiteInfo } from "../siteInfo.ts";

@@ -8,9 +8,9 @@ import { v2 } from "../../shared/utils/v2.ts";
 import type { Ambiance } from "./ambiance.ts";
 import type { AudioManager } from "./audioManager.ts";
 import { Camera } from "./camera.ts";
-import type { ConfigManager, DebugRendererOpts } from "./lib/modules/ConfigManager.svelte.ts";
 import { DebugHUD } from "./debug/debugHUD.ts";
 import { debugLines } from "./debug/debugLines.ts";
+import type { ConfigManager, DebugRendererOpts } from "./lib/modules/ConfigManager.svelte.ts";
 
 /* STRIP_FROM_PROD_CLIENT:START */
 import { Editor } from "./debug/editor.ts";
@@ -19,7 +19,6 @@ import { Editor } from "./debug/editor.ts";
 import { GameObjectDefs } from "../../shared/defs/register.ts";
 import { SpectateAction } from "../../shared/net/spectateMsg.ts";
 import type { GameWsDisconnectReason } from "../../shared/types/api.ts";
-import { device } from "./lib/modules/Device.svelte.ts";
 import { EmoteBarn } from "./emote.ts";
 import { errorLogManager } from "./errorLogs.ts";
 import { Gas } from "./gas.ts";
@@ -27,6 +26,7 @@ import { helpers } from "./helpers.ts";
 import { type InputHandler, Key } from "./input.ts";
 import type { InputBinds, InputBindUi } from "./inputBinds.ts";
 import type { SoundHandle } from "./lib/createJS.ts";
+import { device } from "./lib/modules/Device.svelte.ts";
 import { Map } from "./map.ts";
 import { AirdropBarn } from "./objects/airdrop.ts";
 import { BulletBarn, createBullet } from "./objects/bullet.ts";

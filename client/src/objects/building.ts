@@ -12,7 +12,6 @@ import { util } from "../../../shared/utils/util.ts";
 import { v2, type Vec2 } from "../../../shared/utils/v2.ts";
 import type { AudioManager } from "../audioManager.ts";
 import type { Camera } from "../camera.ts";
-import type { DebugRendererOpts } from "../lib/modules/ConfigManager.svelte.ts";
 import {
     renderBridge,
     renderMapBuildingBounds,
@@ -22,6 +21,7 @@ import {
 import { debugLines } from "../debug/debugLines.ts";
 import type { Ctx } from "../game.ts";
 import type { SoundHandle } from "../lib/createJS.ts";
+import type { DebugRendererOpts } from "../lib/modules/ConfigManager.svelte.ts";
 import type { Map } from "../map.ts";
 import type { Renderer } from "../renderer.ts";
 import type { Obstacle } from "./obstacle.ts";
