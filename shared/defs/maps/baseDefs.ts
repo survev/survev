@@ -620,9 +620,10 @@ export const Main: MapDef = {
             { name: "scarssr", count: 1, weight: 1 },
             { name: "sv98", count: 1, weight: 1 },
             { name: "p30l_dual", count: 1, weight: 1 },
-            { name: "awc", count: 1, weight: 0.75 },
             { name: "pkp", count: 1, weight: 1 },
             { name: "m249", count: 1, weight: 1 },
+            { name: "barrett", count: 1, weight: 1 },
+            { name: "awc", count: 1, weight: 0.75 },
         ],
         tier_airdrop_ammo: [
             { name: "9mm", count: 30, weight: 3 },

@@ -102,7 +102,7 @@ const mapDef: PartialMapDef = {
     gameConfig: {
         planes: {
             crates: [
-                { name: "airdrop_crate_03po", weight: 110 },
+                { name: "airdrop_crate_03po", weight: 1110 },
                 { name: "airdrop_crate_03dev", weight: 1 },
             ],
         },

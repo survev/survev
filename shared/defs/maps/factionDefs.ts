@@ -349,6 +349,8 @@ const mapDef: PartialMapDef = {
             { name: "ots38_dual", count: 1, weight: 2 },
             { name: "spas16", count: 1, weight: 2 },
             { name: "sv98", count: 1, weight: 2 },
+            { name: "barrett", count: 1, weight: 0.5 },
+            { name: "ash12", count: 1, weight: 0.5 },
             { name: "p30l_dual", count: 1, weight: 0.3 },
             { name: "deagle_dual", count: 1, weight: 0.3 },
             { name: "pkp", count: 1, weight: 0.1 },
