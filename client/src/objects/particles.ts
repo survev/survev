@@ -143,7 +143,7 @@ export class Particle {
     }
 }
 
-interface EmitterOptions {
+export interface EmitterOptions {
     pos?: Vec2;
     dir?: Vec2;
     scale?: number;

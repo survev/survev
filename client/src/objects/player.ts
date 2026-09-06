@@ -40,7 +40,7 @@ import type { Renderer } from "../renderer.ts";
 import type { UiManager2 } from "../ui/ui2.ts";
 import { Pool } from "./objectPool.ts";
 import type { Obstacle } from "./obstacle.ts";
-import type { Emitter, ParticleBarn } from "./particles.ts";
+import type { Emitter, EmitterOptions, ParticleBarn } from "./particles.ts";
 import { halloweenSpriteMap } from "./projectile.ts";
 import { createCasingParticle } from "./shot.ts";
 
@@ -2015,14 +2015,7 @@ export class Player implements AbstractObject {
     ) {
         // Determine if we should have an emitter
         let emitterTypes: string[] = [];
-        const emitterProps = {} as {
-            scale: number;
-            radius: number;
-            rateMult: number;
-            layer: number;
-            pos: Vec2;
-            color?: number | (() => number);
-        };
+        const emitterProps: Partial<EmitterOptions> = {};
 
         switch (this.m_action.type) {
             case Action.UseItem: {
@@ -2096,7 +2089,6 @@ export class Player implements AbstractObject {
             emitter.pos = v2.add(this.m_pos, v2.create(0, 0.1));
             emitter.layer = this.renderLayer;
             emitter.zOrd = this.renderZOrd + 1;
-            emitter.color = emitterProps.color;
         }
 
         // Stop emitters
