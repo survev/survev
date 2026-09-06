@@ -531,6 +531,8 @@ export const MapObstacleDefs: Record<string, ObstacleDef> = {
     bush_01: createBush({}),
     bush_01b: createBush({ img: { alpha: 1 } }),
     bush_01cb: createBush({
+        hitParticle: "leafSynthetic",
+        explodeParticle: "leafSynthetic",
         img: { sprite: "map-bush-01cb.img" },
         map: { color: 0x266f59 },
     }),
@@ -675,7 +677,11 @@ export const MapObstacleDefs: Record<string, ObstacleDef> = {
         sound: { enter: "bush_enter_02" },
     }),
     bush_07x: createBush({ img: { sprite: "map-bush-07x.img" } }),
-    bush_07cb: createBush({ img: { sprite: "map-bush-07cb.img" } }),
+    bush_07cb: createBush({
+        hitParticle: "leafSynthetic",
+        explodeParticle: "leafSynthetic",
+        img: { sprite: "map-bush-07cb.img" },
+    }),
 
     campfire_01: createCampfire({}),
 
