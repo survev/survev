@@ -6756,7 +6756,7 @@ export const BunkerDefs: Record<string, BuildingDef> = {
                 type: "vat_03",
                 pos: v2.create(-5, -0.5),
                 scale: 1.25,
-                ori: 0,
+                ori: 1,
             },
         ],
     },
