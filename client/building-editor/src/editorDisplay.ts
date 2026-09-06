@@ -1,5 +1,7 @@
 import * as PIXI from "pixi.js-legacy";
 
+import type { ConfigManager, DebugRendererOpts } from "$lib/modules/ConfigManager.svelte.ts";
+import { device } from "$lib/modules/Device.svelte.ts";
 import { MapDefs } from "../../../shared/defs/mapDefs.ts";
 import { MapObjectDefs } from "../../../shared/defs/register.ts";
 import { MapMsg } from "../../../shared/net/mapMsg.ts";
@@ -12,9 +14,7 @@ import { v2, type Vec2 } from "../../../shared/utils/v2.ts";
 import type { Ambiance } from "../../src/ambiance.ts";
 import type { AudioManager } from "../../src/audioManager.ts";
 import Camera from "../../src/camera.ts";
-import type { ConfigManager, DebugRenderOpts } from "../../src/config.ts";
 import { debugLines } from "../../src/debug/debugLines.ts";
-import { device } from "../../src/device.ts";
 import type { Game } from "../../src/game.ts";
 import type { InputBinds } from "../../src/inputBinds.ts";
 import { Map } from "../../src/map.ts";
@@ -688,7 +688,7 @@ export class EditorDisplay {
         this.render(debug);
     }
 
-    render(debug: DebugRenderOpts) {
+    render(debug: DebugRendererOpts) {
         const grassColor = this.map.mapLoaded
             ? this.map.getMapDef().biome.colors.grass
             : 0x80af49;

@@ -1,5 +1,5 @@
+import { device } from "$lib/modules/Device.svelte.ts";
 import $ from "jquery";
-import { device } from "../device.ts";
 import english from "../en.json";
 
 export function downloadFile(

@@ -21,7 +21,7 @@ export const zMatchHistoryRequest = z.object({
     ]),
 });
 
-export type MatchHistoryParams = z.infer<typeof zMatchHistoryRequest>;
+export type MatchHistoryRequest = z.infer<typeof zMatchHistoryRequest>;
 
 export type MatchHistory = {
     guid: string;
@@ -37,6 +37,7 @@ export type MatchHistory = {
     team_kills: number;
     damage_dealt: number;
     damage_taken: number;
+    player_id: number;
 };
 export type MatchHistoryResponse = MatchHistory[];
 
@@ -116,35 +117,26 @@ const teamModeMap = {
     squad: TeamMode.Squad,
 };
 
-export const zLeaderboardsRequest = z.object({
+export const zLeaderboardRequest = z.object({
     interval: z.enum(["daily", "weekly", "alltime"]),
     mapId: z.enum(VALID_MAP_IDS).transform((v) => Number(v)),
     type: z.enum(["most_kills", "most_damage_dealt", "kpg", "kills", "wins"]),
     teamMode: z.enum(["solo", "duo", "squad"]).transform((mode) => teamModeMap[mode]),
 });
 
-export type LeaderboardResponse =
-    & {
-        val: number;
-        region: string;
-        /**
-         * not used
-         */
-        active?: boolean;
-        /**
-         * required for all types except most_kills & win_streak
-         */
-        games?: number;
-    }
-    & (
-        | {
-            slug: string | null;
-            username: string;
-        }
-        | {
-            slugs: (string | null)[];
-            usernames: string[];
-        }
-    );
+export interface LeaderboardResponse {
+    val: number;
+    region: string;
+    /**
+     * not used
+     */
+    active?: boolean;
+    /**
+     * required for all types except most_kills & win_streak
+     */
+    games?: number;
+    slugs: Array<string | null>;
+    usernames: string[];
+}
 
-export type LeaderboardRequest = z.infer<typeof zLeaderboardsRequest>;
+export type LeaderboardRequest = z.infer<typeof zLeaderboardRequest>;

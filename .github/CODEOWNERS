@@ -7,6 +7,9 @@
 # Global owners.
 * @leia-uwu
 
+# Stats Client
+/client/stats/ @DamienVesper @leia-uwu
+
 # API
 /server/src/api/ @leia-uwu @lmssiehdev
 

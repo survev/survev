@@ -1,8 +1,8 @@
+import { device } from "$lib/modules/Device.svelte.ts";
 import $ from "jquery";
 import loadout, { type Item } from "../../../shared/utils/loadout.ts";
 import type { Account } from "../account.ts";
 import { api } from "../api.ts";
-import { device } from "../device.ts";
 import { helpers } from "../helpers.ts";
 import { proxy } from "../proxy.ts";
 import { SDK } from "../sdk/sdk.ts";

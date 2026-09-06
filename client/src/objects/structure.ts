@@ -1,3 +1,4 @@
+import type { DebugRendererOpts } from "$lib/modules/ConfigManager.svelte.ts";
 import { MapObjectDefs } from "../../../shared/defs/register.ts";
 import type { ObjectData, ObjectType } from "./../../../shared/net/objectSerializeFns.ts";
 import { type AABB, coldet, type Collider } from "../../../shared/utils/coldet.ts";
@@ -8,7 +9,6 @@ import { assert } from "../../../shared/utils/util.ts";
 import { v2, type Vec2 } from "../../../shared/utils/v2.ts";
 import type { Ambiance } from "../ambiance.ts";
 import type Camera from "../camera.ts";
-import type { DebugRenderOpts } from "../config.ts";
 import {
     renderBridge,
     renderMapBuildingBounds,
@@ -233,7 +233,7 @@ export class Structure implements AbstractObject {
         track1.weight = sound ? weight1 * transitionWeight * this.soundEnabledT : 0;
     }
 
-    render(_camera: Camera, debug: DebugRenderOpts, _layer: number) {
+    render(_camera: Camera, debug: DebugRendererOpts, _layer: number) {
         if (!IS_DEV) return; // only debug rendering code here
 
         if (debug.structures.buildingBounds) {

@@ -1,8 +1,4 @@
 {
-  "@metadata": {
-    "last-updated": "2018-05-26",
-    "locale": "en"
-  },
   "word-order": "svo",
   "index-privacy": "privacy",
   "index-go": "Go",
@@ -34,7 +30,7 @@
   "stats-most-damage": "Most damage",
   "stats-avg-damage": "Avg damage",
   "stats-avg-kills": "Avg kills",
-  "stats-avg-survived": "Avg survived time",
+  "stats-avg-survived": "Avg survived",
   "stats-region": "Region",
   "stats-north-america": "North America",
   "stats-europe": "Europe",
@@ -51,7 +47,7 @@
   "stats-kills": "Kills",
   "stats-damage-dealt": "Damage Dealt",
   "stats-damage-taken": "Damage Taken",
-  "stats-survived": "survived",
+  "stats-survived": "Survived",
   "stats-banned": "(Account banned)",
   "game-backpack00": "Pouch",
   "game-backpack01": "Small Pack",

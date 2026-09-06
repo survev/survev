@@ -1,19 +1,19 @@
 import $ from "jquery";
 import { type FolderApi, Pane, type TabPageApi } from "tweakpane";
 
-import { RoleDefs } from "../../../shared/defs/gameObjects/roleDefs.ts";
-import { GameObjectDefs } from "../../../shared/defs/register.ts";
-import { EditMsg } from "../../../shared/net/editMsg.ts";
-import { math } from "../../../shared/utils/math.ts";
-import { util } from "../../../shared/utils/util.ts";
 import {
     type ConfigKey,
     type ConfigManager,
     type ConfigType,
     debugHUDConfig,
-    debugRenderConfig,
+    debugRendererConfig,
     type debugToolsConfig,
-} from "../config.ts";
+} from "$lib/modules/ConfigManager.svelte.ts";
+import { RoleDefs } from "../../../shared/defs/gameObjects/roleDefs.ts";
+import { GameObjectDefs } from "../../../shared/defs/register.ts";
+import { EditMsg } from "../../../shared/net/editMsg.ts";
+import { math } from "../../../shared/utils/math.ts";
+import { util } from "../../../shared/utils/util.ts";
 import { type InputHandler, Key } from "../input.ts";
 
 const availableLoot = GameObjectDefs.getAllTypes()
@@ -45,7 +45,7 @@ function camelCaseToText(str: string) {
 
 export class Editor {
     toolParams: typeof debugToolsConfig;
-    renderParams: typeof debugRenderConfig;
+    rendererParams: typeof debugRendererConfig;
     debugHUDParams: typeof debugHUDConfig;
 
     config: ConfigManager;
@@ -71,7 +71,7 @@ export class Editor {
         this.toolParams = this.config.get("debugTools")!;
         this.toolParams.role = "";
 
-        this.renderParams = this.config.get("debugRenderer")!;
+        this.rendererParams = this.config.get("debugRenderer")!;
         this.debugHUDParams = this.config.get("debugHUD")!;
 
         const container = document.getElementById(
@@ -315,9 +315,9 @@ export class Editor {
             }
         };
         addObject(
-            debugRenderConfig,
-            this.renderParams,
-            this.renderParams,
+            debugRendererConfig,
+            this.rendererParams,
+            this.rendererParams,
             render,
             "debugRenderer",
         );
@@ -394,7 +394,7 @@ export class Editor {
             this.zoomBind.refresh();
         }
 
-        this.config.config.debugRenderer = this.renderParams;
+        this.config.config.debugRenderer = this.rendererParams;
 
         $("#ui-leaderboard-wrapper,#ui-right-center,#ui-kill-leader-container").css(
             "display",

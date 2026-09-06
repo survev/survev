@@ -7,7 +7,7 @@
   },
   "dependencies": {
     "@types/svg-parser": "^2.0.6",
-    "svg-parser": "^2.0.5",
+    "svg-parser": "^2.1.0",
     "vitest": "^4.1.11"
   }
 }

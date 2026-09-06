@@ -1,10 +1,10 @@
+import { device } from "$lib/modules/Device.svelte.ts";
 import * as PIXI from "pixi.js-legacy";
 import type { ObjectData, ObjectType } from "../../../shared/net/objectSerializeFns.ts";
 import { collider } from "../../../shared/utils/collider.ts";
 import { util } from "../../../shared/utils/util.ts";
 import { v2 } from "../../../shared/utils/v2.ts";
 import type { Camera } from "../camera.ts";
-import { device } from "../device.ts";
 import type { Ctx } from "../game.ts";
 import type { Map } from "../map.ts";
 import type { Renderer } from "../renderer.ts";
