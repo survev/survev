@@ -1,5 +1,7 @@
 import * as PIXI from "pixi.js-legacy";
 
+import type { ConfigManager, DebugRendererOpts } from "$lib/modules/ConfigManager.svelte.ts";
+import { device } from "$lib/modules/Device.svelte.ts";
 import type { OutfitDef } from "../../../shared/defs/gameObjects/outfitDefs.ts";
 import { GameObjectDefs } from "../../../shared/defs/register.ts";
 import { type Action, type Anim, GameConfig } from "../../../shared/gameConfig.ts";
@@ -15,8 +17,6 @@ import { Camera } from "../camera.ts";
 import { debugLines } from "../debug/debugLines.ts";
 import type { Game } from "../game.ts";
 import type { InputBinds } from "../inputBinds.ts";
-import type { ConfigManager, DebugRendererOpts } from "../lib/modules/ConfigManager.svelte.ts";
-import { device } from "../lib/modules/Device.svelte.ts";
 import { Map } from "../map.ts";
 import { DecalBarn } from "../objects/decal.ts";
 import { Creator } from "../objects/objectPool.ts";

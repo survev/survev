@@ -1,3 +1,5 @@
+import type { ConfigManager } from "$lib/modules/ConfigManager.svelte.ts";
+import { device } from "$lib/modules/Device.svelte.ts";
 import $ from "jquery";
 import { GameConfig } from "../../../shared/gameConfig.ts";
 import * as net from "../../../shared/net/net.ts";
@@ -13,8 +15,6 @@ import type {
 import { api } from "../api.ts";
 import type { AudioManager } from "../audioManager.ts";
 import { helpers } from "../helpers.ts";
-import type { ConfigManager } from "../lib/modules/ConfigManager.svelte.ts";
-import { device } from "../lib/modules/Device.svelte.ts";
 import type { PingTest } from "../pingTest.ts";
 import { SDK } from "../sdk/sdk.ts";
 import type { SiteInfo } from "../siteInfo.ts";

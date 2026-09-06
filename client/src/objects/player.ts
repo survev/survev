@@ -1,5 +1,8 @@
 import * as PIXI from "pixi.js-legacy";
 
+import type { SoundHandle } from "$lib/createJS.ts";
+import type { DebugRendererOpts } from "$lib/modules/ConfigManager.svelte.ts";
+import { device } from "$lib/modules/Device.svelte.ts";
 import type { LootDef } from "../../../shared/defs/gameObjectDefs.ts";
 import type { BoostDef, HealDef } from "./../../../shared/defs/gameObjects/gearDefs.ts";
 import type { GunDef } from "../../../shared/defs/gameObjects/gunDefs.ts";
@@ -32,9 +35,6 @@ import type { Ctx } from "../game.ts";
 import { helpers } from "../helpers.ts";
 import type { InputHandler } from "../input.ts";
 import type { InputBinds } from "./../inputBinds.ts";
-import type { SoundHandle } from "../lib/createJS.ts";
-import type { DebugRendererOpts } from "../lib/modules/ConfigManager.svelte.ts";
-import { device } from "../lib/modules/Device.svelte.ts";
 import type { Map } from "../map.ts";
 import type { Renderer } from "../renderer.ts";
 import type { UiManager2 } from "../ui/ui2.ts";

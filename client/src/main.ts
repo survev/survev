@@ -1,3 +1,5 @@
+import { ConfigManager, type ConfigType } from "$lib/modules/ConfigManager.svelte.ts";
+import { device } from "$lib/modules/Device.svelte.ts";
 import $ from "jquery";
 import * as PIXI from "pixi.js-legacy";
 import { GameConfig } from "../../shared/gameConfig.ts";
@@ -19,8 +21,6 @@ import { Game } from "./game.ts";
 import { helpers } from "./helpers.ts";
 import { InputHandler } from "./input.ts";
 import { InputBinds, InputBindUi } from "./inputBinds.ts";
-import { ConfigManager, type ConfigType } from "./lib/modules/ConfigManager.svelte.ts";
-import { device } from "./lib/modules/Device.svelte.ts";
 import { PingTest } from "./pingTest.ts";
 import { proxy } from "./proxy.ts";
 import { ResourceManager } from "./resources.ts";

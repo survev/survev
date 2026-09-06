@@ -1,3 +1,5 @@
+import type { DebugRendererOpts } from "$lib/modules/ConfigManager.svelte.ts";
+import { device } from "$lib/modules/Device.svelte.ts";
 import * as PIXI from "pixi.js-legacy";
 import { type MapDef, type MapDefKey, MapDefs } from "../../shared/defs/mapDefs.ts";
 import type { BuildingDef } from "../../shared/defs/mapObjects/buildings/buildingDefs.ts";
@@ -22,8 +24,6 @@ import type { AudioManager } from "./audioManager.ts";
 import type { Camera } from "./camera.ts";
 import { renderSpline } from "./debug/debugHelpers.ts";
 import { debugLines } from "./debug/debugLines.ts";
-import type { DebugRendererOpts } from "./lib/modules/ConfigManager.svelte.ts";
-import { device } from "./lib/modules/Device.svelte.ts";
 import { Building } from "./objects/building.ts";
 import type { DecalBarn } from "./objects/decal.ts";
 import { Pool } from "./objects/objectPool.ts";

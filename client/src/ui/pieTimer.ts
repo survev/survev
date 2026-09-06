@@ -1,7 +1,7 @@
+import { device } from "$lib/modules/Device.svelte.ts";
 import * as PIXI from "pixi.js-legacy";
 import { math } from "../../../shared/utils/math.ts";
 import type { Camera } from "../camera.ts";
-import { device } from "../lib/modules/Device.svelte.ts";
 import type { Touch } from "./touch.ts";
 
 const fontWidth = 24;
