@@ -101,7 +101,11 @@ type QuestDefForEvent<E extends QuestEvent> = {
     event: E;
     target: number;
     xp: number;
-    icon?: string;
+    icon?: {
+        urls: string[];
+        rot?: number;
+        scale?: number;
+    };
     timed?: boolean;
     filters?: SupportedFilters<E>[number][];
     /**
@@ -118,6 +122,9 @@ export const QuestDefs: Record<string, QuestDef> = {
         event: "placement",
         target: 2,
         xp: 30,
+        icon: {
+            urls: ["img/gui/player.svg"],
+        },
         filters: [
             {
                 type: "team_mode",
@@ -134,6 +141,9 @@ export const QuestDefs: Record<string, QuestDef> = {
         event: "placement",
         target: 2,
         xp: 30,
+        icon: {
+            urls: ["img/gui/player-duos.svg"],
+        },
         filters: [
             {
                 type: "team_mode",
@@ -150,6 +160,9 @@ export const QuestDefs: Record<string, QuestDef> = {
         event: "placement",
         target: 2,
         xp: 30,
+        icon: {
+            urls: ["img/gui/player-squads.svg"],
+        },
         filters: [
             {
                 type: "team_mode",
@@ -166,6 +179,9 @@ export const QuestDefs: Record<string, QuestDef> = {
         event: "placement",
         target: 1,
         xp: 50,
+        icon: {
+            urls: ["img/gui/chicken.svg"],
+        },
         filters: [
             {
                 type: "max_rank",
@@ -181,18 +197,27 @@ export const QuestDefs: Record<string, QuestDef> = {
         event: "kill",
         target: 5,
         xp: 30,
+        icon: {
+            urls: ["img/gui/skull-team.svg"],
+        },
     },
     quest_kills_hard: {
         type: "quest",
         event: "kill",
         target: 10,
         xp: 40,
+        icon: {
+            urls: ["img/gui/skull-team.svg"],
+        },
     },
     quest_kills_harder: {
         type: "quest",
         event: "kill",
         target: 30,
         xp: 50,
+        icon: {
+            urls: ["img/gui/skull-team.svg"],
+        },
         difficulty: QuestDifficulty.Hard,
     },
     quest_damage: {
@@ -219,6 +244,9 @@ export const QuestDefs: Record<string, QuestDef> = {
         event: "survived",
         target: 900,
         xp: 30,
+        icon: {
+            urls: ["img/gui/timer.svg"],
+        },
         timed: true,
     },
     quest_damage_9mm: {
@@ -226,7 +254,9 @@ export const QuestDefs: Record<string, QuestDef> = {
         event: "damage",
         target: 350,
         xp: 30,
-        icon: "img/emotes/ammo-9mm.svg",
+        icon: {
+            urls: ["img/emotes/ammo-9mm.svg"],
+        },
         filters: [
             {
                 type: "weapon",
@@ -235,14 +265,16 @@ export const QuestDefs: Record<string, QuestDef> = {
             },
         ],
         mapFilterType: "all_except",
-        maps: [MapId.Savannah],
+        maps: [MapId.Savannah, MapId.Cobalt],
     },
     quest_damage_9mm_ltm: {
         type: "quest",
         event: "damage",
         target: 500,
         xp: 30,
-        icon: "img/emotes/ammo-9mm.svg",
+        icon: {
+            urls: ["img/emotes/ammo-9mm.svg"],
+        },
         filters: [
             {
                 type: "weapon",
@@ -251,14 +283,16 @@ export const QuestDefs: Record<string, QuestDef> = {
             },
         ],
         mapFilterType: "only_on",
-        maps: [MapId.Savannah],
+        maps: [MapId.Savannah, MapId.Cobalt],
     },
     quest_damage_762mm: {
         type: "quest",
         event: "damage",
         target: 350,
         xp: 30,
-        icon: "img/emotes/ammo-762mm.svg",
+        icon: {
+            urls: ["img/emotes/ammo-762mm.svg"],
+        },
         filters: [
             {
                 type: "weapon",
@@ -267,14 +301,16 @@ export const QuestDefs: Record<string, QuestDef> = {
             },
         ],
         mapFilterType: "all_except",
-        maps: [MapId.Savannah, MapId.Woods],
+        maps: [MapId.Savannah, MapId.Woods, MapId.Cobalt],
     },
     quest_damage_762mm_ltm: {
         type: "quest",
         event: "damage",
         target: 350,
         xp: 30,
-        icon: "img/emotes/ammo-762mm.svg",
+        icon: {
+            urls: ["img/emotes/ammo-762mm.svg"],
+        },
         filters: [
             {
                 type: "weapon",
@@ -283,14 +319,16 @@ export const QuestDefs: Record<string, QuestDef> = {
             },
         ],
         mapFilterType: "only_on",
-        maps: [MapId.Savannah, MapId.Woods],
+        maps: [MapId.Savannah, MapId.Woods, MapId.Cobalt],
     },
     quest_damage_556mm: {
         type: "quest",
         event: "damage",
         target: 350,
         xp: 30,
-        icon: "img/emotes/ammo-556mm.svg",
+        icon: {
+            urls: ["img/emotes/ammo-556mm.svg"],
+        },
         filters: [
             {
                 type: "weapon",
@@ -299,14 +337,16 @@ export const QuestDefs: Record<string, QuestDef> = {
             },
         ],
         mapFilterType: "all_except",
-        maps: [MapId.Savannah, MapId.Woods],
+        maps: [MapId.Savannah, MapId.Woods, MapId.Cobalt],
     },
     quest_damage_556mm_ltm: {
         type: "quest",
         event: "damage",
         target: 350,
         xp: 30,
-        icon: "img/emotes/ammo-762mm.svg",
+        icon: {
+            urls: ["img/emotes/ammo-762mm.svg"],
+        },
         filters: [
             {
                 type: "weapon",
@@ -315,14 +355,16 @@ export const QuestDefs: Record<string, QuestDef> = {
             },
         ],
         mapFilterType: "only_on",
-        maps: [MapId.Savannah, MapId.Woods],
+        maps: [MapId.Savannah, MapId.Woods, MapId.Cobalt],
     },
     quest_damage_12gauge: {
         type: "quest",
         event: "damage",
         target: 350,
         xp: 30,
-        icon: "img/emotes/ammo-12gauge.svg",
+        icon: {
+            urls: ["img/emotes/ammo-12gauge.svg"],
+        },
         filters: [
             {
                 type: "weapon",
@@ -331,14 +373,16 @@ export const QuestDefs: Record<string, QuestDef> = {
             },
         ],
         mapFilterType: "all_except",
-        maps: [MapId.Woods],
+        maps: [MapId.Woods, MapId.Cobalt],
     },
     quest_damage_12gauge_ltm: {
         type: "quest",
         event: "damage",
         target: 700,
         xp: 30,
-        icon: "img/emotes/ammo-12gauge.svg",
+        icon: {
+            urls: ["img/emotes/ammo-12gauge.svg"],
+        },
         filters: [
             {
                 type: "weapon",
@@ -347,14 +391,16 @@ export const QuestDefs: Record<string, QuestDef> = {
             },
         ],
         mapFilterType: "only_on",
-        maps: [MapId.Woods],
+        maps: [MapId.Woods, MapId.Cobalt],
     },
     quest_damage_45acp: {
         type: "quest",
         event: "damage",
         target: 350,
         xp: 30,
-        icon: "img/emotes/ammo-45acp.svg",
+        icon: {
+            urls: ["img/emotes/ammo-45acp.svg"],
+        },
         filters: [
             {
                 type: "weapon",
@@ -370,7 +416,9 @@ export const QuestDefs: Record<string, QuestDef> = {
         event: "damage",
         target: 500,
         xp: 40,
-        icon: "img/emotes/ammo-potato_ammo.svg",
+        icon: {
+            urls: ["img/emotes/ammo-potato_ammo.svg"],
+        },
         filters: [
             {
                 type: "weapon",
@@ -386,7 +434,12 @@ export const QuestDefs: Record<string, QuestDef> = {
         event: "damage",
         target: 250,
         xp: 50,
-        icon: "img/emotes/ammo-50AE.svg",
+        icon: {
+            urls: [
+                "img/emotes/ammo-50AE.svg",
+                "img/emotes/ammo-308sub.svg",
+            ],
+        },
         filters: [
             {
                 type: "weapon",
@@ -403,7 +456,12 @@ export const QuestDefs: Record<string, QuestDef> = {
         event: "damage",
         target: 500,
         xp: 50,
-        icon: "img/emotes/ammo-50AE.svg",
+        icon: {
+            urls: [
+                "img/emotes/ammo-50AE.svg",
+                "img/emotes/ammo-308sub.svg",
+            ],
+        },
         filters: [
             {
                 type: "weapon",
@@ -420,6 +478,9 @@ export const QuestDefs: Record<string, QuestDef> = {
         event: "damage",
         target: 1000,
         xp: 50,
+        icon: {
+            urls: ["img/gui/quest-damage-woods-king.svg"],
+        },
         filters: [
             {
                 type: "role",
@@ -435,6 +496,13 @@ export const QuestDefs: Record<string, QuestDef> = {
         event: "damage",
         target: 200,
         xp: 40,
+        icon: {
+            urls: [
+                "img/loot/loot-throwable-frag.svg",
+                "img/loot/loot-throwable-mirv.svg",
+                "img/loot/loot-throwable-strobe.svg",
+            ],
+        },
         filters: [
             {
                 type: "weapon",
@@ -449,6 +517,12 @@ export const QuestDefs: Record<string, QuestDef> = {
         event: "damage",
         target: 400,
         xp: 40,
+        icon: {
+            urls: [
+                "img/loot/loot-throwable-frag.svg",
+                "img/loot/loot-throwable-mirv.svg",
+            ],
+        },
         filters: [
             {
                 type: "weapon",
@@ -463,6 +537,9 @@ export const QuestDefs: Record<string, QuestDef> = {
         event: "damage",
         target: 250,
         xp: 40,
+        icon: {
+            urls: ["img/gui/loadout-melee.svg"],
+        },
         filters: [
             {
                 type: "weapon",
@@ -477,6 +554,9 @@ export const QuestDefs: Record<string, QuestDef> = {
         event: "damage",
         target: 500,
         xp: 40,
+        icon: {
+            urls: ["img/gui/loadout-melee.svg"],
+        },
         filters: [
             {
                 type: "weapon",
@@ -491,6 +571,12 @@ export const QuestDefs: Record<string, QuestDef> = {
         event: "item_used",
         target: 10,
         xp: 30,
+        icon: {
+            urls: [
+                "img/loot/loot-medical-bandage.svg",
+                "img/loot/loot-medical-healthkit.svg",
+            ],
+        },
         filters: [
             {
                 type: "item",
@@ -504,6 +590,12 @@ export const QuestDefs: Record<string, QuestDef> = {
         event: "item_used",
         target: 10,
         xp: 30,
+        icon: {
+            urls: [
+                "img/loot/loot-medical-soda.svg",
+                "img/loot/loot-medical-pill.svg",
+            ],
+        },
         filters: [
             {
                 type: "item",
@@ -517,6 +609,9 @@ export const QuestDefs: Record<string, QuestDef> = {
         event: "airdrop_unlocked",
         target: 1,
         xp: 30,
+        icon: {
+            urls: ["img/gui/ping-team-airdrop.svg"],
+        },
         mapFilterType: "all_except",
         maps: [MapId.Desert, "faction_potato", MapId.Potato],
     },
@@ -525,6 +620,9 @@ export const QuestDefs: Record<string, QuestDef> = {
         event: "airdrop_unlocked",
         target: 5,
         xp: 30,
+        icon: {
+            urls: ["img/gui/ping-team-airdrop.svg"],
+        },
         mapFilterType: "only_on",
         maps: [MapId.Desert, "faction_potato", MapId.Potato],
     },
@@ -533,6 +631,9 @@ export const QuestDefs: Record<string, QuestDef> = {
         event: "airdrop_unlocked",
         target: 10,
         xp: 40,
+        icon: {
+            urls: ["img/gui/ping-team-airdrop.svg"],
+        },
         mapFilterType: "only_on",
         maps: [MapId.Desert, "faction_potato", MapId.Potato],
     },
@@ -541,6 +642,9 @@ export const QuestDefs: Record<string, QuestDef> = {
         event: "airdrop_unlocked",
         target: 1,
         xp: 40,
+        icon: {
+            urls: ["img/gui/ping-team-airdrop.svg"],
+        },
         filters: [
             {
                 type: "obstacle",
@@ -554,6 +658,9 @@ export const QuestDefs: Record<string, QuestDef> = {
         event: "destruction",
         target: 25,
         xp: 30,
+        icon: {
+            urls: ["img/map/map-crate-01.svg"],
+        },
         filters: [
             {
                 type: "obstacle",
@@ -567,6 +674,9 @@ export const QuestDefs: Record<string, QuestDef> = {
         event: "destruction",
         target: 5,
         xp: 30,
+        icon: {
+            urls: ["img/map/map-toilet-01.svg"],
+        },
         filters: [
             {
                 type: "obstacle",
@@ -580,6 +690,13 @@ export const QuestDefs: Record<string, QuestDef> = {
         event: "destruction",
         target: 10,
         xp: 30,
+        icon: {
+            urls: [
+                "img/map/map-stand-01.svg",
+                "img/map/map-table-03.svg",
+                "img/map/map-couch-03.svg",
+            ],
+        },
         filters: [
             {
                 type: "obstacle",
@@ -593,6 +710,12 @@ export const QuestDefs: Record<string, QuestDef> = {
         event: "destruction",
         target: 10,
         xp: 30,
+        icon: {
+            urls: [
+                "img/map/map-barrel-01.svg",
+                "img/map/map-barrel-02.svg",
+            ],
+        },
         filters: [
             {
                 type: "obstacle",
@@ -606,6 +729,12 @@ export const QuestDefs: Record<string, QuestDef> = {
         event: "destruction",
         target: 10,
         xp: 30,
+        icon: {
+            urls: [
+                "img/map/map-locker-01.svg",
+                "img/map/map-deposit-box-01.svg",
+            ],
+        },
         filters: [
             {
                 type: "obstacle",
@@ -619,6 +748,9 @@ export const QuestDefs: Record<string, QuestDef> = {
         event: "destruction",
         target: 8,
         xp: 30,
+        icon: {
+            urls: ["img/map/map-pot-01.svg"],
+        },
         filters: [
             {
                 type: "obstacle",
@@ -632,6 +764,9 @@ export const QuestDefs: Record<string, QuestDef> = {
         event: "destruction",
         target: 1,
         xp: 40,
+        icon: {
+            urls: ["img/map/map-vending-soda-01.svg"],
+        },
         filters: [
             {
                 type: "obstacle",
@@ -645,6 +780,12 @@ export const QuestDefs: Record<string, QuestDef> = {
         event: "destruction",
         target: 2,
         xp: 40,
+        icon: {
+            urls: [
+                "img/map/map-stone-04.svg",
+                "img/map/map-stone-05.svg",
+            ],
+        },
         filters: [
             {
                 type: "obstacle",
@@ -660,6 +801,9 @@ export const QuestDefs: Record<string, QuestDef> = {
         event: "destruction",
         target: 3,
         xp: 30,
+        icon: {
+            urls: ["img/map/map-crate-02.svg"],
+        },
         filters: [
             {
                 type: "obstacle",
@@ -675,6 +819,9 @@ export const QuestDefs: Record<string, QuestDef> = {
         event: "destruction",
         target: 3,
         xp: 30,
+        icon: {
+            urls: ["img/map/map-crate-22.svg"],
+        },
         filters: [
             {
                 type: "obstacle",
@@ -690,6 +837,12 @@ export const QuestDefs: Record<string, QuestDef> = {
         event: "destruction",
         target: 50,
         xp: 30,
+        icon: {
+            urls: [
+                "img/map/map-potato-01.svg",
+                "img/map/map-tomato-01.svg",
+            ],
+        },
         filters: [
             {
                 type: "obstacle",
@@ -705,6 +858,9 @@ export const QuestDefs: Record<string, QuestDef> = {
         event: "destruction",
         target: 50,
         xp: 30,
+        icon: {
+            urls: ["img/map/map-potato-01.svg"],
+        },
         filters: [
             {
                 type: "obstacle",
@@ -801,6 +957,9 @@ export const QuestDefs: Record<string, QuestDef> = {
         event: "kill",
         target: 2,
         xp: 40,
+        icon: {
+            urls: ["img/gui/hatchet.svg"],
+        },
         filters: [
             {
                 type: "building",
@@ -819,6 +978,13 @@ export const QuestDefs: Record<string, QuestDef> = {
         event: "be_mvp",
         target: 1,
         xp: 50,
+        icon: {
+            urls: [
+                "img/gui/ribbon-red.svg",
+                "img/gui/ribbon-blue.svg",
+            ],
+            scale: 1.2,
+        },
         mapFilterType: "only_on",
         maps: [MapId.Faction],
         difficulty: QuestDifficulty.Hard,
@@ -828,6 +994,9 @@ export const QuestDefs: Record<string, QuestDef> = {
         event: "promote",
         target: 1,
         xp: 40,
+        icon: {
+            urls: ["img/gui/quest-promote-hunted.svg"],
+        },
         filters: [
             {
                 type: "role",
@@ -858,6 +1027,21 @@ export const QuestDefs: Record<string, QuestDef> = {
                 ],
             },
         ],
+        icon: {
+            urls: [
+                "img/loot/player-helmet-leader.svg",
+                "img/loot/player-helmet-captain.svg",
+                "img/loot/player-helmet-lieutenant.svg",
+                "img/loot/player-helmet-medic.svg",
+                "img/loot/player-helmet-marksman.svg",
+                "img/loot/player-helmet-recon.svg",
+                "img/loot/player-helmet-grenadier.svg",
+                "img/loot/player-helmet-bugler.svg",
+                "img/loot/player-helmet-last-man-01.svg",
+            ],
+            rot: Math.PI / 2,
+            scale: 1.5,
+        },
         mapFilterType: "only_on",
         maps: [MapId.Faction],
     },
@@ -866,6 +1050,14 @@ export const QuestDefs: Record<string, QuestDef> = {
         event: "damage",
         target: 1000,
         xp: 50,
+        icon: {
+            urls: [
+                "img/loot/player-helmet-last-man-01.svg",
+                "img/loot/player-helmet-last-man-02.svg",
+            ],
+            rot: Math.PI / 2,
+            scale: 1.5,
+        },
         filters: [
             {
                 type: "role",
@@ -897,6 +1089,21 @@ export const QuestDefs: Record<string, QuestDef> = {
                 ],
             },
         ],
+        icon: {
+            urls: [
+                "img/loot/player-helmet-leader.svg",
+                "img/loot/player-helmet-captain.svg",
+                "img/loot/player-helmet-lieutenant.svg",
+                "img/loot/player-helmet-medic.svg",
+                "img/loot/player-helmet-marksman.svg",
+                "img/loot/player-helmet-recon.svg",
+                "img/loot/player-helmet-grenadier.svg",
+                "img/loot/player-helmet-bugler.svg",
+                "img/loot/player-helmet-last-man-01.svg",
+            ],
+            rot: Math.PI / 2,
+            scale: 1.5,
+        },
         mapFilterType: "only_on",
         maps: [MapId.Faction],
     },
@@ -905,6 +1112,9 @@ export const QuestDefs: Record<string, QuestDef> = {
         event: "kill",
         target: 5,
         xp: 30,
+        icon: {
+            urls: ["img/gui/role-healer.svg"],
+        },
         filters: [
             {
                 type: "role",
@@ -919,6 +1129,9 @@ export const QuestDefs: Record<string, QuestDef> = {
         event: "kill",
         target: 5,
         xp: 30,
+        icon: {
+            urls: ["img/gui/role-tank.svg"],
+        },
         filters: [
             {
                 type: "role",
@@ -933,6 +1146,9 @@ export const QuestDefs: Record<string, QuestDef> = {
         event: "kill",
         target: 5,
         xp: 30,
+        icon: {
+            urls: ["img/gui/role-sniper.svg"],
+        },
         filters: [
             {
                 type: "role",
@@ -947,6 +1163,9 @@ export const QuestDefs: Record<string, QuestDef> = {
         event: "kill",
         target: 5,
         xp: 30,
+        icon: {
+            urls: ["img/gui/role-scout.svg"],
+        },
         filters: [
             {
                 type: "role",
@@ -961,6 +1180,9 @@ export const QuestDefs: Record<string, QuestDef> = {
         event: "kill",
         target: 5,
         xp: 30,
+        icon: {
+            urls: ["img/gui/role-demo.svg"],
+        },
         filters: [
             {
                 type: "role",
@@ -975,6 +1197,9 @@ export const QuestDefs: Record<string, QuestDef> = {
         event: "kill",
         target: 5,
         xp: 30,
+        icon: {
+            urls: ["img/gui/role-assault.svg"],
+        },
         filters: [
             {
                 type: "role",
@@ -989,6 +1214,9 @@ export const QuestDefs: Record<string, QuestDef> = {
         event: "damage",
         target: 500,
         xp: 30,
+        icon: {
+            urls: ["img/gui/role-healer.svg"],
+        },
         filters: [
             {
                 type: "role",
@@ -1003,6 +1231,9 @@ export const QuestDefs: Record<string, QuestDef> = {
         event: "damage",
         target: 500,
         xp: 30,
+        icon: {
+            urls: ["img/gui/role-tank.svg"],
+        },
         filters: [
             {
                 type: "role",
@@ -1017,6 +1248,9 @@ export const QuestDefs: Record<string, QuestDef> = {
         event: "damage",
         target: 500,
         xp: 30,
+        icon: {
+            urls: ["img/gui/role-sniper.svg"],
+        },
         filters: [
             {
                 type: "role",
@@ -1031,6 +1265,9 @@ export const QuestDefs: Record<string, QuestDef> = {
         event: "damage",
         target: 500,
         xp: 30,
+        icon: {
+            urls: ["img/gui/role-scout.svg"],
+        },
         filters: [
             {
                 type: "role",
@@ -1045,6 +1282,9 @@ export const QuestDefs: Record<string, QuestDef> = {
         event: "damage",
         target: 500,
         xp: 30,
+        icon: {
+            urls: ["img/gui/role-demo.svg"],
+        },
         filters: [
             {
                 type: "role",
@@ -1059,6 +1299,9 @@ export const QuestDefs: Record<string, QuestDef> = {
         event: "damage",
         target: 500,
         xp: 30,
+        icon: {
+            urls: ["img/gui/role-assault.svg"],
+        },
         filters: [
             {
                 type: "role",
@@ -1073,6 +1316,11 @@ export const QuestDefs: Record<string, QuestDef> = {
         event: "damage",
         target: 750,
         xp: 50,
+        icon: {
+            urls: ["img/loot/player-helmet-classless.svg"],
+            rot: Math.PI / 2,
+            scale: 1.5,
+        },
         filters: [
             {
                 type: "role",

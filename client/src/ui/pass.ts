@@ -10,6 +10,7 @@ import { GameObjectDefs } from "../../../shared/defs/register.ts";
 import type { PassState, QuestState } from "../../../shared/types/user.ts";
 import { math } from "../../../shared/utils/math.ts";
 import { passUtil } from "../../../shared/utils/passUtil.ts";
+import { util } from "../../../shared/utils/util.ts";
 import type { Account } from "../account.ts";
 import { helpers } from "../helpers.ts";
 import type { LoadoutMenu } from "./loadoutMenu.ts";
@@ -82,23 +83,24 @@ export class Pass {
             str: string;
             displayed?: boolean;
         };
-        elems: Record<string, JQuery<HTMLElement>>;
-        // elems: {
-        //     main: JQuery<HTMLElement>;
-        //     xp: JQuery<HTMLElement>;
-        //     info: JQuery<HTMLElement>;
-        //     desc: JQuery<HTMLElement>;
-        //     cur: JQuery<HTMLElement>;
-        //     target: JQuery<HTMLElement>;
-        //     refresh: JQuery<HTMLElement>;
-        //     refreshPrompt: JQuery<HTMLElement>;
-        //     refreshConfirm: JQuery<HTMLElement>;
-        //     refreshCancel: JQuery<HTMLElement>;
-        //     counter: JQuery<HTMLElement>;
-        //     barFill: JQuery<HTMLElement>;
-        //     timer: JQuery<HTMLElement>;
-        //     loading: JQuery<HTMLElement>;
-        // }
+        iconTicker: number;
+        elems: {
+            main: JQuery<HTMLElement>;
+            xp: JQuery<HTMLElement>;
+            info: JQuery<HTMLElement>;
+            icon: JQuery<HTMLElement>;
+            desc: JQuery<HTMLElement>;
+            cur: JQuery<HTMLElement>;
+            target: JQuery<HTMLElement>;
+            refresh: JQuery<HTMLElement>;
+            refreshPrompt: JQuery<HTMLElement>;
+            refreshConfirm: JQuery<HTMLElement>;
+            refreshCancel: JQuery<HTMLElement>;
+            counter: JQuery<HTMLElement>;
+            barFill: JQuery<HTMLElement>;
+            timer: JQuery<HTMLElement>;
+            loading: JQuery<HTMLElement>;
+        };
     }> = [];
 
     loaded = false;
@@ -129,7 +131,8 @@ export class Pass {
         let questAnimCount = 0;
         for (let passIdx = 0; passIdx < quests.length; passIdx++) {
             const questData = quests[passIdx];
-            const quest = {
+            type QuestData = typeof this["quests"][0];
+            const quest: QuestData = {
                 data: questData,
                 start: 0,
                 current: 0,
@@ -146,8 +149,9 @@ export class Pass {
                     enabled: false,
                     str: "",
                 },
-                elems: {},
-            } satisfies Partial<(typeof this.quests)[number]> as (typeof this.quests)[number];
+                iconTicker: 0,
+                elems: {} as QuestData["elems"],
+            };
             const curQuest = this.quests.find((existingQuest) => {
                 return (
                     existingQuest.data.idx == quest.data.idx
@@ -171,6 +175,7 @@ export class Pass {
                 main: fixedQuestElem,
                 xp: fixedQuestElem.find(".pass-quest-xp"),
                 info: fixedQuestElem.find(".pass-quest-info"),
+                icon: fixedQuestElem.find(".pass-quest-icon"),
                 desc: fixedQuestElem.find(".pass-quest-desc"),
                 cur: fixedQuestElem.find(".pass-quest-counter-current"),
                 target: fixedQuestElem.find(".pass-quest-counter-target"),
@@ -217,14 +222,14 @@ export class Pass {
             }
 
             quest.elems.target.html(targetText);
+
+            quest.elems.icon.toggle(!!questDef.icon);
             if (questDef.icon) {
-                quest.elems.desc.addClass("pass-quest-desc-icon");
-                quest.elems.desc.css({
-                    "background-image": `url(${questDef.icon})`,
+                quest.elems.icon.css({
+                    "transform": `rotate(${math.rad2deg(questDef.icon.rot ?? 0)}deg) scale(${
+                        questDef.icon.scale ?? 1
+                    })`,
                 });
-            } else {
-                quest.elems.desc.removeClass("pass-quest-desc-icon");
-                quest.elems.desc.attr("style", "");
             }
             this.setQuestRefreshEnabled(quest);
             newQuests.push(quest);
@@ -467,6 +472,42 @@ export class Pass {
             const fixedQuest = this.quests[questIndex];
             this.setQuestRefreshEnabled(fixedQuest);
             fixedQuest.ticker += dt;
+            const questDef = QuestDefs[fixedQuest.data.type];
+
+            if (!fixedQuest.data.complete) {
+                if (questDef.icon?.urls && questDef.icon.urls.length > 1) {
+                    fixedQuest.iconTicker += dt / 3;
+
+                    const iconIdx = Math.floor(fixedQuest.iconTicker);
+
+                    const swapIcons = iconIdx % 2 === 0;
+
+                    // swap icons so they can fade in / out
+                    const icon1 = util.wrappedArrayIndex(
+                        questDef.icon.urls,
+                        swapIcons ? iconIdx : iconIdx - 1,
+                    );
+                    const icon2 = util.wrappedArrayIndex(
+                        questDef.icon.urls,
+                        swapIcons ? iconIdx - 1 : iconIdx,
+                    );
+
+                    fixedQuest.elems.icon.css({
+                        "--img-url-1": `url(../${icon1})`,
+                        "--img-url-2": `url(../${icon2})`,
+                        "--img-alpha-1": swapIcons ? 1 : 0,
+                        "--img-alpha-2": swapIcons ? 0 : 1,
+                    });
+                } else if (questDef.icon?.urls) {
+                    fixedQuest.elems.icon.css({
+                        "--img-url-1": `url(../${questDef.icon.urls[0]})`,
+                        "--img-url-2": "",
+                        "--img-alpha-1": 1,
+                        "--img-alpha-2": 0,
+                    });
+                }
+            }
+
             if (!fixedQuest.progressAnimFinished) {
                 const progressT = math.clamp(
                     (fixedQuest.ticker - fixedQuest.delay) / 1,
@@ -481,7 +522,6 @@ export class Pass {
                 const pctComplete = (fixedQuest.current / fixedQuest.data.target) * 100;
 
                 // Humanize time for survival quests
-                const questDef = QuestDefs[fixedQuest.data.type];
                 let currentText: number | string = Math.round(fixedQuest.current);
                 if (questDef.timed) {
                     currentText = humanizeTime(currentText, true);

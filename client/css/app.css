@@ -4141,16 +4141,48 @@ a:active {
   right: 10px;
 }
 
+.pass-quest-desc-container {
+  display: flex;
+}
+
 .pass-quest-desc {
   line-height: 22px;
   margin: 0 0 6px 4px;
   min-height: 20px;
 }
 
-.pass-quest-desc-icon {
+.pass-quest-icon {
+  height: 24px;
+  width: 24px;
+  display: flex;
+}
+
+.pass-quest-icon::before, .pass-quest-icon::after {
+  content: '';
   background-repeat: no-repeat;
+  background-position: center center;
   background-size: 20px;
+  height: 24px;
+  width: 24px;
   text-indent: 24px;
+  display: inline-block;
+  position: absolute;
+  transition: opacity 500ms, transform 200ms;
+}
+
+.pass-quest-icon::before {
+  background-image: var(--img-url-1);
+  opacity: var(--img-alpha-1);
+}
+.pass-quest-icon::after {
+  background-image: var(--img-url-2);
+  opacity: var(--img-alpha-2);
+}
+
+.pass-quest-icon:hover {
+  &::after, &::before {
+    transform: scale(1.5)!important;
+  }
 }
 
 .pass-quest-xp {
