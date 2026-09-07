@@ -366,6 +366,9 @@ export const RoleDefs: Record<string, RoleDef> = {
         announce: true,
         killFeed: { assign: true },
         sound: { assign: "last_man_assigned_01" },
+        mapIcon: {
+            alive: "player-last-man.img",
+        },
         perks: [
             "steelskin",
             () =>
