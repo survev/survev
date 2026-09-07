@@ -1,4 +1,4 @@
-import * as PIXI from "pixi.js-legacy";
+import * as PIXI from "pixi.js";
 import { Constants } from "../../shared/net/net.ts";
 import { v2 } from "../../shared/utils/v2.ts";
 import type { Camera } from "./camera.ts";
@@ -64,7 +64,7 @@ export class Renderer {
     }
 
     addPIXIObj(obj: PIXI.Container, layer: number, zOrd: number, zIdx?: number) {
-        if (!obj.transform) {
+        if (obj.destroyed) {
             const err = new Error();
             const str = {
                 type: "addChild",
@@ -123,9 +123,8 @@ export class Renderer {
             : 1772803;
 
         this.ground.clear();
-        this.ground.beginFill(undergroundColor);
-        this.ground.drawRect(0, 0, camera.m_screenWidth, camera.m_screenHeight);
-        this.ground.endFill();
+        this.ground.rect(0, 0, camera.m_screenWidth, camera.m_screenHeight);
+        this.ground.fill(undergroundColor);
 
         this.layerMaskDirty = true;
     }
@@ -135,8 +134,7 @@ export class Renderer {
         if (this.canvasMode) {
             mask.clear();
             if (this.layerMaskActive) {
-                mask.beginFill(0xffffff, 1.0);
-                mask.drawRect(0.0, 0.0, camera.m_screenWidth, camera.m_screenHeight);
+                mask.rect(0.0, 0.0, camera.m_screenWidth, camera.m_screenHeight);
                 const structures = map.m_structurePool.m_getPool();
                 for (let i = 0; i < structures.length; i++) {
                     const structure = structures[i];
@@ -149,18 +147,18 @@ export class Renderer {
                         const c = v2.add(m.min, e);
                         const ll = camera.m_pointToScreen(v2.sub(c, e));
                         const tr = camera.m_pointToScreen(v2.add(c, e));
-                        mask.drawRect(ll.x, ll.y, tr.x - ll.x, tr.y - ll.y);
+                        mask.rect(ll.x, ll.y, tr.x - ll.x, tr.y - ll.y);
                     }
                 }
-                mask.endFill();
+                mask.fill();
             }
         } else {
             // Redraw mask
             if (this.layerMaskDirty) {
                 this.layerMaskDirty = false;
                 mask.clear();
-                mask.beginFill(0xffffff, 1.0);
                 drawRect(mask, 0.0, 0.0, Constants.MaxPosition, Constants.MaxPosition);
+                mask.fill();
                 const structures = map.m_structurePool.m_getPool();
                 for (let i = 0; i < structures.length; i++) {
                     const structure = structures[i];
@@ -176,12 +174,11 @@ export class Renderer {
                         const y = c.y - e.y;
                         const w = e.x * 2.0;
                         const h = e.y * 2.0;
-                        mask.beginHole();
                         drawRect(mask, x, y, w, h);
-                        mask.endHole();
+                        mask.cut();
                     }
                 }
-                mask.endFill();
+                mask.fill();
             }
             // Position layer mask
             const p0 = camera.m_pointToScreen(v2.create(0.0, 0.0));
@@ -197,12 +194,11 @@ export class Renderer {
             // kinda guh but it works /shrug
             this.debugLayerMask = new PIXI.Graphics();
             const layer = this.layers[this.layers.length - 1];
-            const idx = layer.parent.getChildIndex(layer);
-            layer.parent.addChildAt(this.debugLayerMask, idx + 1);
+            const idx = layer.parent!.getChildIndex(layer);
+            layer.parent!.addChildAt(this.debugLayerMask, idx + 1);
         }
         const mask = this.debugLayerMask;
         mask.clear();
-        mask.beginFill(0xff00ff, 0.5);
         const structures = map.m_structurePool.m_getPool();
         for (let i = 0; i < structures.length; i++) {
             const structure = structures[i];
@@ -219,7 +215,7 @@ export class Renderer {
                 }
             }
         }
-        mask.endFill();
+        mask.fill(0xff00ff);
         const p0 = camera.m_pointToScreen(v2.create(0, 0));
         const s = camera.m_scaleToScreen(1);
         mask.position.set(p0.x, p0.y);

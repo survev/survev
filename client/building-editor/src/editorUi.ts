@@ -1,7 +1,7 @@
 import { type FolderApi, Pane, type TabPageApi } from "tweakpane";
 import { MapDefs } from "../../../shared/defs/mapDefs.ts";
 
-import * as PIXI from "pixi.js-legacy";
+import * as PIXI from "pixi.js";
 import { MapObjectDefs } from "../../../shared/defs/register.ts";
 import { collider } from "../../../shared/utils/collider.ts";
 import { mapHelpers } from "../../../shared/utils/mapHelpers.ts";
@@ -123,7 +123,7 @@ export class EditorUi {
                 this.config.set("buildingEditor", this.params);
             });
 
-            const canvas = this.display.pixi.view as HTMLCanvasElement;
+            const canvas = this.display.pixi.canvas as HTMLCanvasElement;
             canvas.addEventListener("mousemove", (e: MouseEvent) => {
                 if (e.buttons === 1) {
                     canvas.style.cursor = "grabbing";
@@ -389,31 +389,27 @@ export class EditorUi {
                 const rect = new PIXI.Rectangle(x, y - height, width, height);
 
                 const pixi = this.display.pixi;
-                const background = new PIXI.Graphics();
-                pixi.stage.addChildAt(background, 0);
 
                 if (screenshotParams.transparent) {
                     display.renderer.ground.alpha = 0;
                     display.map.display.ground.alpha = 0;
                 } else {
-                    background.alpha = 1;
                     display.map.display.ground.alpha = display.renderer.layer === 0 ? 1 : 0;
-
-                    // ... manually draw a background, this can be removed in pixi v8 because v8 renderer.extract has a clearColor param
-                    const colors = display.map.getMapDef().biome.colors;
-                    const undergroundColor = display.renderer.layer === 1 ? colors.underground : colors.grass;
-                    background.clear();
-                    background.beginFill(undergroundColor);
-                    background.drawRect(rect.x, rect.y, rect.width, rect.height);
-                    background.endFill();
                 }
+                const colors = display.map.getMapDef().biome.colors;
 
-                const canvas = pixi.renderer.extract.canvas(pixi.stage, rect);
+                const canvas = pixi.renderer.extract.canvas({
+                    target: pixi.stage,
+                    frame: rect,
+                    clearColor: screenshotParams.transparent
+                        ? [0, 0, 0, 0]
+                        : display.renderer.layer === 1
+                        ? colors.underground
+                        : colors.grass,
+                });
                 canvas.toBlob?.(blob => {
                     if (blob) window.open(URL.createObjectURL(blob));
                 });
-
-                background.destroy();
 
                 // reset stuff
                 this.params.zoom = zoom;

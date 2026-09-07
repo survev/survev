@@ -89,8 +89,8 @@ declare global {
     window.fusetag = window.fusetag || (window.fusetag = { que: [] });
 }
 
-declare module "pixi.js-legacy" {
-    interface DisplayObject {
+declare module "pixi.js" {
+    interface Container {
         __zOrd: number;
         __zIdx: number;
         __layerIdx: number;

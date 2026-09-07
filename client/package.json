@@ -15,7 +15,7 @@
     "ejs": "^4.0.1",
     "hono": "^4.13.3",
     "jquery": "^3.7.1",
-    "pixi.js-legacy": "^7.4.3",
+    "pixi.js": "^8.20.1",
     "slugify": "^1.6.9"
   },
   "devDependencies": {

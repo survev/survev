@@ -1,4 +1,4 @@
-import * as PIXI from "pixi.js-legacy";
+import * as PIXI from "pixi.js";
 
 import type { RoleDef } from "../../../shared/defs/gameObjects/roleDefs.ts";
 import { GameObjectDefs } from "../../../shared/defs/register.ts";

@@ -1,4 +1,4 @@
-import * as PIXI from "pixi.js-legacy";
+import * as PIXI from "pixi.js";
 
 import { MapDefs } from "../../../shared/defs/mapDefs.ts";
 import { MapObjectDefs } from "../../../shared/defs/register.ts";
@@ -65,7 +65,7 @@ export class EditorDisplay {
     ) {}
 
     init() {
-        this.canvasMode = this.pixi.renderer.type == PIXI.RENDERER_TYPE.CANVAS;
+        this.canvasMode = this.pixi.renderer.type == PIXI.RendererType.CANVAS;
         this.camera = new Camera();
         this.renderer = new Renderer(this as unknown as Game, this.canvasMode);
         this.particleBarn = new ParticleBarn(this.renderer);
@@ -561,7 +561,7 @@ export class EditorDisplay {
         this.mapMsg.seed = 218051654;
         this.mapMsg.shoreInset = 48;
 
-        this.map.loadMap(this.mapMsg, this.camera, this.canvasMode, this.particleBarn);
+        this.map.loadMap(this.mapMsg, this.camera, this.particleBarn);
 
         this.clearAllObjs();
         const center = v2.create(this.map.width / 2, this.map.height / 2);
@@ -575,7 +575,6 @@ export class EditorDisplay {
         this.map.renderTerrain(
             this.map.display.ground,
             2 / this.camera.m_ppu,
-            this.canvasMode,
             false,
         );
         this.renderer.resize(this.map, this.camera);
@@ -710,7 +709,7 @@ export class EditorDisplay {
         if (this.initialized) {
             this.camera.m_screenWidth = device.screenWidth;
             this.camera.m_screenHeight = device.screenHeight;
-            this.map.resize(this.pixi.renderer, this.canvasMode);
+            this.map.resize(this.pixi.renderer);
             this.renderer.resize(this.map, this.camera);
         }
     }

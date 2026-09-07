@@ -1,4 +1,4 @@
-import * as PIXI from "pixi.js-legacy";
+import * as PIXI from "pixi.js";
 import type { ConfigManager } from "../config.ts";
 import type { Game } from "../game.ts";
 import type { Pool } from "../objects/objectPool.ts";
@@ -207,13 +207,12 @@ export class DebugHUD {
         for (let i = 0, y = 0; i < this.graphs.length; i++) {
             const graph = this.graphs[i];
             if (!graph.visible) continue;
-            const bounds = graph.container.getLocalBounds();
-            graph.y = y - bounds.top;
-            y += bounds.height - bounds.top + 2;
+            graph.y = y;
+            y += (graph.gfx.visible ? graph.height : 0) + 25;
         }
 
         const bounds = this.contentContainer.getLocalBounds();
-        this.background.width = bounds.width + padding * 2;
+        this.background.width = bounds.width;
         this.background.height = bounds.height + padding * 2;
 
         const topLeftBounds = this.topLeftDiv.getBoundingClientRect();
