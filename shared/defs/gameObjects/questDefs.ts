@@ -649,9 +649,20 @@ export const QuestDefs: Record<string, QuestDef> = {
             {
                 type: "obstacle",
                 subType: "type",
-                obstacleType: ["airdrop_crate_02de", "airdrop_crate_05"],
+                obstacleType: [
+                    "airdrop_crate_02",
+                    "airdrop_crate_02de",
+                    "airdrop_crate_02h",
+                    "airdrop_crate_02sv",
+                    "airdrop_crate_02x",
+                    "airdrop_crate_03dev",
+                    "airdrop_crate_04",
+                    "airdrop_crate_05",
+                ],
             },
         ],
+        mapFilterType: "only_on",
+        maps: [MapId.Desert],
     },
     quest_crates: {
         type: "quest",
@@ -790,7 +801,11 @@ export const QuestDefs: Record<string, QuestDef> = {
             {
                 type: "obstacle",
                 subType: "type",
-                obstacleType: ["stone_04", "stone_05"],
+                obstacleType: [
+                    "stone_04",
+                    "stone_04x",
+                    "stone_05",
+                ],
             },
         ],
         mapFilterType: "only_on",
@@ -802,13 +817,19 @@ export const QuestDefs: Record<string, QuestDef> = {
         target: 3,
         xp: 30,
         icon: {
-            urls: ["img/map/map-crate-02.svg"],
+            urls: [
+                "img/map/map-crate-02.svg",
+                "img/map/map-crate-02f.svg",
+            ],
         },
         filters: [
             {
                 type: "obstacle",
                 subType: "type",
-                obstacleType: ["crate_02f"],
+                obstacleType: [
+                    "crate_02",
+                    "crate_02f",
+                ],
             },
         ],
         mapFilterType: "only_on",
@@ -908,7 +929,7 @@ export const QuestDefs: Record<string, QuestDef> = {
             },
         ],
         mapFilterType: "all_except",
-        maps: [MapId.Faction, MapId.Savannah, MapId.Woods, MapId.Desert],
+        maps: [MapId.Faction, MapId.Savannah, MapId.Woods, MapId.Desert, MapId.Birthday],
     },
     quest_river_town_kills: {
         type: "quest",
