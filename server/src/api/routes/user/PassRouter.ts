@@ -50,6 +50,17 @@ async function getPassAndQuests(
         && questSlotIndexes.every((slot, index) => existingQuests[index]?.idx === slot);
 
     if (existingPass && hasAllSlots) {
+        for (const quest of existingQuests) {
+            if (!quest.rerolled || quest.complete) continue;
+            // reset rerolled state if we have an incompatible map
+            const questDef = QuestDefs[quest.questType];
+            const serverMaps = server.modes.filter(m => m.enabled).map(m => m.mapName);
+            const badMap = !questHelpers.satisfiesMapFilter(serverMaps, questDef);
+            if (badMap) {
+                quest.rerolled = false;
+            }
+        }
+
         return {
             pass: existingPass,
             quests: existingQuests,
