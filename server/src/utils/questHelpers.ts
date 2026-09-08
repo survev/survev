@@ -42,8 +42,9 @@ export const questHelpers = {
         // for top in solo / squad quests
         // filter them based on running modes not being normal mode
         // getting top in solos while a mode is running on squads is really frustrating :)
-        const nonNormalModes = serverMapNames.map(mapName => MapDefs[mapName].mapId).filter(m => m !== MapId.Main);
-        const teamModes = modes.map(m => m.teamMode);
+        const nonNormalTeamModes = modes
+            .filter(m => MapDefs[m.mapName].mapId !== MapId.Main)
+            .map(m => m.teamMode);
 
         return questTypes.filter(questType => {
             if (currentQuests.has(questType)) return false;
@@ -57,10 +58,9 @@ export const questHelpers = {
                 return false;
             }
 
-            if (nonNormalModes.length > 0) {
+            if (nonNormalTeamModes.length > 0) {
                 const modeFilter = questDef.filters?.find(f => f.type === "team_mode");
-
-                if (modeFilter !== undefined && !teamModes.includes(modeFilter.mode)) {
+                if (modeFilter !== undefined && !nonNormalTeamModes.includes(modeFilter.mode)) {
                     return false;
                 }
             }

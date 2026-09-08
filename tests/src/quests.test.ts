@@ -97,6 +97,10 @@ describe("Quest helpers", () => {
             expect.soft(available).not.toContain("quest_vending");
             expect.soft(available).toContain("quest_kills");
             expect.soft(available).toContain("quest_kills_harder");
+
+            expect.soft(available).not.toContain("quest_top_squad");
+            expect.soft(available).not.toContain("quest_top_solo");
+            expect.soft(available).toContain("quest_top_duo");
         });
 
         test("Honors exclusion group with current quest", () => {
