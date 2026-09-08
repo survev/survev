@@ -207,6 +207,9 @@ export class Pass {
             const pct = (quest.current / quest.data.target) * 100;
             quest.elems.main.css("display", "block");
             quest.elems.desc.html(title);
+            quest.elems.desc.css({
+                "font-size": helpers.measureText(title, "16px roboto condensed") > 155 ? "14px" : "16px",
+            });
             quest.elems.cur.html(Math.round(quest.current));
             quest.elems.xp.html(`${questDef.xp} XP`);
             quest.elems.xp.attr("data-xp", questDef.xp);

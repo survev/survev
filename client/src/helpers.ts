@@ -85,6 +85,11 @@ export const helpers = {
             .replace(/</g, "&lt;")
             .replace(/>/g, "&gt;");
     },
+    measureText(str: string, font: string) {
+        const context = truncateCanvas.getContext("2d")!;
+        context.font = font;
+        return context.measureText(str).width;
+    },
     truncateString: function(str: string, font: string, maxWidthPixels: number) {
         const context = truncateCanvas.getContext("2d")!;
         context.font = font;
