@@ -1,3 +1,4 @@
+import { GameConfig } from "../../gameConfig.ts";
 import { type DeepPartial, util } from "../../utils/util.ts";
 import type { BaseLootDef, LootImg } from "./itemTypes.ts";
 
@@ -210,8 +211,11 @@ const HelmetDefs: Record<string, HelmetDef> = {
 export interface BackpackDef extends BaseLootDef {
     type: "backpack";
     level: number;
+    hasDesc?: boolean;
+    desc?: string;
     playerRad: number;
     tint: number;
+    maxPerks?: number;
 }
 
 const BackpackDefs: Record<string, BackpackDef> = {
@@ -274,6 +278,23 @@ const BackpackDefs: Record<string, BackpackDef> = {
         playerRad: 1,
         lootImg: {
             sprite: "loot-pack-03.img",
+            tint: 0xffffff,
+            border: "loot-circle-outer-01.img",
+            borderTint: 0,
+            scale: 0.2,
+        },
+        sound: {
+            pickup: "pack_pickup_01",
+        },
+    },
+    backpack04: {
+        name: "Tactical Pack",
+        type: "backpack",
+        level: 4,
+        tint: 0x666633,
+        playerRad: 1,
+        lootImg: {
+            sprite: "loot-pack-04.img",
             tint: 0xffffff,
             border: "loot-circle-outer-01.img",
             borderTint: 0,
@@ -891,6 +912,13 @@ const SkinDefs = {
             sprite: "player-helmet-classless.img",
             rot: 0.5 * Math.PI,
         },
+    }),
+
+    backpack04_cloud: defineSkin("backpack04", {
+        name: "Experimental Pack",
+        hasDesc: true,
+        desc: "You can equip an extra perk.",
+        maxPerks: 2,
     }),
 };
 

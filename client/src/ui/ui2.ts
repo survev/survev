@@ -1,10 +1,12 @@
 import type { LootDef } from "../../../shared/defs/gameObjectDefs.ts";
 import {
     type AmmoDef,
+    type BackpackDef,
     type BoostDef,
     type ChestDef,
     GEAR_TYPES,
     type HealDef,
+    type HelmetDef,
     SCOPE_LEVELS,
 } from "../../../shared/defs/gameObjects/gearDefs.ts";
 import type { GunDef } from "../../../shared/defs/gameObjects/gunDefs.ts";
@@ -295,6 +297,9 @@ export class UiManager2 {
         gear: [] as Array<{
             gearType: (typeof GEAR_TYPES)[number];
             div: HTMLElement;
+            divTooltip: HTMLElement;
+            divTitle: HTMLElement;
+            divDesc: HTMLElement;
             level: HTMLElement;
             image: HTMLImageElement;
         }>,
@@ -399,6 +404,9 @@ export class UiManager2 {
             const gearData = {
                 gearType,
                 div,
+                divTooltip: div.getElementsByClassName("tooltip-text")[0] as HTMLElement,
+                divTitle: div.getElementsByClassName("tooltip-title")[0] as HTMLElement,
+                divDesc: div.getElementsByClassName("tooltip-desc")[0] as HTMLElement,
                 level: div.getElementsByClassName("ui-armor-level")[0] as HTMLElement,
                 image: div.getElementsByClassName("ui-armor-image")[0] as HTMLImageElement,
             };
@@ -1289,10 +1297,18 @@ export class UiManager2 {
             const gearState = state.gear[gearIndex];
             if (gearPatch.item) {
                 // GearDef?
-                const gearDef = gearState.item ? (GameObjectDefs.typeToDef(gearState.item) as ChestDef) : null;
-                const gearLevel = gearDef ? gearDef.level : 0;
-                gearDom.div.style.display = gearDef ? "block" : "none";
+                const gearDef = gearState.item
+                    ? (GameObjectDefs.typeToDef(gearState.item) as HelmetDef | ChestDef | BackpackDef)
+                    : null;
+                const gearDefMin = gearDef as ChestDef;
+                const gearLevel = gearDefMin ? gearDefMin.level : 0;
+                gearDom.div.style.display = gearDefMin ? "block" : "none";
                 gearDom.level.innerHTML = this.localization.translate(`game-level-${gearLevel}`);
+                gearDom.divTooltip.style.display = (gearDef && "hasDesc" in gearDef && gearDef.hasDesc)
+                    ? "block"
+                    : "none";
+                gearDom.divTitle.innerHTML = this.localization.translate(`game-${gearState.item}`);
+                gearDom.divDesc.innerHTML = this.localization.translate(`game-${gearState.item}-desc`);
                 gearDom.level.style.color = gearLevel === 4 ? "#b30000" : gearLevel === 3 ? "#ff9900" : "#ffffff";
                 gearDom.image.src = helpers.getSvgFromGameType(gearState.item);
             }
