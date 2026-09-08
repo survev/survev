@@ -275,6 +275,16 @@ export const EmotesDefs: Record<string, EmoteDef> = {
         teamOnly: false,
         category: EmoteCategory.Faces,
     },
+    emote_sadboffy: {
+        type: "emote",
+        name: "Sad Boffy",
+        rarity: Rarity.Common,
+        texture: "face-sadboffy.img",
+        sound: "emote_01",
+        channel: "ui",
+        teamOnly: false,
+        category: EmoteCategory.Faces,
+    },
     emote_surviv: {
         type: "emote",
         name: "Surviv Logo",
