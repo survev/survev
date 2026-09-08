@@ -190,7 +190,7 @@ export const QuestDefs: Record<string, QuestDef> = {
         ],
         difficulty: QuestDifficulty.Hard,
         mapFilterType: "all_except",
-        maps: [MapId.Faction],
+        maps: [MapId.Faction, MapId.FactionPotato],
     },
     quest_kills: {
         type: "quest",
@@ -427,7 +427,7 @@ export const QuestDefs: Record<string, QuestDef> = {
             },
         ],
         mapFilterType: "only_on",
-        maps: [MapId.Potato, "faction_potato"],
+        maps: [MapId.Potato, MapId.FactionPotato],
     },
     quest_damage_rare_ammo: {
         type: "quest",
@@ -449,7 +449,7 @@ export const QuestDefs: Record<string, QuestDef> = {
         ],
         difficulty: QuestDifficulty.Hard,
         mapFilterType: "all_except",
-        maps: [MapId.Faction, MapId.Desert, MapId.Savannah, MapId.Potato],
+        maps: [MapId.Faction, MapId.Desert, MapId.Savannah, MapId.Potato, MapId.FactionPotato],
     },
     quest_damage_rare_ammo_ltm: {
         type: "quest",
@@ -471,7 +471,7 @@ export const QuestDefs: Record<string, QuestDef> = {
         ],
         difficulty: QuestDifficulty.Hard,
         mapFilterType: "only_on",
-        maps: [MapId.Faction, MapId.Desert, MapId.Savannah, MapId.Potato],
+        maps: [MapId.Faction, MapId.Desert, MapId.Savannah, MapId.Potato, MapId.FactionPotato],
     },
     quest_damage_woods_king: {
         type: "quest",
@@ -613,7 +613,7 @@ export const QuestDefs: Record<string, QuestDef> = {
             urls: ["img/gui/ping-team-airdrop.svg"],
         },
         mapFilterType: "all_except",
-        maps: [MapId.Desert, "faction_potato", MapId.Potato],
+        maps: [MapId.Desert, MapId.FactionPotato, MapId.Potato],
     },
     quest_airdrop_ltm: {
         type: "quest",
@@ -624,7 +624,7 @@ export const QuestDefs: Record<string, QuestDef> = {
             urls: ["img/gui/ping-team-airdrop.svg"],
         },
         mapFilterType: "only_on",
-        maps: [MapId.Desert, "faction_potato", MapId.Potato],
+        maps: [MapId.Desert, MapId.FactionPotato, MapId.Potato],
     },
     quest_airdrop_ltm_hard: {
         type: "quest",
@@ -635,7 +635,7 @@ export const QuestDefs: Record<string, QuestDef> = {
             urls: ["img/gui/ping-team-airdrop.svg"],
         },
         mapFilterType: "only_on",
-        maps: [MapId.Desert, "faction_potato", MapId.Potato],
+        maps: [MapId.Desert, MapId.FactionPotato, MapId.Potato],
     },
     quest_airdrop_rare: {
         type: "quest",
@@ -833,7 +833,7 @@ export const QuestDefs: Record<string, QuestDef> = {
             },
         ],
         mapFilterType: "only_on",
-        maps: [MapId.Faction],
+        maps: [MapId.Faction, MapId.FactionPotato],
     },
     quest_initiative_crate: {
         type: "quest",
@@ -851,7 +851,7 @@ export const QuestDefs: Record<string, QuestDef> = {
             },
         ],
         mapFilterType: "only_on",
-        maps: [MapId.Faction],
+        maps: [MapId.Faction, MapId.FactionPotato],
     },
     quest_pvt_swappers: {
         type: "quest",
@@ -872,7 +872,7 @@ export const QuestDefs: Record<string, QuestDef> = {
             },
         ],
         mapFilterType: "only_on",
-        maps: ["faction_potato"],
+        maps: [MapId.FactionPotato],
     },
     quest_potatoes: {
         type: "quest",
@@ -912,6 +912,7 @@ export const QuestDefs: Record<string, QuestDef> = {
             MapId.Birthday,
             MapId.Desert,
             MapId.Faction,
+            MapId.FactionPotato,
             MapId.Halloween,
             MapId.Savannah,
             MapId.Woods,
@@ -929,7 +930,7 @@ export const QuestDefs: Record<string, QuestDef> = {
             },
         ],
         mapFilterType: "all_except",
-        maps: [MapId.Faction, MapId.Savannah, MapId.Woods, MapId.Desert, MapId.Birthday],
+        maps: [MapId.Faction, MapId.FactionPotato, MapId.Savannah, MapId.Woods, MapId.Desert, MapId.Birthday],
     },
     quest_river_town_kills: {
         type: "quest",
@@ -943,7 +944,7 @@ export const QuestDefs: Record<string, QuestDef> = {
             },
         ],
         mapFilterType: "only_on",
-        maps: [MapId.Faction],
+        maps: [MapId.Faction, MapId.FactionPotato],
     },
     quest_desert_town_kills: {
         type: "quest",
@@ -1007,7 +1008,7 @@ export const QuestDefs: Record<string, QuestDef> = {
             scale: 1.2,
         },
         mapFilterType: "only_on",
-        maps: [MapId.Faction],
+        maps: [MapId.Faction, MapId.FactionPotato],
         difficulty: QuestDifficulty.Hard,
     },
     quest_promote_hunted: {
@@ -1064,7 +1065,7 @@ export const QuestDefs: Record<string, QuestDef> = {
             scale: 1.5,
         },
         mapFilterType: "only_on",
-        maps: [MapId.Faction],
+        maps: [MapId.Faction, MapId.FactionPotato],
     },
     quest_last_man_damage_hard: {
         type: "quest",
@@ -1086,7 +1087,7 @@ export const QuestDefs: Record<string, QuestDef> = {
             },
         ],
         mapFilterType: "only_on",
-        maps: [MapId.Faction],
+        maps: [MapId.Faction, MapId.FactionPotato],
         difficulty: QuestDifficulty.Hard,
     },
     quest_factions_kills: {
@@ -1126,7 +1127,7 @@ export const QuestDefs: Record<string, QuestDef> = {
             scale: 1.5,
         },
         mapFilterType: "only_on",
-        maps: [MapId.Faction],
+        maps: [MapId.Faction, MapId.FactionPotato],
     },
     quest_healer_kills: {
         type: "quest",

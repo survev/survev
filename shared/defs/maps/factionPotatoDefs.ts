@@ -6,7 +6,7 @@ import type { PartialMapDef } from "./baseDefs.ts";
 import { Faction } from "./factionDefs.ts";
 
 const mapDef: PartialMapDef = {
-    mapId: GameConfig.MapId.Faction,
+    mapId: GameConfig.MapId.FactionPotato,
     desc: {
         name: "Potato vs Tomato",
         icon: "img/gui/star.svg",
