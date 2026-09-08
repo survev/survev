@@ -121,7 +121,7 @@ export async function isBehindProxy(ip: string, checkVpn: boolean): Promise<bool
 
         proxyCheckCache.set(key, {
             info,
-            expiresAt: Date.now() + util.daysToMs(1),
+            expiresAt: Date.now() + 10 * 60 * 1000, // 10 minutes
         });
     }
 
