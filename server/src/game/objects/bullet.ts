@@ -553,9 +553,6 @@ export class Bullet {
                         dist: v2.lengthSqr(v2.sub(panCollision.point, this.startPos)),
                     });
                 }
-                if (collision || panCollision) {
-                    break;
-                }
             }
         }
 
