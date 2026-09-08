@@ -1,3 +1,4 @@
+import { GameConfig } from "../../gameConfig.ts";
 import { util } from "../../utils/util.ts";
 
 function defineSkin(baseType: string, params: unknown) {
@@ -221,12 +222,15 @@ export interface BackpackDef {
     name: string;
     type: "backpack";
     level: number;
+    hasDesc?: boolean;
+    desc?: string;
     playerRad: number;
     tint: number;
     lootImg: LootImg;
     sound: {
         pickup: string;
     };
+    maxPerks?: number;
 }
 
 const BackpackDefs: Record<string, BackpackDef> = {
@@ -297,6 +301,43 @@ const BackpackDefs: Record<string, BackpackDef> = {
         sound: {
             pickup: "pack_pickup_01",
         },
+    },
+    backpack04: {
+        name: "Tactical Pack",
+        type: "backpack",
+        level: 4,
+        tint: 0x666633,
+        playerRad: 1,
+        lootImg: {
+            sprite: "loot-pack-03.img",
+            tint: 0xffffff,
+            border: "loot-circle-outer-01.img",
+            borderTint: 0,
+            scale: 0.2,
+        },
+        sound: {
+            pickup: "pack_pickup_01",
+        },
+    },
+    backpack04perk: {
+        name: "Experimental Pack",
+        type: "backpack",
+        hasDesc: true,
+        desc: "You can equip an extra perk.",
+        level: 4,
+        tint: 0x666633,
+        playerRad: 1,
+        lootImg: {
+            sprite: "loot-pack-03.img",
+            tint: 0xffffff,
+            border: "loot-circle-outer-01.img",
+            borderTint: 0,
+            scale: 0.2,
+        },
+        sound: {
+            pickup: "pack_pickup_01",
+        },
+        maxPerks: 2,
     },
 };
 

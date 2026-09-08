@@ -1,10 +1,12 @@
 import type { LootDef } from "../../../shared/defs/gameObjectDefs.ts";
 import {
     type AmmoDef,
+    type BackpackDef,
     type BoostDef,
     type ChestDef,
     GEAR_TYPES,
     type HealDef,
+    type HelmetDef,
     SCOPE_LEVELS,
 } from "../../../shared/defs/gameObjects/gearDefs.ts";
 import type { GunDef } from "../../../shared/defs/gameObjects/gunDefs.ts";
@@ -293,6 +295,9 @@ export class UiManager2 {
         gear: [] as Array<{
             gearType: (typeof GEAR_TYPES)[number];
             div: HTMLElement;
+            divTooltip: HTMLElement;
+            divTitle: HTMLElement;
+            divDesc: HTMLElement;
             level: HTMLElement;
             image: HTMLImageElement;
         }>,
@@ -400,6 +405,9 @@ export class UiManager2 {
             const L = {
                 gearType,
                 div,
+                divTooltip: div.getElementsByClassName("tooltip-text")[0] as HTMLElement,
+                divTitle: div.getElementsByClassName("tooltip-title")[0] as HTMLElement,
+                divDesc: div.getElementsByClassName("tooltip-desc")[0] as HTMLElement,
                 level: div.getElementsByClassName("ui-armor-level")[0] as HTMLElement,
                 image: div.getElementsByClassName(
                     "ui-armor-image",
@@ -1275,10 +1283,14 @@ export class UiManager2 {
             const ae = state.gear[ee];
             if (te.item) {
                 // GearDef?
-                const ie = ae.item ? (GameObjectDefs.typeToDef(ae.item) as ChestDef) : null;
+                const de = ae.item ? GameObjectDefs.typeToDef(ae.item) as (HelmetDef | ChestDef | BackpackDef) : null;
+                const ie = de as ChestDef;
                 const oe = ie ? ie.level : 0;
                 re.div.style.display = ie ? "block" : "none";
                 re.level.innerHTML = this.localization.translate(`game-level-${oe}`);
+                re.divTooltip.style.display = (de && "hasDesc" in de && de.hasDesc) ? "block" : "none";
+                re.divTitle.innerHTML = this.localization.translate(`game-${ae.item}`);
+                re.divDesc.innerHTML = this.localization.translate(`game-${ae.item}-desc`);
                 re.level.style.color = oe === 4 ? "#b30000" : oe === 3 ? "#ff9900" : "#ffffff";
                 re.image.src = helpers.getSvgFromGameType(ae.item);
             }

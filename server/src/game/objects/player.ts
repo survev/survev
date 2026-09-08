@@ -3750,10 +3750,12 @@ export class Player extends BaseGameObject {
 
                     // role helmets and perk helmets can't be dropped in favor of another helmet, they're the "highest" tier
                     if (
-                        def.type == "helmet"
-                        && (this.hasRoleHelmet
-                            || (thisDef && (thisDef as HelmetDef).perk)
-                            || (thisDef && (thisDef as HelmetDef).role))
+                        (def.type == "helmet"
+                            && (this.hasRoleHelmet
+                                || (thisDef && (thisDef as HelmetDef).perk)
+                                || (thisDef && (thisDef as HelmetDef).role)))
+                        || (def.type == "backpack"
+                            && (GameObjectDefs.typeToDef(this.backpack) as BackpackDef).hasDesc)
                     ) {
                         amountLeft = 1;
                         lootToAdd = obj.type;
@@ -3844,9 +3846,10 @@ export class Player extends BaseGameObject {
                     this.game.playerBarn.addEmote(emoteType, this.__id);
                 }
 
-                const perkSlotType = this.perks.find(
+                const perkSlots = this.perks.filter(
                     (p) => p.droppable || p.replaceOnDeath === "halloween_mystery",
-                )?.type;
+                );
+                const perkSlotType = perkSlots[0]?.type;
 
                 // The client can only show 4 perks in the UI.
                 // If the player already has 4 or more perks, they cannot pick up a new one.
@@ -3855,7 +3858,10 @@ export class Player extends BaseGameObject {
                     pickupMsg.type = net.PickupMsgType.MaxPerks;
                     break;
                 }
-                if (perkSlotType) {
+                if (
+                    perkSlotType
+                    && perkSlots.length >= ((GameObjectDefs.typeToDef(this.backpack) as BackpackDef).maxPerks ?? 1)
+                ) {
                     amountLeft = 1;
                     lootToAdd = isMistery ? "" : perkSlotType;
                     this.removePerk(perkSlotType);
