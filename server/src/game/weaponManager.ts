@@ -436,6 +436,7 @@ export class WeaponManager {
         if (this.player.curWeapIdx !== GameConfig.WeaponSlot.Melee) return;
         const def = GameObjectDefs.typeToDef(this.activeWeapon, "melee");
         if (!def.anim.deployAnims?.length) return;
+        if (this.player.downed) return;
 
         this.player.playAnim(GameConfig.Anim.DeployMelee, def.anim.deployAnimTime + 0.1);
     }
@@ -446,6 +447,7 @@ export class WeaponManager {
         if (this.meleeAnimCooldown > 0) return;
         const def = GameObjectDefs.typeToDef(this.activeWeapon, "melee");
         if (!def.anim.idleAnims?.length) return;
+        if (this.player.downed) return;
 
         this.player.playAnim(GameConfig.Anim.IdleMelee, def.anim.idleAnimTime + 0.1);
         this.meleeAnimCooldown = def.anim.idleAnimTime + 1;
