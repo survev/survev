@@ -173,6 +173,8 @@ export const QuestDefs: Record<string, QuestDef> = {
                 maxRank: 5,
             },
         ],
+        mapFilterType: "all_except",
+        maps: [MapId.Faction, MapId.FactionPotato],
     },
     quest_win_any: {
         type: "quest",
