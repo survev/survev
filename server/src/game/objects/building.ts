@@ -476,7 +476,7 @@ export class Building extends BaseGameObject {
 
     onGoreRegionKill() {
         for (const obj of this.childObjects) {
-            if (obj.__type === ObjectType.Decal) {
+            if (obj.__type === ObjectType.Decal && obj.hasGore) {
                 obj.goreKills++;
                 obj.setDirty();
             }
