@@ -3554,7 +3554,7 @@ export const BaseDefs: Record<string, GunDef> = {
         reloadTime: 5.8,
         fireDelay: 0.07,
         switchDelay: 0.75,
-        barrelLength: 4.5,
+        barrelLength: 5,
         barrelOffset: 0,
         recoilTime: 1e10,
         moveSpread: 4,
@@ -3576,7 +3576,7 @@ export const BaseDefs: Record<string, GunDef> = {
             sprite: "gun-potato-lmg-top-01.img",
             scale: { x: 0.5, y: 0.5 },
             tint: 0xffffff,
-            gunOffset: { x: -30, y: 1.75 },
+            gunOffset: { x: -40, y: 1.75 },
             recoil: 1,
         },
         particle: {

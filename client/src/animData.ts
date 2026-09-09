@@ -128,7 +128,7 @@ export const IdlePoses: Record<string, Partial<Record<Bones, Pose>>> = {
     },
     minigun: {
         [Bones.HandL]: new Pose(v2.create(18, 7.25)),
-        [Bones.HandR]: new Pose(v2.create(44, 0)),
+        [Bones.HandR]: new Pose(v2.create(54, 0)),
     },
     launcher: {
         [Bones.HandL]: new Pose(v2.create(20, 10)),
