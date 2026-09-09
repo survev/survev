@@ -3048,6 +3048,12 @@ export class Player extends BaseGameObject {
                     }
                 }
             }
+            if (obj.goreRegion) {
+                if (coldet.test(obj.goreRegion, this.collider)) {
+                    buildings.add(obj);
+                    continue objLoop;
+                }
+            }
         }
 
         function withAllParents(building: Building): string[] {
