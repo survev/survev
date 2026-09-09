@@ -44,6 +44,7 @@ export const debugRenderConfig = {
         ceiling: false,
         floors: false,
         minimap: false,
+        goreRegion: false,
     },
     structures: {
         buildingBounds: false,

@@ -670,8 +670,8 @@ export class Building implements AbstractObject {
             if (debug.buildings?.waterEdge) {
                 renderWaterEdge(this);
             }
+            const def = MapObjectDefs.typeToDef(this.type, "building");
             if (debug.buildings?.minimap) {
-                const def = MapObjectDefs.typeToDef(this.type, "building");
                 if (def.map && def.map.display) {
                     const scale = def.map.scale ?? 1;
                     if (def.map.shapes) {
@@ -718,6 +718,13 @@ export class Building implements AbstractObject {
                         debugLines.addCollider(colliders[j], 0xff0000, 0);
                     }
                 }
+            }
+            if (debug.buildings?.goreRegion && def.goreRegion) {
+                debugLines.addCollider(
+                    collider.transform(def.goreRegion, this.pos, this.rot, this.scale),
+                    0xff0000,
+                    0.2,
+                );
             }
         }
     }
