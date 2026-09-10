@@ -54,8 +54,6 @@ class DeadBody implements AbstractObject {
         this.nameText.anchor.set(0.5, -1);
         this.nameText.tint = util.rgbToInt(util.hsvToRgb(0, 0, 0.5));
         this.container.addChild(this.nameText);
-        // @ts-expect-error sigh
-        this.container.visible = this.sprite;
     }
 
     m_init() {}

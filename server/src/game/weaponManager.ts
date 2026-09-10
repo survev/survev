@@ -153,10 +153,9 @@ export class WeaponManager {
 
             if (
                 swappingToGun
-                // @ts-expect-error All combinations of non-identical non-zero values (including undefined)
-                //                  give NaN or a number not equal to 1, meaning that this correctly checks
-                //                  for two identical non-zero numerical deploy groups
-                && curWeaponDef.deployGroup / nextWeaponDef.deployGroup === 1
+                && nextWeaponDef.deployGroup !== undefined
+                && (curWeaponDef as GunDef).deployGroup !== undefined
+                && nextWeaponDef.deployGroup === (curWeaponDef as GunDef).deployGroup
                 && curWeapon.cooldown > 0
             ) {
                 effectiveSwitchDelay = nextWeaponDef.switchDelay;

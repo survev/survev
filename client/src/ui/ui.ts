@@ -507,8 +507,6 @@ export class UiManager {
                 "src",
                 muteAudio ? this.muteOffImg : this.muteOnImg,
             );
-            // @ts-expect-error why assing it to null?
-            muteAudio = null;
         });
         this.teamMemberHealthBarWidth = parseInt(
             $(".ui-team-member-health").find(".ui-bar-inner").css("width"),
@@ -1208,7 +1206,7 @@ export class UiManager {
         return v2.create(xPos, yPos);
     }
 
-    getWorldPosFromMapPos(screenPos: Vec2, map: Map, camera: Camera): Vec2 {
+    getWorldPosFromMapPos(screenPos: Vec2, map: Map, camera: Camera): Vec2 | undefined {
         let insideMap = false;
         if (this.bigmapDisplayed) {
             const xBuffer = (camera.m_screenWidth - this.mapSprite.width) / 2;
@@ -1239,8 +1237,7 @@ export class UiManager {
             const yWorldPos = ((mapOrigin.y - screenPos.y) / this.mapSprite.height) * map.height;
             return v2.create(xWorldPos, yWorldPos);
         }
-        // @ts-expect-error why? just why?
-        return false;
+        return undefined;
     }
 
     hideAll() {
@@ -1273,10 +1270,6 @@ export class UiManager {
 
     clearUI() {
         this.m_pieTimer.stop();
-        // @ts-expect-error not used anywhere, should be removed, I think.
-        this.curAction = {
-            type: Action.None,
-        };
         this.displayMapLarge(true);
         this.displayMiniMap();
         this.clearStatsElems();

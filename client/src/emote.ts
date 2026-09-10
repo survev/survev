@@ -233,7 +233,7 @@ export class EmoteBarn {
     ) {
         this.triggerPing = () => {
             if (this.activePlayer) {
-                let worldPos: Vec2;
+                let worldPos: Vec2 | undefined;
                 // Determine if this is going to be a team ping or an emote
                 if (this.emoteSelector.ping && !this.emoteWheelsGreyed) {
                     const pingData = PingDefs[this.emoteSelector.ping];

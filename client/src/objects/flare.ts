@@ -94,8 +94,7 @@ export class FlareBarn {
             bulletDef.tracerColor as keyof typeof GameConfig.tracerColors
         ] as Record<string, number>;
         let tracerColor = tracerColorDefs.regular;
-        // @ts-expect-error isOnBrightSurface has no reference elsewhere
-        if (player?.isOnBrightSurface) {
+        if (player?.surface?.data.isBright) {
             tracerColor = tracerColorDefs.saturated;
         }
         b.bulletTrail.scale.set(0.8, bulletDef.tracerWidth);

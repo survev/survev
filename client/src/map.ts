@@ -499,9 +499,8 @@ export class Map {
             color: number;
             collider: Collider;
         }> = [];
-        if ((def as BuildingDef).map?.shapes !== undefined) {
-            // @ts-expect-error stfu
-            shapes = (def as BuildingDef).map?.shapes;
+        if (def.map && "shapes" in def.map && def.map.shapes) {
+            shapes = def.map.shapes;
         } else {
             let col = null;
             if (
