@@ -234,7 +234,7 @@ export class EditorDisplay {
         this.activePlayer = this.objectCreator.m_updateObjFull(
             ObjectType.Player,
             this.activeId,
-            obj as unknown as ObjectData<ObjectType.Player>,
+            obj,
             this.getCtx(),
         ) as Player;
 

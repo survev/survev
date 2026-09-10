@@ -1,5 +1,5 @@
 export interface PingDef {
-    readonly type: "ping";
+    type: "ping";
     texture?: string;
     mapTexture?: string;
     sound?: string;

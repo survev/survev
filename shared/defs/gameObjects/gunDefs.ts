@@ -1,11 +1,10 @@
 import { FactionTeam } from "../../gameConfig.ts";
 import { type DeepPartial, util } from "../../utils/util.ts";
 import type { Vec2 } from "../../utils/v2.ts";
+import type { BaseWeaponDef } from "./itemTypes.ts";
 
-export interface GunDef {
-    readonly type: "gun";
-    name: string;
-    quality?: number;
+export interface GunDef extends BaseWeaponDef {
+    type: "gun";
     fireMode: "auto" | "single" | "burst";
     caseTiming: "shoot" | "reload";
     ammo: string;
@@ -28,16 +27,6 @@ export interface GunDef {
     speed: {
         equip: number;
         attack: number;
-    };
-    lootImg: {
-        sprite: string;
-        tint: number;
-        border: string;
-        borderTint: number;
-        scale: number;
-        innerScale?: number;
-        rot?: number;
-        mirror?: boolean;
     };
     worldImg: {
         sprite: string;
@@ -80,8 +69,6 @@ export interface GunDef {
     pistol?: boolean;
     dualOffset?: number;
     ammoInfinite?: boolean;
-    noPotatoSwap?: boolean;
-    noDrop?: boolean;
     burstDelay?: number;
     burstCount?: number;
     dualWieldType?: string;
@@ -101,11 +88,10 @@ export interface GunDef {
     reloadTimeAlt?: number;
     toMouseHit?: boolean;
     burstSounds?: number;
-    perk?: string;
 }
 
 function defineGunSkin(baseType: string, params: DeepPartial<GunDef>): GunDef {
-    return util.mergeDeep({}, BaseDefs[baseType], params);
+    return util.mergeDeep({}, BaseDefs[baseType], { baseType }, params);
 }
 
 export const BaseDefs: Record<string, GunDef> = {

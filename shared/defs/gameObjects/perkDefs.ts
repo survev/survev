@@ -1,3 +1,5 @@
+import type { BaseLootDef } from "./itemTypes.ts";
+
 export const PerkProperties = {
     leadership: {
         minBoost: 100,
@@ -119,19 +121,8 @@ export const PerkProperties = {
     },
 };
 
-export interface PerkDef {
-    readonly type: "perk";
-    name: string;
-    lootImg: {
-        sprite: string;
-        tint: number;
-        border: string;
-        borderTint: number;
-        scale: number;
-    };
-    sound: {
-        pickup: string;
-    };
+export interface PerkDef extends BaseLootDef {
+    type: "perk";
     emoteOnPickup?: string;
 }
 

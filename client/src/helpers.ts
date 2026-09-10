@@ -190,10 +190,10 @@ export const helpers = {
             case "backpack":
             case "perk":
             case "xp":
-                return `img/loot/${def.lootImg?.sprite.slice(0, -4)}.svg`;
+                return `img/loot/${def.lootImg.sprite.slice(0, -4)}.svg`;
             case "heal_effect":
             case "boost_effect":
-                return `img/particles/${def.texture?.slice(0, -4)}.svg`;
+                return `img/particles/${def.texture.slice(0, -4)}.svg`;
             case "emote":
                 return `img/emotes/${def.texture.slice(0, -4)}.svg`;
             case "crosshair":

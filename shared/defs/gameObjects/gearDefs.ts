@@ -1,22 +1,19 @@
-import { util } from "../../utils/util.ts";
+import { type DeepPartial, util } from "../../utils/util.ts";
+import type { BaseLootDef } from "./itemTypes.ts";
 
-function defineSkin(baseType: string, params: unknown) {
+type GearDef = HealDef | AmmoDef | BoostDef | BackpackDef | HelmetDef | ChestDef;
+
+function defineSkin<T extends GearDef>(baseType: string, params: DeepPartial<T>): T {
     return util.mergeDeep({}, BaseDefs[baseType], { baseType }, params);
 }
 
-export interface ChestDef {
-    readonly type: "chest";
-    name: string;
-    noDrop?: boolean;
+export interface ChestDef extends BaseLootDef {
+    type: "chest";
     level: number;
     damageReduction: number;
     skinImg: {
         baseTint: number;
         baseSprite: string;
-    };
-    lootImg: LootImg;
-    sound: {
-        pickup: string;
     };
 }
 
@@ -104,12 +101,10 @@ const ChestDefs: Record<string, ChestDef> = {
     },
 };
 
-export interface HelmetDef {
-    name: string;
+export interface HelmetDef extends BaseLootDef {
+    type: "helmet";
     perk?: string;
     role?: string;
-    type: "helmet";
-    noDrop?: boolean;
     level: number;
     damageReduction: number;
     skinImg: {
@@ -118,11 +113,6 @@ export interface HelmetDef {
         baseTintBlue: number;
         baseSprite: string;
         spriteScale?: number;
-    };
-
-    lootImg: LootImg;
-    sound: {
-        pickup: string;
     };
 }
 
@@ -217,16 +207,11 @@ const HelmetDefs: Record<string, HelmetDef> = {
     },
 };
 
-export interface BackpackDef {
-    name: string;
+export interface BackpackDef extends BaseLootDef {
     type: "backpack";
     level: number;
     playerRad: number;
     tint: number;
-    lootImg: LootImg;
-    sound: {
-        pickup: string;
-    };
 }
 
 const BackpackDefs: Record<string, BackpackDef> = {
@@ -300,13 +285,14 @@ const BackpackDefs: Record<string, BackpackDef> = {
     },
 };
 
-export interface BoostDef {
-    name: string;
+export interface BoostDef extends BaseLootDef {
     type: "boost";
     useTime: number;
     boost: number;
-    lootImg: LootImg;
-    sound: Sound;
+    sound: {
+        pickup: string;
+        use: string;
+    };
     emitter: string;
     aura: {
         sprite: string;
@@ -361,35 +347,20 @@ const BoostDefs: Record<string, BoostDef> = {
     },
 };
 
-export interface HealDef {
-    name: string;
+export interface HealDef extends BaseLootDef {
     type: "heal";
     useTime: number;
     heal: number;
     maxHeal: number;
-    lootImg: LootImg;
-    sound: Sound;
+    sound: {
+        pickup: string;
+        use: string;
+    };
     emitter: string;
     aura: {
         sprite: string;
         tint: number;
     };
-}
-
-// shared
-export interface LootImg {
-    sprite: string;
-    scale: number;
-    tint: number;
-    border?: string;
-    borderTint?: number;
-    tintDark?: number;
-    innerScale?: number;
-}
-
-export interface Sound {
-    pickup: string;
-    use: string;
 }
 
 const HealDefs: Record<string, HealDef> = {
@@ -441,15 +412,10 @@ const HealDefs: Record<string, HealDef> = {
     },
 };
 
-export interface AmmoDef {
-    name: string;
+export interface AmmoDef extends BaseLootDef {
     type: "ammo";
     special?: boolean;
     minStackSize: number;
-    lootImg: LootImg;
-    sound: {
-        pickup: string;
-    };
     hideUi?: boolean;
 }
 
@@ -597,14 +563,9 @@ const BaseDefs = {
     ...ChestDefs,
 };
 
-export interface ScopeDef {
-    name: string;
-    readonly type: "scope";
+export interface ScopeDef extends BaseLootDef {
+    type: "scope";
     level: number;
-    lootImg: LootImg;
-    sound: {
-        pickup: string;
-    };
 }
 
 const ScopeDefs: Record<string, ScopeDef> = {
@@ -933,8 +894,6 @@ const SkinDefs = {
 // Shared with the client; move them somewhere
 export const GEAR_TYPES = ["chest", "helmet", "backpack"] as const;
 export const SCOPE_LEVELS = Object.keys(ScopeDefs);
-
-type GearDef = HealDef | AmmoDef | BoostDef | BackpackDef | HelmetDef | ChestDef;
 
 export const GearDefs: Record<string, GearDef> = {
     ...BaseDefs,

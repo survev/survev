@@ -1,3 +1,5 @@
+import type { LootDef } from "./defs/gameObjectDefs";
+
 export enum Action {
     None,
     Reload,
@@ -137,6 +139,15 @@ export enum TeamMode {
 export enum FactionTeam {
     Red = 1,
     Blue = 2,
+}
+
+export interface TracerColors {
+    regular: number;
+    saturated: number;
+    chambered?: number;
+    apSaturated?: number;
+    alphaRate?: number;
+    alphaMin?: number;
 }
 
 export const GameConfig = {
@@ -312,7 +323,7 @@ export const GameConfig = {
             apSaturated: 0xa54b0b,
             alphaRate: 0.92,
             alphaMin: 0.14,
-        },
+        } as TracerColors,
         "9mm_suppressed_bonus": {
             regular: 0xfee2c6,
             saturated: 0xffd9b3,
@@ -320,7 +331,7 @@ export const GameConfig = {
             apSaturated: 0xa54b0b,
             alphaRate: 0.96,
             alphaMin: 0.28,
-        },
+        } as TracerColors,
         "9mm_cursed": {
             regular: 0x130900,
             saturated: 0x130900,
@@ -328,7 +339,7 @@ export const GameConfig = {
             apSaturated: 0x130900,
             alphaRate: 0.92,
             alphaMin: 0.14,
-        },
+        } as TracerColors,
         "762mm": {
             regular: 0xc5d6fe,
             saturated: 0xabc4ff,
@@ -336,13 +347,13 @@ export const GameConfig = {
             apSaturated: 0x0000c8,
             alphaRate: 0.94,
             alphaMin: 0.2,
-        },
+        } as TracerColors,
         "12gauge": {
             regular: 0xfedcdc,
             saturated: 0xfedcdc,
             chambered: 0xff0000,
             apSaturated: 0x9f0000,
-        },
+        } as TracerColors,
         "556mm": {
             regular: 0xa9ff92,
             saturated: 0xa9ff92,
@@ -350,13 +361,13 @@ export const GameConfig = {
             apSaturated: 0x308000,
             alphaRate: 0.92,
             alphaMin: 0.14,
-        },
+        } as TracerColors,
         "50AE": {
             regular: 0xfff088,
             saturated: 0xfff088,
             chambered: 0xffdf00,
             apSaturated: 0xff8000,
-        },
+        } as TracerColors,
         "308sub": {
             regular: 0x252b00,
             saturated: 0x465000,
@@ -364,26 +375,26 @@ export const GameConfig = {
             apSaturated: 0x000a02,
             alphaRate: 0.92,
             alphaMin: 0.07,
-        },
+        } as TracerColors,
         flare: {
             regular: 0xe2e2e2,
             saturated: 0xe2e2e2,
             chambered: 0xc4c4c4,
             apSaturated: 0xc4c4c4,
-        },
+        } as TracerColors,
         "45acp": {
             regular: 0xecbeff,
             saturated: 0xe7acff,
             chambered: 0xb500ff,
             apSaturated: 0x470349,
-        },
+        } as TracerColors,
         shrapnel: {
             regular: 0x333333,
             saturated: 0x333333,
             chambered: 0x660900,
-        },
-        frag: { regular: 0xcb0000, saturated: 0xcb0000, apSaturated: 0xcb0000 },
-        invis: { regular: 0, saturated: 0, chambered: 0, apSaturated: 0 },
+        } as TracerColors,
+        frag: { regular: 0xcb0000, saturated: 0xcb0000, apSaturated: 0xcb0000 } as TracerColors,
+        invis: { regular: 0, saturated: 0, chambered: 0, apSaturated: 0 } as TracerColors,
     },
     scopeZoomRadius: {
         desktop: {
@@ -442,7 +453,7 @@ export const GameConfig = {
         scope: 1,
         perk: 1.25,
         xp: 1,
-    } as Record<string, number>,
+    } as Record<LootDef["type"], number>,
 };
 
 export type InventoryItem = keyof (typeof GameConfig)["bagSizes"];

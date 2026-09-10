@@ -1,5 +1,6 @@
 import { FactionTeam, type InventoryItem } from "../../gameConfig.ts";
 import { type DeepPartial, util } from "../../utils/util.ts";
+import type { MapIndicatorDef } from "./itemTypes.ts";
 
 type BasicRoleWeapon = {
     type: string;
@@ -38,7 +39,7 @@ type DefaultItems = {
 };
 
 export interface RoleDef {
-    readonly type: "role";
+    type: "role";
     announce: boolean;
     killFeed?: {
         assign?: boolean;
@@ -56,12 +57,7 @@ export interface RoleDef {
     };
     defaultItems?: DefaultItems;
     perks?: (string | (() => string))[];
-    mapIndicator?: {
-        sprite: string;
-        tint: number;
-        pulse: boolean;
-        pulseTint: number;
-    };
+    mapIndicator?: MapIndicatorDef;
     visorImg?: {
         baseSprite: string;
         spriteScale: number;

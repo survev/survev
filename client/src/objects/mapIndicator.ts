@@ -1,6 +1,5 @@
 import * as PIXI from "pixi.js-legacy";
 
-import type { RoleDef } from "../../../shared/defs/gameObjects/roleDefs.ts";
 import { GameObjectDefs } from "../../../shared/defs/register.ts";
 import type { MapIndicator } from "../../../shared/net/updateMsg.ts";
 import { math } from "../../../shared/utils/math.ts";
@@ -81,8 +80,8 @@ export class MapIndicatorBarn {
         indicator.pos = v2.copy(data.pos);
         indicator.equipped = data.equipped;
 
-        const objDef = GameObjectDefs.typeToDef(indicator.type) as RoleDef;
-        assert(objDef.mapIndicator);
+        const objDef = GameObjectDefs.typeToDef(indicator.type);
+        assert("mapIndicator" in objDef, `Type ${indicator.type} has mapIndicator on the def`);
         const scale = (device.uiLayout == device.UiLayout.Sm ? 0.15 : 0.2) * 1.25;
         const zOrder = indicator.equipped ? 655350 : 1;
 

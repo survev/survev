@@ -1,9 +1,8 @@
 import { Rarity } from "../../gameConfig.ts";
+import type { BaseLoadoutItem } from "./itemTypes.ts";
 
-export interface CrosshairDef {
-    readonly type: "crosshair";
-    name: string;
-    rarity: Rarity;
+export interface CrosshairDef extends BaseLoadoutItem {
+    type: "crosshair";
     cursor?: string;
     texture: string;
     code: string;

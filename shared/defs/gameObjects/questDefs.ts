@@ -97,7 +97,7 @@ export type QuestMapFilter = {
 };
 
 type QuestDefForEvent<E extends QuestEvent> = {
-    readonly type: "quest";
+    type: "quest";
     event: E;
     target: number;
     xp: number;

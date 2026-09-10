@@ -8,7 +8,7 @@ import { CacheDefs } from "./cacheDefs.ts";
 import { ModeBuildingDefs } from "./modeBuildingDefs.ts";
 
 export interface BuildingDef {
-    readonly type: "building";
+    type: "building";
     map?: {
         display?: boolean;
         color?: number;

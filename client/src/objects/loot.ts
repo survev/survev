@@ -112,14 +112,14 @@ export class Loot implements AbstractObject {
                 this.playDropSfx = true;
             }
 
-            this.rad = GameConfig.lootRadius[itemDef.type as keyof typeof GameConfig.lootRadius];
-            this.imgScale = itemDef.lootImg?.scale * 1.25;
+            this.rad = GameConfig.lootRadius[itemDef.type];
+            this.imgScale = itemDef.lootImg.scale * 1.25;
 
-            const innerScale = (itemDef as { lootImg: { innerScale?: number } }).lootImg.innerScale
+            const innerScale = itemDef.lootImg.innerScale
                 || 0.8;
             this.sprite.scale.set(innerScale, innerScale);
-            this.sprite.texture = PIXI.Texture.from(itemDef.lootImg?.sprite);
-            this.sprite.tint = itemDef.lootImg?.tint;
+            this.sprite.texture = PIXI.Texture.from(itemDef.lootImg.sprite);
+            this.sprite.tint = itemDef.lootImg.tint;
             this.container.texture = itemDef.lootImg.border
                 ? PIXI.Texture.from(itemDef.lootImg.border)
                 : PIXI.Texture.EMPTY;
@@ -142,10 +142,10 @@ export class Loot implements AbstractObject {
                 });
             }
 
-            this.sprite.rotation = (itemDef as MeleeDef)?.lootImg?.rot
-                ? (itemDef as MeleeDef).lootImg.rot!
+            this.sprite.rotation = itemDef?.lootImg?.rot
+                ? itemDef.lootImg.rot!
                 : 0;
-            this.sprite.scale.x = (itemDef as MeleeDef).lootImg.mirror
+            this.sprite.scale.x = itemDef.lootImg.mirror
                 ? -innerScale
                 : innerScale;
 

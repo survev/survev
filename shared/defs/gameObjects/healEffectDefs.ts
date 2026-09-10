@@ -1,10 +1,8 @@
 import { Rarity } from "../../gameConfig.ts";
+import type { BaseLoadoutItem } from "./itemTypes.ts";
 
-export interface HealEffectDef {
-    readonly type: "heal_effect" | "boost_effect";
-    name: string;
-    lore?: string;
-    rarity: Rarity;
+export interface HealEffectDef extends BaseLoadoutItem {
+    type: "heal_effect" | "boost_effect";
     texture: string;
     emitter: string | string[];
 }

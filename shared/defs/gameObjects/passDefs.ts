@@ -1,5 +1,5 @@
 export interface PassDef {
-    readonly type: "pass";
+    type: "pass";
     xp: number[];
     items: Array<{
         level: number;

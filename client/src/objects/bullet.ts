@@ -73,26 +73,16 @@ export class BulletBarn {
         startPos: Vec2;
         tracerLength: number;
         suppressed: boolean;
-        tracerAlphaRate: number;
-        tracerAlphaMin: number;
+        tracerAlphaRate?: number;
+        tracerAlphaMin?: number;
         combatStims: boolean;
         particleTicker: number;
     }> = [];
 
-    tracerColors: Record<
-        string,
-        {
-            regular: number;
-            saturated: number;
-            chambered: number;
-            apSaturated: number;
-            alphaRate: number;
-            alphaMin: number;
-        }
-    > = {};
+    tracerColors = {} as typeof GameConfig["tracerColors"];
 
     onMapLoad(map: Map) {
-        this.tracerColors = util.mergeDeep(
+        this.tracerColors = util.mergeDeep<typeof GameConfig["tracerColors"]>(
             {},
             GameConfig.tracerColors,
             map.getMapDef().biome.tracerColors,
@@ -172,7 +162,7 @@ export class BulletBarn {
         // Use saturated color if the player is on a bright surface
         const tracerColors = this.tracerColors[bulletDef.tracerColor];
         let tracerTint = tracerColors.regular;
-        if (bullet.apRounds) {
+        if (bullet.apRounds && tracerColors.apSaturated) {
             tracerTint = tracerColors.apSaturated;
         } else if (bullet.trailSaturated) {
             tracerTint = tracerColors.chambered || tracerColors.saturated;
@@ -250,7 +240,7 @@ export class BulletBarn {
                 if (b.tracerAlphaRate && b.suppressed) {
                     const rate = b.tracerAlphaRate;
                     b.bulletTrail.alpha = math.max(
-                        b.tracerAlphaMin,
+                        b.tracerAlphaMin!,
                         b.bulletTrail.alpha * rate,
                     );
                 }

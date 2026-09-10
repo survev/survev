@@ -1,5 +1,7 @@
+import type { GameConfig } from "../../gameConfig.ts";
+
 export interface BulletDef {
-    readonly type: "bullet";
+    type: "bullet";
     damage: number;
     obstacleDamage: number;
     falloff: number;
@@ -7,7 +9,7 @@ export interface BulletDef {
     speed: number;
     variance: number;
     shrapnel: boolean;
-    tracerColor: string;
+    tracerColor: keyof typeof GameConfig["tracerColors"];
     tracerWidth: number;
     tracerLength: number;
     suppressed?: boolean;

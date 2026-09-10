@@ -117,8 +117,8 @@ export class Account {
         this.emit("request", this);
         this.emit("items", []);
 
-        const storedLoadout = this.config.get("loadout");
-        this.loadout = util.mergeDeep({}, loadouts.defaultLoadout(), storedLoadout);
+        const storedLoadout = this.config.get("loadout")!;
+        this.loadout = util.mergeDeep<Loadout>({}, loadouts.defaultLoadout(), storedLoadout);
         this.emit("loadout", this.loadout);
     }
 

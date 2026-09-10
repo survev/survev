@@ -3,12 +3,10 @@ import $ from "jquery";
 
 import type { GameObjectDef } from "../../../shared/defs/gameObjectDefs.ts";
 import { EmoteCategory, type EmoteDef } from "../../../shared/defs/gameObjects/emoteDefs.ts";
-import type { MeleeDef } from "../../../shared/defs/gameObjects/meleeDefs.ts";
-import type { OutfitDef } from "../../../shared/defs/gameObjects/outfitDefs.ts";
 import { GameObjectDefs } from "../../../shared/defs/register.ts";
 import { EmoteSlot, Rarity } from "../../../shared/gameConfig.ts";
 import type { PassState } from "../../../shared/types/user.ts";
-import type { Item } from "../../../shared/utils/loadout.ts";
+import type { Item, LoadoutItemDef } from "../../../shared/utils/loadout.ts";
 import { type Crosshair, type Loadout, loadout } from "../../../shared/utils/loadout.ts";
 import { util } from "../../../shared/utils/util.ts";
 import type { Account } from "../account.ts";
@@ -42,8 +40,8 @@ function itemSort(sortFn: (a: SortableItem, b: SortableItem) => number) {
     return function(a: SortableItem, b: SortableItem) {
         // Always put stock items at the front of the list;
         // if not stock, sort by the given sort routine
-        const rarityA = (GameObjectDefs.typeToDef(a.type) as EmoteDef).rarity || Rarity.Stock;
-        const rarityB = (GameObjectDefs.typeToDef(b.type) as EmoteDef).rarity || Rarity.Stock;
+        const rarityA = (GameObjectDefs.typeToDef(a.type) as LoadoutItemDef).rarity || Rarity.Stock;
+        const rarityB = (GameObjectDefs.typeToDef(b.type) as LoadoutItemDef).rarity || Rarity.Stock;
         if (rarityA == Rarity.Stock && rarityB == Rarity.Stock) {
             return sortAlphabetical(a, b);
         }
@@ -65,8 +63,8 @@ function sortAcquired(a: SortableItem, b: SortableItem) {
 }
 
 function sortAlphabetical(a: SortableItem, b: SortableItem): number {
-    const defA = GameObjectDefs.typeToDef(a.type) as EmoteDef;
-    const defB = GameObjectDefs.typeToDef(b.type) as EmoteDef;
+    const defA = GameObjectDefs.typeToDef(a.type) as LoadoutItemDef;
+    const defB = GameObjectDefs.typeToDef(b.type) as LoadoutItemDef;
     if (defA.name! < defB.name!) {
         return -1;
     }
@@ -77,8 +75,8 @@ function sortAlphabetical(a: SortableItem, b: SortableItem): number {
 }
 
 function sortRarity(a: SortableItem, b: SortableItem) {
-    const rarityA = (GameObjectDefs.typeToDef(a.type) as EmoteDef).rarity || Rarity.Stock;
-    const rarityB = (GameObjectDefs.typeToDef(b.type) as EmoteDef).rarity || Rarity.Stock;
+    const rarityA = (GameObjectDefs.typeToDef(a.type) as LoadoutItemDef).rarity || Rarity.Stock;
+    const rarityB = (GameObjectDefs.typeToDef(b.type) as LoadoutItemDef).rarity || Rarity.Stock;
     if (rarityA == rarityB) {
         return sortAlphabetical(a, b);
     }
@@ -551,7 +549,7 @@ export class LoadoutMenu {
         const currentNewItem = this.localPendingConfirm.shift()!;
         if (currentNewItem) {
             this.localConfirmed.push(currentNewItem);
-            const objDef = GameObjectDefs.typeToDef(currentNewItem.type) as EmoteDef | OutfitDef;
+            const objDef = GameObjectDefs.typeToDef(currentNewItem.type) as LoadoutItemDef;
             const itemInfo = {
                 type: currentNewItem.type,
                 rarity: objDef.rarity || Rarity.Stock,
@@ -876,7 +874,7 @@ export class LoadoutMenu {
         const image = parent.find(".customize-emote-slot");
         image.css("background-image", img || "none");
         image.data("img", img || "none");
-        const emoteDef = GameObjectDefs.typeToDefSafe(type) as EmoteDef & { lore: string };
+        const emoteDef = GameObjectDefs.typeToDefSafe(type) as LoadoutItemDef;
         const slotIdx = parent.data("idx") as number;
         if (emoteDef) {
             const itemInfo: EquippedItem = {
@@ -885,7 +883,7 @@ export class LoadoutMenu {
                 rarity: emoteDef.rarity || Rarity.Stock,
                 displayName: this.localization.translate(`game-${type}`) || emoteDef.name!,
                 displayLore: this.localization.translate(`game-${type}-lore`) || emoteDef.lore,
-                subcat: emoteDef.category,
+                subcat: (emoteDef as EmoteDef).category,
             };
             this.equippedItems[slotIdx] = itemInfo;
         } else {
@@ -967,7 +965,7 @@ export class LoadoutMenu {
         this.modalCustomizeItemRarity.html("");
 
         const getItemSourceName = function(source: string) {
-            const sourceDef = GameObjectDefs.typeToDefSafe(source) as EmoteDef;
+            const sourceDef = GameObjectDefs.typeToDefSafe(source) as LoadoutItemDef;
             if (sourceDef?.name) {
                 return sourceDef.name;
             }
@@ -979,18 +977,18 @@ export class LoadoutMenu {
         const listItems = $("<div/>");
         for (let i = 0; i < loadoutItems.length; i++) {
             const item = loadoutItems[i];
-            const objDef = GameObjectDefs.typeToDef(item.type) as OutfitDef | MeleeDef;
+            const objDef = GameObjectDefs.typeToDef(item.type) as LoadoutItemDef;
 
             const itemInfo: ItemInfo = {
                 loadoutType: category.loadoutType,
                 type: item.type,
                 rarity: objDef.rarity || Rarity.Stock,
-                displayName: this.localization.translate(`game-${item.type}`) || objDef.name,
+                displayName: this.localization.translate(`game-${item.type}`) || objDef.name!,
                 displayLore: this.localization.translate(`game-${item.type}-lore`) || objDef.lore!,
                 displaySource: getItemSourceName(item.source),
                 timeAcquired: item.timeAcquired,
                 idx: i,
-                subcat: (objDef as unknown as EmoteDef).category,
+                subcat: (objDef as EmoteDef).category,
                 outerDiv: null,
             };
 

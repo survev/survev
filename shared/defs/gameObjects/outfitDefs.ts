@@ -1,8 +1,9 @@
 import { FactionTeam, Rarity } from "../../gameConfig.ts";
 import { type DeepPartial, util } from "../../utils/util.ts";
+import type { BaseLoadoutItem, BaseLootDef } from "./itemTypes.ts";
 
-export interface OutfitDef {
-    readonly type: "outfit";
+export interface OutfitDef extends BaseLootDef, BaseLoadoutItem {
+    type: "outfit";
     name: string;
     skinImg: {
         baseTint: number;
@@ -14,21 +15,6 @@ export interface OutfitDef {
         backpackTint: number;
         backpackSprite: string;
     };
-    lootImg: {
-        sprite: string;
-        tint: number;
-        border: string;
-        borderTint: number;
-        scale: number;
-    };
-    sound: {
-        pickup: string;
-    };
-    baseType?: string;
-    noDropOnDeath?: boolean;
-    rarity?: number;
-    lore?: string;
-    noDrop?: boolean;
     obstacleType?: string;
     baseScale?: number;
     ghillie?: boolean;
@@ -37,7 +23,7 @@ export interface OutfitDef {
 }
 
 function defineOutfitSkin(baseType: string, params: DeepPartial<OutfitDef>): OutfitDef {
-    return util.mergeDeep({}, BaseDefs[baseType], params);
+    return util.mergeDeep({}, BaseDefs[baseType], { baseType }, params);
 }
 const BaseDefs: Record<string, OutfitDef> = {
     outfitBase: {

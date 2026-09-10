@@ -211,7 +211,7 @@ export class Graph {
         textOptions: Partial<PIXI.ITextStyle> = {},
     ) {
         const text = new PIXI.Text();
-        text.style = util.mergeDeep({}, defaultLabelTextOptions, textOptions);
+        text.style = util.mergeDeep<PIXI.ITextStyle>({}, defaultLabelTextOptions, textOptions);
         this.container.addChild(text);
         this._labels.push({
             text,

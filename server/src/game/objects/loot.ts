@@ -299,7 +299,7 @@ export class Loot extends BaseGameObject {
             v2.create(this.rad, this.rad),
         );
 
-        if ("mapIndicator" in def) {
+        if (def.mapIndicator) {
             this.mapIndicator = this.game.mapIndicatorBarn.allocIndicator(
                 this.type,
                 false,

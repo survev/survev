@@ -36,7 +36,7 @@ export interface LootSpawnDef {
 }
 
 export interface LootSpawnerDef {
-    readonly type: "loot_spawner";
+    type: "loot_spawner";
     loot: Array<LootSpawnDef>;
     terrain?: TerrainSpawnDef;
 }

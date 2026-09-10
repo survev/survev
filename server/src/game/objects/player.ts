@@ -12,6 +12,7 @@ import {
 import type { GunDef } from "../../../../shared/defs/gameObjects/gunDefs.ts";
 import type { MeleeDef } from "../../../../shared/defs/gameObjects/meleeDefs.ts";
 import { PerkProperties } from "../../../../shared/defs/gameObjects/perkDefs.ts";
+import type { RoleDef } from "../../../../shared/defs/gameObjects/roleDefs.ts";
 import type { ThrowableDef } from "../../../../shared/defs/gameObjects/throwableDefs.ts";
 import { UnlockDefs } from "../../../../shared/defs/gameObjects/unlockDefs.ts";
 import { GameObjectDefs } from "../../../../shared/defs/register.ts";
@@ -113,7 +114,7 @@ export class PlayerBarn {
     playerStatusTicker = 0;
     playerStatusRate = 0;
 
-    defaultItems = util.mergeDeep(
+    defaultItems = util.mergeDeep<typeof GameConfig["player"]["defaultItems"]>(
         {},
         GameConfig.player.defaultItems,
         Config.defaultItems,
@@ -132,7 +133,7 @@ export class PlayerBarn {
     sentMvpQuestUpdate = false;
 
     constructor(readonly game: Game) {
-        this.bagSizes = util.mergeDeep(
+        this.bagSizes = util.mergeDeep<typeof GameConfig["bagSizes"]>(
             {},
             GameConfig.bagSizes,
             this.game.map.mapDef.gameConfig.bagSizes,
@@ -862,7 +863,7 @@ export class Player extends BaseGameObject {
 
         const roleOverride = this.game.map.mapDef.gameConfig.roles?.roleOverrides?.[role];
         if (roleOverride) {
-            roleDef = util.mergeDeep({}, roleDef, roleOverride);
+            roleDef = util.mergeDeep<RoleDef>({}, roleDef, roleOverride);
         }
 
         if (role === "leader") {

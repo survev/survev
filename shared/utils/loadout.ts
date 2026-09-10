@@ -1,5 +1,10 @@
 import { z } from "zod";
 
+import type { CrosshairDef } from "../defs/gameObjects/crosshairDefs.ts";
+import type { EmoteDef } from "../defs/gameObjects/emoteDefs.ts";
+import type { HealEffectDef } from "../defs/gameObjects/healEffectDefs.ts";
+import type { MeleeDef } from "../defs/gameObjects/meleeDefs.ts";
+import type { OutfitDef } from "../defs/gameObjects/outfitDefs.ts";
 import { UnlockDefs } from "../defs/gameObjects/unlockDefs.ts";
 import { GameObjectDefs } from "../defs/register.ts";
 import { GameConfig } from "../gameConfig.ts";
@@ -21,6 +26,8 @@ export enum ItemStatus {
     Confirmed,
     Ackd,
 }
+
+export type LoadoutItemDef = OutfitDef | MeleeDef | EmoteDef | HealEffectDef | CrosshairDef;
 
 export const loadout = {
     ItemStatus,

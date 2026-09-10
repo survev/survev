@@ -1,6 +1,6 @@
 export type ExplosionDef =
     & {
-        readonly type: "explosion";
+        type: "explosion";
         damage: number;
         obstacleDamage: number;
         rad: {

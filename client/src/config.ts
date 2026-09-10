@@ -144,7 +144,7 @@ export class ConfigManager {
             try {
                 data = JSON.parse(strConfig);
             } catch (_e) {}
-            this.config = util.mergeDeep({}, defaultConfig, data);
+            this.config = util.mergeDeep<ConfigType>({}, defaultConfig, data);
             this.checkUpgradeConfig();
             this.onModified();
             this.loaded = true;

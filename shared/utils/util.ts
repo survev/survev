@@ -25,10 +25,9 @@ export function assert(value: unknown, message?: string | Error): asserts value 
     }
 }
 
-export type DeepPartial<T> = T extends object ? {
-        [P in keyof T]?: DeepPartial<T[P]>;
-    }
-    : T;
+export type DeepPartial<T> = {
+    [K in keyof T]?: DeepPartial<T[K]>;
+};
 
 export type UnionToIntersection<U> = (U extends unknown ? (x: U) => void : never) extends ((x: infer I) => void) ? I
     : never;
@@ -314,15 +313,15 @@ export const util = {
         );
     },
 
-    mergeDeep(target: any, ...sources: any[]): any {
-        if (!sources.length) return target;
+    mergeDeep<T extends object>(target: DeepPartial<T>, ...sources: DeepPartial<T>[]): T {
+        if (!sources.length) return target as T;
         const source = sources.shift();
 
         if (this.isObject(target) && this.isObject(source)) {
             for (const key in source) {
                 if (this.isObject(source[key])) {
                     if (!target[key]) Object.assign(target, { [key]: {} });
-                    this.mergeDeep(target[key], source[key]);
+                    this.mergeDeep(target[key] as any, source[key] as any);
                 } else {
                     Object.assign(target, { [key]: source[key] });
                 }
@@ -332,9 +331,9 @@ export const util = {
         return this.mergeDeep(target, ...sources);
     },
 
-    cloneDeep(source: unknown) {
+    cloneDeep<T extends object>(source: T): T {
         // @TODO: This does not properly handle arrays
-        return util.mergeDeep({}, source);
+        return util.mergeDeep<T>({}, source);
     },
 
     shuffleArray(arr: unknown[]) {

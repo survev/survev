@@ -3,8 +3,8 @@ import * as PIXI from "pixi.js-legacy";
 import type { LootDef } from "../../../shared/defs/gameObjectDefs.ts";
 import type { BoostDef, HealDef } from "./../../../shared/defs/gameObjects/gearDefs.ts";
 import type { GunDef } from "../../../shared/defs/gameObjects/gunDefs.ts";
-import type { MeleeDef } from "../../../shared/defs/gameObjects/meleeDefs.ts";
-import type { ThrowableDef } from "../../../shared/defs/gameObjects/throwableDefs.ts";
+import { type MeleeDef } from "../../../shared/defs/gameObjects/meleeDefs.ts";
+import type { ThrowableDef, ThrowableHandImgKey } from "../../../shared/defs/gameObjects/throwableDefs.ts";
 import type { ObstacleDef } from "../../../shared/defs/mapObjects/obstacles/obstacleDefs.ts";
 import { GameObjectDefs, MapObjectDefs } from "../../../shared/defs/register.ts";
 import { Action, Anim, GameConfig, HasteType, Input, type WeaponSlot } from "../../../shared/gameConfig.ts";
@@ -270,7 +270,7 @@ export class Player implements AbstractObject {
     gunRecoilR = 0;
     fireDelay = 0;
 
-    throwableState = "equip";
+    throwableState: ThrowableHandImgKey = "equip";
     lastThrowablePickupSfxTicker = 0;
 
     isNearDoorError = false;
@@ -2294,9 +2294,9 @@ export class Player implements AbstractObject {
         }
     }
 
-    animPlaySound(animCtx: AnimCtx, args: { sound: string }) {
-        const itemDef = GameObjectDefs.typeToDef(this.m_netData.m_activeWeapon) as MeleeDef;
-        const sound = itemDef.sound[args.sound];
+    animPlaySound(animCtx: AnimCtx, args: { sound: keyof MeleeDef["sound"] | keyof ThrowableDef["sound"] }) {
+        const itemDef = GameObjectDefs.typeToDef(this.m_netData.m_activeWeapon) as MeleeDef | ThrowableDef;
+        const sound = (itemDef.sound as Record<string, string>)[args.sound];
         if (sound) {
             animCtx.audioManager.playSound(sound, {
                 channel: "sfx",
@@ -2308,7 +2308,7 @@ export class Player implements AbstractObject {
         }
     }
 
-    animSetThrowableState(_animCtx: AnimCtx, args: { state: string }) {
+    animSetThrowableState(_animCtx: AnimCtx, args: { state: ThrowableHandImgKey }) {
         this.throwableState = args.state;
     }
 
@@ -2349,7 +2349,7 @@ export class Player implements AbstractObject {
         }
     }
 
-    animMeleeCollision(animCtx: AnimCtx, args: { playerHit?: string }) {
+    animMeleeCollision(animCtx: AnimCtx, args: { playerHit?: keyof MeleeDef["sound"] }) {
         const meleeDef = GameObjectDefs.typeToDefSafe(this.m_netData.m_activeWeapon);
         if (meleeDef?.type !== "melee") return;
 

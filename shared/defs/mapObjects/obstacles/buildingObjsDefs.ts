@@ -135,11 +135,11 @@ function createWall(params: DeepPartial<ObstacleDef> & { extents: Vec2 }): Obsta
             enter: "none",
         },
     };
-    const material = params.material as keyof typeof MaterialDefs;
-    if (!MaterialDefs[material]) {
+    const material = params.material;
+    if (!MaterialDefs[material!]) {
         throw new Error(`Invalid material ${params.material}`);
     }
-    return util.mergeDeep(baseDef, MaterialDefs[material], params);
+    return util.mergeDeep<ObstacleDef>(baseDef, MaterialDefs[material!], params);
 }
 
 function createLowWall(overrides: DeepPartial<ObstacleDef>): ObstacleDef {

@@ -1,4 +1,5 @@
 import { Rarity } from "../../gameConfig.ts";
+import type { BaseLoadoutItem } from "./itemTypes.ts";
 
 export enum EmoteCategory {
     Locked,
@@ -11,10 +12,8 @@ export enum EmoteCategory {
     Default,
 }
 
-export interface EmoteDef {
-    readonly type: "emote";
-    name?: string;
-    rarity?: Rarity;
+export interface EmoteDef extends BaseLoadoutItem {
+    type: "emote";
     texture: string;
     sound: string;
     channel: string;

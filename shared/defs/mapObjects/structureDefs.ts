@@ -4,7 +4,7 @@ import { v2, type Vec2 } from "../../utils/v2.ts";
 import type { TerrainSpawnDef } from "../mapObjectsTyping.ts";
 
 export interface StructureDef {
-    readonly type: "structure";
+    type: "structure";
     terrain: TerrainSpawnDef;
     ori?: number;
     mapObstacleBounds?: AABB[];

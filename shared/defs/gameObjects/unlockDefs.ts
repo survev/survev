@@ -1,5 +1,5 @@
 export interface UnlockDef {
-    readonly type: "unlock";
+    type: "unlock";
     name: string;
     unlocks: string[];
     free?: boolean;

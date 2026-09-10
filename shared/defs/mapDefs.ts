@@ -1,4 +1,5 @@
-import type { MapId } from "../gameConfig.ts";
+import { type GameConfig, type InventoryItem, type MapId } from "../gameConfig.ts";
+import type { DeepPartial } from "../utils/util.ts";
 import type { Vec2 } from "../utils/v2.ts";
 import type { RoleDef } from "./gameObjects/roleDefs.ts";
 import { Main } from "./maps/baseDefs.ts";
@@ -106,7 +107,7 @@ export interface MapDef {
         particles: {
             camera: string;
         };
-        tracerColors: Record<string, Record<string, number>>;
+        tracerColors: DeepPartial<typeof GameConfig["tracerColors"]>;
         airdrop: {
             planeImg: string;
             planeSound: string;
@@ -165,7 +166,7 @@ export interface MapDef {
                 wait: number;
             }>;
         };
-        bagSizes: Record<string, number[]>;
+        bagSizes: Partial<Record<InventoryItem, number[]>>;
         bleedDamage: number;
         bleedDamageMult: number;
     };

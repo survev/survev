@@ -4,7 +4,7 @@ import { v2 } from "../../utils/v2.ts";
 import type { TerrainSpawnDef } from "../mapObjectsTyping.ts";
 
 export interface DecalDef {
-    readonly type: "decal";
+    type: "decal";
     collision: Collider;
     height: number;
     terrain?: TerrainSpawnDef;

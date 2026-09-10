@@ -1,20 +1,13 @@
 import { type DeepPartial, util } from "../../utils/util.ts";
+import type { BaseLootDef } from "./itemTypes.ts";
 
 function defineXpSkin(baseType: string, params: DeepPartial<XPDef>): XPDef {
-    return util.mergeDeep({}, BaseDefs[baseType], params);
+    return util.mergeDeep({}, BaseDefs[baseType], { baseType }, params);
 }
 
-export interface XPDef {
-    readonly type: "xp";
-    name: string;
+export interface XPDef extends BaseLootDef {
+    type: "xp";
     xp: number;
-    lootImg: {
-        sprite: string;
-        tint: number;
-        border: string;
-        borderTint: number;
-        scale: number;
-    };
     sound: {
         drop: string;
         pickup: string;

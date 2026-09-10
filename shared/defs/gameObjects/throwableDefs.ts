@@ -1,8 +1,10 @@
 import type { Vec2 } from "../../utils/v2.ts";
+import type { BaseWeaponDef } from "./itemTypes.ts";
 
-export interface ThrowableDef {
-    readonly type: "throwable";
-    name: string;
+export type ThrowableHandImgKey = "equip" | "cook" | "throwing";
+
+export interface ThrowableDef extends BaseWeaponDef {
+    type: "throwable";
     quality: number;
     explosionType: string;
     inventoryOrder: number;
@@ -25,21 +27,12 @@ export interface ThrowableDef {
         equip: number;
         attack: number;
     };
-    lootImg: {
-        sprite: string;
-        tint: number;
-        border: "loot-circle-outer-01.img";
-        borderTint: number;
-        scale: number;
-        rot?: number;
-        mirror?: boolean;
-    };
     worldImg: {
         sprite: string;
         scale: number;
         tint: number;
     };
-    handImg?: Record<string, { right: Cook; left: Cook }>;
+    handImg?: Record<ThrowableHandImgKey, { right: Cook; left: Cook }>;
     useThrowParticles: boolean;
     sound: {
         pullPin: string;
@@ -526,7 +519,6 @@ export const ThrowableDefs: Record<string, ThrowableDef> = {
             scale: 0.2,
             tint: 0xffffff,
         },
-        handImg: {},
         useThrowParticles: false,
         sound: {
             pullPin: "",
@@ -638,7 +630,6 @@ export const ThrowableDefs: Record<string, ThrowableDef> = {
             scale: 0.2,
             tint: 0xffffff,
         },
-        handImg: {},
         useThrowParticles: false,
         sound: {
             pullPin: "",
@@ -683,7 +674,6 @@ export const ThrowableDefs: Record<string, ThrowableDef> = {
             scale: 0.2,
             tint: 0xffffff,
         },
-        handImg: {},
         useThrowParticles: false,
         sound: {
             pullPin: "",
@@ -734,7 +724,6 @@ export const ThrowableDefs: Record<string, ThrowableDef> = {
             scale: 0.075,
             tint: 0xffffff,
         },
-        handImg: {},
         useThrowParticles: false,
         sound: {
             pullPin: "",
@@ -785,7 +774,6 @@ export const ThrowableDefs: Record<string, ThrowableDef> = {
             scale: 0.06,
             tint: 0xffffff,
         },
-        handImg: {},
         useThrowParticles: false,
         sound: {
             pullPin: "",
@@ -835,7 +823,6 @@ export const ThrowableDefs: Record<string, ThrowableDef> = {
             scale: 0.12,
             tint: 0xffffff,
         },
-        handImg: {},
         useThrowParticles: true,
         sound: {
             pullPin: "frag_pin_01",

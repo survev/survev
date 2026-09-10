@@ -1,12 +1,11 @@
 import { Rarity } from "../../gameConfig.ts";
 import { type DeepPartial, util } from "../../utils/util.ts";
 import type { Vec2 } from "../../utils/v2.ts";
+import type { BaseLoadoutItem, BaseWeaponDef } from "./itemTypes.ts";
 
-export interface MeleeDef {
-    readonly type: "melee";
+export interface MeleeDef extends BaseWeaponDef, BaseLoadoutItem {
+    type: "melee";
     name: string;
-    perk?: string;
-    quality: number;
     autoAttack: boolean;
     switchDelay: number;
     damage: number;
@@ -41,32 +40,17 @@ export interface MeleeDef {
             idleAnimTime?: undefined;
             idleAnims?: undefined;
         });
-    sound: Record<string, string>;
-    //  {
-    //     swing: string
-    //     deploy: string
-    //     playerHit: string
-    //     playerHit2?: string
-    //     pickup?: string
-    //     bullet?: string
-    // }
-    lootImg: {
-        sprite: string;
-        scale: number;
-        rad?: number;
-        tint: number;
-        border?: string;
-        borderTint?: number;
-        rot?: number;
-        mirror?: boolean;
+    sound: {
+        swing: string;
+        deploy: string;
+        playerHit: string;
+        playerHit2?: string;
+        pickup: string;
+        idle?: string;
+        bullet?: string;
     };
-    baseType?: string;
-    rarity?: number;
-    lore?: string;
-    noPotatoSwap?: boolean;
-    noDropOnDeath?: boolean;
-    worldImg?: Img;
-    hipImg?: Img;
+    worldImg?: MeleeImg;
+    hipImg?: MeleeImg;
     reflectSurface?: {
         equipped: {
             p0: Vec2;
@@ -81,7 +65,7 @@ export interface MeleeDef {
     stonePiercing?: boolean;
 }
 
-export interface Img {
+interface MeleeImg {
     sprite: string;
     pos: Vec2;
     rot: number;
@@ -92,7 +76,7 @@ export interface Img {
 }
 
 function defineMeleeSkin(baseType: string, params: DeepPartial<MeleeDef>): MeleeDef {
-    return util.mergeDeep({}, BaseDefs[baseType], params);
+    return util.mergeDeep({}, BaseDefs[baseType], { baseType }, params);
 }
 
 const BaseDefs: Record<string, MeleeDef> = {
@@ -121,6 +105,7 @@ const BaseDefs: Record<string, MeleeDef> = {
             attackAnims: ["fists"],
         },
         sound: {
+            pickup: "none",
             swing: "punch_swing_01",
             deploy: "stow_weapon_01",
             playerHit: "punch_hit_01",
@@ -128,7 +113,6 @@ const BaseDefs: Record<string, MeleeDef> = {
         lootImg: {
             sprite: "loot-weapon-fists.img",
             scale: 0.3,
-            rad: 25,
             tint: 0xff00,
         },
     },
@@ -176,7 +160,6 @@ const BaseDefs: Record<string, MeleeDef> = {
             border: "loot-circle-outer-02.img",
             borderTint: 0xffffff,
             scale: 0.3,
-            rad: 25,
             rot: 0.785,
         },
         worldImg: {
