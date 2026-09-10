@@ -252,6 +252,7 @@ export const LoadoutAtlas: AtlasDef = {
         "gui/ping-team-help.svg",
         "gui/ping-team-unlock.svg",
         "gui/player-emote.svg",
+        "gui/player-group-downed.svg",
         "gui/player-gui.svg",
         "gui/player-king-woods.svg",
         "gui/player-map-downed.svg",

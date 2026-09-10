@@ -1006,7 +1006,7 @@ export class UiManager {
                     texture = roleDef.mapIcon!.dead;
                 }
             } else if (playerStatus.downed) {
-                texture = sameGroup ? "player-map-inner.img" : "player-map-downed.img";
+                texture = sameGroup ? "player-group-downed.img" : "player-map-downed.img";
             }
             let tint = sameGroup
                 ? playerBarn.getGroupColor(playerId)
