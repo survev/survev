@@ -1,4 +1,4 @@
-import { SCOPE_LEVELS } from "../../../shared/defs/gameObjects/gearDefs.ts";
+import { type BackpackDef, SCOPE_LEVELS } from "../../../shared/defs/gameObjects/gearDefs.ts";
 import { PerkProperties } from "../../../shared/defs/gameObjects/perkDefs.ts";
 import { GameObjectDefs } from "../../../shared/defs/register.ts";
 import { GameConfig, type InventoryItem } from "../../../shared/gameConfig.ts";
@@ -69,6 +69,7 @@ export class InventoryManager {
     }
 
     getMaxCapacity(item: InventoryItem): number {
+        const def = GameObjectDefs.typeToDef(this.player.backpack) as BackpackDef;
         const bagLevel = this.player.getGearLevel(this.player.backpack);
         let amount = this.bagSizes[item][bagLevel];
         if (this.player.hasPerk("flak_jacket")) {
