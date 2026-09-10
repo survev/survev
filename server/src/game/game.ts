@@ -138,8 +138,6 @@ export class Game {
         this.airdropBarn = new AirdropBarn(this);
         this.explosionBarn = new ExplosionBarn(this);
         this.planeBarn = new PlaneBarn(this);
-        this.explosionBarn = new ExplosionBarn(this);
-        this.planeBarn = new PlaneBarn(this);
         this.mapIndicatorBarn = new MapIndicatorBarn();
 
         this.gas = new Gas(this);
