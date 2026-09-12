@@ -608,18 +608,18 @@ export class TeamMenu {
                         "data-playerid": playerStatus.playerId,
                     }),
                 );
-                let n: JQuery<HTMLInputElement> | null = null;
-                let c = null;
+                let nameInput: JQuery<HTMLInputElement> | null = null;
+                let submitButton: JQuery<HTMLDivElement> | null = null;
                 if (this.editingName && playerStatus.self) {
-                    n = $("<input/>", {
+                    nameInput = $("<input/>", {
                         type: "text",
                         tabindex: 0,
                         class: "name menu-option name-text name-self-input",
                         maxLength: net.Constants.PlayerNameMaxLen,
                     });
-                    n.val(playerStatus.name);
-                    const m = () => {
-                        const name = helpers.sanitizeNameInput(n!.val() as string);
+                    nameInput.val(playerStatus.name);
+                    const submit = () => {
+                        const name = helpers.sanitizeNameInput(nameInput!.val() as string);
                         playerStatus.name = name;
                         this.config.set("playerName", name);
                         this.sendMessage("changeName", {
@@ -628,23 +628,23 @@ export class TeamMenu {
                         this.editingName = false;
                         this.refreshUi();
                     };
-                    const h = () => {
+                    const abortEditing = () => {
                         this.editingName = false;
                         this.refreshUi();
                     };
-                    n.on("keydown", (e) => {
+                    nameInput.on("keydown", (e) => {
                         if (e.which === 13) {
-                            m();
+                            submit();
                             return false;
                         }
                     });
-                    n.on("blur", h);
-                    member.append(n);
-                    c = $("<div/>", {
+                    nameInput.on("blur", abortEditing);
+                    member.append(nameInput);
+                    submitButton = $("<div/>", {
                         class: "icon icon-submit-name-change",
                     });
-                    c.on("click", m);
-                    c.on("mousedown", (e) => {
+                    submitButton.on("click", submit);
+                    submitButton.on("mousedown", (e) => {
                         e.preventDefault();
                         e.stopPropagation();
                     });
@@ -670,8 +670,8 @@ export class TeamMenu {
                     }
                     member.append(nameDiv);
                 }
-                if (c) {
-                    member.append(c);
+                if (submitButton) {
+                    member.append(submitButton);
                 } else {
                     member.append(
                         $("<div/>", {
@@ -680,7 +680,7 @@ export class TeamMenu {
                     );
                 }
                 teamMembers.append(member);
-                n?.trigger("focus");
+                nameInput?.trigger("focus");
             }
 
             $(".icon-kick", teamMembers).on("click", (e) => {

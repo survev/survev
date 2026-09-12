@@ -145,11 +145,11 @@ export class Renderer {
                     }
                     for (let j = 0; j < structure.mask.length; j++) {
                         const m = structure.mask[j];
-                        const e = v2.mul(v2.sub(m.max, m.min), 0.5);
-                        const c = v2.add(m.min, e);
-                        const ll = camera.m_pointToScreen(v2.sub(c, e));
-                        const tr = camera.m_pointToScreen(v2.add(c, e));
-                        mask.drawRect(ll.x, ll.y, tr.x - ll.x, tr.y - ll.y);
+                        const halfExtents = v2.mul(v2.sub(m.max, m.min), 0.5);
+                        const center = v2.add(m.min, halfExtents);
+                        const bottomLeft = camera.m_pointToScreen(v2.sub(center, halfExtents));
+                        const topRight = camera.m_pointToScreen(v2.add(center, halfExtents));
+                        mask.drawRect(bottomLeft.x, bottomLeft.y, topRight.x - bottomLeft.x, topRight.y - bottomLeft.y);
                     }
                 }
                 mask.endFill();
@@ -169,13 +169,13 @@ export class Renderer {
                     }
                     for (let j = 0; j < structure.mask.length; j++) {
                         const m = structure.mask[j];
-                        const e = v2.mul(v2.sub(m.max, m.min), 0.5);
-                        const c = v2.add(m.min, e);
+                        const halfExtents = v2.mul(v2.sub(m.max, m.min), 0.5);
+                        const center = v2.add(m.min, halfExtents);
 
-                        const x = c.x - e.x;
-                        const y = c.y - e.y;
-                        const w = e.x * 2.0;
-                        const h = e.y * 2.0;
+                        const x = center.x - halfExtents.x;
+                        const y = center.y - halfExtents.y;
+                        const w = halfExtents.x * 2.0;
+                        const h = halfExtents.y * 2.0;
                         mask.beginHole();
                         drawRect(mask, x, y, w, h);
                         mask.endHole();
