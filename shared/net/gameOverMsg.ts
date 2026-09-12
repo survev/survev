@@ -12,7 +12,7 @@ export class GameOverMsg implements AbstractMsg {
         /* STRIP_FROM_PROD_CLIENT:START */
         s.writeUint8(this.teamId);
         s.writeUint8(this.teamRank);
-        s.writeUint8(+this.gameOver);
+        s.writeUint8(this.gameOver ? 1 : 0);
         s.writeUint8(this.winningTeamId);
 
         s.writeArray(this.playerStats, 8, (stats) => {
@@ -26,7 +26,7 @@ export class GameOverMsg implements AbstractMsg {
     deserialize(s: BitStream) {
         this.teamId = s.readUint8();
         this.teamRank = s.readUint8();
-        this.gameOver = s.readUint8() as unknown as boolean;
+        this.gameOver = !!s.readUint8();
         this.winningTeamId = s.readUint8();
 
         this.playerStats = s.readArray(8, () => {

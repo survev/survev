@@ -6,7 +6,7 @@ import { type AbstractMsg, type BitStream, Constants } from "./net.ts";
 
 function serializeMapRiver(s: BitStream, data: MapRiverData) {
     s.writeUint8(data.width);
-    s.writeUint8(data.looped as unknown as number);
+    s.writeUint8(data.looped ? 1 : 0);
 
     s.writeArray(data.points, 8, (pos) => {
         s.writeMapPos(pos);
