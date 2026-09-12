@@ -1,3 +1,4 @@
+import type { InventoryItem } from "../../gameConfig.ts";
 import type { BaseLootDef } from "./itemTypes.ts";
 
 export const PerkProperties = {
@@ -20,7 +21,7 @@ export const PerkProperties = {
         bonuses: {
             frag: 3,
             mirv: 2,
-        } as Record<string, number | undefined>,
+        } as Partial<Record<InventoryItem, number>>,
     },
     amped_explosives: {
         throwableRangeMult: 1.75,
