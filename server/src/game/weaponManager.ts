@@ -832,7 +832,7 @@ export class WeaponManager {
         }
 
         if (shouldApplyChambered) {
-            damageMult *= 1.25;
+            damageMult *= PerkProperties.chambered.damageMult;
         }
 
         //

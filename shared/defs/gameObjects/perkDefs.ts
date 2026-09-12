@@ -1,3 +1,4 @@
+import type { InventoryItem } from "../../gameConfig.ts";
 import type { BaseLootDef } from "./itemTypes.ts";
 
 export const PerkProperties = {
@@ -17,8 +18,10 @@ export const PerkProperties = {
         scale: 0.1,
         damageReduction: 0.1,
         explosionDamageReduction: 0.9,
-        fragBonus: 3,
-        mirvBonus: 2,
+        bonuses: {
+            frag: 3,
+            mirv: 2,
+        } as Partial<Record<InventoryItem, number>>,
     },
     amped_explosives: {
         throwableRangeMult: 1.75,
@@ -29,6 +32,7 @@ export const PerkProperties = {
     },
     small_arms: {
         scale: -0.25,
+        gunEquipSpeed: 1,
     },
     splinter: {
         mainDamageMult: 0.6,
@@ -44,6 +48,18 @@ export const PerkProperties = {
     final_bugle: {
         bonusDamageMult: 1.08,
         scaleOnDeath: 0.2,
+        effectRange: 60,
+        hasteDuration: 5,
+    },
+    chambered: {
+        damageMult: 1.25,
+    },
+    martyrdom: {
+        projectileCount: 12,
+        projectileMaxVel: 5,
+    },
+    targeting: {
+        damageMult: 1.25,
     },
     broken_arrow: {
         bonusAirstrikes: 2,
@@ -58,9 +74,18 @@ export const PerkProperties = {
             strobe: 5,
         } as const,
     },
+    windwalk: {
+        maxTriggerDistance: 5, // max distance at which a bullet can trigger windwalk
+        hasteDuration: 3,
+    },
     gotw: {
         scale: 0.2,
         healthRegen: 1, // per second
+    },
+    takedown: {
+        hpReward: 25,
+        boostReward: 25,
+        hasteDuration: 3,
     },
     lifeline: {
         decayMult: 0.75, // Adrenaline decay multiplier
@@ -72,9 +97,33 @@ export const PerkProperties = {
     combat_stims: {
         bonusDamageMult: 1.12,
         healPercent: 0.06,
+        effectDuration: 5,
     },
     tree_climbing: {
         waterSpeedBoost: 2,
+    },
+    scavenger: {
+        lootTableConf: {
+            tier: "tier_world",
+            min: 1,
+            max: 1,
+            props: {},
+        },
+    },
+    scavenger_adv: {
+        lootTableConf: {
+            tier: "tier_scavenger_adv",
+            min: 1,
+            max: 1,
+            props: {},
+        },
+    },
+    pirate: {
+        minCount: 3,
+        maxCount: 4,
+        tier: "tier_pirate",
+        rareChance: 0.12,
+        rareTier: "tier_pirate_rare",
     },
     bonus_9mm: {
         spreadMul: 1.1,
@@ -87,6 +136,13 @@ export const PerkProperties = {
     high_velocity: {
         speedMult: 1.4,
         distanceMult: 1.3,
+    },
+    trick_chatty: {
+        minInterval: 5,
+        maxInterval: 15,
+    },
+    trick_drain: {
+        bleedTickRateMult: 3,
     },
     bonus_assault: {
         speedMult: 1.1,
