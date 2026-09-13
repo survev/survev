@@ -1,3 +1,4 @@
+import type { SoundHandle } from "$lib/createJS.ts";
 import * as PIXI from "pixi.js-legacy";
 import { GameConfig } from "../../../shared/gameConfig.ts";
 import type { ObjectData, ObjectType } from "../../../shared/net/objectSerializeFns.ts";
@@ -8,7 +9,6 @@ import { v2, type Vec2 } from "../../../shared/utils/v2.ts";
 import type { AudioManager } from "../audioManager.ts";
 import type { Camera } from "../camera.ts";
 import type { Ctx } from "../game.ts";
-import type { SoundHandle } from "../lib/createJS.ts";
 import type { Map } from "../map.ts";
 import type { Renderer } from "../renderer.ts";
 import { Pool } from "./objectPool.ts";

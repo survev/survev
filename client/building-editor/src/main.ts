@@ -1,9 +1,9 @@
+import { ConfigManager } from "$lib/modules/ConfigManager.svelte.ts";
+import { device } from "$lib/modules/Device.svelte.ts";
 import * as PIXI from "pixi.js-legacy";
 import { math } from "../../../shared/utils/math.ts";
 import { Ambiance } from "../../src/ambiance.ts";
 import { AudioManager } from "../../src/audioManager.ts";
-import { ConfigManager } from "../../src/config.ts";
-import { device } from "../../src/device.ts";
 import { InputHandler } from "../../src/input.ts";
 import { InputBinds } from "../../src/inputBinds.ts";
 import { ResourceManager } from "../../src/resources.ts";

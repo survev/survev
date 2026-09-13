@@ -1,6 +1,8 @@
 import $ from "jquery";
 import * as PIXI from "pixi.js-legacy";
 
+import type { SoundHandle } from "$lib/createJS.ts";
+import { device } from "$lib/modules/Device.svelte.ts";
 import { PingDefs } from "../../../shared/defs/gameObjects/pingDefs.ts";
 import type { RoleDef } from "../../../shared/defs/gameObjects/roleDefs.ts";
 import type { MapDef } from "../../../shared/defs/mapDefs.ts";
@@ -14,13 +16,11 @@ import { math } from "../../../shared/utils/math.ts";
 import { v2, type Vec2 } from "../../../shared/utils/v2.ts";
 import type { AudioManager } from "../audioManager.ts";
 import type { Camera } from "../camera.ts";
-import { device } from "../device.ts";
 import { errorLogManager } from "../errorLogs.ts";
 import type { Game } from "../game.ts";
 import { type Gas, GasRenderer, GasSafeZoneRenderer } from "../gas.ts";
 import { helpers } from "../helpers.ts";
 import type { InputBinds, InputBindUi } from "./../inputBinds.ts";
-import type { SoundHandle } from "../lib/createJS.ts";
 import type { Map } from "../map.ts";
 import { MapIndicatorBarn } from "../objects/mapIndicator.ts";
 import { type MapSprite, MapSpriteBarn } from "../objects/mapSprite.ts";

@@ -1,3 +1,5 @@
+import { ConfigManager, type ConfigType } from "$lib/modules/ConfigManager.svelte.ts";
+import { device } from "$lib/modules/Device.svelte.ts";
 import $ from "jquery";
 import * as PIXI from "pixi.js-legacy";
 import { GameConfig } from "../../shared/gameConfig.ts";
@@ -14,8 +16,6 @@ import { Account } from "./account.ts";
 import { Ambiance } from "./ambiance.ts";
 import { api } from "./api.ts";
 import { AudioManager } from "./audioManager.ts";
-import { ConfigManager, type ConfigType } from "./config.ts";
-import { device } from "./device.ts";
 import { errorLogManager } from "./errorLogs.ts";
 import { Game } from "./game.ts";
 import { helpers } from "./helpers.ts";

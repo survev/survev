@@ -6,6 +6,7 @@ allowBuilds:
   sharp: true
   workerd: true
 ignoredOptionalDependencies:
+  - '@parcel/watcher'
   - pg-cloudflare
 ignoreWorkspaceRootCheck: true
 minimumReleaseAge: 10080

@@ -1,9 +1,9 @@
+import type { ConfigManager } from "$lib/modules/ConfigManager.svelte.ts";
 import type { PassState, QuestState } from "../../shared/types/user.ts";
 import type { Item, ItemStatus } from "../../shared/utils/loadout.ts";
 import { type Loadout, loadout as loadouts } from "../../shared/utils/loadout.ts";
 import { util } from "../../shared/utils/util.ts";
 import { api } from "./api.ts";
-import type { ConfigManager } from "./config.ts";
 import { errorLogManager } from "./errorLogs.ts";
 import { helpers } from "./helpers.ts";
 import { proxy } from "./proxy.ts";

@@ -1,5 +1,5 @@
+import type { ConfigManager } from "$lib/modules/ConfigManager.svelte.ts";
 import * as PIXI from "pixi.js-legacy";
-import type { ConfigManager } from "../config.ts";
 import type { Game } from "../game.ts";
 import type { Pool } from "../objects/objectPool.ts";
 import type { AbstractObject } from "../objects/player.ts";

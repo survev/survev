@@ -1,5 +1,7 @@
 import * as PIXI from "pixi.js-legacy";
 
+import type { DebugRendererOpts } from "$lib/modules/ConfigManager.svelte.ts";
+import { device } from "$lib/modules/Device.svelte.ts";
 import type { LootDef } from "../../../shared/defs/gameObjectDefs.ts";
 import type { AmmoDef } from "../../../shared/defs/gameObjects/gearDefs.ts";
 import type { GunDef } from "../../../shared/defs/gameObjects/gunDefs.ts";
@@ -13,9 +15,7 @@ import { util } from "../../../shared/utils/util.ts";
 import { v2, type Vec2 } from "../../../shared/utils/v2.ts";
 import type { AudioManager } from "../audioManager.ts";
 import type { Camera } from "../camera.ts";
-import type { DebugRendererOpts } from "../config.ts";
 import { debugLines } from "../debug/debugLines.ts";
-import { device } from "../device.ts";
 import type { Map } from "../map.ts";
 import type { Renderer } from "../renderer.ts";
 import { Pool } from "./objectPool.ts";

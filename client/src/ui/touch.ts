@@ -1,6 +1,8 @@
 import $ from "jquery";
 import * as PIXI from "pixi.js-legacy";
 
+import type { ConfigManager } from "$lib/modules/ConfigManager.svelte.ts";
+import { device } from "$lib/modules/Device.svelte.ts";
 import { BulletDefs } from "../../../shared/defs/gameObjects/bulletDefs.ts";
 import type { GunDef } from "../../../shared/defs/gameObjects/gunDefs.ts";
 import type { ThrowableDef } from "../../../shared/defs/gameObjects/throwableDefs.ts";
@@ -11,8 +13,6 @@ import { math } from "../../../shared/utils/math.ts";
 import { util } from "../../../shared/utils/util.ts";
 import { v2, type Vec2 } from "../../../shared/utils/v2.ts";
 import type { Camera } from "../camera.ts";
-import type { ConfigManager } from "../config.ts";
-import { device } from "../device.ts";
 import type { InputHandler } from "./../input.ts";
 import type { Map } from "../map.ts";
 import type { Player } from "../objects/player.ts";

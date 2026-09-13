@@ -1,6 +1,7 @@
 import $ from "jquery";
 import * as PIXI from "pixi.js-legacy";
 
+import { device } from "$lib/modules/Device.svelte.ts";
 import { EmotesDefs } from "../../shared/defs/gameObjects/emoteDefs.ts";
 import type { AmmoDef } from "../../shared/defs/gameObjects/gearDefs.ts";
 import type { GunDef } from "../../shared/defs/gameObjects/gunDefs.ts";
@@ -16,7 +17,6 @@ import { util } from "../../shared/utils/util.ts";
 import { v2, type Vec2 } from "../../shared/utils/v2.ts";
 import type { AudioManager } from "./audioManager.ts";
 import type { Camera } from "./camera.ts";
-import { device } from "./device.ts";
 import { helpers } from "./helpers.ts";
 import type { InputHandler } from "./input.ts";
 import type { InputBinds } from "./inputBinds.ts";
