@@ -1,11 +1,8 @@
-import $ from "jquery";
-
 import type { MeleeDef } from "../../shared/defs/gameObjects/meleeDefs.ts";
 import { type MapDefKey, MapDefs } from "../../shared/defs/mapDefs.ts";
 import { GameObjectDefs } from "../../shared/defs/register.ts";
 import * as net from "../../shared/net/net.ts";
 import { util } from "../../shared/utils/util.ts";
-import { device } from "./device.ts";
 
 const truncateCanvas = document.createElement("canvas");
 
@@ -133,32 +130,10 @@ export const helpers = {
             elem.webkitRequestFullscreen?.();
         }
     },
-    copyTextToClipboard: function(text: string) {
-        try {
-            const $temp = $<HTMLInputElement>("<input>");
-            $("body").append($temp);
-            $temp.val(text);
-
-            if (device.os == "ios") {
-                const el = $temp.get(0)!;
-                const editable = el.contentEditable;
-                const readOnly = el.readOnly;
-                el.contentEditable = "true";
-                el.readOnly = true;
-                const range = document.createRange();
-                range.selectNodeContents(el);
-                const sel = window.getSelection()!;
-                sel.removeAllRanges();
-                sel.addRange(range);
-                el.setSelectionRange(0, 999999);
-                el.contentEditable = editable;
-                el.readOnly = readOnly;
-            } else {
-                $temp.trigger("select");
-            }
-            document.execCommand("copy");
-            $temp.remove();
-        } catch (_e) {}
+    copyTextToClipboard: async function(text: string) {
+        navigator.clipboard.writeText(text).catch(err => {
+            console.error("Failed to copy text to clipboard", err);
+        });
     },
     formatTime(time: number) {
         const minutes = Math.floor(time / 60) % 60;
