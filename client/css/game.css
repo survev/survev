@@ -1189,6 +1189,11 @@ img {
   background-image: url(/img/gui/ping-part-quarter.svg);
 }
 
+.ui-emote-bg-sixth {
+  opacity: 0.5;
+  background-image: url(/img/gui/ping-part-sixth.svg);
+}
+
 .ui-emote-bg-eighth {
   opacity: 0.5;
   background-image: url(/img/gui/ping-part-eighth.svg);
@@ -1201,60 +1206,16 @@ img {
   background-image: url(/img/gui/close.svg);
 }
 
-.ui-emote-top .ui-emote-image {
-  margin-top: -78px;
-  background-image: url(/img/gui/ping-team-danger.svg);
-}
-
-.ui-emote-right .ui-emote {
-  transform: translate(-50%, -50%) rotate(90deg);
-}
-
-.ui-emote-right .ui-emote-image {
-  margin-left: 78px;
-  background-image: url(/img/gui/ping-team-coming.svg);
-}
-
-.ui-emote-bottom .ui-emote {
-  transform: translate(-50%, -50%) rotate(180deg);
-}
-
-.ui-emote-bottom .ui-emote-image {
-  margin-top: 78px;
-  background-image: url(/img/gui/ping-team-help.svg);
-}
-
-.ui-emote-left .ui-emote {
-  transform: translate(-50%, -50%) rotate(270deg);
-}
-
-.ui-emote-left .ui-emote-image {
-  margin-left: -78px;
-  background-image: url(/img/gui/ping-team-help.svg);
-}
-
-.ui-emote-top-left .ui-emote-image {
-  margin-left: -80px;
-  margin-top: -30px;
-  background-image: url(/img/loot/loot-ammo-box.svg);
-}
-
-.ui-emote-bottom-left .ui-emote {
-  transform: translate(-50%, -50%) rotate(-45deg);
-}
-
-.ui-emote-bottom-left .ui-emote-image {
-  margin-left: -80px;
-  margin-top: 30px;
-  background-image: url(/img/loot/loot-medical-healthkit.svg);
-}
-
 .ui-emote-circle .ui-emote-hl {
   background-image: url(/img/gui/ping-part-circle-highlight.svg);
 }
 
 .ui-emote-quarter .ui-emote-hl {
   background-image: url(/img/gui/ping-part-quarter-highlight.svg);
+}
+
+.ui-emote-sixth .ui-emote-hl {
+  background-image: url(/img/gui/ping-part-sixth-highlight.svg);
 }
 
 .ui-emote-eighth .ui-emote-hl {
@@ -1268,16 +1229,36 @@ img {
   transform: translate(-50%, -50%);
 }
 
-.ui-emote-image-large {
+.ui-emote-image-quarter {
   width: 64px;
   height: 64px;
   background-size: 64px;
 }
 
-.ui-emote-image-small {
-  width: 35px;
-  height: 35px;
-  background-size: 35px;
+.ui-emote-image-sixth {
+  width: 52px;
+  height: 52px;
+  background-size: 52px;
+}
+
+.ui-emote-image-eighth {
+  width: 40px;
+  height: 40px;
+  background-size: 40px;
+}
+
+.ui-emote-image-ping {
+  width: 48px;
+  height: 48px;
+  background-size: contain;
+  background-position: center;
+}
+
+.ui-emote-image-ping-emote {
+  width: 32px;
+  height: 32px;
+  background-size: contain;
+  background-position: center;
 }
 
 /**
@@ -3565,6 +3546,11 @@ span.ui-stats-header-value {
     background-image: url(/img/gui/ping-part-quarter.svg);
   }
 
+  .ui-emote-bg-sixth {
+    opacity: 0.65;
+    background-image: url(/img/gui/ping-part-sixth.svg);
+  }
+
   .ui-emote-bg-eighth {
     opacity: 0.65;
     background-image: url(/img/gui/ping-part-eighth.svg);
@@ -3577,60 +3563,16 @@ span.ui-stats-header-value {
     background-image: none !important;
   }
 
-  .ui-emote-top .ui-emote-image {
-    margin-top: -78px;
-    background-image: url(/img/gui/ping-team-danger.svg);
-  }
-
-  .ui-emote-right .ui-emote {
-    transform: translate(-50%, -50%) rotate(90deg);
-  }
-
-  .ui-emote-right .ui-emote-image {
-    margin-left: 78px;
-    background-image: url(/img/gui/ping-team-coming.svg);
-  }
-
-  .ui-emote-bottom .ui-emote {
-    transform: translate(-50%, -50%) rotate(180deg);
-  }
-
-  .ui-emote-bottom .ui-emote-image {
-    margin-top: 78px;
-    background-image: url(/img/gui/ping-team-help.svg);
-  }
-
-  .ui-emote-left .ui-emote {
-    transform: translate(-50%, -50%) rotate(270deg);
-  }
-
-  .ui-emote-left .ui-emote-image {
-    margin-left: -78px;
-    background-image: url(/img/gui/ping-team-help.svg);
-  }
-
-  .ui-emote-top-left .ui-emote-image {
-    margin-left: -80px;
-    margin-top: -30px;
-    background-image: url(/img/loot/loot-ammo-box.svg);
-  }
-
-  .ui-emote-bottom-left .ui-emote {
-    transform: translate(-50%, -50%) rotate(-45deg);
-  }
-
-  .ui-emote-bottom-left .ui-emote-image {
-    margin-left: -80px;
-    margin-top: 30px;
-    background-image: url(/img/loot/loot-medical-healthkit.svg);
-  }
-
   .ui-emote-circle .ui-emote-hl {
     background-image: url(/img/gui/ping-part-circle-highlight.svg);
   }
 
   .ui-emote-quarter .ui-emote-hl {
     background-image: url(/img/gui/ping-part-quarter-highlight.svg);
+  }
+
+  .ui-emote-sixth .ui-emote-hl {
+    background-image: url(/img/gui/ping-part-sixth-highlight.svg);
   }
 
   .ui-emote-eighth .ui-emote-hl {
@@ -3644,17 +3586,39 @@ span.ui-stats-header-value {
     transform: translate(-50%, -50%);
   }
 
-  .ui-emote-image-large {
-    width: 80px;
-    height: 80px;
+  .ui-emote-image-quarter {
+    width: 64px;
+    height: 64px;
     background-size: 64px;
     background-position: center;
   }
 
-  .ui-emote-image-small {
-    width: 35px;
-    height: 35px;
-    background-size: 35px;
+  .ui-emote-image-sixth {
+    width: 52px;
+    height: 52px;
+    background-size: 52px;
+    background-position: center;
+  }
+
+  .ui-emote-image-eighth {
+    width: 40px;
+    height: 40px;
+    background-size: 40px;
+    background-position: center;
+  }
+
+  .ui-emote-image-ping {
+    width: 48px;
+    height: 48px;
+    background-size: contain;
+    background-position: center;
+  }
+
+  .ui-emote-image-ping-emote {
+    width: 32px;
+    height: 32px;
+    background-size: contain;
+    background-position: center;
   }
 
   /**

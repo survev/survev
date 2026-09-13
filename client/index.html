@@ -107,59 +107,14 @@
           <div id="ui-emote-middle" class="ui-emote-middle ui-emote-circle ui-emote-parent" data-key="middle" data-id="0">
             <div class="ui-emote ui-emote-bg-circle"></div>
             <div class="ui-emote ui-emote-hl"></div>
-            <div class="ui-emote-image ui-emote-image-large"></div>
-          </div>
-          <div id="ui-emote-top" class="ui-emote-top ui-emote-quarter ui-emote-parent" data-key="top" data-id="1">
-            <div class="ui-emote ui-emote-bg-quarter"></div>
-            <div class="ui-emote ui-emote-hl"></div>
-            <div class="ui-emote-image ui-emote-image-large"></div>
-          </div>
-          <div id="ui-emote-right" class="ui-emote-right ui-emote-quarter ui-emote-parent" data-key="right" data-id="2">
-            <div class="ui-emote ui-emote-bg-quarter"></div>
-            <div class="ui-emote ui-emote-hl"></div>
-            <div class="ui-emote-image ui-emote-image-large"></div>
-          </div>
-          <div id="ui-emote-bottom" class="ui-emote-bottom ui-emote-quarter ui-emote-parent" data-key="bottom" data-id="3">
-            <div class="ui-emote ui-emote-bg-quarter"></div>
-            <div class="ui-emote ui-emote-hl"></div>
-            <div class="ui-emote-image ui-emote-image-large"></div>
-          </div>
-          <div id="ui-emote-left" class="ui-emote-left ui-emote-quarter ui-emote-parent" data-key="left" data-id="4">
-            <div class="ui-emote ui-emote-bg-quarter"></div>
-            <div class="ui-emote ui-emote-hl"></div>
-            <div class="ui-emote-image ui-emote-image-large"></div>
+            <div class="ui-emote-image"></div>
           </div>
         </div>
         <div id="ui-team-pings" class="ui-emote-wheel">
           <div id="ui-team-ping-middle" class="ui-emote-middle ui-emote-circle ui-emote-parent" data-id="0">
             <div class="ui-emote ui-emote-bg-circle"></div>
             <div class="ui-emote ui-emote-hl"></div>
-            <div class="ui-emote-image ui-emote-image-large"></div>
-          </div>
-          <div id="ui-team-ping-top" class="ui-emote-top ui-emote-quarter ui-emote-parent" data-id="1">
-            <div class="ui-emote ui-emote-bg-quarter"></div>
-            <div class="ui-emote ui-emote-hl"></div>
-            <div class="ui-emote-image ui-emote-image-large"></div>
-          </div>
-          <div id="ui-team-ping-right" class="ui-emote-right ui-emote-quarter ui-emote-parent" data-id="2">
-            <div class="ui-emote ui-emote-bg-quarter"></div>
-            <div class="ui-emote ui-emote-hl"></div>
-            <div class="ui-emote-image ui-emote-image-large"></div>
-          </div>
-          <div id="ui-team-ping-bottom" class="ui-emote-bottom ui-emote-quarter ui-emote-parent" data-id="3">
-            <div class="ui-emote ui-emote-bg-quarter"></div>
-            <div class="ui-emote ui-emote-hl"></div>
-            <div class="ui-emote-image ui-emote-image-large"></div>
-          </div>
-          <div id="ui-team-ping-bottom-left" class="ui-emote-bottom-left ui-emote-eighth ui-emote-parent" data-id="4">
-            <div class="ui-emote ui-emote-bg-eighth"></div>
-            <div class="ui-emote ui-emote-hl"></div>
-            <div class="ui-emote-image ui-emote-image-small"></div>
-          </div>
-          <div id="ui-team-ping-top-left" class="ui-emote-top-left ui-emote-eighth ui-emote-parent" data-id="5">
-            <div class="ui-emote ui-emote-bg-eighth"></div>
-            <div class="ui-emote ui-emote-hl"></div>
-            <div class="ui-emote-image ui-emote-image-small"></div>
+            <div class="ui-emote-image"></div>
           </div>
         </div>
         <div id="ui-team-indicators" class="js-ui-map-hidden js-desktop-ui-hud-show">
@@ -1251,39 +1206,23 @@
           </div>
           <div id="modal-content-right-emote" class="modal-content-right modal-content-shadow">
             <div id="customize-emote-parent">
+              <div id="customize-emote-rotate-btn-ccw" class="customize-emote-rotate-btn rotate-ccw btn-darken" title="Rotate wheel counter-clockwise"></div>
+              <div id="customize-emote-rotate-btn-cw" class="customize-emote-rotate-btn rotate-cw btn-darken" title="Rotate wheel clockwise"></div>
+              <div id="customize-emote-sliders">
+                <div class="crosshair-slider-container">
+                  <p><span data-l10n="loadout-slots">Slots</span>: <span id="emote-slots-val">4</span></p>
+                  <input type="range" min="4" max="8" step="2" value="4" class="crosshair-slider" id="emote-slots-slider">
+                </div>
+              </div>
               <div id="customize-emote-wheel" class="ui-emote-wheel">
                 <div id="customize-emote-middle" class="ui-emote-middle ui-emote-circle ui-emote-parent">
                   <div class="ui-emote ui-emote-bg-circle"></div>
                   <div class="ui-emote ui-emote-hl"></div>
                   <div class="customize-emote-slot customize-item-image ui-emote-image"></div>
                 </div>
-                <div id="customize-emote-top" class="ui-emote-top ui-emote-quarter ui-emote-parent" data-slot="emoteTop" data-idx="0">
-                  <div class="ui-emote ui-emote-bg-quarter"></div>
-                  <div class="ui-emote ui-emote-hl"></div>
-                  <div class="customize-emote-slot customize-item-image ui-emote-image"></div>
-                  <div class="customize-col customize-col-small" draggable="true"></div>
-                </div>
-                <div id="customize-emote-right" class="ui-emote-right ui-emote-quarter ui-emote-parent" data-slot="emoteRight" data-idx="1">
-                  <div class="ui-emote ui-emote-bg-quarter"></div>
-                  <div class="ui-emote ui-emote-hl"></div>
-                  <div class="customize-emote-slot customize-item-image ui-emote-image"></div>
-                  <div class="customize-col customize-col-small" draggable="true"></div>
-                </div>
-                <div id="customize-emote-bottom" class="ui-emote-bottom ui-emote-quarter ui-emote-parent" data-slot="emoteBottom" data-idx="2">
-                  <div class="ui-emote ui-emote-bg-quarter"></div>
-                  <div class="ui-emote ui-emote-hl"></div>
-                  <div class="customize-emote-slot customize-item-image ui-emote-image"></div>
-                  <div class="customize-col customize-col-small" draggable="true"></div>
-                </div>
-                <div id="customize-emote-left" class="ui-emote-left ui-emote-quarter ui-emote-parent" data-slot="emoteLeft" data-idx="3">
-                  <div class="ui-emote ui-emote-bg-quarter"></div>
-                  <div class="ui-emote ui-emote-hl"></div>
-                  <div class="customize-emote-slot customize-item-image ui-emote-image"></div>
-                  <div class="customize-col customize-col-small" draggable="true"></div>
-                </div>
               </div>
               <div id="customize-emote-autos">
-                <div id="customize-emote-win" class="ui-emote-middle ui-emote-circle ui-emote-parent" data-slot="emoteWin" data-idx="4">
+                <div id="customize-emote-win" class="ui-emote-middle ui-emote-circle ui-emote-parent" data-slot="emoteWin" data-idx="8">
                   <div class="ui-emote ui-emote-auto-trash"></div>
                   <div class="ui-emote ui-emote-auto-icon ui-emote-auto-chicken"></div>
                   <div class="ui-emote ui-emote-bg-circle-outer"></div>
@@ -1292,7 +1231,7 @@
                   <div class="customize-emote-slot customize-item-image"></div>
                   <div class="customize-col customize-col-large" draggable="true"></div>
                 </div>
-                <div id="customize-emote-death" class="ui-emote-middle ui-emote-circle ui-emote-parent" data-slot="emoteDeath" data-idx="5">
+                <div id="customize-emote-death" class="ui-emote-middle ui-emote-circle ui-emote-parent" data-slot="emoteDeath" data-idx="9">
                   <div class="ui-emote ui-emote-auto-trash"></div>
                   <div class="ui-emote ui-emote-auto-icon ui-emote-auto-skull"></div>
                   <div class="ui-emote ui-emote-bg-circle-outer"></div>

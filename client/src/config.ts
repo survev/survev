@@ -116,6 +116,8 @@ const defaultConfig = {
     regionSelected: false,
     lastNewsTimestamp: 0,
     perkModeRole: "",
+    emoteWheelSlots: 4,
+    emoteWheelRotated: false,
     loadout: loadout.defaultLoadout(),
     sessionCookie: "" as string | null,
     binds: "",

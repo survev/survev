@@ -172,7 +172,11 @@ export const helpers = {
         return timeSurv;
     },
     emoteImgToSvg(img: string) {
-        return img && img.length > 4 ? `../img/emotes/${img.slice(0, -4)}.svg` : "";
+        if (!img || img.length <= 4) return "";
+        if (img.startsWith("loot-")) {
+            return `../img/loot/${img.slice(0, -4)}.svg`;
+        }
+        return `../img/emotes/${img.slice(0, -4)}.svg`;
     },
     getSvgFromGameType: function(gameType: string) {
         const def = GameObjectDefs.typeToDefSafe(gameType);
@@ -195,7 +199,12 @@ export const helpers = {
             case "boost_effect":
                 return `img/particles/${def.texture.slice(0, -4)}.svg`;
             case "emote":
+                if (def.texture.startsWith("loot-")) {
+                    return `img/loot/${def.texture.slice(0, -4)}.svg`;
+                }
                 return `img/emotes/${def.texture.slice(0, -4)}.svg`;
+            case "ping":
+                return `img/gui/${def.texture?.slice(0, -4)}.svg`;
             case "crosshair":
                 return `img/crosshairs/${def.texture.slice(0, -4)}.svg`;
             case "outfit": {
@@ -284,5 +293,43 @@ ${r} 0 0 0 0 \
                 window.turnstile.remove("#start-turnstile-container");
             },
         });
+    },
+    forEachEmoteWheelSlot: function(
+        slotsCount: number,
+        isRotated: boolean,
+        cb: (info: {
+            i: number;
+            wedgeType: string;
+            bgRotation: number;
+            marginLeft: number;
+            marginTop: number;
+            vA_deg: number;
+            vC_deg: number;
+        }) => void,
+    ) {
+        const sectorAngle = 360 / slotsCount;
+        const halfSector = sectorAngle / 2;
+        const angleOffset = isRotated ? halfSector : 0;
+        const wedgeType = ({ 4: "quarter", 6: "sixth", 8: "eighth" } as Record<number, string>)[slotsCount] || "eighth";
+        const radius = ({ 4: 78, 6: 82, 8: 86 } as Record<number, number>)[slotsCount] || 86;
+
+        for (let i = 0; i < slotsCount; i++) {
+            const centerAngle = (i * sectorAngle + angleOffset) % 360;
+            const bgRotation = slotsCount == 8 ? (centerAngle + 67.5) % 360 : centerAngle;
+            const rad = (centerAngle * Math.PI) / 180;
+            const marginLeft = Math.round(radius * Math.sin(rad));
+            const marginTop = Math.round(-radius * Math.cos(rad));
+            const mathCenter = (90 - centerAngle + 360) % 360;
+
+            cb({
+                i,
+                wedgeType,
+                bgRotation,
+                marginLeft,
+                marginTop,
+                vA_deg: (mathCenter + halfSector + 360) % 360,
+                vC_deg: (mathCenter - halfSector + 360) % 360,
+            });
+        }
     },
 };

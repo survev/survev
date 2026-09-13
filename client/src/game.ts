@@ -247,6 +247,7 @@ export class Game {
             this.m_playerBarn,
             this.m_camera,
             this.m_map,
+            this.m_config,
         );
         this.m_shotBarn = new ShotBarn();
         this.debugHUD = new DebugHUD(this.m_config);

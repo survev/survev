@@ -77,10 +77,13 @@ export const loadout = {
         };
 
         const defaultEmotes = GameConfig.defaultEmoteLoadout.slice();
+        const inputEmotes = mergedLoadout.emotes;
+        const hasEmotesInput = Array.isArray(inputEmotes) && inputEmotes.length > 0;
         for (let i = 0; i < GameConfig.EmoteSlot.Count; i++) {
-            const inputEmote = i < mergedLoadout.emotes.length ? mergedLoadout.emotes[i] : "";
+            const inputEmote = inputEmotes ? (inputEmotes[i] || "") : "";
+            const defaultValue = hasEmotesInput ? "" : defaultEmotes[i];
             validatedLoadout.emotes.push(
-                getGameType("emote", inputEmote, defaultEmotes[i]),
+                getGameType("emote", inputEmote, defaultValue),
             );
         }
         return validatedLoadout;
