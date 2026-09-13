@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="128" height="128" version="1.1" xmlns="http://www.w3.org/2000/svg">
+ <defs>
+  <clipPath id="clipPath1">
+   <circle cx="64" cy="64" r="64"/>
+  </clipPath>
+  <clipPath id="clipPath3">
+   <circle cx="64" cy="64" r="64"/>
+  </clipPath>
+  <clipPath id="clipPath5">
+   <circle cx="64" cy="64" r="64"/>
+  </clipPath>
+ </defs>
+ <g>
+  <circle cx="64" cy="64" r="64" fill="#f0f0f0"/>
+  <rect width="128" height="42.67" clip-path="url(#clipPath5)" fill="#d80027"/>
+  <rect y="85.33" width="128" height="42.67" clip-path="url(#clipPath3)"/>
+  <polygon points="64 64 0 0 0 128" clip-path="url(#clipPath1)" fill="#6da544"/>
+ </g>
+</svg>
