@@ -196,12 +196,7 @@ export class ConfigManager {
     set<T extends ConfigKey>(key: T, value: ConfigType[T]) {
         if (!key) return;
 
-        const path = key.split(".");
-
-        let el: any = this.config;
-        while (path.length > 1) el = el[path.shift()!];
-
-        el[path.shift()!] = value;
+        this.config[key] = value;
 
         this.store();
         this.onModified(key);
@@ -210,12 +205,7 @@ export class ConfigManager {
     get<T extends ConfigKey>(key: T): ConfigType[T] | undefined {
         if (!key) return undefined;
 
-        const path = key.split(".");
-
-        let el: any = this.config;
-        for (let i = 0; i < path.length; i++) el = el[path[i]];
-
-        return el as ConfigType[T] | undefined;
+        return this.config[key];
     }
 
     addModifiedListener(e: (key?: string) => void) {
