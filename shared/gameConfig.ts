@@ -1,4 +1,4 @@
-import type { LootDef } from "./defs/gameObjectDefs";
+import type { LootDef } from "./defs/gameObjectDefs.ts";
 
 export enum Action {
     None,

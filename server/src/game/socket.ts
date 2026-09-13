@@ -1,4 +1,4 @@
-import type { GameWsDisconnectReason } from "../../../shared/types/api";
+import type { GameWsDisconnectReason } from "../../../shared/types/api.ts";
 
 export abstract class ClientSocket<T extends object> {
     private _userData?: WeakRef<T>;

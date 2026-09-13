@@ -1,6 +1,6 @@
 import $ from "jquery";
-import type { Application } from "../main";
-import type { SDKManager as BaseSDKManager } from "./sdk-manager";
+import type { Application } from "../main.ts";
+import type { SDKManager as BaseSDKManager } from "./sdk-manager.ts";
 
 // Prevent Iframe issues
 if (window.self !== window.top) {

@@ -1,7 +1,7 @@
-import type { MapDefKey } from "../../../shared/defs/mapDefs";
-import type { TeamMode } from "../../../shared/gameConfig";
-import type { FindGamePrivateBody, ServerGameConfig } from "../utils/types";
-import type { SpectateTokenData } from "./game";
+import type { MapDefKey } from "../../../shared/defs/mapDefs.ts";
+import type { TeamMode } from "../../../shared/gameConfig.ts";
+import type { FindGamePrivateBody, ServerGameConfig } from "../utils/types.ts";
+import type { SpectateTokenData } from "./game.ts";
 
 export interface GameData {
     id: string;

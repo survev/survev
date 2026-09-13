@@ -1,4 +1,4 @@
-import type { Rarity } from "../../gameConfig";
+import type { Rarity } from "../../gameConfig.ts";
 
 export interface LootImg {
     sprite: string;

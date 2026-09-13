@@ -1,4 +1,4 @@
-import type { Application } from "../main";
+import type { Application } from "../main.ts";
 
 export class SDKManager {
     isPoki = false;

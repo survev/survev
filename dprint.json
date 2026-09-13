@@ -30,7 +30,7 @@
   "excludes": [
     "**/node_modules",
     "**/*-lock.json",
-    "**/*.svg",
+    "**/*.svg"
   ],
   "plugins": [
     "npm:@dprint/typescript@0.96.1",

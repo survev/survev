@@ -25,6 +25,7 @@
       "error",
       "always",
       {
+        "checkTypeImports": true,
         "ignorePackages": true
       }
     ],
