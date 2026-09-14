@@ -657,21 +657,21 @@ export class Game {
 
             // Process 'drop' actions triggered from the ui
             let playDropSound = false;
-            for (let X = 0; X < this.m_ui2Manager.uiEvents.length; X++) {
-                const uiEvent = this.m_ui2Manager.uiEvents[X];
+            for (let i = 0; i < this.m_ui2Manager.uiEvents.length; i++) {
+                const uiEvent = this.m_ui2Manager.uiEvents[i];
                 if (uiEvent.action == "drop") {
                     const dropMsg = new net.DropItemMsg();
                     if (uiEvent.type == "weapon") {
                         const eventData = uiEvent.data as number;
-                        const Y = this.m_activePlayer.m_localData.m_weapons;
-                        dropMsg.item = Y[eventData].type;
+                        const weapons = this.m_activePlayer.m_localData.m_weapons;
+                        dropMsg.item = weapons[eventData].type;
                         dropMsg.weapIdx = eventData;
                     } else if (uiEvent.type == "perk") {
                         const eventData = uiEvent.data as number;
-                        const J = this.m_activePlayer.m_netData.m_perks;
-                        const Q = J.length > eventData ? J[eventData] : null;
-                        if (Q?.droppable) {
-                            dropMsg.item = Q.type;
+                        const perks = this.m_activePlayer.m_netData.m_perks;
+                        const perk = perks.length > eventData ? perks[eventData] : null;
+                        if (perk?.droppable) {
+                            dropMsg.item = perk.type;
                         }
                     } else {
                         const item = uiEvent.data == "helmet"
