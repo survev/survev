@@ -6,7 +6,7 @@ import { GameConfig, type Input } from "../../shared/gameConfig.ts";
 import type { Connection } from "../net/connection.ts";
 import * as net from "../net/net.ts";
 import { type ObjectData, type ObjectsPartialData, ObjectType } from "../net/objectSerializeFns.ts";
-import type { LocalData } from "../net/updateMsg.ts";
+import type { LocalData } from "../net/serverMsgs/updateMsg.ts";
 import { util } from "./util.ts";
 import { v2 } from "./v2.ts";
 
@@ -165,7 +165,7 @@ export class Bot {
                 };
                 joinMsg.joinToken = joinToken;
 
-                this.sendMsg(net.MsgType.Join, joinMsg);
+                this.sendMsg(joinMsg);
 
                 this.connected = true;
 
@@ -185,33 +185,23 @@ export class Bot {
         this.connection.onMessage = (data): void => {
             const stream = new net.MsgStream(data as ArrayBuffer);
             while (true) {
-                const type = stream.deserializeMsgType();
-                if (type == net.MsgType.None) {
+                const msg = stream.deserializeServerMsg();
+                if (!msg) {
                     break;
                 }
-                this.onMsg(type, stream.getStream());
+                this.onMsg(msg);
                 stream.stream.readAlignToNextByte();
             }
         };
     }
 
-    onMsg(type: number, stream: net.BitStream): void {
-        switch (type) {
-            case net.MsgType.Joined: {
-                const msg = new net.JoinedMsg();
-                msg.deserialize(stream);
+    onMsg(msg: net.ServerMsg): void {
+        switch (msg.type) {
+            case net.ServerMsgType.Joined: {
                 this.emotes = msg.emotes;
                 break;
             }
-            case net.MsgType.Map: {
-                const msg = new net.MapMsg();
-                msg.deserialize(stream);
-                break;
-            }
-            case net.MsgType.Update: {
-                const msg = new net.UpdateMsg();
-                msg.deserialize(stream, this.objectCreator);
-
+            case net.ServerMsgType.Update: {
                 if (msg.activePlayerData.weapsDirty) {
                     this.weapons = msg.activePlayerData.weapons;
                 }
@@ -235,24 +225,7 @@ export class Bot {
 
                 break;
             }
-            case net.MsgType.Kill: {
-                const msg = new net.KillMsg();
-                msg.deserialize(stream);
-                break;
-            }
-            case net.MsgType.RoleAnnouncement: {
-                const msg = new net.RoleAnnouncementMsg();
-                msg.deserialize(stream);
-                break;
-            }
-            case net.MsgType.PlayerStats: {
-                const msg = new net.PlayerStatsMsg();
-                msg.deserialize(stream);
-                break;
-            }
-            case net.MsgType.GameOver: {
-                const msg = new net.GameOverMsg();
-                msg.deserialize(stream);
+            case net.ServerMsgType.GameOver: {
                 console.log(
                     `Bot ${this.id} ${msg.gameOver ? "won" : "died"} | kills: ${
                         msg.playerStats[0].kills
@@ -265,28 +238,14 @@ export class Bot {
                 }
                 break;
             }
-            case net.MsgType.Pickup: {
-                const msg = new net.PickupMsg();
-                msg.deserialize(stream);
-                break;
-            }
-            case net.MsgType.UpdatePass: {
-                new net.UpdatePassMsg().deserialize(stream);
-                break;
-            }
-            case net.MsgType.AliveCounts: {
-                const msg = new net.AliveCountsMsg();
-                msg.deserialize(stream);
-                break;
-            }
         }
     }
 
     stream = new net.MsgStream(new ArrayBuffer(1024));
 
-    sendMsg(type: net.MsgType, msg: net.Msg): void {
+    sendMsg(msg: net.ClientMsg): void {
         this.stream.stream.index = 0;
-        this.stream.serializeMsg(type, msg);
+        this.stream.serializeMsg(msg);
 
         this.connection.send(this.stream.getBuffer());
     }
@@ -318,11 +277,11 @@ export class Bot {
         }
         this.inputs.length = 0;
 
-        this.sendMsg(net.MsgType.Input, inputPacket);
+        this.sendMsg(inputPacket);
 
         if (this.emote) {
             const emoteMsg = new net.EmoteMsg();
-            emoteMsg.type = util.randomItem(this.emotes);
+            emoteMsg.emoteType = util.randomItem(this.emotes);
         }
     }
 

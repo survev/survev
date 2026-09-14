@@ -1,7 +1,7 @@
 import * as PIXI from "pixi.js-legacy";
 import { type BulletDef, BulletDefs } from "../../../shared/defs/gameObjects/bulletDefs.ts";
 import { GameConfig } from "../../../shared/gameConfig.ts";
-import type { Bullet } from "../../../shared/net/updateMsg.ts";
+import type { Bullet } from "../../../shared/net/serverMsgs/updateMsg.ts";
 import { collider } from "../../../shared/utils/collider.ts";
 import { math } from "../../../shared/utils/math.ts";
 import { util } from "../../../shared/utils/util.ts";

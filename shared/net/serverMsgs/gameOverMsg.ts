@@ -1,7 +1,10 @@
-import type { AbstractMsg, BitStream } from "./net.ts";
+import { type AbstractServerMsg, ServerMsgType } from "../constants.ts";
+import type { BitStream } from "../stream.ts";
 import { PlayerStatsMsg } from "./playerStatsMsg.ts";
 
-export class GameOverMsg implements AbstractMsg {
+export class GameOverMsg implements AbstractServerMsg {
+    readonly type = ServerMsgType.GameOver;
+
     teamId = 0;
     teamRank = 0;
     gameOver = false;

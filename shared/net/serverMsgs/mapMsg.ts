@@ -1,8 +1,9 @@
-import type { MapDef, MapDefKey } from "../defs/mapDefs.ts";
-import type { Collider } from "../utils/coldet.ts";
-import type { MapRiverData } from "../utils/terrainGen.ts";
-import type { Vec2 } from "../utils/v2.ts";
-import { type AbstractMsg, type BitStream, Constants } from "./net.ts";
+import type { MapDef, MapDefKey } from "../../defs/mapDefs.ts";
+import type { Collider } from "../../utils/coldet.ts";
+import type { MapRiverData } from "../../utils/terrainGen.ts";
+import type { Vec2 } from "../../utils/v2.ts";
+import { AbstractServerMsg, Constants, ServerMsgType } from "../constants.ts";
+import type { BitStream } from "../stream.ts";
 
 function serializeMapRiver(s: BitStream, data: MapRiverData) {
     s.writeUint8(data.width);
@@ -92,7 +93,9 @@ function deserializeMapObj(s: BitStream): MapObj {
     return obj;
 }
 
-export class MapMsg implements AbstractMsg {
+export class MapMsg implements AbstractServerMsg {
+    readonly type = ServerMsgType.Map;
+
     mapName = "" as MapDefKey;
     seed = 0;
     width = 0;

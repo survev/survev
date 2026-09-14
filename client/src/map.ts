@@ -4,7 +4,7 @@ import type { BuildingDef } from "../../shared/defs/mapObjects/buildings/buildin
 import type { ObstacleDef } from "../../shared/defs/mapObjects/obstacles/obstacleDefs.ts";
 import { MapObjectDefs } from "../../shared/defs/register.ts";
 import { GameConfig } from "../../shared/gameConfig.ts";
-import type { GroundPatch, MapMsg } from "../../shared/net/mapMsg.ts";
+import type { GroundPatch, MapMsg } from "../../shared/net/serverMsgs/mapMsg.ts";
 import { coldet, type Collider } from "../../shared/utils/coldet.ts";
 import { collider } from "../../shared/utils/collider.ts";
 import { mapHelpers } from "../../shared/utils/mapHelpers.ts";

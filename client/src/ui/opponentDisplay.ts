@@ -3,7 +3,7 @@ import * as PIXI from "pixi.js-legacy";
 import type { OutfitDef } from "../../../shared/defs/gameObjects/outfitDefs.ts";
 import { GameObjectDefs } from "../../../shared/defs/register.ts";
 import { type Action, type Anim, GameConfig } from "../../../shared/gameConfig.ts";
-import type { MapMsg } from "../../../shared/net/mapMsg.ts";
+import { type MapMsg, ServerMsgType } from "../../../shared/net/net.ts";
 import { type ObjectData, ObjectType } from "../../../shared/net/objectSerializeFns.ts";
 import { collider } from "../../../shared/utils/collider.ts";
 import { type Loadout, loadout as loadouts } from "../../../shared/utils/loadout.ts";
@@ -127,6 +127,7 @@ export class LoadoutDisplay {
 
         this.map.loadMap(
             {
+                type: ServerMsgType.Map,
                 grassInset: 18,
                 groundPatches: [],
                 height: 720,

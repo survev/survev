@@ -1,4 +1,5 @@
-import type { AbstractMsg, BitStream } from "./net.ts";
+import { type AbstractClientMsg, ClientMsgType } from "../constants.ts";
+import type { BitStream } from "../stream.ts";
 
 export enum SpectateAction {
     None,
@@ -7,7 +8,9 @@ export enum SpectateAction {
     Prev,
 }
 
-export class SpectateMsg implements AbstractMsg {
+export class SpectateMsg implements AbstractClientMsg {
+    readonly type = ClientMsgType.Spectate;
+
     action: SpectateAction = SpectateAction.None;
 
     serialize(s: BitStream) {

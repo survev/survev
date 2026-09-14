@@ -15,7 +15,7 @@ import {
     type LocalDataWithDirty,
     type PlayerInfo,
     type PlayerStatus,
-} from "../../../shared/net/updateMsg.ts";
+} from "../../../shared/net/serverMsgs/updateMsg.ts";
 import { coldet } from "../../../shared/utils/coldet.ts";
 import { collider } from "../../../shared/utils/collider.ts";
 import { collisionHelpers } from "../../../shared/utils/collisionHelpers.ts";
