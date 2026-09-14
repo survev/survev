@@ -729,43 +729,68 @@ export class Game {
         this.m_uiManager.roleSelected = "";
 
         // Only send a InputMsg if the new data has changed from the previously sent data. For the look direction, we need to determine if the angle difference is large enough.
+        let pointerInputDiff = false;
         let diff = false;
-        for (const k in inputMsg) {
-            if (inputMsg.hasOwnProperty(k)) {
-                if (k == "inputs") {
-                    diff = inputMsg[k].length > 0;
-                } else if (k == "toMouseDir" || k == "touchMoveDir") {
-                    const dot = math.clamp(
-                        v2.dot(inputMsg[k], this.m_prevInputMsg[k]),
-                        -1,
-                        1,
-                    );
-                    const angle = math.rad2deg(Math.acos(dot));
+        for (const k of Object.keys(inputMsg) as (keyof net.InputMsg)[]) {
+            if (k == "seq") continue;
+            if (k == "inputs") {
+                diff = inputMsg[k].length > 0;
+            } else if (k == "toMouseDir" || k == "touchMoveDir") {
+                const dot = math.clamp(
+                    v2.dot(inputMsg[k], this.m_prevInputMsg[k]),
+                    -1,
+                    1,
+                );
+                const angle = math.rad2deg(Math.acos(dot));
+                if (k == "toMouseDir") {
+                    pointerInputDiff ||= angle > 0.1;
+                } else {
                     diff = angle > 0.1;
-                } else if (k == "toMouseLen") {
-                    diff = Math.abs(this.m_prevInputMsg[k] - inputMsg[k]) > 0.5;
-                } else if (k == "shootStart") {
-                    diff = inputMsg[k] || inputMsg[k] != this.m_prevInputMsg[k];
-                } else if (
-                    this.m_prevInputMsg[k as keyof typeof this.m_prevInputMsg]
-                        != inputMsg[k as keyof typeof inputMsg]
-                ) {
-                    diff = true;
                 }
-                if (diff) {
-                    break;
-                }
+            } else if (k == "toMouseLen") {
+                pointerInputDiff ||= Math.abs(this.m_prevInputMsg[k] - inputMsg[k]) > 0.5;
+            } else if (k == "shootStart") {
+                diff = inputMsg[k] || inputMsg[k] != this.m_prevInputMsg[k];
+            } else if (
+                this.m_prevInputMsg[k] != inputMsg[k]
+            ) {
+                diff = true;
+            }
+            if (diff) {
+                break;
             }
         }
         this.m_inputMsgTimeout -= dt;
-        if (diff || this.m_inputMsgTimeout < 0) {
+
+        const onlyPointerInputChanged = !diff && pointerInputDiff;
+
+        // for mouse inputs, rate limit them based on buffered amount and send rate
+        // this should help prevent the server kicking players in the following scenarios:
+        //
+        // - Websocket connection temporarily frozen, before it would just accumulate all inputs
+        // and send them when it unfreezes, causing hundreds of inputs to be sent at once
+        //
+        // - Weirdos who uncap their framerate causing the client to send over 500 msgs per second
+        // 0.003 value caps it to a maximum of 333 inputs per second
+        const bufferedAmount = this.m_connection?.bufferedAmount || 0;
+        const timeSinceLastInput = 1 - this.m_inputMsgTimeout;
+        const rateLimitMouseInputs = bufferedAmount > 256 || timeSinceLastInput < 0.003;
+        if (diff || pointerInputDiff || this.m_inputMsgTimeout < 0) {
             if (!this.seqInFlight) {
                 this.seq = (this.seq + 1) % 256;
                 this.seqSendTime = Date.now();
                 this.seqInFlight = true;
                 inputMsg.seq = this.seq;
             }
-            this.m_sendMessage(net.MsgType.Input, inputMsg, 128);
+            if (onlyPointerInputChanged && !rateLimitMouseInputs) {
+                const pInput = new net.PointerInputMsg();
+                pInput.seq = inputMsg.seq;
+                pInput.toMouseDir = inputMsg.toMouseDir;
+                pInput.toMouseLen = inputMsg.toMouseLen;
+                this.m_sendMessage(net.MsgType.PointerInput, pInput, 128);
+            } else {
+                this.m_sendMessage(net.MsgType.Input, inputMsg, 128);
+            }
             this.m_inputMsgTimeout = 1;
             this.m_prevInputMsg = inputMsg;
         }
