@@ -9,7 +9,7 @@ import { PingDefs } from "../../shared/defs/gameObjects/pingDefs.ts";
 import type { ThrowableDef } from "../../shared/defs/gameObjects/throwableDefs.ts";
 import { GameObjectDefs } from "../../shared/defs/register.ts";
 import { EmoteSlot, GameConfig, Input, type TeamMode } from "../../shared/gameConfig.ts";
-import type { Emote } from "../../shared/net/updateMsg.ts";
+import type { Emote } from "../../shared/net/serverMsgs/updateMsg.ts";
 import { coldet } from "../../shared/utils/coldet.ts";
 import { math } from "../../shared/utils/math.ts";
 import { util } from "../../shared/utils/util.ts";

@@ -1,5 +1,6 @@
-import { DamageType } from "../gameConfig.ts";
-import type { AbstractMsg, BitStream } from "./net.ts";
+import { DamageType } from "../../gameConfig.ts";
+import type { AbstractMsg } from "../constants.ts";
+import type { BitStream } from "../stream.ts";
 
 export class KillMsg implements AbstractMsg {
     itemSourceType = "";

@@ -898,7 +898,7 @@ export class Player extends BaseGameObject {
         msg.role = role;
         msg.assigned = true;
         msg.playerId = this.__id;
-        this.game.clientBarn.broadcastMsg(net.MsgType.RoleAnnouncement, msg);
+        this.game.clientBarn.broadcastMsg(net.ServerMsgType.RoleAnnouncement, msg);
 
         switch (role) {
             case "leader":
@@ -1125,7 +1125,7 @@ export class Player extends BaseGameObject {
             msg.role = "kill_leader";
             msg.assigned = true;
             msg.playerId = this.__id;
-            this.game.clientBarn.broadcastMsg(net.MsgType.RoleAnnouncement, msg);
+            this.game.clientBarn.broadcastMsg(net.ServerMsgType.RoleAnnouncement, msg);
         }
     }
 
@@ -1846,7 +1846,7 @@ export class Player extends BaseGameObject {
                         this.weaponManager.showNextThrowable();
                     }
 
-                    this.client.sendMsg(net.MsgType.Pickup, msg);
+                    this.client.sendMsg(net.ServerMsgType.Pickup, msg);
                 }
             }
 
@@ -2540,7 +2540,7 @@ export class Player extends BaseGameObject {
         if (this.game.modeManager.showStatsMsg(this)) {
             const statsMsg = new net.PlayerStatsMsg();
             statsMsg.playerStats = this;
-            this.client.sendMsg(net.MsgType.PlayerStats, statsMsg);
+            this.client.sendMsg(net.ServerMsgType.PlayerStats, statsMsg);
         } else {
             this.sentGameOverMsg = true;
 
@@ -2552,10 +2552,10 @@ export class Player extends BaseGameObject {
             gameOverMsg.teamId = this.teamId;
             gameOverMsg.winningTeamId = winningTeamId;
             gameOverMsg.gameOver = !!winningTeamId;
-            this.client.sendMsg(net.MsgType.GameOver, gameOverMsg);
+            this.client.sendMsg(net.ServerMsgType.GameOver, gameOverMsg);
 
             for (const spectator of this.spectators) {
-                spectator.sendMsg(net.MsgType.GameOver, gameOverMsg);
+                spectator.sendMsg(net.ServerMsgType.GameOver, gameOverMsg);
             }
         }
     }
@@ -2609,7 +2609,7 @@ export class Player extends BaseGameObject {
             downedMsg.killCreditId = params.source.__id;
         }
 
-        this.game.clientBarn.broadcastMsg(net.MsgType.Kill, downedMsg);
+        this.game.clientBarn.broadcastMsg(net.ServerMsgType.Kill, downedMsg);
 
         // lone survivr can be given on knock or kill
         if (this.game.map.factionMode) {
@@ -2828,7 +2828,7 @@ export class Player extends BaseGameObject {
             this.lastDamagedBy.randomWeaponSwap(params);
         }
 
-        this.game.clientBarn.broadcastMsg(net.MsgType.Kill, killMsg);
+        this.game.clientBarn.broadcastMsg(net.ServerMsgType.Kill, killMsg);
 
         if (this.role) {
             const roleMsg = new net.RoleAnnouncementMsg();
@@ -2837,7 +2837,7 @@ export class Player extends BaseGameObject {
             roleMsg.killed = true;
             roleMsg.playerId = this.__id;
             roleMsg.killerId = params.source?.__id ?? 0;
-            this.game.clientBarn.broadcastMsg(net.MsgType.RoleAnnouncement, roleMsg);
+            this.game.clientBarn.broadcastMsg(net.ServerMsgType.RoleAnnouncement, roleMsg);
         }
 
         if (this.isKillLeader && this.role !== "the_hunted") {
@@ -2847,7 +2847,7 @@ export class Player extends BaseGameObject {
             roleMsg.killed = true;
             roleMsg.playerId = this.__id;
             roleMsg.killerId = params.source?.__id ?? 0;
-            this.game.clientBarn.broadcastMsg(net.MsgType.RoleAnnouncement, roleMsg);
+            this.game.clientBarn.broadcastMsg(net.ServerMsgType.RoleAnnouncement, roleMsg);
         }
 
         if (this.game.map.mapDef.gameMode.killLeaderEnabled) {
@@ -3987,7 +3987,7 @@ export class Player extends BaseGameObject {
         }
 
         obj.destroy();
-        this.client.sendMsg(net.MsgType.Pickup, pickupMsg);
+        this.client.sendMsg(net.ServerMsgType.Pickup, pickupMsg);
     }
 
     // in original game, only called on snowball or potato collision

@@ -1,4 +1,5 @@
-import type { AbstractMsg, BitStream } from "./net.ts";
+import type { AbstractMsg } from "../constants.ts";
+import type { BitStream } from "../stream.ts";
 
 export class DropItemMsg implements AbstractMsg {
     item = "";

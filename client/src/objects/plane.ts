@@ -1,6 +1,6 @@
 import * as PIXI from "pixi.js-legacy";
 import { GameConfig, type Plane as PlaneType } from "../../../shared/gameConfig.ts";
-import type { Plane as PlaneData, UpdateMsg } from "../../../shared/net/updateMsg.ts";
+import type { Plane as PlaneData, UpdateMsg } from "../../../shared/net/serverMsgs/updateMsg.ts";
 import { collider } from "../../../shared/utils/collider.ts";
 import { math } from "../../../shared/utils/math.ts";
 import { util } from "../../../shared/utils/util.ts";

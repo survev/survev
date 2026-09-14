@@ -1,5 +1,6 @@
-import { v2 } from "../utils/v2.ts";
-import { type AbstractMsg, type BitStream, Constants } from "./net.ts";
+import { v2 } from "../../utils/v2.ts";
+import { type AbstractMsg, Constants } from "../constants.ts";
+import type { BitStream } from "../stream.ts";
 
 export class PointerInputMsg implements AbstractMsg {
     seq = 0;

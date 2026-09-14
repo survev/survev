@@ -18,7 +18,6 @@ import { Editor } from "./debug/editor.ts";
 
 import { GameObjectDefs } from "../../shared/defs/register.ts";
 import { type Connection, ConnectionState, WebsocketConnection } from "../../shared/net/connection.ts";
-import { SpectateAction } from "../../shared/net/spectateMsg.ts";
 import type { GameWsDisconnectReason } from "../../shared/types/api.ts";
 import { device } from "./device.ts";
 import { EmoteBarn } from "./emote.ts";
@@ -169,16 +168,16 @@ export class Game {
                 joinMessage.isMobile = device.mobile || window.mobile!;
                 joinMessage.bot = false;
                 joinMessage.loadout = this.m_config.get("loadout")!;
-                this.m_sendMessage(net.MsgType.Join, joinMessage, 8192);
+                this.m_sendMessage(net.ClientMsgType.Join, joinMessage, 8192);
             };
             this.m_connection.onMessage = (data) => {
                 const msgStream = new net.MsgStream(data);
                 while (true) {
-                    const type = msgStream.deserializeMsgType();
-                    if (type == net.MsgType.None) {
+                    const { type, msg } = msgStream.deserializeServerMsg();
+                    if (type == net.ServerMsgType.None) {
                         break;
                     }
-                    this.m_onMsg(type, msgStream.getStream());
+                    this.m_onMsg({ type, msg } as net.DeserializedServerMsg);
                     msgStream.stream.readAlignToNextByte();
                 }
                 this.debugHUD?.netInGraph.addEntry(
@@ -682,7 +681,7 @@ export class Game {
                         dropMsg.item = item as string;
                     }
                     if (dropMsg.item != "") {
-                        this.m_sendMessage(net.MsgType.DropItem, dropMsg, 128);
+                        this.m_sendMessage(net.ClientMsgType.DropItem, dropMsg, 128);
                         if (dropMsg.item != "fists") {
                             playDropSound = true;
                         }
@@ -698,7 +697,7 @@ export class Game {
                 const roleSelectMessage = new net.PerkModeRoleSelectMsg();
                 roleSelectMessage.role = this.m_uiManager.roleSelected;
                 this.m_sendMessage(
-                    net.MsgType.PerkModeRoleSelect,
+                    net.ClientMsgType.PerkModeRoleSelect,
                     roleSelectMessage,
                     128,
                 );
@@ -707,20 +706,20 @@ export class Game {
         }
 
         let specAction = this.m_uiManager.specAction;
-        if (specAction === SpectateAction.None && this.m_spectating) {
+        if (specAction === net.SpectateAction.None && this.m_spectating) {
             if (this.m_input.keyPressed(Key.Right)) {
-                specAction = SpectateAction.Next;
+                specAction = net.SpectateAction.Next;
             } else if (this.m_input.keyPressed(Key.Left)) {
-                specAction = SpectateAction.Prev;
+                specAction = net.SpectateAction.Prev;
             }
         }
 
-        if (specAction !== SpectateAction.None) {
+        if (specAction !== net.SpectateAction.None) {
             const specMsg = new net.SpectateMsg();
             specMsg.action = specAction;
-            this.m_sendMessage(net.MsgType.Spectate, specMsg, 128);
+            this.m_sendMessage(net.ClientMsgType.Spectate, specMsg, 128);
 
-            this.m_uiManager.specAction = SpectateAction.None;
+            this.m_uiManager.specAction = net.SpectateAction.None;
         }
 
         this.m_uiManager.reloadTouched = false;
@@ -787,9 +786,9 @@ export class Game {
                 pInput.seq = inputMsg.seq;
                 pInput.toMouseDir = inputMsg.toMouseDir;
                 pInput.toMouseLen = inputMsg.toMouseLen;
-                this.m_sendMessage(net.MsgType.PointerInput, pInput, 128);
+                this.m_sendMessage(net.ClientMsgType.PointerInput, pInput, 128);
             } else {
-                this.m_sendMessage(net.MsgType.Input, inputMsg, 128);
+                this.m_sendMessage(net.ClientMsgType.Input, inputMsg, 128);
             }
             this.m_inputMsgTimeout = 1;
             this.m_prevInputMsg = inputMsg;
@@ -800,7 +799,7 @@ export class Game {
 
         if (IS_DEV && this.editor.enabled && this.editor.sendMsg) {
             var msg = this.editor.getMsg();
-            this.m_sendMessage(net.MsgType.Edit, msg);
+            this.m_sendMessage(net.ClientMsgType.Edit, msg);
             this.editor.postSerialization();
         }
 
@@ -939,7 +938,7 @@ export class Game {
             msg.type = ping.type;
             msg.pos = ping.pos;
             msg.isPing = true;
-            this.m_sendMessage(net.MsgType.Emote, msg, 128);
+            this.m_sendMessage(net.ClientMsgType.Emote, msg, 128);
         }
         this.m_emoteBarn.newPings = [];
         for (let i = 0; i < this.m_emoteBarn.newEmotes.length; i++) {
@@ -948,7 +947,7 @@ export class Game {
             msg.type = emote.type;
             msg.pos = emote.pos;
             msg.isPing = false;
-            this.m_sendMessage(net.MsgType.Emote, msg, 128);
+            this.m_sendMessage(net.ClientMsgType.Emote, msg, 128);
         }
         this.m_emoteBarn.newEmotes = [];
 
@@ -1255,11 +1254,9 @@ export class Game {
     }
 
     // Socket functions
-    m_onMsg(type: net.MsgType, stream: net.BitStream) {
+    m_onMsg({ type, msg }: net.DeserializedServerMsg) {
         switch (type) {
-            case net.MsgType.Joined: {
-                const msg = new net.JoinedMsg();
-                msg.deserialize(stream);
+            case net.ServerMsgType.Joined: {
                 this.onJoin();
                 this.teamMode = msg.teamMode;
                 this.m_localId = msg.playerId;
@@ -1288,9 +1285,7 @@ export class Game {
                 SDK.gamePlayStart();
                 break;
             }
-            case net.MsgType.Map: {
-                const msg = new net.MapMsg();
-                msg.deserialize(stream);
+            case net.ServerMsgType.Map: {
                 this.m_map.loadMap(
                     msg,
                     this.m_camera,
@@ -1323,16 +1318,12 @@ export class Game {
                 }
                 break;
             }
-            case net.MsgType.Update: {
-                const msg = new net.UpdateMsg();
-                msg.deserialize(stream, this.m_objectCreator);
+            case net.ServerMsgType.Update: {
                 this.m_playing = true;
                 this.m_processGameUpdate(msg);
                 break;
             }
-            case net.MsgType.Kill: {
-                const msg = new net.KillMsg();
-                msg.deserialize(stream);
+            case net.ServerMsgType.Kill: {
                 const sourceType = msg.itemSourceType || msg.mapSourceType;
                 const activeTeamId = this.m_playerBarn.getPlayerInfo(
                     this.m_activeId,
@@ -1434,9 +1425,7 @@ export class Game {
 
                 break;
             }
-            case net.MsgType.RoleAnnouncement: {
-                const msg = new net.RoleAnnouncementMsg();
-                msg.deserialize(stream);
+            case net.ServerMsgType.RoleAnnouncement: {
                 const roleDef = GameObjectDefs.typeToDef(msg.role, "role");
                 const playerInfo = this.m_playerBarn.getPlayerInfo(msg.playerId);
                 const nameText = helpers.htmlEscape(
@@ -1527,20 +1516,12 @@ export class Game {
                 }
                 break;
             }
-            case net.MsgType.PlayerStats: {
-                const msg = new net.PlayerStatsMsg();
-                msg.deserialize(stream);
+            case net.ServerMsgType.PlayerStats: {
                 this.m_uiManager.setLocalStats(msg.playerStats);
                 this.m_uiManager.showTeamAd(msg.playerStats, this.m_ui2Manager);
                 break;
             }
-            case net.MsgType.Stats: {
-                stream.readString();
-                break;
-            }
-            case net.MsgType.GameOver: {
-                const msg = new net.GameOverMsg();
-                msg.deserialize(stream);
+            case net.ServerMsgType.GameOver: {
                 this.m_gameOver = msg.gameOver;
                 const localTeamId = this.m_playerBarn.getPlayerInfo(
                     this.m_localId,
@@ -1581,9 +1562,7 @@ export class Game {
                 this.m_touch.hideAll();
                 break;
             }
-            case net.MsgType.Pickup: {
-                const msg = new net.PickupMsg();
-                msg.deserialize(stream);
+            case net.ServerMsgType.Pickup: {
                 if (msg.type == net.PickupMsgType.Success && msg.item) {
                     this.m_activePlayer.playItemPickupSound(
                         msg.item,
@@ -1598,15 +1577,12 @@ export class Game {
                 }
                 break;
             }
-            case net.MsgType.UpdatePass: {
-                new net.UpdatePassMsg().deserialize(stream);
+            case net.ServerMsgType.UpdatePass: {
                 this.m_updatePass = true;
                 this.m_updatePassDelay = 0;
                 break;
             }
-            case net.MsgType.AliveCounts: {
-                const msg = new net.AliveCountsMsg();
-                msg.deserialize(stream);
+            case net.ServerMsgType.AliveCounts: {
                 if (msg.teamAliveCounts.length == 1) {
                     this.m_uiManager.updatePlayersAlive(msg.teamAliveCounts[0]);
                 } else if (msg.teamAliveCounts.length >= 2) {
@@ -1618,10 +1594,10 @@ export class Game {
         }
     }
 
-    m_sendMessage(type: net.MsgType, data: net.Msg, maxLen?: number) {
+    m_sendMessage<T extends net.ValidClientMsgType>(type: T, msg: net.ClientMsgTypeToMsg<T>, maxLen?: number) {
         const bufSz = maxLen || 128;
         const msgStream = new net.MsgStream(new ArrayBuffer(bufSz));
-        msgStream.serializeMsg(type, data);
+        msgStream.serializeClientMsg(type, msg);
         this.m_sendMessageImpl(msgStream);
     }
 

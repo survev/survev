@@ -1,7 +1,18 @@
-import type { AbstractMsg, BitStream } from "./net.ts";
+import type { AbstractMsg } from "../constants.ts";
+import type { BitStream } from "../stream.ts";
+
+export enum PickupMsgType {
+    Full,
+    AlreadyOwned,
+    AlreadyEquipped,
+    BetterItemEquipped,
+    Success,
+    GunCannotFire,
+    MaxPerks,
+}
 
 export class PickupMsg implements AbstractMsg {
-    type = 0;
+    type: PickupMsgType = 0;
     item = "";
     count = 0;
 

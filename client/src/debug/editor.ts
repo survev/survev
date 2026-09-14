@@ -3,7 +3,7 @@ import { type FolderApi, Pane, type TabPageApi } from "tweakpane";
 
 import { RoleDefs } from "../../../shared/defs/gameObjects/roleDefs.ts";
 import { GameObjectDefs } from "../../../shared/defs/register.ts";
-import { EditMsg } from "../../../shared/net/editMsg.ts";
+import { EditMsg } from "../../../shared/net/clientMsgs/editMsg.ts";
 import { math } from "../../../shared/utils/math.ts";
 import { util } from "../../../shared/utils/util.ts";
 import {

@@ -2,7 +2,6 @@ import { beforeEach, expect, test } from "vitest";
 import { Main } from "../../shared/defs/maps/baseDefs.ts";
 import { GameConfig, GasMode } from "../../shared/gameConfig.ts";
 import * as net from "../../shared/net/net.ts";
-import { ObjectType } from "../../shared/net/objectSerializeFns.ts";
 import type { AABB, Circle } from "../../shared/utils/coldet.ts";
 import { collider } from "../../shared/utils/collider.ts";
 import { util } from "../../shared/utils/util.ts";
@@ -69,10 +68,10 @@ test("Map Msg", () => {
         };
     });
 
-    stream.serializeMsg(net.MsgType.Map, inMsg);
+    stream.serializeServerMsg(net.ServerMsgType.Map, inMsg);
 
     stream.stream.index = 0;
-    expect(stream.deserializeMsgType()).toBe(net.MsgType.Map);
+    expect(stream.deserializeServerMsg().type).toBe(net.ServerMsgType.Map);
 
     const outMsg = new net.MapMsg();
     outMsg.deserialize(stream.getStream());
@@ -213,17 +212,13 @@ test("Update Msg", () => {
 
     // TODO: add more tests for UpdateMsg fields...
 
-    stream.serializeMsg(net.MsgType.Update, inMsg);
+    stream.serializeServerMsg(net.ServerMsgType.Update, inMsg);
 
     stream.stream.index = 0;
-    expect(stream.deserializeMsgType()).toBe(net.MsgType.Update);
+    expect(stream.deserializeServerMsg().type).toBe(net.ServerMsgType.Update);
 
     const outMsg = new net.UpdateMsg();
-    outMsg.deserialize(stream.getStream(), {
-        m_getTypeById() {
-            return ObjectType.Invalid;
-        },
-    });
+    outMsg.deserialize(stream.getStream());
 
     expect(outMsg.activePlayerData).toStrictEqual({
         ...inMsg.activePlayerData,

@@ -1,7 +1,7 @@
 import * as PIXI from "pixi.js-legacy";
 
 import { GameObjectDefs } from "../../../shared/defs/register.ts";
-import type { MapIndicator } from "../../../shared/net/updateMsg.ts";
+import type { MapIndicator } from "../../../shared/net/serverMsgs/updateMsg.ts";
 import { math } from "../../../shared/utils/math.ts";
 import { assert } from "../../../shared/utils/util.ts";
 import { v2, type Vec2 } from "../../../shared/utils/v2.ts";
