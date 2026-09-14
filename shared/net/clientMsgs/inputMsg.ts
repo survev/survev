@@ -1,9 +1,11 @@
 import type { Input } from "../../gameConfig.ts";
 import { v2 } from "../../utils/v2.ts";
-import { type AbstractMsg, Constants } from "../constants.ts";
+import { type AbstractClientMsg, ClientMsgType, Constants } from "../constants.ts";
 import type { BitStream } from "../stream.ts";
 
-export class InputMsg implements AbstractMsg {
+export class InputMsg implements AbstractClientMsg {
+    readonly type = ClientMsgType.Input;
+
     seq = 0;
     moveLeft = false;
     moveRight = false;

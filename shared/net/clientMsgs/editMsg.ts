@@ -1,7 +1,9 @@
-import type { AbstractMsg } from "../constants.ts";
+import { type AbstractClientMsg, ClientMsgType } from "../constants.ts";
 import type { BitStream } from "../stream.ts";
 
-export class EditMsg implements AbstractMsg {
+export class EditMsg implements AbstractClientMsg {
+    readonly type = ClientMsgType.Edit;
+
     zoomEnabled = false;
     zoom = 1;
 

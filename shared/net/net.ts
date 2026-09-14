@@ -7,7 +7,15 @@ import { JoinMsg } from "./clientMsgs/joinMsg.ts";
 import { PerkModeRoleSelectMsg } from "./clientMsgs/perkModeRoleSelectMsg.ts";
 import { PointerInputMsg } from "./clientMsgs/pointerInputMsg.ts";
 import { SpectateAction, SpectateMsg } from "./clientMsgs/spectateMsg.ts";
-import { type AbstractMsg, Constants } from "./constants.ts";
+import {
+    AbstractClientMsg,
+    AbstractServerMsg,
+    ClientMsgType,
+    Constants,
+    ServerMsgType,
+    type ValidClientMsgType,
+    type ValidServerMsgType,
+} from "./constants.ts";
 import { AliveCountsMsg } from "./serverMsgs/aliveCountsMsg.ts";
 import { GameOverMsg } from "./serverMsgs/gameOverMsg.ts";
 import { JoinedMsg } from "./serverMsgs/joinedMsg.ts";
@@ -22,19 +30,6 @@ import { BitStream } from "./stream.ts";
 
 export { BitStream, Constants };
 
-export enum ClientMsgType {
-    None = 0,
-    Join = 1, // JoinMsg should always be ID 1 to not break protocol version check with old clients!
-    Input,
-    PointerInput,
-    Emote,
-    DropItem,
-    Spectate,
-    PerkModeRoleSelect,
-    Edit,
-}
-export type ValidClientMsgType = Exclude<ClientMsgType, ClientMsgType.None>;
-
 const ClientMsgMap = {
     [ClientMsgType.Join]: JoinMsg,
     [ClientMsgType.Input]: InputMsg,
@@ -44,12 +39,12 @@ const ClientMsgMap = {
     [ClientMsgType.Spectate]: SpectateMsg,
     [ClientMsgType.PerkModeRoleSelect]: PerkModeRoleSelectMsg,
     [ClientMsgType.Edit]: EditMsg,
-} satisfies Record<ValidClientMsgType, new() => AbstractMsg>;
+} satisfies Record<ValidClientMsgType, new() => AbstractClientMsg>;
 
 export type ClientMsg = InstanceType<typeof ClientMsgMap[ValidClientMsgType]>;
-export type ClientMsgTypeToMsg<T extends ValidClientMsgType> = InstanceType<typeof ClientMsgMap[T]>;
 
 export {
+    ClientMsgType,
     DropItemMsg,
     EditMsg,
     EmoteMsg,
@@ -59,22 +54,9 @@ export {
     PointerInputMsg,
     SpectateAction,
     SpectateMsg,
+    type ValidClientMsgType,
 };
 
-export enum ServerMsgType {
-    None = 0,
-    Joined = 1,
-    Map,
-    Update,
-    AliveCounts,
-    Pickup,
-    Kill,
-    RoleAnnouncement,
-    UpdatePass,
-    PlayerStats,
-    GameOver,
-}
-export type ValidServerMsgType = Exclude<ServerMsgType, ServerMsgType.None>;
 const ServerMsgMap = {
     [ServerMsgType.Joined]: JoinedMsg,
     [ServerMsgType.Map]: MapMsg,
@@ -86,10 +68,9 @@ const ServerMsgMap = {
     [ServerMsgType.UpdatePass]: UpdatePassMsg,
     [ServerMsgType.PlayerStats]: PlayerStatsMsg,
     [ServerMsgType.GameOver]: GameOverMsg,
-} satisfies Record<ValidServerMsgType, new() => AbstractMsg>;
+} satisfies Record<ValidServerMsgType, new() => AbstractServerMsg>;
 
 export type ServerMsg = InstanceType<typeof ServerMsgMap[ValidServerMsgType]>;
-export type ServerMsgTypeToMsg<T extends ValidServerMsgType> = InstanceType<typeof ServerMsgMap[T]>;
 
 export {
     AliveCountsMsg,
@@ -102,26 +83,14 @@ export {
     PickupMsgType,
     PlayerStatsMsg,
     RoleAnnouncementMsg,
+    ServerMsgType,
     UpdateMsg,
+    type ValidServerMsgType,
 };
 
 //
 // MsgStream
 //
-
-export type DeserializedClientMsg = {
-    [T in ValidClientMsgType]: {
-        type: T;
-        msg: ClientMsgTypeToMsg<T>;
-    };
-}[ValidClientMsgType];
-
-export type DeserializedServerMsg = {
-    [T in ValidServerMsgType]: {
-        type: T;
-        msg: ServerMsgTypeToMsg<T>;
-    };
-}[ValidServerMsgType];
 
 export class MsgStream {
     stream: BitStream;
@@ -140,57 +109,32 @@ export class MsgStream {
         return this.stream;
     }
 
-    serializeClientMsg<T extends ValidClientMsgType>(
-        type: T,
-        msg: ClientMsgTypeToMsg<T>,
-    ) {
+    serializeMsg(msg: ClientMsg | ServerMsg) {
         assert(this.stream.index % 8 == 0);
-        this.stream.writeUint8(type);
+        this.stream.writeUint8(msg.type);
         msg.serialize(this.stream);
         this.stream.writeAlignToNextByte();
     }
 
-    deserializeClientMsg(): { type: ClientMsgType.None; msg: undefined } | DeserializedClientMsg {
+    deserializeClientMsg(): ClientMsg | undefined {
         if (this.stream.length - this.stream.byteIndex * 8 >= 1) {
             const type = this.stream.readUint8();
             assert(type in ClientMsgMap, `Received invalid msg with type ${type}`);
             const msg = new ClientMsgMap[type as ValidClientMsgType]();
             msg.deserialize(this.stream);
-            return {
-                type,
-                msg,
-            };
+            return msg;
         }
-        return {
-            type: ClientMsgType.None,
-            msg: undefined,
-        };
+        return undefined;
     }
 
-    serializeServerMsg<T extends ValidServerMsgType>(
-        type: T,
-        msg: ServerMsgTypeToMsg<T>,
-    ) {
-        assert(this.stream.index % 8 == 0);
-        this.stream.writeUint8(type);
-        msg.serialize(this.stream);
-        this.stream.writeAlignToNextByte();
-    }
-
-    deserializeServerMsg(): { type: ServerMsgType.None; msg: undefined } | DeserializedServerMsg {
+    deserializeServerMsg(): ServerMsg | undefined {
         if (this.stream.length - this.stream.byteIndex * 8 >= 1) {
             const type = this.stream.readUint8();
             assert(type in ServerMsgMap, `Received invalid msg with type ${type}`);
             const msg = new ServerMsgMap[type as ValidServerMsgType]();
             msg.deserialize(this.stream);
-            return {
-                type,
-                msg,
-            };
+            return msg;
         }
-        return {
-            type: ServerMsgType.None,
-            msg: undefined,
-        };
+        return undefined;
     }
 }

@@ -1,8 +1,10 @@
 import { DamageType } from "../../gameConfig.ts";
-import type { AbstractMsg } from "../constants.ts";
+import { type AbstractServerMsg, ServerMsgType } from "../constants.ts";
 import type { BitStream } from "../stream.ts";
 
-export class KillMsg implements AbstractMsg {
+export class KillMsg implements AbstractServerMsg {
+    readonly type = ServerMsgType.Kill;
+
     itemSourceType = "";
     mapSourceType = "";
     damageType = DamageType.Player;

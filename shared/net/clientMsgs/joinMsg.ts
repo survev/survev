@@ -1,7 +1,9 @@
-import { type AbstractMsg, Constants } from "../constants.ts";
+import { type AbstractClientMsg, ClientMsgType, Constants } from "../constants.ts";
 import type { BitStream } from "../stream.ts";
 
-export class JoinMsg implements AbstractMsg {
+export class JoinMsg implements AbstractClientMsg {
+    readonly type = ClientMsgType.Join;
+
     protocol = 0;
     joinToken = "";
     name = "";

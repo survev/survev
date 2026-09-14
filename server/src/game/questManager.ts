@@ -9,7 +9,6 @@ import {
 } from "../../../shared/defs/gameObjects/questDefs.ts";
 import { GameObjectDefs } from "../../../shared/defs/register.ts";
 import type { TeamMode } from "../../../shared/gameConfig.ts";
-import { ServerMsgType } from "../../../shared/net/net.ts";
 import { UpdatePassMsg } from "../../../shared/net/serverMsgs/updatePassMsg.ts";
 import { math } from "../../../shared/utils/math.ts";
 import { assert, type UnionToIntersection } from "../../../shared/utils/util.ts";
@@ -95,7 +94,7 @@ export class QuestManager {
         if (progress.length === 0) return;
 
         if (!this.player.disconnected) {
-            this.player.client.sendInstantMsg(ServerMsgType.UpdatePass, new UpdatePassMsg());
+            this.player.client.sendInstantMsg(new UpdatePassMsg());
         }
 
         this.game.sendQuestProgress(this.player.userId, progress);

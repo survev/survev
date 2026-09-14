@@ -1,4 +1,4 @@
-import type { AbstractMsg } from "../constants.ts";
+import { type AbstractServerMsg, ServerMsgType } from "../constants.ts";
 import type { BitStream } from "../stream.ts";
 
 export enum PickupMsgType {
@@ -11,21 +11,23 @@ export enum PickupMsgType {
     MaxPerks,
 }
 
-export class PickupMsg implements AbstractMsg {
-    type: PickupMsgType = 0;
+export class PickupMsg implements AbstractServerMsg {
+    readonly type = ServerMsgType.Pickup;
+
+    pickupType: PickupMsgType = 0;
     item = "";
     count = 0;
 
     serialize(s: BitStream) {
         /* STRIP_FROM_PROD_CLIENT:START */
-        s.writeUint8(this.type);
+        s.writeUint8(this.pickupType);
         s.writeGameType(this.item);
         s.writeUint8(this.count);
         /* STRIP_FROM_PROD_CLIENT:END */
     }
 
     deserialize(s: BitStream) {
-        this.type = s.readUint8();
+        this.pickupType = s.readUint8();
         this.item = s.readGameType();
         this.count = s.readUint8();
     }

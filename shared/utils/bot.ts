@@ -165,7 +165,7 @@ export class Bot {
                 };
                 joinMsg.joinToken = joinToken;
 
-                this.sendMsg(net.ClientMsgType.Join, joinMsg);
+                this.sendMsg(joinMsg);
 
                 this.connected = true;
 
@@ -185,18 +185,18 @@ export class Bot {
         this.connection.onMessage = (data): void => {
             const stream = new net.MsgStream(data as ArrayBuffer);
             while (true) {
-                const { type, msg } = stream.deserializeServerMsg();
-                if (type == net.ServerMsgType.None) {
+                const msg = stream.deserializeServerMsg();
+                if (!msg) {
                     break;
                 }
-                this.onMsg({ type, msg } as net.DeserializedServerMsg);
+                this.onMsg(msg);
                 stream.stream.readAlignToNextByte();
             }
         };
     }
 
-    onMsg({ type, msg }: net.DeserializedServerMsg): void {
-        switch (type) {
+    onMsg(msg: net.ServerMsg): void {
+        switch (msg.type) {
             case net.ServerMsgType.Joined: {
                 this.emotes = msg.emotes;
                 break;
@@ -243,9 +243,9 @@ export class Bot {
 
     stream = new net.MsgStream(new ArrayBuffer(1024));
 
-    sendMsg<T extends net.ValidClientMsgType>(type: T, msg: net.ClientMsgTypeToMsg<T>): void {
+    sendMsg(msg: net.ClientMsg): void {
         this.stream.stream.index = 0;
-        this.stream.serializeClientMsg(type, msg);
+        this.stream.serializeMsg(msg);
 
         this.connection.send(this.stream.getBuffer());
     }
@@ -277,11 +277,11 @@ export class Bot {
         }
         this.inputs.length = 0;
 
-        this.sendMsg(net.ClientMsgType.Input, inputPacket);
+        this.sendMsg(inputPacket);
 
         if (this.emote) {
             const emoteMsg = new net.EmoteMsg();
-            emoteMsg.type = util.randomItem(this.emotes);
+            emoteMsg.emoteType = util.randomItem(this.emotes);
         }
     }
 

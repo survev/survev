@@ -1,7 +1,9 @@
-import type { AbstractMsg } from "../constants.ts";
+import { type AbstractServerMsg, ServerMsgType } from "../constants.ts";
 import type { BitStream } from "../stream.ts";
 
-export class PlayerStatsMsg implements AbstractMsg {
+export class PlayerStatsMsg implements AbstractServerMsg {
+    readonly type = ServerMsgType.PlayerStats;
+
     playerStats = {
         playerId: 0,
         timeAlive: 0,

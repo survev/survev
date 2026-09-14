@@ -395,7 +395,7 @@ export class GameMap {
         this.timerEnd("Generating all objects");
 
         this.mapStream.stream.index = 0;
-        this.mapStream.serializeServerMsg(net.ServerMsgType.Map, this.msg);
+        this.mapStream.serializeMsg(this.msg);
     }
 
     regenerate(seed?: number) {

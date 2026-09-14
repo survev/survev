@@ -68,13 +68,11 @@ test("Map Msg", () => {
         };
     });
 
-    stream.serializeServerMsg(net.ServerMsgType.Map, inMsg);
+    stream.serializeMsg(inMsg);
 
     stream.stream.index = 0;
-    expect(stream.deserializeServerMsg().type).toBe(net.ServerMsgType.Map);
-
-    const outMsg = new net.MapMsg();
-    outMsg.deserialize(stream.getStream());
+    const outMsg = stream.deserializeServerMsg()! as net.MapMsg;
+    expect(outMsg.type).toBe(net.ServerMsgType.Map);
 
     expect(outMsg).toMatchObject({
         mapName: inMsg.mapName,
@@ -212,13 +210,11 @@ test("Update Msg", () => {
 
     // TODO: add more tests for UpdateMsg fields...
 
-    stream.serializeServerMsg(net.ServerMsgType.Update, inMsg);
+    stream.serializeMsg(inMsg);
 
     stream.stream.index = 0;
-    expect(stream.deserializeServerMsg().type).toBe(net.ServerMsgType.Update);
 
-    const outMsg = new net.UpdateMsg();
-    outMsg.deserialize(stream.getStream());
+    const outMsg = stream.deserializeServerMsg() as net.UpdateMsg;
 
     expect(outMsg.activePlayerData).toStrictEqual({
         ...inMsg.activePlayerData,

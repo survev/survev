@@ -168,16 +168,16 @@ export class Game {
                 joinMessage.isMobile = device.mobile || window.mobile!;
                 joinMessage.bot = false;
                 joinMessage.loadout = this.m_config.get("loadout")!;
-                this.m_sendMessage(net.ClientMsgType.Join, joinMessage, 8192);
+                this.m_sendMessage(joinMessage, 8192);
             };
             this.m_connection.onMessage = (data) => {
                 const msgStream = new net.MsgStream(data);
                 while (true) {
-                    const { type, msg } = msgStream.deserializeServerMsg();
-                    if (type == net.ServerMsgType.None) {
+                    const msg = msgStream.deserializeServerMsg();
+                    if (!msg) {
                         break;
                     }
-                    this.m_onMsg({ type, msg } as net.DeserializedServerMsg);
+                    this.m_onMsg(msg);
                     msgStream.stream.readAlignToNextByte();
                 }
                 this.debugHUD?.netInGraph.addEntry(
@@ -681,7 +681,7 @@ export class Game {
                         dropMsg.item = item as string;
                     }
                     if (dropMsg.item != "") {
-                        this.m_sendMessage(net.ClientMsgType.DropItem, dropMsg, 128);
+                        this.m_sendMessage(dropMsg);
                         if (dropMsg.item != "fists") {
                             playDropSound = true;
                         }
@@ -696,11 +696,7 @@ export class Game {
             if (this.m_uiManager.roleSelected) {
                 const roleSelectMessage = new net.PerkModeRoleSelectMsg();
                 roleSelectMessage.role = this.m_uiManager.roleSelected;
-                this.m_sendMessage(
-                    net.ClientMsgType.PerkModeRoleSelect,
-                    roleSelectMessage,
-                    128,
-                );
+                this.m_sendMessage(roleSelectMessage);
                 this.m_config.set("perkModeRole", roleSelectMessage.role);
             }
         }
@@ -717,7 +713,7 @@ export class Game {
         if (specAction !== net.SpectateAction.None) {
             const specMsg = new net.SpectateMsg();
             specMsg.action = specAction;
-            this.m_sendMessage(net.ClientMsgType.Spectate, specMsg, 128);
+            this.m_sendMessage(specMsg);
 
             this.m_uiManager.specAction = net.SpectateAction.None;
         }
@@ -786,9 +782,9 @@ export class Game {
                 pInput.seq = inputMsg.seq;
                 pInput.toMouseDir = inputMsg.toMouseDir;
                 pInput.toMouseLen = inputMsg.toMouseLen;
-                this.m_sendMessage(net.ClientMsgType.PointerInput, pInput, 128);
+                this.m_sendMessage(pInput);
             } else {
-                this.m_sendMessage(net.ClientMsgType.Input, inputMsg, 128);
+                this.m_sendMessage(inputMsg);
             }
             this.m_inputMsgTimeout = 1;
             this.m_prevInputMsg = inputMsg;
@@ -799,7 +795,7 @@ export class Game {
 
         if (IS_DEV && this.editor.enabled && this.editor.sendMsg) {
             var msg = this.editor.getMsg();
-            this.m_sendMessage(net.ClientMsgType.Edit, msg);
+            this.m_sendMessage(msg);
             this.editor.postSerialization();
         }
 
@@ -935,19 +931,19 @@ export class Game {
         for (let i = 0; i < this.m_emoteBarn.newPings.length; i++) {
             const ping = this.m_emoteBarn.newPings[i];
             const msg = new net.EmoteMsg();
-            msg.type = ping.type;
+            msg.emoteType = ping.type;
             msg.pos = ping.pos;
             msg.isPing = true;
-            this.m_sendMessage(net.ClientMsgType.Emote, msg, 128);
+            this.m_sendMessage(msg);
         }
         this.m_emoteBarn.newPings = [];
         for (let i = 0; i < this.m_emoteBarn.newEmotes.length; i++) {
             const emote = this.m_emoteBarn.newEmotes[i];
             const msg = new net.EmoteMsg();
-            msg.type = emote.type;
+            msg.emoteType = emote.type;
             msg.pos = emote.pos;
             msg.isPing = false;
-            this.m_sendMessage(net.ClientMsgType.Emote, msg, 128);
+            this.m_sendMessage(msg);
         }
         this.m_emoteBarn.newEmotes = [];
 
@@ -1254,8 +1250,8 @@ export class Game {
     }
 
     // Socket functions
-    m_onMsg({ type, msg }: net.DeserializedServerMsg) {
-        switch (type) {
+    m_onMsg(msg: net.ServerMsg) {
+        switch (msg.type) {
             case net.ServerMsgType.Joined: {
                 this.onJoin();
                 this.teamMode = msg.teamMode;
@@ -1563,7 +1559,7 @@ export class Game {
                 break;
             }
             case net.ServerMsgType.Pickup: {
-                if (msg.type == net.PickupMsgType.Success && msg.item) {
+                if (msg.pickupType == net.PickupMsgType.Success && msg.item) {
                     this.m_activePlayer.playItemPickupSound(
                         msg.item,
                         this.m_audioManager,
@@ -1573,7 +1569,7 @@ export class Game {
                         this.m_ui2Manager.addRareLootMessage(msg.item, true);
                     }
                 } else {
-                    this.m_ui2Manager.displayPickupMessage(msg.type);
+                    this.m_ui2Manager.displayPickupMessage(msg.pickupType);
                 }
                 break;
             }
@@ -1594,10 +1590,9 @@ export class Game {
         }
     }
 
-    m_sendMessage<T extends net.ValidClientMsgType>(type: T, msg: net.ClientMsgTypeToMsg<T>, maxLen?: number) {
-        const bufSz = maxLen || 128;
-        const msgStream = new net.MsgStream(new ArrayBuffer(bufSz));
-        msgStream.serializeClientMsg(type, msg);
+    m_sendMessage(msg: net.ClientMsg, maxLen = 128) {
+        const msgStream = new net.MsgStream(new ArrayBuffer(maxLen));
+        msgStream.serializeMsg(msg);
         this.m_sendMessageImpl(msgStream);
     }
 

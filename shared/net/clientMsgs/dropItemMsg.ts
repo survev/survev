@@ -1,7 +1,9 @@
-import type { AbstractMsg } from "../constants.ts";
+import { type AbstractClientMsg, ClientMsgType } from "../constants.ts";
 import type { BitStream } from "../stream.ts";
 
-export class DropItemMsg implements AbstractMsg {
+export class DropItemMsg implements AbstractClientMsg {
+    readonly type = ClientMsgType.DropItem;
+
     item = "";
     weapIdx = 0;
 

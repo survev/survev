@@ -94,7 +94,7 @@ export class ClientBarn {
 
     deserializeMsg(
         buff: ArrayBuffer,
-    ): net.DeserializedClientMsg | { type: net.ClientMsgType.None; msg: undefined; error?: GameWsDisconnectReason } {
+    ): net.ClientMsg | GameWsDisconnectReason {
         const msgStream = new net.MsgStream(buff);
         const stream = msgStream.stream;
 
@@ -107,16 +107,16 @@ export class ClientBarn {
             const protocol = stream.readUint32();
 
             if (protocol !== GameConfig.protocolVersion) {
-                return {
-                    type: net.ClientMsgType.None,
-                    msg: undefined,
-                    error: "invalid_protocol",
-                };
+                return "invalid_protocol";
             }
         }
         stream.index = 0;
 
-        return msgStream.deserializeClientMsg();
+        const msg = msgStream.deserializeClientMsg();
+        if (!msg) {
+            throw new Error(`Client sent invalid msg`);
+        }
+        return msg;
     }
 
     handleMsg(buff: ArrayBuffer | Buffer, socket: ClientSocket<Client>) {
@@ -125,14 +125,15 @@ export class ClientBarn {
         let client = socket.getUserData();
 
         let msg: net.ClientMsg | undefined = undefined;
-        let type = net.ClientMsgType.None;
         let error: GameWsDisconnectReason | undefined;
 
         try {
             const deserialized = this.deserializeMsg(buff);
-            msg = deserialized.msg;
-            type = deserialized.type;
-            error = "error" in deserialized ? deserialized.error : undefined;
+            if (typeof deserialized === "string") {
+                error = deserialized;
+            } else {
+                msg = deserialized;
+            }
         } catch (err) {
             this.game.logger.error(
                 "Failed to deserialize msg: ",
@@ -154,7 +155,7 @@ export class ClientBarn {
         }
 
         if (!msg) return;
-        if (type === net.ClientMsgType.Join && !client) {
+        if (msg.type === net.ClientMsgType.Join && !client) {
             const joinMsg = msg as net.JoinMsg;
 
             const joinData = this.game.joinTokens.get(joinMsg.joinToken);
@@ -188,7 +189,7 @@ export class ClientBarn {
         if (socket.closed()) {
             return;
         }
-        client.handleMsg({ type, msg } as net.DeserializedClientMsg);
+        client.handleMsg(msg);
     }
 
     handleSocketClose(socket: ClientSocket<Client>) {
@@ -221,8 +222,8 @@ export class ClientBarn {
         }
     }
 
-    broadcastMsg<T extends net.ValidServerMsgType>(type: T, msg: net.ServerMsgTypeToMsg<T>) {
-        this.msgsToSend.serializeServerMsg(type, msg);
+    broadcastMsg(msg: net.ServerMsg) {
+        this.msgsToSend.serializeMsg(msg);
     }
 }
 
@@ -290,7 +291,7 @@ export class Client {
     private _cullingPortraitTicker = 0;
 
     msgStream = new net.MsgStream(new ArrayBuffer(65536));
-    msgsToSend: Array<net.DeserializedServerMsg> = [];
+    msgsToSend: Array<net.ServerMsg> = [];
 
     ack = 0;
 
@@ -308,13 +309,13 @@ export class Client {
         this.socket = socket as ClientSocket<Client>;
     }
 
-    sendMsg<T extends net.ValidServerMsgType>(type: T, msg: net.ServerMsgTypeToMsg<T>): void {
-        this.msgsToSend.push({ type, msg } as net.DeserializedServerMsg);
+    sendMsg(msg: net.ServerMsg): void {
+        this.msgsToSend.push(msg);
     }
 
-    sendInstantMsg<T extends net.ValidServerMsgType>(type: T, msg: net.ServerMsgTypeToMsg<T>, bytes = 128): void {
+    sendInstantMsg(msg: net.ServerMsg, bytes = 128): void {
         const stream = new net.MsgStream(new ArrayBuffer(bytes));
-        stream.serializeServerMsg(type, msg);
+        stream.serializeMsg(msg);
         this.sendData(stream.getBuffer());
     }
 
@@ -405,7 +406,7 @@ export class Client {
             if (this.player) {
                 joinedMsg.emotes = this.player.loadout.emotes;
             }
-            msgStream.serializeServerMsg(net.ServerMsgType.Joined, joinedMsg);
+            msgStream.serializeMsg(joinedMsg);
 
             const mapStream = game.map.mapStream.stream;
 
@@ -415,7 +416,7 @@ export class Client {
         if (playerBarn.aliveCountDirty || this._firstUpdate) {
             const aliveMsg = new net.AliveCountsMsg();
             this.game.modeManager.updateAliveCounts(aliveMsg.teamAliveCounts);
-            msgStream.serializeServerMsg(net.ServerMsgType.AliveCounts, aliveMsg);
+            msgStream.serializeMsg(aliveMsg);
         }
 
         const updateMsg = new net.UpdateMsg();
@@ -645,11 +646,11 @@ export class Client {
             updateMsg.killLeaderKills = playerBarn.killLeader?.kills ?? 0;
         }
 
-        msgStream.serializeServerMsg(net.ServerMsgType.Update, updateMsg);
+        msgStream.serializeMsg(updateMsg);
 
         for (let i = 0; i < this.msgsToSend.length; i++) {
             const msg = this.msgsToSend[i];
-            msgStream.serializeServerMsg(msg.type, msg.msg);
+            msgStream.serializeMsg(msg);
         }
 
         this.msgsToSend.length = 0;
@@ -661,9 +662,9 @@ export class Client {
         this._firstUpdate = false;
     }
 
-    handleMsg({ msg, type }: net.DeserializedClientMsg) {
+    handleMsg(msg: net.ClientMsg) {
         const player = this.player;
-        switch (type) {
+        switch (msg.type) {
             case net.ClientMsgType.Input: {
                 if (this.portrait != msg.portrait) {
                     this._cullingPortraitTicker = 0.5;

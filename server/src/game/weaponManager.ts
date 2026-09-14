@@ -730,8 +730,8 @@ export class WeaponManager {
         // Check firing location
         if (itemDef.outsideOnly && this.player.indoors && !forceFire) {
             const msg = new net.PickupMsg();
-            msg.type = net.PickupMsgType.GunCannotFire;
-            this.player.client.sendMsg(net.ServerMsgType.Pickup, msg);
+            msg.pickupType = net.PickupMsgType.GunCannotFire;
+            this.player.client.sendMsg(msg);
             return;
         }
 

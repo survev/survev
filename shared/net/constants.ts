@@ -28,7 +28,42 @@ export const BitSizes = {
     MapIndicators: getBits(Constants.MaxMapIndicators),
 };
 
-export abstract class AbstractMsg {
+export enum ClientMsgType {
+    None = 0,
+    Join = 1, // JoinMsg should always be ID 1 to not break protocol version check with old clients!
+    Input,
+    PointerInput,
+    Emote,
+    DropItem,
+    Spectate,
+    PerkModeRoleSelect,
+    Edit,
+}
+export type ValidClientMsgType = Exclude<ClientMsgType, ClientMsgType.None>;
+
+export abstract class AbstractClientMsg {
+    abstract readonly type: ValidClientMsgType;
+    abstract serialize(s: BitStream): void;
+    abstract deserialize(s: BitStream): void;
+}
+
+export enum ServerMsgType {
+    None = 0,
+    Joined = 1,
+    Map,
+    Update,
+    AliveCounts,
+    Pickup,
+    Kill,
+    RoleAnnouncement,
+    UpdatePass,
+    PlayerStats,
+    GameOver,
+}
+export type ValidServerMsgType = Exclude<ServerMsgType, ServerMsgType.None>;
+
+export abstract class AbstractServerMsg {
+    abstract readonly type: ValidServerMsgType;
     abstract serialize(s: BitStream): void;
     abstract deserialize(s: BitStream): void;
 }

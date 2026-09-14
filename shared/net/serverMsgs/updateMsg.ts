@@ -1,6 +1,6 @@
 import { GameConfig, Plane as PlaneType } from "../../gameConfig.ts";
 import { v2, type Vec2 } from "../../utils/v2.ts";
-import { AbstractMsg, BitSizes, Constants } from "../constants.ts";
+import { AbstractServerMsg, BitSizes, Constants, ServerMsgType } from "../constants.ts";
 import {
     ObjectSerializeFns,
     type ObjectsFullData,
@@ -246,7 +246,9 @@ export const UpdateExtFlags = {
     KillLeader: 1 << 15,
 };
 
-export class UpdateMsg implements AbstractMsg {
+export class UpdateMsg implements AbstractServerMsg {
+    readonly type = ServerMsgType.Update;
+
     delObjIds: number[] = [];
     fullObjects: Array<
         & ObjectsFullData[ObjectType]

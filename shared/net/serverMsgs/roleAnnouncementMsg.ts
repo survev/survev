@@ -1,7 +1,9 @@
-import type { AbstractMsg } from "../constants.ts";
+import { type AbstractServerMsg, ServerMsgType } from "../constants.ts";
 import type { BitStream } from "../stream.ts";
 
-export class RoleAnnouncementMsg implements AbstractMsg {
+export class RoleAnnouncementMsg implements AbstractServerMsg {
+    readonly type = ServerMsgType.RoleAnnouncement;
+
     playerId = 0;
     killerId = 0;
     role = "";

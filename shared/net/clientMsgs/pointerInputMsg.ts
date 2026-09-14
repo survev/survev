@@ -1,8 +1,10 @@
 import { v2 } from "../../utils/v2.ts";
-import { type AbstractMsg, Constants } from "../constants.ts";
+import { type AbstractClientMsg, ClientMsgType, Constants } from "../constants.ts";
 import type { BitStream } from "../stream.ts";
 
-export class PointerInputMsg implements AbstractMsg {
+export class PointerInputMsg implements AbstractClientMsg {
+    readonly type = ClientMsgType.PointerInput;
+
     seq = 0;
     toMouseDir = v2.create(1, 0);
     toMouseLen = 0;
