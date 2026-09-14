@@ -1,3 +1,4 @@
+import { readFileSync } from "node:fs";
 import { resolve } from "node:path";
 import { defineConfig, loadEnv, PluginOption, type ServerOptions } from "vite";
 import { getConfig } from "../config.ts";
@@ -41,6 +42,9 @@ export default defineConfig(({ mode }) => {
         );
     }
 
+    const key = Config.vite.ssl ? readFileSync(Config.vite.ssl!.keyFile) : undefined;
+    const cert = Config.vite.ssl ? readFileSync(Config.vite.ssl!.certFile) : undefined;
+
     const serverOptions: ServerOptions = {
         port: Config.vite.port,
         host: Config.vite.host,
@@ -64,6 +68,10 @@ export default defineConfig(({ mode }) => {
                 secure: false,
                 ws: true,
             },
+        },
+        https: {
+            key,
+            cert,
         },
     };
 

@@ -64,6 +64,11 @@ export interface ConfigType {
          * Maximum amount of games the server can run.
          */
         maxGames: number;
+
+        webtransport?: {
+            keyFile: string;
+            certFile: string;
+        };
     };
 
     /**
@@ -72,6 +77,10 @@ export interface ConfigType {
     vite: {
         host: string;
         port: number;
+        ssl?: {
+            keyFile: string;
+            certFile: string;
+        };
     };
 
     /**

@@ -55,6 +55,7 @@ export type FindGamePrivateBody = z.infer<typeof zFindGamePrivateBody>;
 export type FindGamePrivateRes =
     | {
         urls: string[];
+        wtCertificateHashes: number[][];
     }
     | { error: FindGamePrivateError };
 

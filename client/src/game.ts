@@ -17,7 +17,12 @@ import { Editor } from "./debug/editor.ts";
 /* STRIP_FROM_PROD_CLIENT:END */
 
 import { GameObjectDefs } from "../../shared/defs/register.ts";
-import { type Connection, ConnectionState, WebsocketConnection } from "../../shared/net/connection.ts";
+import {
+    Connection,
+    ConnectionState,
+    WebsocketConnection,
+    WebTransportConnection,
+} from "../../shared/net/connection.ts";
 import type { GameWsDisconnectReason } from "../../shared/types/api.ts";
 import { device } from "./device.ts";
 import { EmoteBarn } from "./emote.ts";
@@ -141,7 +146,12 @@ export class Game {
         }
     }
 
-    tryJoinGame(url: string, joinToken: string, onConnectFail: () => void) {
+    tryJoinGame(
+        url: string,
+        joinToken: string,
+        wtCertificateHashes: WebTransportHash[],
+        onConnectFail: () => void,
+    ) {
         if (this.connecting || this.connected || this.initialized) return;
 
         if (this.m_connection) {
@@ -152,9 +162,20 @@ export class Game {
         this.connecting = true;
         this.connected = false;
         try {
-            this.m_connection = new WebsocketConnection(url);
+            if (url.startsWith("ws")) {
+                this.m_connection = new WebsocketConnection(url);
+            } else if (url.startsWith("https")) {
+                this.m_connection = new WebTransportConnection(url, wtCertificateHashes);
+            } else {
+                throw new Error(`Invalid URL ${url}`);
+            }
             this.m_connection.onError = () => {
                 this.m_connection?.close();
+                if (this.connecting) {
+                    this.connecting = false;
+                    onConnectFail();
+                }
+                this.connected = false;
             };
             this.m_connection.onOpen = () => {
                 this.connecting = false;
@@ -782,7 +803,7 @@ export class Game {
                 pInput.seq = inputMsg.seq;
                 pInput.toMouseDir = inputMsg.toMouseDir;
                 pInput.toMouseLen = inputMsg.toMouseLen;
-                this.m_sendMessage(pInput);
+                this.m_sendMessage(pInput, 128, this.m_connection?.supportsUnreliable || false);
             } else {
                 this.m_sendMessage(inputMsg);
             }
@@ -1590,18 +1611,22 @@ export class Game {
         }
     }
 
-    m_sendMessage(msg: net.ClientMsg, maxLen = 128) {
+    m_sendMessage(msg: net.ClientMsg, maxLen = 128, unreliable = false) {
         const msgStream = new net.MsgStream(new ArrayBuffer(maxLen));
         msgStream.serializeMsg(msg);
-        this.m_sendMessageImpl(msgStream);
+        this.m_sendMessageImpl(msgStream, unreliable);
     }
 
-    m_sendMessageImpl(msgStream: net.MsgStream) {
+    m_sendMessageImpl(msgStream: net.MsgStream, unreliable = false) {
         // Separate function call so sendMessage can be optimized;
         // v8 won't optimize functions containing a try/catch
         if (this.m_connection && this.m_connection.state == ConnectionState.Open) {
             try {
-                this.m_connection.send(msgStream.getBuffer());
+                if (unreliable) {
+                    this.m_connection.sendUnreliable(msgStream.getBuffer());
+                } else {
+                    this.m_connection.send(msgStream.getBuffer());
+                }
             } catch (e) {
                 console.error("sendMessageException", e);
                 this.m_connection.close();

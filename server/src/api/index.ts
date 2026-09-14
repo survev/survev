@@ -187,6 +187,7 @@ app.post("/api/find_game_v2", validateParams(zFindGameBody), async (c) => {
         res: {
             joinToken,
             urls: data.urls,
+            wtCertificateHashes: data.wtCertificateHashes,
         },
     });
 });

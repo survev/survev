@@ -322,6 +322,7 @@ class Room {
             player.send("joinGame", {
                 joinToken: token,
                 urls: res.urls,
+                wtCertificateHashes: res.wtCertificateHashes,
             });
         }
 

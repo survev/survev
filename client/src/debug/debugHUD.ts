@@ -1,4 +1,5 @@
 import * as PIXI from "pixi.js-legacy";
+import { WebTransportConnection } from "../../../shared/net/connection.ts";
 import type { ConfigManager } from "../config.ts";
 import type { Game } from "../game.ts";
 import type { Pool } from "../objects/objectPool.ts";

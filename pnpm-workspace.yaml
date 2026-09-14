@@ -1,4 +1,5 @@
 allowBuilds:
+  '@fails-components/webtransport-transport-http3-quiche': true
   '@taufik-nurrohman/color-picker': true
   canvas: true
   dprint: true

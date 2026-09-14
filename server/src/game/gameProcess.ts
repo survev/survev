@@ -1,9 +1,11 @@
 import fs from "node:fs";
+import { isIP } from "node:net";
 import { platform } from "node:os";
 import path from "node:path";
 import { App, SSLApp, type WebSocket } from "uWebSockets.js";
 import type { GameWsDisconnectReason } from "../../../shared/types/api.ts";
 import { Logger } from "../../../shared/utils/logger.ts";
+import { assert } from "../../../shared/utils/util.ts";
 import { Config } from "../config.ts";
 import { apiPrivateRouter, checkIp } from "../utils/apiRouter.ts";
 import { logErrorToWebhook } from "../utils/logger.ts";
@@ -13,7 +15,7 @@ import { uwsHelpers } from "../utils/uwsHelpers.ts";
 import type { Client } from "./client.ts";
 import { Game } from "./game.ts";
 import { type ProcessMsg, ProcessMsgType } from "./ipcTypes.ts";
-import { ClientSocket } from "./socket.ts";
+import { ClientSocket, WebTransportSocket } from "./socket.ts";
 
 function sendMsg(msg: ProcessMsg) {
     process.send!(msg);
@@ -33,7 +35,13 @@ function broadcastDisconnect(reason: GameWsDisconnectReason) {
 }
 process.on("disconnect", () => {
     broadcastDisconnect("server_restart");
-    process.exit();
+
+    // webtransport .close wont work if we exit the process immediately...
+    // and it will error-out the connections on the client instead of cleanly closing them
+    // TODO: figure out if this is still needed in the future
+    setImmediate(() => {
+        process.exit();
+    });
 });
 
 process.on("uncaughtException", async (err) => {
@@ -43,7 +51,10 @@ process.on("uncaughtException", async (err) => {
     game = undefined;
     await logErrorToWebhook("server", "Game process error", err);
 
-    process.exit(1);
+    // see comment on disconnect
+    setImmediate(() => {
+        process.exit(1);
+    });
 });
 
 function stopGame() {
@@ -288,6 +299,10 @@ class UwsSocket extends ClientSocket<Client> {
         this._socket.send(data, true, false);
     }
 
+    sendUnreliable() {
+        throw new Error("Websockets don't support unreliable messages");
+    }
+
     close(reason?: GameWsDisconnectReason): void {
         if (this._closed) return;
         this._closed = true;
@@ -421,3 +436,141 @@ app.listen(Config.gameServer.host, port, 1, (socket) => {
         `Listening on ${Config.gameServer.host}:${port}`,
     );
 });
+
+import { webtHelpers } from "../../../shared/net/connection.ts";
+import type * as wtTypes from "../../node_modules/@fails-components/webtransport/dist/lib/index.node.d.ts";
+if (Config.gameServer.webtransport) {
+    // @ts-expect-error the types for this are broken
+    const webt = await import("@fails-components/webtransport") as typeof wtTypes;
+
+    const cert = fs.readFileSync(Config.gameServer.webtransport.certFile);
+    const key = fs.readFileSync(Config.gameServer.webtransport.keyFile);
+
+    const webtServer = new webt.Http3Server({
+        port: port,
+        secret: "meow",
+        host: Config.gameServer.host,
+        cert: cert.toString("utf8"),
+        privKey: key.toString("utf8"),
+        defaultDatagramsReadableMode: "bytes",
+    });
+
+    webtServer.startServer();
+    await webtServer.ready;
+
+    webtServer.setRequestCallback(async (args: { header: Record<string, string> }) => {
+        // just copied this code from https://github.com/fails-components/webtransport/blob/a605f95755939778ac1d0049987ae9a4b09af814/test/fixtures/server.js#L63
+        const url = args.header[":path"];
+        const [path] = url.split("?");
+
+        if (webtServer.sessionController[path] == null) {
+            return {
+                ...args,
+                path,
+                status: 404,
+            };
+        }
+        const protocols = args.header["wt-available-protocols"]
+            ? args.header["wt-available-protocols"]
+            : undefined;
+        // we chose for testing always the last one
+        let selectedProtocol = protocols && protocols[protocols.length - 1];
+        // however if it says noprot we remove it
+        if (selectedProtocol === "noprot") selectedProtocol = undefined;
+
+        return {
+            ...args,
+            path,
+            userData: {
+                search: url.substring(path.length),
+            },
+            header: {
+                ...args.header,
+                ":path": path,
+            },
+            status: 200,
+            selectedProtocol,
+        };
+    });
+
+    procLogger.info(
+        `WebTransport server listening on ${webtServer.address()!.host}:${webtServer.address()!.port}`,
+    );
+
+    webtServer.closed.then(() => {
+        procLogger.info("Webtransport server closed");
+    });
+
+    (async () => {
+        try {
+            for await (const session of webtServer.sessionStream("/play")) {
+                try {
+                    await session.ready;
+                    handleWebtransportSession(session);
+                } catch (e) {
+                    console.error(e);
+                }
+            }
+        } catch (e) {
+            console.error(e);
+        }
+    })();
+}
+
+function handleWebtransportSession(session: wtTypes.WebTransportSession) {
+    // i hate this, theres no typings for it, it will probably break on a future version
+    // but whatever, this is an experiment anyway
+    const ip = (session as unknown as { peerAddress_: string }).peerAddress_
+        .split(":")
+        .slice(0, -1)
+        .join(":")
+        .replace(/(\[|\])/g, "");
+
+    assert(isIP(ip));
+    const clientSocket = new WebTransportSocket<Client>(
+        session,
+        ip,
+    );
+
+    type Uint8RS = ReadableStream<Uint8Array<ArrayBuffer>>;
+    (async () => {
+        for await (const stream of session.incomingUnidirectionalStreams as ReadableStream<Uint8RS>) {
+            try {
+                const buff = await webtHelpers.readIcomingStream(stream, 1024);
+                game?.clientBarn.handleMsg(buff, clientSocket);
+            } catch (err) {
+                procLogger.error("Error reading incoming stream:", err);
+            }
+        }
+    })().catch(err => {
+        procLogger.error("Error reading incoming stream:", err);
+    });
+
+    (async () => {
+        let lastSeq = -1;
+        for await (const data of session.datagrams.readable as Uint8RS) {
+            try {
+                const { seq, contents } = webtHelpers.readDatagram(data);
+                if (seq <= lastSeq) {
+                    continue;
+                }
+
+                lastSeq = seq;
+                game?.clientBarn.handleMsg(contents.buffer, clientSocket);
+            } catch (err) {
+                procLogger.error("Error reading datagram stream:", err);
+            }
+        }
+    })().catch(err => {
+        procLogger.error("Error reading datagram stream:", err);
+    });
+
+    session.closed.then(() => {
+        clientSocket._closed = true;
+        game?.clientBarn.handleSocketClose(clientSocket);
+    }).catch(e => {
+        clientSocket._closed = true;
+        game?.clientBarn.handleSocketClose(clientSocket);
+        console.error("web transport error:", e);
+    });
+}

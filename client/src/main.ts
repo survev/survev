@@ -791,6 +791,12 @@ export class Application {
             this.game!.tryJoinGame(
                 url,
                 matchData.joinToken,
+                matchData.wtCertificateHashes.map(value => {
+                    return {
+                        algorithm: "sha-256",
+                        value: new Uint8Array(value),
+                    };
+                }),
                 onFailure,
             );
         };
@@ -804,7 +810,7 @@ export class Application {
                 const urls = atob(params.get("u")!).split(",");
                 const joinToken = params.get("jt")!;
 
-                this!.joinGame({ urls, joinToken });
+                this!.joinGame({ urls, joinToken, wtCertificateHashes: [] });
             } catch (e) {
                 console.error("Failed to parse join data:", e);
                 this.onJoinGameError("join_game_failed");

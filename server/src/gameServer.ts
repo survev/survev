@@ -1,4 +1,5 @@
 import { Cron } from "croner";
+import crypto from "node:crypto";
 import { existsSync } from "node:fs";
 import fs from "node:fs/promises";
 import path from "node:path";
@@ -30,6 +31,13 @@ process.on("uncaughtException", async (err) => {
     process.exit(1);
 });
 
+const webtransportHashes: number[][] = [];
+if (Config.gameServer.webtransport) {
+    const cert = await fs.readFile(Config.gameServer.webtransport.certFile);
+
+    webtransportHashes.push([...crypto.createHash("sha256").update(new crypto.X509Certificate(cert).raw).digest()]);
+}
+
 class GameServer {
     readonly logger = new ServerLogger("GameServer");
 
@@ -42,10 +50,19 @@ class GameServer {
         const protocol = this.region.https ? "wss" : "ws";
         const mainPortUrl = new URL(`${protocol}://${this.region.address}/play`);
 
-        const gamePortUrl = new URL(mainPortUrl.toString());
-        gamePortUrl.port = game.port.toString();
+        const wsUrl = new URL(mainPortUrl.toString());
+        wsUrl.port = game.port.toString();
 
-        return [gamePortUrl.toString()];
+        const urls = [wsUrl.toString()];
+
+        if (Config.gameServer.webtransport) {
+            const wtUrl = new URL(mainPortUrl.toString());
+            wtUrl.port = game.port.toString();
+            wtUrl.protocol = "https";
+            urls.unshift(wtUrl.toString());
+        }
+
+        return urls;
     }
 
     async findGame(body: FindGamePrivateBody): Promise<FindGamePrivateRes> {
@@ -73,6 +90,7 @@ class GameServer {
 
         return {
             urls: this.getUrlsForGame(game),
+            wtCertificateHashes: webtransportHashes,
         };
     }
 
@@ -88,6 +106,7 @@ class GameServer {
                     data: {
                         joinToken: d.joinToken,
                         urls: this.getUrlsForGame(d.game),
+                        wtCertificateHashes: webtransportHashes,
                     },
                 };
             }),

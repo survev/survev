@@ -17,6 +17,7 @@ export type FindGameBody = z.infer<typeof zFindGameBody>;
 export interface FindGameMatchData {
     urls: string[];
     joinToken: string;
+    wtCertificateHashes: number[][];
 }
 
 export const loadoutSchema = z.object({
