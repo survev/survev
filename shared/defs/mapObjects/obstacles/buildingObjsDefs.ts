@@ -320,7 +320,14 @@ export const BuildingObjectDefs: Record<string, ObstacleDef> = {
         hinge: v2.create(0, 2),
         extents: v2.create(0.3, 2),
     }),
-    lab_door_01: createLabDoor({ img: { tint: 0x520000 } }),
+    lab_door_01: createLabDoor({
+        img: { tint: 0x520000 },
+        door: {
+            sound: {
+                unlock: "button_press_01",
+            },
+        },
+    }),
     lab_door_02: createLabDoor({
         door: {
             openOneWay: 1,
@@ -1259,6 +1266,10 @@ export const BuildingObjectDefs: Record<string, ObstacleDef> = {
         material: "metal",
         extents: v2.create(0.5, 6.5),
     }),
+    metal_wall_1x15: createWall({
+        material: "metal",
+        extents: v2.create(0.5, 7.5),
+    }),
     metal_wall_ext_16: createWall({
         material: "metal",
         extents: v2.create(0.5, 8),
@@ -1288,6 +1299,10 @@ export const BuildingObjectDefs: Record<string, ObstacleDef> = {
     metal_wall_ext_thick_5: createWall({
         material: "metal",
         extents: v2.create(1, 2.5),
+    }),
+    metal_wall_2x5_5: createWall({
+        material: "metal",
+        extents: v2.create(1, 2.75),
     }),
     metal_wall_ext_thick_6: createWall({
         material: "metal",
@@ -1453,6 +1468,34 @@ export const BuildingObjectDefs: Record<string, ObstacleDef> = {
         material: "metal",
         extents: v2.create(2.5, 7),
     }),
+    metal_wall_5x6: createWall({
+        material: "metal",
+        extents: v2.create(2.5, 3),
+    }),
+    metal_wall_5x10: createWall({
+        material: "metal",
+        extents: v2.create(2.5, 5),
+    }),
+    metal_wall_5x13: createWall({
+        material: "metal",
+        extents: v2.create(2.5, 6.5),
+    }),
+    metal_wall_5x22_5: createWall({
+        material: "metal",
+        extents: v2.create(2.5, 11.25),
+    }),
+    metal_wall_5x23: createWall({
+        material: "metal",
+        extents: v2.create(2.5, 11.5),
+    }),
+    metal_wall_5x26: createWall({
+        material: "metal",
+        extents: v2.create(2.5, 13),
+    }),
+    metal_wall_6x8: createWall({
+        material: "metal",
+        extents: v2.create(3, 4),
+    }),
     glass_wall_9: createWall({
         material: "glass",
         extents: v2.create(0.5, 4.5),
@@ -1483,11 +1526,17 @@ export const BuildingObjectDefs: Record<string, ObstacleDef> = {
         health: 75,
         img: wallImg("map-wall-glass-13.img"),
     }),
-    glass_wall_18: createWall({
+    glass_wall_1x19: createWall({
         material: "glass",
-        extents: v2.create(0.5, 9),
+        extents: v2.create(0.5, 9.5),
         health: 150,
-        img: wallImg("map-wall-glass-18.img"),
+        img: wallImg("map-wall-glass-1x19.img"),
+    }),
+    glass_wall_1x23: createWall({
+        material: "glass",
+        extents: v2.create(0.5, 11.5),
+        health: 150,
+        img: wallImg("map-wall-glass-1x23.img"),
     }),
     barn_wall_int_2: createWall({
         material: "wood",

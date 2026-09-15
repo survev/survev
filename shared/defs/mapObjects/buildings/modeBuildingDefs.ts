@@ -3282,7 +3282,7 @@ function createReserveBasement(overrides: DeepPartial<BuildingDef>): BuildingDef
                 ori: 0,
             },
             {
-                type: "control_panel_07",
+                type: "control_panel_07de",
                 pos: v2.create(18.5, -23.25),
                 scale: 1,
                 ori: 0,

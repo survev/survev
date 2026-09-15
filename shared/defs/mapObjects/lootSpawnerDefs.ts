@@ -46,10 +46,10 @@ export const LootSpawnerDefs: Record<string, LootSpawnerDef> = {
         type: "loot_spawner",
         loot: [tierLoot("tier_woodaxe", 1, 1)],
     },
-    // loot_tier_fireaxe: {
-    //     type: "loot_spawner",
-    //     loot: [tierLoot("tier_fireaxe", 1, 1)],
-    // },
+    loot_tier_fireaxe: {
+        type: "loot_spawner",
+        loot: [tierLoot("tier_fireaxe", 1, 1)],
+    },
     loot_tier_stonehammer: {
         type: "loot_spawner",
         loot: [tierLoot("tier_stonehammer", 1, 1)],

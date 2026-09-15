@@ -352,6 +352,18 @@ export const BuildingSprites = {
         "map/map-bunker-chrys-compartment-floor-03a.svg",
     ],
 
+    bunker_cloud: [
+        "map/map-bunker-cloud-ceiling-01.svg",
+        "map/map-bunker-cloud-ceiling-02.svg",
+        "map/map-bunker-cloud-ceiling-03.svg",
+        "map/map-bunker-cloud-ceiling-04.svg",
+        "map/map-bunker-cloud-ceiling-05.svg",
+        "map/map-bunker-cloud-ceiling-06.svg",
+        "map/map-bunker-cloud-floor-01.svg",
+        "map/map-bunker-cloud-floor-02.svg",
+        "map/map-bunker-cloud-floor-03.svg",
+    ],
+
     bunker_eye: [
         "map/map-bunker-eye-chamber-ceiling-01.svg",
         "map/map-bunker-eye-chamber-floor-01a.svg",
