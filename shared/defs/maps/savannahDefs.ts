@@ -170,7 +170,7 @@ const mapDef: PartialMapDef = {
                         odds: 1,
                         innerRad: 32,
                         outerRad: 48,
-                        centerObj: "crate_02sv_lake",
+                        centerObj: "bunker_structure_10",
                         spawnBound: {
                             pos: v2.create(0.5, 0.5),
                             rad: 200,

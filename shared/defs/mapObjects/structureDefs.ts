@@ -1063,4 +1063,46 @@ export const StructureDefs: Record<string, StructureDef> = {
         ],
         mask: [collider.createAabbExtents(v2.create(0, 0), v2.create(16.75, 11.75))],
     },
+    bunker_structure_10: {
+        type: "structure",
+        terrain: { grass: false, beach: false },
+        ori: 0,
+        mapObstacleBounds: [
+            collider.createAabbExtents(v2.create(0, 2), v2.create(20, 20)),
+            collider.createAabbExtents(v2.create(-28.5, -82), v2.create(18, 17)),
+        ],
+        layers: [
+            {
+                type: "bunker_cloud_01",
+                pos: v2.create(0, 0),
+                ori: 0,
+            },
+            {
+                type: "bunker_cloud_sublevel_01",
+                pos: v2.create(1.5, -39),
+                ori: 0,
+            },
+        ],
+        stairs: [
+            {
+                collision: collider.createAabbExtents(
+                    v2.create(0, 0.9),
+                    v2.create(2, 2.6),
+                ),
+                downDir: v2.create(0, -1),
+            },
+            {
+                collision: collider.createAabbExtents(
+                    v2.create(-28.5, -77.9),
+                    v2.create(2, 2.6),
+                ),
+                downDir: v2.create(0, 1),
+            },
+        ],
+        mask: [
+            collider.createAabbExtents(v2.create(10, -33.4), v2.create(35, 31.4)),
+            collider.createAabbExtents(v2.create(10, -74.8), v2.create(29, 10)),
+            collider.createAabbExtents(v2.create(-32, -43.8), v2.create(7, 31.3)),
+        ],
+    },
 };

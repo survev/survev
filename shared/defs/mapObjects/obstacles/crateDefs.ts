@@ -298,6 +298,19 @@ export const CrateDefs: Record<string, ObstacleDef> = {
         ],
         hitParticle: "blackChip",
     }),
+    case_10: createCase({
+        health: 140,
+        img: {
+            sprite: "map-case-cloud-01.img",
+            residue: "map-case-hatchet-res-01.img",
+        },
+        loot: [
+            // autoLoot("backpack04", 1, 1),
+            tierLoot("tier_ammo", 2, 3),
+            tierLoot("tier_medical", 2, 2),
+        ],
+        hitParticle: "blackChip",
+    }),
     chest_01: createChest({
         loot: [
             tierLoot("tier_chest", 3, 4),
