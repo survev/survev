@@ -1259,6 +1259,7 @@ export const FurnitureDefs: Record<string, ObstacleDef> = {
         collision: collider.createAabbExtents(v2.create(0, 0), v2.create(4, 2)),
         destructible: false,
         scale: { createMin: 1, createMax: 1, destroy: 0.95 },
+        hitParticle: "barrelChip",
         img: {
             sprite: "map-table-06.img",
             residue: "",
@@ -1267,11 +1268,18 @@ export const FurnitureDefs: Record<string, ObstacleDef> = {
             tint: 0xffffff,
             zIdx: 60,
         },
+        sound: {
+            bullet: "wall_bullet",
+            punch: "metal_punch",
+            explode: "none",
+            enter: "none",
+        },
     }),
     table_07: createTable({
         collision: collider.createAabbExtents(v2.create(0.05, -0.1), v2.create(3.35, 1.25)),
         destructible: false,
         scale: { createMin: 1, createMax: 1, destroy: 0.95 },
+        hitParticle: "barrelChip",
         img: {
             sprite: "map-table-07.img",
             residue: "",
@@ -1280,11 +1288,18 @@ export const FurnitureDefs: Record<string, ObstacleDef> = {
             tint: 0xffffff,
             zIdx: 60,
         },
+        sound: {
+            bullet: "wall_bullet",
+            punch: "metal_punch",
+            explode: "none",
+            enter: "none",
+        },
     }),
     table_08: createTable({
         collision: collider.createAabbExtents(v2.create(0, -0.05), v2.create(4, 1.5)),
         destructible: false,
         scale: { createMin: 1, createMax: 1, destroy: 0.95 },
+        hitParticle: "barrelChip",
         img: {
             sprite: "map-table-08.img",
             residue: "",
@@ -1293,11 +1308,18 @@ export const FurnitureDefs: Record<string, ObstacleDef> = {
             tint: 0xffffff,
             zIdx: 60,
         },
+        sound: {
+            bullet: "wall_bullet",
+            punch: "metal_punch",
+            explode: "none",
+            enter: "none",
+        },
     }),
     table_09: createTable({
         collision: collider.createAabbExtents(v2.create(0, -0.05), v2.create(3, 2)),
         destructible: false,
         scale: { createMin: 1, createMax: 1, destroy: 0.95 },
+        hitParticle: "barrelChip",
         img: {
             sprite: "map-table-09.img",
             residue: "",
@@ -1305,6 +1327,12 @@ export const FurnitureDefs: Record<string, ObstacleDef> = {
             alpha: 1,
             tint: 0xffffff,
             zIdx: 60,
+        },
+        sound: {
+            bullet: "wall_bullet",
+            punch: "metal_punch",
+            explode: "none",
+            enter: "none",
         },
     }),
     toilet_01: createToilet({
