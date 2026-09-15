@@ -130,7 +130,6 @@ export class PlayerBarn {
      * Assigned once at game end
      */
     factionsMvp?: Player = undefined;
-    sentMvpQuestUpdate = false;
 
     constructor(readonly game: Game) {
         this.bagSizes = util.mergeDeep<typeof GameConfig["bagSizes"]>(
@@ -291,12 +290,6 @@ export class PlayerBarn {
                 sendWinEmotes = true;
                 this.sentWinEmotes = true;
             }
-        }
-
-        if (!this.sentMvpQuestUpdate && this.game.over) {
-            this.sentMvpQuestUpdate = true;
-            const mvp = this.factionsMvp;
-            mvp?.questManager.trackEvent("be_mvp", { role: mvp.role });
         }
 
         if (this.game.isTeamMode || this.game.map.factionMode) {
