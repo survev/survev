@@ -171,6 +171,7 @@ export class Map {
     } | null = null;
 
     cameraEmitter: Emitter | null = null;
+    private glListener = false;
 
     constructor(public decalBarn: DecalBarn) {}
 
@@ -527,6 +528,11 @@ export class Map {
 
     renderMap(renderer: PIXI.IRenderer, canvasMode: boolean) {
         if (this.mapLoaded) {
+            if (!this.glListener && renderer.type == PIXI.RENDERER_TYPE.WEBGL) {
+                const canvas = renderer.view as HTMLCanvasElement;
+                canvas.addEventListener("webglcontextrestored", () => this.renderMap(renderer, canvasMode));
+                this.glListener = true;
+            }
             const mapRender = new PIXI.Container();
             const txtRender = new PIXI.Container();
             const mapColors = this.mapDef.biome.colors;
