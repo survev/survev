@@ -5,7 +5,7 @@
    version="1.1"
    id="svg854"
    sodipodi:docname="gun-l86-01.svg"
-   inkscape:version="1.4 (e7c3feb1, 2024-10-09)"
+   inkscape:version="1.4.3 (0d15f75, 2025-12-25)"
    xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
    xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
    xmlns="http://www.w3.org/2000/svg"
@@ -34,18 +34,18 @@
      inkscape:pageopacity="0"
      inkscape:pageshadow="2"
      inkscape:window-width="1464"
-     inkscape:window-height="920"
+     inkscape:window-height="895"
      id="namedview856"
      showgrid="true"
      fit-margin-top="1"
      fit-margin-left="1"
      fit-margin-bottom="1"
      fit-margin-right="1"
-     inkscape:zoom="1.7781604"
-     inkscape:cx="37.3982"
-     inkscape:cy="158.30968"
-     inkscape:window-x="49"
-     inkscape:window-y="34"
+     inkscape:zoom="1.2573493"
+     inkscape:cx="18.690113"
+     inkscape:cy="130.03547"
+     inkscape:window-x="6"
+     inkscape:window-y="33"
      inkscape:window-maximized="0"
      inkscape:current-layer="svg854"
      inkscape:showpageshadow="false"
@@ -178,7 +178,7 @@
      width="13"
      height="55"
      x="28.5"
-     y="78" />
+     y="67" />
   <path
      style="fill:#000000;fill-opacity:1;stroke:none;stroke-width:6.83201;stroke-linecap:round;stroke-dasharray:none"
      id="rect2"
@@ -189,28 +189,28 @@
      inkscape:path-effect="#path-effect7"
      sodipodi:type="rect"
      d="m 23.363045,49.613327 h 4.056646 v 70.315203 h -4.056646 z"
-     transform="matrix(0.98603616,0,0,0.78219218,-0.53680691,30.192844)" />
+     transform="matrix(0.98603616,0,0,0.78219218,-0.53680691,19.192844)" />
   <rect
      style="fill:#000000;fill-opacity:1;stroke:none;stroke-width:6;stroke-linecap:round;stroke-dasharray:none"
      id="rect2-8"
      width="4"
      height="55"
      x="43.5"
-     y="69" />
+     y="58" />
   <rect
      style="fill:#000000;fill-opacity:1;stroke:none;stroke-width:6;stroke-linecap:round;stroke-dasharray:none"
      id="rect3"
      width="19"
      height="7"
      x="25.500002"
-     y="73" />
+     y="62" />
   <rect
      style="fill:#000000;fill-opacity:1;stroke:none;stroke-width:6.00001;stroke-linecap:round;stroke-dasharray:none"
      id="rect4"
      width="11"
      height="12"
      x="29.499998"
-     y="64" />
+     y="53" />
   <path
      style="fill:#000000;fill-opacity:1;stroke:none;stroke-width:5.99999;stroke-linecap:round;stroke-dasharray:none"
      id="rect4-4"
@@ -221,10 +221,10 @@
      inkscape:path-effect="#path-effect1"
      sodipodi:type="rect"
      d="m 32.5,52 h 5 a 4,4 45 0 1 4,4 v 15 h -13 V 56 a 4,4 135 0 1 4,-4 z"
-     transform="translate(0,-6)" />
+     transform="translate(0,-17)" />
   <g
      id="rect9"
-     transform="translate(0,-6)">
+     transform="translate(0,-17)">
     <path
        style="fill:#d5be9d;stroke-linecap:round"
        d="m 23.500002,128.5 h 23 V 169 h -23 z"
@@ -242,7 +242,7 @@
      width="20"
      height="95"
      x="25"
-     y="155.5"
+     y="144.5"
      inkscape:label="rect13" />
   <rect
      style="fill:#000000;fill-opacity:1;stroke:none;stroke-width:4.99999;stroke-linecap:round;stroke-dasharray:none;stroke-opacity:1"
@@ -250,7 +250,7 @@
      width="6.5"
      height="13"
      x="31.75"
-     y="131" />
+     y="120" />
   <path
      style="fill:#000000;fill-opacity:1;stroke:none;stroke-width:5.00001;stroke-linecap:round;stroke-dasharray:none;stroke-opacity:1"
      id="rect11-0"
@@ -261,14 +261,14 @@
      inkscape:path-effect="#path-effect3"
      sodipodi:type="rect"
      d="m 33,178 h 4 l 2,2 v 20 a 4,4 135 0 1 -4,4 4,4 45 0 1 -4,-4 v -20 z"
-     transform="translate(0,-6)" />
+     transform="translate(0,-17)" />
   <rect
      style="fill:#000000;fill-opacity:1;stroke-width:6.99997;stroke-linecap:round;stroke-dasharray:none"
      id="rect5"
      width="23"
      height="7"
      x="23.5"
-     y="254" />
+     y="243" />
   <path
      style="fill:#000000;fill-opacity:1;stroke-width:5.83332;stroke-linecap:round;stroke-dasharray:none"
      id="rect5-4"
@@ -279,7 +279,7 @@
      inkscape:path-effect="#path-effect4"
      sodipodi:type="rect"
      d="m 45,197 h 10 a 2,2 45 0 1 2,2 l 0,3.5 a 2,2 135 0 1 -2,2 l -10,0 z"
-     transform="matrix(1.2,0,0,1.2,-10.2,-46.15)" />
+     transform="matrix(1.2,0,0,1.2,-10.2,-57.15)" />
   <path
      style="fill:#dcc8a7;fill-opacity:1;stroke:#000000;stroke-width:8.4902;stroke-linecap:round"
      id="rect6"
@@ -290,25 +290,25 @@
      inkscape:path-effect="#path-effect6"
      sodipodi:type="rect"
      d="m 24,214 h 22 v 32 a 2,2 135 0 1 -2,2 l -18,0 a 2,2 45 0 1 -2,-2 z"
-     transform="matrix(0.94335409,0,0,0.94117238,1.982607,6.589109)" />
+     transform="matrix(0.94335409,0,0,0.94117238,1.982607,-4.410891)" />
   <path
      style="fill:#000000;stroke-width:8;stroke-linecap:round"
-     d="m 27,138.5 v 11 l 3,-2.5 v -6 z"
+     d="m 27,127.5 v 11 l 3,-2.5 v -6 z"
      id="path3"
      sodipodi:nodetypes="ccccc" />
   <path
      style="fill:#000000;stroke-width:8;stroke-linecap:round"
-     d="m 27,128.5 v 11 l 3,-2.5 v -6 z"
+     d="m 27,117.5 v 11 l 3,-2.5 v -6 z"
      id="path3-8"
      sodipodi:nodetypes="ccccc" />
   <path
      style="fill:#000000;stroke-width:8;stroke-linecap:round"
-     d="m 43,149.5 v -11 l -3,2.5 v 6 z"
+     d="m 43,138.5 v -11 l -3,2.5 v 6 z"
      id="path3-6"
      sodipodi:nodetypes="ccccc" />
   <path
      style="fill:#000000;stroke-width:8;stroke-linecap:round"
-     d="m 43,139.5 v -11 l -3,2.5 v 6 z"
+     d="m 43,128.5 v -11 l -3,2.5 v 6 z"
      id="path3-8-3"
      sodipodi:nodetypes="ccccc" />
 </svg>
