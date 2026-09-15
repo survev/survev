@@ -362,8 +362,15 @@ export class Game {
             // stop game after 1.8s
             this.stopTicker = 1.8;
 
-            this.playerBarn.factionsMvp = this.modeManager.getFactionMvp();
+            const mvp = this.modeManager.getFactionMvp();
+            this.playerBarn.factionsMvp = mvp;
+            mvp?.questManager.trackEvent("be_mvp", { role: mvp.role });
+
             this.winningTeamId = this.modeManager.getWinningTeamId();
+            // forcefully flush progress, because after this point, any unsynced updates are lost
+            for (const player of this.playerBarn.players) {
+                player.questManager.flushProgress(this.winningTeamId);
+            }
             this.updateData();
         }
     }
