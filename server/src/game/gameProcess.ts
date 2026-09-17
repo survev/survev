@@ -437,7 +437,7 @@ app.listen(Config.gameServer.host, port, 1, (socket) => {
     );
 });
 
-import { webtHelpers } from "../../../shared/net/connection.ts";
+import { ChunkReader, webtHelpers } from "../../../shared/net/connection.ts";
 import type * as wtTypes from "../../node_modules/@fails-components/webtransport/dist/lib/index.node.d.ts";
 if (Config.gameServer.webtransport) {
     // @ts-expect-error the types for this are broken
@@ -506,7 +506,7 @@ if (Config.gameServer.webtransport) {
             for await (const session of webtServer.sessionStream("/play")) {
                 try {
                     await session.ready;
-                    handleWebtransportSession(session);
+                    await handleWebtransportSession(session);
                 } catch (e) {
                     console.error(e);
                 }
@@ -517,7 +517,7 @@ if (Config.gameServer.webtransport) {
     })();
 }
 
-function handleWebtransportSession(session: wtTypes.WebTransportSession) {
+async function handleWebtransportSession(session: wtTypes.WebTransportSession) {
     // i hate this, theres no typings for it, it will probably break on a future version
     // but whatever, this is an experiment anyway
     const ip = (session as unknown as { peerAddress_: string }).peerAddress_
@@ -527,19 +527,22 @@ function handleWebtransportSession(session: wtTypes.WebTransportSession) {
         .replace(/(\[|\])/g, "");
 
     assert(isIP(ip));
+    const stream = await session.createUnidirectionalStream();
     const clientSocket = new WebTransportSocket<Client>(
         session,
         ip,
     );
+    clientSocket.writableUniStream = stream;
 
     type Uint8RS = ReadableStream<Uint8Array<ArrayBuffer>>;
     (async () => {
         for await (const stream of session.incomingUnidirectionalStreams as ReadableStream<Uint8RS>) {
-            try {
-                const buff = await webtHelpers.readIcomingStream(stream, 1024);
-                game?.clientBarn.handleMsg(buff, clientSocket);
-            } catch (err) {
-                procLogger.error("Error reading incoming stream:", err);
+            const chunkReader = new ChunkReader();
+            for await (const data of stream) {
+                chunkReader.addChunk(data);
+                for (const packet of chunkReader.getPackets()) {
+                    game?.clientBarn.handleMsg(packet, clientSocket);
+                }
             }
         }
     })().catch(err => {

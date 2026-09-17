@@ -81,6 +81,101 @@ export class WebsocketConnection extends Connection {
     }
 }
 
+export class ChunkReader {
+    private readingChunks = false;
+    private nextPacketFullSize = 0;
+    private nextPacketIncrementingSize = 0;
+    private nextPacketChunks: Uint8Array<ArrayBuffer>[] = [];
+
+    private packets: Uint8Array<ArrayBuffer>[] = [];
+
+    private readingHeader = false;
+    private headerBuffer = new Uint8Array(4);
+    private headerIdx = 0;
+
+    addChunk(chunk: Uint8Array<ArrayBuffer>) {
+        if (!this.readingChunks) {
+            let headerSize = 4;
+            let packetSize: number;
+            if (chunk.length < headerSize || this.readingHeader) {
+                const oldIdx = this.headerIdx;
+                const toRead = Math.min(headerSize - this.headerIdx, chunk.length);
+                for (let i = 0; i < toRead; i++) {
+                    this.headerBuffer[this.headerIdx] = chunk[i];
+                    this.headerIdx++;
+                }
+                if (this.headerIdx === headerSize) {
+                    this.readingHeader = false;
+                    packetSize = new DataView(this.headerBuffer.buffer).getUint32(0, true);
+                    headerSize -= oldIdx;
+                } else {
+                    this.readingHeader = true;
+                    return;
+                }
+            } else {
+                const view = new DataView(chunk.buffer);
+                packetSize = view.getUint32(chunk.byteOffset, true);
+            }
+
+            this.headerIdx = 0;
+
+            const chunkSizeWithoutHeader = chunk.length - headerSize;
+
+            if (chunkSizeWithoutHeader === packetSize) {
+                this.packets.push(chunk.slice(headerSize, chunk.length));
+            } else if (chunkSizeWithoutHeader < packetSize) {
+                this.readingChunks = true;
+                this.nextPacketFullSize = packetSize;
+                this.nextPacketIncrementingSize = 0;
+                this.nextPacketChunks.length = 0;
+
+                if (chunkSizeWithoutHeader > 0) {
+                    this.nextPacketChunks.push(chunk.slice(headerSize, chunk.length));
+                    this.nextPacketIncrementingSize += chunkSizeWithoutHeader;
+                }
+            } else if (chunkSizeWithoutHeader > packetSize) {
+                this.packets.push(chunk.slice(headerSize, headerSize + packetSize));
+                this.addChunk(chunk.slice(headerSize + packetSize, chunk.length));
+            }
+        } else {
+            const newSize = this.nextPacketIncrementingSize + chunk.length;
+            if (newSize === this.nextPacketFullSize) {
+                this.nextPacketChunks.push(chunk);
+                this.nextPacketIncrementingSize += chunk.length;
+                this.combineChunks();
+            } else if (newSize < this.nextPacketFullSize) {
+                this.nextPacketIncrementingSize += chunk.length;
+                this.nextPacketChunks.push(chunk);
+            } else if (newSize > this.nextPacketFullSize) {
+                const missingBytes = this.nextPacketFullSize - this.nextPacketIncrementingSize;
+                this.addChunk(chunk.slice(0, missingBytes));
+                this.addChunk(chunk.slice(missingBytes, chunk.length));
+            }
+        }
+    }
+
+    combineChunks() {
+        const merged = new Uint8Array(this.nextPacketFullSize);
+        for (let i = 0, offset = 0; i < this.nextPacketChunks.length; i++) {
+            const buff = this.nextPacketChunks[i];
+            merged.set(buff, offset);
+            offset += buff.length;
+        }
+        this.packets.push(merged);
+
+        this.nextPacketChunks.length = 0;
+        this.readingChunks = false;
+        this.nextPacketIncrementingSize = 0;
+        this.nextPacketFullSize = 0;
+    }
+
+    getPackets(): ArrayBuffer[] {
+        const packets = this.packets;
+        this.packets = [];
+        return packets.map(p => p.buffer.slice(p.byteOffset, p.byteLength));
+    }
+}
+
 type Uint8RS = ReadableStream<Uint8Array<ArrayBuffer>>;
 export const webtHelpers = {
     async readIcomingStream(stream: Uint8RS, maxSize: number) {
@@ -136,6 +231,7 @@ export class WebTransportConnection extends Connection {
 
     private _sendOrder = 0;
 
+    writableUniStream!: WritableStream;
     private _datagramWriter!: WritableStreamDefaultWriter;
     private _nextDatagramOutSeq = 0;
 
@@ -149,8 +245,6 @@ export class WebTransportConnection extends Connection {
         // this.transport.datagrams.incomingMaxAge = 100;
 
         this.transport.ready.then(() => {
-            this._state = ConnectionState.Open;
-
             // datagrams.writable.getWriter() is deprecated
             // need to use `datagrams.createWritable()` instead
             // but chrome doesn't support that yet!
@@ -165,9 +259,14 @@ export class WebTransportConnection extends Connection {
             }
 
             (async () => {
-                for await (const stream of this.transport.incomingUnidirectionalStreams as ReadableStream<Uint8RS>) {
-                    const buff = await webtHelpers.readIcomingStream(stream, 65536);
-                    this.onMessage(buff);
+                for await (const stream of this.transport.incomingUnidirectionalStreams) {
+                    const chunkReader = new ChunkReader();
+                    for await (const data of stream) {
+                        chunkReader.addChunk(data);
+                        for (const packet of chunkReader.getPackets()) {
+                            this.onMessage?.(packet);
+                        }
+                    }
                 }
             })();
 
@@ -185,7 +284,11 @@ export class WebTransportConnection extends Connection {
                 this.supportsUnreliable = this.transport.reliability === "supports-unreliable";
             }
 
-            this.onOpen();
+            this.transport.createUnidirectionalStream().then((s) => {
+                this.writableUniStream = s;
+                this._state = ConnectionState.Open;
+                this.onOpen();
+            });
         }).catch(err => {
             console.error(err);
             this.onError();
@@ -201,15 +304,20 @@ export class WebTransportConnection extends Connection {
         });
     }
 
-    override async send(data: Uint8Array<ArrayBuffer>) {
+    override send(data: Uint8Array<ArrayBuffer>) {
         try {
-            const stream = await this.transport.createUnidirectionalStream({
-                sendOrder: this._sendOrder++,
-            });
+            const stream = this.writableUniStream;
+            if (stream.locked) {
+                console.error("Writable stream is locked");
+                return;
+            }
+
             const writer = stream.getWriter();
-            await writer.write(data);
+            const view = new DataView(new ArrayBuffer(4));
+            view.setUint32(0, data.length, true);
+            writer.write(view.buffer);
+            writer.write(data);
             writer.releaseLock();
-            await stream.close();
         } catch (e) {
             console.error("Webtransport send error:", e);
             this.close();

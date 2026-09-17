@@ -50,6 +50,7 @@ export class WebTransportSocket<T extends object> extends ClientSocket<T> {
 
     private _sendOrder = 0;
 
+    writableUniStream!: WritableStream;
     private _datagramWriter: WritableStreamDefaultWriter;
     private _nextDatagramOutSeq = 0;
 
@@ -62,16 +63,20 @@ export class WebTransportSocket<T extends object> extends ClientSocket<T> {
         this._datagramWriter = this.transport.datagrams.createWritable().getWriter();
     }
 
-    override async send(data: Uint8Array<ArrayBuffer>) {
+    override send(data: Uint8Array<ArrayBuffer>) {
         try {
-            const stream = await this.transport.createUnidirectionalStream({
-                sendOrder: this._sendOrder++,
-                sendGroup: null,
-            });
+            const stream = this.writableUniStream;
+            if (stream.locked) {
+                console.error("Writable stream is locked");
+                return;
+            }
+
             const writer = stream.getWriter();
-            await writer.write(data);
+            const view = new DataView(new ArrayBuffer(4));
+            view.setUint32(0, data.length, true);
+            writer.write(view.buffer);
+            writer.write(data);
             writer.releaseLock();
-            await stream.close();
         } catch (e) {
             console.error("Webtransport send error:", e);
             this.close();
