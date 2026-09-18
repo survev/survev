@@ -2377,6 +2377,12 @@ export const BunkerDefs: Record<string, BuildingDef> = {
                 scale: 1,
                 ori: 0,
             },
+            {
+                type: "bunker_cloud_compartment_02",
+                pos: v2.create(-30, -33.25),
+                scale: 1,
+                ori: 0,
+            },
         ],
     },
     bunker_cloud_compartment_01: {
@@ -2419,6 +2425,28 @@ export const BunkerDefs: Record<string, BuildingDef> = {
                     tint: 0x5f5f5f,
                 },
             ],
+        },
+        mapObjects: [],
+    },
+    bunker_cloud_compartment_02: {
+        type: "building",
+        map: { display: false, color: 0x665a4e, scale: 1 },
+        terrain: { grass: true, beach: false },
+        zIdx: 2,
+        floor: {
+            surfaces: [],
+            imgs: [],
+        },
+        ceiling: {
+            zoomRegions: [
+                {
+                    zoomIn: collider.createAabbExtents(
+                        v2.create(0, 0),
+                        v2.create(2.5, 2.25),
+                    ),
+                },
+            ],
+            imgs: [],
         },
         mapObjects: [],
     },
