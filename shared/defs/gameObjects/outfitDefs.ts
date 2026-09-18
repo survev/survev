@@ -1234,7 +1234,7 @@ const SkinDefs: Record<string, OutfitDef> = {
     outfitChrys: defineOutfitSkin("outfitBase", {
         name: "Chrysanthemum Garb",
         rarity: Rarity.Rare,
-        lore: "Sourced from the luxurious plants of Bunker 17.",
+        lore: "Sourced from the luxurious plants of Bunker 16.",
         skinImg: {
             baseTint: 0xffffff,
             baseSprite: "player-base-outfitChrys.img",
