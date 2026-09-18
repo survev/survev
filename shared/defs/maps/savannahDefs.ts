@@ -175,6 +175,7 @@ const mapDef: PartialMapDef = {
                             pos: v2.create(0.5, 0.5),
                             rad: 200,
                         },
+                        riverMaskRad: 85,
                     },
                     {
                         odds: 1,

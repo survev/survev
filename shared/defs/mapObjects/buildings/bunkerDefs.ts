@@ -1696,7 +1696,7 @@ export const BunkerDefs: Record<string, BuildingDef> = {
                     tint: 0x5f5f5f,
                 },
             ],
-            vision: { dist: 10, width: 3 },
+            vision: { dist: 7, width: 3 },
         },
         mapObstacleBounds: [
             collider.createAabbExtents(v2.create(0, 0), v2.create(45, 45)),
@@ -1932,11 +1932,23 @@ export const BunkerDefs: Record<string, BuildingDef> = {
                 scale: 1,
                 ori: 0,
             },
+            {
+                type: "metal_wall_1x15",
+                pos: v2.create(36.5, -13),
+                scale: 1,
+                ori: 0,
+            },
 
             //
             // Doors
             //
 
+            {
+                type: "house_door_02",
+                pos: v2.create(0.5, 36),
+                scale: 1,
+                ori: 1,
+            },
             {
                 type: "lab_door_01",
                 pos: v2.create(2.5, 15),

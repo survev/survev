@@ -1259,6 +1259,10 @@ export const BuildingObjectDefs: Record<string, ObstacleDef> = {
         material: "metal",
         extents: v2.create(0.5, 6.5),
     }),
+    metal_wall_1x15: createWall({
+        material: "metal",
+        extents: v2.create(0.5, 7.5),
+    }),
     metal_wall_ext_16: createWall({
         material: "metal",
         extents: v2.create(0.5, 8),
