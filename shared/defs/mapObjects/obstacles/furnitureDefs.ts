@@ -1257,7 +1257,9 @@ export const FurnitureDefs: Record<string, ObstacleDef> = {
     // Cloud Bunker tables
     table_06: createTable({
         collision: collider.createAabbExtents(v2.create(0, 0), v2.create(4, 2)),
+        collidable: true,
         destructible: false,
+        reflectBullets: true,
         scale: { createMin: 1, createMax: 1, destroy: 0.95 },
         hitParticle: "barrelChip",
         img: {
@@ -1277,7 +1279,9 @@ export const FurnitureDefs: Record<string, ObstacleDef> = {
     }),
     table_07: createTable({
         collision: collider.createAabbExtents(v2.create(0.05, -0.1), v2.create(3.35, 1.25)),
+        collidable: true,
         destructible: false,
+        reflectBullets: true,
         scale: { createMin: 1, createMax: 1, destroy: 0.95 },
         hitParticle: "barrelChip",
         img: {
@@ -1297,7 +1301,9 @@ export const FurnitureDefs: Record<string, ObstacleDef> = {
     }),
     table_08: createTable({
         collision: collider.createAabbExtents(v2.create(0, -0.05), v2.create(4, 1.5)),
+        collidable: true,
         destructible: false,
+        reflectBullets: true,
         scale: { createMin: 1, createMax: 1, destroy: 0.95 },
         hitParticle: "barrelChip",
         img: {
@@ -1317,7 +1323,9 @@ export const FurnitureDefs: Record<string, ObstacleDef> = {
     }),
     table_09: createTable({
         collision: collider.createAabbExtents(v2.create(0, -0.05), v2.create(3, 2)),
+        collidable: true,
         destructible: false,
+        reflectBullets: true,
         scale: { createMin: 1, createMax: 1, destroy: 0.95 },
         hitParticle: "barrelChip",
         img: {
