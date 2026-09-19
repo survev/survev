@@ -1186,7 +1186,7 @@ const SkinDefs: Record<string, MeleeDef> = {
         name: "Karambit Borealis",
         rarity: Rarity.Epic,
         lore: "Rend the skies asunder.",
-        noPotatoSwap: true,
+        noPotatoSwap: false,
         lootImg: {
             sprite: "loot-melee-karambit-borealis.img",
         },

@@ -292,7 +292,13 @@ Turkey Cache Changes (2025/11/01):
 ~ Hollow-Points now speeds up bullet velocity by 10%.
 ~ Spade now deals 1.3x obstacle damage (from 1x) and has 0.3s attack delay (from 0.35).
 
-0.3.2 (Factions) (2026/09/07):
+0.4.0 (Factions) (2026/09/07):
 + Airdrop Rare: Added Barrett M107 & ASh-12 (weights of 0.5 for both).
 + Airdrop Mythic: Added Barrett M107 (weight of 1).
 ~ PvT: Adjusted troll airdrop weight (1/111 -> 1/1111).
+
+0.4.2 (Savannah) (2026/09/23):
++ .45 in the Chamber: Now has a 1/6 chance to fire an empowered bullet with an additional 1.25x damage, 1.2x speed, & perfect accuracy.
+- 9mm Overpressure: Decreased the speed & range multipliers from 1.25x -> 1.2x.
++ Ammo Perks: Increased the damage multiplier from 1.08x -> 1.12x.
++ Combat Stimulants: Increased the damage multiplier from 1.12x -> 1.15x.
