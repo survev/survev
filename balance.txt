@@ -297,8 +297,10 @@ Turkey Cache Changes (2025/11/01):
 + Airdrop Mythic: Added Barrett M107 (weight of 1).
 ~ PvT: Adjusted troll airdrop weight (1/111 -> 1/1111).
 
-0.4.2 (Savannah) (2026/09/23):
+0.4.2 (Savannah) (2026/09/25):
 + .45 in the Chamber: Now has a 1/6 chance to fire an empowered bullet with an additional 1.25x damage, 1.2x speed, & perfect accuracy.
 - 9mm Overpressure: Decreased the speed & range multipliers from 1.25x -> 1.2x.
 + Ammo Perks: Increased the damage multiplier from 1.08x -> 1.12x.
 + Combat Stimulants: Increased the damage multiplier from 1.12x -> 1.15x.
++ Added the Barrett to Savannah (tier_guns, tier_airdrop_uncommon, tier_airdrop_rare) with weights equal to the AWM-S & MK 20 SSR.
+~ Decreased the weight of the AWM-S & Mk 20 SSR by 50% in all Savannah loot pools.
