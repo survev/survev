@@ -95,7 +95,7 @@ export const PerkProperties = {
         speedBoost: 1,
     },
     combat_stims: {
-        bonusDamageMult: 1.12,
+        bonusDamageMult: 1.15,
         healPercent: 0.06,
         effectDuration: 5,
     },
@@ -127,8 +127,13 @@ export const PerkProperties = {
     },
     bonus_9mm: {
         spreadMul: 1.1,
-        speedMult: 1.25,
-        distanceMult: 1.25,
+        speedMult: 1.2,
+        distanceMult: 1.2,
+    },
+    bonus_45: {
+        empoweredChance: 0.166,
+        empoweredDamageMult: 1.25,
+        empoweredSpeedMult: 1.2,
     },
     rare_potato: {
         quality: 1,
@@ -157,7 +162,7 @@ export const PerkProperties = {
         "12gauge": ["treat_12g"],
         "45acp": ["bonus_45"],
     } as Record<string, string[]>,
-    ammoBonusDamageMult: 1.08,
+    ammoBonusDamageMult: 1.12,
     // Classless perk list (effectively all class perks in Cobalt, minus martyrdom)
     classless: {
         perkPool: [

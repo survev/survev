@@ -805,7 +805,7 @@
   "game-targeting": "High-Value Targets",
   "game-targeting-desc": "Bullets deal bonus damage to players with perks.",
   "game-bonus_45": ".45 in the Chamber",
-  "game-bonus_45-desc": ".45 ACP bullets deal bonus damage.",
+  "game-bonus_45-desc": ".45 ACP bullets deal bonus damage, with a chance of being further empowered.",
   "game-broken_arrow": "Broken Arrow",
   "game-broken_arrow-desc": "Air strikes call in two additional fighters.",
   "game-fabricate": "Fabricate",
