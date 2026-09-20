@@ -116,6 +116,21 @@ const GasStages: StageData[] = [
     },
 ];
 
+/** One minute to loot, then gradual circles reaching zero radius after 4:45. */
+const DuelGasStages: StageData[] = [
+    { mode: GasMode.Inactive, duration: 0, rad: 0.7425, damage: 0 },
+    { mode: GasMode.Waiting, duration: 60, rad: 0.45, damage: 1.4 },
+    { mode: GasMode.Moving, duration: 30, rad: 0.45, damage: 1.4 },
+    { mode: GasMode.Waiting, duration: 40, rad: 0.31, damage: 2.2 },
+    { mode: GasMode.Moving, duration: 25, rad: 0.31, damage: 2.2 },
+    { mode: GasMode.Waiting, duration: 30, rad: 0.19, damage: 3.5 },
+    { mode: GasMode.Moving, duration: 25, rad: 0.19, damage: 3.5 },
+    { mode: GasMode.Waiting, duration: 25, rad: 0.09, damage: 7.5 },
+    { mode: GasMode.Moving, duration: 20, rad: 0.09, damage: 7.5 },
+    { mode: GasMode.Waiting, duration: 15, rad: 0, damage: 22 },
+    { mode: GasMode.Moving, duration: 15, rad: 0, damage: 22 },
+];
+
 export class Gas {
     /**
      * Current gas mode
@@ -318,7 +333,7 @@ export class Gas {
     }
 
     private _getStageData() {
-        return GasStages[this.stage];
+        return (this.game.config.duel ? DuelGasStages : GasStages)[this.stage];
     }
 
     isInGas(pos: Vec2) {

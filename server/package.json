@@ -5,6 +5,7 @@
   "scripts": {
     "build": "rolldown -c rolldown.config.ts",
     "typecheck": "tsc",
+    "test:ranked-native": "tsx scripts/check-ranked-native.ts",
     "start:api": "node --enable-source-maps dist/index.js",
     "start:game": "node --enable-source-maps dist/gameServer.js",
     "dev": "concurrently \"pnpm run dev:api\" \"pnpm run dev:game\"",

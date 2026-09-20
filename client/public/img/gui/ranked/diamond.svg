@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="128" height="128" viewBox="0 0 128 128">
+  <title>Diamond rank</title>
+  <path d="M44 37 9 31l5 20 17 8-14 1 7 16 15 2-9 6 11 14 16-5m27-56 35-6-5 20-17 8 14 1-7 16-15 2 9 6-11 14-16-5" fill="#6db9d9" stroke="#29251f" stroke-width="5" stroke-linejoin="round"/>
+  <path d="m64 10 37 28-6 44-31 33-31-33-6-44Z" fill="#bceaf0" stroke="#29251f" stroke-width="6" stroke-linejoin="round"/>
+  <path d="M44 38h40l10 19-30 43-30-43Z" fill="#4897c5" stroke="#29251f" stroke-width="5" stroke-linejoin="round"/>
+  <path d="m44 38 8 19 12-19 12 19 8-19M34 57h60M52 57l12 43 12-43" fill="none" stroke="#29251f" stroke-width="3.5" stroke-linejoin="round"/>
+  <path d="m64 41 10 14H54Z" fill="#d8f6f6"/>
+</svg>

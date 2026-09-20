@@ -1,13 +1,16 @@
 import $ from "jquery";
+import { getRankedTier } from "../../../../shared/defs/rankedDefs.ts";
+import type { RankedStatsEntry } from "../../../../shared/types/rankedStats.ts";
 import type { LeaderboardRequest } from "../../../../shared/types/stats.ts";
-import { api } from "../../api.ts";
 import { device } from "../../device.ts";
 import { helpers } from "../../helpers.ts";
 import type { App } from "./app.ts";
+import { statsLink, statsUrl } from "./statsApi.ts";
 import leaderboard from "./templates/leaderboard.ejs";
 import leaderboardError from "./templates/leaderboardError.ejs";
 import loading from "./templates/loading.ejs";
 import main from "./templates/main.ejs";
+import rankedLeaderboard from "./templates/rankedLeaderboard.ejs";
 
 const templates = {
     loading,
@@ -20,6 +23,9 @@ const templates = {
 // MainView
 //
 export class MainView {
+    rankedEntries: RankedStatsEntry[] = [];
+    ranked = false;
+    requestId = 0;
     loading = false;
     error = false;
     data = {} as Partial<
@@ -47,6 +53,46 @@ export class MainView {
     load() {
         this.loading = true;
         this.error = false;
+        const requestId = ++this.requestId;
+        const params = new URLSearchParams(location.search);
+        this.ranked = params.get("mapId") === "ranked";
+        this.el.find("#leaderboard-team-mode option[value=trio]").prop("disabled", !this.ranked).prop(
+            "hidden",
+            !this.ranked,
+        );
+        this.el.find("#leaderboard-type option").each((_, option) => {
+            const rankedMetric = ["elo", "series_wins"].includes((option as HTMLOptionElement).value);
+            $(option).prop("hidden", rankedMetric !== this.ranked).prop("disabled", rankedMetric !== this.ranked);
+        });
+        this.el.find("#leaderboard-time").prop("disabled", this.ranked);
+        if (this.ranked) {
+            const team = ["solo", "duo", "trio", "squad"].includes(params.get("team") ?? "")
+                ? params.get("team")!
+                : "solo";
+            const size = { solo: 1, duo: 2, trio: 3, squad: 4 }[team]!;
+            const metric = params.get("type") === "series_wins" ? "wins" : "elo";
+            this.el.find("#leaderboard-team-mode").val(team);
+            this.el.find("#leaderboard-map-id").val("ranked");
+            this.el.find("#leaderboard-type").val(metric === "elo" ? "elo" : "series_wins");
+            this.el.find("#leaderboard-time").val("alltime");
+            $.ajax({
+                url: `${statsUrl("/api/ranked_stats/leaderboard")}?size=${size}&metric=${metric}`,
+                success: (data: { entries: RankedStatsEntry[] }) => {
+                    if (requestId === this.requestId) this.rankedEntries = data.entries;
+                },
+                error: () => {
+                    if (requestId === this.requestId) this.error = true;
+                },
+                complete: () => {
+                    if (requestId === this.requestId) {
+                        this.loading = false;
+                        this.render();
+                    }
+                },
+            });
+            this.render();
+            return;
+        }
 
         // Supported args so far:
         //   type:     most_kills, most_damage_dealt, kills, wins, kpg
@@ -55,8 +101,10 @@ export class MainView {
         //   maxCount: 10, 100
         let type = helpers.getParameterByName<LeaderboardRequest["type"]>("type")
             || "most_kills";
+        if (!["most_kills", "most_damage_dealt", "kills", "wins", "kpg"].includes(type)) type = "most_kills";
         const interval = helpers.getParameterByName<LeaderboardRequest["interval"]>("t") || "daily";
-        const teamMode = helpers.getParameterByName("team") || "solo";
+        const selectedTeam = helpers.getParameterByName("team") || "solo";
+        const teamMode = selectedTeam === "trio" ? "squad" : selectedTeam;
         const mapId = helpers.getParameterByName("mapId") || "0";
         // Change to most_damage_dealt if faction mode and most_kills selected
         if (type == "most_kills" && Number(mapId) == 3) {
@@ -71,11 +119,12 @@ export class MainView {
         };
 
         $.ajax({
-            url: api.resolveUrl("/api/leaderboard"),
+            url: statsUrl("/api/leaderboard"),
             type: "POST",
             data: JSON.stringify(args),
             contentType: "application/json; charset=utf-8",
             success: (data) => {
+                if (requestId !== this.requestId) return;
                 this.data = {
                     type: type,
                     interval: interval,
@@ -85,9 +134,11 @@ export class MainView {
                 };
             },
             error: () => {
+                if (requestId !== this.requestId) return;
                 this.error = true;
             },
             complete: () => {
+                if (requestId !== this.requestId) return;
                 this.loading = false;
                 this.render();
             },
@@ -103,7 +154,7 @@ export class MainView {
         window.history.pushState(
             "",
             "",
-            `?type=${type}&team=${teamMode}&t=${time}&mapId=${mapId}`,
+            statsLink({ type: String(type), team: String(teamMode), t: String(time), mapId: String(mapId) }),
         );
         this.load();
     }
@@ -121,14 +172,22 @@ export class MainView {
             content = templates.loading({
                 type: "leaderboard",
             });
-        } else if (this.error || !this.data.data) {
+        } else if (this.error || (!this.ranked && !this.data.data)) {
             content = templates.leaderboardError({});
+        } else if (this.ranked) {
+            content = rankedLeaderboard({
+                entries: this.rankedEntries,
+                metric: this.el.find("#leaderboard-type").val() === "series_wins" ? "Series wins" : "Elo",
+                getRankedTier,
+                statsLink,
+            });
         } else {
             const statName = TypeToString[this.data.type as keyof typeof TypeToString] || "";
 
             content = templates.leaderboard({
                 ...this.data,
                 statName: statName,
+                statsLink,
             });
 
             // Set the select options

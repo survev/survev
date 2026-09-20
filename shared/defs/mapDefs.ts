@@ -7,6 +7,7 @@ import { Beach } from "./maps/beachDefs.ts";
 import { Birthday } from "./maps/birthdayDefs.ts";
 import { Cobalt } from "./maps/cobaltDefs.ts";
 import { Desert } from "./maps/desertDefs.ts";
+import { Duel } from "./maps/duelDefs.ts";
 import { Faction } from "./maps/factionDefs.ts";
 import { FactionPotato } from "./maps/factionPotatoDefs.ts";
 import { Halloween } from "./maps/halloweenDefs.ts";
@@ -40,6 +41,7 @@ export type Atlas =
 
 const _MapDefs = {
     main: Main,
+    duel: Duel,
     main_spring: MainSpring,
     main_summer: MainSummer,
     desert: Desert,

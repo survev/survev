@@ -17,7 +17,9 @@ import {
     type SaveGameBody,
     type SpectateGamePrivateBody,
     type SpectateGamePrivateRes,
+    zCancelDuelBody,
     zFindGamePrivateBody,
+    zRemoveDuelPlayerBody,
     zSpectateGamePrivateBody,
 } from "./utils/types.ts";
 import { uwsHelpers } from "./utils/uwsHelpers.ts";
@@ -64,6 +66,7 @@ class GameServer {
             mapName: body.mapName,
             teamMode: body.teamMode,
             playerData: body.playerData,
+            duel: body.duel,
         });
         if (!game) {
             return {
@@ -73,6 +76,7 @@ class GameServer {
 
         return {
             urls: this.getUrlsForGame(game),
+            gameId: game.gameData.id,
         };
     }
 
@@ -229,6 +233,42 @@ app.post("/api/spectate_game", async (res, req) => {
         if (!res.aborted) {
             res.writeStatus("500 Internal Server Error").end("500 Internal Server Error");
         }
+    }
+});
+
+app.post("/api/cancel_duel", async (res, req) => {
+    res.onAborted(() => {
+        res.aborted = true;
+    });
+    if (req.getHeader("survev-api-key") !== Config.secrets.SURVEV_API_KEY) {
+        uwsHelpers.forbidden(res);
+        return;
+    }
+    try {
+        const body = await uwsHelpers.getJsonBody(res, zCancelDuelBody);
+        server.manager.cancelDuel(body.seriesId, body.roundId);
+        uwsHelpers.returnJson(res, { ok: true });
+    } catch (error) {
+        server.logger.warn("/api/cancel_duel error: ", error);
+        if (!res.aborted) res.writeStatus("400 Bad Request").end("Invalid duel cancellation");
+    }
+});
+
+app.post("/api/remove_duel_player", async (res, req) => {
+    res.onAborted(() => {
+        res.aborted = true;
+    });
+    if (req.getHeader("survev-api-key") !== Config.secrets.SURVEV_API_KEY) {
+        uwsHelpers.forbidden(res);
+        return;
+    }
+    try {
+        const body = await uwsHelpers.getJsonBody(res, zRemoveDuelPlayerBody);
+        const combat = await server.manager.removeDuelPlayer(body.seriesId, body.roundId, body.profileId);
+        if (!res.aborted) uwsHelpers.returnJson(res, { ok: true, combat });
+    } catch (error) {
+        server.logger.warn("/api/remove_duel_player error: ", error);
+        if (!res.aborted) res.writeStatus("400 Bad Request").end("Invalid duel player removal");
     }
 });
 

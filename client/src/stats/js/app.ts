@@ -7,6 +7,7 @@ import { device } from "../../device.ts";
 import { SDK } from "../../sdk/sdk.ts";
 import { MainView } from "./mainView.ts";
 import { PlayerView } from "./playerView.ts";
+import { statsLink, statsPreview, statsUrl } from "./statsApi.ts";
 import language from "./templates/langauge.ejs";
 
 import "bootstrap/dist/css/bootstrap.css";
@@ -38,8 +39,19 @@ export class App {
         $("#search-players").on("submit", (e) => {
             e.preventDefault();
             const name = $("#search-players :input").val() as string;
-            const slug = slugify(name);
-            window.location.href = `/stats/?slug=${slug}`;
+            if (!name.trim()) return;
+            if (statsPreview) {
+                window.location.href = statsLink({ slug: `demo-${slugify(name).toLowerCase().replace(/^demo-/, "")}` });
+                return;
+            }
+            // Local accounts accept their exact display name; native profiles retain the original slug search.
+            $.getJSON(statsUrl("/api/auth/providers"))
+                .done((providers: { local: boolean }) => {
+                    window.location.href = statsLink({ slug: providers.local ? name.trim() : slugify(name) });
+                })
+                .fail(() => {
+                    window.location.href = statsLink({ slug: slugify(name) });
+                });
         });
 
         // Load slug for "My Profile" link
@@ -48,9 +60,23 @@ export class App {
             if (config.profile && config.profile.slug) {
                 $("#my-profile")
                     .css("display", "block")
-                    .attr("href", `/stats/?slug=${config.profile.slug}`);
+                    .attr("href", `/stats/?slug=${encodeURIComponent(config.profile.slug)}`);
             }
         } catch (_err) {}
+        if (statsPreview) {
+            $("body").addClass("stats-preview");
+            $("#content").before(
+                $("<div class='container stats-preview-banner'>")
+                    .append(
+                        $("<span>").text("Local preview · Sample data"),
+                        $("<a>").attr("href", statsLink({ slug: "demo-demosurvevr" })).text("Demo profile"),
+                        $("<a>").attr("href", statsLink({ mapId: "ranked", team: "solo", type: "elo" })).text(
+                            "Ranked leaderboard",
+                        ),
+                    ),
+            );
+            $("a[href='/stats']").attr("href", statsLink());
+        }
         // Ignore
         // Load config
         this.config = new ConfigManager();
@@ -81,6 +107,10 @@ export class App {
     }
 
     updateAds(name: Routes) {
+        if (statsPreview) {
+            $("#adsLeaderBoardTop, #adsLeaderBoardBottom, #adsPlayerTop, #adsPlayerBottom").hide();
+            return;
+        }
         const phoneDetected = device.mobile && !device.tablet;
         const elAdsLeaderboardTop = $("#adsLeaderBoardTop");
         const elAdsLeaderboardBottom = $("#adsLeaderBoardBottom");

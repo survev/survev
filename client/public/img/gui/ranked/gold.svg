@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="128" height="128" viewBox="0 0 128 128">
+  <title>Gold rank</title>
+  <path d="M36 82 30 117l34-17 34 17-6-35" fill="#9a782d" stroke="#29251f" stroke-width="6" stroke-linejoin="round"/>
+  <circle cx="64" cy="56" r="43" fill="#e5b840" stroke="#29251f" stroke-width="6"/>
+  <path d="M24 56a40 40 0 0 1 80 0H94a30 30 0 0 0-60 0Z" fill="#ffe28a"/>
+  <circle cx="64" cy="56" r="30" fill="#ab812d" stroke="#29251f" stroke-width="4"/>
+  <path d="m64 27 8 21 23 1-18 15 6 22-19-13-19 13 6-22-18-15 23-1Z" fill="#ffe28a" stroke="#29251f" stroke-width="4" stroke-linejoin="round"/>
+</svg>

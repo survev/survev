@@ -18,11 +18,14 @@
       <select id="leaderboard-team-mode" class="leaderboard-opt custom-select">
         <option value="solo" data-l10n='stats-solo'>Solo</option>
         <option value="duo" data-l10n='stats-duo'>Duo</option>
+        <option value="trio" hidden disabled>Trio · 3v3</option>
         <option value="squad" data-l10n='stats-squad'>Squad</option>
       </select>
     </div>
     <div class='col-lg-2 col-3 pl-lg-0 pr-lg-3 pl-0 pr-1'>
       <select id="leaderboard-type" class="leaderboard-opt custom-select">
+        <option value="elo" hidden disabled>Elo</option>
+        <option value="series_wins" hidden disabled>Series wins</option>
         <option value="most_kills" data-l10n='stats-most-kills'>Most kills</option>
         <option value="most_damage_dealt" data-l10n='stats-most-damage'>Most damage</option>
         <option value="kpg" data-l10n='stats-kpg-full'>Kills per game</option>
@@ -39,6 +42,7 @@
     </div>
     <div class='col-lg-2 col-3 pl-0'>
       <select id="leaderboard-map-id" class="leaderboard-opt custom-select">
+        <option value="ranked">Ranked</option>
         <% for (var i = 0; i < env.gameModes.length; i++) { %>
           <option value="<%= env.gameModes[i].mapId %>"><%= env.gameModes[i].desc.name%></option>
         <% } %>
@@ -54,4 +58,3 @@
     </div>
   </div>
 </div>
-

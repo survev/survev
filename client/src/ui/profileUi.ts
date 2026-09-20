@@ -9,6 +9,50 @@ import { SDK } from "../sdk/sdk.ts";
 import type { LoadoutMenu } from "./loadoutMenu.ts";
 import type { Localization } from "./localization.ts";
 import { MenuModal } from "./menuModal.ts";
+import "./localAccount.css";
+
+function createLocalLoginForm(parent: JQuery<HTMLElement>, account: Account) {
+    let mode: "login" | "register" = "login";
+    let pending = false;
+    const form = $("<form/>", { class: "local-account-form" });
+    const tabs = $(
+        "<div class=\"local-account-tabs\"><button type=\"button\" class=\"menu-option btn-green btn-darken\" data-mode=\"login\">Log In</button><button type=\"button\" class=\"menu-option btn-standard btn-darken\" data-mode=\"register\">Create Account</button></div>",
+    );
+    const name = $(
+        "<input type=\"text\" class=\"menu-option player-name-input\" aria-label=\"Account name\" placeholder=\"Account name\" minlength=\"2\" maxlength=\"16\" autocomplete=\"username\" required>",
+    );
+    const password = $(
+        "<input type=\"password\" class=\"menu-option player-name-input\" aria-label=\"Password\" placeholder=\"Password (8+ characters)\" minlength=\"8\" maxlength=\"128\" autocomplete=\"current-password\" required>",
+    );
+    const submit = $("<button type=\"submit\" class=\"menu-option btn-green btn-darken\">Log In</button>");
+    const error = $("<div class=\"local-account-error\" role=\"alert\"></div>");
+    tabs.on("click", "button", event => {
+        if (pending) return;
+        mode = $(event.currentTarget).data("mode") as typeof mode;
+        tabs.find("button").removeClass("btn-green").addClass("btn-standard");
+        $(event.currentTarget).removeClass("btn-standard").addClass("btn-green");
+        submit.text(mode === "login" ? "Log In" : "Create Account");
+        password.attr("autocomplete", mode === "login" ? "current-password" : "new-password");
+        error.text("");
+    });
+    form.on("submit", event => {
+        event.preventDefault();
+        if (pending) return;
+        pending = true;
+        error.text("");
+        submit.prop("disabled", true).text("Signing in…");
+        void account.signInLocal(mode, String(name.val()).trim(), String(password.val())).then(() => {
+            password.val("");
+        }).catch(reason => {
+            error.text(reason instanceof Error ? reason.message : "Could not sign in. Please try again.");
+        }).finally(() => {
+            pending = false;
+            submit.prop("disabled", false).text(mode === "login" ? "Log In" : "Create Account");
+        });
+    });
+    form.append(tabs, name, password, submit, error);
+    parent.append(form);
+}
 
 function createLoginOptions(
     parentElem: JQuery<HTMLElement>,
@@ -33,6 +77,9 @@ function createLoginOptions(
         class: "account-buttons",
     });
     contentsElem.append(buttonParentElem);
+    if (account.localLoginEnabled && !linkAccount) {
+        createLocalLoginForm(buttonParentElem, account);
+    }
     const addLoginOption = function(method: string, onClick: () => void) {
         const el = $("<div/>", {
             class: `menu-option btn-darken btn-standard btn-login-${method}`,
@@ -331,7 +378,7 @@ export class ProfileUi {
 
     onError(type: string, data?: string) {
         const typeText = {
-            server_error: "Operation failed, please try again later.",
+            server_error: data ? helpers.htmlEscape(data) : "Operation failed, please try again later.",
             facebook_account_in_use: "Failed linking Facebook account.<br/>Account already in use!",
             google_account_in_use: "Failed linking Google account.<br/>Account already in use!",
             twitch_account_in_use: "Failed linking Twitch account.<br/>Account already in use!",
@@ -401,6 +448,8 @@ export class ProfileUi {
             link: false,
             ...opts,
         };
+        // Local credentials live in the existing account modal, alongside the normal login providers.
+        if (this.account.localLoginEnabled) opts.modal = true;
 
         const modal = opts.modal
             ? this.createAccountModal
@@ -421,6 +470,7 @@ export class ProfileUi {
     }
 
     render() {
+        $(".account-block").toggle(!SDK.isAnySDK && (proxy.anyLoginSupported() || this.account.localLoginEnabled));
         // Loading icon
         const loading = this.account.requestsInFlight > 0;
         $(".account-loading").css("opacity", loading ? 1 : 0);

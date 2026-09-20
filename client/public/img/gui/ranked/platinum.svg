@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="128" height="128" viewBox="0 0 128 128">
+  <title>Platinum rank</title>
+  <path d="M43 41 9 31l5 20 17 8-14 1 7 16 15 2-9 6 11 14 16-5m28-52 34-10-5 20-17 8 14 1-7 16-15 2 9 6-11 14-16-5" fill="#8fc7bc" stroke="#29251f" stroke-width="5" stroke-linejoin="round"/>
+  <path d="M64 10 98 27v40c0 22-20 37-34 48-14-11-34-26-34-48V27Z" fill="#c4e5d9" stroke="#29251f" stroke-width="6" stroke-linejoin="round"/>
+  <path d="m64 23 22 12v32c0 14-10 25-22 35-12-10-22-21-22-35V35Z" fill="#548f86" stroke="#29251f" stroke-width="4"/>
+  <path d="m64 38 7 19 20 1-16 12 5 19-16-11-16 11 5-19-16-12 20-1Z" fill="#dbf1e7" stroke="#29251f" stroke-width="4" stroke-linejoin="round"/>
+</svg>

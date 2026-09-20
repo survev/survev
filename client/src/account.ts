@@ -6,7 +6,6 @@ import { api } from "./api.ts";
 import type { ConfigManager } from "./config.ts";
 import { errorLogManager } from "./errorLogs.ts";
 import { helpers } from "./helpers.ts";
-import { proxy } from "./proxy.ts";
 
 import { hc } from "hono/client";
 import type { UserRouterApp } from "../../server/src/api/routes/user/UserRouter.ts";
@@ -28,6 +27,7 @@ export class Account {
     requestsInFlight = 0;
     loggingIn = false;
     loggedIn = false;
+    localLoginEnabled = false;
     profile = {
         linked: false,
         usernameSet: false,
@@ -46,7 +46,7 @@ export class Account {
     constructor(public config: ConfigManager) {
         this.router = hc<UserRouterApp>(api.resolveUrl("/api/user"), {
             init: {
-                credentials: proxy.anyLoginSupported() ? "include" : "omit",
+                credentials: "include",
             },
         });
     }
@@ -65,6 +65,9 @@ export class Account {
         try {
             const res = await this.router[path].$post(body as any);
             const data = await res.json();
+            if (!res.ok) {
+                throw new Error((data as { error?: string }).error || "Request failed. Please try again.");
+            }
             cb(null, data as any);
         } catch (err) {
             cb(err, {} as any);
@@ -105,6 +108,7 @@ export class Account {
     }
 
     init() {
+        void this.loadLoginProviders();
         if (this.config.get("sessionCookie")) {
             this.setSessionCookies();
         }
@@ -120,6 +124,29 @@ export class Account {
         const storedLoadout = this.config.get("loadout")!;
         this.loadout = util.mergeDeep<Loadout>({}, loadouts.defaultLoadout(), storedLoadout);
         this.emit("loadout", this.loadout);
+    }
+
+    private async loadLoginProviders() {
+        try {
+            const response = await fetch(api.resolveUrl("/api/auth/providers"), { credentials: "include" });
+            if (!response.ok) return;
+            const providers = await response.json() as { local: boolean };
+            this.localLoginEnabled = providers.local;
+            this.emit("request", this);
+        } catch { /* Existing external login providers remain available. */ }
+    }
+
+    async signInLocal(mode: "register" | "login", name: string, password: string) {
+        const response = await fetch(api.resolveUrl(`/api/auth/local/${mode}`), {
+            method: "POST",
+            credentials: "include",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ name, password }),
+            signal: helpers.abortSignal(10000),
+        });
+        const result = await response.json() as { success?: boolean; error?: string };
+        if (!response.ok || !result.success) throw new Error(result.error || "Could not sign in. Please try again.");
+        this.login();
     }
 
     setSessionCookies() {
@@ -141,10 +168,14 @@ export class Account {
     }
 
     logout() {
-        this.config.set("profile", null);
-        this.config.set("sessionCookie", null);
-        this.config.set("loadout", loadouts.defaultLoadout());
-        this.fetchApi("logout", {}, () => {
+        this.fetchApi("logout", {}, (err) => {
+            if (err) {
+                this.emit("error", "server_error", err instanceof Error ? err.message : undefined);
+                return;
+            }
+            this.config.set("profile", null);
+            this.config.set("sessionCookie", null);
+            this.config.set("loadout", loadouts.defaultLoadout());
             window.location.reload();
         });
     }

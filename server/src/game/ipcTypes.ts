@@ -1,6 +1,7 @@
 import type { MapDefKey } from "../../../shared/defs/mapDefs.ts";
 import type { TeamMode } from "../../../shared/gameConfig.ts";
-import type { FindGamePrivateBody, ServerGameConfig } from "../utils/types.ts";
+import type { DuelCombatSnapshot } from "../../../shared/types/rankedCombat.ts";
+import type { DuelRoundStatus, FindGamePrivateBody, ServerGameConfig } from "../utils/types.ts";
 import type { SpectateTokenData } from "./game.ts";
 
 export interface GameData {
@@ -12,6 +13,8 @@ export interface GameData {
     startedTime: number;
     stopped: boolean;
     timeRunning: number;
+    duel?: DuelRoundStatus;
+    duelCombat?: DuelCombatSnapshot;
 
     livingPlayers: Array<{
         id: number;
@@ -27,6 +30,9 @@ export enum ProcessMsgType {
     UpdateData,
     AddJoinToken,
     AddSpectateToken,
+    CancelDuel,
+    RemoveDuelPlayer,
+    DuelPlayerRemoved,
 }
 
 export interface CreateGameMsg {
@@ -55,9 +61,32 @@ export interface AddSpectateTokenMsg {
     data: SpectateTokenData;
 }
 
+export interface CancelDuelMsg {
+    type: ProcessMsgType.CancelDuel;
+    seriesId: string;
+    roundId: string;
+}
+
+export interface RemoveDuelPlayerMsg {
+    type: ProcessMsgType.RemoveDuelPlayer;
+    seriesId: string;
+    roundId: string;
+    profileId: string;
+    requestId: string;
+}
+
+export interface DuelPlayerRemovedMsg {
+    type: ProcessMsgType.DuelPlayerRemoved;
+    requestId: string;
+    combat?: DuelCombatSnapshot;
+}
+
 export type ProcessMsg =
     | CreateGameMsg
     | KeepAliveMsg
     | UpdateDataMsg
     | AddJoinTokenMsg
-    | AddSpectateTokenMsg;
+    | AddSpectateTokenMsg
+    | CancelDuelMsg
+    | RemoveDuelPlayerMsg
+    | DuelPlayerRemovedMsg;

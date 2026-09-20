@@ -22,7 +22,7 @@
             <% for (var j = 0; j < data[i].slugs.length; j++) { %>
               <span class='player-name'>
               <% if (data[i].slugs[j]) { %>
-                  <a href="/stats/?slug=<%= data[i].slugs[j] %>"><%= data[i].usernames[j] %></a>
+                  <a href="<%= env.statsLink({slug: data[i].slugs[j]}) %>"><%= data[i].usernames[j] %></a>
               <% } else { %>
                   <%= data[i].usernames[j] %>
               <% } %>
@@ -41,7 +41,7 @@
           <td class='data-player-names'>
             <span class='player-name'>
             <% if (data[i].slug) { %>
-                <a href="/stats/?slug=<%= data[i].slug%>"><%= data[i].username %></a>
+                <a href="<%= env.statsLink({slug: data[i].slug}) %>"><%= data[i].username %></a>
             <% } else { %>
                 <%= data[i].username %>
             <% } %>

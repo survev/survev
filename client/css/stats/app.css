@@ -11,6 +11,279 @@ body {
     overflow-y: auto;
 }
 
+.stats-preview-banner {
+    position: relative;
+    z-index: 1;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px 24px;
+    padding: 12px 15px;
+    background: #333d28;
+    color: #ffffff;
+}
+
+.stats-preview-banner span {
+    color: #ffe567;
+}
+
+.stats-preview #content {
+    padding-top: 20px;
+}
+
+.ranked-stats-heading {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 8px 20px;
+    color: white;
+    margin-bottom: 10px;
+}
+
+.ranked-stats-heading h2, .ranked-stats-heading h3 {
+    font-size: 28px;
+    margin: 0;
+    text-shadow: 0 2px 2px #000000;
+}
+
+.ranked-stats-heading > span {
+    color: #e0ebd5;
+}
+
+.ranked-stats-heading > a {
+    margin-left: auto;
+    padding: 8px 12px;
+    background: #3f582b;
+}
+
+.ranked-mode-cards {
+    margin-left: -7px;
+    margin-right: -7px;
+}
+
+.ranked-mode-cards > div {
+    padding: 0 7px;
+    margin-bottom: 14px;
+}
+
+.ranked-mode-card {
+    border: 0;
+    border-radius: 0;
+    color: white;
+    background: #405a28;
+    height: 100%;
+}
+
+.ranked-mode-title {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 28px;
+    font-weight: bold;
+    padding: 2px 12px;
+}
+
+.ranked-mode-title span {
+    font-size: 14px;
+}
+
+.ranked-mode-title-1 {
+    background: #3498db;
+}
+
+.ranked-mode-title-2 {
+    background: #9b59b6;
+}
+
+.ranked-mode-title-3 {
+    background: #bba23b;
+}
+
+.ranked-mode-title-4 {
+    background: #e67e22;
+}
+
+.ranked-mode-rating {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 12px;
+    background: #4e6b35;
+}
+
+.ranked-mode-rating img {
+    width: 64px;
+    height: 64px;
+}
+
+.ranked-mode-rating strong {
+    display: block;
+    font-size: 30px;
+    line-height: 1.15;
+}
+
+.ranked-mode-rating span {
+    color: #ffe600;
+}
+
+.ranked-mode-rating .ranked-stats-unplaced {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    width: 64px;
+    height: 64px;
+    border: 2px solid #8e9b83;
+    border-radius: 4px;
+    background: #4c5942;
+    color: #c9d3c0;
+    font-size: 42px;
+    font-weight: bold;
+}
+
+.ranked-mode-values {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+    padding: 12px 18px;
+}
+
+.ranked-mode-values span {
+    display: block;
+    color: #ffe600;
+    font-size: 12px;
+}
+
+.ranked-mode-values strong {
+    font-weight: normal;
+    font-size: 22px;
+}
+
+.ranked-placement {
+    padding: 0 18px 10px;
+    color: #dce5d5;
+    font-size: 14px;
+}
+
+.ranked-history-heading {
+    margin-top: 10px;
+    background: #405a28;
+    padding: 6px 12px;
+}
+
+.ranked-history-heading h3 {
+    font-size: 22px;
+}
+
+.ranked-history-heading select {
+    margin-left: auto;
+    max-width: 145px;
+}
+
+.ranked-stats-player {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.ranked-stats-badge {
+    width: 34px;
+    height: 34px;
+}
+
+.ranked-history-table-wrap {
+    overflow-x: auto;
+}
+
+.ranked-history-table {
+    width: 100%;
+    color: #ffffff;
+    background: #405a28;
+    margin-bottom: 25px;
+}
+
+.ranked-history-table th {
+    font-size: 12px;
+    color: #dfebd5;
+}
+
+.ranked-history-table th, .ranked-history-table td {
+    padding: 10px 12px;
+    border-bottom: 1px solid #304320;
+}
+
+.ranked-history-table td {
+    font-size: 17px;
+}
+
+.ranked-history-table td:nth-child(2), .ranked-history-table td:nth-child(4) {
+    white-space: nowrap;
+}
+
+.ranked-history-table td:nth-child(3) {
+    max-width: 340px;
+}
+
+.ranked-history-after {
+    color: #bbcaaa;
+    padding-left: 5px;
+}
+
+.ranked-win {
+    color: #b7f273;
+}
+
+.ranked-loss {
+    color: #ffb0a2;
+}
+
+.ranked-stats-note {
+    color: #e6eedf;
+    margin-top: 12px;
+}
+
+@media (max-width: 575px) {
+    .ranked-mode-title {
+        font-size: 23px;
+        padding: 4px 9px;
+    }
+
+    .ranked-mode-title span {
+        font-size: 11px;
+    }
+
+    .ranked-mode-rating {
+        gap: 7px;
+        padding: 10px 7px;
+    }
+
+    .ranked-mode-rating img {
+        width: 45px;
+        height: 45px;
+    }
+
+    .ranked-mode-rating strong {
+        font-size: 25px;
+    }
+
+    .ranked-stats-table .ranked-stats-badge {
+        width: 24px;
+        height: 24px;
+    }
+
+    .ranked-stats-table .ranked-stats-player {
+        gap: 4px;
+    }
+
+    .ranked-stats-table td {
+        font-size: 14px;
+    }
+
+    .ranked-history-table th, .ranked-history-table td {
+        padding: 8px;
+        font-size: 13px;
+    }
+}
+
 input {
     -webkit-user-select: initial;
     -moz-user-select: initial;

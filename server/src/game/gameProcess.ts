@@ -7,11 +7,11 @@ import { Logger } from "../../../shared/utils/logger.ts";
 import { Config } from "../config.ts";
 import { apiPrivateRouter, checkIp } from "../utils/apiRouter.ts";
 import { logErrorToWebhook } from "../utils/logger.ts";
-import { HTTPRateLimit, WebSocketRateLimit } from "../utils/rateLimit.ts";
-import type { SaveGameBody } from "../utils/types.ts";
+import type { DuelPlayerAbandoned, DuelRoundResult, SaveGameBody } from "../utils/types.ts";
 import { uwsHelpers } from "../utils/uwsHelpers.ts";
 import type { Client } from "./client.ts";
 import { Game } from "./game.ts";
+import { type GameSocketRateLease, GameSocketRateLimits } from "./gameSocketRateLimits.ts";
 import { type ProcessMsg, ProcessMsgType } from "./ipcTypes.ts";
 import { ClientSocket } from "./socket.ts";
 
@@ -115,6 +115,36 @@ async function sendQuestProgress(userId: string, progress: Array<{ id: string; d
     }
 }
 
+async function reportDuelEvent(
+    event: "round-result" | "player-abandoned",
+    result: DuelRoundResult | DuelPlayerAbandoned,
+) {
+    // The coordinator deduplicates round results and individual abandonments.
+    for (let attempt = 0; attempt < 8; attempt++) {
+        try {
+            const response = await fetch(`${Config.gameServer.apiServerUrl}/private/ranked/${event}`, {
+                method: "POST",
+                headers: { "Content-Type": "application/json", "survev-api-key": Config.secrets.SURVEV_API_KEY },
+                body: JSON.stringify(result),
+                signal: AbortSignal.timeout(5000),
+            });
+            if (response.ok) return;
+            throw new Error(`Result endpoint returned ${response.status}`);
+        } catch (error) {
+            if (attempt === 7) {
+                procLogger.error(
+                    "Could not report ranked event",
+                    event,
+                    result.roundId,
+                    error,
+                );
+                return;
+            }
+            await new Promise(resolve => setTimeout(resolve, Math.min(1000 * (attempt + 1), 5000)));
+        }
+    }
+}
+
 /**
  * Implements methods only used when the game is actually running on a server
  */
@@ -130,6 +160,8 @@ class ServerGame extends Game {
             startedTime: this.startedTime,
             stopped: this.stopped,
             timeRunning: this.timeRunning,
+            duel: this.duelStatus,
+            duelCombat: this.getDuelCombatSnapshot(),
             livingPlayers: this.playerBarn.livingPlayers.map(p => {
                 return {
                     id: p.__id,
@@ -145,6 +177,8 @@ class ServerGame extends Game {
     }
 
     override _saveGameToDatabase() {
+        // Ranked series have their own persistent records and must not alter public BR stats.
+        if (this.config.duel) return;
         // don't save games that never started
         if (!this.started) return;
 
@@ -201,6 +235,14 @@ class ServerGame extends Game {
     override sendQuestProgress(userId: string, progress: Array<{ id: string; delta: number }>) {
         sendQuestProgress(userId, progress);
     }
+
+    override _reportDuelResult(result: DuelRoundResult) {
+        void reportDuelEvent("round-result", result);
+    }
+
+    override _reportDuelPlayerAbandoned(result: DuelPlayerAbandoned) {
+        void reportDuelEvent("player-abandoned", result);
+    }
 }
 
 let lastMsgTime = Date.now();
@@ -212,6 +254,15 @@ process.on("message", (msg: ProcessMsg) => {
         gameWeakRef = new WeakRef(game);
     }
 
+    if (msg.type === ProcessMsgType.RemoveDuelPlayer) {
+        const removed = game?.removeDuelPlayer(msg.seriesId, msg.roundId, msg.profileId);
+        sendMsg({
+            type: ProcessMsgType.DuelPlayerRemoved,
+            requestId: msg.requestId,
+            combat: removed ? game?.getDuelCombatSnapshot() : undefined,
+        });
+        return;
+    }
     if (!game) return;
 
     switch (msg.type) {
@@ -220,6 +271,9 @@ process.on("message", (msg: ProcessMsg) => {
             break;
         case ProcessMsgType.AddSpectateToken:
             game.addSpectateToken(msg.token, msg.data);
+            break;
+        case ProcessMsgType.CancelDuel:
+            game.cancelDuel(msg.seriesId, msg.roundId);
             break;
     }
 });
@@ -260,6 +314,7 @@ setGameInterval(() => {
 interface GameSocketData {
     ip: string;
     rateLimit: Record<symbol, number>;
+    rateLease: GameSocketRateLease;
     disconnectReason?: GameWsDisconnectReason;
     clientSocket?: UwsSocket;
 }
@@ -302,16 +357,17 @@ const app = Config.gameServer.ssl
     })
     : App();
 
-const gameHTTPRateLimit = new HTTPRateLimit(5, 1000);
-const gameWsRateLimit = new WebSocketRateLimit(500, 1000, 5);
+const gameSocketRateLimits = new GameSocketRateLimits();
 
 app.ws<GameSocketData>("/play", {
     idleTimeout: 30,
     maxPayloadLength: 1024,
 
     async upgrade(res, req, context): Promise<void> {
+        let rateLease: GameSocketRateLease | undefined;
         res.onAborted((): void => {
             res.aborted = true;
+            rateLease?.release();
         });
         const wskey = req.getHeader("sec-websocket-key");
         const wsProtocol = req.getHeader("sec-websocket-protocol");
@@ -331,7 +387,9 @@ app.ws<GameSocketData>("/play", {
             return;
         }
 
-        if (gameHTTPRateLimit.isRateLimited(ip) || gameWsRateLimit.isIpRateLimited(ip)) {
+        const upgradingGame = game;
+        rateLease = gameSocketRateLimits.reserve(ip, !!upgradingGame.config.duel);
+        if (!rateLease) {
             res.cork(() => {
                 game!.logger.warn("Websocket upgrade closed: Rate limited");
                 res.writeStatus("429 Too Many Requests");
@@ -341,34 +399,32 @@ app.ws<GameSocketData>("/play", {
             return;
         }
 
-        gameWsRateLimit.ipConnected(ip);
-
-        let disconnectReason: GameWsDisconnectReason | undefined = undefined;
-
-        const ipData = await checkIp(ip);
-
-        if (ipData?.banned) {
-            disconnectReason = "ip_banned";
-        } else if (ipData?.behindProxy) {
-            disconnectReason = "behind_proxy";
-        }
-
-        if (res.aborted) return;
-        res.cork(() => {
+        let upgraded = false;
+        try {
+            let disconnectReason: GameWsDisconnectReason | undefined;
+            const ipData = await checkIp(ip);
+            if (ipData?.banned) disconnectReason = "ip_banned";
+            else if (ipData?.behindProxy) disconnectReason = "behind_proxy";
             if (res.aborted) return;
-            res.upgrade<GameSocketData>(
-                {
-                    rateLimit: {},
-                    ip,
-                    disconnectReason,
-                    clientSocket: undefined as unknown as UwsSocket,
-                },
-                wskey,
-                wsProtocol,
-                wsExtensions,
-                context,
-            );
-        });
+            if (game !== upgradingGame || upgradingGame.stopped) {
+                res.end();
+                return;
+            }
+            res.cork(() => {
+                if (res.aborted) return;
+                res.upgrade<GameSocketData>(
+                    { rateLimit: {}, rateLease: rateLease!, ip, disconnectReason },
+                    wskey,
+                    wsProtocol,
+                    wsExtensions,
+                    context,
+                );
+                upgraded = true;
+            });
+        } finally {
+            // Aborted/failed upgrades have no websocket close event to release their slot.
+            if (!upgraded) rateLease.release();
+        }
     },
 
     open(socket: WebSocket<GameSocketData>) {
@@ -392,7 +448,7 @@ app.ws<GameSocketData>("/play", {
             }
             return;
         }
-        if (gameWsRateLimit.isRateLimited(socket.getUserData().rateLimit)) {
+        if (data.rateLease.isRateLimited(data.rateLimit)) {
             procLogger.warn("Game websocket rate limited, closing socket.");
             socket.end(3000, "rate_limited");
             return;
@@ -402,7 +458,7 @@ app.ws<GameSocketData>("/play", {
 
     close(socket: WebSocket<GameSocketData>) {
         const data = socket.getUserData();
-        gameWsRateLimit.ipDisconnected(data.ip);
+        data.rateLease.release();
         if (data.clientSocket) {
             data.clientSocket._closed = true;
             game?.clientBarn?.handleSocketClose(data.clientSocket);

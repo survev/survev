@@ -136,6 +136,7 @@ export class Game {
         public m_resourceManager: ResourceManager,
         public onJoin: () => void,
         public onQuit: (err?: GameWsDisconnectReason) => void,
+        public onGameOver?: (gameOver: boolean) => boolean,
     ) {
         if (IS_DEV) {
             this.editor = new Editor(this.m_config);
@@ -1532,20 +1533,23 @@ export class Game {
                         break;
                     }
                 }
-                this.m_uiManager.showStats(
-                    msg.playerStats,
-                    msg.teamId,
-                    msg.teamRank,
-                    msg.winningTeamId,
-                    msg.gameOver,
-                    localTeamId,
-                    this.teamMode,
-                    this.m_spectating,
-                    this.m_playerBarn,
-                    this.m_audioManager,
-                    this.m_map,
-                    this.m_ui2Manager,
-                );
+                if (!this.onGameOver?.(msg.gameOver)) {
+                    this.m_uiManager.showStats(
+                        msg.playerStats,
+                        msg.teamId,
+                        msg.teamRank,
+                        msg.winningTeamId,
+                        msg.gameOver,
+                        localTeamId,
+                        this.teamMode,
+                        this.m_spectating,
+                        this.m_playerBarn,
+                        this.m_audioManager,
+                        this.m_map,
+                        this.m_ui2Manager,
+                    );
+                    this.m_touch.hideAll();
+                }
                 if (localTeamId == msg.winningTeamId) {
                     this.victoryMusic = this.m_audioManager.playSound("menu_music", {
                         channel: "music",
@@ -1553,7 +1557,6 @@ export class Game {
                         forceStart: true,
                     });
                 }
-                this.m_touch.hideAll();
                 break;
             }
             case net.MsgType.Pickup: {

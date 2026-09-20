@@ -47,9 +47,9 @@ export default defineConfig(({ mode }) => {
         proxy: {
             // this redirects /stats to /stats/
             // because vite is cringe and does not work without trailing slashes at the end of paths 😭
-            "^/stats(?!/$).*": {
+            "^/stats(?:\\?.*)?$": {
                 target: `http://${Config.vite.host}:${Config.vite.port}`,
-                rewrite: (path) => path.replace(/^\/stats(?!\/$).*/, "/stats/"),
+                rewrite: (path) => path.replace(/^\/stats(?=\?|$)/, "/stats/"),
                 changeOrigin: true,
                 secure: false,
             },

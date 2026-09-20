@@ -1,0 +1,100 @@
+<div class="ranked-stats-heading">
+  <h2>RANKED</h2>
+  <span>All time · First to five</span>
+  <a href="<%= env.statsLink({mapId: 'ranked', team: 'solo', type: 'elo'}) %>">Leaderboards</a>
+</div>
+<% if (env.loading) { %>
+  <p class="ranked-stats-note">Loading ranked stats…</p>
+<% } else if (env.error || !env.data) { %>
+  <p class="ranked-stats-note">Ranked stats are unavailable. Please try again.</p>
+<% } else { %>
+  <div class="row ranked-mode-cards">
+    <% for (const size of [1,2,3,4]) { %>
+      <% const rating = env.data.profile.ratings[size]; %>
+      <% const tier = env.getRankedTier(rating.elo); %>
+      <div class="col-6 col-lg-3">
+        <div class="card card-mode ranked-mode-card">
+          <div class="ranked-mode-title ranked-mode-title-<%= size %>">
+            <%= size %>v<%= size %><span><%= rating.played %> SERIES</span>
+          </div>
+          <div class="ranked-mode-rating">
+            <% if (rating.placementsRemaining) { %>
+              <span class="ranked-stats-unplaced" role="img" aria-label="Unranked">?</span>
+            <% } else { %>
+              <img src="/img/gui/ranked/<%= tier.id %>.svg" alt="<%= tier.name %>">
+            <% } %>
+            <div>
+              <strong><%= rating.elo %></strong>
+              <span><%= rating.placementsRemaining ? 'Provisional Elo' : tier.name %></span>
+            </div>
+          </div>
+          <div class="ranked-mode-values">
+            <div>
+              <span>WINS</span>
+              <strong><%= rating.wins %></strong>
+            </div>
+            <div>
+              <span>LOSSES</span>
+              <strong><%= rating.losses %></strong>
+            </div>
+            <div>
+              <span>WIN %</span>
+              <strong><%= rating.played ? (rating.wins / rating.played * 100).toFixed(1) : '0.0' %></strong>
+            </div>
+            <div>
+              <span>WIN STREAK</span>
+              <strong><%= Math.max(0, rating.streak) %></strong>
+            </div>
+          </div>
+          <% if (rating.placementsRemaining) { %>
+            <div class="ranked-placement">Placements <%= env.placementSeries - rating.placementsRemaining %>/<%= env.placementSeries %> · <%= rating.placementsRemaining %> to join the ladder</div>
+          <% } %>
+        </div>
+      </div>
+    <% } %>
+  </div>
+  <div class="ranked-stats-heading ranked-history-heading">
+    <h3>RANKED HISTORY</h3>
+    <select id="ranked-history-size" class="custom-select" aria-label="Ranked history mode">
+      <option value="0">All ranked</option>
+      <% for (const size of [1,2,3,4]) { %>
+        <option value="<%= size %>" <%= env.historySize === size ? 'selected' : '' %>><%= size %>v<%= size %></option>
+      <% } %>
+    </select>
+  </div>
+  <% const history = env.data.history.filter(match => !env.historySize || match.size === env.historySize); %>
+  <div class="ranked-history-table-wrap">
+    <table class="ranked-history-table">
+      <thead>
+        <tr>
+          <th>MODE</th>
+          <th>RESULT</th>
+          <th>OPPONENTS</th>
+          <th>ELO</th>
+          <th>WHEN</th>
+        </tr>
+      </thead>
+      <tbody>
+        <% for (const match of history) { %>
+          <tr>
+            <td><%= match.size %>v<%= match.size %></td>
+            <td class="<%= match.won ? 'ranked-win' : 'ranked-loss' %>">
+              <%= match.won ? 'Win' : match.forfeited ? 'Forfeit' : 'Loss' %> <%= match.score[0] %>–<%= match.score[1] %>
+            </td>
+            <td><%= match.opponents.join(', ') %></td>
+            <td>
+              <strong class="<%= match.delta > 0 ? 'ranked-win' : 'ranked-loss' %>"><%= match.delta > 0 ? '+' : '' %><%= match.delta %></strong>
+              <span class="ranked-history-after"><%= match.after %></span>
+            </td>
+            <td><%= new Date(match.at).toLocaleDateString() %></td>
+          </tr>
+        <% } %>
+        <% if (!history.length) { %>
+          <tr>
+            <td colspan="5">No recent ranked series.</td>
+          </tr>
+        <% } %>
+      </tbody>
+    </table>
+  </div>
+<% } %>

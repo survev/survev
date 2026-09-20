@@ -1,0 +1,34 @@
+<table id="leaderboard-table" class="ranked-stats-table">
+  <thead>
+    <tr class="leaderboard-headers">
+      <th class="header-rank">RANK</th>
+      <th class="header-player">PLAYER</th>
+      <th><%= env.metric.toUpperCase() %></th>
+      <th>W / L</th>
+      <th>WIN %</th>
+    </tr>
+  </thead>
+  <tbody class="leaderboard-values">
+    <% for (const entry of env.entries) { %>
+      <% const tier = env.getRankedTier(entry.rating.elo); %>
+      <tr class="main single-player">
+        <td class="data-rank">#<%= entry.rank %></td>
+        <td class="data-player-names">
+          <a class="ranked-stats-player" href="<%= env.statsLink({slug: entry.slug}) %>">
+            <img class="ranked-stats-badge" src="/img/gui/ranked/<%= tier.id %>.svg" alt="<%= tier.name %>" title="<%= tier.name %>">
+            <span><%= entry.name %></span>
+          </a>
+        </td>
+        <td><%= env.metric === 'Elo' ? entry.rating.elo : entry.rating.wins %></td>
+        <td><%= entry.rating.wins %> / <%= entry.rating.losses %></td>
+        <td><%= entry.rating.played ? (entry.rating.wins / entry.rating.played * 100).toFixed(1) : '0.0' %></td>
+      </tr>
+    <% } %>
+    <% if (!env.entries.length) { %>
+      <tr>
+        <td colspan="5" class="p-3">No placed players yet. Complete five series to join the ladder.</td>
+      </tr>
+    <% } %>
+  </tbody>
+</table>
+<p class="ranked-stats-note">Placed players · All-time series results</p>

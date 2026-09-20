@@ -1,0 +1,56 @@
+.local-account-form {
+    margin: 8px auto;
+    width: 100%;
+}
+
+.local-account-tabs {
+    display: flex;
+    gap: 4px;
+    margin-bottom: 8px;
+}
+
+.local-account-tabs .menu-option {
+    flex: 1 1 0;
+    min-width: 0;
+    font: 14px "Roboto Condensed", sans-serif;
+}
+
+.local-account-form button {
+    font-family: "Roboto Condensed", sans-serif;
+    padding: 0;
+}
+
+.local-account-form > input {
+    padding: 0 8px;
+    text-align: left;
+    font-size: 15px;
+}
+
+.local-account-form > button {
+    font-size: 16px;
+}
+
+.local-account-form button:disabled {
+    opacity: 0.5;
+    cursor: default;
+}
+
+.local-account-error {
+    color: #ffb2a0;
+    text-align: center;
+    font-size: 14px;
+    line-height: 1.35;
+}
+
+.local-account-error:empty {
+    display: none;
+}
+
+#modal-create-account:has(.local-account-form) .modal-body-text {
+    display: none;
+}
+
+#modal-create-account:has(.local-account-form) .account-buttons {
+    width: 100%;
+    max-width: 330px;
+}

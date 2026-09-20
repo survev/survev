@@ -6,7 +6,9 @@
     "test": "vitest"
   },
   "dependencies": {
+    "@types/ejs": "^3.1.5",
     "@types/svg-parser": "^2.0.6",
+    "ejs": "^4.0.1",
     "svg-parser": "^2.1.0",
     "vitest": "^4.1.11"
   }

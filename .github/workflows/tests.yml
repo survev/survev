@@ -6,6 +6,7 @@ on:
       - master
     paths: &paths
       - "tests/**"
+      - "client/**"
       - "server/**"
       - "shared/**"
       - "*.json"

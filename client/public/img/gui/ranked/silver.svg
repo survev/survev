@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="128" height="128" viewBox="0 0 128 128">
+  <title>Silver rank</title>
+  <path d="M36 82 30 117l34-17 34 17-6-35" fill="#687779" stroke="#29251f" stroke-width="6" stroke-linejoin="round"/>
+  <circle cx="64" cy="56" r="43" fill="#b8c5c9" stroke="#29251f" stroke-width="6"/>
+  <path d="M24 56a40 40 0 0 1 80 0H94a30 30 0 0 0-60 0Z" fill="#e1e8e8"/>
+  <circle cx="64" cy="56" r="30" fill="#75868c" stroke="#29251f" stroke-width="4"/>
+  <path d="m43 57 21-18 21 18V44L64 26 43 44Zm0 23 21-18 21 18V67L64 49 43 67Z" fill="#e1e8e8" stroke="#29251f" stroke-width="4" stroke-linejoin="round"/>
+</svg>

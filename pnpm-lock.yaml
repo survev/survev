@@ -195,9 +195,15 @@ importers:
 
   tests:
     dependencies:
+      '@types/ejs':
+        specifier: ^3.1.5
+        version: 3.1.5
       '@types/svg-parser':
         specifier: ^2.0.6
         version: 2.0.6
+      ejs:
+        specifier: ^4.0.1
+        version: 4.0.1
       svg-parser:
         specifier: ^2.1.0
         version: 2.1.0

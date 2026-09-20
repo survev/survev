@@ -25,6 +25,8 @@ import type { Player } from "./objects/player.ts";
 import { Structure } from "./objects/structure.ts";
 import { RiverCreator } from "./riverCreator.ts";
 
+const duelBuildingEdgeMargin = 8;
+
 // most of this logic is based on the `renderMapBuildingBounds` from client debugHelpers
 // which was found on BHA leak
 function getBuildingBounds(type: string, layer = 0, pos: Vec2, rot: number) {
@@ -272,6 +274,20 @@ export class GameMap {
         ) as MapDef);
 
         assert(mapDef, `Invalid map name: ${game.config.mapName}`);
+
+        if (game.config.duel) {
+            const size = game.config.duel.teamSize;
+            const dimensionScale = [1, 1.2, 1.5, 2][size - 1];
+            mapDef.mapGen.map.baseWidth *= dimensionScale;
+            mapDef.mapGen.map.baseHeight *= dimensionScale;
+            mapDef.gameMode.maxPlayers = size * 2;
+            // cloneDeep shares arrays, so explicitly detach the spawn table before scaling it.
+            mapDef.mapGen.fixedSpawns = [{ ...mapDef.mapGen.fixedSpawns[0] }];
+            // Scale this private copy: three main buildings per teammate, with matching cover and loot.
+            for (const [type, count] of Object.entries(mapDef.mapGen.fixedSpawns[0])) {
+                if (typeof count === "number") mapDef.mapGen.fixedSpawns[0][type] = count * size;
+            }
+        }
 
         this.mapId = mapDef.mapId;
 
@@ -1257,6 +1273,14 @@ export class GameMap {
             buildingBounds = getBuildingBounds(type, 0, pos, rot);
             for (let i = 0; i < buildingBounds.length; i++) {
                 const coll = buildingBounds[i];
+                if (this.game.config.duel && coll.layer === 0) {
+                    const bound = collider.toAabb(coll.collision);
+                    if (
+                        bound.min.x < duelBuildingEdgeMargin || bound.min.y < duelBuildingEdgeMargin
+                        || bound.max.x > this.width - duelBuildingEdgeMargin
+                        || bound.max.y > this.height - duelBuildingEdgeMargin
+                    ) return false;
+                }
                 const gridColls = this.grid.intersectCollider(coll.collision);
 
                 for (let j = 0; j < gridColls.length; j++) {
@@ -2134,7 +2158,14 @@ export class GameMap {
         }
     }
 
-    getSpawnPos(group?: Group, team?: Team): Vec2 {
+    getSpawnPos(group?: Group, team?: Team, duelTeam?: 0 | 1): Vec2 {
+        if (this.game.config.duel && duelTeam !== undefined) {
+            // Opposing sides alternate between rounds, with teammates clustered together.
+            const side = duelTeam ^ (this.game.config.duel.round % 2);
+            const center = group?.spawnPosition ?? v2.create(this.width * (side ? 0.76 : 0.24), this.height * 0.5);
+            const radius = group?.spawnPosition ? 10 : this.width * 0.09;
+            return this.getRandomSpawnPos(() => v2.add(center, util.randomPointInCircle(radius)), group, team);
+        }
         if (Config.debug.spawnMode === "fixed") {
             return v2.copy(Config.debug.spawnPos ?? this.center);
         }

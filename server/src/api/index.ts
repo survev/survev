@@ -9,6 +9,9 @@ import { randomUUID } from "node:crypto";
 import pkgJson from "../../../package.json" with { type: "json" };
 import { type FindGameResponse, type SiteInfoRes, zFindGameBody } from "../../../shared/types/api.ts";
 import { Config } from "../config.ts";
+import { createRankedAccountHooks } from "../ranked/accountHooks.ts";
+import { createLocalAccountRouter } from "../ranked/localAccountRouter.ts";
+import { rankedCoordinator, rankedRouters, rankedStore } from "../ranked/runtime.ts";
 import { GIT_VERSION } from "../utils/gitRevision.ts";
 import { logErrorToWebhook } from "../utils/logger.ts";
 import { isBehindProxy } from "../utils/proxyCheck.ts";
@@ -21,9 +24,9 @@ import { rateLimitMiddleware, validateParams } from "./auth/middleware.ts";
 import type { SessionTableSelect, UsersTableSelect } from "./db/schema.ts";
 import { cleanupOldLogs, isBanned } from "./routes/private/ModerationRouter.ts";
 import { PrivateRouter } from "./routes/private/private.ts";
-import { StatsRouter } from "./routes/stats/StatsRouter.ts";
+import { createStatsRouter } from "./routes/stats/StatsRouter.ts";
 import { AuthRouter } from "./routes/user/AuthRouter.ts";
-import { UserRouter } from "./routes/user/UserRouter.ts";
+import { createUserRouter } from "./routes/user/UserRouter.ts";
 
 export type Context = {
     Variables: {
@@ -77,9 +80,22 @@ app.use(
 // @TODO: figure out the origins for this..
 // app.use(csrf())
 
-app.route("/api/user/", UserRouter);
+app.get("/api/auth/providers", c => c.json({ local: !Config.database.enabled }));
+const accountHooks = createRankedAccountHooks(rankedStore, rankedCoordinator);
+if (!Config.database.enabled) {
+    app.route(
+        "/api",
+        createLocalAccountRouter(rankedStore, accountHooks),
+    );
+}
+app.route(
+    "/api/user/",
+    createUserRouter(accountHooks),
+);
+app.route("/api/ranked", rankedRouters.app);
+app.route("/private/ranked", rankedRouters.privateApp);
 app.route("/api/auth/", AuthRouter);
-app.route("/api/", StatsRouter);
+app.route("/api/", createStatsRouter(rankedStore));
 app.route("/private/", PrivateRouter);
 
 server.init(app, upgradeWebSocket);
@@ -228,6 +244,7 @@ setInterval(() => {
 
 const honoServer = serve({
     fetch: app.fetch,
+    hostname: Config.apiServer.host,
     port: Config.apiServer.port,
 });
 injectWebSocket(honoServer);

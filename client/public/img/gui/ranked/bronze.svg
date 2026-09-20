@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="128" height="128" viewBox="0 0 128 128">
+  <title>Bronze rank</title>
+  <path d="M36 82 30 117l34-17 34 17-6-35" fill="#795139" stroke="#29251f" stroke-width="6" stroke-linejoin="round"/>
+  <circle cx="64" cy="56" r="43" fill="#b9804b" stroke="#29251f" stroke-width="6"/>
+  <path d="M24 56a40 40 0 0 1 80 0H94a30 30 0 0 0-60 0Z" fill="#d6a573"/>
+  <circle cx="64" cy="56" r="30" fill="#8e603d" stroke="#29251f" stroke-width="4"/>
+  <path d="m44 67 20-21 20 21V51L64 31 44 51Z" fill="#e1af76" stroke="#29251f" stroke-width="4" stroke-linejoin="round"/>
+</svg>

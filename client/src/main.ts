@@ -33,6 +33,7 @@ import { MenuModal } from "./ui/menuModal.ts";
 import { LoadoutDisplay } from "./ui/opponentDisplay.ts";
 import { Pass } from "./ui/pass.ts";
 import { ProfileUi } from "./ui/profileUi.ts";
+import { RankedMenu } from "./ui/rankedMenu.ts";
 import { TeamMenu } from "./ui/teamMenu.ts";
 import { loadStaticDomImages } from "./ui/ui2.ts";
 
@@ -63,6 +64,7 @@ export class Application {
     loadoutMenu!: LoadoutMenu;
     pass!: Pass;
     profileUi!: ProfileUi;
+    rankedMenu?: RankedMenu;
 
     pingTest = new PingTest();
     audioManager = new AudioManager();
@@ -347,13 +349,15 @@ export class Application {
                 this.onResize();
                 this.findGameAttempts = 0;
                 this.ambience.onGameStart();
+                this.rankedMenu?.onGameJoined();
             };
             const onQuit = (errMsg?: GameWsDisconnectReason) => {
                 if (this.game!.m_updatePass) {
                     this.pass.scheduleUpdatePass(this.game!.m_updatePassDelay);
                 }
                 this.game!.free();
-                this.errorMessage = errMsg ? this.getErrorString(errMsg, "host_closed") : "";
+                const rankedQuit = this.rankedMenu?.onGameQuit() ?? false;
+                this.errorMessage = errMsg && !rankedQuit ? this.getErrorString(errMsg, "host_closed") : "";
                 this.teamMenu.onGameComplete(this.errorMessage);
                 this.ambience.onGameComplete(this.audioManager);
                 this.setAppActive(true);
@@ -383,6 +387,7 @@ export class Application {
                 this.resourceManager,
                 onJoin,
                 onQuit,
+                gameOver => this.rankedMenu?.onGameOver(gameOver) ?? false,
             );
             this.loadoutDisplay = new LoadoutDisplay(
                 this.pixi,
@@ -398,6 +403,7 @@ export class Application {
             this.onConfigModified();
             this.config.addModifiedListener(this.onConfigModified.bind(this));
             loadStaticDomImages();
+            this.rankedMenu = new RankedMenu(this);
 
             SDK.gameLoadComplete();
 
@@ -621,6 +627,10 @@ export class Application {
     }
 
     tryJoinTeam(create: boolean, url?: string) {
+        if (this.rankedMenu?.isBusy()) {
+            this.rankedMenu.open();
+            return;
+        }
         if (this.active && this.quickPlayPendingModeIdx === -1) {
             // Join team if the url contains a team address
             let roomUrl = url || window.location.hash.slice(1);
@@ -644,6 +654,10 @@ export class Application {
     }
 
     tryQuickStartGame(gameModeIdx: number) {
+        if (this.rankedMenu?.isBusy()) {
+            this.rankedMenu.open();
+            return;
+        }
         if (this.quickPlayPendingModeIdx === -1) {
             // Update UI to display a spinner on the play button
             this.errorMessage = "";
@@ -747,7 +761,7 @@ export class Application {
                 headers: {
                     "Content-Type": "application/json; charset=utf-8",
                 },
-                credentials: proxy.anyLoginSupported() ? "include" : "omit",
+                credentials: proxy.anyLoginSupported() || this.account.localLoginEnabled ? "include" : "omit",
                 signal: helpers.abortSignal(10 * 1000),
             }).then(res => res.json()).then((data: FindGameResponse) => {
                 if (data.type === "error") {
@@ -842,6 +856,7 @@ export class Application {
     }
 
     onJoinGameError(err: FindGameError) {
+        const rankedJoin = this.rankedMenu?.onGameQuit() ?? false;
         if (err == "invalid_protocol") {
             this.showInvalidProtocolModal();
         }
@@ -856,9 +871,9 @@ export class Application {
             this.showErrorModal(err);
         }
 
-        this.errorMessage = this.getErrorString(err, "full");
+        this.errorMessage = rankedJoin ? "" : this.getErrorString(err, "full");
         this.quickPlayPendingModeIdx = -1;
-        this.teamMenu.leave("join_game_failed");
+        this.teamMenu.leave(rankedJoin ? undefined : "join_game_failed");
         this.refreshUi();
     }
 

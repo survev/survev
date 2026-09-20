@@ -1,10 +1,18 @@
 import type { MapDefKey } from "../../../shared/defs/mapDefs.ts";
-import { TeamMode } from "../../../shared/gameConfig.ts";
+import { DamageType, TeamMode } from "../../../shared/gameConfig.ts";
+import type { DuelCombatSnapshot, DuelCombatStats } from "../../../shared/types/rankedCombat.ts";
 import type { Loadout } from "../../../shared/utils/loadout.ts";
 import { math } from "../../../shared/utils/math.ts";
+import { v2 } from "../../../shared/utils/v2.ts";
 import { Config } from "../config.ts";
 import { ServerLogger } from "../utils/logger.ts";
-import { type FindGamePrivateBody, type ServerGameConfig } from "../utils/types.ts";
+import {
+    type DuelPlayerAbandoned,
+    type DuelRoundResult,
+    type DuelRoundStatus,
+    type FindGamePrivateBody,
+    type ServerGameConfig,
+} from "../utils/types.ts";
 import { ClientBarn } from "./client.ts";
 import { GameModeManager } from "./gameModeManager.ts";
 import { Grid } from "./grid.ts";
@@ -19,7 +27,7 @@ import { Gas } from "./objects/gas.ts";
 import { LootBarn } from "./objects/loot.ts";
 import { MapIndicatorBarn } from "./objects/mapIndicator.ts";
 import { PlaneBarn } from "./objects/plane.ts";
-import { PlayerBarn } from "./objects/player.ts";
+import { type Player, PlayerBarn } from "./objects/player.ts";
 import { ProjectileBarn } from "./objects/projectile.ts";
 import { SmokeBarn } from "./objects/smoke.ts";
 import { Profiler } from "./profiler.ts";
@@ -29,6 +37,9 @@ export interface JoinTokenData {
     findGameIp: string;
     loadout?: Loadout;
     quests?: string[];
+    duelProfileId?: string;
+    duelTeam?: 0 | 1;
+    duelName?: string;
     groupData: {
         autoFill: boolean;
         playerCount: number;
@@ -82,6 +93,263 @@ export class Game {
     netSyncWarnings = 0;
 
     joinTokens = new Map<string, JoinToken>();
+
+    /** Reserved identities remain attached to their original player across reconnects. */
+    readonly duelPlayers = new Map<string, Player>();
+    private duelCountdown = 3;
+    private duelCountdownEndsAt?: number;
+    private duelDisconnectedSeconds = new Map<string, number>();
+    private duelRemovedProfiles = new Set<string>();
+    private duelAbandonedProfiles = new Set<string>();
+    private duelRemovingPlayers = false;
+    private duelResult?: DuelRoundResult;
+    private duelResultReported = false;
+    private duelRemovedCombat = new Map<string, DuelCombatStats>();
+    private duelCombatFinal?: DuelCombatSnapshot;
+
+    /** Read the original player objects, never client/spectator connections. */
+    getDuelCombatSnapshot(): DuelCombatSnapshot | undefined {
+        return this.duelCombatFinal ?? this.snapshotDuelCombat(null);
+    }
+
+    private snapshotDuelCombat(winnerTeam: 0 | 1 | null): DuelCombatSnapshot | undefined {
+        const duel = this.config.duel;
+        if (!duel) return;
+        return {
+            seriesId: duel.seriesId,
+            roundId: duel.roundId,
+            round: duel.round,
+            gameId: this.id,
+            players: duel.roster.map(member => {
+                const removed = this.duelRemovedCombat.get(member.profileId);
+                if (removed) return { ...removed };
+                const player = this.duelPlayers.get(member.profileId);
+                return {
+                    profileId: member.profileId,
+                    kills: player?.kills ?? 0,
+                    damageDealt: Math.round(player?.damageDealt ?? 0),
+                    roundWins: Number(
+                        this.started && member.team === winnerTeam && !this.duelRemovedProfiles.has(member.profileId),
+                    ),
+                };
+            }),
+        };
+    }
+
+    private get activeDuelRoster() {
+        return this.config.duel?.roster.filter(p => !this.duelRemovedProfiles.has(p.profileId)) ?? [];
+    }
+
+    get gameplayFrozen(): boolean {
+        // A decided round still simulates its native victory celebration and accepts key releases.
+        return this.stopped || (!!this.config.duel && !this.started);
+    }
+
+    get duelStatus(): DuelRoundStatus | undefined {
+        const duel = this.config.duel;
+        if (!duel) return;
+        return {
+            seriesId: duel.seriesId,
+            roundId: duel.roundId,
+            round: duel.round,
+            phase: this.over
+                ? "finished"
+                : this.started
+                ? "playing"
+                : this.duelCountdownEndsAt
+                ? "countdown"
+                : "connecting",
+            connected: this.activeDuelRoster.filter(p => {
+                const player = this.duelPlayers.get(p.profileId);
+                return player && !player.disconnected;
+            }).length,
+            expected: this.activeDuelRoster.length,
+            countdownEndsAt: this.duelCountdownEndsAt,
+        };
+    }
+
+    /** Only the server's reserved roster can populate this round. */
+    canJoinDuel(data: JoinTokenData): boolean {
+        const duel = this.config.duel;
+        if (!duel) return true;
+        if (this.over || !data.duelProfileId || this.duelRemovedProfiles.has(data.duelProfileId)) return false;
+        const member = duel.roster.find(p => p.profileId === data.duelProfileId);
+        if (!member || member.team !== data.duelTeam || member.name !== data.duelName) return false;
+        const existing = this.duelPlayers.get(member.profileId);
+        return existing ? existing.disconnected : !this.started;
+    }
+
+    resetDuelDisconnectGrace(profileId: string) {
+        this.duelDisconnectedSeconds.delete(profileId);
+    }
+
+    private updateDuel(dt: number) {
+        const duel = this.config.duel;
+        if (!duel || this.over) return;
+        const roster = this.activeDuelRoster;
+        // The coordinator settles a series when an entire side forfeits.
+        if (new Set(roster.map(p => p.team)).size < 2) return;
+        if (!this.started) {
+            const status = this.duelStatus!;
+            if (status.connected === status.expected) {
+                if (!this.duelCountdownEndsAt) {
+                    this.duelCountdownEndsAt = Date.now() + this.duelCountdown * 1000;
+                    this.updateData();
+                }
+                this.duelCountdown -= dt;
+                if (this.duelCountdown <= 0) {
+                    this.started = true;
+                    this.duelCountdownEndsAt = undefined;
+                    this.gas.advanceGasStage();
+                    this.updateData();
+                }
+            } else {
+                if (this.duelCountdownEndsAt) {
+                    this.duelCountdownEndsAt = undefined;
+                    this.duelCountdown = 3;
+                    this.updateData();
+                }
+                if (this.timeRunning >= 45) {
+                    const missing = roster.filter(p => {
+                        const player = this.duelPlayers.get(p.profileId);
+                        return !player || player.disconnected;
+                    });
+                    if (duel.round > 1) {
+                        this.removeDuelPlayers(missing.map(p => p.profileId), true);
+                        return;
+                    }
+                    const missingTeams = ([0, 1] as const).filter(team => missing.some(p => p.team === team));
+                    this.finishDuel(null, "connection_timeout", missingTeams, missing.map(p => p.profileId));
+                }
+            }
+            return;
+        }
+
+        const abandoned: string[] = [];
+        for (const member of roster) {
+            const player = this.duelPlayers.get(member.profileId);
+            const seconds = player?.disconnected ? (this.duelDisconnectedSeconds.get(member.profileId) ?? 0) + dt : 0;
+            this.duelDisconnectedSeconds.set(member.profileId, seconds);
+            if (seconds >= 15) abandoned.push(member.profileId);
+        }
+        if (abandoned.length) this.removeDuelPlayers(abandoned, true);
+    }
+
+    private finishDuel(
+        winnerTeam: 0 | 1 | null,
+        reason: DuelRoundResult["reason"],
+        missingTeams?: Array<0 | 1>,
+        missingProfileIds?: string[],
+    ) {
+        const duel = this.config.duel;
+        if (!duel || this.duelResult) return;
+        this.over = true;
+        const celebrate = this.started && winnerTeam !== null;
+        this.stopTicker = celebrate ? 3 : 1.8;
+        this.playerBarn.sendWinEmoteTicker = 1;
+        const winner = this.activeDuelRoster.find(p => p.team === winnerTeam && this.duelPlayers.has(p.profileId));
+        this.winningTeamId = winner ? this.duelPlayers.get(winner.profileId)?.teamId ?? 0 : 0;
+        // Celebration still simulates normally; ranked counters stop at the actual decision.
+        this.duelCombatFinal = this.snapshotDuelCombat(winnerTeam);
+        this.duelResult = {
+            seriesId: duel.seriesId,
+            roundId: duel.roundId,
+            round: duel.round,
+            gameId: this.id,
+            winnerTeam,
+            reason,
+            started: this.started,
+            missingTeams,
+            missingProfileIds,
+            abandonedProfileIds: [...this.duelAbandonedProfiles],
+            combat: this.duelCombatFinal,
+        };
+        // Reporting immediately would make the coordinator replace the arena before celebration ends.
+        if (!celebrate) this.reportDuelResult();
+        this.updateData();
+    }
+
+    private reportDuelResult() {
+        if (!this.duelResult || this.duelResultReported) return;
+        this.duelResultReported = true;
+        this._reportDuelResult(this.duelResult);
+    }
+
+    /** The coordinator owns cancellation/series forfeits; stopping here must not award a round. */
+    cancelDuel(seriesId: string, roundId: string): boolean {
+        if (this.config.duel?.seriesId !== seriesId || this.config.duel.roundId !== roundId) return false;
+        this.over = true;
+        this.duelResult = undefined;
+        this.stop();
+        return true;
+    }
+
+    /** An individual forfeit removes only that reserved player; teammates retain their round. */
+    removeDuelPlayer(seriesId: string, roundId: string, profileId: string): boolean {
+        const duel = this.config.duel;
+        if (duel?.seriesId !== seriesId || duel.roundId !== roundId || this.stopped) return false;
+        if (!duel.roster.some(p => p.profileId === profileId)) return false;
+        this.removeDuelPlayers([profileId], false);
+        return true;
+    }
+
+    private removeDuelPlayers(profileIds: string[], abandoned: boolean) {
+        const duel = this.config.duel!;
+        const removed = profileIds.filter(id => !this.duelRemovedProfiles.has(id));
+        if (!removed.length) return;
+        const combat = this.getDuelCombatSnapshot()!;
+        // Mark the whole batch first so simultaneous disconnects cannot invent a winner.
+        for (const id of removed) {
+            const stats = combat.players.find(player => player.profileId === id);
+            if (stats) this.duelRemovedCombat.set(id, { ...stats });
+            this.duelRemovedProfiles.add(id);
+            this.duelDisconnectedSeconds.delete(id);
+            if (abandoned) this.duelAbandonedProfiles.add(id);
+            for (const [token, data] of this.joinTokens) {
+                if (data.type === "join" && data.data.duelProfileId === id) this.joinTokens.delete(token);
+            }
+        }
+        this.duelRemovingPlayers = true;
+        try {
+            for (const profileId of removed) {
+                const player = this.duelPlayers.get(profileId);
+                if (player) {
+                    player.clearHeldInput();
+                    player.kill({ damageType: DamageType.Bleeding, dir: v2.create(0, 0) });
+                    this.clientBarn.handleSocketClose(player.client.socket);
+                    player.client.disconnect("invalid_token");
+                }
+            }
+        } finally {
+            this.duelRemovingPlayers = false;
+        }
+        if (!this.started) {
+            this.duelCountdown = 3;
+            this.duelCountdownEndsAt = undefined;
+        } else if (!this.over) {
+            const aliveTeams = new Set(
+                this.activeDuelRoster.filter(p => !this.duelPlayers.get(p.profileId)?.dead).map(p => p.team),
+            );
+            if (aliveTeams.size <= 1) {
+                this.finishDuel(aliveTeams.values().next().value ?? null, aliveTeams.size ? "disconnect" : "draw");
+            }
+        }
+        if (abandoned) {
+            const combat = this.getDuelCombatSnapshot();
+            for (const profileId of removed) {
+                this._reportDuelPlayerAbandoned({
+                    seriesId: duel.seriesId,
+                    roundId: duel.roundId,
+                    round: duel.round,
+                    gameId: this.id,
+                    profileId,
+                    abandonedProfileIds: [...this.duelAbandonedProfiles],
+                    combat,
+                });
+            }
+        }
+        this.updateData();
+    }
 
     get aliveCount(): number {
         return this.playerBarn.livingPlayers.length;
@@ -179,7 +447,15 @@ export class Game {
             }
         }
 
-        if (!this.started && !this.preventStart) {
+        if (this.config.duel) {
+            this.updateDuel(dt);
+            if (!this.started) {
+                this.clientBarn.update(dt);
+                return;
+            }
+        }
+
+        if (!this.config.duel && !this.started && !this.preventStart) {
             this.started = this.modeManager.isGameStarted();
             if (this.started) {
                 this.gas.advanceGasStage();
@@ -342,6 +618,9 @@ export class Game {
     }
 
     get canJoin(): boolean {
+        if (this.config.duel) {
+            return !this.over && !this.started && this.activeDuelRoster.some(p => !this.duelPlayers.has(p.profileId));
+        }
         return (
             this.aliveCount < this.map.mapDef.gameMode.maxPlayers
             && !this.over
@@ -351,6 +630,20 @@ export class Game {
 
     checkGameOver() {
         if (this.over) return;
+
+        if (this.config.duel) {
+            if (!this.started || this.duelRemovingPlayers) return;
+            const aliveTeams = new Set(
+                this.activeDuelRoster.filter(p => {
+                    const player = this.duelPlayers.get(p.profileId);
+                    return player && !player.dead;
+                }).map(p => p.team),
+            );
+            if (aliveTeams.size <= 1) {
+                this.finishDuel(aliveTeams.values().next().value ?? null, aliveTeams.size ? "elimination" : "draw");
+            }
+            return;
+        }
 
         const didGameEnd = this.started && this.modeManager.aliveCount() <= 1;
 
@@ -369,6 +662,19 @@ export class Game {
     }
 
     addJoinTokens(tokens: FindGamePrivateBody["playerData"], autoFill: boolean) {
+        if (this.config.duel) {
+            for (const team of [0, 1] as const) {
+                const members = tokens.filter(t =>
+                    t.duelTeam === team && !this.duelRemovedProfiles.has(t.duelProfileId ?? "")
+                );
+                this.storeJoinTokens(members, false);
+            }
+            return;
+        }
+        this.storeJoinTokens(tokens, autoFill);
+    }
+
+    private storeJoinTokens(tokens: FindGamePrivateBody["playerData"], autoFill: boolean) {
         const groupData = {
             playerCount: tokens.length,
             groupHashToJoin: "",
@@ -378,13 +684,16 @@ export class Game {
         for (const token of tokens) {
             this.joinTokens.set(token.joinToken, {
                 type: "join",
-                expiresAt: Date.now() + 10000,
+                expiresAt: Date.now() + (this.config.duel ? 10 * 60 * 1000 : 10000),
                 data: {
                     userId: token.userId,
                     groupData,
                     findGameIp: token.ip,
                     loadout: token.loadout,
                     quests: token.quests,
+                    duelProfileId: token.duelProfileId,
+                    duelTeam: token.duelTeam,
+                    duelName: token.duelName,
                 },
             });
         }
@@ -400,6 +709,22 @@ export class Game {
 
     stop() {
         if (this.stopped) return;
+        if (this.config.duel) {
+            for (const player of this.playerBarn.players) {
+                player.clearHeldInput();
+                player.cancelAction();
+                player.cancelAnim();
+                player.weaponManager.scheduledReload = false;
+                player.weaponManager.bursts.length = 0;
+                player.weaponManager.meleeAttacks.length = 0;
+                player.weaponManager.bufferInput = false;
+                player.weaponManager.cookTicker = 0;
+                player.actionDirty = true;
+            }
+            // Deliver stopped animations/actions before closing the socket and exposing the next round.
+            this.netSync();
+            this.reportDuelResult();
+        }
         this.stopped = true;
         for (const client of this.clientBarn.clients) {
             client.disconnect();
@@ -415,6 +740,8 @@ export class Game {
 
     updateData() {}
     protected _saveGameToDatabase() {}
+    protected _reportDuelResult(_result: DuelRoundResult) {}
+    protected _reportDuelPlayerAbandoned(_result: DuelPlayerAbandoned) {}
     sendQuestProgress(_userId: string, _progress: Array<{ id: string; delta: number }>) {}
 
     /**

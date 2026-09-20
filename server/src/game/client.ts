@@ -52,7 +52,12 @@ export class ClientBarn {
     }
 
     addClientWithPlayer(socket: ClientSocket<Client>, joinData: JoinTokenData, joinMsg: net.JoinMsg) {
-        if (Config.rateLimitsEnabled) {
+        if (!this.game.canJoinDuel(joinData)) {
+            socket.close("invalid_token");
+            return;
+        }
+        // Ranked capacity is already bounded by its authenticated, exact roster.
+        if (Config.rateLimitsEnabled && !this.game.config.duel) {
             const count = this.clients.filter(
                 (c) => {
                     return c.ip === socket.ip()
@@ -68,6 +73,21 @@ export class ClientBarn {
 
         const client = new Client(this.game, socket, joinData.userId, joinData.findGameIp);
         this.clients.push(client);
+
+        const returningPlayer = joinData.duelProfileId ? this.game.duelPlayers.get(joinData.duelProfileId) : undefined;
+        if (returningPlayer) {
+            this.game.resetDuelDisconnectGrace(joinData.duelProfileId!);
+            returningPlayer.client = client;
+            client.player = returningPlayer;
+            returningPlayer.setPartDirty();
+            returningPlayer.group?.checkPlayers();
+            returningPlayer.setGroupStatuses();
+            if (returningPlayer.dead) {
+                client.spectating = client.getNewPlayerToSpectate();
+            }
+            this.game.updateData();
+            return client;
+        }
 
         const player = this.game.playerBarn.addPlayer(client, joinMsg, joinData);
         client.player = player;
@@ -158,7 +178,7 @@ export class ClientBarn {
                 msg.deserialize(stream);
                 break;
             case net.MsgType.Edit:
-                if (!Config.debug.allowEditMsg) break;
+                if (this.game.config.duel || !Config.debug.allowEditMsg) break;
                 msg = new net.EditMsg();
                 msg.deserialize(stream);
                 break;
@@ -222,7 +242,7 @@ export class ClientBarn {
             if (joinData) {
                 if (joinData.type === "join") {
                     client = this.game.clientBarn.addClientWithPlayer(socket, joinData.data, joinMsg);
-                    this.game.joinTokens.delete(joinMsg.joinToken);
+                    if (!this.game.config.duel) this.game.joinTokens.delete(joinMsg.joinToken);
                 } else {
                     client = this.game.clientBarn.addSpectatorClient(socket, joinData.data);
                 }
@@ -252,16 +272,13 @@ export class ClientBarn {
 
         if (!client.player) return;
         const player = client.player;
+        // A replaced socket must never disconnect the player's new connection.
+        if (player.client !== client) return;
         this.game.logger.info(`"${player.name}" left`);
 
         // reset direction and movement
         player.dirNew = v2.create(1, 0);
-        player.moveLeft = false;
-        player.moveRight = false;
-        player.moveUp = false;
-        player.moveDown = false;
-        player.shootHold = false;
-        player.touchMoveActive = false;
+        player.clearHeldInput();
 
         player.setPartDirty();
         player.group?.checkPlayers();
@@ -271,6 +288,7 @@ export class ClientBarn {
         if (player.canDespawn()) {
             player.game.playerBarn.removePlayer(player);
         }
+        if (this.game.config.duel) this.game.updateData();
     }
 
     broadcastMsg(type: net.MsgType, msg: net.Msg) {
@@ -519,11 +537,12 @@ export class Client {
         this.visibleObjects = newVisibleObjects;
 
         updateMsg.activePlayerId = player.__id;
-        if (this.startedSpectating) {
+        if (this._firstUpdate || this.startedSpectating) {
             updateMsg.activePlayerIdDirty = true;
 
-            // build the active player data object manually
-            // To avoid setting the spectating player fields to dirty
+            // New sockets and spectate targets need a full owner snapshot, even if
+            // the player's dirty flags were already flushed for other clients.
+            // Keep this snapshot local so those clients can still receive deltas.
             updateMsg.activePlayerData = {
                 healthDirty: true,
                 health: player.health,
@@ -715,6 +734,14 @@ export class Client {
 
     handleMsg(type: net.MsgType, msg: net.Msg) {
         const player = this.player;
+        if (this.game.stopped) return;
+        if (this.game.gameplayFrozen && type !== net.MsgType.Emote && type !== net.MsgType.Spectate) {
+            if (type === net.MsgType.Input) {
+                this.ack = (msg as net.InputMsg).seq;
+                player?.clearHeldInput();
+            }
+            return;
+        }
         switch (type) {
             case net.MsgType.Input: {
                 const imsg = msg as net.InputMsg;
@@ -770,6 +797,8 @@ export class Client {
         const team = this.player.team || this.player.group;
         if (!team) return false;
 
+        // A disconnected ranked teammate is still playing during their reconnect grace.
+        if (this.game.config.duel) return team.players.some(player => !player.dead);
         return !team.allDeadOrDisconnected;
     }
 

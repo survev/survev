@@ -1,11 +1,17 @@
 import { type ChildProcess, fork } from "node:child_process";
 import { randomBytes } from "node:crypto";
 import { type MapDefKey, MapDefs } from "../../../shared/defs/mapDefs.ts";
-import type { TeamMode } from "../../../shared/gameConfig.ts";
+import { TeamMode } from "../../../shared/gameConfig.ts";
+import type { DuelCombatSnapshot } from "../../../shared/types/rankedCombat.ts";
 import { util } from "../../../shared/utils/util.ts";
 import { Config } from "../config.ts";
 import { ServerLogger } from "../utils/logger.ts";
-import { type FindGamePrivateBody, type ServerGameConfig, type SpectateGamePrivateBody } from "../utils/types.ts";
+import {
+    type DuelRoundConfig,
+    type FindGamePrivateBody,
+    type ServerGameConfig,
+    type SpectateGamePrivateBody,
+} from "../utils/types.ts";
 import type { SpectateTokenData } from "./game.ts";
 import { type GameData, type ProcessMsg, ProcessMsgType } from "./ipcTypes.ts";
 
@@ -24,6 +30,35 @@ export enum ProcState {
     Idle,
     CreatingGame,
     Running,
+}
+
+export function getDuelRoundConfig(body: FindGamePrivateBody): DuelRoundConfig {
+    const duel = body.duel;
+    if (!duel || (duel.round === 1 && body.playerData.length !== duel.teamSize * 2)) {
+        throw new Error("The first duel round requires two complete teams");
+    }
+    const ids = new Set<string>();
+    const tokens = new Set<string>();
+    const roster = body.playerData.map(p => {
+        if (
+            !p.duelProfileId || !p.duelName || p.duelTeam === undefined || ids.has(p.duelProfileId)
+            || tokens.has(p.joinToken)
+        ) {
+            throw new Error("Invalid or duplicate duel roster identity");
+        }
+        ids.add(p.duelProfileId);
+        tokens.add(p.joinToken);
+        return { profileId: p.duelProfileId, team: p.duelTeam, name: p.duelName };
+    });
+    if (
+        [0, 1].some(team => {
+            const count = roster.filter(p => p.team === team).length;
+            return count < 1 || count > duel.teamSize || (duel.round === 1 && count !== duel.teamSize);
+        })
+    ) {
+        throw new Error("Duel teams need at least one reserved player and cannot exceed the original team size");
+    }
+    return { ...duel, roster };
 }
 
 export class GameProcess {
@@ -56,6 +91,7 @@ export class GameProcess {
     avaliableSlots = 0;
 
     reusedCount = 0;
+    private duelRemovalRequests = new Map<string, (combat?: DuelCombatSnapshot) => void>();
 
     constructor(
         manager: GameProcessManager,
@@ -84,6 +120,9 @@ export class GameProcess {
         }
 
         switch (msg.type) {
+            case ProcessMsgType.DuelPlayerRemoved:
+                this.duelRemovalRequests.get(msg.requestId)?.(msg.combat);
+                break;
             case ProcessMsgType.UpdateData:
                 if (this.state === ProcState.CreatingGame && msg.canJoin) {
                     this.state = ProcState.Running;
@@ -117,6 +156,31 @@ export class GameProcess {
         this.process.send(msg);
     }
 
+    removeDuelPlayer(seriesId: string, roundId: string, profileId: string): Promise<DuelCombatSnapshot | undefined> {
+        const cached = this.gameData.duelCombat;
+        if (this.gameData.stopped) return Promise.resolve(cached);
+        const requestId = randomBytes(16).toString("hex");
+        return new Promise((resolve, reject) => {
+            const timer = setTimeout(() => {
+                this.duelRemovalRequests.delete(requestId);
+                reject(new Error("The arena did not confirm player removal"));
+            }, 3000);
+            const complete = (combat?: DuelCombatSnapshot) => {
+                clearTimeout(timer);
+                this.duelRemovalRequests.delete(requestId);
+                resolve(combat);
+            };
+            this.duelRemovalRequests.set(requestId, complete);
+            try {
+                this.send({ type: ProcessMsgType.RemoveDuelPlayer, seriesId, roundId, profileId, requestId });
+            } catch (error) {
+                clearTimeout(timer);
+                this.duelRemovalRequests.delete(requestId);
+                reject(error);
+            }
+        });
+    }
+
     create(id: string, config: ServerGameConfig) {
         this.send({
             type: ProcessMsgType.Create,
@@ -127,10 +191,21 @@ export class GameProcess {
         this.gameData.teamMode = config.teamMode;
         this.gameData.mapName = config.mapName;
         this.gameData.stopped = false;
+        this.gameData.duelCombat = undefined;
+        this.gameData.duel = config.duel
+            ? {
+                seriesId: config.duel.seriesId,
+                roundId: config.duel.roundId,
+                round: config.duel.round,
+                phase: "connecting",
+                connected: 0,
+                expected: config.duel.roster.length,
+            }
+            : undefined;
         this.state = ProcState.CreatingGame;
 
         const mapDef = MapDefs[this.gameData.mapName as MapDefKey];
-        this.avaliableSlots = mapDef.gameMode.maxPlayers;
+        this.avaliableSlots = config.duel?.roster.length ?? mapDef.gameMode.maxPlayers;
 
         this.reusedCount++;
     }
@@ -141,7 +216,7 @@ export class GameProcess {
             autoFill,
             tokens,
         });
-        this.avaliableSlots--;
+        this.avaliableSlots -= this.gameData.duel ? tokens.length : 1;
     }
 
     addSpectateToken(token: string, data: SpectateTokenData) {
@@ -214,7 +289,7 @@ export class GameProcessManager {
 
     getPlayerCount(): number {
         return this.processes.reduce((a, b) => {
-            return a + b.gameData.aliveCount;
+            return a + (b.gameData.stopped ? 0 : b.gameData.aliveCount);
         }, 0);
     }
 
@@ -280,7 +355,64 @@ export class GameProcessManager {
         return this.processById.get(id);
     }
 
+    cancelDuel(seriesId: string, roundId: string) {
+        for (const proc of this.processes) {
+            const duel = proc.gameData.duel;
+            if (duel?.seriesId === seriesId && duel.roundId === roundId) {
+                proc.send({ type: ProcessMsgType.CancelDuel, seriesId, roundId });
+            }
+        }
+    }
+
+    async removeDuelPlayer(seriesId: string, roundId: string, profileId: string) {
+        for (const proc of this.processes) {
+            const duel = proc.gameData.duel;
+            if (duel?.seriesId === seriesId && duel.roundId === roundId) {
+                return proc.removeDuelPlayer(seriesId, roundId, profileId);
+            }
+        }
+    }
+
     async findGame(body: FindGamePrivateBody): Promise<GameProcess | undefined> {
+        if (body.duel) {
+            const duel = getDuelRoundConfig(body);
+            let proc = this.processes.find(p =>
+                !p.gameData.stopped && p.gameData.duel?.roundId === duel.roundId
+                && p.gameData.duel.seriesId === duel.seriesId
+            );
+            if (!proc) {
+                proc = this.newGame({
+                    mapName: "duel",
+                    teamMode: duel.teamSize === 1 ? TeamMode.Solo : duel.teamSize === 2 ? TeamMode.Duo : TeamMode.Squad,
+                    duel,
+                });
+            }
+            if (!proc) return;
+            const gameId = proc.gameData.id;
+            if (proc.state !== ProcState.Running) {
+                const ready = await new Promise<boolean>(resolve => {
+                    const callback = () => {
+                        clearTimeout(timeout);
+                        resolve(true);
+                    };
+                    const timeout = setTimeout(() => {
+                        util.removeFrom(proc!.onCreatedCbs, callback);
+                        resolve(false);
+                    }, 20000);
+                    proc!.onCreatedCbs.push(callback);
+                });
+                if (!ready) return;
+            }
+            // A cancelled arena can be replaced while its creation callback is pending.
+            if (
+                proc.gameData.id !== gameId || proc.gameData.stopped || proc.state !== ProcState.Running
+                || proc.gameData.duel?.seriesId !== duel.seriesId || proc.gameData.duel.roundId !== duel.roundId
+            ) return;
+            if (proc.avaliableSlots > 0) proc.addJoinTokens(body.playerData, false);
+            return proc;
+        }
+        // This reserved map is never a public matchmaking destination.
+        if (body.mapName === "duel") return;
         let proc: GameProcess | undefined = this.processes
             .filter((proc) => {
                 const game = proc.gameData;
@@ -289,6 +421,7 @@ export class GameProcessManager {
                     && proc.avaliableSlots > 0
                     && game.teamMode === body.teamMode
                     && game.mapName === body.mapName
+                    && !game.duel
                 );
             })
             .sort((a, b) => {

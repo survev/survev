@@ -1,6 +1,9 @@
 import $ from "jquery";
 import { EmotesDefs } from "../../../../shared/defs/gameObjects/emoteDefs.ts";
+import { getRankedTier } from "../../../../shared/defs/rankedDefs.ts";
 import { GameConfig, type TeamMode } from "../../../../shared/gameConfig.ts";
+import { RankedPlacementSeries } from "../../../../shared/types/ranked.ts";
+import type { RankedStatsProfile } from "../../../../shared/types/rankedStats.ts";
 import {
     ALL_MAPS,
     ALL_TEAM_MODES,
@@ -14,15 +17,16 @@ import {
     type UserStatsRequest,
     type UserStatsResponse,
 } from "../../../../shared/types/stats.ts";
-import { api } from "../../api.ts";
 import { device } from "../../device.ts";
 import { helpers } from "../../helpers.ts";
 import type { App } from "./app.ts";
+import { statsLink, statsPreview, statsUrl } from "./statsApi.ts";
 import loading from "./templates/loading.ejs";
 import matchData from "./templates/matchData.ejs";
 import matchHistory from "./templates/matchHistory.ejs";
 import player from "./templates/player.ejs";
 import playerCards from "./templates/playerCards.ejs";
+import rankedCards from "./templates/rankedCards.ejs";
 
 const templates = {
     loading,
@@ -168,7 +172,7 @@ class Query<T> {
         this.error = false;
 
         $.ajax({
-            url: api.resolveUrl(url),
+            url: statsUrl(url),
             type: "POST",
             data: JSON.stringify(args),
             contentType: "application/json; charset=utf-8",
@@ -195,6 +199,11 @@ class Query<T> {
 // PlayerView
 //
 export class PlayerView {
+    rankedProfile?: RankedStatsProfile;
+    rankedLoading = false;
+    rankedError = false;
+    rankedHistorySize = 0;
+    rankedRequestId = 0;
     games: {
         expanded: boolean;
         dataError: boolean;
@@ -239,6 +248,7 @@ export class PlayerView {
 
         this.loadUserStats(slug, interval, mapId);
         this.loadMatchHistory(slug, 0, 7);
+        this.loadRanked(slug);
 
         this.render();
     }
@@ -374,6 +384,7 @@ export class PlayerView {
         searchP.set("slug", slug);
         searchP.set("time", time as string);
         searchP.set("mapId", mapId as string);
+        if (statsPreview) searchP.set("preview", "1");
 
         const selectedGame = this.games.find((g) => g.expanded);
         if (selectedGame) {
@@ -411,6 +422,7 @@ export class PlayerView {
             content = templates.playerCards(cardData);
         }
         this.el.find(".content").html(content);
+        this.renderRanked();
 
         const timeSelector = this.el.find("#player-time");
         if (timeSelector) {
@@ -514,5 +526,45 @@ export class PlayerView {
         }
 
         this.app.localization.localizeIndex();
+    }
+
+    renderRanked() {
+        this.el.find("#ranked-stats").html(rankedCards({
+            data: this.rankedProfile,
+            loading: this.rankedLoading,
+            error: this.rankedError,
+            historySize: this.rankedHistorySize,
+            getRankedTier,
+            placementSeries: RankedPlacementSeries,
+            statsLink,
+        }));
+        this.el.find("#ranked-history-size").on("change", event => {
+            this.rankedHistorySize = Number($(event.currentTarget).val());
+            this.loadRanked(this.getUrlParams().slug);
+            this.renderRanked();
+        });
+    }
+
+    loadRanked(slug: string) {
+        const requestId = ++this.rankedRequestId;
+        this.rankedLoading = true;
+        this.rankedError = false;
+        $.ajax({
+            url: `${statsUrl("/api/ranked_stats/profile")}?slug=${
+                encodeURIComponent(slug)
+            }&size=${this.rankedHistorySize}`,
+            success: (data: RankedStatsProfile) => {
+                if (requestId === this.rankedRequestId) this.rankedProfile = data;
+            },
+            error: () => {
+                if (requestId === this.rankedRequestId) this.rankedError = true;
+            },
+            complete: () => {
+                if (requestId === this.rankedRequestId) {
+                    this.rankedLoading = false;
+                    this.renderRanked();
+                }
+            },
+        });
     }
 }

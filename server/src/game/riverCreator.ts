@@ -153,6 +153,9 @@ export class RiverCreator {
             (this.map.shoreInset + this.map.grassInset) / 9,
             3,
         );
+        // On the compact duel island, crossing each coast naturally uses more
+        // of the same 17 control points than on a full-sized BR map.
+        if (this.map.game.config.duel) maxPointsOutside = math.max(maxPointsOutside, 5);
         if (isFactionRiver) maxPointsOutside *= 2;
         for (let i = 0, pointsOutsideGrass = 0; i < riverPoints.length; i++) {
             if (

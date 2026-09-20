@@ -77,5 +77,9 @@ Ensure Redis starts on boot and is running:
 systemctl enable --now redis-server
 ```
 
+## Ranked duels
+Ranked supports first-to-five 1v1, 2v2, 3v3 and 4v4 series with account-linked Elo.
+See [RANKED_DUELS.md](./RANKED_DUELS.md) for match rules, storage requirements and development checks.
+
 ## Production
 See [HOSTING.md](./HOSTING.md)

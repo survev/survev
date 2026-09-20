@@ -162,14 +162,14 @@ export class PlayerBarn {
             pos = spawnBuilding.pos;
             layer = spawnBuilding.layer;
         } else {
-            pos = this.game.map.getSpawnPos(group, team);
+            pos = this.game.map.getSpawnPos(group, team, joinData.duelTeam);
             if (group && !group.spawnPosition) {
                 group.spawnPosition = v2.copy(pos);
             }
             layer = 0;
         }
 
-        const originalName = validateUserName(joinMsg.name).validName;
+        const originalName = validateUserName(joinData.duelName ?? joinMsg.name).validName;
         let finalName = originalName;
 
         if (Config.uniqueInGameNames) {
@@ -198,6 +198,9 @@ export class PlayerBarn {
             joinData.quests,
         );
 
+        if (this.game.config.duel && joinData.duelProfileId) {
+            this.game.duelPlayers.set(joinData.duelProfileId, player);
+        }
         this.activatePlayer(player, group, team);
         player.setLoadout(
             joinData.loadout ? joinData.loadout : joinMsg.loadout,
@@ -516,7 +519,7 @@ export class PlayerBarn {
         // second condition should never happen
         // but keeping it just in case
         // since more than 4 players in a group crashes the client
-        if (!group || group.players.length >= this.game.teamMode) {
+        if (!group || group.players.length >= (this.game.config.duel?.teamSize ?? this.game.teamMode)) {
             group = this.addGroup(groupData.autoFill);
         }
 
@@ -543,7 +546,7 @@ export class PlayerBarn {
         // and doesn't need to be cryptographically secure lol
         const hash = Math.random().toString(16).slice(2);
         const groupId = this.groupIdAllocator.getNextId();
-        const group = new Group(hash, groupId, autoFill, this.game.teamMode);
+        const group = new Group(hash, groupId, autoFill, this.game.config.duel?.teamSize ?? this.game.teamMode);
         this.groups.push(group);
         this.groupsByHash.set(hash, group);
         return group;
@@ -1365,7 +1368,7 @@ export class Player extends BaseGameObject {
         this.name = name;
         this.client = client;
         this.isMobile = isMobile;
-        this.bot = Config.debug.allowBots && isBot;
+        this.bot = !game.config.duel && Config.debug.allowBots && isBot;
 
         this.questManager.quests = (questIds ?? []).map((id) => ({
             id,
@@ -2392,6 +2395,7 @@ export class Player extends BaseGameObject {
     lastDamagedBy: Player | undefined;
 
     damage(params: DamageParams) {
+        if (this.game.gameplayFrozen) return;
         if (this.debug.godMode) return;
         if (this._health < 0) this._health = 0;
         if (this.dead) return;
@@ -3098,6 +3102,7 @@ export class Player extends BaseGameObject {
     }
 
     canDespawn() {
+        if (this.game.config.duel) return false;
         // special check for 50v50
         // we dont want eg leaders to despawn a second after being promoted :p
         if (this.game.map.factionMode && this.role) return false;
@@ -3325,6 +3330,17 @@ export class Player extends BaseGameObject {
     toMouseDir = v2.create(1, 0);
     toMouseLen = 0;
     mousePos = v2.create(1, 0);
+
+    clearHeldInput(): void {
+        this.moveLeft = false;
+        this.moveRight = false;
+        this.moveUp = false;
+        this.moveDown = false;
+        this.shootStart = false;
+        this.shootHold = false;
+        this.touchMoveActive = false;
+        this.touchMoveLen = 0;
+    }
 
     shouldAcceptInput(input: Input): boolean {
         return (
@@ -4379,7 +4395,7 @@ export class Player extends BaseGameObject {
     }
 
     processEditMsg(msg: net.EditMsg) {
-        if (!Config.debug.allowEditMsg) return;
+        if (this.game.config.duel || !Config.debug.allowEditMsg) return;
 
         if (msg.loadNewMap) {
             this.game.map.regenerate(msg.newMapSeed);
