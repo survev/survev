@@ -303,6 +303,36 @@ export class PlayerBarn {
             this.playerStatusTicker += dt;
         }
 
+        for (const player of this.players) {
+            player.visionBoost = 0;
+        
+            if (player.dead && player.visionBoostEffect) {
+                player.visionBoostEffect = false;
+                player.setDirty();
+            }
+        }
+        
+        for (const source of this.players) {
+            if (source.dead) continue;
+        
+            const visionBoostSource = source.hasPerk("leadership")
+                ? PerkProperties.leadership
+                : source.hasPerk("assume_leadership")
+                ? PerkProperties.assume_leadership
+                : undefined;
+        
+            if (!visionBoostSource) continue;
+        
+            const affectedPlayers = this.game.modeManager.getNearbyAlivePlayersContext(
+                source,
+                visionBoostSource.effectRange,
+            );
+        
+            for (const target of affectedPlayers) {
+                target.visionBoost += visionBoostSource.visionBonus;
+            }
+        }
+
         for (let i = 0; i < this.players.length; i++) {
             const player = this.players[i];
             player.update(dt);
@@ -818,7 +848,8 @@ export class Player extends BaseGameObject {
 
     lastStandEffect = false;
     lastStandEffectTicker = 0;
-    
+
+    visionBoost = 0;
     visionBoostEffect = false;
 
     // if hit by snowball, potato, or coconut: slowed down for "x" seconds
@@ -2239,34 +2270,10 @@ export class Player extends BaseGameObject {
             }
         }
 
-        let hasVisionBoost = false;
-
-        const maxEffectRange = Math.max(
-            PerkProperties.leadership.effectRange,
-            PerkProperties.assume_leadership.effectRange,
-        );
-
-        const visionBoostSource = this.game.modeManager
-            .getNearbyAlivePlayersContext(this, maxEffectRange)
-            .find((player) => {
-                const source = player.hasPerk("leadership")
-                    ? PerkProperties.leadership
-                    : player.hasPerk("assume_leadership")
-                    ? PerkProperties.assume_leadership
-                    : undefined;
-
-                return source
-                    && v2.lengthSqr(v2.sub(this.pos, player.pos))
-                        <= source.effectRange * source.effectRange;
-            });
-
-        if (visionBoostSource) {
-            const source = visionBoostSource.hasPerk("leadership")
-                ? PerkProperties.leadership
-                : PerkProperties.assume_leadership;
-
-            finalZoom += source.visionBonus;
-            hasVisionBoost = true;
+        const hasVisionBoost = this.visionBoost > 0;
+        
+        if (hasVisionBoost) {
+            finalZoom += this.visionBoost;
         }
 
         if (this.insideZoomRegion) {
@@ -2286,8 +2293,12 @@ export class Player extends BaseGameObject {
             this.insideZoomRegion = false;
         }
 
-        const newVisionBoostEffect = hasVisionBoost && finalZoom > lowestZoom;
-
+        const newVisionBoostEffect =
+            hasVisionBoost
+            && !this.visionObscured
+            && !this.downed
+            && finalZoom > lowestZoom;
+        
         if (this.visionBoostEffect !== newVisionBoostEffect) {
             this.visionBoostEffect = newVisionBoostEffect;
             this.setDirty();

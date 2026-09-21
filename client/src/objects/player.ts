@@ -1216,7 +1216,6 @@ export class Player implements AbstractObject {
 
         // Vision boost effect
         if (this.m_netData.m_visionBoostEffect && !this.visionBoostEmitter) {
-            // "heal_basic" is a placeholder; replace it with the new emitter later.
             this.visionBoostEmitter = particleBarn.addEmitter("vision_boost", {
                 pos: this.m_pos,
                 layer: this.layer,
