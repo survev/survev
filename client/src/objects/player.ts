@@ -262,6 +262,7 @@ export class Player implements AbstractObject {
     hasteEmitter: Emitter | null = null;
     passiveHealEmitter: Emitter | null = null;
     adrenalineEmitter: Emitter | null = null;
+    visionBoostEmitter: Emitter | null = null;
     downed = false;
     wasDowned = false;
     bleedTicker = 0;
@@ -323,6 +324,7 @@ export class Player implements AbstractObject {
         m_wearingPan: boolean;
         m_healEffect: boolean;
         m_adrenalineEffect: boolean;
+        m_visionBoostEffect: boolean;
         m_frozen: boolean;
         m_frozenOri: number;
         m_frozenType: string;
@@ -477,6 +479,7 @@ export class Player implements AbstractObject {
             m_wearingPan: false,
             m_healEffect: false,
             m_adrenalineEffect: false,
+            m_visionBoostEffect: false,
             m_frozen: false,
             m_frozenOri: 0,
             m_frozenType: "",
@@ -521,6 +524,10 @@ export class Player implements AbstractObject {
             this.adrenalineEmitter.stop();
             this.adrenalineEmitter = null;
         }
+        if (this.visionBoostEmitter) {
+            this.visionBoostEmitter.stop();
+            this.visionBoostEmitter = null;
+        }
     }
 
     m_updateData(
@@ -557,6 +564,7 @@ export class Player implements AbstractObject {
             this.m_netData.m_wearingPan = data.wearingPan;
             this.m_netData.m_healEffect = data.healEffect;
             this.m_netData.m_adrenalineEffect = data.lastStandEffect;
+            this.m_netData.m_visionBoostEffect = data.visionBoostEffect;
             this.m_netData.m_frozen = data.frozen;
             this.m_netData.m_frozenOri = data.frozenOri;
             if (this.m_netData.m_frozenType !== data.frozenType) {
@@ -1204,6 +1212,24 @@ export class Player implements AbstractObject {
             this.passiveHealEmitter.pos = v2.add(this.m_pos, v2.create(0, 0.1));
             this.passiveHealEmitter.layer = this.renderLayer;
             this.passiveHealEmitter.zOrd = this.renderZOrd + 1;
+        }
+
+        // Vision boost effect
+        if (this.m_netData.m_visionBoostEffect && !this.visionBoostEmitter) {
+            // "heal_basic" is a placeholder; replace it with the new emitter later.
+            this.visionBoostEmitter = particleBarn.addEmitter("vision_boost", {
+                pos: this.m_pos,
+                layer: this.layer,
+            });
+        } else if (!this.m_netData.m_visionBoostEffect && this.visionBoostEmitter) {
+            this.visionBoostEmitter.stop();
+            this.visionBoostEmitter = null;
+        }
+
+        if (this.visionBoostEmitter) {
+            this.visionBoostEmitter.pos = v2.add(this.m_pos, v2.create(0, 0.1));
+            this.visionBoostEmitter.layer = this.renderLayer;
+            this.visionBoostEmitter.zOrd = this.renderZOrd + 1;
         }
 
         const adrenalineEmitter = (

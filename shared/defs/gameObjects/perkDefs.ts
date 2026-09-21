@@ -5,10 +5,16 @@ export const PerkProperties = {
     leadership: {
         minBoost: 100,
         scale: 0.25,
+
+        visionBonus: 8, // flat amount
+        effectRange: 60,
     },
     assume_leadership: {
         minBoost: 50,
         scale: 0.15,
+
+        visionBonus: 6, // flat amount
+        effectRange: 45,
     },
     steelskin: {
         scale: 0.4,

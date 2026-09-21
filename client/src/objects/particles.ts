@@ -3416,6 +3416,31 @@ const ParticleDefs: Record<string, ParticleDef> = {
             return util.rgbToInt(util.hsvToRgb(0.13, 1, util.random(0.98, 1)));
         },
     },
+    visionStim: {
+        image: ["part-crosshair-01.img"],
+        life: new Range(0.5, 0.75),
+        drag: 0.25,
+        rotVel: 0,
+        scale: {
+            start: new Range(0.12, 0.15),
+            end: new Range(0.07, 0.09),
+            lerp: new Range(0, 1),
+        },
+        alpha: {
+            start: 1,
+            end: 0,
+            lerp: new Range(0.7, 1),
+        },
+        alphaIn: {
+            start: 0,
+            end: 1,
+            lerp: new Range(0, 0.05),
+        },
+        color: function() {
+            return util.rgbToInt(util.hsvToRgb(0.7, 0.7, util.random(0.7, 1)));
+        },
+        ignoreValueAdjust: true,
+    },
     xp_common: {
         image: ["part-boost-basic.img"],
         life: new Range(0.75, 1),
@@ -3826,6 +3851,15 @@ const EmitterDefs: Record<string, EmitterDef> = {
     inspire: {
         particle: "inspireStim",
         rate: new Range(0.3, 0.35),
+        radius: 1.5,
+        speed: new Range(1, 1.5),
+        angle: 0,
+        rot: 0,
+        maxCount: Number.MAX_VALUE,
+    },
+    vision_boost: {
+        particle: "visionStim",
+        rate: new Range(0.4, 0.6),
         radius: 1.5,
         speed: new Range(1, 1.5),
         angle: 0,
