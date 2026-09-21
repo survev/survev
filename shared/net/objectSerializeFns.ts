@@ -88,6 +88,7 @@ export interface ObjectsFullData {
         wearingPan: boolean;
         healEffect: boolean;
         lastStandEffect: boolean;
+        visionBoostEffect: boolean;
 
         frozen: boolean;
         frozenOri: number;
@@ -218,6 +219,7 @@ export const ObjectSerializeFns: {
             s.writeBoolean(data.wearingPan);
             s.writeBoolean(data.healEffect);
             s.writeBoolean(data.lastStandEffect);
+            s.writeBoolean(data.visionBoostEffect);
 
             s.writeBoolean(data.frozen);
             if (data.frozen) {
@@ -287,6 +289,7 @@ export const ObjectSerializeFns: {
             data.wearingPan = s.readBoolean();
             data.healEffect = s.readBoolean();
             data.lastStandEffect = s.readBoolean();
+            data.visionBoostEffect = s.readBoolean();
 
             data.frozen = s.readBoolean();
             data.frozenOri = 0;

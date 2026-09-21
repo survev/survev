@@ -835,6 +835,8 @@ export class Player extends BaseGameObject {
     lastStandEffect = false;
     lastStandEffectTicker = 0;
 
+    visionBoostEffect = false;
+
     // if hit by snowball, potato, or coconut: slowed down for "x" seconds
     frozenTicker = 0;
     frozen = false;
@@ -2253,6 +2255,36 @@ export class Player extends BaseGameObject {
             }
         }
 
+        let hasVisionBoost = false;
+
+        const maxEffectRange = Math.max(
+            PerkProperties.leadership.effectRange,
+            PerkProperties.assume_leadership.effectRange,
+        );
+
+        const visionBoostSource = this.game.modeManager
+            .getNearbyAlivePlayersContext(this, maxEffectRange)
+            .find((player) => {
+                const source = player.hasPerk("leadership")
+                    ? PerkProperties.leadership
+                    : player.hasPerk("assume_leadership")
+                    ? PerkProperties.assume_leadership
+                    : undefined;
+
+                return source
+                    && v2.lengthSqr(v2.sub(this.pos, player.pos))
+                        <= source.effectRange * source.effectRange;
+            });
+
+        if (visionBoostSource) {
+            const source = visionBoostSource.hasPerk("leadership")
+                ? PerkProperties.leadership
+                : PerkProperties.assume_leadership;
+
+            finalZoom += source.visionBonus;
+            hasVisionBoost = true;
+        }
+
         if (this.insideZoomRegion) {
             finalZoom = zoomRegionZoom;
         }
@@ -2268,6 +2300,13 @@ export class Player extends BaseGameObject {
 
         if (insideNoZoomRegion) {
             this.insideZoomRegion = false;
+        }
+
+        const newVisionBoostEffect = hasVisionBoost && finalZoom > lowestZoom;
+
+        if (this.visionBoostEffect !== newVisionBoostEffect) {
+            this.visionBoostEffect = newVisionBoostEffect;
+            this.setDirty();
         }
 
         //
