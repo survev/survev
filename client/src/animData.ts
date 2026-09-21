@@ -106,6 +106,10 @@ export const IdlePoses: Record<string, Partial<Record<Bones, Pose>>> = {
         [Bones.HandL]: new Pose(v2.create(19, -7.25)),
         [Bones.HandR]: new Pose(v2.create(8.5, 24.25)),
     },
+    mace: {
+        [Bones.HandL]: new Pose(v2.create(21, -9.25)),
+        [Bones.HandR]: new Pose(v2.create(12, 22.25)),
+    },
     machete: {
         [Bones.HandL]: new Pose(v2.create(14, -12.25)),
         [Bones.HandR]: new Pose(v2.create(1, 17.75)),
@@ -449,6 +453,55 @@ export const Animations: Record<
             effect(def("saw").attack.damageTimes[1], "animMeleeCollision", {
                 playerHit: "playerHit2",
             }),
+        ],
+    },
+    maceSwing: {
+        keyframes: [
+            frame(0, {
+                [Bones.HandL]: new Pose(v2.create(21, -9.25)),
+                [Bones.HandR]: new Pose(v2.create(12, 22.25)),
+                [Bones.MeleeR]: new Pose(v2.create(0, 0)).rotate(0).offset(v2.create(0, 0)),
+            }),
+            frame(0.2, {
+                [Bones.HandL]: new Pose(v2.create(21, -9.25)).rotate(Math.PI * 0.45),
+                [Bones.HandR]: new Pose(v2.create(12, 22.25)).rotate(Math.PI * 0.45),
+                [Bones.MeleeR]: new Pose(v2.create(0, 0)).rotate(0).offset(v2.create(30, 0)),
+            }, math.easeOutSine),
+            frame(0.3, {
+                [Bones.HandL]: new Pose(v2.create(21, -9.25)),
+                [Bones.HandR]: new Pose(v2.create(12, 22.25)),
+                [Bones.MeleeR]: new Pose(v2.create(0, 0)).rotate(Math.PI * -0.15).offset(v2.create(50, 0)),
+            }, math.easeInSine),
+            frame(0.35, {
+                [Bones.HandL]: new Pose(v2.create(21, -9.25)).rotate(Math.PI * -0.15),
+                [Bones.HandR]: new Pose(v2.create(17, 22.25)).rotate(Math.PI * -0.2),
+                [Bones.MeleeR]: new Pose(v2.create(0, 0)).rotate(Math.PI * -0.3).offset(v2.create(130, 0)),
+            }),
+            frame(0.8, {
+                [Bones.HandL]: new Pose(v2.create(21, -9.25)).rotate(Math.PI * -0.5),
+                [Bones.HandR]: new Pose(v2.create(12, 22.25)).rotate(Math.PI * -0.9),
+                [Bones.MeleeR]: new Pose(v2.create(0, 0)).rotate(Math.PI * -0.675).offset(v2.create(70, 0)),
+            }, math.easeOutSine),
+            frame(0.95, {
+                [Bones.HandL]: new Pose(v2.create(21, -9.25)).rotate(Math.PI * 0.05),
+                [Bones.HandR]: new Pose(v2.create(12, 22.25)).rotate(Math.PI * -0.45),
+                [Bones.MeleeR]: new Pose(v2.create(0, 0)).rotate(Math.PI * -0.475).offset(v2.create(70, 0)),
+            }, math.easeInSine),
+            frame(1.1, {
+                [Bones.HandL]: new Pose(v2.create(21, -9.25)),
+                [Bones.HandR]: new Pose(v2.create(12, 22.25)),
+                [Bones.MeleeR]: new Pose(v2.create(0, 0)).rotate(0).offset(v2.create(0, 0)),
+            }, math.easeOutSine),
+        ],
+        effects: [
+            effect(def("mace").attack.damageTimes[0], "animPlaySound", {
+                sound: "swing",
+            }),
+            effect(def("mace").attack.damageTimes[1], "animPlaySound", {
+                sound: "swing",
+            }),
+            effect(def("mace").attack.damageTimes[0], "animMeleeCollision", {}),
+            effect(def("mace").attack.damageTimes[1], "animMeleeCollision", {}),
         ],
     },
     cutReverseShort: {

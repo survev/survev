@@ -849,6 +849,64 @@ const BaseDefs: Record<string, MeleeDef> = {
             playerHit: "knife_hit_01",
         },
     },
+    mace: {
+        name: "Nightfall",
+        type: "melee",
+        quality: 1,
+        noPotatoSwap: true,
+        armorPiercing: true,
+        stonePiercing: true,
+        cleave: true,
+        autoAttack: false,
+        switchDelay: 0.25,
+        damage: 74,
+        obstacleDamage: 2,
+        attack: {
+            offset: {
+                x: 3.75,
+                y: 0,
+            },
+            rad: 3.25,
+            damageTimes: [0.375, 0.95],
+            cooldownTime: 1.15,
+        },
+        speed: {
+            equip: -0.5,
+        },
+        anim: {
+            idlePose: "mace",
+            attackAnims: ["maceSwing"],
+        },
+        sound: {
+            pickup: "heavy_pickup_01",
+            swing: "mace_swing_01",
+            deploy: "stow_weapon_01",
+            playerHit: "axe_hit_01",
+        },
+        lootImg: {
+            sprite: "loot-melee-mace-blue.img",
+            tint: 0xffffff,
+            border: "loot-circle-outer-02.img",
+            borderTint: 0xffffff,
+            scale: 0.3,
+            mirror: true,
+            rot: 2.35619,
+        },
+        worldImg: {
+            sprite: "loot-melee-mace-blue.img",
+            pos: {
+                x: 0,
+                y: -3,
+            },
+            rot: 1.85,
+            scale: {
+                x: 0.35,
+                y: 0.35,
+            },
+            tint: 0xffffff,
+            leftHandOntop: true,
+        },
+    },
     hook: {
         name: "Hook",
         type: "melee",
@@ -1418,6 +1476,10 @@ const SkinDefs: Record<string, MeleeDef> = {
         name: "Naginata Daemon",
         lootImg: { sprite: "loot-melee-naginata-daemon.img" },
         worldImg: { sprite: "loot-melee-naginata-daemon.img" },
+    }),
+    mace_red: defineMeleeSkin("mace", {
+        lootImg: { sprite: "loot-melee-mace-red.img" },
+        worldImg: { sprite: "loot-melee-mace-red.img" },
     }),
     cutlass_gold: defineMeleeSkin("cutlass", {
         name: "Gold Cutlass",
