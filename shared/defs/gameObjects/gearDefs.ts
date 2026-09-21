@@ -810,6 +810,38 @@ const SkinDefs = {
             rot: 0.5 * Math.PI,
         },
     }),
+    helmet04_renegade_red: defineSkin("helmet04", {
+        name: "Renegade Helmet",
+        noDrop: true,
+        skinImg: {
+            baseTint: 0xffffff,
+            baseTintRed: 0xffffff,
+            baseTintBlue: 0xffffff,
+            baseSprite: "player-helmet-renegade-01.img",
+            spriteScale: 0.3,
+        },
+        lootImg: {
+            sprite: "player-helmet-renegade-01.img",
+            scale: 0.3,
+            rot: 0.5 * Math.PI,
+        },
+    }),
+    helmet04_renegade_blue: defineSkin("helmet04", {
+        name: "Lone Survivr Helmet",
+        noDrop: true,
+        skinImg: {
+            baseTint: 0xffffff,
+            baseTintRed: 0xffffff,
+            baseTintBlue: 0xffffff,
+            baseSprite: "player-helmet-renegade-02.img",
+            spriteScale: 0.3,
+        },
+        lootImg: {
+            sprite: "player-helmet-renegade-02.img",
+            scale: 0.3,
+            rot: 0.5 * Math.PI,
+        },
+    }),
     helmet04_last_man_red: defineSkin("helmet04", {
         name: "Lone Survivr Helmet",
         noDrop: true,

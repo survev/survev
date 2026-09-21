@@ -418,6 +418,57 @@ export const RoleDefs: Record<string, RoleDef> = {
             },
         }),
     },
+    renegade: {
+        type: "role",
+        announce: true,
+        killFeed: { assign: true, dead: true },
+        sound: { // TODO
+            assign: "last_man_assigned_01",
+            dead: "leader_dead_01",
+        },
+        mapIcon: {
+            alive: "player-renegade.img",
+        },
+        perks: [ // TODO: perks
+            "lifeline",
+            "windwalk",
+        ],
+        defaultItems: createDefaultItems({ // TODO: items
+            weapons: [
+                { type: "", ammo: 0 },
+                { type: "", ammo: 0 },
+                (teamcolor: FactionTeam) =>
+                    getTeamWeapon(
+                        {
+                            [FactionTeam.Red]: { type: "mace_red", ammo: 0 },
+                            [FactionTeam.Blue]: { type: "mace", ammo: 0 },
+                        },
+                        teamcolor,
+                    ),
+                { type: "mirv", ammo: 8 },
+            ],
+            backpack: "backpack03",
+            helmet: (teamcolor: FactionTeam) =>
+                getTeamHelmet(
+                    {
+                        [FactionTeam.Red]: "helmet04_renegade_red",
+                        [FactionTeam.Blue]: "helmet04_renegade_blue",
+                    },
+                    teamcolor,
+                ),
+            chest: "chest04",
+            inventory: {
+                frag: 12,
+                mirv: 8,
+                "4xscope": 1,
+                "8xscope": 1,
+                bandage: 15,
+                healthkit: 1,
+                soda: 3,
+                painkiller: 1,
+            },
+        }),
+    },
     woods_king: {
         type: "role",
         announce: false,

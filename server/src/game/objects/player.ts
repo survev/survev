@@ -944,6 +944,11 @@ export class Player extends BaseGameObject {
                 this.boost = 100;
                 this.giveHaste(GameConfig.HasteType.Windwalk, 5);
                 break;
+            case "renegade":
+                this.health = 100;
+                this.boost = 100;
+                this.giveHaste(GameConfig.HasteType.Takedown, 5);
+                break;
         }
 
         // A list of the new perks to add must be built first
@@ -4085,7 +4090,7 @@ export class Player extends BaseGameObject {
     /** just used in potato mode, swaps oldWeapon with a random weapon of the same type (mosin -> m9) */
     randomWeaponSwap(params: DamageParams): void {
         if (this.dead) return;
-        if (this.role === "last_man") return;
+        if (this.role === "last_man" || this.role === "renegade") return; // TODO: replace with PvT lone
         const oldWeapon = params.weaponSourceType || params.gameSourceType;
         if (!oldWeapon) return;
 
@@ -4689,6 +4694,10 @@ export class Player extends BaseGameObject {
 
         if (this.lastBreathActive) {
             scale += PerkProperties.final_bugle.scaleOnDeath;
+        }
+
+        if (this.role === "renegade") {
+            scale += 0.325
         }
 
         scale += this.fatModifier;
