@@ -127,8 +127,8 @@ export const RoleDefs: Record<string, RoleDef> = {
                 (teamcolor: FactionTeam) =>
                     getTeamWeapon(
                         {
-                            [FactionTeam.Red]: { type: "m1014", ammo: 8, fillInv: true },
-                            [FactionTeam.Blue]: { type: "an94", ammo: 45, fillInv: true },
+                            [FactionTeam.Red]: { type: "m1014_commander", ammo: 8, fillInv: true },
+                            [FactionTeam.Blue]: { type: "an94_commander", ammo: 45, fillInv: true },
                         },
                         teamcolor,
                     ),

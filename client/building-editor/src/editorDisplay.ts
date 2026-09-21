@@ -219,6 +219,7 @@ export class EditorDisplay {
             wearingPan: false,
             healEffect: false,
             lastStandEffect: false,
+            visionBoostEffect: false,
             frozen: false,
             frozenOri: 0,
             frozenType: "",

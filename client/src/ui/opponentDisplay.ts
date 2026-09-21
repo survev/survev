@@ -293,6 +293,7 @@ export class LoadoutDisplay {
             wearingPan: false,
             healEffect: false,
             lastStandEffect: false,
+            visionBoostEffect: false,
             frozen: false,
             frozenOri: 0,
             frozenType: "",
