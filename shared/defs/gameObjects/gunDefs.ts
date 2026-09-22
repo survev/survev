@@ -3640,6 +3640,7 @@ export const BaseDefs: Record<string, GunDef> = {
 };
 
 const SkinDefs: Record<string, GunDef> = {
+    // Winter Reskins
     svd_winter: defineGunSkin("svd", {
         name: "SVD-63",
         noPotatoSwap: true,
@@ -3659,6 +3660,20 @@ const SkinDefs: Record<string, GunDef> = {
         noPotatoSwap: true,
         worldImg: {
             sprite: "gun-awc-02.img",
+        },
+    }),
+    m1014_winter: defineGunSkin("m1014", {
+        name: "Commander's Super 90",
+        noPotatoSwap: true,
+        worldImg: {
+            sprite: "gun-m1014-02.img",
+        },
+    }),
+    an94_winter: defineGunSkin("an94", {
+        name: "Commander's AN-94",
+        noPotatoSwap: true,
+        worldImg: {
+            sprite: "gun-an94-02.img",
         },
     }),
     // Commander-Specific Guns (to make them immune to potato swap)

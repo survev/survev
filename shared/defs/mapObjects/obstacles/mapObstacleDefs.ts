@@ -1611,6 +1611,40 @@ export const MapObstacleDefs: Record<string, ObstacleDef> = {
             randomRotation: true,
         },
     }),
+    // Winter Factions tree
+    tree_15: createTree({
+        scale: { createMin: 1.2, createMax: 1.6 },
+        health: 250,
+        terrain: {
+            grass: true,
+            beach: false,
+            minDistanceFromSameType: 8,
+        },
+        map: { color: 0x2e3726, scale: 3 },
+        img: {
+            sprite: "map-tree-15.img",
+            residue: "map-tree-res-01.img",
+            scale: 0.35,
+            zIdx: 801,
+        },
+    }),
+    // XL Winter Factions Tree
+    tree_16: createTree({
+        scale: { createMin: 1.9, createMax: 2 },
+        health: 350,
+        map: { color: 0x2e3726, scale: 3.5 },
+        terrain: {
+            grass: true,
+            beach: false,
+            minDistanceFromSameType: 24,
+        },
+        img: {
+            sprite: "map-tree-16.img",
+            residue: "map-tree-res-01.img",
+            scale: 0.35,
+            zIdx: 801,
+        },
+    }),
     woodpile_01: createWoodPile({}),
     woodpile_02: createWoodPile({
         collision: collider.createAabbExtents(v2.create(0, 0), v2.create(6, 3)),
