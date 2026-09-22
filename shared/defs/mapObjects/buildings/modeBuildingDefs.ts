@@ -31,12 +31,22 @@ import type { BuildingChildObjType, BuildingDef } from "./buildingDefs.ts";
 
 function createCamp(
     overrides: DeepPartial<BuildingDef>,
-    params: { groundTintDk?: number; tree?: BuildingChildObjType },
+    params: {
+        groundTintDk?: number;
+        tree?: BuildingChildObjType;
+        crate?: BuildingChildObjType;
+        box?: BuildingChildObjType;
+        light?: BuildingChildObjType;
+    },
 ): BuildingDef {
     const baseDef: BuildingDef = {
         type: "building",
         map: { display: true, shapes: [] },
-        terrain: { grass: true, beach: false },
+        terrain: {
+            grass: true,
+            beach: false,
+            minDistanceFromSameType: 700,
+        },
         mapObstacleBounds: [collider.createCircle(v2.create(0, 0), 22.5)],
         mapGroundPatches: [
             {
@@ -111,7 +121,13 @@ function createCamp(
                 ori: 0,
             },
             {
-                type: "crate_01",
+                type: params.light || "",
+                pos: v2.create(0, 0),
+                scale: 1.5,
+                ori: 0,
+            },
+            {
+                type: params.crate || "crate_01",
                 pos: v2.create(8, 12),
                 scale: 1,
                 ori: 0,
@@ -125,7 +141,7 @@ function createCamp(
                 inheritOri: false,
             },
             {
-                type: "crate_03x",
+                type: params.box || "crate_03x",
                 pos: v2.create(8.5, 7.5),
                 scale: 1,
                 ori: 0,
@@ -7198,6 +7214,77 @@ export const ModeBuildingDefs: Record<string, BuildingDef> = {
         botRightObs: "crate_01",
         ignoreMapSpawnReplacement: false,
     }),
+
+    // Winter Factions
+    warehouse_01fx: createWarehouse({
+        ceiling: {
+            imgs: [
+                {
+                    sprite: "map-building-warehouse-ceiling-01.img",
+                    scale: 1,
+                    alpha: 1,
+                    tint: 0xffffff,
+                },
+                {
+                    sprite: "map-snow-04.img",
+                    pos: v2.create(7.5, 5),
+                    scale: 0.9,
+                    alpha: 1,
+                    tint: 0xffffff,
+                    rot: 1,
+                },
+                {
+                    sprite: "map-snow-05.img",
+                    pos: v2.create(-8.5, 4),
+                    scale: 0.9,
+                    alpha: 1,
+                    tint: 0xffffff,
+                    rot: 2,
+                },
+                {
+                    sprite: "map-snow-06.img",
+                    pos: v2.create(22.25, 11.25),
+                    scale: 0.75,
+                    alpha: 1,
+                    tint: 0xffffff,
+                    rot: 0,
+                },
+                {
+                    sprite: "map-snow-06.img",
+                    pos: v2.create(-22.25, -11.25),
+                    scale: 0.75,
+                    alpha: 1,
+                    tint: 0xffffff,
+                    rot: 2,
+                },
+            ],
+        },
+    }, {
+        topLeftObs: "crate_01",
+        topRightObs: "crate_01",
+        botRightObs: "crate_01",
+        ignoreMapSpawnReplacement: false,
+    }),
+
+    camp_01f_red: createCamp({
+        teamId: 1,
+    }, {
+        tree: "tree_15",
+        box: "crate_03",
+        crate: "crate_02f",
+        light: "decal_light_01",
+        groundTintDk: 0x3f3f3f,
+    }),
+    camp_01f_blue: createCamp({
+        teamId: 2,
+    }, {
+        tree: "tree_15",
+        box: "crate_03",
+        crate: "crate_22",
+        light: "decal_light_01",
+        groundTintDk: 0x3f3f3f,
+    }),
+
     // Halloween
 
     barn_01h: createBarn({}, {
@@ -8959,6 +9046,7 @@ export const ModeBuildingDefs: Record<string, BuildingDef> = {
         bonus_door: "",
     }),
     bank_01x: createBank({
+        teamId: 2,
         ceiling: {
             imgs: [
                 {
@@ -9018,6 +9106,7 @@ export const ModeBuildingDefs: Record<string, BuildingDef> = {
         },
     }, {}),
     police_01x: createPoliceStation({
+        teamId: 2,
         ceiling: {
             imgs: [
                 {

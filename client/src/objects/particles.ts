@@ -2800,6 +2800,30 @@ const ParticleDefs: Record<string, ParticleDef> = {
             return util.rgbToInt(util.hsvToRgb(0, 0, util.random(0.9, 0.95)));
         },
     },
+    snow_dark: {
+        image: ["part-snow-01.img"],
+        life: new Range(10, 15),
+        drag: new Range(0, 0),
+        rotVel: new Range(Math.PI * 0.25, Math.PI * 0.5),
+        scale: {
+            start: new Range(0.07, 0.12),
+            end: new Range(0.05, 0.1),
+            lerp: new Range(0, 1),
+        },
+        alpha: {
+            start: 1,
+            end: 0,
+            lerp: new Range(0.9, 1),
+        },
+        alphaIn: {
+            start: 0,
+            end: 1,
+            lerp: new Range(0, 0.05),
+        },
+        color: function() {
+            return util.rgbToInt(util.hsvToRgb(0, 0, util.random(0.4, 0.45)));
+        },
+    },
     snowball_impact: {
         image: ["part-snow-01.img"],
         life: new Range(0.5, 1),
@@ -3667,6 +3691,18 @@ const EmitterDefs: Record<string, EmitterDef> = {
         radius: 70,
         speed: new Range(1, 1.5),
         angle: Math.PI * 0.2,
+        rot: new Range(0, Math.PI * 2),
+        maxCount: Number.MAX_VALUE,
+        zOrd: 999,
+    },
+    falling_snowstorm: {
+        particle: "snow_dark",
+        rate: new Range(0.001, 0.0015),
+        maxRate: new Range(0.005, 0.075),
+        maxElapsed: 240,
+        radius: 70,
+        speed: new Range(50, 76),
+        angle: Math.PI * 0.1,
         rot: new Range(0, Math.PI * 2),
         maxCount: Number.MAX_VALUE,
         zOrd: 999,

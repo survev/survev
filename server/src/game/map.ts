@@ -1558,14 +1558,22 @@ export class GameMap {
                 // obstacles, buildings, and structures that need to spawn on either team's side
                 // doesn't matter which team, just as long as theyre grouped with the team specific buildings
                 const edgeObjects = [
+                    // Regular
                     "warehouse_01f",
                     "house_red_01",
                     "house_red_02",
+                    "house_red_01x",
+                    "house_red_02x",
                     "barn_01",
+                    "barn_01x",
+
+                    // Winter
+                    "warehouse_01fx",
                 ];
 
                 // obstacles, buildings, and structures that are specific to a team but can spawn anywhere on their side.
                 const teamObjects = [
+                    // PvT
                     "potato_01f",
                     "potato_02f",
                     "potato_03f",
@@ -1576,19 +1584,32 @@ export class GameMap {
 
                 // obstacles, buildings, and structures that need to spawn away from the sides and closer to the center river
                 const centerObjects = [
+                    // Regular
                     "greenhouse_01",
                     "bunker_structure_03", // storm bunker
+
+                    // Winter
+                    "greenhouse_02",
+                    "camp_01f_red",
+                    "camp_01f_blue",
                 ];
 
                 const divisions = 10;
                 let divisionIdx: number;
                 if ("teamId" in def && def.teamId) {
                     const teamId = def.teamId;
+
                     if (teamObjects.includes(type)) {
                         // picks any of the divisions on the team's side (0-4 for red, 5-9 for blue)
                         divisionIdx = util.randomInt(
                             (teamId - 1) * (divisions / 2),
                             teamId * (divisions / 2) - 1,
+                        );
+                    } else if (centerObjects.includes(type)) {
+                        // picks any "non-furthest" division on the team's side (2-4 for red, 5-7 for blue)
+                        divisionIdx = util.randomInt(
+                            teamId === 1 ? 2 : 5,
+                            teamId === 1 ? 4 : 7,
                         );
                     } else {
                         // picks either of the furthest divisions from the center

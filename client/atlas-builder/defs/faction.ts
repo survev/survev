@@ -31,5 +31,9 @@ export const FactionAtlas: AtlasDef = {
 
         "map/map-stone-03f.svg",
         "map/map-stone-res-02f.svg",
+        
+        "map/map-tree-15.svg",
+        "map/map-tree-16.svg",
+        "map/map-light-01.svg",
     ],
 };
