@@ -7268,6 +7268,19 @@ export const ModeBuildingDefs: Record<string, BuildingDef> = {
 
     camp_01f_red: createCamp({
         teamId: 1,
+        soundEmitters: [
+            {
+                sound: "ambient_campfire_01",
+                channel: "ambient",
+                pos: v2.create(0, 0),
+                range: {
+                    min: 0,
+                    max: 35,
+                },
+                falloff: 1,
+                volume: 1,
+            },
+        ],
     }, {
         tree: "tree_15",
         box: "crate_03",
@@ -7277,6 +7290,19 @@ export const ModeBuildingDefs: Record<string, BuildingDef> = {
     }),
     camp_01f_blue: createCamp({
         teamId: 2,
+        soundEmitters: [
+            {
+                sound: "ambient_campfire_01",
+                channel: "ambient",
+                pos: v2.create(0, 0),
+                range: {
+                    min: 0,
+                    max: 35,
+                },
+                falloff: 1,
+                volume: 1,
+            },
+        ],
     }, {
         tree: "tree_15",
         box: "crate_03",
