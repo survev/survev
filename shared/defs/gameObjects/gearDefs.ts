@@ -699,6 +699,10 @@ const SkinDefs = {
             baseSprite: "player-helmet-lieutenant.img",
             spriteScale: 0.3,
         },
+        lootImg: {
+            sprite: "player-helmet-lieutenant.img",
+            rot: 0.5 * Math.PI,
+        },
     }),
     helmet03_lt_aged: defineSkin("helmet03", {
         name: "Lieutenant Helmet",
