@@ -1,7 +1,7 @@
 import { math } from "../../shared/utils/math.ts";
 import type { AudioManager } from "./audioManager.ts";
 import type { SoundHandle } from "./lib/createJS.ts";
-import type { MapDef } from "../../shared/defs/mapDefs.ts";
+import { MapDefs, type MapDefKey } from "../../shared/defs/mapDefs.ts";
 
 export class Ambiance {
     introMusic = true;
@@ -53,9 +53,10 @@ export class Ambiance {
         this.initTime = Date.now();
     }
 
-    setMapDef(mapDef: MapDef) {
-        const ambience = mapDef.biome.ambience;
+    setMap(mapName: MapDefKey) {
+        const ambience = MapDefs[mapName].biome.ambience;
 
+        this.getTrack("music").sound = ambience.music;
         this.getTrack("wind").sound = ambience.wind;
         this.getTrack("river").sound = ambience.river;
         this.getTrack("waves").sound = ambience.waves;
@@ -75,6 +76,11 @@ export class Ambiance {
     }
 
     onGameComplete(_audioManager: AudioManager) {
+        this.setMap("main");
+
+        this.introMusic = true;
+        this.soundUpdateThrottle = 0;
+
         for (let i = 0; i < this.tracks.length; i++) {
             const track = this.tracks[i];
             if (track.immediateMode) {

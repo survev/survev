@@ -1641,10 +1641,6 @@ const Sounds: Record<string, Record<string, SoundDef>> = {
             volume: 1,
             preload: false,
         },
-        ambient_wind_03: {
-            path: "audio/ambient/ambient_wind_03.mp3",
-            volume: 0.33,
-        },
         ambient_steam_01: {
             path: "audio/ambient/ambient_steam_01.mp3",
             volume: 1,

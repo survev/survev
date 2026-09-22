@@ -109,6 +109,7 @@ export interface MapDef {
             camera: string;
         };
         ambience: {
+            music: string;
             wind: string;
             river: string;
             waves: string;

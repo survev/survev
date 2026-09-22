@@ -46,6 +46,7 @@ export const Main: MapDef = {
         valueAdjust: 1,
         sound: { riverShore: "sand" },
         ambience: {
+            music: "menu_music",
             wind: "ambient_wind_01",
             river: "ambient_stream_01",
             waves: "ambient_waves_01",
