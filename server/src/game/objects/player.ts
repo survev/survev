@@ -2518,6 +2518,10 @@ export class Player extends BaseGameObject {
                 reduceDamage(PerkProperties.steelskin.damageReduction);
             }
 
+            if (this.lastBreathActive) {
+                reduceDamage(PerkProperties.final_bugle.damageReduction)
+            }
+
             const chest = GameObjectDefs.typeToDefSafe(this.chest) as ChestDef | undefined;
             if (chest && !isHeadShot) {
                 reduceDamage(chest.damageReduction);
