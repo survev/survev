@@ -90,6 +90,10 @@ const mapDef: PartialMapDef = {
             playerGhillie: 0x4b4b4b,
         },
         valueAdjust: 0.4,
+        ambience: {
+            wind: "ambient_wind_03",
+            river: "ambient_wind_03",
+        },
         particles: { camera: "falling_snowstorm" },
     },
     gameMode: {
