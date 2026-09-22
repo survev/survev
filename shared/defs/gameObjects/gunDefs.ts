@@ -3661,6 +3661,15 @@ const SkinDefs: Record<string, GunDef> = {
             sprite: "gun-awc-02.img",
         },
     }),
+    // Commander-Specific Guns (to make them immune to potato swap)
+    m1014_commander: defineGunSkin("m1014", {
+        name: "Commander's Super 90",
+        noPotatoSwap: true,
+    }),
+    an94_commander: defineGunSkin("an94", {
+        name: "Commander's AN-94",
+        noPotatoSwap: true,
+    }),
 };
 
 export const GunDefs: Record<string, GunDef> = { ...BaseDefs, ...SkinDefs };
