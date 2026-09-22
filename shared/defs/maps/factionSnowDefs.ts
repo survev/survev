@@ -74,6 +74,7 @@ const mapDef: PartialMapDef = {
             { name: "log_05", channel: "sfx" },
             { name: "vault_change_03", channel: "sfx" },
             { name: "watering_01", channel: "sfx" },
+            { name: "ambient_campfire_01", channel: "ambient" },
         ],
         atlases: ["loadout", "shared", "faction", "snow"],
     },
@@ -306,6 +307,13 @@ const mapDef: PartialMapDef = {
                 weight: 1,
             },
         ],
+        tier_faction_outfits: [
+            { name: "outfitVerde", count: 1, weight: 1 },
+            { name: "outfitWoodland", count: 1, weight: 1 },
+            { name: "outfitKeyLime", count: 1, weight: 1 },
+            { name: "outfitCamo", count: 1, weight: 1 },
+            { name: "outfitBlackIce", count: 1, weight: 1 },
+        ],
     },
     mapGen: {
         densitySpawns: [
@@ -357,8 +365,8 @@ const mapDef: PartialMapDef = {
                 chest_03f: 1,
                 mil_crate_02: { odds: 1 },
                 tree_02: 3,
-                camp_01f_red: 4,
-                camp_01f_blue: 4,
+                camp_01f_red: 6,
+                camp_01f_blue: 6,
             },
         ],
         importantSpawns: [
@@ -370,6 +378,7 @@ const mapDef: PartialMapDef = {
         ],
         spawnReplacements: [
             {
+                tree_01: "tree_15",
                 bridge_lg_01: "bridge_lg_01x",
                 bush_07: "bush_07x",
                 cabin_01: "cabin_01x",
