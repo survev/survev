@@ -125,11 +125,13 @@ const defaultConfig = {
     loadout: loadout.defaultLoadout(),
     perkModeRole: "",
 
+    emoteWheelSlots: 4,
+    emoteWheelRotated: false,
+
     prerollGamesPlayed: 0,
     lastNewsTimestamp: 0,
     totalGamesPlayed: 0,
     promptAppRate: true,
-
     version: 1,
 
     /* STRIP_FROM_PROD_CLIENT:START */

@@ -4359,7 +4359,7 @@ export class Player extends BaseGameObject {
                 return;
             }
 
-            if (!emoteDef.teamOnly && (emoteIdx < 0 || emoteIdx > 3)) {
+            if (!emoteDef.teamOnly && (emoteIdx < 0 || emoteIdx >= GameConfig.EmoteSlot.Count)) {
                 return;
             }
 

@@ -4,10 +4,11 @@ import $ from "jquery";
 import type { GameObjectDef } from "../../../shared/defs/gameObjectDefs.ts";
 import { EmoteCategory, type EmoteDef } from "../../../shared/defs/gameObjects/emoteDefs.ts";
 import { GameObjectDefs } from "../../../shared/defs/register.ts";
-import { EmoteSlot, Rarity } from "../../../shared/gameConfig.ts";
+import { EmoteSlot, GameConfig, Rarity } from "../../../shared/gameConfig.ts";
 import type { PassState } from "../../../shared/types/user.ts";
 import type { Item, LoadoutItemDef } from "../../../shared/utils/loadout.ts";
 import { type Crosshair, type Loadout, loadout } from "../../../shared/utils/loadout.ts";
+import { math } from "../../../shared/utils/math.ts";
 import { util } from "../../../shared/utils/util.ts";
 import type { Account } from "../account.ts";
 import { crosshair } from "../crosshair.ts";
@@ -20,14 +21,18 @@ import type { LoadoutDisplay } from "./opponentDisplay.ts";
 
 function emoteSlotToDomElem(e: Exclude<EmoteSlot, EmoteSlot.Count>) {
     const emoteSlotToDomId = {
-        [EmoteSlot.Top]: "customize-emote-top",
-        [EmoteSlot.Right]: "customize-emote-right",
-        [EmoteSlot.Bottom]: "customize-emote-bottom",
-        [EmoteSlot.Left]: "customize-emote-left",
+        [EmoteSlot.Emote1]: "customize-emote-e1",
+        [EmoteSlot.Emote2]: "customize-emote-e2",
+        [EmoteSlot.Emote3]: "customize-emote-e3",
+        [EmoteSlot.Emote4]: "customize-emote-e4",
+        [EmoteSlot.Emote5]: "customize-emote-e5",
+        [EmoteSlot.Emote6]: "customize-emote-e6",
+        [EmoteSlot.Emote7]: "customize-emote-e7",
+        [EmoteSlot.Emote8]: "customize-emote-e8",
         [EmoteSlot.Win]: "customize-emote-win",
         [EmoteSlot.Death]: "customize-emote-death",
     };
-    const domId = emoteSlotToDomId[e] || emoteSlotToDomId[EmoteSlot.Top];
+    const domId = emoteSlotToDomId[e] || emoteSlotToDomId[EmoteSlot.Emote1];
     return $(`#${domId}`);
 }
 
@@ -355,6 +360,45 @@ export class LoadoutMenu {
             colorCode.onpaste = updateColor;
             colorCode.onkeyup = updateColor;
             colorCode.oninput = updateColor;
+
+            $("#emote-slots-slider").on("input change", (e) => {
+                const val = parseInt($(e.currentTarget).val() as string, 10);
+                $("#emote-slots-val").text(val);
+                this.account.config.set("emoteWheelSlots", val);
+                this.account.config.store();
+                this.refreshLoadoutWheel(val);
+            });
+
+            const rotateStep = (dir: number) => {
+                const slotsCount = this.account.config.config.emoteWheelSlots || 4;
+                let isRotated = this.account.config.config.emoteWheelRotated || false;
+
+                const shift = dir > 0 ? isRotated : !isRotated;
+                isRotated = !isRotated;
+
+                if (shift) {
+                    const active = this.loadout.emotes.slice(0, slotsCount);
+                    const rest = this.loadout.emotes.slice(slotsCount);
+
+                    if (dir > 0) {
+                        active.unshift(active.pop()!);
+                    } else {
+                        active.push(active.shift()!);
+                    }
+
+                    this.loadout.emotes = [...active, ...rest];
+                    this.account.config.set("loadout", this.loadout);
+                }
+
+                this.account.config.set("emoteWheelRotated", isRotated);
+                this.account.config.store();
+
+                this.refreshLoadoutWheel(slotsCount);
+            };
+
+            $("#customize-emote-rotate-btn-cw").on("click", () => rotateStep(1));
+            $("#customize-emote-rotate-btn-ccw").on("click", () => rotateStep(-1));
+
             this.initialized = true;
         }
     }
@@ -587,11 +631,11 @@ export class LoadoutMenu {
         }
         this.modalCustomizeList.html("");
         this.modalCustomizeList.append(listChildren);
-        this.selectableSlots.off("mouseup");
         this.setItemListeners(category.loadoutType);
     }
 
     setItemListeners(loadoutType: string) {
+        this.selectableSlots.off("mouseup");
         // listen for ui modifications
         this.selectableSlots.on("mouseup", (e) => {
             const elem = e.currentTarget;
@@ -610,6 +654,9 @@ export class LoadoutMenu {
             this.setEmoteDraggable(this.selectableSlots, this);
             // Only do this once, assuming the wheel is only used for emotes
             if (!this.emotesLoaded) {
+                this.droppableSlots.off("mouseup drop mousedown dragover dragleave dragend");
+                $(".ui-emote-auto-trash").off("click");
+
                 this.setEmoteDraggable(this.droppableSlots, this);
                 this.droppableSlots.on("mouseup", (e) => {
                     const elem = e.currentTarget;
@@ -686,14 +733,17 @@ export class LoadoutMenu {
     updateLoadoutFromDOM() {
         const loadoutType = this.categories[this.selectedCatIdx].loadoutType;
         if (loadoutType == "emote") {
+            const slotsCount = this.account.config.config.emoteWheelSlots || 4;
+            this.loadout.emotes = [];
             for (let t = 0; t < EmoteSlot.Count; t++) {
+                const isWinOrDeath = t == EmoteSlot.Win || t == EmoteSlot.Death;
                 const domElem = emoteSlotToDomElem(t);
-                const slotIdx = domElem.data("idx");
-                const slotItem = this.equippedItems[slotIdx];
-                if (slotItem?.type) {
-                    this.loadout.emotes[t] = slotItem.type;
+                if (t < slotsCount || isWinOrDeath) {
+                    const slotIdx = domElem.data("idx");
+                    const slotItem = this.equippedItems[slotIdx];
+                    this.loadout.emotes[t] = slotItem?.type || "";
                 } else {
-                    this.loadout.emotes[t] = "";
+                    this.loadout.emotes[t] = this.equippedItems[t]?.type || "";
                 }
             }
         } else if (loadoutType == "crosshair") {
@@ -729,7 +779,7 @@ export class LoadoutMenu {
             ? this.equippedItems[selectorIdx]
             : this.selectedCatItems[selectorIdx];
 
-        if (!selectedItem) {
+        if (!selectedItem || !selectedItem.type) {
             this.itemSelected = false;
             this.selectedItem = {
                 prevSlot: null,
@@ -842,13 +892,13 @@ export class LoadoutMenu {
 
     updateSlot(parent: JQuery<HTMLElement>, img: string, type: string) {
         const prevParent = this.selectedItem.prevSlot;
-        this.selectedItem = {} as (typeof this)["selectedItem"];
+        this.deselectItem();
         if (prevParent) {
             const image = parent.find(".customize-item-image");
             const slotIdx = parent.data("idx");
             const slotItem = this.equippedItems[slotIdx];
             let slotItemType = "";
-            if (slotItem.type) {
+            if (slotItem?.type) {
                 slotItemType = slotItem.type;
             }
             this.updateSlot(prevParent, image.data("img"), slotItemType);
@@ -1067,18 +1117,11 @@ export class LoadoutMenu {
 
         // Set itemInfo for equipped emotes
         if (category.loadoutType == "emote") {
-            this.equippedItems = [];
+            const slotsCount = this.account.config.config.emoteWheelSlots || 4;
 
-            for (let T = 0; T < this.loadout.emotes.length; T++) {
-                this.equippedItems.push({} as EquippedItem);
-                const emote = this.loadout.emotes[T];
-                if (GameObjectDefs.typeExists(emote)) {
-                    const svg = helpers.getSvgFromGameType(emote);
-                    const imgCss = `url(${svg})`;
-                    const domElem = emoteSlotToDomElem(T);
-                    this.updateSlotData(domElem, imgCss, emote);
-                }
-            }
+            $("#emote-slots-slider").val(slotsCount);
+            $("#emote-slots-val").text(slotsCount);
+            this.refreshLoadoutWheel(slotsCount);
         }
 
         this.selectableSlots = $(".customize-list-item");
@@ -1103,6 +1146,46 @@ export class LoadoutMenu {
         this.onResize();
     }
 
+    refreshLoadoutWheel(slotsCount: number) {
+        const isRotated = this.account.config.config.emoteWheelRotated || false;
+        const wheelElem = $("#customize-emote-wheel");
+        const middleElem = wheelElem.find(".ui-emote-middle").detach();
+        wheelElem.empty().append(middleElem);
+
+        helpers.forEachEmoteWheelSlot(slotsCount, isRotated, (slot) => {
+            const emoteSlotElem = $(
+                `<div id="customize-emote-e${slot.i + 1}" class="ui-emote-e${
+                    slot.i + 1
+                } ui-emote-${slot.wedgeType} ui-emote-parent" data-slot="emoteE${slot.i + 1}" data-idx="${slot.i}">
+                    <div class="ui-emote ui-emote-bg-${slot.wedgeType}" style="transform: translate(-50%, -50%) rotate(${slot.bgRotation}deg);"></div>
+                    <div class="ui-emote ui-emote-hl" style="transform: translate(-50%, -50%) rotate(${slot.bgRotation}deg);"></div>
+                    <div class="customize-emote-slot customize-item-image ui-emote-image ui-emote-image-${slot.wedgeType}" style="margin-left: ${slot.marginLeft}px; margin-top: ${slot.marginTop}px;"></div>
+                    <div class="customize-col customize-col-small" draggable="true" style="margin-left: ${slot.marginLeft}px; margin-top: ${slot.marginTop}px;"></div>
+                </div>`,
+            );
+            wheelElem.append(emoteSlotElem);
+        });
+
+        this.equippedItems = [];
+        for (let i = 0; i < EmoteSlot.Count; i++) {
+            const emote = this.loadout.emotes[i] || "";
+            const isWinOrDeath = i === EmoteSlot.Win || i === EmoteSlot.Death;
+            if (i < slotsCount || isWinOrDeath) {
+                const svg = helpers.getSvgFromGameType(emote);
+                const imgCss = svg ? `url(${svg})` : "none";
+                const domElem = emoteSlotToDomElem(i);
+                this.updateSlotData(domElem, imgCss, emote);
+            } else {
+                this.equippedItems[i] = GameObjectDefs.typeExists(emote)
+                    ? { type: emote } as EquippedItem
+                    : {} as EquippedItem;
+            }
+        }
+
+        this.emotesLoaded = false;
+        this.setItemListeners("emote");
+    }
+
     setCategoryAlerts() {
         // Display alerts on each category that has new items
         for (let i = 0; i < this.categories.length; i++) {
@@ -1118,6 +1201,7 @@ export class LoadoutMenu {
     }
 
     setEmoteDraggable(selector: JQuery<HTMLElement>, that: LoadoutMenu) {
+        selector.off("dragstart");
         selector.on("dragstart", function(e) {
             if ($(this).hasClass("customize-list-item-locked")) {
                 return;
