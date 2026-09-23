@@ -1,6 +1,9 @@
-import type { AbstractMsg, BitStream } from "./net.ts";
+import { type AbstractServerMsg, ServerMsgType } from "../constants.ts";
+import type { BitStream } from "../stream.ts";
 
-export class AliveCountsMsg implements AbstractMsg {
+export class AliveCountsMsg implements AbstractServerMsg {
+    readonly type = ServerMsgType.AliveCounts;
+
     teamAliveCounts: number[] = [];
 
     serialize(s: BitStream) {

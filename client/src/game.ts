@@ -18,7 +18,6 @@ import { Editor } from "./debug/editor.ts";
 
 import { GameObjectDefs } from "../../shared/defs/register.ts";
 import { type Connection, ConnectionState, WebsocketConnection } from "../../shared/net/connection.ts";
-import { SpectateAction } from "../../shared/net/spectateMsg.ts";
 import type { GameWsDisconnectReason } from "../../shared/types/api.ts";
 import { device } from "./device.ts";
 import { EmoteBarn } from "./emote.ts";
@@ -169,16 +168,16 @@ export class Game {
                 joinMessage.isMobile = device.mobile || window.mobile!;
                 joinMessage.bot = false;
                 joinMessage.loadout = this.m_config.get("loadout")!;
-                this.m_sendMessage(net.MsgType.Join, joinMessage, 8192);
+                this.m_sendMessage(joinMessage, 8192);
             };
             this.m_connection.onMessage = (data) => {
                 const msgStream = new net.MsgStream(data);
                 while (true) {
-                    const type = msgStream.deserializeMsgType();
-                    if (type == net.MsgType.None) {
+                    const msg = msgStream.deserializeServerMsg();
+                    if (!msg) {
                         break;
                     }
-                    this.m_onMsg(type, msgStream.getStream());
+                    this.m_onMsg(msg);
                     msgStream.stream.readAlignToNextByte();
                 }
                 this.debugHUD?.netInGraph.addEntry(
@@ -657,21 +656,21 @@ export class Game {
 
             // Process 'drop' actions triggered from the ui
             let playDropSound = false;
-            for (let X = 0; X < this.m_ui2Manager.uiEvents.length; X++) {
-                const uiEvent = this.m_ui2Manager.uiEvents[X];
+            for (let i = 0; i < this.m_ui2Manager.uiEvents.length; i++) {
+                const uiEvent = this.m_ui2Manager.uiEvents[i];
                 if (uiEvent.action == "drop") {
                     const dropMsg = new net.DropItemMsg();
                     if (uiEvent.type == "weapon") {
                         const eventData = uiEvent.data as number;
-                        const Y = this.m_activePlayer.m_localData.m_weapons;
-                        dropMsg.item = Y[eventData].type;
+                        const weapons = this.m_activePlayer.m_localData.m_weapons;
+                        dropMsg.item = weapons[eventData].type;
                         dropMsg.weapIdx = eventData;
                     } else if (uiEvent.type == "perk") {
                         const eventData = uiEvent.data as number;
-                        const J = this.m_activePlayer.m_netData.m_perks;
-                        const Q = J.length > eventData ? J[eventData] : null;
-                        if (Q?.droppable) {
-                            dropMsg.item = Q.type;
+                        const perks = this.m_activePlayer.m_netData.m_perks;
+                        const perk = perks.length > eventData ? perks[eventData] : null;
+                        if (perk?.droppable) {
+                            dropMsg.item = perk.type;
                         }
                     } else {
                         const item = uiEvent.data == "helmet"
@@ -682,7 +681,7 @@ export class Game {
                         dropMsg.item = item as string;
                     }
                     if (dropMsg.item != "") {
-                        this.m_sendMessage(net.MsgType.DropItem, dropMsg, 128);
+                        this.m_sendMessage(dropMsg);
                         if (dropMsg.item != "fists") {
                             playDropSound = true;
                         }
@@ -697,30 +696,26 @@ export class Game {
             if (this.m_uiManager.roleSelected) {
                 const roleSelectMessage = new net.PerkModeRoleSelectMsg();
                 roleSelectMessage.role = this.m_uiManager.roleSelected;
-                this.m_sendMessage(
-                    net.MsgType.PerkModeRoleSelect,
-                    roleSelectMessage,
-                    128,
-                );
+                this.m_sendMessage(roleSelectMessage);
                 this.m_config.set("perkModeRole", roleSelectMessage.role);
             }
         }
 
         let specAction = this.m_uiManager.specAction;
-        if (specAction === SpectateAction.None && this.m_spectating) {
+        if (specAction === net.SpectateAction.None && this.m_spectating) {
             if (this.m_input.keyPressed(Key.Right)) {
-                specAction = SpectateAction.Next;
+                specAction = net.SpectateAction.Next;
             } else if (this.m_input.keyPressed(Key.Left)) {
-                specAction = SpectateAction.Prev;
+                specAction = net.SpectateAction.Prev;
             }
         }
 
-        if (specAction !== SpectateAction.None) {
+        if (specAction !== net.SpectateAction.None) {
             const specMsg = new net.SpectateMsg();
             specMsg.action = specAction;
-            this.m_sendMessage(net.MsgType.Spectate, specMsg, 128);
+            this.m_sendMessage(specMsg);
 
-            this.m_uiManager.specAction = SpectateAction.None;
+            this.m_uiManager.specAction = net.SpectateAction.None;
         }
 
         this.m_uiManager.reloadTouched = false;
@@ -729,43 +724,68 @@ export class Game {
         this.m_uiManager.roleSelected = "";
 
         // Only send a InputMsg if the new data has changed from the previously sent data. For the look direction, we need to determine if the angle difference is large enough.
+        let pointerInputDiff = false;
         let diff = false;
-        for (const k in inputMsg) {
-            if (inputMsg.hasOwnProperty(k)) {
-                if (k == "inputs") {
-                    diff = inputMsg[k].length > 0;
-                } else if (k == "toMouseDir" || k == "touchMoveDir") {
-                    const dot = math.clamp(
-                        v2.dot(inputMsg[k], this.m_prevInputMsg[k]),
-                        -1,
-                        1,
-                    );
-                    const angle = math.rad2deg(Math.acos(dot));
+        for (const k of Object.keys(inputMsg) as (keyof net.InputMsg)[]) {
+            if (k == "seq") continue;
+            if (k == "inputs") {
+                diff = inputMsg[k].length > 0;
+            } else if (k == "toMouseDir" || k == "touchMoveDir") {
+                const dot = math.clamp(
+                    v2.dot(inputMsg[k], this.m_prevInputMsg[k]),
+                    -1,
+                    1,
+                );
+                const angle = math.rad2deg(Math.acos(dot));
+                if (k == "toMouseDir") {
+                    pointerInputDiff ||= angle > 0.1;
+                } else {
                     diff = angle > 0.1;
-                } else if (k == "toMouseLen") {
-                    diff = Math.abs(this.m_prevInputMsg[k] - inputMsg[k]) > 0.5;
-                } else if (k == "shootStart") {
-                    diff = inputMsg[k] || inputMsg[k] != this.m_prevInputMsg[k];
-                } else if (
-                    this.m_prevInputMsg[k as keyof typeof this.m_prevInputMsg]
-                        != inputMsg[k as keyof typeof inputMsg]
-                ) {
-                    diff = true;
                 }
-                if (diff) {
-                    break;
-                }
+            } else if (k == "toMouseLen") {
+                pointerInputDiff ||= Math.abs(this.m_prevInputMsg[k] - inputMsg[k]) > 0.5;
+            } else if (k == "shootStart") {
+                diff = inputMsg[k] || inputMsg[k] != this.m_prevInputMsg[k];
+            } else if (
+                this.m_prevInputMsg[k] != inputMsg[k]
+            ) {
+                diff = true;
+            }
+            if (diff) {
+                break;
             }
         }
         this.m_inputMsgTimeout -= dt;
-        if (diff || this.m_inputMsgTimeout < 0) {
+
+        const onlyPointerInputChanged = !diff && pointerInputDiff;
+
+        // for mouse inputs, rate limit them based on buffered amount and send rate
+        // this should help prevent the server kicking players in the following scenarios:
+        //
+        // - Websocket connection temporarily frozen, before it would just accumulate all inputs
+        // and send them when it unfreezes, causing hundreds of inputs to be sent at once
+        //
+        // - Weirdos who uncap their framerate causing the client to send over 500 msgs per second
+        // 0.003 value caps it to a maximum of 333 inputs per second
+        const bufferedAmount = this.m_connection?.bufferedAmount || 0;
+        const timeSinceLastInput = 1 - this.m_inputMsgTimeout;
+        const rateLimitMouseInputs = bufferedAmount > 256 || timeSinceLastInput < 0.003;
+        if (diff || pointerInputDiff || this.m_inputMsgTimeout < 0) {
             if (!this.seqInFlight) {
                 this.seq = (this.seq + 1) % 256;
                 this.seqSendTime = Date.now();
                 this.seqInFlight = true;
                 inputMsg.seq = this.seq;
             }
-            this.m_sendMessage(net.MsgType.Input, inputMsg, 128);
+            if (onlyPointerInputChanged && !rateLimitMouseInputs) {
+                const pInput = new net.PointerInputMsg();
+                pInput.seq = inputMsg.seq;
+                pInput.toMouseDir = inputMsg.toMouseDir;
+                pInput.toMouseLen = inputMsg.toMouseLen;
+                this.m_sendMessage(pInput);
+            } else {
+                this.m_sendMessage(inputMsg);
+            }
             this.m_inputMsgTimeout = 1;
             this.m_prevInputMsg = inputMsg;
         }
@@ -775,7 +795,7 @@ export class Game {
 
         if (IS_DEV && this.editor.enabled && this.editor.sendMsg) {
             var msg = this.editor.getMsg();
-            this.m_sendMessage(net.MsgType.Edit, msg);
+            this.m_sendMessage(msg);
             this.editor.postSerialization();
         }
 
@@ -911,19 +931,19 @@ export class Game {
         for (let i = 0; i < this.m_emoteBarn.newPings.length; i++) {
             const ping = this.m_emoteBarn.newPings[i];
             const msg = new net.EmoteMsg();
-            msg.type = ping.type;
+            msg.emoteType = ping.type;
             msg.pos = ping.pos;
             msg.isPing = true;
-            this.m_sendMessage(net.MsgType.Emote, msg, 128);
+            this.m_sendMessage(msg);
         }
         this.m_emoteBarn.newPings = [];
         for (let i = 0; i < this.m_emoteBarn.newEmotes.length; i++) {
             const emote = this.m_emoteBarn.newEmotes[i];
             const msg = new net.EmoteMsg();
-            msg.type = emote.type;
+            msg.emoteType = emote.type;
             msg.pos = emote.pos;
             msg.isPing = false;
-            this.m_sendMessage(net.MsgType.Emote, msg, 128);
+            this.m_sendMessage(msg);
         }
         this.m_emoteBarn.newEmotes = [];
 
@@ -1230,11 +1250,9 @@ export class Game {
     }
 
     // Socket functions
-    m_onMsg(type: net.MsgType, stream: net.BitStream) {
-        switch (type) {
-            case net.MsgType.Joined: {
-                const msg = new net.JoinedMsg();
-                msg.deserialize(stream);
+    m_onMsg(msg: net.ServerMsg) {
+        switch (msg.type) {
+            case net.ServerMsgType.Joined: {
                 this.onJoin();
                 this.teamMode = msg.teamMode;
                 this.m_localId = msg.playerId;
@@ -1263,9 +1281,7 @@ export class Game {
                 SDK.gamePlayStart();
                 break;
             }
-            case net.MsgType.Map: {
-                const msg = new net.MapMsg();
-                msg.deserialize(stream);
+            case net.ServerMsgType.Map: {
                 this.m_map.loadMap(
                     msg,
                     this.m_camera,
@@ -1298,16 +1314,12 @@ export class Game {
                 }
                 break;
             }
-            case net.MsgType.Update: {
-                const msg = new net.UpdateMsg();
-                msg.deserialize(stream, this.m_objectCreator);
+            case net.ServerMsgType.Update: {
                 this.m_playing = true;
                 this.m_processGameUpdate(msg);
                 break;
             }
-            case net.MsgType.Kill: {
-                const msg = new net.KillMsg();
-                msg.deserialize(stream);
+            case net.ServerMsgType.Kill: {
                 const sourceType = msg.itemSourceType || msg.mapSourceType;
                 const activeTeamId = this.m_playerBarn.getPlayerInfo(
                     this.m_activeId,
@@ -1409,9 +1421,7 @@ export class Game {
 
                 break;
             }
-            case net.MsgType.RoleAnnouncement: {
-                const msg = new net.RoleAnnouncementMsg();
-                msg.deserialize(stream);
+            case net.ServerMsgType.RoleAnnouncement: {
                 const roleDef = GameObjectDefs.typeToDef(msg.role, "role");
                 const playerInfo = this.m_playerBarn.getPlayerInfo(msg.playerId);
                 const nameText = helpers.htmlEscape(
@@ -1502,20 +1512,12 @@ export class Game {
                 }
                 break;
             }
-            case net.MsgType.PlayerStats: {
-                const msg = new net.PlayerStatsMsg();
-                msg.deserialize(stream);
+            case net.ServerMsgType.PlayerStats: {
                 this.m_uiManager.setLocalStats(msg.playerStats);
                 this.m_uiManager.showTeamAd(msg.playerStats, this.m_ui2Manager);
                 break;
             }
-            case net.MsgType.Stats: {
-                stream.readString();
-                break;
-            }
-            case net.MsgType.GameOver: {
-                const msg = new net.GameOverMsg();
-                msg.deserialize(stream);
+            case net.ServerMsgType.GameOver: {
                 this.m_gameOver = msg.gameOver;
                 const localTeamId = this.m_playerBarn.getPlayerInfo(
                     this.m_localId,
@@ -1556,10 +1558,8 @@ export class Game {
                 this.m_touch.hideAll();
                 break;
             }
-            case net.MsgType.Pickup: {
-                const msg = new net.PickupMsg();
-                msg.deserialize(stream);
-                if (msg.type == net.PickupMsgType.Success && msg.item) {
+            case net.ServerMsgType.Pickup: {
+                if (msg.pickupType == net.PickupMsgType.Success && msg.item) {
                     this.m_activePlayer.playItemPickupSound(
                         msg.item,
                         this.m_audioManager,
@@ -1569,19 +1569,16 @@ export class Game {
                         this.m_ui2Manager.addRareLootMessage(msg.item, true);
                     }
                 } else {
-                    this.m_ui2Manager.displayPickupMessage(msg.type);
+                    this.m_ui2Manager.displayPickupMessage(msg.pickupType);
                 }
                 break;
             }
-            case net.MsgType.UpdatePass: {
-                new net.UpdatePassMsg().deserialize(stream);
+            case net.ServerMsgType.UpdatePass: {
                 this.m_updatePass = true;
                 this.m_updatePassDelay = 0;
                 break;
             }
-            case net.MsgType.AliveCounts: {
-                const msg = new net.AliveCountsMsg();
-                msg.deserialize(stream);
+            case net.ServerMsgType.AliveCounts: {
                 if (msg.teamAliveCounts.length == 1) {
                     this.m_uiManager.updatePlayersAlive(msg.teamAliveCounts[0]);
                 } else if (msg.teamAliveCounts.length >= 2) {
@@ -1593,10 +1590,9 @@ export class Game {
         }
     }
 
-    m_sendMessage(type: net.MsgType, data: net.Msg, maxLen?: number) {
-        const bufSz = maxLen || 128;
-        const msgStream = new net.MsgStream(new ArrayBuffer(bufSz));
-        msgStream.serializeMsg(type, data);
+    m_sendMessage(msg: net.ClientMsg, maxLen = 128) {
+        const msgStream = new net.MsgStream(new ArrayBuffer(maxLen));
+        msgStream.serializeMsg(msg);
         this.m_sendMessageImpl(msgStream);
     }
 

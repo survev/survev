@@ -3,8 +3,7 @@ import { GameObjectDefs } from "../../../shared/defs/register.ts";
 import { GameConfig } from "../../../shared/gameConfig.ts";
 import * as net from "../../../shared/net/net.ts";
 import { ObjectType } from "../../../shared/net/objectSerializeFns.ts";
-import { SpectateAction } from "../../../shared/net/spectateMsg.ts";
-import type { Emote, GroupStatus } from "../../../shared/net/updateMsg.ts";
+import type { Emote, GroupStatus } from "../../../shared/net/serverMsgs/updateMsg.ts";
 import type { GameWsDisconnectReason } from "../../../shared/types/api.ts";
 import { coldet } from "../../../shared/utils/coldet.ts";
 import { collider } from "../../../shared/utils/collider.ts";
@@ -93,81 +92,31 @@ export class ClientBarn {
         return client;
     }
 
-    deserializeMsg(buff: ArrayBuffer): {
-        type: net.MsgType;
-        msg: net.AbstractMsg | undefined;
-        error?: GameWsDisconnectReason;
-    } {
+    deserializeMsg(
+        buff: ArrayBuffer,
+    ): net.ClientMsg | GameWsDisconnectReason {
         const msgStream = new net.MsgStream(buff);
         const stream = msgStream.stream;
 
-        const type = msgStream.deserializeMsgType();
+        const type = stream.readUint8();
+        if (type === net.ClientMsgType.Join) {
+            // read protocol version outside of JoinMsg
+            // reason: if theres a protocol change in JoinMsg it will fail to deserialize the entire msg
+            // and won't give the proper invalid-protocol error
+            // so we read it before deserializing the msg to avoid it throwing and giving the wrong error
+            const protocol = stream.readUint32();
 
-        let msg:
-            | net.JoinMsg
-            | net.InputMsg
-            | net.EmoteMsg
-            | net.DropItemMsg
-            | net.SpectateMsg
-            | net.PerkModeRoleSelectMsg
-            | net.EditMsg
-            | undefined = undefined;
-
-        switch (type) {
-            case net.MsgType.Join: {
-                // read protocol version outside of JoinMsg
-                // reason: if theres a protocol change in JoinMsg it will fail to deserialize the entire msg
-                // and won't give the proper invalid-protocol error
-                // so we read it before deserializing the msg to avoid it throwing and giving the wrong error
-
-                const oldIdx = stream.index;
-                const protocol = stream.readUint32();
-
-                if (protocol !== GameConfig.protocolVersion) {
-                    return {
-                        type: net.MsgType.Join,
-                        msg: undefined,
-                        error: "invalid_protocol",
-                    };
-                }
-                stream.index = oldIdx;
-
-                msg = new net.JoinMsg();
-                msg.deserialize(stream);
-                break;
+            if (protocol !== GameConfig.protocolVersion) {
+                return "invalid_protocol";
             }
-            case net.MsgType.Input: {
-                msg = new net.InputMsg();
-                msg.deserialize(stream);
-                break;
-            }
-            case net.MsgType.Emote:
-                msg = new net.EmoteMsg();
-                msg.deserialize(stream);
-                break;
-            case net.MsgType.DropItem:
-                msg = new net.DropItemMsg();
-                msg.deserialize(stream);
-                break;
-            case net.MsgType.Spectate:
-                msg = new net.SpectateMsg();
-                msg.deserialize(stream);
-                break;
-            case net.MsgType.PerkModeRoleSelect:
-                msg = new net.PerkModeRoleSelectMsg();
-                msg.deserialize(stream);
-                break;
-            case net.MsgType.Edit:
-                if (!Config.debug.allowEditMsg) break;
-                msg = new net.EditMsg();
-                msg.deserialize(stream);
-                break;
         }
+        stream.index = 0;
 
-        return {
-            type,
-            msg,
-        };
+        const msg = msgStream.deserializeClientMsg();
+        if (!msg) {
+            throw new Error(`Client sent invalid msg`);
+        }
+        return msg;
     }
 
     handleMsg(buff: ArrayBuffer | Buffer, socket: ClientSocket<Client>) {
@@ -175,15 +124,16 @@ export class ClientBarn {
 
         let client = socket.getUserData();
 
-        let msg: net.AbstractMsg | undefined = undefined;
-        let type = net.MsgType.None;
+        let msg: net.ClientMsg | undefined = undefined;
         let error: GameWsDisconnectReason | undefined;
 
         try {
             const deserialized = this.deserializeMsg(buff);
-            msg = deserialized.msg;
-            type = deserialized.type;
-            error = deserialized.error;
+            if (typeof deserialized === "string") {
+                error = deserialized;
+            } else {
+                msg = deserialized;
+            }
         } catch (err) {
             this.game.logger.error(
                 "Failed to deserialize msg: ",
@@ -205,8 +155,7 @@ export class ClientBarn {
         }
 
         if (!msg) return;
-
-        if (type === net.MsgType.Join && !client) {
+        if (msg.type === net.ClientMsgType.Join && !client) {
             const joinMsg = msg as net.JoinMsg;
 
             const joinData = this.game.joinTokens.get(joinMsg.joinToken);
@@ -240,7 +189,7 @@ export class ClientBarn {
         if (socket.closed()) {
             return;
         }
-        client.handleMsg(type, msg);
+        client.handleMsg(msg);
     }
 
     handleSocketClose(socket: ClientSocket<Client>) {
@@ -273,8 +222,8 @@ export class ClientBarn {
         }
     }
 
-    broadcastMsg(type: net.MsgType, msg: net.Msg) {
-        this.msgsToSend.serializeMsg(type, msg);
+    broadcastMsg(msg: net.ServerMsg) {
+        this.msgsToSend.serializeMsg(msg);
     }
 }
 
@@ -324,7 +273,7 @@ export class Client {
     }
 
     private _specCooldown = 0;
-    private _specAction = SpectateAction.None;
+    private _specAction = net.SpectateAction.None;
     specAnon = false;
     noSpecCooldown = false;
 
@@ -342,7 +291,7 @@ export class Client {
     private _cullingPortraitTicker = 0;
 
     msgStream = new net.MsgStream(new ArrayBuffer(65536));
-    msgsToSend: Array<{ type: number; msg: net.Msg }> = [];
+    msgsToSend: Array<net.ServerMsg> = [];
 
     ack = 0;
 
@@ -360,13 +309,13 @@ export class Client {
         this.socket = socket as ClientSocket<Client>;
     }
 
-    sendMsg(type: net.MsgType, msg: net.AbstractMsg): void {
-        this.msgsToSend.push({ type, msg });
+    sendMsg(msg: net.ServerMsg): void {
+        this.msgsToSend.push(msg);
     }
 
-    sendInstantMsg(type: net.MsgType, msg: net.AbstractMsg, bytes = 128): void {
+    sendInstantMsg(msg: net.ServerMsg, bytes = 128): void {
         const stream = new net.MsgStream(new ArrayBuffer(bytes));
-        stream.serializeMsg(type, msg);
+        stream.serializeMsg(msg);
         this.sendData(stream.getBuffer());
     }
 
@@ -402,8 +351,8 @@ export class Client {
 
             // spectate prev/next keybind logic
             this._specCooldown -= dt;
-            if (this._specCooldown <= 0 && this._specAction !== SpectateAction.None) {
-                const nextOrPrev = this._specAction === SpectateAction.Next ? +1 : -1;
+            if (this._specCooldown <= 0 && this._specAction !== net.SpectateAction.None) {
+                const nextOrPrev = this._specAction === net.SpectateAction.Next ? +1 : -1;
                 const spectatablePlayers = this.getSpectablePlayers(true);
 
                 newPlayerToSpectate = util.wrappedArrayIndex(
@@ -414,7 +363,7 @@ export class Client {
                 // when spectating teammates we can have a lower cooldown
                 // since it cant be abused to know players positions
                 this._specCooldown = this.getSpectateCooldown();
-                this._specAction = SpectateAction.None;
+                this._specAction = net.SpectateAction.None;
             }
 
             if (newPlayerToSpectate) {
@@ -457,7 +406,7 @@ export class Client {
             if (this.player) {
                 joinedMsg.emotes = this.player.loadout.emotes;
             }
-            msgStream.serializeMsg(net.MsgType.Joined, joinedMsg);
+            msgStream.serializeMsg(joinedMsg);
 
             const mapStream = game.map.mapStream.stream;
 
@@ -467,7 +416,7 @@ export class Client {
         if (playerBarn.aliveCountDirty || this._firstUpdate) {
             const aliveMsg = new net.AliveCountsMsg();
             this.game.modeManager.updateAliveCounts(aliveMsg.teamAliveCounts);
-            msgStream.serializeMsg(net.MsgType.AliveCounts, aliveMsg);
+            msgStream.serializeMsg(aliveMsg);
         }
 
         const updateMsg = new net.UpdateMsg();
@@ -697,11 +646,11 @@ export class Client {
             updateMsg.killLeaderKills = playerBarn.killLeader?.kills ?? 0;
         }
 
-        msgStream.serializeMsg(net.MsgType.Update, updateMsg);
+        msgStream.serializeMsg(updateMsg);
 
         for (let i = 0; i < this.msgsToSend.length; i++) {
             const msg = this.msgsToSend[i];
-            msgStream.serializeMsg(msg.type, msg.msg);
+            msgStream.serializeMsg(msg);
         }
 
         this.msgsToSend.length = 0;
@@ -713,46 +662,51 @@ export class Client {
         this._firstUpdate = false;
     }
 
-    handleMsg(type: net.MsgType, msg: net.Msg) {
+    handleMsg(msg: net.ClientMsg) {
         const player = this.player;
-        switch (type) {
-            case net.MsgType.Input: {
-                const imsg = msg as net.InputMsg;
-                if (this.portrait != imsg.portrait) {
+        switch (msg.type) {
+            case net.ClientMsgType.Input: {
+                if (this.portrait != msg.portrait) {
                     this._cullingPortraitTicker = 0.5;
                 }
-                this.portrait = imsg.portrait;
+                this.portrait = msg.portrait;
 
-                this.ack = imsg.seq;
+                this.ack = msg.seq;
 
                 if (!player) break;
-                player.handleInput(imsg);
+                player.handleInput(msg);
                 break;
             }
-            case net.MsgType.Emote: {
+            case net.ClientMsgType.PointerInput: {
+                this.ack = msg.seq;
+                if (!player) break;
+                player.handlePointerInput(msg);
+                break;
+            }
+            case net.ClientMsgType.Emote: {
                 if (!player) break;
 
-                player.emoteFromMsg(msg as net.EmoteMsg);
+                player.emoteFromMsg(msg);
                 break;
             }
-            case net.MsgType.DropItem: {
+            case net.ClientMsgType.DropItem: {
                 if (!player) break;
 
-                player.dropItem(msg as net.DropItemMsg);
+                player.dropItem(msg);
                 break;
             }
-            case net.MsgType.Spectate: {
+            case net.ClientMsgType.Spectate: {
                 this.handleSpectateMsg(msg as net.SpectateMsg);
                 break;
             }
-            case net.MsgType.PerkModeRoleSelect: {
+            case net.ClientMsgType.PerkModeRoleSelect: {
                 if (!player) break;
-                player.roleSelect((msg as net.PerkModeRoleSelectMsg).role);
+                player.roleSelect(msg.role);
                 break;
             }
-            case net.MsgType.Edit: {
+            case net.ClientMsgType.Edit: {
                 if (!player) break;
-                player.processEditMsg(msg as net.EditMsg);
+                player.processEditMsg(msg);
                 break;
             }
         }
@@ -825,12 +779,12 @@ export class Client {
         if (this.player && !this.player.dead) return;
 
         switch (spectateMsg.action) {
-            case SpectateAction.Begin:
+            case net.SpectateAction.Begin:
                 if (this.spectating && !this.spectating.dead) break;
                 this.spectating = this.getNewPlayerToSpectate();
                 break;
-            case SpectateAction.Next:
-            case SpectateAction.Prev:
+            case net.SpectateAction.Next:
+            case net.SpectateAction.Prev:
                 this._specAction = spectateMsg.action;
                 break;
         }

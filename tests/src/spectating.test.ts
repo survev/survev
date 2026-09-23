@@ -1,7 +1,6 @@
 import { expect, test } from "vitest";
 import { GameConfig, TeamMode } from "../../shared/gameConfig.ts";
-import { MsgType, SpectateMsg } from "../../shared/net/net.ts";
-import { SpectateAction } from "../../shared/net/spectateMsg.ts";
+import { SpectateAction, SpectateMsg } from "../../shared/net/net.ts";
 import { v2 } from "../../shared/utils/v2.ts";
 import { createGame } from "./gameTestHelpers.ts";
 import "./testHelpers.ts";
@@ -34,7 +33,7 @@ test("Spectate killer", () => {
         amount: 999,
         dir: v2.randomUnit(),
     });
-    playerA.client.handleMsg(MsgType.Spectate, specBegin);
+    playerA.client.handleMsg(specBegin);
     expect(playerA.client.spectating).toBeSamePlayer(playerB);
 
     playerB.damage({
@@ -74,10 +73,10 @@ test("Spectate killer of spectating", () => {
         amount: 999,
         dir: v2.randomUnit(),
     });
-    playerA.client.handleMsg(MsgType.Spectate, specBegin);
+    playerA.client.handleMsg(specBegin);
     expect(playerA.client.spectating).toBeSamePlayer(playerB);
 
-    playerA.client.handleMsg(MsgType.Spectate, specNext);
+    playerA.client.handleMsg(specNext);
     game.step(spectateSoloCooldown);
     expect(playerA.client.spectating).toBeSamePlayer(playerC);
 
@@ -118,27 +117,27 @@ test("Spectate solo", () => {
         amount: 999,
         dir: v2.randomUnit(),
     });
-    playerA.client.handleMsg(MsgType.Spectate, specBegin);
+    playerA.client.handleMsg(specBegin);
     expect(playerA.client.spectating).toBeSamePlayer(playerB);
 
-    playerA.client.handleMsg(MsgType.Spectate, specNext);
+    playerA.client.handleMsg(specNext);
     game.step(spectateSoloCooldown);
     expect(playerA.client.spectating).toBeSamePlayer(playerC);
 
-    playerA.client.handleMsg(MsgType.Spectate, specNext);
+    playerA.client.handleMsg(specNext);
     game.step(spectateSoloCooldown);
     expect(playerA.client.spectating).toBeSamePlayer(playerD);
 
-    playerA.client.handleMsg(MsgType.Spectate, specNext);
+    playerA.client.handleMsg(specNext);
     game.step(spectateSoloCooldown);
     expect(playerA.client.spectating).toBeSamePlayer(playerB);
 
-    playerA.client.handleMsg(MsgType.Spectate, specPrev);
+    playerA.client.handleMsg(specPrev);
     game.step(spectateSoloCooldown);
     expect(playerA.client.spectating).toBeSamePlayer(playerD);
 
     // test the cooldown
-    playerA.client.handleMsg(MsgType.Spectate, specNext);
+    playerA.client.handleMsg(specNext);
     game.step(0.4);
     expect(playerA.client.spectating).toBeSamePlayer(playerD);
     game.step(1);
@@ -155,11 +154,11 @@ test("Spectate solo", () => {
     // we stay spectating playerB until the 2 seconds timer is over or manually switching
     expect(playerA.client.spectating).toBeSamePlayer(playerB);
 
-    playerA.client.handleMsg(MsgType.Spectate, specNext);
+    playerA.client.handleMsg(specNext);
     game.step(0.4);
     expect(playerA.client.spectating).toBeSamePlayer(playerC);
 
-    playerA.client.handleMsg(MsgType.Spectate, specPrev);
+    playerA.client.handleMsg(specPrev);
     game.step(spectateSoloCooldown);
     // we shouldn't be able to go back to the playerB since they are dead
     expect(playerA.client.spectating).toBeSamePlayer(playerD);
@@ -186,18 +185,18 @@ test("Spectate teammates", () => {
     });
 
     // test wrap around
-    playerA.client.handleMsg(MsgType.Spectate, specBegin);
+    playerA.client.handleMsg(specBegin);
     expect(playerA.client.spectating).toBeSamePlayer(playerB);
 
-    playerA.client.handleMsg(MsgType.Spectate, specNext);
+    playerA.client.handleMsg(specNext);
     game.step(spectateTeammateCooldown);
     expect(playerA.client.spectating).toBeSamePlayer(playerC);
 
-    playerA.client.handleMsg(MsgType.Spectate, specPrev);
+    playerA.client.handleMsg(specPrev);
     game.step(spectateTeammateCooldown);
     expect(playerA.client.spectating).toBeSamePlayer(playerB);
 
-    playerA.client.handleMsg(MsgType.Spectate, specPrev);
+    playerA.client.handleMsg(specPrev);
     game.step(spectateTeammateCooldown);
     expect(playerA.client.spectating).toBeSamePlayer(playerD);
 
@@ -217,7 +216,7 @@ test("Spectate teammates", () => {
     game.step(spectateDeathCooldown);
     expect(playerA.client.spectating).toBeSamePlayer(playerD);
 
-    playerA.client.handleMsg(MsgType.Spectate, specBegin);
+    playerA.client.handleMsg(specBegin);
     expect(playerA.client.spectating).toBeSamePlayer(playerE);
 });
 
@@ -245,22 +244,22 @@ test("Spectate faction teammates", () => {
         dir: v2.randomUnit(),
     });
 
-    playerA.client.handleMsg(MsgType.Spectate, specBegin);
+    playerA.client.handleMsg(specBegin);
     expect(playerA.client.spectating).toBeSamePlayer(playerB);
 
-    playerA.client.handleMsg(MsgType.Spectate, specNext);
+    playerA.client.handleMsg(specNext);
     game.step(spectateTeammateCooldown);
     expect(playerA.client.spectating).toBeSamePlayer(playerC);
 
-    playerA.client.handleMsg(MsgType.Spectate, specPrev);
+    playerA.client.handleMsg(specPrev);
     game.step(spectateTeammateCooldown);
     expect(playerA.client.spectating).toBeSamePlayer(playerB);
 
-    playerA.client.handleMsg(MsgType.Spectate, specPrev);
+    playerA.client.handleMsg(specPrev);
     game.step(spectateTeammateCooldown);
     expect(playerA.client.spectating).toBeSamePlayer(playerF);
 
-    playerA.client.handleMsg(MsgType.Spectate, specNext);
+    playerA.client.handleMsg(specNext);
     game.step(spectateTeammateCooldown);
     expect(playerA.client.spectating).toBeSamePlayer(playerB);
 

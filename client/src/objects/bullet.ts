@@ -2,7 +2,7 @@ import * as PIXI from "pixi.js-legacy";
 
 import { GameObjectDefs, MapObjectDefs } from "../../../shared/defs/register.ts";
 import { GameConfig } from "../../../shared/gameConfig.ts";
-import type { Bullet } from "../../../shared/net/updateMsg.ts";
+import type { Bullet } from "../../../shared/net/serverMsgs/updateMsg.ts";
 import { coldet } from "../../../shared/utils/coldet.ts";
 import { collider } from "../../../shared/utils/collider.ts";
 import { math } from "../../../shared/utils/math.ts";

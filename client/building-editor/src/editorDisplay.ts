@@ -2,9 +2,9 @@ import * as PIXI from "pixi.js-legacy";
 
 import { MapDefs } from "../../../shared/defs/mapDefs.ts";
 import { MapObjectDefs } from "../../../shared/defs/register.ts";
-import { MapMsg } from "../../../shared/net/mapMsg.ts";
+import { MapMsg } from "../../../shared/net/net.ts";
 import { type ObjectData, ObjectType } from "../../../shared/net/objectSerializeFns.ts";
-import type { LocalDataWithDirty } from "./../../../shared/net/updateMsg.ts";
+import type { LocalDataWithDirty } from "../../../shared/net/serverMsgs/updateMsg.ts";
 import { collider } from "../../../shared/utils/collider.ts";
 import { math } from "../../../shared/utils/math.ts";
 import { util } from "../../../shared/utils/util.ts";

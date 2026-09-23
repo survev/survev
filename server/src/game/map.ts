@@ -6,7 +6,7 @@ import type { StructureDef } from "../../../shared/defs/mapObjects/structureDefs
 import { MapObjectDefs } from "../../../shared/defs/register.ts";
 import { GameConfig, MapId, TeamMode } from "../../../shared/gameConfig.ts";
 import * as net from "../../../shared/net/net.ts";
-import { MsgStream, MsgType } from "../../../shared/net/net.ts";
+import { MsgStream } from "../../../shared/net/net.ts";
 import { ObjectType } from "../../../shared/net/objectSerializeFns.ts";
 import { type AABB, coldet, type Collider } from "../../../shared/utils/coldet.ts";
 import { collider } from "../../../shared/utils/collider.ts";
@@ -395,7 +395,7 @@ export class GameMap {
         this.timerEnd("Generating all objects");
 
         this.mapStream.stream.index = 0;
-        this.mapStream.serializeMsg(MsgType.Map, this.msg);
+        this.mapStream.serializeMsg(this.msg);
     }
 
     regenerate(seed?: number) {

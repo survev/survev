@@ -1,6 +1,6 @@
 import { GameObjectDefs } from "../../../shared/defs/register.ts";
 import { FactionTeam, GameConfig } from "../../../shared/gameConfig.ts";
-import type { Bullet } from "../../../shared/net/updateMsg.ts";
+import type { Bullet } from "../../../shared/net/serverMsgs/updateMsg.ts";
 import { v2, type Vec2 } from "../../../shared/utils/v2.ts";
 import type { AudioManager } from "../audioManager.ts";
 import type { ParticleBarn } from "./particles.ts";

@@ -1,12 +1,13 @@
-import { GameConfig, type Plane as PlaneType } from "../gameConfig.ts";
-import { v2, type Vec2 } from "./../utils/v2.ts";
-import { type AbstractMsg, BitSizes, type BitStream, Constants } from "./net.ts";
+import { GameConfig, Plane as PlaneType } from "../../gameConfig.ts";
+import { v2, type Vec2 } from "../../utils/v2.ts";
+import { AbstractServerMsg, BitSizes, Constants, ServerMsgType } from "../constants.ts";
 import {
     ObjectSerializeFns,
     type ObjectsFullData,
     type ObjectsPartialData,
     type ObjectType,
-} from "./objectSerializeFns.ts";
+} from "../objectSerializeFns.ts";
+import type { BitStream } from "../stream.ts";
 
 function serializeActivePlayer(s: BitStream, data: LocalDataWithDirty) {
     s.writeBoolean(data.healthDirty);
@@ -245,7 +246,9 @@ export const UpdateExtFlags = {
     KillLeader: 1 << 15,
 };
 
-export class UpdateMsg implements AbstractMsg {
+export class UpdateMsg implements AbstractServerMsg {
+    readonly type = ServerMsgType.Update;
+
     delObjIds: number[] = [];
     fullObjects: Array<
         & ObjectsFullData[ObjectType]
@@ -497,11 +500,7 @@ export class UpdateMsg implements AbstractMsg {
         /* STRIP_FROM_PROD_CLIENT:END */
     }
 
-    // @ts-expect-error deserialize only accept one argument for now
-    deserialize(
-        s: BitStream,
-        objectCreator: { m_getTypeById: (id: number, s: BitStream) => ObjectType },
-    ) {
+    deserialize(s: BitStream) {
         const flags = s.readUint16();
 
         if ((flags & UpdateExtFlags.DeletedObjects) != 0) {

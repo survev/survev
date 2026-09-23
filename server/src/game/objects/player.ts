@@ -898,7 +898,7 @@ export class Player extends BaseGameObject {
         msg.role = role;
         msg.assigned = true;
         msg.playerId = this.__id;
-        this.game.clientBarn.broadcastMsg(net.MsgType.RoleAnnouncement, msg);
+        this.game.clientBarn.broadcastMsg(msg);
 
         switch (role) {
             case "leader":
@@ -1125,7 +1125,7 @@ export class Player extends BaseGameObject {
             msg.role = "kill_leader";
             msg.assigned = true;
             msg.playerId = this.__id;
-            this.game.clientBarn.broadcastMsg(net.MsgType.RoleAnnouncement, msg);
+            this.game.clientBarn.broadcastMsg(msg);
         }
     }
 
@@ -1837,7 +1837,7 @@ export class Player extends BaseGameObject {
                     this.invManager.give(item, 1);
 
                     const msg = new net.PickupMsg();
-                    msg.type = net.PickupMsgType.Success;
+                    msg.pickupType = net.PickupMsgType.Success;
                     msg.item = item;
                     msg.count = 1;
                     if (
@@ -1846,7 +1846,7 @@ export class Player extends BaseGameObject {
                         this.weaponManager.showNextThrowable();
                     }
 
-                    this.client.sendMsg(net.MsgType.Pickup, msg);
+                    this.client.sendMsg(msg);
                 }
             }
 
@@ -2540,7 +2540,7 @@ export class Player extends BaseGameObject {
         if (this.game.modeManager.showStatsMsg(this)) {
             const statsMsg = new net.PlayerStatsMsg();
             statsMsg.playerStats = this;
-            this.client.sendMsg(net.MsgType.PlayerStats, statsMsg);
+            this.client.sendMsg(statsMsg);
         } else {
             this.sentGameOverMsg = true;
 
@@ -2552,10 +2552,10 @@ export class Player extends BaseGameObject {
             gameOverMsg.teamId = this.teamId;
             gameOverMsg.winningTeamId = winningTeamId;
             gameOverMsg.gameOver = !!winningTeamId;
-            this.client.sendMsg(net.MsgType.GameOver, gameOverMsg);
+            this.client.sendMsg(gameOverMsg);
 
             for (const spectator of this.spectators) {
-                spectator.sendMsg(net.MsgType.GameOver, gameOverMsg);
+                spectator.sendMsg(gameOverMsg);
             }
         }
     }
@@ -2609,7 +2609,7 @@ export class Player extends BaseGameObject {
             downedMsg.killCreditId = params.source.__id;
         }
 
-        this.game.clientBarn.broadcastMsg(net.MsgType.Kill, downedMsg);
+        this.game.clientBarn.broadcastMsg(downedMsg);
 
         // lone survivr can be given on knock or kill
         if (this.game.map.factionMode) {
@@ -2828,7 +2828,7 @@ export class Player extends BaseGameObject {
             this.lastDamagedBy.randomWeaponSwap(params);
         }
 
-        this.game.clientBarn.broadcastMsg(net.MsgType.Kill, killMsg);
+        this.game.clientBarn.broadcastMsg(killMsg);
 
         if (this.role) {
             const roleMsg = new net.RoleAnnouncementMsg();
@@ -2837,7 +2837,7 @@ export class Player extends BaseGameObject {
             roleMsg.killed = true;
             roleMsg.playerId = this.__id;
             roleMsg.killerId = params.source?.__id ?? 0;
-            this.game.clientBarn.broadcastMsg(net.MsgType.RoleAnnouncement, roleMsg);
+            this.game.clientBarn.broadcastMsg(roleMsg);
         }
 
         if (this.isKillLeader && this.role !== "the_hunted") {
@@ -2847,7 +2847,7 @@ export class Player extends BaseGameObject {
             roleMsg.killed = true;
             roleMsg.playerId = this.__id;
             roleMsg.killerId = params.source?.__id ?? 0;
-            this.game.clientBarn.broadcastMsg(net.MsgType.RoleAnnouncement, roleMsg);
+            this.game.clientBarn.broadcastMsg(roleMsg);
         }
 
         if (this.game.map.mapDef.gameMode.killLeaderEnabled) {
@@ -3342,8 +3342,7 @@ export class Player extends BaseGameObject {
         if (this.dead) return;
         if (this.game.map.perkMode && !this.role) return;
 
-        this.dirNew = v2.normalizeSafe(msg.toMouseDir);
-
+        this.handlePointerInput(msg);
         this.moveLeft = msg.moveLeft;
         this.moveRight = msg.moveRight;
         this.moveUp = msg.moveUp;
@@ -3352,7 +3351,6 @@ export class Player extends BaseGameObject {
         this.touchMoveActive = msg.touchMoveActive;
         this.touchMoveDir = v2.normalizeSafe(msg.touchMoveDir);
         this.touchMoveLen = msg.touchMoveLen;
-        this.toMouseLen = msg.toMouseLen;
 
         this.shootHold = msg.shootHold;
 
@@ -3549,6 +3547,11 @@ export class Player extends BaseGameObject {
         }
     }
 
+    handlePointerInput(msg: net.InputMsg | net.PointerInputMsg) {
+        this.dirNew = v2.normalizeSafe(msg.toMouseDir);
+        this.toMouseLen = msg.toMouseLen;
+    }
+
     getClosestLoot(): Loot | undefined {
         const objs = this.game.grid.intersectCollider(
             collider.createCircle(this.pos, this.rad + 5),
@@ -3712,7 +3715,7 @@ export class Player extends BaseGameObject {
         let lootToAdd = obj.type;
         const pickupMsg = new net.PickupMsg();
         pickupMsg.item = obj.type;
-        pickupMsg.type = net.PickupMsgType.Success;
+        pickupMsg.pickupType = net.PickupMsgType.Success;
 
         switch (def.type) {
             case "ammo":
@@ -3728,9 +3731,9 @@ export class Player extends BaseGameObject {
 
                     if (result.added <= 0) {
                         if (def.type === "scope") {
-                            pickupMsg.type = net.PickupMsgType.AlreadyOwned;
+                            pickupMsg.pickupType = net.PickupMsgType.AlreadyOwned;
                         } else {
-                            pickupMsg.type = net.PickupMsgType.Full;
+                            pickupMsg.pickupType = net.PickupMsgType.Full;
                         }
                     }
 
@@ -3739,7 +3742,7 @@ export class Player extends BaseGameObject {
                 break;
             case "melee":
                 if (this.weapons[GameConfig.WeaponSlot.Melee].type === obj.type) {
-                    pickupMsg.type = net.PickupMsgType.AlreadyEquipped;
+                    pickupMsg.pickupType = net.PickupMsgType.AlreadyEquipped;
                     amountLeft = 1;
                     break;
                 }
@@ -3751,7 +3754,7 @@ export class Player extends BaseGameObject {
                     amountLeft = 0;
 
                     const freeGunSlot = this.getFreeGunSlot(obj);
-                    pickupMsg.type = freeGunSlot.cause;
+                    pickupMsg.pickupType = freeGunSlot.cause;
                     let newGunIdx = freeGunSlot.slot;
 
                     if (newGunIdx === null) {
@@ -3851,17 +3854,17 @@ export class Player extends BaseGameObject {
                     ) {
                         amountLeft = 1;
                         lootToAdd = obj.type;
-                        pickupMsg.type = net.PickupMsgType.BetterItemEquipped;
+                        pickupMsg.pickupType = net.PickupMsgType.BetterItemEquipped;
                         break;
                     }
 
                     if (thisType === obj.type) {
                         lootToAdd = obj.type;
-                        pickupMsg.type = net.PickupMsgType.AlreadyEquipped;
+                        pickupMsg.pickupType = net.PickupMsgType.AlreadyEquipped;
                     } else if (thisLevel <= objLevel) {
                         lootToAdd = thisType;
                         this[def.type] = obj.type;
-                        pickupMsg.type = net.PickupMsgType.Success;
+                        pickupMsg.pickupType = net.PickupMsgType.Success;
 
                         // removes roles/perks associated with the dropped role/perk helmet
                         if (thisDef && thisDef.type == "helmet" && thisDef.perk) {
@@ -3884,7 +3887,7 @@ export class Player extends BaseGameObject {
                         this.setDirty();
                     } else {
                         lootToAdd = obj.type;
-                        pickupMsg.type = net.PickupMsgType.BetterItemEquipped;
+                        pickupMsg.pickupType = net.PickupMsgType.BetterItemEquipped;
                     }
                     if (this.getGearLevel(lootToAdd) === 0) lootToAdd = "";
                 }
@@ -3899,20 +3902,20 @@ export class Player extends BaseGameObject {
                     const roleDef = GameObjectDefs.typeToDef(this.role, "role");
                     if (roleDef.defaultItems?.noDropOutfit) {
                         amountLeft = 1;
-                        pickupMsg.type = net.PickupMsgType.BetterItemEquipped;
+                        pickupMsg.pickupType = net.PickupMsgType.BetterItemEquipped;
                         break;
                     }
                 }
 
                 if (this.outfit === obj.type) {
-                    pickupMsg.type = net.PickupMsgType.AlreadyEquipped;
+                    pickupMsg.pickupType = net.PickupMsgType.AlreadyEquipped;
                     amountLeft = 1;
                     break;
                 }
 
                 amountLeft = 1;
                 lootToAdd = this.outfit;
-                pickupMsg.type = net.PickupMsgType.Success;
+                pickupMsg.pickupType = net.PickupMsgType.Success;
                 this.setOutfit(obj.type);
                 break;
             case "perk":
@@ -3929,7 +3932,7 @@ export class Player extends BaseGameObject {
 
                 if (this.hasPerk(obj.type)) {
                     amountLeft = 1;
-                    pickupMsg.type = net.PickupMsgType.AlreadyEquipped;
+                    pickupMsg.pickupType = net.PickupMsgType.AlreadyEquipped;
                     break;
                 }
 
@@ -3946,7 +3949,7 @@ export class Player extends BaseGameObject {
                 // If the player already has 4 or more perks, they cannot pick up a new one.
                 if (!perkSlotType && this.perks.length >= 4) {
                     amountLeft = 1;
-                    pickupMsg.type = net.PickupMsgType.MaxPerks;
+                    pickupMsg.pickupType = net.PickupMsgType.MaxPerks;
                     break;
                 }
                 if (perkSlotType) {
@@ -3984,7 +3987,7 @@ export class Player extends BaseGameObject {
         }
 
         obj.destroy();
-        this.client.sendMsg(net.MsgType.Pickup, pickupMsg);
+        this.client.sendMsg(pickupMsg);
     }
 
     // in original game, only called on snowball or potato collision
@@ -4335,8 +4338,8 @@ export class Player extends BaseGameObject {
 
         const emoteMsg = msg as net.EmoteMsg;
 
-        const emoteIdx = this.loadout.emotes.indexOf(emoteMsg.type);
-        const emoteDef = GameObjectDefs.typeToDefSafe(emoteMsg.type);
+        const emoteIdx = this.loadout.emotes.indexOf(emoteMsg.emoteType);
+        const emoteDef = GameObjectDefs.typeToDefSafe(emoteMsg.emoteType);
         if (!emoteDef) return;
 
         if (emoteMsg.isPing) {
@@ -4353,7 +4356,7 @@ export class Player extends BaseGameObject {
                 return;
             }
 
-            this.game.playerBarn.addMapPing(emoteMsg.type, emoteMsg.pos, this.__id);
+            this.game.playerBarn.addMapPing(emoteMsg.emoteType, emoteMsg.pos, this.__id);
         } else {
             if (emoteDef.type !== "emote") {
                 return;
@@ -4364,7 +4367,7 @@ export class Player extends BaseGameObject {
             }
 
             if (emoteDef.teamOnly) {
-                this.game.playerBarn.addEmote(emoteMsg.type, this.__id);
+                this.game.playerBarn.addEmote(emoteMsg.emoteType, this.__id);
             } else {
                 this.emoteFromSlot(emoteIdx);
             }
