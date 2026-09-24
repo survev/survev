@@ -208,17 +208,13 @@ export class BulletBarn {
 
                 b.particleTicker += dt;
                 if (b.combatStims && b.particleTicker >= 0.15) {
-                    particleBarn.addParticle(
+                    const particle = particleBarn.addParticle(
                         "boost_basic",
                         b.layer,
                         b.pos,
                         b.dir,
-                        undefined,
-                        undefined,
-                        undefined,
-                        undefined,
-                        PIXI.Color.shared.setValue(b.bulletTrail.tint).toNumber(),
                     );
+                    particle.setColor(PIXI.Color.shared.setValue(b.bulletTrail.tint).toNumber());
                     b.particleTicker = util.random(0, 0.1); // Done to make the particles for shotguns less periodic and more continuous
                 }
 

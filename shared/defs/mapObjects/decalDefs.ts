@@ -8,18 +8,23 @@ export interface DecalDef {
     collision: Collider;
     height: number;
     terrain?: TerrainSpawnDef;
-    img: {
-        sprite: string;
-        scale: number;
-        alpha: number;
-        tint: number;
-        zIdx: number;
-        flicker?: boolean;
-        flickerMin?: number;
-        flickerMax?: number;
-        flickerRate?: number;
-        ignoreAdjust?: boolean;
-    };
+    img:
+        & {
+            sprite: string;
+            scale: number;
+            alpha: number;
+            tint: number;
+            zIdx: number;
+            ignoreAdjust?: boolean;
+        }
+        & ({
+            flicker?: false;
+        } | {
+            flicker: true;
+            flickerMin: number;
+            flickerMax: number;
+            flickerRate: number;
+        });
     lifetime?:
         | {
             min: number;

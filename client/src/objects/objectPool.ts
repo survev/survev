@@ -4,7 +4,20 @@ import { assert } from "../../../shared/utils/util.ts";
 import { errorLogManager } from "../errorLogs.ts";
 import type { Ctx } from "../game.ts";
 
-import type { AbstractObject } from "./player.ts";
+export abstract class AbstractObject {
+    abstract __id: number;
+    abstract __type: ObjectType;
+    abstract active: boolean;
+
+    abstract m_init(): void;
+    abstract m_free(): void;
+    abstract m_updateData(
+        data: ObjectData<ObjectType>,
+        fullUpdate: boolean,
+        isNew: boolean,
+        ctx: Ctx,
+    ): void;
+}
 
 type C<T extends AbstractObject> = new() => T;
 

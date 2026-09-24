@@ -6,7 +6,6 @@ export interface LootImg {
     tint: number;
     border?: string;
     borderTint?: number;
-    tintDark?: number;
     innerScale?: number;
     mirror?: boolean;
     rot?: number;

@@ -1,5 +1,5 @@
 import { type DeepPartial, util } from "../../utils/util.ts";
-import type { BaseLootDef } from "./itemTypes.ts";
+import type { BaseLootDef, LootImg } from "./itemTypes.ts";
 
 type GearDef = HealDef | AmmoDef | BoostDef | BackpackDef | HelmetDef | ChestDef;
 
@@ -417,6 +417,9 @@ export interface AmmoDef extends BaseLootDef {
     special?: boolean;
     minStackSize: number;
     hideUi?: boolean;
+    lootImg: LootImg & {
+        tintDark: number;
+    };
 }
 
 const AmmoDefs: Record<string, AmmoDef> = {

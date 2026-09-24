@@ -18,7 +18,8 @@ import {
 import { debugLines } from "../debug/debugLines.ts";
 import type { Ctx } from "../game.ts";
 import type { Map } from "../map.ts";
-import type { AbstractObject, Player } from "./player.ts";
+import type { AbstractObject } from "./objectPool.ts";
+import type { Player } from "./player.ts";
 
 interface Stair {
     collision: AABB;

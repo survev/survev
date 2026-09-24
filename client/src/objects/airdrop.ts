@@ -11,9 +11,9 @@ import type { Ctx } from "../game.ts";
 import type { SoundHandle } from "../lib/createJS.ts";
 import type { Map } from "../map.ts";
 import type { Renderer } from "../renderer.ts";
-import { Pool } from "./objectPool.ts";
+import { AbstractObject, Pool } from "./objectPool.ts";
 import type { ParticleBarn } from "./particles.ts";
-import type { AbstractObject, Player } from "./player.ts";
+import type { Player } from "./player.ts";
 
 class AirDrop implements AbstractObject {
     __id!: number;

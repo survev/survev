@@ -32,7 +32,7 @@ export interface ThrowableDef extends BaseWeaponDef {
         scale: number;
         tint: number;
     };
-    handImg?: Record<ThrowableHandImgKey, { right: Cook; left: Cook }>;
+    handImg?: Record<ThrowableHandImgKey, { right: CookImg; left: CookImg }>;
     useThrowParticles: boolean;
     sound: {
         pullPin: string;
@@ -59,11 +59,15 @@ export interface ThrowableDef extends BaseWeaponDef {
     splitType?: string;
 }
 
-export interface Cook {
+export type CookImg = {
     sprite: string;
+    pos: Vec2;
+    scale: number;
+} | {
+    sprite: "none";
     pos?: Vec2;
     scale?: number;
-}
+};
 
 export const ThrowableDefs: Record<string, ThrowableDef> = {
     frag: {

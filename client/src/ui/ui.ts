@@ -476,7 +476,7 @@ export class UiManager {
             border: new PIXI.Graphics(),
         };
 
-        this.mapSprite.anchor = new PIXI.Point(0.5, 0.5) as PIXI.ObservablePoint;
+        this.mapSprite.anchor.set(0.5, 0.5);
         this.container.addChild(this.mapSprite);
         this.container.addChild(this.display.gas);
         this.container.addChild(this.display.gasSafeZone);

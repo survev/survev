@@ -8,8 +8,8 @@ import type { Camera } from "../camera.ts";
 import type { Ctx } from "../game.ts";
 import type { Map } from "../map.ts";
 import type { Renderer } from "../renderer.ts";
-import { Pool } from "./objectPool.ts";
-import type { AbstractObject, Player } from "./player.ts";
+import { AbstractObject, Pool } from "./objectPool.ts";
+import type { Player } from "./player.ts";
 
 class Smoke implements AbstractObject {
     __id!: number;
@@ -77,7 +77,7 @@ export class SmokeParticle {
     interior!: number;
 
     constructor() {
-        this.sprite.anchor = new PIXI.Point(0.5, 0.5) as PIXI.ObservablePoint;
+        this.sprite.anchor.set(0.5, 0.5);
         this.sprite.visible = false;
     }
 
@@ -129,11 +129,6 @@ export class SmokeBarn {
         map: Map,
         renderer: Renderer,
     ) {
-        // why is this commented out?
-        // for (let o = this.e.getPool(), s = 0; s < o.length; s++) {
-        // o[s].active;
-        // }
-
         // Update visual particles
         for (let m = 0; m < this.m_particles.length; m++) {
             const p = this.m_particles[m];

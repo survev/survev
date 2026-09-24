@@ -78,7 +78,6 @@ export class Particle {
         parent: PIXI.Container | null,
         zOrd: number,
         valueAdjust: number,
-        tint?: number,
     ) {
         const def = ParticleDefs[type];
         this.active = true;
@@ -117,7 +116,7 @@ export class Particle {
         this.sprite.texture = PIXI.Texture.from(tex);
         this.sprite.visible = false;
         this.valueAdjust = def.ignoreValueAdjust ? 1 : valueAdjust;
-        this.setColor(tint !== undefined ? tint : getColorValue(def.color!));
+        this.setColor(getColorValue(def.color!));
 
         if (SDK.disableBloodParticles() && type == "bloodSplat") {
             this.sprite.renderable = false;
@@ -243,7 +242,6 @@ export class ParticleBarn {
         rot?: number,
         parent?: PIXI.Container | null,
         zOrd?: number,
-        tint?: number,
     ) {
         let particle = null;
         for (let i = 0; i < this.particles.length; i++) {
@@ -271,7 +269,6 @@ export class ParticleBarn {
             parent!,
             zOrd,
             this.valueAdjust,
-            tint,
         );
         return particle;
     }

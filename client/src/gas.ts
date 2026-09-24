@@ -29,8 +29,7 @@ export class GasRenderer {
             this.display = new PIXI.Sprite(PIXI.Texture.from(this.canvas));
             this.gasColorDOMString = helpers.colorToDOMString(gasColor, 0.6);
         } else {
-            this.display = new PIXI.Graphics();
-            const ctx = this.display as PIXI.Graphics;
+            const ctx = this.display = new PIXI.Graphics();
             ctx.clear();
             ctx.beginFill(gasColor, 0.6);
             ctx.moveTo(-overdraw, -overdraw);

@@ -1,6 +1,6 @@
 import * as PIXI from "pixi.js-legacy";
 
-import type { BuildingDef, FloorImage } from "../../../shared/defs/mapObjects/buildings/buildingDefs.ts";
+import type { FloorImage } from "../../../shared/defs/mapObjects/buildings/buildingDefs.ts";
 import { MapObjectDefs } from "../../../shared/defs/register.ts";
 import type { ObjectData, ObjectType } from "../../../shared/net/objectSerializeFns.ts";
 import type { Collider } from "../../../shared/utils/coldet.ts";
@@ -24,9 +24,10 @@ import type { Ctx } from "../game.ts";
 import type { SoundHandle } from "../lib/createJS.ts";
 import type { Map } from "../map.ts";
 import type { Renderer } from "../renderer.ts";
+import type { AbstractObject } from "./objectPool.ts";
 import type { Obstacle } from "./obstacle.ts";
 import type { Emitter, ParticleBarn } from "./particles.ts";
-import type { AbstractObject, Player } from "./player.ts";
+import type { Player } from "./player.ts";
 
 function step(cur: number, target: number, rate: number) {
     const delta = target - cur;
@@ -102,7 +103,12 @@ export class Building implements AbstractObject {
             zoomOut?: Collider | null;
         }>;
         type?: string;
-        vision: BuildingDef["ceiling"]["vision"];
+        vision: {
+            dist: number;
+            width: number;
+            linger: number;
+            fadeRate: number;
+        };
         visionTicker: number;
         fadeAlpha: number;
     };
@@ -230,13 +236,13 @@ export class Building implements AbstractObject {
             this.zIdx = def.zIdx || 0;
 
             // Create floor surfaces
-            this.surfaces = [] as this["surfaces"];
+            this.surfaces = [];
             for (let i = 0; i < def.floor.surfaces.length; i++) {
                 const surfaceDef = def.floor.surfaces[i];
-                const surface = {
+                const surface: this["surfaces"][0] = {
                     type: surfaceDef.type,
                     data: surfaceDef.data || {},
-                    colliders: [] as this["surfaces"][number]["colliders"],
+                    colliders: [],
                 };
                 for (let j = 0; j < surfaceDef.collision.length; j++) {
                     surface.colliders.push(
@@ -455,7 +461,7 @@ export class Building implements AbstractObject {
 
         // Determine ceiling visibility
         this.ceiling.visionTicker -= dt;
-        const vision = this.ceiling.vision!;
+        const vision = this.ceiling.vision;
 
         let canSeeInside = false;
         for (let i = 0; i < this.ceiling.zoomRegions.length; i++) {
@@ -469,8 +475,8 @@ export class Building implements AbstractObject {
                     activePlayer.m_pos,
                     activePlayer.layer,
                     0.5,
-                    vision.width! * 2,
-                    vision.dist!,
+                    vision.width * 2,
+                    vision.dist,
                     5,
                     debug.buildings?.ceiling,
                     debugLines,
@@ -484,7 +490,7 @@ export class Building implements AbstractObject {
             canSeeInside = true;
         }
         if (canSeeInside) {
-            this.ceiling.visionTicker = vision.linger! + 0.0001;
+            this.ceiling.visionTicker = vision.linger + 0.0001;
         }
 
         // @NOTE: This will not allow for revealing any ceilings while
@@ -497,7 +503,7 @@ export class Building implements AbstractObject {
         const ceilingStep = step(
             this.ceiling.fadeAlpha,
             visible ? 0 : 1,
-            dt * (visible ? 12 : (vision.fadeRate ?? 1)),
+            dt * (visible ? 12 : vision.fadeRate),
         );
         this.ceiling.fadeAlpha += ceilingStep;
 

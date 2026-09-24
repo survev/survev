@@ -13,10 +13,10 @@ import type { Ctx } from "../game.ts";
 import type { Map } from "../map.ts";
 import type { Renderer } from "../renderer.ts";
 import { playHitFx } from "./bullet.ts";
-import { Pool } from "./objectPool.ts";
+import { AbstractObject, Pool } from "./objectPool.ts";
 import type { Obstacle } from "./obstacle.ts";
 import type { ParticleBarn } from "./particles.ts";
-import type { AbstractObject, Player } from "./player.ts";
+import type { Player } from "./player.ts";
 
 export const halloweenSpriteMap: Record<string, string> = {
     "proj-frag-nopin-01.img": "proj-frag-nopin-02.img",

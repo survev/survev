@@ -8,8 +8,8 @@ import { device } from "../device.ts";
 import type { Ctx } from "../game.ts";
 import type { Map } from "../map.ts";
 import type { Renderer } from "../renderer.ts";
-import { Pool } from "./objectPool.ts";
-import type { AbstractObject, Player, PlayerBarn } from "./player.ts";
+import { AbstractObject, Pool } from "./objectPool.ts";
+import type { Player, PlayerBarn } from "./player.ts";
 
 function createDeadBodyText() {
     const nameStyle: Partial<PIXI.TextStyle> = {

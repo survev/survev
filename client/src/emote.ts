@@ -756,7 +756,7 @@ export class EmoteBarn {
 
                     // Colorize if defined
                     const ammo = GameObjectDefs.typeToDefSafe((lootDef as GunDef).ammo) as AmmoDef;
-                    e.circleOuter.tint = ammo ? ammo.lootImg.tintDark! : 0;
+                    e.circleOuter.tint = ammo ? ammo.lootImg.tintDark : 0;
 
                     // Rotate if defined
                     if (lootDef.lootImg.rot) {

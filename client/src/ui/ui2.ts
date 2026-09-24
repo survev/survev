@@ -696,7 +696,7 @@ export class UiManager2 {
                 ) {
                     const interact = obstacle.getInteraction(activePlayer);
                     if (interact) {
-                        if (obstacle.isButton && obstacle.button.isVat) {
+                        if (obstacle.isButton && obstacle.button!.isVat) {
                             const distance = v2.distance(
                                 activePlayer.m_pos,
                                 obstacle.pos,

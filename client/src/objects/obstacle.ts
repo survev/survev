@@ -14,8 +14,9 @@ import { debugLines } from "../debug/debugLines.ts";
 import type { Ctx } from "../game.ts";
 import type { Map } from "../map.ts";
 import type { Renderer } from "../renderer.ts";
+import type { AbstractObject } from "./objectPool.ts";
 import type { Emitter, ParticleBarn } from "./particles.ts";
-import type { AbstractObject, Player, PlayerBarn } from "./player.ts";
+import type { Player, PlayerBarn } from "./player.ts";
 
 interface ObstacleSprite extends PIXI.Sprite {
     zIdx: number;
@@ -62,7 +63,7 @@ export class Obstacle implements AbstractObject {
     isPuzzlePiece!: boolean;
     parentBuildingId!: number;
 
-    button!: {
+    button?: {
         interactionRad: number;
         interactionText: string;
         seq: number;
@@ -75,7 +76,7 @@ export class Obstacle implements AbstractObject {
         roleToPromote?: string;
     };
 
-    door!: {
+    door?: {
         openOneWay: boolean | number;
         closedPos: Vec2;
         autoOpen: boolean;
@@ -194,7 +195,7 @@ export class Obstacle implements AbstractObject {
                     couldUse: data.door.canUse,
                     casingSprite: null,
                 };
-                const casingImgDef = def.door?.casingImg;
+                const casingImgDef = def.door.casingImg;
                 if (casingImgDef !== undefined) {
                     let posOffset = casingImgDef.pos || v2.create(0, 0);
                     posOffset = v2.rotate(posOffset, this.rot + Math.PI * 0.5);
@@ -235,7 +236,7 @@ export class Obstacle implements AbstractObject {
             }
         }
         if (this.isDoor && fullUpdate) {
-            assert(data.door && def.door);
+            assert(this.door && data.door && def.door);
             this.door.canUse = data.door.canUse;
             this.door.open = data.door.open;
             this.door.seq = data.door.seq;
@@ -248,7 +249,7 @@ export class Obstacle implements AbstractObject {
                 : v2.copy(data.pos);
         }
         if (this.isButton && fullUpdate) {
-            assert(data.button);
+            assert(this.button && data.button);
             this.button.onOff = data.button.onOff;
             this.button.canUse = data.button.canUse;
             this.button.seq = data.button.seq;
@@ -267,11 +268,13 @@ export class Obstacle implements AbstractObject {
             });
         }
         let doTint = false;
-        let currentImg = this.dead ? def.img.residue! : def.img.sprite!;
-        if (this.isButton && this.button.onOff && !this.dead && def.button?.useImg) {
-            currentImg = def.button.useImg;
-        } else if (this.isButton && !this.button.canUse && def.button?.offImg) {
-            currentImg = def.button.offImg;
+        let currentImg = this.dead ? def.img.residue : def.img.sprite;
+        if (this.isButton && this.button && def.button) {
+            if (this.button.onOff && !this.dead && def.button.useImg) {
+                currentImg = def.button.useImg;
+            } else if (!this.button.canUse && def.button.offImg) {
+                currentImg = def.button.offImg;
+            }
         }
         if (currentImg != this.img) {
             let anchor = v2.create(0.5, 0.5);
@@ -294,7 +297,7 @@ export class Obstacle implements AbstractObject {
                 this.sprite.parent?.removeChild(this.sprite);
             }
             this.sprite.visible = hasImage;
-            this.img = currentImg;
+            this.img = currentImg || "";
         }
         const biomeValueAdjust = ctx.map.getMapDef().biome.valueAdjust;
         if (doTint && biomeValueAdjust < 1) {
@@ -303,7 +306,7 @@ export class Obstacle implements AbstractObject {
     }
 
     getInteraction(player: Player) {
-        if (this.isButton && this.button.canUse) {
+        if (this.isButton && this.button?.canUse) {
             if (
                 this.button.roleToPromote
                 && this.button.roleToPromote === player.m_netData.m_role
@@ -317,7 +320,7 @@ export class Obstacle implements AbstractObject {
                 object: `game-${this.type}`,
             };
         }
-        if (this.isDoor && this.door.canUse && !this.door.autoOpen) {
+        if (this.isDoor && this.door?.canUse && !this.door.autoOpen) {
             return {
                 rad: this.door.interactionRad,
                 action: this.door.open ? "game-close-door" : "game-open-door",
@@ -336,7 +339,7 @@ export class Obstacle implements AbstractObject {
         activePlayer: Player,
         renderer: Renderer,
     ) {
-        if (this.isButton) {
+        if (this.isButton && this.button) {
             const button = this.button;
             if (button.seq != button.seqOld) {
                 const def = MapObjectDefs.typeToDef(this.type, "obstacle");
@@ -368,7 +371,7 @@ export class Obstacle implements AbstractObject {
         }
 
         // Door
-        if (this.isDoor) {
+        if (this.isDoor && this.door) {
             const door = this.door;
 
             // Interpolate position
@@ -495,7 +498,7 @@ export class Obstacle implements AbstractObject {
 
             renderer.addPIXIObj(this.sprite, layer, zOrd, zIdx);
 
-            if (this.isDoor && this.door.casingSprite) {
+            if (this.isDoor && this.door?.casingSprite) {
                 renderer.addPIXIObj(this.door.casingSprite, layer, zOrd + 1, zIdx);
             }
         }
@@ -503,7 +506,7 @@ export class Obstacle implements AbstractObject {
     }
 
     render(dt: number, camera: Camera, debug: DebugRendererOpts, layer: number) {
-        let pos = this.isDoor ? this.door.interpPos : this.pos;
+        let pos = this.isDoor ? this.door!.interpPos : this.pos;
 
         if (this.isSkin && camera.m_interpEnabled) {
             this.posInterpTicker += dt;
@@ -511,7 +514,7 @@ export class Obstacle implements AbstractObject {
             pos = v2.lerp(posT, this.visualPosOld, this.pos);
         }
 
-        const rot = this.isDoor ? this.door.interpRot : this.rot;
+        const rot = this.isDoor ? this.door!.interpRot : this.rot;
         const scale = this.scale;
 
         const screenPos = camera.m_pointToScreen(pos);
