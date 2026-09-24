@@ -330,7 +330,7 @@ export const InteractableDefs: Record<string, ObstacleDef> = {
         img: { sprite: "map-control-panel-04.img" },
     }),
     control_panel_06: createControlPanel({
-        collision: collider.createAabbExtents(v2.create(0, 0), v2.create(2.5, 1.2)),
+        collision: collider.createAabbExtents(v2.create(0, 0), v2.create(3, 1.4)),
         health: 200,
         img: { sprite: "map-control-panel-06.img" },
     }),
