@@ -3965,7 +3965,7 @@ export class Player extends BaseGameObject {
                 }
                 if (
                     perkSlotType
-                    && perkSlots.length >= ((GameObjectDefs.typeToDef(this.backpack) as BackpackDef).maxPerks ?? 1)
+                    && perkSlots.length >= (GameObjectDefs.typeToDef(this.backpack, "backpack").maxPerks ?? 1)
                 ) {
                     amountLeft = 1;
                     lootToAdd = isMistery ? "" : perkSlotType;

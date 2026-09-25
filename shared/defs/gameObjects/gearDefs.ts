@@ -1,16 +1,20 @@
-import { GameConfig } from "../../gameConfig.ts";
 import { type DeepPartial, util } from "../../utils/util.ts";
 import type { BaseLootDef, LootImg } from "./itemTypes.ts";
 
 type GearDef = HealDef | AmmoDef | BoostDef | BackpackDef | HelmetDef | ChestDef;
 
 function defineSkin<T extends GearDef>(baseType: string, params: DeepPartial<T>): T {
-    return util.mergeDeep({}, BaseDefs[baseType], { baseType }, params);
+    return util.mergeDeep<T>({}, BaseDefs[baseType] as T, { baseType } as T, params);
 }
 
-export interface ChestDef extends BaseLootDef {
+export interface BaseGearDef extends BaseLootDef {
+    level: 0 | 1 | 2 | 3 | 4;
+    hasDesc?: boolean;
+    desc?: string;
+}
+
+export interface ChestDef extends BaseGearDef {
     type: "chest";
-    level: number;
     damageReduction: number;
     skinImg: {
         baseTint: number;
@@ -102,11 +106,10 @@ const ChestDefs: Record<string, ChestDef> = {
     },
 };
 
-export interface HelmetDef extends BaseLootDef {
+export interface HelmetDef extends BaseGearDef {
     type: "helmet";
     perk?: string;
     role?: string;
-    level: number;
     damageReduction: number;
     skinImg: {
         baseTint: number;
@@ -208,11 +211,8 @@ const HelmetDefs: Record<string, HelmetDef> = {
     },
 };
 
-export interface BackpackDef extends BaseLootDef {
+export interface BackpackDef extends BaseGearDef {
     type: "backpack";
-    level: number;
-    hasDesc?: boolean;
-    desc?: string;
     playerRad: number;
     tint: number;
     maxPerks?: number;

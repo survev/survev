@@ -253,6 +253,7 @@ const mapDef: PartialMapDef = {
         randomSpawns: [
             {
                 spawns: [],
+                choose: 0,
             },
         ],
         spawnReplacements: [

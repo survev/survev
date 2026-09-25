@@ -438,7 +438,7 @@ export const GameConfig = {
         "4xscope": [1, 1, 1, 1, 1],
         "8xscope": [1, 1, 1, 1, 1],
         "15xscope": [1, 1, 1, 1, 1],
-    },
+    } satisfies Record<string, [number, number, number, number, number]>,
     lootRadius: {
         outfit: 1,
         melee: 1.25,

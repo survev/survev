@@ -1,4 +1,4 @@
-import { type GameConfig, type InventoryItem, type MapId } from "../gameConfig.ts";
+import { type GameConfig, type MapId } from "../gameConfig.ts";
 import type { DeepPartial } from "../utils/util.ts";
 import type { Vec2 } from "../utils/v2.ts";
 import type { RoleDef } from "./gameObjects/roleDefs.ts";
@@ -166,7 +166,7 @@ export interface MapDef {
                 wait: number;
             }>;
         };
-        bagSizes: Partial<Record<InventoryItem, number[]>>;
+        bagSizes: Partial<typeof GameConfig["bagSizes"]>;
         bleedDamage: number;
         bleedDamageMult: number;
     };

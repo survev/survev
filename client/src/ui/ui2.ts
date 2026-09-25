@@ -1304,9 +1304,7 @@ export class UiManager2 {
                 const gearLevel = gearDefMin ? gearDefMin.level : 0;
                 gearDom.div.style.display = gearDefMin ? "block" : "none";
                 gearDom.level.innerHTML = this.localization.translate(`game-level-${gearLevel}`);
-                gearDom.divTooltip.style.display = (gearDef && "hasDesc" in gearDef && gearDef.hasDesc)
-                    ? "block"
-                    : "none";
+                gearDom.divTooltip.style.display = gearDef?.hasDesc ? "block" : "none";
                 gearDom.divTitle.innerHTML = this.localization.translate(`game-${gearState.item}`);
                 gearDom.divDesc.innerHTML = this.localization.translate(`game-${gearState.item}-desc`);
                 gearDom.level.style.color = gearLevel === 4 ? "#b30000" : gearLevel === 3 ? "#ff9900" : "#ffffff";

@@ -57,8 +57,8 @@ const mapDef: PartialMapDef = {
         },
         /* STRIP_FROM_PROD_CLIENT:END */
         bagSizes: {
-            frag: [6, 12, 15, 18],
-            smoke: [6, 12, 15, 18],
+            frag: [6, 12, 15, 18, 20],
+            smoke: [6, 12, 15, 18, 20],
         },
     },
     /* STRIP_FROM_PROD_CLIENT:START */

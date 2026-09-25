@@ -26,7 +26,10 @@ export function assert(value: unknown, message?: string | Error): asserts value 
 }
 
 export type DeepPartial<T> = {
-    [K in keyof T]?: DeepPartial<T[K]>;
+    // special array handling because we use this with util.mergeDeep
+    // which doesn't merge arrays, so items inside arrays shouldn't be optional
+    [K in keyof T]?: Required<T>[K] extends any[] ? T[K]
+        : DeepPartial<T[K]>;
 };
 
 export type UnionToIntersection<U> = (U extends unknown ? (x: U) => void : never) extends ((x: infer I) => void) ? I
