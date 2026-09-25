@@ -1601,10 +1601,48 @@ export const BunkerDefs: Record<string, BuildingDef> = {
         floor: {
             surfaces: [
                 {
+                    type: "tile",
+                    collision: [
+                        // left corridor from entrance
+                        collider.createAabbExtents(v2.create(-22, 9), v2.create(10.5, 14)),
+                        // right corridor from entrance
+                        collider.createAabbExtents(v2.create(19.5, 14), v2.create(11, 9)),
+                        // bottom right tile that goes into cloud crate room
+                        collider.createAabbExtents(v2.create(24, -28.5), v2.create(5, 7)),
+                        // bottom left tile that goes into cloud crate room
+                        collider.createAabbExtents(v2.create(-14, -32), v2.create(5, 5)),
+                    ],
+                },
+                {
+                    type: "tile",
+                    data: {
+                        isBright: true,
+                    },
+                    collision: [
+                        // main lab area
+                        collider.createAabbExtents(v2.create(-1, -5), v2.create(24, 22)),
+                    ],
+                },
+                {
+                    type: "grass",
+                    data: {
+                        isBright: true,
+                    },
+                    collision: [
+                        collider.createAabbExtents(v2.create(-1.5, -6), v2.create(12.5, 10.5)),
+                    ],
+                },
+                {
                     type: "bunker",
                     collision: [
-                        collider.createAabbExtents(v2.create(0, 0), v2.create(40, 36.5)),
-                        collider.createAabbExtents(v2.create(3.5, -39), v2.create(11.5, 2.5)),
+                        // entrance
+                        collider.createAabbExtents(v2.create(-1.5, 27.5), v2.create(10, 10.5)),
+                        // exit
+                        collider.createAabbExtents(v2.create(-31, -21), v2.create(6, 16)),
+                        // cloud crate room
+                        collider.createAabbExtents(v2.create(5, -33.5), v2.create(14, 9)),
+                        // lockers room
+                        collider.createAabbExtents(v2.create(30, -8.25), v2.create(7, 13.25)),
                     ],
                 },
                 {
