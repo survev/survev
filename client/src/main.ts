@@ -356,6 +356,7 @@ export class Application {
                 this.errorMessage = errMsg ? this.getErrorString(errMsg, "host_closed") : "";
                 this.teamMenu.onGameComplete(this.errorMessage);
                 this.ambience.onGameComplete(this.audioManager);
+                this.ambience.setMap(this.siteInfo?.info?.clientTheme || "main", this.audioManager);
                 this.setAppActive(true);
                 this.setPlayLockout(false);
 
@@ -562,6 +563,12 @@ export class Application {
 
         if (key == "highResTex") {
             location.reload();
+        }
+
+        if (key == "clientTheme") {
+            if (!this.game?.initialized) {
+                this.ambience.setMap(this.config.get("clientTheme") || "main", this.audioManager);
+            }
         }
 
         if (key === "debugHUD") {

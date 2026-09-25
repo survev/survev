@@ -231,7 +231,7 @@ export class ResourceManager {
                 const soundDef = soundsList[sound.name];
 
                 const options = {
-                    canCoalesce: soundDef.canCoalesce!,
+                    canCoalesce: soundDef.canCoalesce,
                     channels: soundDef.maxInstances,
                     volume: soundDef.volume,
                 };

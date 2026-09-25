@@ -1,7 +1,9 @@
+import { type MapDefKey, MapDefs } from "../../shared/defs/mapDefs.ts";
 import { math } from "../../shared/utils/math.ts";
+import { assert } from "../../shared/utils/util.ts";
 import type { AudioManager } from "./audioManager.ts";
 import type { SoundHandle } from "./lib/createJS.ts";
-import { MapDefs, type MapDefKey } from "../../shared/defs/mapDefs.ts";
+import SoundDefs from "./soundDefs.ts";
 
 export class Ambiance {
     introMusic = true;
@@ -44,7 +46,7 @@ export class Ambiance {
             this.trackToIdx[name] = this.tracks.length - 1;
         };
         // Added in order of weight from least to greatest
-        addTrack("music", "menu_music", "music", false);
+        addTrack("music", "menu_music_01", "music", false);
         addTrack("wind", "ambient_wind_01", "ambient", false);
         addTrack("river", "ambient_stream_01", "ambient", false);
         addTrack("waves", "ambient_waves_01", "ambient", false);
@@ -53,13 +55,32 @@ export class Ambiance {
         this.initTime = Date.now();
     }
 
-    setMap(mapName: MapDefKey) {
+    setMap(mapName: MapDefKey, audioManager: AudioManager) {
         const ambience = MapDefs[mapName].biome.ambience;
 
-        this.getTrack("music").sound = ambience.music;
-        this.getTrack("wind").sound = ambience.wind;
-        this.getTrack("river").sound = ambience.river;
-        this.getTrack("waves").sound = ambience.waves;
+        const tracks = ["music", "wind", "river", "waves"] as const;
+        for (const track of tracks) {
+            const sound = ambience[track];
+            this.getTrack(track).sound = sound;
+
+            const channel = track === "music" ? "music" : "ambient";
+            let soundsList = SoundDefs.Sounds[channel];
+            const soundDef = soundsList[sound];
+            assert(soundDef, `Invalid ambience sound ${sound}`);
+
+            const options = {
+                canCoalesce: soundDef.canCoalesce!,
+                channels: soundDef.maxInstances,
+                volume: soundDef.volume,
+            };
+
+            audioManager.loadSound({
+                name: sound,
+                channel: channel,
+                path: soundDef.path,
+                options,
+            });
+        }
     }
 
     getTrack(name: string) {
@@ -76,8 +97,6 @@ export class Ambiance {
     }
 
     onGameComplete(_audioManager: AudioManager) {
-        this.setMap("main");
-
         this.introMusic = true;
         this.soundUpdateThrottle = 0;
 

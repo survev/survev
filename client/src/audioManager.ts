@@ -139,8 +139,8 @@ export class AudioManager {
         path: string;
         channel: string;
         options?: {
-            canCoalesce: boolean;
             volume: number;
+            canCoalesce?: boolean;
             maxInstances?: number;
             channels?: number;
         };
