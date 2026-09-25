@@ -14,7 +14,7 @@ import { Account } from "./account.ts";
 import { Ambiance } from "./ambiance.ts";
 import { api } from "./api.ts";
 import { AudioManager } from "./audioManager.ts";
-import { ConfigManager, type ConfigType } from "./config.ts";
+import { type ConfigKey, ConfigManager, type ConfigType } from "./config.ts";
 import { device } from "./device.ts";
 import { errorLogManager } from "./errorLogs.ts";
 import { Game } from "./game.ts";
@@ -529,7 +529,7 @@ export class Application {
         this.languageSelect.val(this.localization.getLocale());
     }
 
-    onConfigModified(key?: string) {
+    onConfigModified(key?: ConfigKey) {
         const muteAudio = this.config.get("muteAudio")!;
         if (muteAudio != this.audioManager.mute) {
             this.muteBtns.removeClass(muteAudio ? "audio-on-icon" : "audio-off-icon");

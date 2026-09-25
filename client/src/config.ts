@@ -150,7 +150,7 @@ export class ConfigManager {
 
     config = {} as ConfigType;
 
-    onModifiedListeners: Array<(key?: string) => void> = [];
+    onModifiedListeners: Array<(key?: ConfigKey) => void> = [];
 
     load(cb?: () => void) {
         const onLoaded = (configStr: string) => {
@@ -208,11 +208,11 @@ export class ConfigManager {
         return this.config[key];
     }
 
-    addModifiedListener(e: (key?: string) => void) {
+    addModifiedListener(e: (key?: ConfigKey) => void) {
         this.onModifiedListeners.push(e);
     }
 
-    onModified(key?: string) {
+    onModified(key?: ConfigKey) {
         for (let i = 0; i < this.onModifiedListeners.length; i++) {
             this.onModifiedListeners[i](key);
         }
