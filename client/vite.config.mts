@@ -1,7 +1,7 @@
 import { resolve } from "node:path";
 import { defineConfig, loadEnv, PluginOption, type ServerOptions } from "vite";
 import { getConfig } from "../config.ts";
-import { version } from "../package.json" with { type: "json" };
+import pkgJson from "../package.json" with { type: "json" };
 import { GIT_VERSION } from "../server/src/utils/gitRevision.ts";
 import { stripBlockPlugin } from "../shared/utils/stripBlockPlugin.ts";
 import { atlasBuilderPlugin } from "./atlas-builder/vitePlugin.ts";
@@ -23,7 +23,7 @@ export default defineConfig(({ mode }) => {
     process.env.VITE_DEBUG_CSS_LINK = isDev
         ? `<link href='css/dev.css' rel="stylesheet" />`
         : "";
-    process.env.VITE_GAME_VERSION = version;
+    process.env.VITE_GAME_VERSION = pkgJson.version;
 
     process.env.VITE_SPELLSYNC_PROJECT_ID = Config.secrets.SPELLSYNC_PROJECT_ID;
     process.env.VITE_SPELLSYNC_PUBLIC_TOKEN = Config.secrets.SPELLSYNC_PUBLIC_TOKEN;
@@ -73,7 +73,7 @@ export default defineConfig(({ mode }) => {
         build: {
             target: "es2022",
             chunkSizeWarningLimit: 2000,
-            rollupOptions: {
+            rolldownOptions: {
                 input: {
                     main: resolve(import.meta.dirname, "index.html"),
                     stats: resolve(import.meta.dirname, "stats/index.html"),
