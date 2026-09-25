@@ -91,7 +91,7 @@ export class Obstacle implements AbstractObject {
         locked: boolean;
         casingSprite: ObstacleSprite | null;
         canUse: boolean;
-        couldUse: boolean;
+        wasLocked: boolean;
     };
 
     imgScale!: number;
@@ -191,8 +191,8 @@ export class Obstacle implements AbstractObject {
                     open: data.door.open,
                     wasOpen: data.door.open,
                     locked: data.door.locked,
+                    wasLocked: data.door.locked,
                     canUse: data.door.canUse,
-                    couldUse: data.door.canUse,
                     casingSprite: null,
                 };
                 const casingImgDef = def.door.casingImg;
@@ -240,6 +240,7 @@ export class Obstacle implements AbstractObject {
             this.door.canUse = data.door.canUse;
             this.door.open = data.door.open;
             this.door.seq = data.door.seq;
+            this.door.locked = data.door.locked;
             const offset = v2.rotate(
                 v2.create(def.door?.slideOffset, 0),
                 this.rot + Math.PI * 0.5,
@@ -421,8 +422,8 @@ export class Obstacle implements AbstractObject {
                 door.wasOpen = door.open;
             }
 
-            if (door.couldUse !== door.canUse) {
-                if (door.canUse && def.door?.sound.unlock) {
+            if (door.wasLocked !== door.locked) {
+                if (!door.locked && def.door?.sound.unlock) {
                     audioManager.playSound(def.door?.sound.unlock, {
                         channel: "sfx",
                         soundPos: this.pos,
@@ -430,7 +431,7 @@ export class Obstacle implements AbstractObject {
                         filter: "muffled",
                     });
                 }
-                door.couldUse = door.canUse;
+                door.wasLocked = door.locked;
             }
         }
         if (this.dead && !this.exploded) {

@@ -892,7 +892,7 @@ export class Player implements AbstractObject {
                     );
                     if (
                         res
-                        && (obstacle.door!.locked
+                        && !obstacle.door!.open && (obstacle.door!.locked
                             || (obstacle.door!.openOneWay && v2.dot(toDoor, doorDir) < 0))
                     ) {
                         doorErrorObstacle = obstacle;

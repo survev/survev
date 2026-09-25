@@ -245,6 +245,7 @@ export class Obstacle extends BaseGameObject {
                         this.door
                         && this.door.open
                         && this.door.autoClose
+                        && !this.delayedDoorInteraction.lock
                         && this.checkNearByPlayers()
                     )
                 ) {
@@ -273,9 +274,12 @@ export class Obstacle extends BaseGameObject {
                     }
 
                     if (this.door && this.delayedDoorInteraction.lock) {
-                        const couldUse = this.door.canUse;
+                        const locked = this.door.locked;
+                        const canUse = this.door.canUse;
                         this.door.canUse = this.delayedDoorInteraction.lock === "unlock";
-                        if (couldUse !== this.door.canUse) {
+                        this.door.locked = !this.door.canUse;
+
+                        if (locked !== this.door.locked || canUse !== this.door.canUse) {
                             this.setDirty();
                         }
                     }
@@ -327,6 +331,7 @@ export class Obstacle extends BaseGameObject {
             if (this.useExpirationTicker < 0 && this.memorizedDoorState && this.isDoor) {
                 this.setDoorState(this.memorizedDoorState.open, undefined, this.memorizedDoorState.useDir);
                 this.door!.canUse = this.memorizedDoorState.canUse;
+                this.door!.locked = !this.door!.canUse;
                 this.setDirty();
             }
         }
