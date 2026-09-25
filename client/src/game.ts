@@ -1272,6 +1272,8 @@ export class Game {
                     this.m_canvasMode,
                     this.m_particleBarn,
                 );
+
+                this.m_ambience.setMapDef(this.m_map.getMapDef());
                 this.m_resourceManager.loadMapAssets(this.m_map.mapName);
                 this.m_map.renderMap(this.m_pixi.renderer, this.m_canvasMode);
                 this.m_renderer.resize(this.m_map, this.m_camera);

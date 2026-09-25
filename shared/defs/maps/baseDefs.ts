@@ -45,6 +45,11 @@ export const Main: MapDef = {
         },
         valueAdjust: 1,
         sound: { riverShore: "sand" },
+        ambience: {
+            wind: "ambient_wind_01",
+            river: "ambient_stream_01",
+            waves: "ambient_waves_01",
+        },
         particles: { camera: "" },
         tracerColors: {},
         airdrop: {
