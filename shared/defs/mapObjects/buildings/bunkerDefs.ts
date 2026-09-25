@@ -1609,6 +1609,10 @@ export const BunkerDefs: Record<string, BuildingDef> = {
                 },
                 {
                     type: "water",
+                    data: {
+                        rippleColor: 0xb3f0ff,
+                        waterColor: 0x18425B,
+                    },
                     collision: [
                         collider.createAabbExtents(v2.create(24.5, 17), v2.create(4.5, 4.5)),
                         collider.createAabbExtents(v2.create(-30, 7), v2.create(2, 5.5)),
