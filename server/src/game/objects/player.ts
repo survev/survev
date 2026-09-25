@@ -778,6 +778,29 @@ export class Player extends BaseGameObject {
         return (GameObjectDefs.typeToDef(type) as BackpackDef | HelmetDef | ChestDef).level;
     }
 
+    /**
+     * Handles knowing if a gear item is better or worse, to show the "better item equipped" toast
+     */
+    getGearQuality(type: string) {
+        if (!type) {
+            return 0;
+        }
+
+        const def = GameObjectDefs.typeToDef(type) as BackpackDef | HelmetDef | ChestDef;
+        let level = def.level * 10;
+        if (def.type === "helmet") {
+            if (def.perk) {
+                level += 1;
+            }
+            if (def.role) {
+                level += 1;
+            }
+        } else if (def.type === "backpack") {
+            level += def.maxPerks ?? 1;
+        }
+        return level;
+    }
+
     layer: number;
     aimLayer = 0;
     dead = false;
@@ -2054,9 +2077,9 @@ export class Player extends BaseGameObject {
                     case "helmet":
                     case "chest":
                     case "backpack": {
-                        const thisLevel = this.getGearLevel(this[itemDef.type]);
-                        const thatLevel = this.getGearLevel(closestLoot.type);
-                        if (thisLevel < thatLevel) {
+                        const thisQuality = this.getGearQuality(this[itemDef.type]);
+                        const thatQuality = this.getGearQuality(closestLoot.type);
+                        if (thisQuality < thatQuality) {
                             this.pickupLoot(closestLoot);
                         }
                         break;
@@ -3836,22 +3859,13 @@ export class Player extends BaseGameObject {
             case "chest":
             case "backpack":
                 {
-                    const objLevel = this.getGearLevel(obj.type);
+                    const objQuality = this.getGearQuality(obj.type);
                     const thisType = this[def.type];
                     const thisDef = GameObjectDefs.typeToDefSafe(thisType);
-                    const thisLevel = this.getGearLevel(thisType);
+                    const thisQuality = this.getGearQuality(thisType);
                     amountLeft = 1;
 
-                    // role helmets and perk helmets can't be dropped in favor of another helmet, they're the "highest" tier
-                    if (
-                        (def.type == "helmet"
-                            && (this.hasRoleHelmet
-                                || (thisDef && (thisDef as HelmetDef).perk)
-                                || (thisDef && (thisDef as HelmetDef).role)))
-                        || (def.type == "backpack"
-                            && (GameObjectDefs.typeToDef(this.backpack) as BackpackDef).hasDesc)
-                    ) {
-                        amountLeft = 1;
+                    if ((def.type == "helmet" && this.hasRoleHelmet) || thisQuality > objQuality) {
                         lootToAdd = obj.type;
                         pickupMsg.type = net.PickupMsgType.BetterItemEquipped;
                         break;
@@ -3860,7 +3874,7 @@ export class Player extends BaseGameObject {
                     if (thisType === obj.type) {
                         lootToAdd = obj.type;
                         pickupMsg.type = net.PickupMsgType.AlreadyEquipped;
-                    } else if (thisLevel <= objLevel) {
+                    } else {
                         lootToAdd = thisType;
                         this[def.type] = obj.type;
                         pickupMsg.type = net.PickupMsgType.Success;
@@ -3884,9 +3898,6 @@ export class Player extends BaseGameObject {
                         }
 
                         this.setDirty();
-                    } else {
-                        lootToAdd = obj.type;
-                        pickupMsg.type = net.PickupMsgType.BetterItemEquipped;
                     }
                     if (this.getGearLevel(lootToAdd) === 0) lootToAdd = "";
                 }
