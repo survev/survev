@@ -58,10 +58,6 @@ export class MainView {
         const interval = helpers.getParameterByName<LeaderboardRequest["interval"]>("t") || "daily";
         const teamMode = helpers.getParameterByName("team") || "solo";
         const mapId = helpers.getParameterByName("mapId") || "0";
-        // Change to most_damage_dealt if faction mode and most_kills selected
-        if (type == "most_kills" && Number(mapId) == 3) {
-            type = "most_damage_dealt";
-        }
 
         const args: LeaderboardRequest = {
             type: type,
@@ -136,17 +132,6 @@ export class MainView {
             $("#leaderboard-map-id").val(this.data.mapId!);
             $("#leaderboard-type").val(this.data.type!);
             $("#leaderboard-time").val(this.data.interval!);
-
-            // Disable most kills option if 50v50 selected
-            const factionMode = Number(this.data.mapId) == 3;
-            if (factionMode) {
-                $("#leaderboard-type option[value=\"most_kills\"]").attr(
-                    "disabled",
-                    "disabled",
-                );
-            } else {
-                $("#leaderboard-type option[value=\"most_kills\"]").removeAttr("disabled");
-            }
         }
 
         this.el.find(".content").html(content);

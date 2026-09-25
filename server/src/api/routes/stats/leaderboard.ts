@@ -1,6 +1,6 @@
 import { and, count, eq, gte, inArray, ne, type SQL, sql } from "drizzle-orm";
 import { Hono } from "hono";
-import { TeamMode } from "../../../../../shared/gameConfig.ts";
+import { MapId, TeamMode } from "../../../../../shared/gameConfig.ts";
 import {
     type LeaderboardRequest,
     type LeaderboardResponse,
@@ -30,7 +30,7 @@ leaderboardRouter.post(
     validateParams(zLeaderboardsRequest),
     async (c) => {
         const params = c.req.valid("json");
-        const { type, teamMode } = params;
+        const { type, teamMode, mapId } = params;
         const cachedResult = await leaderboardCache.get(params);
 
         if (cachedResult) {
@@ -41,7 +41,10 @@ leaderboardRouter.post(
         }
 
         const startTime = performance.now();
-        const data = type === "most_kills" && teamMode != TeamMode.Solo
+
+        const isFaction = mapId === MapId.Faction || mapId === MapId.FactionPotato;
+
+        const data = type === "most_kills" && teamMode !== TeamMode.Solo && !isFaction
             ? await multiplePlayersQuery(params)
             : await soloLeaderboardQuery(params);
         logQueryPerformance(startTime, params);
