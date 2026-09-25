@@ -33,7 +33,9 @@ export interface DecalDef {
         | number;
     fadeChance?: number;
     surface?: {
-        type: string;
+        // note: decal surfaces are currently hardcoded to water only
+        // need to change client logic
+        type: "water";
         data: {
             waterColor: number;
             rippleColor: number;

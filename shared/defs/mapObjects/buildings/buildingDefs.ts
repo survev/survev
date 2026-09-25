@@ -1,7 +1,7 @@
 import type { FactionTeam } from "../../../gameConfig.ts";
 import type { AABB, Collider } from "../../../utils/coldet.ts";
 import type { Vec2 } from "../../../utils/v2.ts";
-import type { TerrainSpawnDef } from "../../mapObjectsTyping.ts";
+import type { SurfaceData, SurfaceType, TerrainSpawnDef } from "../../mapObjectsTyping.ts";
 import { BaseBuildingDefs } from "./baseBuildingDefs.ts";
 import { BunkerDefs } from "./bunkerDefs.ts";
 import { CacheDefs } from "./cacheDefs.ts";
@@ -32,11 +32,9 @@ export interface BuildingDef {
     mapObstacleBounds?: Collider[];
     floor: {
         surfaces: Array<{
-            type: string;
+            type: SurfaceType;
             collision: AABB[];
-            data?: {
-                isBright: boolean;
-            };
+            data?: SurfaceData;
         }>;
         imgs: FloorImage[];
     };

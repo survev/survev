@@ -6,6 +6,7 @@ import type { GunDef } from "../../../shared/defs/gameObjects/gunDefs.ts";
 import { type MeleeDef } from "../../../shared/defs/gameObjects/meleeDefs.ts";
 import type { CookImg, ThrowableDef, ThrowableHandImgKey } from "../../../shared/defs/gameObjects/throwableDefs.ts";
 import type { ObstacleDef } from "../../../shared/defs/mapObjects/obstacles/obstacleDefs.ts";
+import type { SurfaceData } from "../../../shared/defs/mapObjectsTyping.ts";
 import { GameObjectDefs, MapObjectDefs } from "../../../shared/defs/register.ts";
 import { Action, Anim, GameConfig, HasteType, Input, type WeaponSlot } from "../../../shared/gameConfig.ts";
 import type { ObjectData, ObjectType } from "../../../shared/net/objectSerializeFns.ts";
@@ -223,15 +224,7 @@ export class Player implements AbstractObject {
     // Maintain a list of just the perk types as a hasPerk() optimization
     perkTypes: string[] = [];
     perksDirty = false;
-    surface: {
-        type: string;
-        data: {
-            river?: River;
-            waterColor?: number;
-            isBright?: boolean;
-            rippleColor?: number;
-        };
-    } | null = null;
+    surface: ReturnType<Map["getGroundSurface"]> | null = null;
 
     wasInWater = false;
     weapTypeOld = "";

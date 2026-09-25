@@ -1,6 +1,6 @@
 import type { Vec2 } from "../utils/v2.ts";
 
-interface TerrainSpawnDef {
+export interface TerrainSpawnDef {
     grass?: boolean;
     beach?: boolean;
     riverShore?: boolean;
@@ -24,6 +24,28 @@ interface TerrainSpawnDef {
     minDistanceFromSameType?: number;
 }
 
+export type SurfaceType =
+    | "asphalt"
+    | "brick"
+    | "bunker"
+    | "carpet"
+    | "container"
+    | "grass"
+    | "shack"
+    | "snow"
+    | "stone"
+    | "tile"
+    | "warehouse"
+    | "water"
+    | "house"
+    | "sand";
+
+export interface SurfaceData {
+    isBright?: boolean;
+    waterColor?: number;
+    rippleColor?: number;
+}
+
 export interface LootSpawnDef {
     tier?: string;
     min?: number;
@@ -40,5 +62,3 @@ export interface LootSpawnerDef {
     loot: Array<LootSpawnDef>;
     terrain?: TerrainSpawnDef;
 }
-
-export type { TerrainSpawnDef };
