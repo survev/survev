@@ -1919,10 +1919,16 @@ const Sounds: Record<string, Record<string, SoundDef>> = {
         },
     },
     music: {
-        menu_music: {
+        menu_music_01: {
             path: "audio/ambient/menu_music_01.mp3",
             volume: 1,
             loadPriority: 2,
+        },
+        menu_music_02: {
+            path: "audio/ambient/menu_music_02.mp3",
+            volume: 1,
+            loadPriority: 2,
+            preload: false,
         },
     },
 };

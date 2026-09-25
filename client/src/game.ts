@@ -1273,7 +1273,7 @@ export class Game {
                     this.m_particleBarn,
                 );
 
-                this.m_ambience.setMap(this.m_map.mapName);
+                this.m_ambience.setMap(this.m_map.mapName, this.m_audioManager);
                 this.m_resourceManager.loadMapAssets(this.m_map.mapName);
                 this.m_map.renderMap(this.m_pixi.renderer, this.m_canvasMode);
                 this.m_renderer.resize(this.m_map, this.m_camera);
@@ -1549,7 +1549,7 @@ export class Game {
                     this.m_ui2Manager,
                 );
                 if (localTeamId == msg.winningTeamId) {
-                    this.victoryMusic = this.m_audioManager.playSound("menu_music", {
+                    this.victoryMusic = this.m_audioManager.playSound(this.m_map.getMapDef().biome.ambience.music, {
                         channel: "music",
                         delay: 1300,
                         forceStart: true,

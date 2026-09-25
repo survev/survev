@@ -111,6 +111,7 @@ const defaultConfig = {
     touchAimLine: true,
 
     binds: "",
+    clientTheme: "main" as MapDefKey,
     cachedBgImg: "img/main_splash.png",
     language: "en" as Locale,
     playerName: "",
