@@ -1,3 +1,4 @@
+import { type MapDefKey, MapDefs } from "../../shared/defs/mapDefs.ts";
 import { math } from "../../shared/utils/math.ts";
 import type { AudioManager } from "./audioManager.ts";
 import type { SoundHandle } from "./lib/createJS.ts";
@@ -50,6 +51,15 @@ export class Ambiance {
         addTrack("interior_0", "", "ambient", true);
         addTrack("interior_1", "", "ambient", true);
         this.initTime = Date.now();
+    }
+
+    setMap(mapName: MapDefKey) {
+        const ambience = MapDefs[mapName].biome.ambience;
+
+        this.getTrack("music").sound = ambience.music;
+        this.getTrack("wind").sound = ambience.wind;
+        this.getTrack("river").sound = ambience.river;
+        this.getTrack("waves").sound = ambience.waves;
     }
 
     getTrack(name: string) {
