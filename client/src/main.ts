@@ -71,7 +71,7 @@ export class Application {
     siteInfo!: SiteInfo;
     teamMenu!: TeamMenu;
 
-    pixi: PIXI.Application<PIXI.ICanvas> | null = null;
+    pixi: PIXI.Application<HTMLCanvasElement> | null = null;
     resourceManager: ResourceManager | null = null;
     input: InputHandler | null = null;
     inputBinds: InputBinds | null = null;
@@ -308,7 +308,7 @@ export class Application {
             }
 
             const createPixiApplication = (forceCanvas: boolean) => {
-                return new PIXI.Application({
+                return new PIXI.Application<HTMLCanvasElement>({
                     width: window.innerWidth,
                     height: window.innerHeight,
                     view: domCanvas,
@@ -391,6 +391,15 @@ export class Application {
                 this.inputBinds,
                 this.account,
             );
+
+            if (this.pixi.renderer.type === PIXI.RENDERER_TYPE.WEBGL) {
+                this.pixi.view.addEventListener("webglcontextrestored", () => {
+                    if (this.game?.initialized && this.game.m_map.mapLoaded) {
+                        this.game.m_map.renderMap(this.pixi!.renderer, false);
+                    }
+                });
+            }
+
             this.loadoutMenu.loadoutDisplay = this.loadoutDisplay;
             this.onResize();
             this.tryJoinTeam(false);
