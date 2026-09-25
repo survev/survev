@@ -95,6 +95,9 @@ const mapDef: PartialMapDef = {
         particles: {
             camera: "falling_leaf_halloween",
         },
+        ambience: {
+            music: "menu_music_02",
+        },
         valueAdjust: 0.3,
     },
     gameMode: {

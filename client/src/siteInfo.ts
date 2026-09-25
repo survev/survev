@@ -150,6 +150,7 @@ export class SiteInfo {
 
             const mapDef = MapDefs[this.info.clientTheme];
             if (mapDef) {
+                this.config.set("clientTheme", this.info.clientTheme);
                 this.config.set("cachedBgImg", mapDef.desc.backgroundImg);
                 const bg = document.getElementById("background");
                 if (bg) {

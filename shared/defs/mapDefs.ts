@@ -108,6 +108,12 @@ export interface MapDef {
         particles: {
             camera: string;
         };
+        ambience: {
+            music: string;
+            wind: string;
+            river: string;
+            waves: string;
+        };
         tracerColors: DeepPartial<typeof GameConfig["tracerColors"]>;
         airdrop: {
             planeImg: string;
