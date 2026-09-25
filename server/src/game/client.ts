@@ -111,6 +111,7 @@ export class ClientBarn {
             | net.SpectateMsg
             | net.PerkModeRoleSelectMsg
             | net.EditMsg
+            | net.PointerInputMsg
             | undefined = undefined;
 
         switch (type) {
@@ -160,6 +161,10 @@ export class ClientBarn {
             case net.MsgType.Edit:
                 if (!Config.debug.allowEditMsg) break;
                 msg = new net.EditMsg();
+                msg.deserialize(stream);
+                break;
+            case net.MsgType.PointerInput:
+                msg = new net.PointerInputMsg();
                 msg.deserialize(stream);
                 break;
         }
@@ -727,6 +732,13 @@ export class Client {
 
                 if (!player) break;
                 player.handleInput(imsg);
+                break;
+            }
+            case net.MsgType.PointerInput: {
+                const imsg = msg as net.PointerInputMsg;
+                this.ack = imsg.seq;
+                if (!player) break;
+                player.handlePointerInput(imsg);
                 break;
             }
             case net.MsgType.Emote: {
