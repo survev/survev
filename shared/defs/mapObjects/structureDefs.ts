@@ -1100,9 +1100,8 @@ export const StructureDefs: Record<string, StructureDef> = {
             },
         ],
         mask: [
-            collider.createAabbExtents(v2.create(10, -33.4), v2.create(35, 31.4)),
-            collider.createAabbExtents(v2.create(10, -74.8), v2.create(29, 10)),
-            collider.createAabbExtents(v2.create(-32, -43.8), v2.create(7, 31.3)),
+            collider.createAabbExtents(v2.create(0, -38.5), v2.create(40, 36.8)),
+            collider.createAabbExtents(v2.create(10, -80.31), v2.create(29, 5)),
         ],
     },
 };
