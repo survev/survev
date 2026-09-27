@@ -347,13 +347,13 @@ export const QuestDefs: Record<string, QuestDef> = {
         target: 350,
         xp: 30,
         icon: {
-            urls: ["img/emotes/ammo-762mm.svg"],
+            urls: ["img/emotes/ammo-556mm.svg"],
         },
         filters: [
             {
                 type: "weapon",
                 weaponClass: "gun",
-                ammo: ["762mm"],
+                ammo: ["556mm"],
             },
         ],
         mapFilterType: "only_on",
