@@ -125,7 +125,7 @@ describe("Quest helpers", () => {
                 new Set(["quest_kills"]),
             );
 
-            expect.soft(available).toContain("quest_kills_hard");
+            expect.soft(available).not.toContain("quest_kills_hard");
         });
 
         test("Ignores exclusion groups of the rerolled quest", () => {
