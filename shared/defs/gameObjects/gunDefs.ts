@@ -202,8 +202,8 @@ export const BaseDefs: Record<string, GunDef> = {
         extendedClip: 40,
         extendedReload: 40,
         reloadTime: 1.9,
-        fireDelay: 0.35,
-        burstDelay: 0.07,
+        fireDelay: 0.3,
+        burstDelay: 0.06,
         switchDelay: 0.75,
         barrelLength: 2.7,
         barrelOffset: 0,
@@ -401,7 +401,7 @@ export const BaseDefs: Record<string, GunDef> = {
         shotSpread: 2,
         bulletCount: 1,
         bulletType: "bullet_vss",
-        headshotMult: 1.75,
+        headshotMult: 1.5,
         speed: { equip: 0, attack: 0 },
         lootImg: {
             sprite: "loot-weapon-vss.img",
@@ -441,7 +441,7 @@ export const BaseDefs: Record<string, GunDef> = {
         extendedReload: 35,
         reloadTime: 2.3,
         fireDelay: 0.35,
-        burstDelay: 0.07,
+        burstDelay: 0.05,
         switchDelay: 0.75,
         barrelLength: 3.1,
         barrelOffset: 0,
@@ -594,7 +594,7 @@ export const BaseDefs: Record<string, GunDef> = {
         shotSpread: 1,
         bulletCount: 1,
         bulletType: "bullet_mk12",
-        headshotMult: 1.75,
+        headshotMult: 1.5,
         speed: { equip: 0, attack: 0 },
         lootImg: {
             sprite: "loot-weapon-mk12.img",
@@ -641,7 +641,7 @@ export const BaseDefs: Record<string, GunDef> = {
         shotSpread: 1,
         bulletCount: 1,
         bulletType: "bullet_l86",
-        headshotMult: 1.75,
+        headshotMult: 1.5,
         speed: { equip: 0, attack: 0 },
         lootImg: {
             sprite: "loot-weapon-l86.img",
@@ -1638,7 +1638,7 @@ export const BaseDefs: Record<string, GunDef> = {
         shotSpread: 1,
         bulletCount: 1,
         bulletType: "bullet_m39",
-        headshotMult: 1.75,
+        headshotMult: 1.5,
         speed: { equip: 0, attack: 0 },
         lootImg: {
             sprite: "loot-weapon-m39.img",
@@ -1685,7 +1685,7 @@ export const BaseDefs: Record<string, GunDef> = {
         shotSpread: 1,
         bulletCount: 1,
         bulletType: "bullet_svd",
-        headshotMult: 1.75,
+        headshotMult: 1.5,
         speed: { equip: 0, attack: 0 },
         lootImg: {
             sprite: "loot-weapon-svd.img",
@@ -1732,7 +1732,7 @@ export const BaseDefs: Record<string, GunDef> = {
         shotSpread: 0.4,
         bulletCount: 1,
         bulletType: "bullet_garand",
-        headshotMult: 1.74,
+        headshotMult: 1.44,
         speed: { equip: 0, attack: 0 },
         lootImg: {
             sprite: "loot-weapon-garand.img",

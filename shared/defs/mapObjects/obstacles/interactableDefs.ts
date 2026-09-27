@@ -371,7 +371,7 @@ export const InteractableDefs: Record<string, ObstacleDef> = {
             useStyle: "close",
             useLock: "lock",
             useCooldown: 40,
-            useExpiration: 15,
+            useExpiration: 10,
             resetAfterCooldown: true,
             useDir: v2.create(-1, 0),
             useImg: "map-control-panel-02.img",

@@ -68,8 +68,9 @@ const mapDef: PartialMapDef = {
             { name: "l86", count: 1, weight: 0.75 }, // ?
             { name: "svd", count: 1, weight: 0.75 }, // ?
             { name: "garand", count: 1, weight: 0.45 }, // ?
-            { name: "scarssr", count: 1, weight: 0.06 },
+            { name: "sw500", count: 1, weight: 0.09 },
             { name: "barrett", count: 1, weight: 0.06 },
+            { name: "scarssr", count: 1, weight: 0.06 },
             { name: "awc", count: 1, weight: 0.06 },
             { name: "sv98", count: 1, weight: 0.09 }, // ?
         ],
@@ -92,13 +93,15 @@ const mapDef: PartialMapDef = {
             { name: "vss", count: 1, weight: 2.5 }, // !
             { name: "l86", count: 1, weight: 0.75 }, // ?
             { name: "svd", count: 1, weight: 0.75 }, // ?
-            { name: "scarssr", count: 1, weight: 0.075 },
+            { name: "sw500", count: 1, weight: 0.25 },
             { name: "barrett", count: 1, weight: 0.075 },
+            { name: "scarssr", count: 1, weight: 0.075 },
             { name: "awc", count: 1, weight: 0.075 },
-            { name: "sv98", count: 1, weight: 0.1 }, // ?
+            { name: "sv98", count: 1, weight: 0.2 }, // ?
         ],
         tier_airdrop_rare: [
             { name: "garand", count: 1, weight: 6 },
+            { name: "sw500", count: 1, weight: 2 },
             { name: "barrett", count: 1, weight: 1.5 },
             { name: "awc", count: 1, weight: 1.5 },
             { name: "scarssr", count: 1, weight: 1.5 },
@@ -162,6 +165,25 @@ const mapDef: PartialMapDef = {
             { name: "crowbar", count: 1, weight: 9 },
             { name: "sledgehammer", count: 1, weight: 1 },
         ],
+        tier_perks: [
+            { name: "firepower", count: 1, weight: 1 },
+            { name: "windwalk", count: 1, weight: 1 },
+            { name: "endless_ammo", count: 1, weight: 1 },
+            { name: "steelskin", count: 1, weight: 1 },
+            { name: "splinter", count: 1, weight: 1 },
+            { name: "small_arms", count: 1, weight: 1 },
+            { name: "takedown", count: 1, weight: 1 },
+            { name: "field_medic", count: 1, weight: 1 },
+            { name: "tree_climbing", count: 1, weight: 1 },
+            { name: "scavenger", count: 1, weight: 1 },
+            { name: "chambered", count: 1, weight: 1 },
+            { name: "martyrdom", count: 1, weight: 1 },
+            { name: "self_revive", count: 1, weight: 1 },
+            { name: "bonus_9mm", count: 1, weight: 1 },
+            { name: "bonus_45", count: 1, weight: 1 },
+            { name: "high_velocity", count: 1, weight: 1 },
+            { name: "amped_explosives", count: 1, weight: 1 },
+        ],
     },
     mapGen: {
         map: {
@@ -212,7 +234,10 @@ const mapDef: PartialMapDef = {
                         },
                     },
                 ],
-                weights: [{ weight: 1, widths: [4] }],
+                weights: [
+                    { weight: 1, widths: [4] },
+                    { weight: 1, widths: [4, 4] },
+                ],
                 smoothness: 0.45,
                 spawnCabins: false,
                 masks: [],
@@ -228,10 +253,10 @@ const mapDef: PartialMapDef = {
                 barrel_01: 48,
                 propane_01: 24,
                 stone_07: 6,
-                crate_01: 50,
-                crate_02sv: 4,
-                crate_03: 8,
-                crate_21b: 2,
+                crate_01: 70,
+                crate_02sv: 6,
+                crate_03: 10,
+                crate_21b: 3,
                 bush_01sv: 48,
                 tree_01sv: 48,
                 hedgehog_01: 24,
@@ -242,7 +267,7 @@ const mapDef: PartialMapDef = {
                 container_04: 5,
                 shack_01: 7,
                 outhouse_01: 5,
-                loot_tier_1: 24,
+                loot_tier_1: 30,
                 loot_tier_beach: 4,
             },
         ],
