@@ -182,6 +182,17 @@ const mapDef: PartialMapDef = {
                     },
                     {
                         odds: 1,
+                        innerRad: 10,
+                        outerRad: 20,
+                        centerObj: "oasis_01sv",
+                        riverMaskRad: 48,
+                        spawnBound: {
+                            pos: v2.create(0.5, 0.5),
+                            rad: 300,
+                        },
+                    },
+                    {
+                        odds: 1,
                         innerRad: 16,
                         outerRad: 32,
                         centerObj: "crate_02sv_lake",
