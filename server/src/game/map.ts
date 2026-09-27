@@ -394,6 +394,10 @@ export class GameMap {
         }
         this.timerEnd("Generating all objects");
 
+        // Objects are pushed in generation order, which gives away fixed spawns like caches
+        // (their placeholders sit next to each other). The client sorts by zIdx anyway.
+        this.msg.objects.sort((a, b) => a.pos.x - b.pos.x || a.pos.y - b.pos.y);
+
         this.mapStream.stream.index = 0;
         this.mapStream.serializeMsg(MsgType.Map, this.msg);
     }
@@ -1175,6 +1179,7 @@ export class GameMap {
                     scale,
                     parentId,
                     puzzlePiece,
+                    hideFromMap,
                 );
             case "building":
                 return this.genBuilding(type, pos, layer, ori, parentId, hideFromMap);
@@ -1973,11 +1978,18 @@ export class GameMap {
         }
 
         if (def.map?.display && layer === 0 && !hideFromMap) {
+            const displayType = def.map.displayType ?? type;
+            // Disguised buildings (caches) show as an obstacle on the map,
+            // give them a scale like a real one or the fixed scale gives them away
+            const displayDef = MapObjectDefs.typeToDef(displayType);
+            const scale = displayDef.type === "obstacle"
+                ? util.random(displayDef.scale.createMin, displayDef.scale.createMax)
+                : 1;
             this.msg.objects.push({
-                type: def.map.displayType ?? type,
+                type: displayType,
                 pos,
                 ori,
-                scale: 1,
+                scale,
             });
         }
 
