@@ -68,7 +68,7 @@ export const BaseDefs: Record<string, BulletDef> = {
         obstacleDamage: 1,
         falloff: 0.94,
         distance: 300,
-        speed: 110,
+        speed: 120,
         variance: 0,
         shrapnel: false,
         tracerColor: "762mm",
@@ -492,7 +492,7 @@ export const BaseDefs: Record<string, BulletDef> = {
     },
     bullet_ump9: {
         type: "bullet",
-        damage: 15,
+        damage: 14.5,
         obstacleDamage: 1,
         falloff: 0.75,
         distance: 100,
@@ -677,7 +677,7 @@ export const BaseDefs: Record<string, BulletDef> = {
     },
     bullet_l86: {
         type: "bullet",
-        damage: 27,
+        damage: 25,
         obstacleDamage: 1,
         falloff: 0.9,
         distance: 425,
