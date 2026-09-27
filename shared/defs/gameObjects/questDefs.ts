@@ -308,7 +308,7 @@ export const QuestDefs: Record<string, QuestDef> = {
     quest_damage_762mm_ltm: {
         type: "quest",
         event: "damage",
-        target: 350,
+        target: 700,
         xp: 30,
         icon: {
             urls: ["img/emotes/ammo-762mm.svg"],
@@ -344,7 +344,7 @@ export const QuestDefs: Record<string, QuestDef> = {
     quest_damage_556mm_ltm: {
         type: "quest",
         event: "damage",
-        target: 350,
+        target: 700,
         xp: 30,
         icon: {
             urls: ["img/emotes/ammo-556mm.svg"],
