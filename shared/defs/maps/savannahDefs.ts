@@ -11,7 +11,10 @@ const mapDef: PartialMapDef = {
         buttonCss: "btn-mode-savannah",
     },
     assets: {
-        audio: [],
+        audio: [
+            { name: "coconut_01", channel: "sfx" },
+            { name: "potato_pickup_01", channel: "ui" },
+        ],
         atlases: ["loadout", "shared", "savannah"],
     },
     biome: {
