@@ -17,6 +17,7 @@ import type { Game, JoinTokenData, SpectateTokenData } from "./game.ts";
 import type { GameObject } from "./objects/gameObject.ts";
 import type { MapIndicator } from "./objects/mapIndicator.ts";
 import type { Player } from "./objects/player.ts";
+import { Occlusion } from "./occlusion.ts";
 import type { ClientSocket } from "./socket.ts";
 
 export class ClientBarn {
@@ -333,6 +334,7 @@ export class Client {
     private _firstUpdate = true;
     visibleObjects = new Set<GameObject>();
     visibleMapIndicators = new Set<MapIndicator>();
+    occlusion: Occlusion;
 
     // zoom used for the area in which the server will send objects to the client
     private _cullingZoom = GameConfig.scopeZoomRadius.desktop["1xscope"];
@@ -356,6 +358,7 @@ export class Client {
         this.ip = socket.ip();
         this.findGameIp = findGameIp;
         this.game = game;
+        this.occlusion = new Occlusion(game);
         socket.setUserData(this);
         this.socket = socket as ClientSocket<Client>;
     }
@@ -379,6 +382,8 @@ export class Client {
     }
 
     update(dt: number) {
+        this.occlusion.update(dt);
+
         if (this.spectating) {
             let newPlayerToSpectate: Player | undefined = undefined;
 
@@ -495,6 +500,8 @@ export class Client {
         const rect = collider.createAabbExtents(player.pos, v2.create(width, height));
 
         const newVisibleObjects = game.grid.intersectAABBSet(rect);
+        // drop what's in range but hidden under roofs or on another layer
+        this.occlusion.filter(player, newVisibleObjects, this.visibleObjects);
         // client crashes if active player is not visible
         // so make sure its always added to visible objects
         newVisibleObjects.add(player);
