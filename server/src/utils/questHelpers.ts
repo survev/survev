@@ -66,12 +66,14 @@ export const questHelpers = {
             }
 
             const incompatibleQuests = incompatibleQuestMap.get(questType);
-            if (incompatibleQuests === undefined || rerollingId === undefined) {
+            if (incompatibleQuests === undefined) {
                 return true;
             }
 
             const validBlockers = new Set(currentQuests);
-            validBlockers.delete(rerollingId);
+            if (rerollingId !== undefined) {
+                validBlockers.delete(rerollingId);
+            }
             return incompatibleQuests.isDisjointFrom(validBlockers);
         });
     },
