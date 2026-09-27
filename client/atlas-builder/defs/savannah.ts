@@ -5,6 +5,8 @@ export const SavannahAtlas: AtlasDef = {
     images: [
         ...BuildingSprites.bunker_cloud,
 
+        "map/map-barrel-05.svg",
+
         "map/map-brush-01sv.svg",
         "map/map-brush-02sv.svg",
         "map/map-brush-res-02sv.svg",
