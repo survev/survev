@@ -99,6 +99,44 @@ export const mapHelpers = {
         return col;
     },
 
+    /**
+     * Ceiling reveal parameters for a building, filled in with the defaults.
+     * Shared so the server's occlusion checks reveal ceilings exactly like the client does.
+     */
+    getCeilingVision(type: string) {
+        const def = MapObjectDefs.typeToDef(type, "building");
+        return Object.assign(
+            {
+                dist: 5.5,
+                width: 2.75,
+                linger: 0,
+                fadeRate: 12,
+            },
+            def.ceiling.vision,
+        );
+    },
+
+    /**
+     * World space bounds of each layer of a structure, and whether that layer is underground.
+     * The client renderer uses these to decide if the ground layer is drawn,
+     * the server uses them to decide if ground layer objects need to be sent.
+     */
+    getStructureLayers(type: string, pos: Vec2, ori: number) {
+        const def = MapObjectDefs.typeToDef(type, "structure");
+        return def.layers.map((layer, i) => {
+            const inheritOri = layer.inheritOri === undefined || layer.inheritOri;
+            return {
+                collision: collider.transform(
+                    mapHelpers.getBoundingCollider(layer.type),
+                    v2.add(pos, layer.pos),
+                    math.oriToRad(inheritOri ? ori + layer.ori : layer.ori),
+                    1,
+                ),
+                underground: layer.underground !== undefined ? layer.underground : i == 1,
+            };
+        });
+    },
+
     getBridgeDims(type: string) {
         const col = mapHelpers.getBoundingCollider(type);
         const aabb = collider.toAabb(col);

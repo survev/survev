@@ -34,6 +34,9 @@ export class Structure extends BaseGameObject {
 
     stairs: Stair[];
 
+    /** World space bounds of each layer, see `mapHelpers.getStructureLayers` */
+    layers: ReturnType<typeof mapHelpers.getStructureLayers>;
+
     scale = 1;
     rot: number;
 
@@ -68,6 +71,8 @@ export class Structure extends BaseGameObject {
         ) as AABB;
 
         const def = MapObjectDefs.typeToDef(type, "structure");
+
+        this.layers = mapHelpers.getStructureLayers(type, this.pos, ori);
 
         this.stairs = [];
         for (let i = 0; i < def.stairs.length; i++) {

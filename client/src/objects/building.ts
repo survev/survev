@@ -259,15 +259,7 @@ export class Building implements AbstractObject {
             }
 
             // Create ceiling
-            const vision = Object.assign(
-                {
-                    dist: 5.5,
-                    width: 2.75,
-                    linger: 0,
-                    fadeRate: 12,
-                },
-                def.ceiling.vision,
-            );
+            const vision = mapHelpers.getCeilingVision(this.type);
 
             this.ceiling = {
                 zoomRegions: [],
@@ -464,29 +456,16 @@ export class Building implements AbstractObject {
         this.ceiling.visionTicker -= dt;
         const vision = this.ceiling.vision;
 
-        let canSeeInside = false;
-        for (let i = 0; i < this.ceiling.zoomRegions.length; i++) {
-            const zoomIn = this.ceiling.zoomRegions[i].zoomIn;
-            if (
-                zoomIn
-                && (this.layer == activePlayer.layer || activePlayer.layer & 2)
-                && collisionHelpers.scanCollider(
-                    zoomIn,
-                    map.m_obstaclePool.m_getPool(),
-                    activePlayer.m_pos,
-                    activePlayer.layer,
-                    0.5,
-                    vision.width * 2,
-                    vision.dist,
-                    5,
-                    debug.buildings?.ceiling,
-                    debugLines,
-                )
-            ) {
-                canSeeInside = true;
-                break;
-            }
-        }
+        let canSeeInside = collisionHelpers.canSeeUnderCeiling(
+            this.ceiling.zoomRegions,
+            this.layer,
+            vision,
+            map.m_obstaclePool.m_getPool(),
+            activePlayer.m_pos,
+            activePlayer.layer,
+            debug.buildings?.ceiling,
+            debugLines,
+        );
         if (this.ceilingDead) {
             canSeeInside = true;
         }

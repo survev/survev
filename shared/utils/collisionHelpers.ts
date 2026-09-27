@@ -206,4 +206,45 @@ export const collisionHelpers = {
 
         return null;
     },
+
+    /**
+     * Whether a player can see under a building ceiling, either by standing inside it
+     * or by peeking in through a door or window.
+     * The server uses this too, to withhold objects the client would draw under a ceiling.
+     */
+    canSeeUnderCeiling(
+        zoomRegions: Array<{ zoomIn?: Collider | null }>,
+        buildingLayer: number,
+        vision: { dist: number; width: number },
+        obstacles: Obstacle[],
+        pos: Vec2,
+        layer: number,
+        debug?: boolean,
+        debugLines?: {
+            addRay: (pos: Vec2, dir: Vec2, dist: number, color: number) => void;
+        },
+    ) {
+        for (let i = 0; i < zoomRegions.length; i++) {
+            const zoomIn = zoomRegions[i].zoomIn;
+            if (
+                zoomIn
+                && (buildingLayer == layer || layer & 2)
+                && collisionHelpers.scanCollider(
+                    zoomIn,
+                    obstacles,
+                    pos,
+                    layer,
+                    0.5,
+                    vision.width * 2,
+                    vision.dist,
+                    5,
+                    debug,
+                    debugLines,
+                )
+            ) {
+                return true;
+            }
+        }
+        return false;
+    },
 };

@@ -90,27 +90,9 @@ export class Structure implements AbstractObject {
                 this.scale,
             );
             const def = MapObjectDefs.typeToDef(this.type, "structure");
-            this.layers = [];
-            for (let i = 0; i < def.layers.length; i++) {
-                const layer = def.layers[i];
-                const objId = data.layerObjIds[i];
-
-                const inheritOri = layer?.inheritOri === undefined || layer.inheritOri;
-                const underground = layer.underground !== undefined ? layer.underground : i == 1;
-                const pos = v2.add(this.pos, layer.pos);
-                const rot = math.oriToRad(inheritOri ? data.ori + layer.ori : layer.ori);
-                const collision = collider.transform(
-                    mapHelpers.getBoundingCollider(layer.type),
-                    pos,
-                    rot,
-                    1,
-                );
-                this.layers.push({
-                    objId,
-                    collision,
-                    underground,
-                });
-            }
+            this.layers = mapHelpers
+                .getStructureLayers(this.type, this.pos, data.ori)
+                .map((layer, i) => ({ ...layer, objId: data.layerObjIds[i] }));
             this.stairs = [];
             for (let i = 0; i < def.stairs.length; i++) {
                 const stairsDef = def.stairs[i];
