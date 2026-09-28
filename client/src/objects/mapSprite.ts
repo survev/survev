@@ -4,21 +4,10 @@ import { v2 } from "../../../shared/utils/v2.ts";
 import type { Map } from "../map.ts";
 import type { UiManager } from "../ui/ui.ts";
 
-class SortableSprite extends PIXI.Sprite {
-    /**
-     *  zindex: A higher value will mean it will be rendered on top of other displayObjects within the same container.
-     */
-    __zOrder = -1;
-
-    constructor() {
-        super();
-    }
-}
-
 export class MapSprite {
     active = false;
     retained = true;
-    sprite = new SortableSprite();
+    sprite = new PIXI.Sprite();
     pos = v2.create(0, 0);
     scale = 1;
     alpha = 1;
@@ -58,7 +47,7 @@ export class MapSprite {
 }
 
 export class MapSpriteBarn {
-    container = new PIXI.Container<SortableSprite>();
+    container = new PIXI.Container();
     mapSprites: MapSprite[] = [];
 
     free() {
@@ -93,8 +82,8 @@ export class MapSpriteBarn {
         for (let i = 0; i < this.mapSprites.length; i++) {
             const m = this.mapSprites[i];
             if (m.active) {
-                if (m.zOrder != m.sprite.__zOrder) {
-                    m.sprite.__zOrder = m.zOrder;
+                if (m.zOrder != m.sprite.zIndex) {
+                    m.sprite.zIndex = m.zOrder;
                     doSort = true;
                 }
                 m.ticker += dt;
@@ -115,9 +104,7 @@ export class MapSpriteBarn {
             }
         }
         if (doSort) {
-            this.container.children.sort((a, b) => {
-                return a.__zOrder - b.__zOrder;
-            });
+            this.container.sortChildren();
         }
     }
 }
