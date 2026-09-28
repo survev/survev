@@ -221,8 +221,6 @@ export class UiManager {
         gasSafeZone: PIXI.Container;
         airstrikeZones: PIXI.Container;
         mapSprites: PIXI.Container;
-        teammates: PIXI.Container;
-        player: PIXI.Container;
         border: PIXI.Graphics;
     };
 
@@ -471,8 +469,6 @@ export class UiManager {
             gasSafeZone: this.gasSafeZoneRenderer.display,
             airstrikeZones: planeBarn.airstrikeZoneContainer,
             mapSprites: this.mapSpriteBarn.container,
-            teammates: new PIXI.Container(),
-            player: new PIXI.Container(),
             border: new PIXI.Graphics(),
         };
 
@@ -482,8 +478,6 @@ export class UiManager {
         this.container.addChild(this.display.gasSafeZone);
         this.container.addChild(this.display.airstrikeZones);
         this.container.addChild(this.display.mapSprites);
-        this.container.addChild(this.display.teammates);
-        this.container.addChild(this.display.player);
         this.container.addChild(this.display.border);
 
         const minimapMargin = this.getMinimapMargin();
