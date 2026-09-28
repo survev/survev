@@ -31,10 +31,10 @@ export class SoundInstance {
     id = 0;
 
     volume = 1.0;
-    volumeOld!: number;
+    volumeOld: number;
 
     pan = 0.0;
-    panOld!: number;
+    panOld: number;
 
     ambient!: boolean;
 
@@ -43,8 +43,8 @@ export class SoundInstance {
     destination: GainNode | null = null;
     paramEvents = 0;
 
-    gainNode!: GainNode;
-    pannerNode!: PannerNode;
+    gainNode: GainNode;
+    pannerNode: PannerNode;
 
     stopTime = 0.0;
     stopping = false;
@@ -430,7 +430,7 @@ class WebAudioEngine {
     startTime!: number;
 
     // Soundjs API compat:
-    onfileload = function(..._args: any[]) {};
+    onfileload = function(_path: string) {};
 
     PLAY_INITED = "playInited";
     PLAY_SUCCEEDED = "playSucceeded";
@@ -453,10 +453,6 @@ class WebAudioEngine {
         // Similarly, check for the Safari AudioNode.disconnect() spec break
         hasSelectiveDisconnect = testSelectiveDisconnect(this.ctx);
 
-        // @HACK: For messing around with the audio engine in the dev console
-        // @ts-expect-error meh
-        window.audioEngine = this;
-
         this.masterGainNode = this.ctx.createGain();
         this.compressorNode = this.ctx.createDynamicsCompressor();
         this.masterGainNode.connect(this.compressorNode);
@@ -465,7 +461,7 @@ class WebAudioEngine {
         this.reverbNode = this.ctx.createGain();
         this.reverbNode.connect(this.masterGainNode);
 
-        const eqTypes: Record<string, any[][]> = {
+        const eqTypes: Record<string, [frequency: number, Q: number, gain: number, type: BiquadFilterType][]> = {
             muffled: [
                 [20.0, 2.8284 / 2.0, -6.0, "peaking"],
                 [40.0, 2.8284 / 2.0, -7.0, "peaking"],
@@ -652,23 +648,23 @@ class WebAudioEngine {
             const kCoalesceTime = 0.03;
             const stopTime = this.ctx.currentTime + sound.file.buffer.duration;
             for (let i = 0; i < sound.instances.length; i++) {
-                const _instance = sound.instances[i];
-                if (Math.abs(stopTime - _instance.stopTime) > kCoalesceTime) {
+                const instance = sound.instances[i];
+                if (Math.abs(stopTime - instance.stopTime) > kCoalesceTime) {
                     continue;
                 }
                 // Add this new instance's params on an equal power basis
-                const vv = _instance.volume * _instance.volume + volume * volume;
-                const vp = _instance.volume * _instance.pan + volume * pan;
-                const v = _instance.volume + volume;
-                _instance.volume = Math.sqrt(vv);
-                _instance.pan = vp / Math.max(0.001, v);
+                const vv = instance.volume * instance.volume + volume * volume;
+                const vp = instance.volume * instance.pan + volume * pan;
+                const v = instance.volume + volume;
+                instance.volume = Math.sqrt(vv);
+                instance.pan = vp / Math.max(0.001, v);
                 // We were able to coalesce this sound, so we can return early
                 return nullHandle;
             }
         }
 
         // Grab the next unused instance
-        for (let _i = 0; _i < kMaxInstances; _i++) {
+        for (let i = 0; i < kMaxInstances; i++) {
             ++this.instanceId;
             if (!this.instances[this.instanceId % kMaxInstances].sound) {
                 break;
@@ -694,9 +690,9 @@ class WebAudioEngine {
         // If this sound is at its instance limit, kill the oldest instance
         while (sound.instances.length >= sound.maxInstances) {
             let oldest = sound.instances[0];
-            for (let _i2 = 1; _i2 < sound.instances.length; _i2++) {
-                if (oldest.stopTime > sound.instances[_i2].stopTime) {
-                    oldest = sound.instances[_i2];
+            for (let i = 1; i < sound.instances.length; i++) {
+                if (oldest.stopTime > sound.instances[i].stopTime) {
+                    oldest = sound.instances[i];
                 }
             }
             // Immediately disconnecting the sound can cause popping, but
@@ -766,16 +762,16 @@ class WebAudioEngine {
             if (!reverbLevels[name as keyof typeof reverbLevels]) {
                 continue;
             }
-            const _reverb = this.reverbs[name];
-            if (!_reverb) {
+            const reverb = this.reverbs[name];
+            if (!reverb) {
                 console.error(`No reverb named ${name}`);
                 continue;
             }
             if (!this.reverbs[name].active) {
-                this.activeReverbs.push(_reverb);
-                _reverb.active = true;
+                this.activeReverbs.push(reverb);
+                reverb.active = true;
             }
-            _reverb.targetLevel = reverbLevels[name as keyof typeof reverbLevels];
+            reverb.targetLevel = reverbLevels[name as keyof typeof reverbLevels];
         }
     }
 
@@ -856,20 +852,20 @@ class WebAudioEngine {
             }
             const scale = sum > 1.0 ? 1.0 / sum : 1.0;
             for (let i = 0; i < this.activeReverbs.length; i++) {
-                const _reverb2 = this.activeReverbs[i];
-                const gain = Math.sqrt(scale * _reverb2.targetLevel);
-                _reverb2.setGain(gain, fadeStartTime, this.reverbFadeEndTime);
+                const reverb = this.activeReverbs[i];
+                const gain = Math.sqrt(scale * reverb.targetLevel);
+                reverb.setGain(gain, fadeStartTime, this.reverbFadeEndTime);
             }
 
             // Deactivate any silent, drained reverbs
             for (let i = this.activeReverbs.length - 1; i >= 0; i--) {
-                const _reverb3 = this.activeReverbs[i];
-                const drained = this.ctx.currentTime > _reverb3.drainEndTime;
-                if (_reverb3.gain == 0.0 && drained) {
-                    if (_reverb3.isConnected()) {
-                        _reverb3.disconnect();
+                const reverb = this.activeReverbs[i];
+                const drained = this.ctx.currentTime > reverb.drainEndTime;
+                if (reverb.gain == 0.0 && drained) {
+                    if (reverb.isConnected()) {
+                        reverb.disconnect();
                     }
-                    _reverb3.active = false;
+                    reverb.active = false;
                     this.activeReverbs.splice(i, 1);
                 }
             }
@@ -882,7 +878,7 @@ class WebAudioEngine {
         this.muted = mute;
     }
 
-    on(eventName: string, eventHandler: (...args: any[]) => void, that?: AudioManager) {
+    on(eventName: "fileload", eventHandler: (path: string) => void, that?: AudioManager) {
         if (eventName != "fileload") {
             console.error("Only \"fileload\" event supported");
             return;
@@ -931,9 +927,9 @@ class WebAudioEngine {
             this.ctx.sampleRate,
         );
         for (let channel = 0; channel < convolverBuffer.numberOfChannels; channel++) {
-            const _pcm = convolverBuffer.getChannelData(channel);
-            for (let _i6 = 0; _i6 < _pcm.length; _i6++) {
-                _pcm[_i6] = 2.0 * Math.random() - 1.0;
+            const pcm = convolverBuffer.getChannelData(channel);
+            for (let i = 0; i < pcm.length; i++) {
+                pcm[i] = 2.0 * Math.random() - 1.0;
             }
         }
         convolverNode.buffer = convolverBuffer;
