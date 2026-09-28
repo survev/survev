@@ -1872,7 +1872,7 @@ const Sounds: Record<string, Record<string, SoundDef>> = {
         },
         bugler_assigned_01: {
             path: "audio/ui/bugler_assigned_01.mp3",
-            volume: 2.5,
+            volume: 1,
             preload: false,
             maxInstances: 1,
         },
