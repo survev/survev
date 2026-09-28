@@ -6,7 +6,6 @@ import type { GunDef } from "../../../shared/defs/gameObjects/gunDefs.ts";
 import { type MeleeDef } from "../../../shared/defs/gameObjects/meleeDefs.ts";
 import type { CookImg, ThrowableDef, ThrowableHandImgKey } from "../../../shared/defs/gameObjects/throwableDefs.ts";
 import type { ObstacleDef } from "../../../shared/defs/mapObjects/obstacles/obstacleDefs.ts";
-import type { SurfaceData } from "../../../shared/defs/mapObjectsTyping.ts";
 import { GameObjectDefs, MapObjectDefs } from "../../../shared/defs/register.ts";
 import { Action, Anim, GameConfig, HasteType, Input, type WeaponSlot } from "../../../shared/gameConfig.ts";
 import type { ObjectData, ObjectType } from "../../../shared/net/objectSerializeFns.ts";
@@ -21,7 +20,6 @@ import { coldet } from "../../../shared/utils/coldet.ts";
 import { collider } from "../../../shared/utils/collider.ts";
 import { collisionHelpers } from "../../../shared/utils/collisionHelpers.ts";
 import { math } from "../../../shared/utils/math.ts";
-import type { River } from "../../../shared/utils/river.ts";
 import { assert, util } from "../../../shared/utils/util.ts";
 import { v2, type Vec2 } from "../../../shared/utils/v2.ts";
 import { Animations, Bones, IdlePoses, Pose } from "../animData.ts";
@@ -2616,6 +2614,19 @@ export class Player implements AbstractObject {
     }
 }
 
+export interface ClientPlayerStatus extends PlayerStatus {
+    disconnected: boolean;
+    playerId: number;
+    posTarget: Vec2;
+    posDelta: number;
+    health: number;
+    posInterp: number;
+    timeSinceUpdate: number;
+    timeSinceVisible: number;
+    minimapAlpha: number;
+    minimapVisible: boolean;
+}
+
 export class PlayerBarn {
     playerPool = new Pool(Player);
     playerInfo: Record<number, PlayerInfo & { nameTruncated: string; anonName: string }> = {};
@@ -2637,7 +2648,7 @@ export class PlayerBarn {
         }
     > = {};
 
-    playerStatus: Record<number, PlayerStatus> = {};
+    playerStatus: Record<number, ClientPlayerStatus> = {};
     anonPlayerNames = false;
 
     m_update(
@@ -2688,6 +2699,7 @@ export class PlayerBarn {
         const activePlayer = this.getPlayerById(activeId)!;
 
         this.setPlayerStatus(activeId, {
+            hasData: true,
             pos: v2.copy(activePlayer.m_netData.m_pos),
             health: activePlayer.m_localData.m_health,
             disconnected: false,
@@ -2885,11 +2897,11 @@ export class PlayerBarn {
         }
     }
 
-    setPlayerStatus(playerId: number, newStatus: Partial<PlayerStatus>) {
+    setPlayerStatus(playerId: number, newStatus: PlayerStatus & { health?: number; disconnected?: boolean }) {
         const status = this.playerStatus[playerId] || {
             playerId,
-            pos: v2.copy(newStatus.pos!),
-            posTarget: v2.copy(newStatus.pos!),
+            pos: v2.copy(newStatus.pos),
+            posTarget: v2.copy(newStatus.pos),
             posDelta: v2.create(0, 0),
             health: 100,
             posInterp: 0,
@@ -2905,22 +2917,22 @@ export class PlayerBarn {
         };
 
         if (!status.minimapVisible) {
-            status.pos = v2.copy(newStatus.pos!);
+            status.pos = v2.copy(newStatus.pos);
             if (!status.visible && newStatus.visible) {
                 status.timeSinceVisible = 0;
             }
         }
 
-        status.visible = newStatus.visible!;
+        status.visible = newStatus.visible;
         if (status.visible) {
             status.timeSinceUpdate = 0;
         }
 
-        status.posTarget = v2.copy(newStatus.pos!);
-        status.posDelta = v2.length(v2.sub(newStatus.pos!, status.pos));
-        status.dead = newStatus.dead!;
-        status.downed = newStatus.downed!;
-        status.role = newStatus.role!;
+        status.posTarget = v2.copy(newStatus.pos);
+        status.posDelta = v2.length(v2.sub(newStatus.pos, status.pos));
+        status.dead = newStatus.dead;
+        status.downed = newStatus.downed;
+        status.role = newStatus.role;
         if (newStatus.health !== undefined) {
             status.health = newStatus.health;
         }

@@ -839,24 +839,13 @@ export interface LocalDataWithDirty extends LocalData {
     spectatorCountDirty: boolean;
 }
 
-// the non-optional properties are used by both server and client
 export interface PlayerStatus {
-    playerId?: number;
+    hasData: boolean;
     pos: Vec2;
-    posTarget?: Vec2;
-    posDelta?: number;
-    health?: number;
-    posInterp?: number;
     visible: boolean;
     dead: boolean;
     downed: boolean;
-    disconnected?: boolean;
     role: string;
-    timeSinceUpdate?: number;
-    timeSinceVisible?: number;
-    minimapAlpha?: number;
-    minimapVisible?: boolean;
-    hasData: boolean;
 }
 
 export interface GroupStatus {
