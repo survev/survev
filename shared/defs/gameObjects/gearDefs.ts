@@ -919,7 +919,7 @@ const SkinDefs = {
         hasDesc: true,
         desc: "You can equip an extra perk.",
         maxPerks: 2,
-        lootImg: { sprite: "loot-pack-04_cloud.img" },
+        lootImg: { sprite: "loot-pack-04-cloud.img" },
     }),
 };
 
