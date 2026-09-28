@@ -16,7 +16,7 @@ export const Main: MapDef = {
         name: "Normal",
         icon: "",
         buttonCss: "",
-        backgroundImg: "img/main_splash.png",
+        backgroundImg: "img/splashes/main.webp",
     },
     assets: {
         audio: [

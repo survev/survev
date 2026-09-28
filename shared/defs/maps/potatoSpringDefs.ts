@@ -4,6 +4,9 @@ import type { PartialMapDef } from "./baseDefs.ts";
 import { Potato } from "./potatoDefs.ts";
 
 const mapDef: PartialMapDef = {
+    desc: {
+        backgroundImg: "img/splashes/potato_spring.webp",
+    },
     assets: {
         audio: [
             { name: "pumpkin_break_01", channel: "sfx" },

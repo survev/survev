@@ -5,9 +5,9 @@ import { Main, type PartialMapDef } from "./baseDefs.ts";
 
 const mapDef: PartialMapDef = {
     desc: {
-        backgroundImg: "img/main_splash_0_6_10.png",
         icon: "img/loot/loot-throwable-snowball.svg",
         buttonCss: "btn-mode-snow",
+        backgroundImg: "img/splashes/snow.webp",
     },
     assets: {
         audio: [

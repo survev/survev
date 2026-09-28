@@ -1,4 +1,6 @@
 import "./testHelpers.ts";
+import fs from "node:fs";
+import path from "node:path";
 import { describe, expect, test } from "vitest";
 import { Atlases } from "../../client/atlas-builder/atlasDefs.ts";
 import { type MapDef, type MapDefKey, MapDefs } from "../../shared/defs/mapDefs.ts";
@@ -126,5 +128,10 @@ describe.for(maps)("Map %s", (map) => {
             diff.size,
             `Map ${map} is missing ${[...diff].join(", ")} sprites on its atlases`,
         ).toBe(0);
+    });
+
+    test("splash img exists", () => {
+        const file = path.join(import.meta.dirname, `../../client/public/${mapDef.desc.backgroundImg}`);
+        expect(fs.existsSync(file), `File ${file} should exist`).toBeTruthy();
     });
 });

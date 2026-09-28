@@ -4,7 +4,7 @@ import { Main, type PartialMapDef } from "./baseDefs.ts";
 
 const mapDef: PartialMapDef = {
     desc: {
-        backgroundImg: "img/main_splash_7_3.png",
+        backgroundImg: "img/splashes/main_spring.webp",
     },
     assets: {
         audio: [],
