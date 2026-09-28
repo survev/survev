@@ -552,34 +552,23 @@ class WebAudioEngine {
 
         this.files[path] = { buffer: null };
 
-        const xhr = new XMLHttpRequest();
-        xhr.open("GET", path);
-        xhr.responseType = "arraybuffer";
-        const onfailure = function onfailure(_event: unknown) {
-            console.error(`Failed loading sound file: ${path}`);
-        };
-        xhr.addEventListener("load", (event) => {
-            const arrayBuffer = xhr.response;
-            if (!arrayBuffer) {
-                onfailure(event);
-                return;
-            }
-            this.ctx.decodeAudioData(
-                arrayBuffer,
-                (audioBuffer) => {
-                    // let memorySize = 4 * audioBuffer.length * audioBuffer.numberOfChannels;
-                    this.files[path].buffer = audioBuffer;
-                    onfileload(path);
-                },
-                () => {
-                    console.error(`Failed decoding sound: ${path}`);
-                },
-            );
-        });
-        xhr.addEventListener("abort", onfailure);
-        xhr.addEventListener("error", onfailure);
-        xhr.addEventListener("timeout", onfailure);
-        xhr.send();
+        fetch(path, { method: "GET" }).then((res) => res.arrayBuffer())
+            .then((arrayBuffer) => {
+                this.ctx.decodeAudioData(
+                    arrayBuffer,
+                    (audioBuffer) => {
+                        // let memorySize = 4 * audioBuffer.length * audioBuffer.numberOfChannels;
+                        this.files[path].buffer = audioBuffer;
+                        onfileload(path);
+                    },
+                    (e) => {
+                        console.error(`Failed decoding sound: ${path}, err:`, e);
+                    },
+                );
+            })
+            .catch((e) => {
+                console.error(`Failed loading sound file: ${path}, err:`, e);
+            });
 
         return this.files[path];
     }

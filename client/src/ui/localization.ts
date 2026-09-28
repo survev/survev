@@ -4,7 +4,7 @@ import english from "../en.json";
 
 export function downloadFile(
     file: string,
-    onComplete: (err: null | JQuery.jqXHR<any>, data?: Record<string, string>) => void,
+    onComplete: (err: unknown, data?: Record<string, string>) => void,
 ) {
     fetch(file, {
         method: "GET",
