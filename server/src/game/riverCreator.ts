@@ -269,6 +269,7 @@ export class RiverCreator {
             looped: true,
             center,
             aabb: collider.createAabb(aabbMin, aabbMax),
+            noRiverObjs: !!lake.noRiverObjs,
         };
     }
 }

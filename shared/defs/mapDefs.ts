@@ -197,6 +197,10 @@ export interface MapDef {
                     innerRad: number;
                     outerRad: number;
                     centerObj?: string;
+                    /**
+                     * Disables bushes and rocks from spawning
+                     */
+                    noRiverObjs?: boolean;
                     riverMaskRad?: number;
                     spawnBound: {
                         pos: Vec2;

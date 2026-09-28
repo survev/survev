@@ -240,6 +240,7 @@ const mapDef: PartialMapDef = {
                         innerRad: 10,
                         outerRad: 20,
                         centerObj: "oasis_01",
+                        noRiverObjs: true,
                         riverMaskRad: 48,
                         spawnBound: {
                             pos: v2.create(0.5, 0.5),
