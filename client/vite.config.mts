@@ -7,6 +7,7 @@ import { stripBlockPlugin } from "../shared/utils/stripBlockPlugin.ts";
 import { atlasBuilderPlugin } from "./atlas-builder/vitePlugin.ts";
 import { codefendPlugin } from "./vite-plugins/codefendPlugin.ts";
 import { ejsPlugin } from "./vite-plugins/ejsPlugin.ts";
+import { svgoPlugin } from "./vite-plugins/svgoPlugin.ts";
 
 export default defineConfig(({ mode }) => {
     const viteEnv = loadEnv(mode, process.cwd(), "VITE_");
@@ -28,7 +29,11 @@ export default defineConfig(({ mode }) => {
     process.env.VITE_SPELLSYNC_PROJECT_ID = Config.secrets.SPELLSYNC_PROJECT_ID;
     process.env.VITE_SPELLSYNC_PUBLIC_TOKEN = Config.secrets.SPELLSYNC_PUBLIC_TOKEN;
 
-    const plugins: PluginOption[] = [ejsPlugin(), ...atlasBuilderPlugin(mode === "production")];
+    const plugins: PluginOption[] = [
+        ejsPlugin(),
+        ...atlasBuilderPlugin(mode === "production"),
+        svgoPlugin(),
+    ];
 
     if (!isDev) {
         plugins.push(codefendPlugin());
