@@ -389,6 +389,7 @@ interface Params {
 
 class WebAudioEngine {
     ctx = new (window.AudioContext || window.webkitAudioContext)();
+    ctxResumeTicker = 0;
 
     masterGainNode!: GainNode;
     compressorNode!: DynamicsCompressorNode;
@@ -789,11 +790,15 @@ class WebAudioEngine {
         }
     }
 
-    update(_dt: unknown) {
+    update(dt: number) {
         // If the audio context got suspended (as it is be default in Chrome,
         // until the user interacts with the page), try to resume it
         if (this.ctx.state == "suspended") {
-            this.ctx.resume();
+            this.ctxResumeTicker -= dt;
+            if (this.ctxResumeTicker <= 0) {
+                this.ctx.resume();
+                this.ctxResumeTicker = 0.5;
+            }
         }
 
         // Update master volume params
