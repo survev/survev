@@ -610,7 +610,7 @@ export class EmoteBarn {
                     this.playerBarn,
                 );
                 let indicator: Indicator | null = null;
-                let pingSound = pingData.sound!;
+                let pingSound = pingData.sound;
                 if (ping.type == "ping_airdrop") {
                     indicator = this.pingIndicators[airdropIdx].ping;
                 } else if (ping.type == "ping_airstrike") {

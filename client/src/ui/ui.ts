@@ -1092,10 +1092,10 @@ export class UiManager {
                 const s = this.mapSpriteBarn.addSprite();
                 s.pos = v2.copy(pos);
                 s.scale = scale;
-                s.lifetime = pingDef.mapLife!;
+                s.lifetime = pingDef.mapLife;
                 s.pulse = false;
                 s.zOrder = 100;
-                s.sprite.texture = PIXI.Texture.from(pingDef.mapTexture!);
+                s.sprite.texture = PIXI.Texture.from(pingDef.mapTexture);
                 s.sprite.tint = tint;
                 return s;
             };
@@ -1103,7 +1103,7 @@ export class UiManager {
                 const s = this.mapSpriteBarn.addSprite();
                 s.pos = v2.copy(pos);
                 s.scale = 0;
-                s.lifetime = pingDef.pingLife!;
+                s.lifetime = pingDef.pingLife;
                 s.pulse = true;
                 s.zOrder = 99;
                 s.sprite.texture = PIXI.Texture.from("ping-map-pulse.img");
@@ -1114,9 +1114,9 @@ export class UiManager {
                 // Map-event pings free themselves after they are finished;
                 // there's no limit to the number that an occur simultaneously.
                 const scale = (device.uiLayout == device.UiLayout.Sm ? 0.15 : 0.2) * 1.5;
-                createPingSprite(scale, pingDef.tint!).release();
+                createPingSprite(scale, pingDef.tint).release();
 
-                createPulseSprite(pingDef.tint!).release();
+                createPulseSprite(pingDef.tint).release();
             } else {
                 //
                 // Player pings
