@@ -875,4 +875,69 @@ export const Animations: Record<
             effect(0.25, "animPlaySound", { sound: "idle" }),
         ],
     },
+
+    // Non-Cosmetic Deploy Animations
+    // Most of these are simpler, to avoid visual clarity issues.
+
+    machete_deploy: {
+        keyframes: [
+            frame(0, {
+                [Bones.HandR]: new Pose(v2.create(1, 17.75)).rotate(Math.PI * 0.35),
+                [Bones.MeleeR]: new Pose(v2.create(0, 0)).rotate(Math.PI * 0.85).offset(v2.create(0, 0)),
+            }),
+            frame(0.35, {
+                [Bones.HandR]: new Pose(v2.create(1, 17.75)).rotate(Math.PI * -0.15),
+                [Bones.MeleeR]: new Pose(v2.create(0, 0)).rotate(Math.PI * -0.1).offset(v2.create(0, 0)),
+            }, math.easeOutSine),
+            frame(0.45, {
+                [Bones.HandR]: new Pose(v2.create(1, 17.75)),
+                [Bones.MeleeR]: new Pose(v2.create(0, 0)).rotate(0).offset(v2.create(0, 0)),
+            }, math.easeInOutSine),
+        ],
+        effects: [
+            effect(0, "animPlaySound", { sound: "deploy" }),
+        ],
+    },
+    meleeTwoHanded_deploy: {
+        keyframes: [
+            frame(0, {
+                [Bones.HandL]: new Pose(v2.create(10.5, -14.25)).rotate(Math.PI * -0.15),
+                [Bones.HandR]: new Pose(v2.create(18, 6.25)),
+                [Bones.MeleeR]: new Pose(v2.create(12, 24.25)).rotate(Math.PI * -1.4).offset(v2.create(55, 0)),
+            }),
+            frame(0.3, {
+                [Bones.HandL]: new Pose(v2.create(10.5, -14.25)),
+                [Bones.HandR]: new Pose(v2.create(18, 6.25)),
+                [Bones.MeleeR]: new Pose(v2.create(8, 20.25)).rotate(0).offset(v2.create(55, 0)),
+            }),
+            frame(0.375, {
+                [Bones.HandR]: new Pose(v2.create(13, 7.25)),
+                [Bones.MeleeR]: new Pose(v2.create(3, 21.25)).rotate(Math.PI * 0.1).offset(v2.create(62, 0)),
+            }, math.easeOutSine),
+            frame(0.45, {
+                [Bones.HandR]: new Pose(v2.create(18, 6.25)),
+                [Bones.MeleeR]: new Pose(v2.create(8, 20.25)).rotate(0).offset(v2.create(62, 0)),
+            }, math.easeInOutSine),
+        ],
+        effects: [
+            effect(0, "animPlaySound", { sound: "deploy" }),
+        ],
+    },
+    meleeTwoHanded_deploy_heavy: {
+        keyframes: [
+            frame(0, {
+                [Bones.HandL]: new Pose(v2.create(10.5, -14.25)).rotate(Math.PI * -0.15),
+                [Bones.HandR]: new Pose(v2.create(18, 6.25)),
+                [Bones.MeleeR]: new Pose(v2.create(12, 24.25)).rotate(Math.PI * -1.4).offset(v2.create(55, 0)),
+            }),
+            frame(0.45, {
+                [Bones.HandL]: new Pose(v2.create(10.5, -14.25)),
+                [Bones.HandR]: new Pose(v2.create(18, 6.25)),
+                [Bones.MeleeR]: new Pose(v2.create(8, 20.25)).rotate(0).offset(v2.create(62, 0)),
+            }, math.easeOutSine),
+        ],
+        effects: [
+            effect(0, "animPlaySound", { sound: "deploy" }),
+        ],
+    },
 };
