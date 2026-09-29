@@ -477,17 +477,17 @@ export const Animations: Record<
                 [Bones.HandR]: new Pose(v2.create(17, 22.25)).rotate(Math.PI * -0.2),
                 [Bones.MeleeR]: new Pose(v2.create(0, 0)).rotate(Math.PI * -0.3).offset(v2.create(130, 0)),
             }),
-            frame(0.8, {
+            frame(0.75, {
                 [Bones.HandL]: new Pose(v2.create(21, -9.25)).rotate(Math.PI * -0.5),
                 [Bones.HandR]: new Pose(v2.create(12, 22.25)).rotate(Math.PI * -0.9),
                 [Bones.MeleeR]: new Pose(v2.create(0, 0)).rotate(Math.PI * -0.675).offset(v2.create(70, 0)),
             }, math.easeOutSine),
-            frame(0.95, {
+            frame(0.9, {
                 [Bones.HandL]: new Pose(v2.create(21, -9.25)).rotate(Math.PI * 0.05),
                 [Bones.HandR]: new Pose(v2.create(12, 22.25)).rotate(Math.PI * -0.45),
                 [Bones.MeleeR]: new Pose(v2.create(0, 0)).rotate(Math.PI * -0.475).offset(v2.create(70, 0)),
             }, math.easeInSine),
-            frame(1.1, {
+            frame(1.05, {
                 [Bones.HandL]: new Pose(v2.create(21, -9.25)),
                 [Bones.HandR]: new Pose(v2.create(12, 22.25)),
                 [Bones.MeleeR]: new Pose(v2.create(0, 0)).rotate(0).offset(v2.create(0, 0)),
