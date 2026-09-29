@@ -1648,7 +1648,7 @@ export const MapObstacleDefs: Record<string, ObstacleDef> = {
             beach: false,
             minDistanceFromSameType: 8,
         },
-        map: { color: 0x2e3726, scale: 3 },
+        map: { color: 0x5f6f6b, scale: 3 },
         img: {
             sprite: "map-tree-15.img",
             residue: "map-tree-res-01.img",
@@ -1660,7 +1660,7 @@ export const MapObstacleDefs: Record<string, ObstacleDef> = {
     tree_16: createTree({
         scale: { createMin: 1.9, createMax: 2 },
         health: 350,
-        map: { color: 0x2e3726, scale: 3.5 },
+        map: { color: 0x505f5b, scale: 3.5 },
         terrain: {
             grass: true,
             beach: false,
