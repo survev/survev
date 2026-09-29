@@ -887,7 +887,7 @@ export const MapObstacleDefs: Record<string, ObstacleDef> = {
         destructible: true,
         map: { display: false, color: 0x575757, scale: 1 },
         img: {
-            sprite: "map-statue-top-02.img",
+            sprite: "map-statue-top-03.img",
             residue: "",
             scale: 0.5,
             zIdx: 60,
@@ -901,7 +901,7 @@ export const MapObstacleDefs: Record<string, ObstacleDef> = {
         destructible: true,
         map: { display: false, color: 0x575757, scale: 1 },
         img: {
-            sprite: "map-statue-top-02.img",
+            sprite: "map-statue-top-04.img",
             residue: "",
             scale: 0.5,
             zIdx: 60,

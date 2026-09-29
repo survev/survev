@@ -7215,6 +7215,68 @@ export const ModeBuildingDefs: Record<string, BuildingDef> = {
             },
         ],
     },
+    statue_structure_lone: {
+        type: "building",
+        ori: 0,
+        terrain: {},
+        floor: {
+            surfaces: [],
+            imgs: [
+                {
+                    sprite: "",
+                    scale: 0.5,
+                    alpha: 1,
+                    tint: 0xffffff,
+                },
+            ],
+        },
+        ceiling: { zoomRegions: [], imgs: [] },
+        mapObjects: [
+            {
+                type: "statue_01",
+                pos: v2.create(0, 0),
+                scale: 1,
+                ori: 0,
+            },
+            {
+                type: "statue_top_03",
+                pos: v2.create(0, 0),
+                scale: 1,
+                ori: 0,
+            },
+        ],
+    },
+    statue_structure_renegade: {
+        type: "building",
+        ori: 0,
+        terrain: {},
+        floor: {
+            surfaces: [],
+            imgs: [
+                {
+                    sprite: "",
+                    scale: 0.5,
+                    alpha: 1,
+                    tint: 0xffffff,
+                },
+            ],
+        },
+        ceiling: { zoomRegions: [], imgs: [] },
+        mapObjects: [
+            {
+                type: "statue_01",
+                pos: v2.create(0, 0),
+                scale: 1,
+                ori: 0,
+            },
+            {
+                type: "statue_top_04",
+                pos: v2.create(0, 0),
+                scale: 1,
+                ori: 0,
+            },
+        ],
+    },
     warehouse_01f: createWarehouse({}, {
         topLeftObs: "crate_01",
         topRightObs: "crate_01",
