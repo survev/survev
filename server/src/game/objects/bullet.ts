@@ -528,7 +528,7 @@ export class Bullet {
                         collidable: true,
                         dist: v2.lengthSqr(v2.sub(collision.point, this.startPos)),
                     });
-                    if (obj.hasPerk("steelskin")) {
+                    if (obj.hasPerk("steelskin") || obj.hasPerk("reinforced")) {
                         const point = v2.add(
                             collision.point,
                             v2.mul(collision.normal, 0.1),

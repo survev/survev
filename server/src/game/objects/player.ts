@@ -2533,6 +2533,14 @@ export class Player extends BaseGameObject {
                 reduceDamage(PerkProperties.steelskin.damageReduction);
             }
 
+            if (this.hasPerk("reinforced")) {
+                reduceDamage(
+                    params.isExplosion
+                        ? PerkProperties.reinforced.explosionDamageReduction
+                        : PerkProperties.reinforced.damageReduction,
+                );
+            }
+
             if (this.lastBreathActive) {
                 reduceDamage(PerkProperties.final_bugle.damageReduction);
             }
@@ -4774,8 +4782,8 @@ export class Player extends BaseGameObject {
             | ThrowableDef;
         if (this.weaponManager.meleeAttacks.length == 0) {
             let equipSpeed = weaponDef.speed.equip;
-            if (this.hasPerk("small_arms") && weaponDef.type == "gun") {
-                equipSpeed = PerkProperties.small_arms.gunEquipSpeed;
+            if (this.hasPerk("reinforced") && weaponDef.type == "gun") {
+                equipSpeed = PerkProperties.reinforced.gunEquipSpeed;
             }
 
             this.speed += equipSpeed;

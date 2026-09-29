@@ -366,7 +366,7 @@ export const RoleDefs: Record<string, RoleDef> = {
             alive: "player-last-man.img",
         },
         perks: [
-            "steelskin",
+            "reinforced",
             () =>
                 util.weightedRandom([
                     { type: "ap_rounds", weight: 1 },

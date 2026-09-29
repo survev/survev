@@ -1599,8 +1599,8 @@ export class Player implements AbstractObject {
             this.chestSprite.visible = true;
         }
 
-        // Steelskin
-        if (this.m_hasPerk("steelskin") && !outfitDef.ghillie) {
+        // Cast Ironskin + Reinforced Plating
+        if ((this.m_hasPerk("steelskin") || this.m_hasPerk("reinforced")) && !outfitDef.ghillie) {
             this.steelskinSprite.texture = PIXI.Texture.from("loot-melee-pan-black.img");
             this.steelskinSprite.scale.set(0.4, 0.4);
             this.steelskinSprite.anchor.set(0.575, 0.5);

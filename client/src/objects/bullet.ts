@@ -347,7 +347,7 @@ export class BulletBarn {
                                 layer: player.layer,
                                 collidable: true,
                             });
-                            if (player.m_hasPerk("steelskin")) {
+                            if (player.m_hasPerk("steelskin") || player.m_hasPerk("reinforced")) {
                                 colObjs.push({
                                     type: "pan",
                                     point: v2.add(

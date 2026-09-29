@@ -29,6 +29,12 @@ export const PerkProperties = {
             mirv: 2,
         } as Partial<Record<InventoryItem, number>>,
     },
+    reinforced: {
+        scale: 0.4,
+        damageReduction: 0.55,
+        explosionDamageReduction: 0.8,
+        gunEquipSpeed: 1,
+    },
     amped_explosives: {
         throwableRangeMult: 1.75,
         throwableSpeedMult: 2,
@@ -38,7 +44,6 @@ export const PerkProperties = {
     },
     small_arms: {
         scale: -0.25,
-        gunEquipSpeed: 1,
     },
     splinter: {
         mainDamageMult: 0.6,
@@ -312,6 +317,20 @@ export const PerkDefs: Record<string, PerkDef> = {
         type: "perk",
         lootImg: {
             sprite: "loot-perk-steelskin.img",
+            tint: 0xffffff,
+            border: "loot-circle-outer-03.img",
+            borderTint: 0xffffff,
+            scale: 0.275,
+        },
+        sound: {
+            pickup: "perk_pickup_01",
+        },
+    },
+    reinforced: {
+        name: "Reinforced Plating",
+        type: "perk",
+        lootImg: {
+            sprite: "loot-perk-reinforced.img",
             tint: 0xffffff,
             border: "loot-circle-outer-03.img",
             borderTint: 0xffffff,
