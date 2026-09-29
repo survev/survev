@@ -34,6 +34,8 @@ export class MapSprite {
         this.lifetime = Number.MAX_VALUE;
         this.ticker = 0;
         this.zOrder = 0;
+        this.sprite.visible = true;
+        this.sprite.alpha = 1;
     }
 
     free() {
