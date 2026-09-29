@@ -430,6 +430,8 @@ const BaseDefs: Record<string, MeleeDef> = {
         anim: {
             idlePose: "machete",
             attackAnims: ["cutReverse"],
+            deployAnims: ["machete_deploy"],
+            deployAnimTime: 0.4,
         },
         sound: {
             pickup: "frag_pickup_01",
@@ -539,6 +541,8 @@ const BaseDefs: Record<string, MeleeDef> = {
         anim: {
             idlePose: "meleeTwoHanded",
             attackAnims: ["axeSwing"],
+            deployAnims: ["meleeTwoHanded_deploy"],
+            deployAnimTime: 0.45,
         },
         sound: {
             pickup: "heavy_pickup_01",
@@ -594,6 +598,8 @@ const BaseDefs: Record<string, MeleeDef> = {
         anim: {
             idlePose: "meleeTwoHanded",
             attackAnims: ["axeSwing"],
+            deployAnims: ["meleeTwoHanded_deploy"],
+            deployAnimTime: 0.45,
         },
         sound: {
             pickup: "heavy_pickup_01",
@@ -762,6 +768,8 @@ const BaseDefs: Record<string, MeleeDef> = {
         anim: {
             idlePose: "meleeTwoHanded",
             attackAnims: ["hammerSwing"],
+            deployAnims: ["meleeTwoHanded_deploy_heavy"],
+            deployAnimTime: 0.45,
         },
         sound: {
             pickup: "heavy_pickup_01",
@@ -917,7 +925,7 @@ const BaseDefs: Record<string, MeleeDef> = {
             },
             rad: 1.5,
             damageTimes: [0.15],
-            cooldownTime: 0.5,
+            cooldownTime: 0.55,
         },
         speed: {
             equip: 1,
@@ -1412,6 +1420,10 @@ const SkinDefs: Record<string, MeleeDef> = {
         worldImg: {
             sprite: "loot-melee-warhammer-tank.img",
             pos: { x: -10.5, y: -3 },
+        },
+        anim: {
+            idlePose: "meleeTwoHanded",
+            attackAnims: ["hammerSwing"],
         },
     }),
     naginata_daemon: defineMeleeSkin("naginata", {
