@@ -3358,8 +3358,7 @@ export class Player extends BaseGameObject {
         if (this.dead) return;
         if (this.game.map.perkMode && !this.role) return;
 
-        this.dirNew = v2.normalizeSafe(msg.toMouseDir);
-
+        this.handlePointerInput(msg);
         this.moveLeft = msg.moveLeft;
         this.moveRight = msg.moveRight;
         this.moveUp = msg.moveUp;
@@ -3368,7 +3367,6 @@ export class Player extends BaseGameObject {
         this.touchMoveActive = msg.touchMoveActive;
         this.touchMoveDir = v2.normalizeSafe(msg.touchMoveDir);
         this.touchMoveLen = msg.touchMoveLen;
-        this.toMouseLen = msg.toMouseLen;
 
         this.shootHold = msg.shootHold;
 
@@ -3563,6 +3561,11 @@ export class Player extends BaseGameObject {
                 }
                 break;
         }
+    }
+
+    handlePointerInput(msg: net.InputMsg | net.PointerInputMsg) {
+        this.dirNew = v2.normalizeSafe(msg.toMouseDir);
+        this.toMouseLen = msg.toMouseLen;
     }
 
     getClosestLoot(): Loot | undefined {
