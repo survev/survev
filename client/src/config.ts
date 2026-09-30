@@ -112,7 +112,7 @@ const defaultConfig = {
 
     binds: "",
     clientTheme: "main" as MapDefKey,
-    cachedBgImg: "img/main_splash.png",
+    cachedBgImg: "img/splashes/main.webp",
     language: "en" as Locale,
     playerName: "",
     profile: null as { slug: string } | null,
