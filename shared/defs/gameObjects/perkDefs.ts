@@ -62,6 +62,7 @@ export const PerkProperties = {
         scaleOnDeath: 0.1,
         effectRange: 60,
         hasteDuration: 5,
+        hasteSpeed: 4.8,
     },
     chambered: {
         damageMult: 1.25,
@@ -89,6 +90,7 @@ export const PerkProperties = {
     windwalk: {
         maxTriggerDistance: 5, // max distance at which a bullet can trigger windwalk
         hasteDuration: 3,
+        hasteSpeed: 4.8,
     },
     gotw: {
         scale: 0.2,
@@ -98,6 +100,7 @@ export const PerkProperties = {
         hpReward: 25,
         boostReward: 25,
         hasteDuration: 3,
+        hasteSpeed: 4.8,
     },
     lifeline: {
         decayMult: 0.75, // Adrenaline decay multiplier

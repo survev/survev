@@ -876,6 +876,7 @@ export class Player extends BaseGameObject {
 
     private _hasteTicker = 0;
     hasteType: HasteType = GameConfig.HasteType.None;
+    hasteSpeed = 0;
     hasteSeq = 0;
 
     actionItem = "";
@@ -958,12 +959,12 @@ export class Player extends BaseGameObject {
             case "last_man":
                 this.health = 100;
                 this.boost = 100;
-                this.giveHaste(GameConfig.HasteType.Windwalk, 5);
+                this.giveHaste(GameConfig.HasteType.Windwalk, 5, PerkProperties.windwalk.hasteSpeed);
                 break;
             case "renegade":
                 this.health = 100;
                 this.boost = 100;
-                this.giveHaste(GameConfig.HasteType.Takedown, 5);
+                this.giveHaste(GameConfig.HasteType.Takedown, 5, PerkProperties.takedown.hasteSpeed);
                 break;
         }
 
@@ -1823,6 +1824,7 @@ export class Player extends BaseGameObject {
 
             if (this._hasteTicker <= 0) {
                 this.hasteType = GameConfig.HasteType.None;
+                this.hasteSpeed = 0;
                 this._hasteTicker = 0;
                 this.hasteSeq++;
                 this.setDirty();
@@ -2787,7 +2789,11 @@ export class Player extends BaseGameObject {
                 if (killCreditSource.hasPerk("takedown")) {
                     killCreditSource.health += PerkProperties.takedown.hpReward;
                     killCreditSource.boost += PerkProperties.takedown.boostReward;
-                    killCreditSource.giveHaste(GameConfig.HasteType.Takedown, PerkProperties.takedown.hasteDuration);
+                    killCreditSource.giveHaste(
+                        GameConfig.HasteType.Takedown,
+                        PerkProperties.takedown.hasteDuration,
+                        PerkProperties.takedown.hasteSpeed,
+                    );
                 }
 
                 // Pirate's Bounty (Cutlass-specific)
@@ -4614,7 +4620,11 @@ export class Player extends BaseGameObject {
             player.lastBreathActive = true;
             player._lastBreathTicker = 5;
 
-            player.giveHaste(GameConfig.HasteType.Inspire, PerkProperties.final_bugle.hasteDuration);
+            player.giveHaste(
+                GameConfig.HasteType.Inspire,
+                PerkProperties.final_bugle.hasteDuration,
+                PerkProperties.final_bugle.hasteSpeed,
+            );
             if (player.teamId == GameConfig.FactionTeam.Red && player.__id != this.__id) {
                 this.game.playerBarn.addEmote("emote_bugle_final_red", player.__id);
             }
@@ -4662,8 +4672,9 @@ export class Player extends BaseGameObject {
         this.zoomDirty = true;
     }
 
-    giveHaste(type: HasteType, duration: number): void {
+    giveHaste(type: HasteType, duration: number, hasteSpeed: number): void {
         this.hasteType = type;
+        this.hasteSpeed += hasteSpeed;
         this.hasteSeq++;
         this._hasteTicker = duration;
         this.setDirty();
@@ -4811,7 +4822,7 @@ export class Player extends BaseGameObject {
         }
 
         if (this.hasteType != GameConfig.HasteType.None) {
-            this.speed += GameConfig.player.hasteSpeedBonus;
+            this.speed += this.hasteSpeed;
         }
 
         if (this.frozen) {
