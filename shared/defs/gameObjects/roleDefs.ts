@@ -344,7 +344,7 @@ export const RoleDefs: Record<string, RoleDef> = {
         defaultItems: createDefaultItems({
             weapons: [
                 { type: "", ammo: 0 },
-                { type: "bugle", ammo: 1 },
+                { type: "bugle", ammo: 2 },
                 { type: "pan", ammo: 0 },
                 { type: "", ammo: 0 },
             ],

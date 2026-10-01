@@ -56,9 +56,14 @@ export const PerkProperties = {
     trick_size: {
         scale: 0.25,
     },
+    inspiration: {
+        damageReduction: 0.1,
+        durationScale: 1.5, // Bugle effect duration incrase per lv
+        hasteSpeed: 3.6,
+    },
     final_bugle: {
         bonusDamageMult: 1.15,
-        damageReduction: 0.9,
+        damageReduction: 0.1,
         scaleOnDeath: 0.1,
         effectRange: 60,
         hasteDuration: 5,

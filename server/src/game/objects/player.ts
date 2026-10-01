@@ -1193,6 +1193,9 @@ export class Player extends BaseGameObject {
     bugleTickerActive = false;
     private _bugleTicker = 0;
 
+    bugleDamageReductionActive = false;
+    private _bugleDamageReductionTicker = 0;
+
     private _perks: Array<{
         type: string;
         droppable: boolean;
@@ -1883,6 +1886,15 @@ export class Player extends BaseGameObject {
             }
         }
 
+        if (this.bugleDamageReductionActive) {
+            this._bugleDamageReductionTicker -= dt;
+
+            if (this._bugleDamageReductionTicker <= 0) {
+                this.bugleDamageReductionActive = false;
+                this._bugleDamageReductionTicker = 0;
+            }
+        }
+
         if (this.hasPerk("fabricate")) {
             if (this.fabricateThrowablesLeft.length > 0) {
                 this.fabricateGiveTicker -= dt;
@@ -2541,6 +2553,10 @@ export class Player extends BaseGameObject {
                         ? PerkProperties.reinforced.explosionDamageReduction
                         : PerkProperties.reinforced.damageReduction,
                 );
+            }
+
+            if (this.bugleDamageReductionActive) {
+                reduceDamage(PerkProperties.inspiration.damageReduction);
             }
 
             if (this.lastBreathActive) {
@@ -4635,7 +4651,16 @@ export class Player extends BaseGameObject {
         }
     }
 
-    playBugle(): void {
+    playBugle(bugleAmmo: number): void {
+        const bugle = this.weapons.find((w) => w.type === "bugle");
+
+        if (bugle) {
+            // Consume all remaining ammo
+            bugle.ammo = 0;
+            this.weapsDirty = true;
+        }
+
+        // Reset the bugle cooldown to 8
         this.bugleTickerActive = true;
         this._bugleTicker = 8;
 
@@ -4644,16 +4669,43 @@ export class Player extends BaseGameObject {
             30,
         );
 
+        // Duration scales based on the number of charges; this is so firepower retains an actual use
+        const bugleEffectDuration = 1.5 + bugleAmmo * PerkProperties.inspiration.durationScale;
+
         for (const player of affectedPlayers) {
-            player.giveHaste(GameConfig.HasteType.Inspire, 3);
+            // Give a variation of the Inspire stim if the bugle has 2+ ammo that uses a double-note particle.
+            // Give damage reduction if the bugle has 2+ ammo. Scales off ammo consumed as well.
+            if (bugleAmmo >= 2) {
+                player.bugleDamageReductionActive = true;
+                player._bugleDamageReductionTicker = 2 + bugleEffectDuration;
+
+                player.giveHaste(
+                    GameConfig.HasteType.BoostedInspire,
+                    bugleEffectDuration,
+                    PerkProperties.inspiration.hasteSpeed,
+                );
+            } else {
+                player.giveHaste(
+                    GameConfig.HasteType.Inspire,
+                    bugleEffectDuration,
+                    PerkProperties.inspiration.hasteSpeed,
+                );
+            }
+
+            // Emotes (double note for speed + damage reduction, single note for speed only)
             if (player.teamId == GameConfig.FactionTeam.Red && player.__id != this.__id) {
-                this.game.playerBarn.addEmote("emote_bugle_inspiration_red", player.__id);
+                if (bugleAmmo >= 2) {
+                    this.game.playerBarn.addEmote("emote_bugle_inspiration_red_02", player.__id);
+                } else {
+                    this.game.playerBarn.addEmote("emote_bugle_inspiration_red_01", player.__id);
+                }
             }
             if (player.teamId == GameConfig.FactionTeam.Blue && player.__id != this.__id) {
-                this.game.playerBarn.addEmote(
-                    "emote_bugle_inspiration_blue",
-                    player.__id,
-                );
+                if (bugleAmmo >= 2) {
+                    this.game.playerBarn.addEmote("emote_bugle_inspiration_blue_02", player.__id);
+                } else {
+                    this.game.playerBarn.addEmote("emote_bugle_inspiration_blue_01", player.__id);
+                }
             }
         }
     }

@@ -3413,8 +3413,32 @@ const ParticleDefs: Record<string, ParticleDef> = {
         },
         color: 13107200,
     },
-    inspireStim: {
+    inspireStim_01: {
         image: ["part-note-01.img"],
+        life: new Range(4, 5),
+        drag: 0,
+        rotVel: new Range(Math.PI * 0.25, Math.PI * 0.5),
+        scale: {
+            start: new Range(0.12, 0.14),
+            end: new Range(0.06, 0.08),
+            lerp: new Range(0, 1),
+        },
+        alpha: {
+            start: 1,
+            end: 0,
+            lerp: new Range(0.7, 1),
+        },
+        alphaIn: {
+            start: 0,
+            end: 1,
+            lerp: new Range(0, 0.05),
+        },
+        color: function() {
+            return util.rgbToInt(util.hsvToRgb(0.13, 1, util.random(0.98, 1)));
+        },
+    },
+    inspireStim_02: {
+        image: ["part-note-03.img"],
         life: new Range(4, 5),
         drag: 0,
         rotVel: new Range(Math.PI * 0.25, Math.PI * 0.5),
@@ -3881,8 +3905,17 @@ const EmitterDefs: Record<string, EmitterDef> = {
         rot: 0,
         maxCount: Number.MAX_VALUE,
     },
-    inspire: {
-        particle: "inspireStim",
+    inspire_01: {
+        particle: "inspireStim_01",
+        rate: new Range(0.3, 0.35),
+        radius: 1.5,
+        speed: new Range(1, 1.5),
+        angle: 0,
+        rot: 0,
+        maxCount: Number.MAX_VALUE,
+    },
+    inspire_02: {
+        particle: "inspireStim_02",
         rate: new Range(0.3, 0.35),
         radius: 1.5,
         speed: new Range(1, 1.5),

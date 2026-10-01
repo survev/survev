@@ -202,9 +202,17 @@ export const EmotesDefs: Record<string, EmoteDef> = {
         noCustom: true,
         category: EmoteCategory.Locked,
     },
-    emote_bugle_inspiration_red: {
+    emote_bugle_inspiration_red_01: {
         type: "emote",
-        texture: "bugle-inspiration-red.img",
+        texture: "bugle-inspiration-red-01.img",
+        sound: "emote_01",
+        channel: "ui",
+        noCustom: true,
+        category: EmoteCategory.Other,
+    },
+    emote_bugle_inspiration_red_02: {
+        type: "emote",
+        texture: "bugle-inspiration-red-02.img",
         sound: "emote_01",
         channel: "ui",
         noCustom: true,
@@ -218,9 +226,17 @@ export const EmotesDefs: Record<string, EmoteDef> = {
         noCustom: true,
         category: EmoteCategory.Other,
     },
-    emote_bugle_inspiration_blue: {
+    emote_bugle_inspiration_blue_01: {
         type: "emote",
-        texture: "bugle-inspiration-blue.img",
+        texture: "bugle-inspiration-blue-01.img",
+        sound: "emote_01",
+        channel: "ui",
+        noCustom: true,
+        category: EmoteCategory.Other,
+    },
+    emote_bugle_inspiration_blue_02: {
+        type: "emote",
+        texture: "bugle-inspiration-blue-02.img",
         sound: "emote_01",
         channel: "ui",
         noCustom: true,

@@ -836,7 +836,7 @@
   "game-bonus_assault": "Hollow-Points",
   "game-bonus_assault-desc": "Bullets have increased damage & speed.",
   "game-inspiration": "Inspiration",
-  "game-inspiration-desc": "Your bugle call grants nearby allies a short burst of speed.",
+  "game-inspiration-desc": "Your bugle call grants nearby allies a short burst of speed. Consuming two charges gives additional damage reduction.",
   "game-final_bugle": "Last Breath",
   "game-final_bugle-desc": "When you die, nearby allies are bloodlusted for a short period of time.",
   "game-high_velocity": "High-Velocity Rounds",

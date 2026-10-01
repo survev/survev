@@ -3638,7 +3638,7 @@ export const BaseDefs: Record<string, GunDef> = {
         ignoreDetune: true,
         ammo: "bugle_ammo",
         ammoSpawnCount: 0,
-        maxClip: 1,
+        maxClip: 2,
         maxReload: 1,
         extendedClip: 4,
         extendedReload: 1,

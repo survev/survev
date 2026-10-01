@@ -718,6 +718,7 @@ export class WeaponManager {
         const itemDef = GameObjectDefs.typeToDef(this.activeWeapon, "gun");
 
         const weapon = this.weapons[this.curWeapIdx];
+        const ammoAtFire = weapon.ammo;
         this.scheduledReload = weapon.ammo <= 1;
 
         if (weapon.ammo <= 0) return;
@@ -1004,7 +1005,7 @@ export class WeaponManager {
         }
 
         if (this.activeWeapon == "bugle" && this.player.hasPerk("inspiration")) {
-            this.player.playBugle();
+            this.player.playBugle(ammoAtFire);
         }
 
         if (bulletType === "bullet_flare" && this.player.role === "leader") {

@@ -1142,7 +1142,11 @@ export class Player implements AbstractObject {
                     sound: "ability_stim_01",
                 },
                 [HasteType.Inspire]: {
-                    particle: "inspire",
+                    particle: "inspire_01",
+                    sound: "ability_stim_01",
+                },
+                [HasteType.BoostedInspire]: {
+                    particle: "inspire_02",
                     sound: "ability_stim_01",
                 },
             };
