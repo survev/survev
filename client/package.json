@@ -13,7 +13,7 @@
     "@taufik-nurrohman/color-picker": "1.4.2",
     "bootstrap": "^4.6.2",
     "ejs": "^4.0.1",
-    "hono": "^4.13.8",
+    "hono": "^4.13.13",
     "jquery": "^3.7.1",
     "pixi.js-legacy": "^7.4.3",
     "slugify": "^1.6.9"
@@ -24,11 +24,11 @@
     "@types/jquery": "^3.5.34",
     "canvas": "^3.2.3",
     "codefend": "^3.2.0",
-    "maxrects-packer": "^2.7.3",
-    "sharp": "^0.35.4",
+    "maxrects-packer": "2.7.3",
+    "sharp": "^0.35.5",
     "svgo": "^4.1.0",
     "turnstile-types": "^1.2.3",
     "tweakpane": "^4.0.5",
-    "vite": "^8.3.0"
+    "vite": "^8.3.4"
   }
 }
