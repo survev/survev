@@ -33,5 +33,5 @@
     "hjson": "^3.2.2",
     "tsx": "^4.23.15"
   },
-  "packageManager": "pnpm@11.24.0"
+  "packageManager": "pnpm@12.15.0"
 }
