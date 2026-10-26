@@ -1,5 +1,5 @@
 export const Puzzles: Record<string, string[]> = {
-    bunker_eye_02: ["egg", "hydra", "storm", "conch", "crossing", "hatchet"],
+    bunker_eye_02: ["egg", "hydra", "storm", "conch", "crossing", "hatchet", "cloud"],
     bunker_eye_02_woods: [
         "swine",
         "hydra",
