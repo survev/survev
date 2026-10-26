@@ -723,6 +723,10 @@ export const Main: MapDef = {
             */
         ],
         tier_halloween_mystery_perks: [
+            { name: "tier_halloween_treat_perks", count: 1, weight: 1 },
+            { name: "tier_halloween_trick_perks", count: 1, weight: 1 },
+        ],
+        tier_halloween_treat_perks: [
             { name: "trick_nothing", count: 1, weight: 1 },
             { name: "trick_size", count: 1, weight: 1 },
             { name: "trick_m9", count: 1, weight: 1 },
@@ -730,7 +734,8 @@ export const Main: MapDef = {
             { name: "trick_drain", count: 1, weight: 1 },
             { name: "trick_explosive", count: 1, weight: 1 },
             { name: "trick_velocity", count: 1, weight: 1 },
-
+        ],
+        tier_halloween_trick_perks: [
             { name: "treat_9mm", count: 1, weight: 1 },
             { name: "treat_12g", count: 1, weight: 1 },
             { name: "treat_556", count: 1, weight: 1 },
