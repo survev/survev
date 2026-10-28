@@ -86,6 +86,8 @@ export const Main: MapDef = {
         bagSizes: {},
         bleedDamage: 2,
         bleedDamageMult: 1,
+        gasDamageScale: false,
+        gasDamageScaleMult: 0.025,
     },
     // NOTE: this loot table is not the original one so its not accurate
     // ? are guesses based on statistics

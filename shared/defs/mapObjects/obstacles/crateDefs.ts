@@ -281,6 +281,19 @@ export const CrateDefs: Record<string, ObstacleDef> = {
         hitParticle: "blackChip",
         map: { display: false, color: 0x6b3500, scale: 0.85 },
     }),
+    case_08d: createCase({
+        health: 140,
+        img: { sprite: "map-case-crow-01.img" },
+        loot: [
+            tierLoot("tier_armor", 1, 1),
+            tierLoot("tier_medical", 1, 2),
+            tierLoot("tier_crow_case_melee", 1, 1),
+            tierLoot("tier_crow_case_skin", 1, 1),
+            autoLoot("flare_gun", 1),
+        ],
+        hitParticle: "blackChip",
+        map: { display: false, color: 0x6b3500, scale: 0.85 },
+    }),
     case_09: createCase({
         health: 140,
         img: {
@@ -372,7 +385,8 @@ export const CrateDefs: Record<string, ObstacleDef> = {
         loot: [
             tierLoot("tier_noir_outfit", 1, 1),
             tierLoot("tier_chest_04", 1, 1),
-            autoLoot("9mm", 300),
+            autoLoot("9mm", 150),
+            autoLoot("9mm", 150),
             autoLoot("smoke", 4),
             autoLoot("backpack02", 1),
         ],

@@ -643,7 +643,7 @@ export const QuestDefs: Record<string, QuestDef> = {
         type: "quest",
         event: "airdrop_unlocked",
         target: 1,
-        xp: 40,
+        xp: 50,
         icon: {
             urls: ["img/gui/ping-team-airdrop.svg"],
         },
@@ -665,6 +665,7 @@ export const QuestDefs: Record<string, QuestDef> = {
         ],
         mapFilterType: "only_on",
         maps: [MapId.Desert],
+        difficulty: QuestDifficulty.Hard,
     },
     quest_crates: {
         type: "quest",
@@ -791,8 +792,8 @@ export const QuestDefs: Record<string, QuestDef> = {
     quest_hardstone: {
         type: "quest",
         event: "destruction",
-        target: 2,
-        xp: 40,
+        target: 3,
+        xp: 50,
         icon: {
             urls: [
                 "img/map/map-stone-04.svg",
@@ -812,6 +813,7 @@ export const QuestDefs: Record<string, QuestDef> = {
         ],
         mapFilterType: "only_on",
         maps: [MapId.Desert, MapId.Woods],
+        difficulty: QuestDifficulty.Hard,
     },
     quest_soviet_crate: {
         type: "quest",
@@ -854,6 +856,29 @@ export const QuestDefs: Record<string, QuestDef> = {
         ],
         mapFilterType: "only_on",
         maps: [MapId.Faction, MapId.FactionPotato],
+    },
+    quest_hatchet_crate: {
+        type: "quest",
+        event: "destruction",
+        target: 3,
+        xp: 30,
+        icon: {
+            urls: [
+                "img/map/map-crate-02.svg",
+                "img/map/map-crate-02f.svg",
+            ],
+        },
+        filters: [
+            {
+                type: "obstacle",
+                subType: "type",
+                obstacleType: [
+                    "crate_19",
+                ],
+            },
+        ],
+        mapFilterType: "only_on",
+        maps: [MapId.Woods],
     },
     quest_pvt_swappers: {
         type: "quest",

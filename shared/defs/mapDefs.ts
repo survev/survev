@@ -176,6 +176,8 @@ export interface MapDef {
         bagSizes: Partial<typeof GameConfig["bagSizes"]>;
         bleedDamage: number;
         bleedDamageMult: number;
+        gasDamageScale: boolean;
+        gasDamageScaleMult: number;
     };
     lootTable: Record<
         string,
