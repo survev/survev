@@ -132,6 +132,7 @@ export class Map {
     potatoMode = false;
     perkMode = false;
     turkeyMode = false;
+    desertMode = false;
     seed = 0;
     width = 0;
     height = 0;
@@ -210,6 +211,7 @@ export class Map {
         this.potatoMode = !!this.mapDef.gameMode.potatoMode;
         this.perkMode = !!this.mapDef.gameMode.perkMode;
         this.turkeyMode = !!this.mapDef.gameMode.turkeyMode;
+        this.desertMode = !!this.mapDef.gameMode.desertMode;
         this.seed = mapMsg.seed;
         this.width = mapMsg.width;
         this.height = mapMsg.height;
