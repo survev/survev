@@ -20,8 +20,8 @@ export const Main: MapDef = {
     },
     assets: {
         audio: [
-            { name: "club_music_01", channel: "ambient" },
-            { name: "club_music_02", channel: "ambient" },
+            { name: "club_music_01", channel: "music" },
+            { name: "club_music_02", channel: "music" },
             { name: "ambient_steam_01", channel: "ambient" },
             { name: "log_05", channel: "sfx" },
             { name: "log_11", channel: "sfx" },

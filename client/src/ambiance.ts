@@ -115,6 +115,9 @@ export class Ambiance {
         for (let i = this.tracks.length - 1; i >= 0; i--) {
             const track = this.tracks[i];
             // Start sound if it's loaded
+            if (track.immediateMode && track.sound) {
+                track.channel = SoundDefs.Sounds["ambient"][track.sound] ? "ambient" : "music";
+            }
 
             if (
                 !track.inst
@@ -125,7 +128,7 @@ export class Ambiance {
                 track.inst = audioManager.playSound(track.sound, {
                     channel: track.channel,
                     startSilent: true,
-                    loop: track.channel == "ambient",
+                    loop: track.channel == "ambient" || track.immediateMode,
                     forceStart: true,
                     filter: track.filter,
                     forceFilter: true,

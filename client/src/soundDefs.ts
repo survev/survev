@@ -1631,11 +1631,6 @@ const Sounds: Record<string, Record<string, SoundDef>> = {
             volume: 1,
             loadPriority: 1,
         },
-        piano_music_01: {
-            path: "audio/ambient/piano_music_01.mp3",
-            volume: 1,
-            preload: false,
-        },
         ambient_wind_02: {
             path: "audio/ambient/ambient_wind_02.mp3",
             volume: 1,
@@ -1644,26 +1639,6 @@ const Sounds: Record<string, Record<string, SoundDef>> = {
         ambient_steam_01: {
             path: "audio/ambient/ambient_steam_01.mp3",
             volume: 1,
-            preload: false,
-        },
-        club_music_01: {
-            path: "audio/ambient/club_music_01.mp3",
-            volume: 1,
-            preload: false,
-        },
-        club_music_02: {
-            path: "audio/ambient/club_music_02.mp3",
-            volume: 1,
-            preload: false,
-        },
-        reserve_music_01: {
-            path: "audio/ambient/reserve_music_01.mp3",
-            volume: 0.66,
-            preload: false,
-        },
-        reserve_music_02: {
-            path: "audio/ambient/reserve_music_02.mp3",
-            volume: 0.66,
             preload: false,
         },
         ambient_lab_01: {
@@ -1928,6 +1903,31 @@ const Sounds: Record<string, Record<string, SoundDef>> = {
             path: "audio/ambient/menu_music_02.mp3",
             volume: 1,
             loadPriority: 2,
+            preload: false,
+        },
+        piano_music_01: {
+            path: "audio/ambient/piano_music_01.mp3",
+            volume: 1,
+            preload: false,
+        },
+        club_music_01: {
+            path: "audio/ambient/club_music_01.mp3",
+            volume: 1,
+            preload: false,
+        },
+        club_music_02: {
+            path: "audio/ambient/club_music_02.mp3",
+            volume: 1,
+            preload: false,
+        },
+        reserve_music_01: {
+            path: "audio/ambient/reserve_music_01.mp3",
+            volume: 0.66,
+            preload: false,
+        },
+        reserve_music_02: {
+            path: "audio/ambient/reserve_music_02.mp3",
+            volume: 0.33,
             preload: false,
         },
     },
