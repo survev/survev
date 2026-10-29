@@ -186,6 +186,7 @@ export const UnlockDefs: Record<UnlockDefKey, UnlockDef> = {
             "emote_flagiran",
             "emote_flaglebanon",
             "emote_flagyemen",
+            "emote_flagmoldova",
             "emote_flagtransgender",
             "emote_flagpride",
             "emote_flaglesbian",
