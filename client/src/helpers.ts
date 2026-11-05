@@ -170,6 +170,9 @@ export const helpers = {
             case "boost_effect":
                 return `img/particles/${def.texture.slice(0, -4)}.svg`;
             case "emote":
+                if (def.texture.startsWith("loot-")) {
+                    return `img/loot/${def.texture.slice(0, -4)}.svg`;
+                }
                 return `img/emotes/${def.texture.slice(0, -4)}.svg`;
             case "crosshair":
                 return `img/crosshairs/${def.texture.slice(0, -4)}.svg`;
