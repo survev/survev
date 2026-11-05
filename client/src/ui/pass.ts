@@ -361,7 +361,7 @@ export class Pass {
         const tooltipElem = $("#pass-unlock-tooltip");
         tooltipElem.css("opacity", def ? 1 : 0);
         tooltipElem.find(".tooltip-pass-title").html(unlockTypeTitle);
-        tooltipElem.find(".tooltip-pass-desc").html(def ? def.name! : "");
+        tooltipElem.find(".tooltip-pass-desc").html(def ? this.localization.translate(`game-${item}`) : "");
         const unlockTypeImageUrl = def
             ? `url(${this.loadoutMenu.getCategory(def.type)!.categoryImage})`
             : "";
