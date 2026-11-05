@@ -173,33 +173,31 @@ export const PassRouter = new Hono<Context>()
 
             let activeQuests = quests;
 
-            if (tryRefreshQuests) {
-                const expiredQuests = activeQuests.filter(
-                    (quest) => quest.nextRefreshAt - now < 0,
+            const expiredQuests = activeQuests.filter(
+                (quest) => quest.nextRefreshAt - now < 0,
+            );
+            for (const quest of expiredQuests) {
+                const newType = await rerollSlot(
+                    user.id,
+                    quest.idx,
+                    now,
+                    false,
+                    activeQuests,
                 );
-                for (const quest of expiredQuests) {
-                    const newType = await rerollSlot(
-                        user.id,
-                        quest.idx,
-                        now,
-                        false,
-                        activeQuests,
-                    );
-                    activeQuests = activeQuests.map((current) =>
-                        current.idx === quest.idx
-                            ? {
-                                ...current,
-                                questType: newType,
-                                progress: 0,
-                                target: QuestDefs[newType]!.target,
-                                complete: false,
-                                rerolled: false,
-                                timeAcquired: now,
-                                nextRefreshAt: passUtil.getNextQuestRefreshAt(now),
-                            }
-                            : current
-                    );
-                }
+                activeQuests = activeQuests.map((current) =>
+                    current.idx === quest.idx
+                        ? {
+                            ...current,
+                            questType: newType,
+                            progress: 0,
+                            target: QuestDefs[newType]!.target,
+                            complete: false,
+                            rerolled: false,
+                            timeAcquired: now,
+                            nextRefreshAt: passUtil.getNextQuestRefreshAt(now),
+                        }
+                        : current
+                );
             }
 
             if (pass.newItems) {
