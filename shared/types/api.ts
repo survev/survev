@@ -1,6 +1,6 @@
 import { z } from "zod";
 import type { MapDefKey } from "../defs/mapDefs.ts";
-import type { TeamMode } from "../gameConfig.ts";
+import { GameConfig, type TeamMode } from "../gameConfig.ts";
 
 export const zFindGameBody = z.object({
     region: z.string(),
@@ -31,7 +31,7 @@ export const loadoutSchema = z.object({
         size: z.string(),
         stroke: z.string(),
     }),
-    emotes: z.array(z.string()).length(6),
+    emotes: z.array(z.string()).length(GameConfig.EmoteSlot.Count),
 });
 
 export type FindGameError =
