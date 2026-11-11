@@ -430,6 +430,8 @@ const BaseDefs: Record<string, MeleeDef> = {
         anim: {
             idlePose: "machete",
             attackAnims: ["cutReverse"],
+            deployAnims: ["machete_deploy"],
+            deployAnimTime: 0.4,
         },
         sound: {
             pickup: "frag_pickup_01",
@@ -539,6 +541,8 @@ const BaseDefs: Record<string, MeleeDef> = {
         anim: {
             idlePose: "meleeTwoHanded",
             attackAnims: ["axeSwing"],
+            deployAnims: ["meleeTwoHanded_deploy"],
+            deployAnimTime: 0.45,
         },
         sound: {
             pickup: "heavy_pickup_01",
@@ -594,6 +598,8 @@ const BaseDefs: Record<string, MeleeDef> = {
         anim: {
             idlePose: "meleeTwoHanded",
             attackAnims: ["axeSwing"],
+            deployAnims: ["meleeTwoHanded_deploy"],
+            deployAnimTime: 0.45,
         },
         sound: {
             pickup: "heavy_pickup_01",
@@ -650,6 +656,8 @@ const BaseDefs: Record<string, MeleeDef> = {
         anim: {
             idlePose: "meleeKatana",
             attackAnims: ["katanaSwing"],
+            deployAnims: ["katana_unsheathe_01", "katana_unsheathe_02"],
+            deployAnimTime: 0.75,
         },
         sound: {
             pickup: "frag_pickup_01",
@@ -1113,14 +1121,16 @@ const BaseDefs: Record<string, MeleeDef> = {
             },
             rad: 1.75,
             damageTimes: [0.1],
-            cooldownTime: 0.225,
+            cooldownTime: 0.25,
         },
         speed: {
             equip: 1,
         },
         anim: {
             idlePose: "cutlass",
-            attackAnims: ["cut", "cutReverse"],
+            attackAnims: ["cutlassCut", "cutlassCutReverse"],
+            deployAnims: ["cutlass_unsheathe"],
+            deployAnimTime: 0.75,
         },
         sound: {
             pickup: "frag_pickup_01",
@@ -1148,6 +1158,7 @@ const BaseDefs: Record<string, MeleeDef> = {
                 y: 0.325,
             },
             tint: 0xffffff,
+            leftHandOntop: true,
         },
     },
 };
