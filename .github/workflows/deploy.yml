@@ -36,7 +36,7 @@ jobs:
           fi
 
       - name: Setup Node
-        uses: actions/setup-node@v6
+        uses: actions/setup-node@v7
         with:
           node-version: "22"
 
@@ -48,7 +48,7 @@ jobs:
 
       - name: Restore Atlas Cache
         id: cache-atlases-restore
-        uses: actions/cache@v5
+        uses: actions/cache@v6
         if: always()
         with:
           path: ./client/node_modules/.atlas-cache/
@@ -62,7 +62,7 @@ jobs:
 
       - name: Save Atlas Cache
         id: cache-atlases-save
-        uses: actions/cache/save@v5
+        uses: actions/cache/save@v6
         with:
           path: ./client/node_modules/.atlas-cache/
           key: "atlas-cache-${{ github.run_id }}"
