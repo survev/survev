@@ -9,8 +9,8 @@
     "register-commands": "tsx src/register-commands.ts"
   },
   "dependencies": {
-    "discord.js": "^14.27.0",
-    "hono": "^4.13.13",
+    "discord.js": "^14.28.1",
+    "hono": "^4.13.16",
     "tsx": "^4.23.15",
     "zod": "^4.6.7"
   }

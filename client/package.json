@@ -13,7 +13,7 @@
     "@taufik-nurrohman/color-picker": "1.4.2",
     "bootstrap": "^4.6.2",
     "ejs": "^4.0.1",
-    "hono": "^4.13.13",
+    "hono": "^4.13.16",
     "jquery": "^3.7.1",
     "pixi.js-legacy": "^7.4.3",
     "slugify": "^1.6.9"
@@ -29,6 +29,6 @@
     "svgo": "^4.1.0",
     "turnstile-types": "^1.2.3",
     "tweakpane": "^4.0.5",
-    "vite": "^8.3.4"
+    "vite": "^8.3.5"
   }
 }
