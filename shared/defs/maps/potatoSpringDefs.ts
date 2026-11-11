@@ -13,8 +13,8 @@ const mapDef: PartialMapDef = {
             { name: "potato_01", channel: "sfx" },
             { name: "potato_02", channel: "sfx" },
             { name: "potato_pickup_01", channel: "ui" },
-            { name: "club_music_01", channel: "ambient" },
-            { name: "club_music_02", channel: "ambient" },
+            { name: "club_music_01", channel: "music" },
+            { name: "club_music_02", channel: "music" },
             {
                 name: "ambient_steam_01",
                 channel: "ambient",
