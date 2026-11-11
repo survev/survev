@@ -7,9 +7,6 @@
 # Global owners.
 * @leia-uwu
 
-# API
-/server/src/api/ @leia-uwu @lmssiehdev
-
 # GitHub
 /COMMIT_FORMAT.md @DamienVesper
-/README.md @DamienVesper
+/README.md @leia-uwu @DamienVesper
