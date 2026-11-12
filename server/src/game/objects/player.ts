@@ -1652,7 +1652,9 @@ export class Player extends BaseGameObject {
 
             if (this.game.gas.doDamage) {
                 let damage = this.disconnected ? 22 : this.game.gas.damage;
-                const damageMulti = 1 + this.timeInsideGas * 0.025;
+                const damageMulti = this.game.map.mapDef.gameConfig.gasDamageScale
+                    ? 1 + this.timeInsideGas * this.game.map.mapDef.gameConfig.gasDamageScaleMult
+                    : 1;
 
                 this.damage({
                     amount: damage * damageMulti,

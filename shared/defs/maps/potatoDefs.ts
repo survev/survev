@@ -66,6 +66,8 @@ const mapDef: PartialMapDef = {
                 { name: "airdrop_crate_02", weight: 1 },
             ],
         },
+        gasDamageScale: true,
+        gasDamageScaleMult: 0.0125,
     },
     lootTable: {
         tier_guns: [

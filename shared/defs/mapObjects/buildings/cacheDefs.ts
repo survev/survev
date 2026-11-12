@@ -405,6 +405,28 @@ export const CacheDefs: Record<string, BuildingDef> = {
             },
         ],
     }),
+    cache_04tr: createCache({
+        terrain: {
+            grass: false,
+            beach: false,
+            river: { centerWeight: 0.5 },
+            riverShore: false,
+        },
+        mapObjects: [
+            {
+                type: "stone_08tr",
+                pos: v2.create(0, 0),
+                scale: 1,
+                ori: 0,
+            },
+            {
+                type: "decal_caduceus_01",
+                pos: v2.create(0, 0),
+                scale: 1,
+                ori: 0,
+            },
+        ],
+    }),
     cache_04x: createCache({
         terrain: {
             grass: false,

@@ -1093,6 +1093,18 @@ export const MapObstacleDefs: Record<string, ObstacleDef> = {
             tint: 0xe6e6e6,
         },
     }),
+    stone_08tr: createRiverStone({
+        loot: [
+            tierLoot("tier_medical", 2, 3),
+            tierLoot("tier_surviv", 1, 2),
+            autoLoot("vss", 1),
+        ],
+        img: {
+            sprite: "map-stone-03tr.img",
+            residue: "",
+            tint: 0xe6e6e6,
+        },
+    }),
     stone_08x: createRiverStone({
         loot: [
             tierLoot("tier_medical", 2, 3),

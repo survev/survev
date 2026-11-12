@@ -6790,6 +6790,10 @@ export const ModeBuildingDefs: Record<string, BuildingDef> = {
     statue_building_03: createStatue({}, { statue: "statue_03" }),
     statue_underground_03: createStatueUnderground({}, { crate: "crate_02d" }),
 
+    warehouse_03d: createWarehouse3({}, {
+        specialLoot: "case_08d",
+    }),
+
     // Faction
 
     river_town_01: {

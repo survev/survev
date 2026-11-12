@@ -244,6 +244,8 @@ const mapDef: PartialMapDef = {
         bagSizes: {},
         bleedDamage: 2,
         bleedDamageMult: 1.25,
+        gasDamageScale: true,
+        gasDamageScaleMult: 0.025,
     },
     lootTable: {
         tier_guns: [

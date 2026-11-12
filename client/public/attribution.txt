@@ -1,8 +1,4 @@
-"MP5 icon" by Skoll is licensed under CC BY 3.0
-"Colt M1911 icon" by Skoll is licensed under CC BY 3.0
-"AK47 icon" by Skoll is licensed under CC BY 3.0
 "Sawed-off shotgun icon" by Delapouite is licensed under CC BY 3.0
-"FN FAL icon" by Skoll is licensed under CC BY 3.0
 "Lee Enfield icon" by Skoll is licensed under CC BY 3.0
 "Radioactive icon" by Lorc is licensed under CC BY 3.0
 "Hazard sign icon" by Lorc is licensed under CC BY 3.0
@@ -37,3 +33,4 @@ Emoji icons supplied by EmojiOne
 "Contract icon" by Delapouite is licensed under CC BY 3.0
 "Thumb up icon" by Delapouite is licensed under CC BY 3.0
 "Pig icon" by Skoll is licensed under CC BY 3.0
+"Snail icon" by Lorc is licensed under CC BY 3.0

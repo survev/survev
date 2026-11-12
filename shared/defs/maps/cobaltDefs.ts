@@ -52,6 +52,8 @@ const mapDef: PartialMapDef = {
                 },
             ],
         },
+        gasDamageScale: true,
+        gasDamageScaleMult: 0.0125,
     },
     lootTable: {
         // disable outfits from spawning
