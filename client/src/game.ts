@@ -1198,7 +1198,7 @@ export class Game {
         for (let i = 0; i < msg.emotes.length; i++) {
             const e = msg.emotes[i];
             if (e.isPing) {
-                this.m_emoteBarn.addPing(e, this.m_map.factionMode);
+                this.m_emoteBarn.addPing(e, this.m_map.factionMode, this.m_map.desertMode);
             } else {
                 this.m_emoteBarn.addEmote(e);
             }

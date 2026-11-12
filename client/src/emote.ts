@@ -597,7 +597,7 @@ export class EmoteBarn {
         this.incrementEmote();
     }
 
-    addPing(ping: Emote, factionMode: boolean) {
+    addPing(ping: Emote, factionMode: boolean, desertMode: boolean) {
         // Given the ping position, create an indicator on the map and make a sound
         if (this.activePlayer) {
             const pingData = PingDefs[ping.type];
@@ -641,18 +641,18 @@ export class EmoteBarn {
                     }
                 }
 
-                if (factionMode || ping.type != "ping_airstrike") {
-                    // Pings always play at full volume
-                    this.audioManager.playSound(pingSound, {
-                        channel: "ui",
-                    });
-                } else {
-                    // If we're too far from an air strike ping in non-faction mode, reduce the ping sound
+                if ((!factionMode && ping.type == "ping_airstrike") || (desertMode && ping.type == "ping_airdrop")) {
+                    // If we're too far from a) an air strike ping in non-faction mode or b) an air drop ping in desert mode, reduce the ping sound
                     this.audioManager.playSound(pingSound, {
                         channel: "ui",
                         fallOff: 1,
                         soundPos: ping.pos,
                         rangeMult: 20,
+                    });
+                } else {
+                    // All other pings always play at full volume
+                    this.audioManager.playSound(pingSound, {
+                        channel: "ui",
                     });
                 }
                 if (indicator) {
