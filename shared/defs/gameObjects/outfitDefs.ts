@@ -202,6 +202,7 @@ const SkinDefs: Record<string, OutfitDef> = {
         },
         rarity: Rarity.Rare,
         lore: "M1100 not included.",
+        teamId: FactionTeam.Red,
     }),
     outfitDev: defineOutfitSkin("outfitBase", {
         name: "Developer Swag",
