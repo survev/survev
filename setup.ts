@@ -236,13 +236,17 @@ async function setupRegions(config: PartialConfig) {
 }
 
 async function setupProxyCheck(config: PartialConfig) {
-    const enableProxyCheck = await prompt<{ value: boolean }>({
-        message: "Would you like to enable proxycheck.io to ban VPNs and proxies?",
+    const provider = await prompt<{ value: "none" | "proxycheck" | "vpndetection" }>({
+        message: "Would you like to ban VPNs and proxies?",
         name: "value",
-        type: "confirm",
-        initial: false,
+        type: "select",
+        choices: [
+            { name: "none", message: "No" },
+            { name: "proxycheck", message: "Yes, with proxycheck.io (API key)" },
+            { name: "vpndetection", message: "Yes, with vpndetection.io (no key)" },
+        ],
     });
-    if (enableProxyCheck.value) {
+    if (provider.value === "proxycheck") {
         const proxycheckKey = await prompt<{ value: string }>({
             message: "Enter proxycheck API key",
             name: "value",
@@ -250,6 +254,8 @@ async function setupProxyCheck(config: PartialConfig) {
         });
         config.secrets ??= {};
         config.secrets.PROXYCHECK_KEY = proxycheckKey.value;
+    } else if (provider.value === "vpndetection") {
+        config.proxyCheckProvider = "vpndetection";
     }
 }
 

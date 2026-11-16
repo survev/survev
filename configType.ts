@@ -285,6 +285,7 @@ export interface ConfigType {
 
         /**
          * Enables proxycheck.io to ban VPNs and proxies from connecting.
+         * See `proxyCheckProvider`.
          */
         PROXYCHECK_KEY?: string;
 
@@ -343,6 +344,15 @@ export interface ConfigType {
      * Enabled by default on production.
      */
     rateLimitsEnabled: boolean;
+
+    /**
+     * Which service checks IPs to ban VPNs and proxies from connecting.
+     * "proxycheck" (proxycheck.io) requires PROXYCHECK_KEY on secrets object.
+     * "vpndetection" (vpndetection.io) needs no key, and treats Tor exits as proxies.
+     *
+     * Defaults to "proxycheck" when PROXYCHECK_KEY is set, otherwise no IPs are checked.
+     */
+    proxyCheckProvider?: "proxycheck" | "vpndetection";
 
     /**
      * If in-game names should be unique.

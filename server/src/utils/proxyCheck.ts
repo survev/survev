@@ -67,10 +67,18 @@ type ProxyCheckRes<IP extends string> =
         [k in IP]: IpInfo;
     };
 
+type Detections = Pick<IpInfo["detections"], "proxy" | "vpn">;
+
+type VpnDetectionRes = {
+    is_vpn: boolean;
+    is_tor: boolean;
+    error?: string;
+};
+
 const proxyCheckCache = new Map<
     string,
     {
-        info: IpInfo;
+        info: Detections;
         expiresAt: number;
     }
 >();
@@ -84,10 +92,40 @@ async function fetchProxyCheck<IP extends string>(ip: IP) {
     return data as ProxyCheckRes<IP>;
 }
 
-export async function isBehindProxy(ip: string, checkVpn: boolean): Promise<boolean> {
-    if (!Config.secrets.PROXYCHECK_KEY) return false;
+async function checkProxyCheck(ip: string): Promise<Detections | undefined> {
+    const proxyRes = await fetchProxyCheck(ip);
+    switch (proxyRes.status) {
+        case "ok":
+        case "warning": {
+            const info = proxyRes[ip];
+            if (proxyRes.status === "warning") {
+                defaultLogger.warn(`ProxyCheck warning, res:`, proxyRes);
+            }
+            assert(info.detections);
+            return info.detections;
+        }
+        case "denied":
+        case "error":
+            defaultLogger.error(`Failed to check for ip ${ip}:`, proxyRes);
+            return undefined;
+    }
+}
 
-    let info: IpInfo | undefined = undefined;
+async function checkVpnDetection(ip: string): Promise<Detections | undefined> {
+    const res = await fetchWithRetry(`https://api.vpndetection.io/${encodeURIComponent(ip)}`);
+    const data = (await res.json()) as VpnDetectionRes;
+    if (!res.ok) {
+        defaultLogger.error(`Failed to check for ip ${ip}:`, data);
+        return undefined;
+    }
+    return { vpn: data.is_vpn, proxy: data.is_tor };
+}
+
+export async function isBehindProxy(ip: string, checkVpn: boolean): Promise<boolean> {
+    const provider = Config.proxyCheckProvider ?? "proxycheck";
+    if (provider === "proxycheck" && !Config.secrets.PROXYCHECK_KEY) return false;
+
+    let info: Detections | undefined = undefined;
 
     const key = `${ip}_${checkVpn}`;
 
@@ -96,21 +134,9 @@ export async function isBehindProxy(ip: string, checkVpn: boolean): Promise<bool
         info = cached.info;
     } else {
         try {
-            const proxyRes = await fetchProxyCheck(ip);
-            switch (proxyRes.status) {
-                case "ok":
-                case "warning":
-                    info = proxyRes[ip];
-                    if (proxyRes.status === "warning") {
-                        defaultLogger.warn(`ProxyCheck warning, res:`, proxyRes);
-                    }
-                    assert(info.detections);
-                    break;
-                case "denied":
-                case "error":
-                    defaultLogger.error(`Failed to check for ip ${ip}:`, proxyRes);
-                    break;
-            }
+            info = provider === "vpndetection"
+                ? await checkVpnDetection(ip)
+                : await checkProxyCheck(ip);
         } catch (error) {
             defaultLogger.error(`Proxycheck error:`, error);
         }
@@ -125,7 +151,7 @@ export async function isBehindProxy(ip: string, checkVpn: boolean): Promise<bool
         });
     }
 
-    if (checkVpn && info.detections.vpn) return true;
+    if (checkVpn && info.vpn) return true;
 
-    return info.detections.proxy;
+    return info.proxy;
 }
