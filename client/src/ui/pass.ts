@@ -548,15 +548,11 @@ export class Pass {
             const completionPhaseReady = !fixedQuest.playCompleteAnim
                 || (fixedQuest.completeAnimFinished
                     && fixedQuest.ticker - fixedQuest.delay > 4.25);
-            if (
-                fixedQuest.data.complete
-                && completionPhaseReady
-                && fixedQuest.refreshEnabled
-                && fixedQuest.shouldRequestRefresh
-            ) {
+            if (fixedQuest.refreshTime - Date.now() <= 0 && fixedQuest.shouldRequestRefresh) {
                 fixedQuest.shouldRequestRefresh = false;
-                this.account.refreshQuest(fixedQuest.data.idx);
+                this.account.getPass(false);
             }
+
             const showRefreshTimer = fixedQuest.data.complete && completionPhaseReady;
             if (showRefreshTimer != fixedQuest.timer.displayed) {
                 fixedQuest.timer.displayed = showRefreshTimer;
