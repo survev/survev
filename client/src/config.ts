@@ -63,6 +63,7 @@ export const debugHUDConfig = {
     enabled: false,
     position: false,
     objectPools: false,
+    netStats: false,
     fps: {
         show: false,
         showGraph: false,

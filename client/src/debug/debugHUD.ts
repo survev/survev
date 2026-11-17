@@ -190,6 +190,11 @@ export class DebugHUD {
             addCount("Planes", activePlanes, game.m_planeBarn.planes.length);
         }
 
+        // this will have way more with webtransport eventually i think!!
+        if (cfg.netStats) {
+            this.addLine(`Buffered amount: ${game.m_connection?.bufferedAmount} bytes`);
+        }
+
         this.updateLayout();
     }
 

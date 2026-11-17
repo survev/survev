@@ -295,6 +295,7 @@ export enum MsgType {
     UpdatePass,
     AliveCounts,
     PerkModeRoleSelect,
+    PointerInput,
 }
 
 export enum PickupMsgType {
@@ -325,6 +326,7 @@ export { MapMsg } from "./mapMsg.ts";
 export { PerkModeRoleSelectMsg } from "./perkModeRoleSelectMsg.ts";
 export { PickupMsg } from "./pickupMsg.ts";
 export { PlayerStatsMsg } from "./playerStatsMsg.ts";
+export { PointerInputMsg } from "./pointerInputMsg.ts";
 export { RoleAnnouncementMsg } from "./roleAnnouncementMsg.ts";
 export { SpectateMsg } from "./spectateMsg.ts";
 export { getPlayerStatusUpdateRate, UpdateMsg } from "./updateMsg.ts";
