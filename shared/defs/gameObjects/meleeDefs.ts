@@ -1048,6 +1048,61 @@ const BaseDefs: Record<string, MeleeDef> = {
             },
         },
     },
+    shield: {
+        name: "Ballistic Shield",
+        type: "melee",
+        quality: 1,
+        armorPiercing: false,
+        cleave: false,
+        autoAttack: false,
+        switchDelay: 0.5,
+        damage: 40,
+        obstacleDamage: 1.5,
+        attack: {
+            offset: {
+                x: 2.25,
+                y: 0.3,
+            },
+            rad: 1.75,
+            damageTimes: [0.1],
+            cooldownTime: 1,
+        },
+        speed: {
+            equip: -1,
+        },
+        anim: {
+            idlePose: "shield",
+            attackAnims: ["shieldBash"],
+        },
+        sound: {
+            pickup: "heavy_pickup_01",
+            swing: "heavy_swing_01",
+            deploy: "stow_weapon_01",
+            playerHit: "hammer_hit_01",
+        },
+        lootImg: {
+            sprite: "loot-melee-shield-01.img",
+            tint: 0xffffff,
+            border: "loot-circle-outer-02.img",
+            borderTint: 0xffffff,
+            scale: 0.3,
+            mirror: true,
+            rot: 1.5708,
+        },
+        worldImg: {
+            sprite: "loot-melee-shield-held-01.img",
+            pos: {
+                x: 7,
+                y: -20,
+            },
+            rot: 1.5708,
+            scale: {
+                x: 0.35,
+                y: 0.35,
+            },
+            tint: 0xffffff,
+        },
+    },
     spade: {
         name: "Spade",
         type: "melee",
@@ -1480,6 +1535,10 @@ const SkinDefs: Record<string, MeleeDef> = {
     mace_red: defineMeleeSkin("mace", {
         lootImg: { sprite: "loot-melee-mace-red.img" },
         worldImg: { sprite: "loot-melee-mace-red.img" },
+    }),
+    shield_red: defineMeleeSkin("shield", {
+        lootImg: { sprite: "loot-melee-shield-02.img" },
+        worldImg: { sprite: "loot-melee-shield-held-02.img" },
     }),
     cutlass_gold: defineMeleeSkin("cutlass", {
         name: "Gold Cutlass",

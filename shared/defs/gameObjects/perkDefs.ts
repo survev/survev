@@ -145,6 +145,20 @@ export const PerkProperties = {
         rareChance: 0.12,
         rareTier: "tier_pirate_rare",
     },
+    boosted_revive: {
+        reviveHealth: 50,
+        reviveBoost: 33,
+        hasteDuration: 2,
+        hasteSpeed: 2.4,
+    },
+    smokescreen: {
+        healthThreshold: 33, // Health to drop smokes at
+        rechargeThreshold: 66, // Health to recharge the smoke drop
+        smokeCount: 4,
+        fuseTime: 0.75,
+        fuseVariance: 0.25,
+        projectileMaxVel: 12,
+    },
     bonus_9mm: {
         spreadMul: 1.1,
         speedMult: 1.2,
@@ -605,6 +619,34 @@ export const PerkDefs: Record<string, PerkDef> = {
         type: "perk",
         lootImg: {
             sprite: "loot-perk-self-revive.img",
+            tint: 0xffffff,
+            border: "loot-circle-outer-03.img",
+            borderTint: 0xffffff,
+            scale: 0.275,
+        },
+        sound: {
+            pickup: "perk_pickup_01",
+        },
+    },
+    boosted_revive: {
+        name: "Rejuvenate",
+        type: "perk",
+        lootImg: {
+            sprite: "loot-perk-boosted_revive.img",
+            tint: 0xffffff,
+            border: "loot-circle-outer-03.img",
+            borderTint: 0xffffff,
+            scale: 0.275,
+        },
+        sound: {
+            pickup: "perk_pickup_01",
+        },
+    },
+    smokescreen: {
+        name: "Smokescreen",
+        type: "perk",
+        lootImg: {
+            sprite: "loot-perk-smokescreen.img",
             tint: 0xffffff,
             border: "loot-circle-outer-03.img",
             borderTint: 0xffffff,

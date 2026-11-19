@@ -118,6 +118,10 @@ export const IdlePoses: Record<string, Partial<Record<Bones, Pose>>> = {
         [Bones.HandL]: new Pose(v2.create(14, -12.25)),
         [Bones.HandR]: new Pose(v2.create(6, 16)),
     },
+    shield: {
+        [Bones.HandL]: new Pose(v2.create(12, 16.5)),
+        [Bones.HandR]: new Pose(v2.create(19, -7)),
+    },
     rifle: {
         [Bones.HandL]: new Pose(v2.create(28, 5.25)),
         [Bones.HandR]: new Pose(v2.create(14, 1.75)),
@@ -321,6 +325,26 @@ export const Animations: Record<
         effects: [
             effect(0, "animPlaySound", { sound: "swing" }),
             effect(def("pan").attack.damageTimes[0], "animMeleeCollision", {}),
+        ],
+    },
+    shieldBash: {
+        keyframes: [
+            frame(0, {
+                [Bones.HandR]: new Pose(v2.create(19, -7)),
+            }),
+            frame(def("shield").attack.cooldownTime * 0.1, {
+                [Bones.HandR]: new Pose(v2.create(12, -7)),
+            }, math.easeOutExpo),
+            frame(def("shield").attack.cooldownTime * 0.35, {
+                [Bones.HandR]: new Pose(v2.create(44, -7)),
+            }, math.easeOutExpo),
+            frame(def("shield").attack.cooldownTime * 0.5, {
+                [Bones.HandR]: new Pose(v2.create(19, -7)),
+            }, math.easeInOutSine),
+        ],
+        effects: [
+            effect(0, "animPlaySound", { sound: "swing" }),
+            effect(def("shield").attack.damageTimes[0], "animMeleeCollision", {}),
         ],
     },
     axeSwing: {

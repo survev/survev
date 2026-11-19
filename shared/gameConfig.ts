@@ -52,6 +52,7 @@ export enum HasteType {
     Takedown,
     Inspire,
     BoostedInspire,
+    BoostedRevive,
     Count,
 }
 

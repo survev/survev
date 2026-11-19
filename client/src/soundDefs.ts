@@ -1889,6 +1889,12 @@ const Sounds: Record<string, Record<string, SoundDef>> = {
             preload: false,
             maxInstances: 1,
         },
+        bastion_assigned_01: {
+            path: "audio/ui/bastion_assigned_01.mp3",
+            volume: 2.5,
+            preload: false,
+            maxInstances: 1,
+        },
         last_man_assigned_01: {
             path: "audio/ui/last_man_assigned_01.mp3",
             volume: 1.75,

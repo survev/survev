@@ -675,9 +675,40 @@ export class Player extends BaseGameObject {
     }
 
     set health(health: number) {
+        const oldHealth = this._health;
+
         health = math.clamp(health, 0, GameConfig.player.health);
-        if (this._health === health) return;
+
         this._health = health;
+
+        if (
+            this.hasPerk("smokescreen")
+            && this.smokescreenReady
+            && oldHealth > PerkProperties.smokescreen.healthThreshold
+            && health <= PerkProperties.smokescreen.healthThreshold
+        ) {
+            this.smokescreenReady = false;
+            this.game.projectileBarn.addSplitProjectiles(
+                this.__id,
+                "smokescreen_smoke",
+                this.pos,
+                this.layer,
+                v2.create(0, 0),
+                PerkProperties.smokescreen.smokeCount,
+                PerkProperties.smokescreen.projectileMaxVel,
+            );
+        }
+
+        if (
+            this.hasPerk("smokescreen")
+            && !this.smokescreenReady
+            && oldHealth < PerkProperties.smokescreen.rechargeThreshold
+            && health >= PerkProperties.smokescreen.rechargeThreshold
+        ) {
+            this.smokescreenReady = true;
+        }
+
+        if (oldHealth === health) return;
         this.healthDirty = true;
         this.setGroupStatuses();
 
@@ -892,6 +923,10 @@ export class Player extends BaseGameObject {
     fabricateRefillTicker = 0;
     fabricateGiveTicker = 0;
     fabricateThrowablesLeft: Array<FabricateThrowable> = [];
+
+    // Check to see whether the Smokescreen perk can be used
+    // (recovers when the player goes above a certain threshold defined in perkDefs)
+    smokescreenReady = true;
 
     // "Gabby Ghost" perk random emojis
     chattyTicker = 0;
@@ -1764,7 +1799,23 @@ export class Player extends BaseGameObject {
                         target.downed = false;
                         target.downedBy = undefined;
                         target.downedDamageTicker = 0;
-                        target.health = GameConfig.player.reviveHealth;
+                        if (this.hasPerk("boosted_revive")) {
+                            target.health = PerkProperties.boosted_revive.reviveHealth;
+                            target.boost = PerkProperties.boosted_revive.reviveBoost;
+                            target.giveHaste(
+                                GameConfig.HasteType.BoostedRevive,
+                                PerkProperties.boosted_revive.hasteDuration,
+                                PerkProperties.boosted_revive.hasteSpeed,
+                            );
+
+                            this.giveHaste(
+                                GameConfig.HasteType.BoostedRevive,
+                                PerkProperties.boosted_revive.hasteDuration,
+                                PerkProperties.boosted_revive.hasteSpeed,
+                            );
+                        } else {
+                            target.health = GameConfig.player.reviveHealth;
+                        }
 
                         // checks 2 conditions in one, player has pan AND has it selected
                         if (target.weapons[target.curWeapIdx].type === "pan") {
@@ -2314,7 +2365,7 @@ export class Player extends BaseGameObject {
         if (this.insideZoomRegion) {
             finalZoom = zoomRegionZoom;
         }
-        if (this.visionObscured || this.downed) {
+        if ((this.visionObscured && !this.hasPerk("smokescreen")) || this.downed) {
             finalZoom = lowestZoom;
         }
 

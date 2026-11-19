@@ -357,6 +357,49 @@ export const RoleDefs: Record<string, RoleDef> = {
             },
         }),
     },
+    bastion: {
+        type: "role",
+        announce: true,
+        killFeed: { assign: true },
+        sound: { assign: "bastion_assigned_01" },
+        assignEffects: {
+            health: 100,
+            adrenaline: 50,
+            scale: 0.1,
+            haste: {
+                type: HasteType.BoostedRevive,
+                duration: 2,
+                speed: 2.4,
+            },
+        },
+        perks: ["boosted_revive", "smokescreen", "self_revive"],
+        defaultItems: createDefaultItems({
+            weapons: [
+                { type: "", ammo: 0 },
+                { type: "m60", ammo: 100, fillInv: true }, // TODO: M60
+                (teamcolor: FactionTeam) =>
+                    getTeamWeapon(
+                        {
+                            [FactionTeam.Red]: { type: "shield_red", ammo: 0 },
+                            [FactionTeam.Blue]: { type: "shield", ammo: 0 },
+                        },
+                        teamcolor,
+                    ),
+                { type: "smoke", ammo: 12 },
+            ],
+            backpack: "backpack03",
+            helmet: "helmet03_bastion",
+            chest: "chest04",
+            inventory: {
+                "4xscope": 1,
+                bandage: 15,
+                healthkit: 2,
+                soda: 5,
+                painkiller: 1,
+                smoke: 12,
+            },
+        }),
+    },
     last_man: {
         type: "role",
         announce: true,

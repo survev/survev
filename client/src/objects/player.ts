@@ -1149,6 +1149,10 @@ export class Player implements AbstractObject {
                     particle: "inspire_02",
                     sound: "ability_stim_01",
                 },
+                [HasteType.BoostedRevive]: {
+                    particle: "revive",
+                    sound: "ability_stim_01",
+                },
             };
             const fx = hasteEffects[this.m_netData.m_hasteType];
 

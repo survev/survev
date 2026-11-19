@@ -40,6 +40,10 @@ const mapDef: PartialMapDef = {
                 channel: "ui",
             },
             {
+                name: "bastion_assigned_01",
+                channel: "ui",
+            },
+            {
                 name: "last_man_assigned_01",
                 channel: "ui",
             },

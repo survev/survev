@@ -1,5 +1,6 @@
 import type { Vec2 } from "../../utils/v2.ts";
 import type { BaseWeaponDef } from "./itemTypes.ts";
+import { PerkProperties } from "./perkDefs.ts";
 
 export type ThrowableHandImgKey = "equip" | "cook" | "throwing";
 
@@ -351,6 +352,47 @@ export const ThrowableDefs: Record<string, ThrowableDef> = {
             pullPin: "frag_pin_01",
             throwing: "frag_throw_01",
             pickup: "frag_pickup_01",
+            deploy: "frag_deploy_01",
+        },
+    },
+    smokescreen_smoke: {
+        name: "Smokescreen Smoke",
+        type: "throwable",
+        quality: 0,
+        explosionType: "explosion_smoke",
+        inventoryOrder: 99,
+        cookable: false,
+        explodeOnImpact: false,
+        playerCollision: false,
+        fuseTime: PerkProperties.smokescreen.fuseTime,
+        fuseVariance: PerkProperties.smokescreen.fuseVariance,
+        aimDistance: 0,
+        rad: 1,
+        throwPhysics: {
+            playerVelMult: 0.6,
+            velZ: 5,
+            speed: 20,
+            spinVel: 10 * Math.PI,
+            spinDrag: 1,
+        },
+        speed: { equip: 0, attack: 0 },
+        lootImg: {
+            sprite: "loot-throwable-smoke.img",
+            tint: 0xffffff,
+            border: "loot-circle-outer-01.img",
+            borderTint: 0,
+            scale: 0.2,
+        },
+        worldImg: {
+            sprite: "proj-smoke-nopin-nolever.img",
+            scale: 0.12,
+            tint: 0xffffff,
+        },
+        useThrowParticles: false,
+        sound: {
+            pullPin: "",
+            throwing: "",
+            pickup: "",
             deploy: "frag_deploy_01",
         },
     },

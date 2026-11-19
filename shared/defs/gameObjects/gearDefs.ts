@@ -822,6 +822,22 @@ const SkinDefs = {
             rot: 0.5 * Math.PI,
         },
     }),
+    helmet03_bastion: defineSkin("helmet03", {
+        name: "Bastion Helmet",
+        noDrop: true,
+        skinImg: {
+            baseTint: 0xffffff,
+            baseTintRed: 0xffffff,
+            baseTintBlue: 0xffffff,
+            baseSprite: "player-helmet-bastion.img",
+            spriteScale: 0.3,
+        },
+        lootImg: {
+            sprite: "player-helmet-bastion.img",
+            scale: 0.3,
+            rot: 0.5 * Math.PI,
+        },
+    }),
     helmet04_medic: defineSkin("helmet04", {
         name: "Medic Helmet",
         noDrop: true,
