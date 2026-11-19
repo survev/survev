@@ -181,4 +181,9 @@ export const LootSpawnerDefs: Record<string, LootSpawnerDef> = {
         loot: [tierLoot("tier_forest_helmet", 1, 1)],
         terrain: { grass: true, beach: false },
     },
+    loot_tier_bridge_special: {
+        type: "loot_spawner",
+        loot: [tierLoot("tier_airdrop_uncommon", 1, 1)],
+        terrain: { grass: true, beach: true, riverShore: true },
+    },
 };

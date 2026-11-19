@@ -76,6 +76,51 @@ function createBunkerChrys(params?: { bunkerType?: string }): StructureDef {
     return baseDef;
 }
 
+function createBridgeXlarge(params: { layers?: StructureDef["layers"] } = {}): StructureDef {
+    const baseDef: StructureDef = {
+        type: "structure",
+        terrain: { bridge: { nearbyWidthMult: 5 } },
+        layers: params.layers ?? [
+            {
+                type: "bridge_xlg_01",
+                pos: v2.create(0, 0),
+                ori: 0,
+            },
+            {
+                type: "bridge_xlg_under_01",
+                pos: v2.create(0, 0),
+                ori: 0,
+                underground: false,
+            },
+        ],
+        bridgeLandBounds: [
+            collider.createAabbExtents(v2.create(-41, 0), v2.create(5, 10)),
+            collider.createAabbExtents(v2.create(41, 0), v2.create(5, 10)),
+        ],
+        bridgeWaterBounds: [collider.createAabbExtents(v2.create(0, 0), v2.create(5, 5))],
+        stairs: [
+            {
+                collision: collider.createAabbExtents(
+                    v2.create(0, -13.5),
+                    v2.create(11.5, 1.5),
+                ),
+                downDir: v2.create(0, 1),
+                lootOnly: true,
+            },
+            {
+                collision: collider.createAabbExtents(
+                    v2.create(0, 13.5),
+                    v2.create(11.5, 1.5),
+                ),
+                downDir: v2.create(0, -1),
+                lootOnly: true,
+            },
+        ],
+        mask: [collider.createAabbExtents(v2.create(0, 0), v2.create(12, 12))],
+    };
+    return baseDef;
+}
+
 export const StructureDefs: Record<string, StructureDef> = {
     bridge_lg_structure_01: {
         type: "structure",
@@ -117,12 +162,12 @@ export const StructureDefs: Record<string, StructureDef> = {
         ],
         mask: [collider.createAabbExtents(v2.create(0, 0), v2.create(12, 8))],
     },
-    bridge_xlg_structure_01: {
-        type: "structure",
-        terrain: { bridge: { nearbyWidthMult: 5 } },
+
+    bridge_xlg_structure_01: createBridgeXlarge(),
+    bridge_xlg_structure_02: createBridgeXlarge({
         layers: [
             {
-                type: "bridge_xlg_01",
+                type: "bridge_xlg_02",
                 pos: v2.create(0, 0),
                 ori: 0,
             },
@@ -133,31 +178,67 @@ export const StructureDefs: Record<string, StructureDef> = {
                 underground: false,
             },
         ],
-        bridgeLandBounds: [
-            collider.createAabbExtents(v2.create(-41, 0), v2.create(5, 10)),
-            collider.createAabbExtents(v2.create(41, 0), v2.create(5, 10)),
-        ],
-        bridgeWaterBounds: [collider.createAabbExtents(v2.create(0, 0), v2.create(5, 5))],
-        stairs: [
+    }),
+    bridge_xlg_structure_03: createBridgeXlarge({
+        layers: [
             {
-                collision: collider.createAabbExtents(
-                    v2.create(0, -13.5),
-                    v2.create(11.5, 1.5),
-                ),
-                downDir: v2.create(0, 1),
-                lootOnly: true,
+                type: "bridge_xlg_03",
+                pos: v2.create(0, 0),
+                ori: 0,
             },
             {
-                collision: collider.createAabbExtents(
-                    v2.create(0, 13.5),
-                    v2.create(11.5, 1.5),
-                ),
-                downDir: v2.create(0, -1),
-                lootOnly: true,
+                type: "bridge_xlg_under_01",
+                pos: v2.create(0, 0),
+                ori: 0,
+                underground: false,
             },
         ],
-        mask: [collider.createAabbExtents(v2.create(0, 0), v2.create(12, 12))],
-    },
+    }),
+    bridge_xlg_structure_04: createBridgeXlarge({
+        layers: [
+            {
+                type: "bridge_xlg_04",
+                pos: v2.create(0, 0),
+                ori: 0,
+            },
+            {
+                type: "bridge_xlg_under_01",
+                pos: v2.create(0, 0),
+                ori: 0,
+                underground: false,
+            },
+        ],
+    }),
+    bridge_xlg_structure_05: createBridgeXlarge({
+        layers: [
+            {
+                type: "bridge_xlg_05",
+                pos: v2.create(0, 0),
+                ori: 0,
+            },
+            {
+                type: "bridge_xlg_under_01",
+                pos: v2.create(0, 0),
+                ori: 0,
+                underground: false,
+            },
+        ],
+    }),
+    bridge_xlg_structure_06: createBridgeXlarge({
+        layers: [
+            {
+                type: "bridge_xlg_06",
+                pos: v2.create(0, 0),
+                ori: 0,
+            },
+            {
+                type: "bridge_xlg_under_01",
+                pos: v2.create(0, 0),
+                ori: 0,
+                underground: false,
+            },
+        ],
+    }),
     bridge_md_structure_01: {
         type: "structure",
         terrain: { bridge: { nearbyWidthMult: 8 } },

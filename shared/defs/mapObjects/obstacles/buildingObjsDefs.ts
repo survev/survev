@@ -2258,6 +2258,16 @@ export const BuildingObjectDefs: Record<string, ObstacleDef> = {
             zIdx: 10,
         },
     }),
+    bridge_rail_10: createLowWall({
+        collision: collider.createAabbExtents(v2.create(0, 0), v2.create(0.4, 5.5)),
+        img: {
+            sprite: "",
+            scale: 0.5,
+            alpha: 1,
+            tint: 0x440000,
+            zIdx: 10,
+        },
+    }),
     bridge_rail_12: createLowWall({
         collision: collider.createAabbExtents(v2.create(0, 0), v2.create(0.4, 6.5)),
         img: {

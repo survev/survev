@@ -729,9 +729,9 @@ export class GameMap {
         const mapDef = this.mapDef;
 
         const bridges = [
-            "river_town_01",
-            mapDef.mapGen.bridgeTypes.xlarge,
-            mapDef.mapGen.bridgeTypes.xlarge,
+            util.randomItem(["river_town_01", "river_town_02", "river_town_03", "river_town_04"]),
+            randomBridgeType(mapDef.mapGen.bridgeTypes.xlarge),
+            randomBridgeType(mapDef.mapGen.bridgeTypes.xlarge),
         ];
 
         // min and max T of the river the bridges can spawn
@@ -742,6 +742,10 @@ export class GameMap {
         ];
 
         const bridgeGenData: Array<{ type: string; pos: Vec2; ori: number }> = [];
+
+        function randomBridgeType(type: string | string[]): string {
+            return Array.isArray(type) ? util.randomItem(type) : type;
+        }
 
         for (let i = 0; i < bridges.length; i++) {
             inner: for (let j = 0; j < riverTs.length; j++) {
@@ -779,7 +783,10 @@ export class GameMap {
             const norm = river.spline.getNormal(t);
             let ori = math.radToOri(Math.atan2(norm.y, norm.x));
 
-            if (type == "river_town_01") {
+            if (
+                type == "river_town_01" || type == "river_town_02" || type == "river_town_03" || type == "river_town_04"
+                || type == "river_camp_01"
+            ) {
                 // we flip the orientation because river town has red on left and blue on right by default
                 // the faction mode ori that gets us a left/right split vs top/bottom split is 1
                 // so of course we need to flip this value and vice versa for the other case
@@ -830,6 +837,10 @@ export class GameMap {
             return "xlarge";
         }
 
+        function randomBridgeType(type: string | string[]): string {
+            return Array.isArray(type) ? util.randomItem(type) : type;
+        }
+
         // maximum amount of a specific bridge that can spawn
         const maxBridges: Record<BridgeSize, number> = {
             medium: 3,
@@ -852,7 +863,7 @@ export class GameMap {
                 maxBridges[bridgeSize] * (river.spline.points.length / 33),
             );
             for (let i = 0; i < max; i++) {
-                this.genBridge(bridgeType, river, false);
+                this.genBridge(randomBridgeType(mapDef.mapGen.bridgeTypes[bridgeSize]), river, false);
             }
         }
     }

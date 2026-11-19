@@ -378,8 +378,11 @@ const mapDef: PartialMapDef = {
         ],
         spawnReplacements: [
             {
+                river_town_01: "river_town_01x",
+                river_town_02: "river_town_02x",
+                river_town_03: "river_town_03x",
+                river_town_04: "river_town_04x",
                 tree_01: "tree_15",
-                bridge_lg_01: "bridge_lg_01x",
                 bush_07: "bush_07x",
                 cabin_01: "cabin_01x",
                 container_01: "container_01x",
@@ -389,6 +392,7 @@ const mapDef: PartialMapDef = {
                 shack_02: "shack_02x",
                 stone_03: "stone_03x",
                 warehouse_02: "warehouse_02x",
+                warehouse_03f: "warehouse_03fx",
             },
         ],
     },

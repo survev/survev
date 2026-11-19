@@ -5,16 +5,21 @@ export const FactionAtlas: AtlasDef = {
     images: [
         "map/map-airdrop-03.svg",
         "map/map-airdrop-04.svg",
-        "map/map-building-bridge-xlg-floor.svg",
+        "map/map-building-bridge-xlg-floor-01.svg",
+        "map/map-building-bridge-xlg-floor-02.svg",
 
         ...BuildingSprites.greenhouse,
         ...BuildingSprites.bunker_chrys,
 
+        "map/map-case-meteor-01.svg",
+        "map/map-case-meteor-res-01.svg",
         "map/map-chest-03f.svg",
 
         ...BuildingSprites.warehouse_complex,
         // 50v50 main bridge only
         "map/map-complex-warehouse-floor-04.svg",
+        "map/map-complex-warehouse-floor-04a.svg",
+        "map/map-complex-warehouse-floor-04b.svg",
 
         "map/map-crate-02f.svg",
 

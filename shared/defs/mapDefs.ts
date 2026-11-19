@@ -236,7 +236,7 @@ export interface MapDef {
         bridgeTypes: {
             medium: string;
             large: string;
-            xlarge: string;
+            xlarge: string | string[];
         };
         customSpawnRules: {
             locationSpawns: Array<{

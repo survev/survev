@@ -425,7 +425,13 @@ const mapDef: PartialMapDef = {
         bridgeTypes: {
             medium: "bridge_md_structure_01",
             large: "bridge_lg_structure_01",
-            xlarge: "bridge_xlg_structure_01",
+            xlarge: [
+                "bridge_xlg_structure_01",
+                "bridge_xlg_structure_02",
+                "bridge_xlg_structure_03",
+                "bridge_xlg_structure_04",
+                "bridge_xlg_structure_05",
+            ],
         },
         customSpawnRules: {
             locationSpawns: [],
@@ -492,6 +498,9 @@ const mapDef: PartialMapDef = {
         ],
         importantSpawns: [
             "river_town_01",
+            "river_town_02",
+            "river_town_03",
+            "river_town_04",
             "police_01",
             "bank_01",
             "mansion_structure_01",

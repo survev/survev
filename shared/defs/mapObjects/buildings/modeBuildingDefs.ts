@@ -32,7 +32,6 @@ import type { BuildingChildObjType, BuildingDef } from "./buildingDefs.ts";
 function createCamp(
     overrides: DeepPartial<BuildingDef>,
     params: {
-        groundTintDk?: number;
         tree?: BuildingChildObjType;
         crate?: BuildingChildObjType;
         box?: BuildingChildObjType;
@@ -54,7 +53,7 @@ function createCamp(
                     v2.create(10.5, 10),
                     v2.create(5.75, 5.5),
                 ),
-                color: params.groundTintDk || 0x9e9e9e,
+                color: 0x9e9e9e,
                 roughness: 0.1,
                 offsetDist: 0,
             },
@@ -63,7 +62,7 @@ function createCamp(
                     v2.create(-1, -15),
                     v2.create(6.25, 4.5),
                 ),
-                color: params.groundTintDk || 0x9e9e9e,
+                color: 0x9e9e9e,
                 roughness: 0.1,
                 offsetDist: 0,
             },
@@ -5262,6 +5261,1397 @@ function createWorkshopComplex(overrides: DeepPartial<BuildingDef>): BuildingDef
     return util.mergeDeep(baseDef, overrides);
 }
 
+// Original Red Side
+// Town Offset: -75 (based on central path)
+function createRiverTownRed_01(
+    overrides: DeepPartial<BuildingDef>,
+    params: {
+        groundTint?: number;
+    },
+): BuildingDef {
+    const baseDef: BuildingDef = {
+        type: "building",
+        map: {
+            display: true,
+            shapes: [],
+        },
+        terrain: {},
+        mapObstacleBounds: [
+            collider.createAabbExtents(v2.create(4, 32), v2.create(27, 15)),
+            collider.createAabbExtents(v2.create(4, 16), v2.create(8, 6)),
+            collider.createAabbExtents(v2.create(0, -34), v2.create(40, 19)),
+            collider.createAabbExtents(v2.create(18, -10), v2.create(5, 11)),
+            collider.createAabbExtents(v2.create(-11, -10), v2.create(5, 11)),
+            collider.createAabbExtents(v2.create(5, 0), v2.create(50, 8)),
+            collider.createAabbExtents(v2.create(-34, 30), v2.create(7, 7.25)),
+        ],
+        mapGroundPatches: [
+            {
+                bound: collider.createAabbExtents(v2.create(0, 0), v2.create(45, 6)),
+                color: params.groundTint || 0x653313,
+                roughness: 0.05,
+                offsetDist: 1,
+            },
+            {
+                bound: collider.createAabbExtents(v2.create(4, 10), v2.create(2, 9)),
+                color: params.groundTint || 0x653313,
+                roughness: 0,
+                offsetDist: 1,
+            },
+            {
+                bound: collider.createAabbExtents(v2.create(18, -10), v2.create(2, 9)),
+                color: params.groundTint || 0x653313,
+                roughness: 0,
+                offsetDist: 1,
+            },
+            {
+                bound: collider.createAabbExtents(
+                    v2.create(-34, 30),
+                    v2.create(6, 6.25),
+                ),
+                color: params.groundTint || 0x324319,
+                roughness: 0.05,
+                offsetDist: 0.5,
+            },
+            {
+                bound: collider.createAabbExtents(v2.create(-11, -10), v2.create(2, 9)),
+                color: params.groundTint || 0x653313,
+                roughness: 0,
+                offsetDist: 1,
+            },
+        ],
+        floor: {
+            surfaces: [
+                {
+                    type: "grass",
+                    collision: [
+                        collider.createAabbExtents(v2.create(0, 0), v2.create(0, 0)),
+                    ],
+                },
+            ],
+            imgs: [],
+        },
+        ceiling: {
+            zoomRegions: [],
+            imgs: [],
+        },
+        mapObjects: [
+            {
+                type: "barn_01",
+                pos: v2.create(4, 30),
+                scale: 1,
+                ori: 2,
+            },
+            {
+                type: "house_red_01",
+                pos: v2.create(19, -30),
+                scale: 1,
+                ori: 0,
+                ignoreMapSpawnReplacement: false,
+            },
+            {
+                type: "house_red_02",
+                pos: v2.create(-21, -30),
+                scale: 1,
+                ori: 0,
+            },
+            {
+                type: "sandbags_02",
+                pos: v2.create(7, 2),
+                scale: 1,
+                ori: 0,
+            },
+            {
+                type: randomObstacleType({ crate_02: 1, crate_01: 3 }),
+                pos: v2.create(-10, 1),
+                scale: 1,
+                ori: 0,
+                inheritOri: false,
+            },
+            {
+                type: randomObstacleType({ crate_02: 1, crate_01: 3 }),
+                pos: v2.create(-15, -1),
+                scale: 1,
+                ori: 0,
+                inheritOri: false,
+            },
+            {
+                type: "crate_02f",
+                pos: v2.create(-31.5, 32.25),
+                scale: 1,
+                ori: 0,
+                inheritOri: false,
+            },
+            {
+                type: "crate_01",
+                pos: v2.create(-36.25, 32.25),
+                scale: 1,
+                ori: 0,
+            },
+            {
+                type: "crate_01",
+                pos: v2.create(-33, 27.25),
+                scale: 1,
+                ori: 0,
+            },
+            {
+                type: randomObstacleType({
+                    statue_structure_01: 18,
+                    statue_structure_lone: 1,
+                    statue_structure_renegade: 1,
+                }),
+                pos: v2.create(25, 0),
+                scale: 1,
+                ori: 0,
+            },
+        ],
+    };
+    return util.mergeDeep(baseDef, overrides);
+}
+
+// Original Blue Side
+// Town Offset: 81 (based on warehouse complex floor)
+function createRiverTownBlue_01(
+    overrides: DeepPartial<BuildingDef>,
+    params: {
+        groundTint?: number;
+    },
+): BuildingDef {
+    const baseDef: BuildingDef = {
+        type: "building",
+        map: {
+            display: true,
+            shapes: [
+                {
+                    collider: collider.createAabbExtents(
+                        v2.create(-10.5, 0.5),
+                        v2.create(30, 54.5),
+                    ),
+                    color: 0x3a3a3a,
+                },
+                {
+                    collider: collider.createAabbExtents(
+                        v2.create(-4.5, 64),
+                        v2.create(23, 10),
+                    ),
+                    color: 0x3a3a3a,
+                },
+                {
+                    collider: collider.createAabbExtents(
+                        v2.create(30, -29.5),
+                        v2.create(10.5, 24.5),
+                    ),
+                    color: 0x3a3a3a,
+                },
+                {
+                    collider: collider.createAabbExtents(
+                        v2.create(-31, 0),
+                        v2.create(4.4, 4.4),
+                    ),
+                    color: 0x575757,
+                },
+            ],
+        },
+        terrain: {},
+        mapObstacleBounds: [
+            collider.createAabbExtents(v2.create(-10, 0), v2.create(31, 56)),
+            collider.createAabbExtents(v2.create(-4, 65), v2.create(24, 10)),
+            collider.createAabbExtents(v2.create(31, -30), v2.create(10, 26)),
+            collider.createAabbExtents(v2.create(25, 19.5), v2.create(8, 7.25)),
+        ],
+        mapGroundPatches: [
+            {
+                bound: collider.createAabbExtents(v2.create(-41, 0), v2.create(5, 6)),
+                color: params.groundTint || 0x653313,
+                roughness: 0.05,
+                offsetDist: 1,
+            },
+            {
+                bound: collider.createAabbExtents(
+                    v2.create(25, 19.5),
+                    v2.create(7, 6.25),
+                ),
+                color: params.groundTint || 0x324319,
+                roughness: 0.05,
+                offsetDist: 0.5,
+            },
+        ],
+        floor: {
+            surfaces: [
+                {
+                    type: "grass",
+                    collision: [
+                        collider.createAabbExtents(v2.create(0, 0), v2.create(0, 0)),
+                    ],
+                },
+                {
+                    type: "asphalt",
+                    collision: [
+                        collider.createAabbExtents(
+                            v2.create(-11.75, 0.5),
+                            v2.create(30, 54.5),
+                        ),
+                        collider.createAabbExtents(
+                            v2.create(-4.5, 64),
+                            v2.create(23, 10),
+                        ),
+                        collider.createAabbExtents(
+                            v2.create(30, -29.5),
+                            v2.create(10.5, 24.5),
+                        ),
+                    ],
+                },
+            ],
+            imgs: [
+                {
+                    sprite: "map-complex-warehouse-floor-04.img",
+                    pos: v2.create(0, 10),
+                    scale: 1,
+                    alpha: 1,
+                    tint: 0xffffff,
+                },
+            ],
+        },
+        ceiling: {
+            zoomRegions: [],
+            imgs: [],
+        },
+        mapObjects: [
+            {
+                type: randomObstacleType({
+                    container_01: 1,
+                    container_02: 1,
+                    container_03: 1,
+                }),
+                pos: v2.create(-36, 36),
+                scale: 1,
+                ori: 2,
+            },
+            {
+                type: randomObstacleType({
+                    container_01: 1,
+                    container_02: 1,
+                    container_03: 1,
+                }),
+                pos: v2.create(-30, 36),
+                scale: 1,
+                ori: 2,
+            },
+            {
+                type: "shack_02",
+                pos: v2.create(-34, 20),
+                scale: 1,
+                ori: 0,
+            },
+            {
+                type: "warehouse_02",
+                pos: v2.create(-3, 40),
+                scale: 1,
+                ori: 1,
+            },
+            {
+                type: randomObstacleType({
+                    container_01: 1,
+                    container_02: 1,
+                    container_03: 1,
+                }),
+                pos: v2.create(14, 44),
+                scale: 1,
+                ori: 0,
+            },
+            {
+                type: randomObstacleType({
+                    statue_structure_02: 18,
+                    statue_structure_lone: 1,
+                    statue_structure_renegade: 1,
+                }),
+                pos: v2.create(-31, 0),
+                scale: 1,
+                ori: 2,
+            },
+            {
+                type: "crate_01",
+                pos: v2.create(-7.5, -0.5),
+                scale: 1,
+                ori: 0,
+                inheritOri: false,
+            },
+            {
+                type: "crate_01",
+                pos: v2.create(-2.5, 0.25),
+                scale: 1,
+                ori: 0,
+                inheritOri: false,
+            },
+            {
+                type: "crate_01",
+                pos: v2.create(25, 22),
+                scale: 1,
+                ori: 0,
+                inheritOri: false,
+            },
+            {
+                type: "crate_01",
+                pos: v2.create(23.5, 17.25),
+                scale: 1,
+                ori: 0,
+                inheritOri: false,
+            },
+            {
+                type: "crate_22",
+                pos: v2.create(28.25, 17.25),
+                scale: 1,
+                ori: 0,
+                inheritOri: false,
+            },
+            {
+                type: randomObstacleType({
+                    container_01: 1,
+                    container_02: 1,
+                    container_03: 1,
+                }),
+                pos: v2.create(4, -13),
+                scale: 1,
+                ori: 1,
+            },
+            {
+                type: randomObstacleType({
+                    container_01: 1,
+                    container_02: 1,
+                    container_03: 1,
+                }),
+                pos: v2.create(-36, -36),
+                scale: 1,
+                ori: 0,
+            },
+            {
+                type: "shack_02",
+                pos: v2.create(-34, -20),
+                scale: 1,
+                ori: 2,
+            },
+            {
+                type: "warehouse_02",
+                pos: v2.create(5, -30),
+                scale: 1,
+                ori: 0,
+            },
+            {
+                type: randomObstacleType({
+                    container_01: 1,
+                    container_02: 1,
+                    container_03: 1,
+                }),
+                pos: v2.create(-9, -47),
+                scale: 1,
+                ori: 1,
+            },
+        ],
+    };
+    return util.mergeDeep(baseDef, overrides);
+}
+
+// Alternate Red Side
+// Town Offset: -75 (based on central path)
+function createRiverTownRed_02(
+    overrides: DeepPartial<BuildingDef>,
+    params: {
+        groundTint?: number;
+    },
+): BuildingDef {
+    const baseDef: BuildingDef = {
+        type: "building",
+        map: {
+            display: true,
+            shapes: [
+                {
+                    collider: collider.createAabbExtents(
+                        v2.create(4.75, -46.5),
+                        v2.create(25.75, 37.5),
+                    ),
+                    color: 0x383333,
+                },
+                {
+                    collider: collider.createAabbExtents(
+                        v2.create(-35.75, -64),
+                        v2.create(14.75, 20),
+                    ),
+                    color: 0x383333,
+                },
+            ],
+        },
+        terrain: {},
+        mapObstacleBounds: [
+            collider.createAabbExtents(v2.create(-3, 32), v2.create(27, 15)),
+            collider.createAabbExtents(v2.create(-3, 16), v2.create(8, 6)),
+            collider.createAabbExtents(v2.create(-13, -45), v2.create(46, 42)),
+            collider.createAabbExtents(v2.create(5, 0), v2.create(50, 8)),
+            collider.createAabbExtents(v2.create(-39, 30), v2.create(7, 7.25)),
+        ],
+        mapGroundPatches: [
+            {
+                bound: collider.createAabbExtents(v2.create(0, 0), v2.create(45, 6)),
+                color: params.groundTint || 0x653313,
+                roughness: 0.05,
+                offsetDist: 1,
+            },
+            {
+                bound: collider.createAabbExtents(v2.create(-3, 10), v2.create(2, 9)),
+                color: params.groundTint || 0x653313,
+                roughness: 0,
+                offsetDist: 1,
+            },
+            {
+                bound: collider.createAabbExtents(v2.create(7, -8), v2.create(6, 4)),
+                color: params.groundTint || 0x653313,
+                roughness: 0,
+                offsetDist: 1,
+            },
+            {
+                bound: collider.createAabbExtents(v2.create(-30, -8), v2.create(2, 6)),
+                color: params.groundTint || 0x653313,
+                roughness: 0,
+                offsetDist: 1,
+            },
+            {
+                bound: collider.createAabbExtents(
+                    v2.create(-39, 30),
+                    v2.create(6, 6.25),
+                ),
+                color: params.groundTint || 0x324319,
+                roughness: 0.05,
+                offsetDist: 0.5,
+            },
+        ],
+        floor: {
+            surfaces: [
+                {
+                    type: "grass",
+                    collision: [
+                        collider.createAabbExtents(v2.create(0, 0), v2.create(0, 0)),
+                    ],
+                },
+                {
+                    type: "asphalt",
+                    collision: [
+                        collider.createAabbExtents(
+                            v2.create(4.75, -46.5),
+                            v2.create(25.75, 37.5),
+                        ),
+                        collider.createAabbExtents(
+                            v2.create(-35.75, -64),
+                            v2.create(14.75, 20),
+                        ),
+                    ],
+                },
+            ],
+            imgs: [
+                {
+                    sprite: "map-complex-warehouse-floor-04a.img",
+                    pos: v2.create(-10, -46.5),
+                    scale: 1,
+                    alpha: 1,
+                    tint: 0xffffff,
+                },
+            ],
+        },
+        ceiling: {
+            zoomRegions: [],
+            imgs: [],
+        },
+        mapObjects: [
+            {
+                type: "barn_01",
+                pos: v2.create(-3, 30),
+                scale: 1,
+                ori: 2,
+            },
+            {
+                type: "warehouse_03f",
+                pos: v2.create(7, -45),
+                scale: 1,
+                ori: 1,
+            },
+            {
+                type: "sandbags_01",
+                pos: v2.create(26.5, -55),
+                scale: 1,
+                ori: 1,
+            },
+            {
+                type: "sandbags_01",
+                pos: v2.create(25.5, -65),
+                scale: 1,
+                ori: 1,
+            },
+            {
+                type: randomObstacleType({
+                    container_01r: 1,
+                    container_02r: 1,
+                    container_03r: 1,
+                    container_04r: 1,
+                }),
+                pos: v2.create(24, -36),
+                scale: 1,
+                ori: 2,
+            },
+            {
+                type: randomObstacleType({
+                    container_01r: 1,
+                    container_02r: 1,
+                    container_03r: 1,
+                    container_04r: 1,
+                }),
+                pos: v2.create(-10, -60),
+                scale: 1,
+                ori: 2,
+            },
+            {
+                type: randomObstacleType({
+                    container_01r: 1,
+                    container_02r: 1,
+                    container_03r: 1,
+                }),
+                pos: v2.create(-46, -66.5),
+                scale: 1,
+                ori: 0,
+            },
+            {
+                type: "container_04r",
+                pos: v2.create(-16.5, -29),
+                scale: 1,
+                ori: 0,
+            },
+            {
+                type: "shack_02",
+                pos: v2.create(-44, -51),
+                scale: 1,
+                ori: 1,
+            },
+            {
+                type: "sandbags_01",
+                pos: v2.create(-22, -79.75),
+                scale: 1,
+                ori: 0,
+            },
+            {
+                type: "sandbags_01",
+                pos: v2.create(-28.5, -78),
+                scale: 1,
+                ori: 1,
+            },
+            {
+                type: "crate_03",
+                pos: v2.create(-24.5, -75.75),
+                scale: 1,
+                ori: 0,
+                inheritOri: false,
+            },
+            {
+                type: "house_red_02",
+                pos: v2.create(-40, -24),
+                scale: 1,
+                ori: 0,
+            },
+            {
+                type: "sandbags_02",
+                pos: v2.create(7, 2),
+                scale: 1,
+                ori: 0,
+            },
+            {
+                type: "crate_01",
+                pos: v2.create(-10, 1),
+                scale: 1,
+                ori: 0,
+                inheritOri: false,
+            },
+            {
+                type: "crate_01",
+                pos: v2.create(-15, -1),
+                scale: 1,
+                ori: 0,
+                inheritOri: false,
+            },
+            {
+                type: "crate_02f",
+                pos: v2.create(-36.5, 32.25),
+                scale: 1,
+                ori: 0,
+                inheritOri: false,
+            },
+            {
+                type: "crate_01",
+                pos: v2.create(-41.25, 32.25),
+                scale: 1,
+                ori: 0,
+            },
+            {
+                type: "crate_01",
+                pos: v2.create(-38, 27.25),
+                scale: 1,
+                ori: 0,
+            },
+            {
+                type: "crate_01",
+                pos: v2.create(-24, -60),
+                scale: 1,
+                ori: 0,
+                inheritOri: false,
+            },
+            {
+                type: "crate_01",
+                pos: v2.create(-29, -59),
+                scale: 1,
+                ori: 0,
+                inheritOri: false,
+            },
+            {
+                type: randomObstacleType({
+                    statue_structure_01: 18,
+                    statue_structure_lone: 1,
+                    statue_structure_renegade: 1,
+                }),
+                pos: v2.create(25, 0),
+                scale: 1,
+                ori: 0,
+            },
+        ],
+    };
+    return util.mergeDeep(baseDef, overrides);
+}
+
+// Alternate Blue Side
+// Offset: 71 (based on central path)
+function createRiverTownBlue_02(
+    overrides: DeepPartial<BuildingDef>,
+    params: {
+        groundTint?: number;
+    },
+): BuildingDef {
+    const baseDef: BuildingDef = {
+        type: "building",
+        map: {
+            display: true,
+            shapes: [
+                {
+                    collider: collider.createAabbExtents(
+                        v2.create(54, -11.5),
+                        v2.create(23.5, 20.25),
+                    ),
+                    color: 0x3a3a3a,
+                },
+                {
+                    collider: collider.createAabbExtents(
+                        v2.create(23.5, 33.25),
+                        v2.create(54, 24.5),
+                    ),
+                    color: 0x3a3a3a,
+                },
+            ],
+        },
+        terrain: {},
+        mapObstacleBounds: [
+            collider.createAabbExtents(v2.create(23.5, 13), v2.create(55.5, 46)),
+            collider.createAabbExtents(v2.create(-3, -32), v2.create(27, 15)),
+        ],
+        mapGroundPatches: [
+            {
+                bound: collider.createAabbExtents(v2.create(0, 0), v2.create(45, 6)),
+                color: params.groundTint || 0x653313,
+                roughness: 0.05,
+                offsetDist: 1,
+            },
+            {
+                bound: collider.createAabbExtents(v2.create(12, 10), v2.create(19, 5)),
+                color: params.groundTint || 0x653313,
+                roughness: 0,
+                offsetDist: 1,
+            },
+            {
+                bound: collider.createAabbExtents(v2.create(-3, -10), v2.create(2, 9)),
+                color: params.groundTint || 0x653313,
+                roughness: 0,
+                offsetDist: 1,
+            },
+        ],
+        floor: {
+            surfaces: [
+                {
+                    type: "grass",
+                    collision: [
+                        collider.createAabbExtents(v2.create(0, 0), v2.create(0, 0)),
+                    ],
+                },
+                {
+                    type: "asphalt",
+                    collision: [
+                        collider.createAabbExtents(
+                            v2.create(23.5, 33.25),
+                            v2.create(54, 24.5),
+                        ),
+                        collider.createAabbExtents(
+                            v2.create(54, -11.5),
+                            v2.create(23.5, 20.25),
+                        ),
+                    ],
+                },
+            ],
+            imgs: [
+                {
+                    sprite: "map-complex-warehouse-floor-04b.img",
+                    pos: v2.create(23.5, 13),
+                    scale: 1,
+                    alpha: 1,
+                    tint: 0xffffff,
+                },
+            ],
+        },
+        ceiling: {
+            zoomRegions: [],
+            imgs: [],
+        },
+        mapObjects: [
+            {
+                type: randomObstacleType({
+                    statue_structure_02: 18,
+                    statue_structure_lone: 1,
+                    statue_structure_renegade: 1,
+                }),
+                pos: v2.create(-21, 0),
+                scale: 1,
+                ori: 2,
+            },
+            {
+                type: "barn_01",
+                pos: v2.create(-3, -30),
+                scale: 1,
+                ori: 0,
+            },
+            {
+                type: "crate_01",
+                pos: v2.create(3.5, -1),
+                scale: 1,
+                ori: 0,
+                inheritOri: false,
+            },
+            {
+                type: "crate_01",
+                pos: v2.create(2.5, 4),
+                scale: 1,
+                ori: 0,
+                inheritOri: false,
+            },
+            {
+                type: "sandbags_01",
+                pos: v2.create(16.5, 5.5),
+                scale: 1,
+                ori: 0,
+            },
+            {
+                type: "sandbags_02",
+                pos: v2.create(25.5, -2.5),
+                scale: 1,
+                ori: 0,
+            },
+            {
+                type: "crate_01",
+                pos: v2.create(73.5, 18.25),
+                scale: 1,
+                ori: 0,
+                inheritOri: false,
+            },
+            {
+                type: "crate_04",
+                pos: v2.create(73.5, 8),
+                scale: 1,
+                ori: 0,
+            },
+            {
+                type: "crate_22",
+                pos: v2.create(73.5, 13.25),
+                scale: 1,
+                ori: 0,
+                inheritOri: false,
+            },
+            {
+                type: "crate_01",
+                pos: v2.create(68.5, 9.75),
+                scale: 1,
+                ori: 0,
+                inheritOri: false,
+            },
+            {
+                type: "crate_06",
+                pos: v2.create(69.25, 15),
+                scale: 1,
+                ori: 1,
+            },
+            {
+                type: randomObstacleType({
+                    container_01: 1,
+                    container_02: 1,
+                    container_03: 1,
+                }),
+                pos: v2.create(14, 17),
+                scale: 1,
+                ori: 3,
+            },
+            {
+                type: randomObstacleType({
+                    container_01: 1,
+                    container_02: 1,
+                    container_03: 1,
+                }),
+                pos: v2.create(-26, 40),
+                scale: 1,
+                ori: 2,
+            },
+            {
+                type: "shack_02",
+                pos: v2.create(-24, 24),
+                scale: 1,
+                ori: 0,
+            },
+            {
+                type: "warehouse_02",
+                pos: v2.create(15, 34),
+                scale: 1,
+                ori: 0,
+            },
+            {
+                type: randomObstacleType({
+                    container_01: 1,
+                    container_02: 1,
+                    container_03: 1,
+                }),
+                pos: v2.create(1, 51),
+                scale: 1,
+                ori: 3,
+            },
+            {
+                type: randomObstacleType({
+                    container_01: 1,
+                    container_02: 1,
+                    container_03: 1,
+                }),
+                pos: v2.create(34.5, -13),
+                scale: 1,
+                ori: 0,
+            },
+            {
+                type: randomObstacleType({
+                    container_01: 1,
+                    container_02: 1,
+                    container_03: 1,
+                }),
+                pos: v2.create(40.5, -13),
+                scale: 1,
+                ori: 0,
+            },
+            {
+                type: "shack_02",
+                pos: v2.create(36.5, 3),
+                scale: 1,
+                ori: 2,
+            },
+            {
+                type: randomObstacleType({
+                    container_01: 1,
+                    container_02: 1,
+                    container_03: 1,
+                }),
+                pos: v2.create(73, -13),
+                scale: 1,
+                ori: 2,
+            },
+            {
+                type: randomObstacleType({
+                    container_01: 1,
+                    container_02: 1,
+                    container_03: 1,
+                }),
+                pos: v2.create(73, 39.5),
+                scale: 1,
+                ori: 0,
+            },
+            // {
+            //     type: "shack_02",
+            //     pos: v2.create(55.75, -9.75),
+            //     scale: 1,
+            //     ori: 3,
+            // },
+            // {
+            //     type: "shack_02",
+            //     pos: v2.create(57.75, -20.25),
+            //     scale: 1,
+            //     ori: 1
+            // },
+            {
+                type: "sandbags_01",
+                pos: v2.create(37, -27),
+                scale: 1,
+                ori: 0,
+            },
+            {
+                type: "sandbags_01",
+                pos: v2.create(49, 54),
+                scale: 1,
+                ori: 0,
+            },
+            {
+                type: "sandbags_01",
+                pos: v2.create(57, 53),
+                scale: 1,
+                ori: 2,
+            },
+            {
+                type: "sandbags_01",
+                pos: v2.create(54, 23),
+                scale: 1,
+                ori: 1,
+            },
+            {
+                type: "crate_04",
+                pos: v2.create(54.5, 30),
+                scale: 1,
+                ori: 0,
+            },
+        ],
+    };
+    return util.mergeDeep(baseDef, overrides);
+}
+
+//
+// River Towns
+//
+
+// Original Red + Original Blue
+function createRiverTown_01(
+    overrides: DeepPartial<BuildingDef>,
+    params: {
+        redTown?: BuildingChildObjType;
+        blueTown?: BuildingChildObjType;
+    },
+): BuildingDef {
+    const baseDef: BuildingDef = {
+        type: "building",
+        map: {},
+        terrain: {
+            bridge: { nearbyWidthMult: 1 },
+            spawnPriority: 100,
+        },
+        bridgeLandBounds: [
+            // Bridge
+            collider.createAabbExtents(v2.create(-41, 0), v2.create(6, 10)),
+            collider.createAabbExtents(v2.create(41, 0), v2.create(6, 10)),
+            // Red
+            collider.createAabbExtents(v2.create(-76, -22), v2.create(36, 24)),
+            collider.createAabbExtents(v2.create(-72, 22), v2.create(27, 25)),
+            // Blue
+            collider.createAabbExtents(v2.create(81, 0), v2.create(40, 54)),
+            collider.createAabbExtents(v2.create(78, 64), v2.create(23, 10)),
+        ],
+        bridgeWaterBounds: [collider.createAabbExtents(v2.create(0, 0), v2.create(5, 5))],
+        mapObstacleBounds: [
+            // Bridge
+            collider.createAabbExtents(v2.create(0, 0), v2.create(40, 15)),
+            // Red
+            collider.createAabbExtents(v2.create(-71, 32), v2.create(27, 15)),
+            collider.createAabbExtents(v2.create(-71, 16), v2.create(8, 6)),
+            collider.createAabbExtents(v2.create(-75, -34), v2.create(40, 19)),
+            collider.createAabbExtents(v2.create(-57, -10), v2.create(5, 11)),
+            collider.createAabbExtents(v2.create(-86, -10), v2.create(5, 11)),
+            collider.createAabbExtents(v2.create(-21, 0), v2.create(100, 8)),
+            collider.createAabbExtents(v2.create(-109, 30), v2.create(7, 7.25)),
+            // Blue
+            collider.createAabbExtents(v2.create(71, 0), v2.create(31, 56)),
+            collider.createAabbExtents(v2.create(77, 65), v2.create(24, 10)),
+            collider.createAabbExtents(v2.create(112, -30), v2.create(10, 26)),
+            collider.createAabbExtents(v2.create(106, 19.5), v2.create(8, 7.25)),
+        ],
+        floor: {
+            surfaces: [
+                {
+                    type: "grass",
+                    collision: [
+                        collider.createAabbExtents(v2.create(0, 0), v2.create(0, 0)),
+                    ],
+                },
+            ],
+            imgs: [],
+        },
+        // HACK: used to define a region that counts as "river town" for quests
+        goreRegion: collider.createAabbExtents(v2.create(0, 10), v2.create(125, 70)),
+        ceiling: {
+            zoomRegions: [],
+            imgs: [],
+        },
+        mapObjects: [
+            {
+                type: randomObstacleType({
+                    bridge_xlg_structure_01: 1,
+                    bridge_xlg_structure_02: 1,
+                    bridge_xlg_structure_03: 1,
+                    bridge_xlg_structure_04: 1,
+                    bridge_xlg_structure_05: 0.95,
+                    bridge_xlg_structure_06: 0.05,
+                }),
+                pos: v2.create(0, 0),
+                scale: 1,
+                ori: 0,
+            },
+            {
+                type: params.redTown || "river_town_red_01",
+                pos: v2.create(-75, 0),
+                scale: 1,
+                ori: 0,
+            },
+            {
+                type: params.blueTown || "river_town_blue_01",
+                pos: v2.create(81, 0),
+                scale: 1,
+                ori: 0,
+            },
+        ],
+    };
+    return util.mergeDeep(baseDef, overrides);
+}
+
+// New Red + Original Blue
+function createRiverTown_02(
+    overrides: DeepPartial<BuildingDef>,
+    params: {
+        redTown?: BuildingChildObjType;
+        blueTown?: BuildingChildObjType;
+    },
+): BuildingDef {
+    const baseDef: BuildingDef = {
+        type: "building",
+        map: {},
+        terrain: {
+            bridge: { nearbyWidthMult: 1 },
+            spawnPriority: 100,
+        },
+        bridgeLandBounds: [
+            // Bridge
+            collider.createAabbExtents(v2.create(-41, 0), v2.create(6, 10)),
+            collider.createAabbExtents(v2.create(41, 0), v2.create(6, 10)),
+            // Red
+            collider.createAabbExtents(v2.create(-86, -42), v2.create(42, 44)),
+            collider.createAabbExtents(v2.create(-78, 22), v2.create(27, 25)),
+            // Blue
+            collider.createAabbExtents(v2.create(81, 0), v2.create(40, 54)),
+            collider.createAabbExtents(v2.create(78, 64), v2.create(23, 10)),
+        ],
+        bridgeWaterBounds: [collider.createAabbExtents(v2.create(0, 0), v2.create(5, 5))],
+        mapObstacleBounds: [
+            // Bridge
+            collider.createAabbExtents(v2.create(0, 0), v2.create(40, 15)),
+            // Red
+            collider.createAabbExtents(v2.create(-78, 32), v2.create(27, 15)),
+            collider.createAabbExtents(v2.create(-78, 16), v2.create(8, 6)),
+            collider.createAabbExtents(v2.create(-88, -45), v2.create(46, 42)),
+            collider.createAabbExtents(v2.create(-70, 0), v2.create(50, 8)),
+            collider.createAabbExtents(v2.create(-114, 30), v2.create(7, 7.25)),
+            // Blue
+            collider.createAabbExtents(v2.create(71, 0), v2.create(31, 56)),
+            collider.createAabbExtents(v2.create(77, 65), v2.create(24, 10)),
+            collider.createAabbExtents(v2.create(112, -30), v2.create(10, 26)),
+            collider.createAabbExtents(v2.create(106, 19.5), v2.create(8, 7.25)),
+        ],
+        floor: {
+            surfaces: [
+                {
+                    type: "grass",
+                    collision: [
+                        collider.createAabbExtents(v2.create(0, 0), v2.create(0, 0)),
+                    ],
+                },
+            ],
+            imgs: [],
+        },
+        // HACK: used to define a region that counts as "river town" for quests
+        goreRegion: collider.createAabbExtents(v2.create(-5, -5), v2.create(130, 85)),
+        ceiling: {
+            zoomRegions: [],
+            imgs: [],
+        },
+        mapObjects: [
+            {
+                type: randomObstacleType({
+                    bridge_xlg_structure_01: 1,
+                    bridge_xlg_structure_02: 1,
+                    bridge_xlg_structure_03: 1,
+                    bridge_xlg_structure_04: 1,
+                    bridge_xlg_structure_05: 0.95,
+                    bridge_xlg_structure_06: 0.05,
+                }),
+                pos: v2.create(0, 0),
+                scale: 1,
+                ori: 0,
+            },
+            {
+                type: params.redTown || "river_town_red_02",
+                pos: v2.create(-75, 0),
+                scale: 1,
+                ori: 0,
+            },
+            {
+                type: params.blueTown || "river_town_blue_01",
+                pos: v2.create(81, 0),
+                scale: 1,
+                ori: 0,
+            },
+        ],
+    };
+    return util.mergeDeep(baseDef, overrides);
+}
+
+// Original Red + New Blue
+function createRiverTown_03(
+    overrides: DeepPartial<BuildingDef>,
+    params: {
+        redTown?: BuildingChildObjType;
+        blueTown?: BuildingChildObjType;
+    },
+): BuildingDef {
+    const baseDef: BuildingDef = {
+        type: "building",
+        map: {},
+        terrain: {
+            bridge: { nearbyWidthMult: 1 },
+            spawnPriority: 100,
+        },
+        bridgeLandBounds: [
+            // Bridge
+            collider.createAabbExtents(v2.create(-41, 0), v2.create(6, 10)),
+            collider.createAabbExtents(v2.create(41, 0), v2.create(6, 10)),
+            // Red
+            collider.createAabbExtents(v2.create(-76, -22), v2.create(36, 24)),
+            collider.createAabbExtents(v2.create(-72, 22), v2.create(27, 25)),
+            // Blue
+            collider.createAabbExtents(v2.create(95, 5.5), v2.create(55, 53)),
+        ],
+        bridgeWaterBounds: [collider.createAabbExtents(v2.create(0, 0), v2.create(5, 5))],
+        mapObstacleBounds: [
+            // Bridge
+            collider.createAabbExtents(v2.create(0, 0), v2.create(40, 15)),
+            // Red
+            collider.createAabbExtents(v2.create(-71, 32), v2.create(27, 15)),
+            collider.createAabbExtents(v2.create(-71, 16), v2.create(8, 6)),
+            collider.createAabbExtents(v2.create(-75, -34), v2.create(40, 19)),
+            collider.createAabbExtents(v2.create(-57, -10), v2.create(5, 11)),
+            collider.createAabbExtents(v2.create(-86, -10), v2.create(5, 11)),
+            collider.createAabbExtents(v2.create(-21, 0), v2.create(100, 8)),
+            collider.createAabbExtents(v2.create(-109, 30), v2.create(7, 7.25)),
+            // Blue
+            collider.createAabbExtents(v2.create(94.5, 13), v2.create(55.5, 46)),
+            collider.createAabbExtents(v2.create(68, -32), v2.create(27, 15)),
+        ],
+        floor: {
+            surfaces: [
+                {
+                    type: "grass",
+                    collision: [
+                        collider.createAabbExtents(v2.create(0, 0), v2.create(0, 0)),
+                    ],
+                },
+            ],
+            imgs: [],
+        },
+        // HACK: used to define a region that counts as "river town" for quests
+        goreRegion: collider.createAabbExtents(v2.create(15, 5), v2.create(150, 60)),
+        ceiling: {
+            zoomRegions: [],
+            imgs: [],
+        },
+        mapObjects: [
+            {
+                type: randomObstacleType({
+                    bridge_xlg_structure_01: 1,
+                    bridge_xlg_structure_02: 1,
+                    bridge_xlg_structure_03: 1,
+                    bridge_xlg_structure_04: 1,
+                    bridge_xlg_structure_05: 0.95,
+                    bridge_xlg_structure_06: 0.05,
+                }),
+                pos: v2.create(0, 0),
+                scale: 1,
+                ori: 0,
+            },
+            {
+                type: params.redTown || "river_town_red_01",
+                pos: v2.create(-75, 0),
+                scale: 1,
+                ori: 0,
+            },
+            {
+                type: params.blueTown || "river_town_blue_02",
+                pos: v2.create(71, 0),
+                scale: 1,
+                ori: 0,
+            },
+        ],
+    };
+    return util.mergeDeep(baseDef, overrides);
+}
+
+// New Red + New Blue
+function createRiverTown_04(
+    overrides: DeepPartial<BuildingDef>,
+    params: {
+        redTown?: BuildingChildObjType;
+        blueTown?: BuildingChildObjType;
+    },
+): BuildingDef {
+    const baseDef: BuildingDef = {
+        type: "building",
+        map: {},
+        terrain: {
+            bridge: { nearbyWidthMult: 1 },
+            spawnPriority: 100,
+        },
+        bridgeLandBounds: [
+            // Bridge
+            collider.createAabbExtents(v2.create(-41, 0), v2.create(6, 10)),
+            collider.createAabbExtents(v2.create(41, 0), v2.create(6, 10)),
+            // Red
+            collider.createAabbExtents(v2.create(-86, -42), v2.create(42, 44)),
+            collider.createAabbExtents(v2.create(-78, 22), v2.create(27, 25)),
+            // Blue
+            collider.createAabbExtents(v2.create(95, 5.5), v2.create(55, 53)),
+        ],
+        bridgeWaterBounds: [collider.createAabbExtents(v2.create(0, 0), v2.create(5, 5))],
+        mapObstacleBounds: [
+            // Bridge
+            collider.createAabbExtents(v2.create(0, 0), v2.create(40, 15)),
+            // Red
+            collider.createAabbExtents(v2.create(-78, 32), v2.create(27, 15)),
+            collider.createAabbExtents(v2.create(-78, 16), v2.create(8, 6)),
+            collider.createAabbExtents(v2.create(-88, -45), v2.create(46, 42)),
+            collider.createAabbExtents(v2.create(-70, 0), v2.create(50, 8)),
+            collider.createAabbExtents(v2.create(-114, 30), v2.create(7, 7.25)),
+            // Blue
+            collider.createAabbExtents(v2.create(94.5, 13), v2.create(55.5, 46)),
+            collider.createAabbExtents(v2.create(68, -32), v2.create(27, 15)),
+        ],
+        floor: {
+            surfaces: [
+                {
+                    type: "grass",
+                    collision: [
+                        collider.createAabbExtents(v2.create(0, 0), v2.create(0, 0)),
+                    ],
+                },
+            ],
+            imgs: [],
+        },
+        // HACK: used to define a region that counts as "river town" for quests
+        goreRegion: collider.createAabbExtents(v2.create(7.5, -5), v2.create(145, 85)),
+        ceiling: {
+            zoomRegions: [],
+            imgs: [],
+        },
+        mapObjects: [
+            {
+                type: randomObstacleType({
+                    bridge_xlg_structure_01: 1,
+                    bridge_xlg_structure_02: 1,
+                    bridge_xlg_structure_03: 1,
+                    bridge_xlg_structure_04: 1,
+                    bridge_xlg_structure_05: 0.95,
+                    bridge_xlg_structure_06: 0.05,
+                }),
+                pos: v2.create(0, 0),
+                scale: 1,
+                ori: 0,
+            },
+            {
+                type: params.redTown || "river_town_red_02",
+                pos: v2.create(-75, 0),
+                scale: 1,
+                ori: 0,
+            },
+            {
+                type: params.blueTown || "river_town_blue_02",
+                pos: v2.create(71, 0),
+                scale: 1,
+                ori: 0,
+            },
+        ],
+    };
+    return util.mergeDeep(baseDef, overrides);
+}
+
+function createWinterBridge(overrides: DeepPartial<BuildingDef>): BuildingDef {
+    const baseDef: BuildingDef = {
+        type: "building",
+        map: {},
+        terrain: {
+            bridge: { nearbyWidthMult: 1 },
+            spawnPriority: 100,
+        },
+        bridgeLandBounds: [
+            collider.createAabbExtents(v2.create(-41, 0), v2.create(6, 10)),
+            collider.createAabbExtents(v2.create(41, 0), v2.create(6, 10)),
+            collider.createAabbExtents(v2.create(-65, 15), v2.create(20, 20)),
+            collider.createAabbExtents(v2.create(65, -15), v2.create(20, 20)),
+        ],
+        bridgeWaterBounds: [collider.createAabbExtents(v2.create(0, 0), v2.create(5, 5))],
+        mapObstacleBounds: [
+            // Bridge
+            collider.createAabbExtents(v2.create(0, 0), v2.create(40, 15)),
+            // Red
+            collider.createCircle(v2.create(-65, 15), 20),
+            // Blue
+            collider.createCircle(v2.create(65, -15), 20),
+        ],
+        floor: {
+            surfaces: [
+                {
+                    type: "grass",
+                    collision: [
+                        collider.createAabbExtents(v2.create(0, 0), v2.create(0, 0)),
+                    ],
+                },
+            ],
+            imgs: [],
+        },
+        ceiling: {
+            zoomRegions: [],
+            imgs: [],
+        },
+        mapObjects: [
+            {
+                type: randomObstacleType({
+                    bridge_xlg_structure_01: 1,
+                    bridge_xlg_structure_02: 1,
+                    bridge_xlg_structure_03: 1,
+                    bridge_xlg_structure_04: 1,
+                    bridge_xlg_structure_05: 1,
+                }),
+                pos: v2.create(0, 0),
+                scale: 1,
+                ori: 0,
+            },
+            {
+                type: "camp_01f_red",
+                pos: v2.create(-65, 15),
+                scale: 1,
+                ori: 0,
+            },
+            {
+                type: "camp_01f_blue",
+                pos: v2.create(65, -15),
+                scale: 1,
+                ori: 2,
+            },
+        ],
+    };
+    return util.mergeDeep(baseDef, overrides);
+}
+
 export const ModeBuildingDefs: Record<string, BuildingDef> = {
     // Beach
 
@@ -5864,7 +7254,7 @@ export const ModeBuildingDefs: Record<string, BuildingDef> = {
         ],
     },
     oasis_01: createOasis({}, {}),
-    river_town_02: {
+    river_town_aged: {
         type: "building",
         map: { display: true, shapes: [] },
         terrain: { grass: true, beach: false },
@@ -6808,351 +8198,106 @@ export const ModeBuildingDefs: Record<string, BuildingDef> = {
 
     // Faction
 
-    river_town_01: {
-        type: "building",
-        map: {
-            display: true,
-            shapes: [
-                {
-                    collider: collider.createAabbExtents(
-                        v2.create(70.75, 0.5),
-                        v2.create(30, 54.5),
-                    ),
-                    color: 0x3a3a3a,
-                },
-                {
-                    collider: collider.createAabbExtents(
-                        v2.create(77.5, 64),
-                        v2.create(23, 10),
-                    ),
-                    color: 0x3a3a3a,
-                },
-                {
-                    collider: collider.createAabbExtents(
-                        v2.create(111, -29.5),
-                        v2.create(10.5, 24.5),
-                    ),
-                    color: 0x3a3a3a,
-                },
-                {
-                    collider: collider.createAabbExtents(
-                        v2.create(50, 0),
-                        v2.create(4.4, 4.4),
-                    ),
-                    color: 0x575757,
-                },
-            ],
-        },
-        terrain: {
-            bridge: { nearbyWidthMult: 1 },
-            spawnPriority: 100,
-        },
-        bridgeLandBounds: [
-            collider.createAabbExtents(v2.create(-41, 0), v2.create(6, 10)),
-            collider.createAabbExtents(v2.create(41, 0), v2.create(6, 10)),
-            collider.createAabbExtents(v2.create(81, 0), v2.create(40, 54)),
-            collider.createAabbExtents(v2.create(78, 64), v2.create(23, 10)),
-            collider.createAabbExtents(v2.create(-76, -22), v2.create(36, 24)),
-            collider.createAabbExtents(v2.create(-72, 22), v2.create(27, 25)),
-        ],
-        bridgeWaterBounds: [collider.createAabbExtents(v2.create(0, 0), v2.create(5, 5))],
-        mapObstacleBounds: [
-            collider.createAabbExtents(v2.create(71, 0), v2.create(31, 56)),
-            collider.createAabbExtents(v2.create(77, 65), v2.create(24, 10)),
-            collider.createAabbExtents(v2.create(112, -30), v2.create(10, 26)),
-            collider.createAabbExtents(v2.create(106, 19.5), v2.create(8, 7.25)),
-            collider.createAabbExtents(v2.create(-71, 32), v2.create(27, 15)),
-            collider.createAabbExtents(v2.create(-71, 16), v2.create(8, 6)),
-            collider.createAabbExtents(v2.create(-75, -34), v2.create(40, 19)),
-            collider.createAabbExtents(v2.create(-57, -10), v2.create(5, 11)),
-            collider.createAabbExtents(v2.create(-86, -10), v2.create(5, 11)),
-            collider.createAabbExtents(v2.create(-21, 0), v2.create(100, 8)),
-            collider.createAabbExtents(v2.create(-109, 30), v2.create(7, 7.25)),
-            collider.createAabbExtents(v2.create(0, 0), v2.create(40, 15)),
-        ],
-        mapGroundPatches: [
-            {
-                bound: collider.createAabbExtents(v2.create(-20, 0), v2.create(100, 6)),
-                color: 0x653313,
-                roughness: 0.05,
-                offsetDist: 1,
-            },
-            {
-                bound: collider.createAabbExtents(v2.create(-71, 10), v2.create(2, 9)),
-                color: 0x653313,
-                roughness: 0,
-                offsetDist: 1,
-            },
-            {
-                bound: collider.createAabbExtents(v2.create(-57, -10), v2.create(2, 9)),
-                color: 0x653313,
-                roughness: 0,
-                offsetDist: 1,
-            },
-            {
-                bound: collider.createAabbExtents(
-                    v2.create(-109, 30),
-                    v2.create(6, 6.25),
-                ),
-                color: 0x324319,
-                roughness: 0.05,
-                offsetDist: 0.5,
-            },
-            {
-                bound: collider.createAabbExtents(v2.create(-86, -10), v2.create(2, 9)),
-                color: 0x653313,
-                roughness: 0,
-                offsetDist: 1,
-            },
-            {
-                bound: collider.createAabbExtents(
-                    v2.create(106, 19.5),
-                    v2.create(7, 6.25),
-                ),
-                color: 0x324319,
-                roughness: 0.05,
-                offsetDist: 0.5,
-            },
-        ],
-        floor: {
-            surfaces: [
-                {
-                    type: "grass",
-                    collision: [
-                        collider.createAabbExtents(v2.create(0, 0), v2.create(0, 0)),
-                    ],
-                },
-                {
-                    type: "asphalt",
-                    collision: [
-                        collider.createAabbExtents(
-                            v2.create(70.75, 0.5),
-                            v2.create(30, 54.5),
-                        ),
-                        collider.createAabbExtents(
-                            v2.create(77.5, 64),
-                            v2.create(23, 10),
-                        ),
-                        collider.createAabbExtents(
-                            v2.create(111, -29.5),
-                            v2.create(10.5, 24.5),
-                        ),
-                    ],
-                },
-            ],
+    // Original Red Side
+    river_town_red_01: createRiverTownRed_01({}, {}),
+    river_town_red_01x: createRiverTownRed_01({}, {
+        groundTint: 0x444444,
+    }),
+
+    // Original Blue Side
+    river_town_blue_01: createRiverTownBlue_01({}, {}),
+    river_town_blue_01x: createRiverTownBlue_01({}, {
+        groundTint: 0x444444,
+    }),
+
+    // Alternate Red Side
+    // Includes custom alt warehouse
+    river_town_red_02: createRiverTownRed_02({}, {}),
+    river_town_red_02x: createRiverTownRed_02({}, {
+        groundTint: 0x444444,
+    }),
+    warehouse_03f: createWarehouse3({}, {
+        crate: "crate_03",
+        specialCrate: "crate_01",
+        ceilingTint: 0xd6a9a9,
+    }),
+    warehouse_03fx: createWarehouse3({
+        ceiling: {
             imgs: [
                 {
-                    sprite: "map-complex-warehouse-floor-04.img",
-                    pos: v2.create(81, 10),
+                    sprite: "map-building-warehouse-ceiling-01.img",
                     scale: 1,
                     alpha: 1,
+                    tint: 0xd6a9a9,
+                },
+                {
+                    sprite: "map-snow-04.img",
+                    pos: v2.create(7.5, 5),
+                    scale: 0.9,
+                    alpha: 1,
                     tint: 0xffffff,
+                    rot: 1,
+                },
+                {
+                    sprite: "map-snow-05.img",
+                    pos: v2.create(-8.5, 4),
+                    scale: 0.9,
+                    alpha: 1,
+                    tint: 0xffffff,
+                    rot: 2,
+                },
+                {
+                    sprite: "map-snow-06.img",
+                    pos: v2.create(22.25, 11.25),
+                    scale: 0.75,
+                    alpha: 1,
+                    tint: 0xffffff,
+                    rot: 0,
+                },
+                {
+                    sprite: "map-snow-06.img",
+                    pos: v2.create(-22.25, -11.25),
+                    scale: 0.75,
+                    alpha: 1,
+                    tint: 0xffffff,
+                    rot: 2,
                 },
             ],
         },
-        // HACK: used to define a region that counts as "river town" for quests
-        goreRegion: collider.createAabbExtents(v2.create(0, 10), v2.create(125, 70)),
-        ceiling: {
-            zoomRegions: [],
-            imgs: [],
-        },
-        mapObjects: [
-            {
-                type: "bridge_xlg_structure_01",
-                pos: v2.create(0, 0),
-                scale: 1,
-                ori: 0,
-            },
-            {
-                type: "barn_01",
-                pos: v2.create(-71, 30),
-                scale: 1,
-                ori: 2,
-            },
-            {
-                type: "house_red_01",
-                pos: v2.create(-56, -30),
-                scale: 1,
-                ori: 0,
-            },
-            {
-                type: "house_red_02",
-                pos: v2.create(-96, -30),
-                scale: 1,
-                ori: 0,
-            },
-            {
-                type: "sandbags_02",
-                pos: v2.create(-68, 2),
-                scale: 1,
-                ori: 0,
-            },
-            {
-                type: randomObstacleType({ crate_02: 1, crate_01: 3 }),
-                pos: v2.create(-85, 1),
-                scale: 1,
-                ori: 0,
-                inheritOri: false,
-            },
-            {
-                type: randomObstacleType({ crate_02: 1, crate_01: 3 }),
-                pos: v2.create(-90, -1),
-                scale: 1,
-                ori: 0,
-                inheritOri: false,
-            },
-            {
-                type: "crate_02f",
-                pos: v2.create(-106.5, 32.25),
-                scale: 1,
-                ori: 0,
-                inheritOri: false,
-            },
-            {
-                type: "crate_01",
-                pos: v2.create(-111.25, 32.25),
-                scale: 1,
-                ori: 0,
-            },
-            {
-                type: "crate_01",
-                pos: v2.create(-108, 27.25),
-                scale: 1,
-                ori: 0,
-            },
-            {
-                type: "statue_structure_01",
-                pos: v2.create(-50, 0),
-                scale: 1,
-                ori: 0,
-            },
-            {
-                type: randomObstacleType({
-                    container_01: 1,
-                    container_02: 1,
-                    container_03: 1,
-                }),
-                pos: v2.create(45, 36),
-                scale: 1,
-                ori: 2,
-            },
-            {
-                type: randomObstacleType({
-                    container_01: 1,
-                    container_02: 1,
-                    container_03: 1,
-                }),
-                pos: v2.create(51, 36),
-                scale: 1,
-                ori: 2,
-            },
-            {
-                type: "shack_02",
-                pos: v2.create(47, 20),
-                scale: 1,
-                ori: 0,
-            },
-            {
-                type: "warehouse_02",
-                pos: v2.create(78, 40),
-                scale: 1,
-                ori: 1,
-            },
-            {
-                type: randomObstacleType({
-                    container_01: 1,
-                    container_02: 1,
-                    container_03: 1,
-                }),
-                pos: v2.create(95, 44),
-                scale: 1,
-                ori: 0,
-            },
-            {
-                type: "statue_structure_02",
-                pos: v2.create(50, 0),
-                scale: 1,
-                ori: 2,
-            },
-            {
-                type: "crate_01",
-                pos: v2.create(74.5, -0.5),
-                scale: 1,
-                ori: 0,
-                inheritOri: false,
-            },
-            {
-                type: "crate_01",
-                pos: v2.create(79.5, 0.25),
-                scale: 1,
-                ori: 0,
-                inheritOri: false,
-            },
-            {
-                type: "crate_01",
-                pos: v2.create(106, 22),
-                scale: 1,
-                ori: 0,
-                inheritOri: false,
-            },
-            {
-                type: "crate_01",
-                pos: v2.create(104.5, 17.25),
-                scale: 1,
-                ori: 0,
-                inheritOri: false,
-            },
-            {
-                type: "crate_22",
-                pos: v2.create(109.25, 17.25),
-                scale: 1,
-                ori: 0,
-                inheritOri: false,
-            },
-            {
-                type: randomObstacleType({
-                    container_01: 1,
-                    container_02: 1,
-                    container_03: 1,
-                }),
-                pos: v2.create(85, -13),
-                scale: 1,
-                ori: 1,
-            },
-            {
-                type: randomObstacleType({
-                    container_01: 1,
-                    container_02: 1,
-                    container_03: 1,
-                }),
-                pos: v2.create(45, -36),
-                scale: 1,
-                ori: 0,
-            },
-            {
-                type: "shack_02",
-                pos: v2.create(47, -20),
-                scale: 1,
-                ori: 2,
-            },
-            {
-                type: "warehouse_02",
-                pos: v2.create(86, -30),
-                scale: 1,
-                ori: 0,
-            },
-            {
-                type: randomObstacleType({
-                    container_01: 1,
-                    container_02: 1,
-                    container_03: 1,
-                }),
-                pos: v2.create(72, -47),
-                scale: 1,
-                ori: 1,
-            },
-        ],
-    },
+    }, {
+        crate: "crate_03",
+        specialCrate: "crate_01",
+    }),
+
+    // Alternate Blue Side
+    // Includes custom alt warehouse
+    river_town_blue_02: createRiverTownBlue_02({}, {}),
+    river_town_blue_02x: createRiverTownBlue_02({}, {
+        groundTint: 0x444444,
+    }),
+
+    // River Towns
+    river_town_01: createRiverTown_01({}, {}), // Original Red + Blue
+    river_town_01x: createRiverTown_01({}, {
+        redTown: "river_town_red_01x",
+        blueTown: "river_town_blue_01x",
+    }),
+    river_town_02: createRiverTown_02({}, {}), // New Red + Original Blue
+    river_town_02x: createRiverTown_02({}, {
+        redTown: "river_town_red_02x",
+        blueTown: "river_town_blue_01x",
+    }),
+    river_town_03: createRiverTown_03({}, {}), // Original Red + New Blue
+    river_town_03x: createRiverTown_03({}, {
+        redTown: "river_town_red_01x",
+        blueTown: "river_town_blue_02x",
+    }),
+    river_town_04: createRiverTown_04({}, {}), // New Red + New Blue
+    river_town_04x: createRiverTown_04({}, {
+        redTown: "river_town_red_02x",
+        blueTown: "river_town_blue_02x",
+    }),
+
     statue_structure_01: {
         type: "building",
         ori: 0,
@@ -7337,6 +8482,32 @@ export const ModeBuildingDefs: Record<string, BuildingDef> = {
 
     camp_01f_red: createCamp({
         teamId: 1,
+        mapGroundPatches: [
+            {
+                bound: collider.createAabbExtents(
+                    v2.create(10.5, 10),
+                    v2.create(5.75, 5.5),
+                ),
+                color: 0x3f3f3f,
+                roughness: 0.1,
+                offsetDist: 0,
+            },
+            {
+                bound: collider.createAabbExtents(
+                    v2.create(-1, -15),
+                    v2.create(6.25, 4.5),
+                ),
+                color: 0x3f3f3f,
+                roughness: 0.1,
+                offsetDist: 0,
+            },
+            {
+                bound: collider.createCircle(v2.create(0, 0), 4),
+                color: 0x3a260e,
+                roughness: 0.2,
+                offsetDist: 0.15,
+            },
+        ],
         soundEmitters: [
             {
                 sound: "ambient_campfire_01",
@@ -7355,10 +8526,35 @@ export const ModeBuildingDefs: Record<string, BuildingDef> = {
         box: "crate_03",
         crate: "crate_02f",
         light: "decal_light_01",
-        groundTintDk: 0x3f3f3f,
     }),
     camp_01f_blue: createCamp({
         teamId: 2,
+        mapGroundPatches: [
+            {
+                bound: collider.createAabbExtents(
+                    v2.create(10.5, 10),
+                    v2.create(5.75, 5.5),
+                ),
+                color: 0x3f3f3f,
+                roughness: 0.1,
+                offsetDist: 0,
+            },
+            {
+                bound: collider.createAabbExtents(
+                    v2.create(-1, -15),
+                    v2.create(6.25, 4.5),
+                ),
+                color: 0x3f3f3f,
+                roughness: 0.1,
+                offsetDist: 0,
+            },
+            {
+                bound: collider.createCircle(v2.create(0, 0), 4),
+                color: 0x3a260e,
+                roughness: 0.2,
+                offsetDist: 0.15,
+            },
+        ],
         soundEmitters: [
             {
                 sound: "ambient_campfire_01",
@@ -7377,8 +8573,9 @@ export const ModeBuildingDefs: Record<string, BuildingDef> = {
         box: "crate_03",
         crate: "crate_22",
         light: "decal_light_01",
-        groundTintDk: 0x3f3f3f,
     }),
+
+    river_camp_01: createWinterBridge({}),
 
     // Halloween
 

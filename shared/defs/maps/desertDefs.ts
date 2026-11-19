@@ -285,7 +285,7 @@ const mapDef: PartialMapDef = {
         customSpawnRules: {
             locationSpawns: [
                 {
-                    type: "river_town_02",
+                    type: "river_town_aged",
                     pos: v2.create(0.51, 0.5),
                     rad: 50,
                     retryOnFailure: false,
