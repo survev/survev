@@ -149,6 +149,24 @@ export const CacheDefs: Record<string, BuildingDef> = {
         ],
         map: { displayType: "stone_01" },
     }),
+    cache_01fx: createCache({
+        mapObjects: [
+            {
+                type: "stone_02fx",
+                pos: v2.create(0, 0),
+                scale: 1,
+                ori: 0,
+            },
+            {
+                type: "decal_initiative_01",
+                pos: v2.create(0, 0),
+                scale: 1,
+                ori: 0,
+                inheritOri: false,
+            },
+        ],
+        map: { displayType: "stone_01x" },
+    }),
     cache_02: createCache({
         mapObjects: [
             {
@@ -310,6 +328,24 @@ export const CacheDefs: Record<string, BuildingDef> = {
             },
         ],
         map: { displayType: "tree_08f" },
+    }),
+    cache_02fx: createCache({
+        mapObjects: [
+            {
+                type: "tree_15f",
+                pos: v2.create(0, 0),
+                scale: 1.2,
+                ori: 0,
+            },
+            {
+                type: "decal_initiative_01",
+                pos: v2.create(0, 0),
+                scale: 1.3,
+                ori: 0,
+                inheritOri: false,
+            },
+        ],
+        map: { displayType: "tree_15" },
     }),
     cache_02h: createCache({
         mapObjects: [

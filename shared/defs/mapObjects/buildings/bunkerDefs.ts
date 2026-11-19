@@ -543,6 +543,187 @@ export const BunkerDefs: Record<string, BuildingDef> = {
             },
         ],
     },
+    // Winter Factions chrysanthemum bunker
+    // Mainly changes the final room
+    bunker_chrys_sublevel_01c: {
+        type: "building",
+        map: { display: false, color: 0x665a4e, scale: 1 },
+        terrain: { grass: true, beach: false },
+        zIdx: 1,
+        floor: {
+            surfaces: [
+                {
+                    type: "bunker",
+                    collision: [
+                        collider.createAabbExtents(
+                            v2.create(11, -12),
+                            v2.create(14.5, 9),
+                        ),
+                    ],
+                },
+            ],
+            imgs: [
+                {
+                    sprite: "map-bunker-chrys-chamber-floor-01a.img",
+                    pos: v2.create(0, 1.85),
+                    scale: 0.5,
+                    alpha: 1,
+                    tint: 0xffffff,
+                },
+                {
+                    sprite: "map-bunker-chrys-chamber-floor-01b.img",
+                    pos: v2.create(11, -10.75),
+                    scale: 0.5,
+                    alpha: 1,
+                    tint: 0xffffff,
+                },
+            ],
+        },
+        ceiling: {
+            zoomRegions: [
+                {
+                    zoomIn: collider.createAabbExtents(
+                        v2.create(11, -12),
+                        v2.create(14.5, 9),
+                    ),
+                },
+            ],
+            imgs: [
+                {
+                    sprite: "map-bunker-chrys-chamber-ceiling-01.img",
+                    pos: v2.create(11.5, -11),
+                    scale: 1,
+                    alpha: 1,
+                    tint: 0x5e574b,
+                },
+            ],
+        },
+        mapObjects: [
+            {
+                type: "concrete_wall_ext_5",
+                pos: v2.create(0, 4),
+                scale: 1,
+                ori: 1,
+            },
+            {
+                type: "metal_wall_ext_thicker_26",
+                pos: v2.create(-3, -8.5),
+                scale: 1,
+                ori: 0,
+            },
+            {
+                type: "metal_wall_ext_thicker_9",
+                pos: v2.create(3, 0),
+                scale: 1,
+                ori: 0,
+            },
+            {
+                type: "metal_wall_ext_thicker_19",
+                pos: v2.create(14, -3),
+                scale: 1,
+                ori: 1,
+            },
+            {
+                type: "metal_wall_ext_thicker_25",
+                pos: v2.create(11, -20),
+                scale: 1,
+                ori: 1,
+            },
+            {
+                type: "metal_wall_ext_thicker_8",
+                pos: v2.create(25, -5.5),
+                scale: 1,
+                ori: 0,
+            },
+            {
+                type: "metal_wall_ext_thicker_8",
+                pos: v2.create(25, -17.5),
+                scale: 1,
+                ori: 0,
+            },
+            {
+                type: "locker_01",
+                pos: v2.create(4.5, -4.15),
+                scale: 1,
+                ori: 0,
+            },
+            {
+                type: "barrel_01",
+                pos: v2.create(0.5, -16.5),
+                scale: 0.9,
+                ori: 0,
+            },
+            {
+                type: "crate_01",
+                pos: v2.create(12, -9.5),
+                scale: 0.8,
+                ori: 0,
+                ignoreMapSpawnReplacement: true,
+            },
+            {
+                type: "crate_01",
+                pos: v2.create(12, -13.5),
+                scale: 0.8,
+                ori: 0,
+                ignoreMapSpawnReplacement: true,
+            },
+            {
+                type: "couch_01",
+                pos: v2.create(15.5, -11.5),
+                scale: 1,
+                ori: 1,
+            },
+            {
+                type: "switch_02",
+                pos: v2.create(18.5, -4.25),
+                scale: 1,
+                ori: 0,
+            },
+            {
+                type: "switch_02",
+                pos: v2.create(21.5, -4.25),
+                scale: 1,
+                ori: 0,
+            },
+            {
+                type: "switch_02",
+                pos: v2.create(18.5, -18.75),
+                scale: 1,
+                ori: 2,
+            },
+            {
+                type: "switch_02",
+                pos: v2.create(21.5, -18.75),
+                scale: 1,
+                ori: 2,
+            },
+            {
+                type: "lab_door_01",
+                pos: v2.create(25.5, -9.5),
+                scale: 1,
+                ori: 2,
+            },
+            {
+                type: "bunker_chrys_compartment_01b",
+                pos: v2.create(39.5, -6),
+                scale: 1,
+                ori: 0,
+            },
+            {
+                type: "bunker_chrys_compartment_02b",
+                pos: v2.create(43.5, 19),
+                scale: 1,
+                ori: 0,
+            },
+            // Only real change is here
+            {
+                type: "bunker_chrys_compartment_03c",
+                pos: v2.create(43.5, 43),
+                scale: 1,
+                ori: 0,
+            },
+        ],
+    },
     bunker_chrys_compartment_01: {
         type: "building",
         map: { display: false, color: 0x665a4e, scale: 1 },
@@ -1473,6 +1654,153 @@ export const BunkerDefs: Record<string, BuildingDef> = {
             },
             {
                 type: "case_05",
+                pos: v2.create(0, -5.5),
+                scale: 1,
+                ori: 0,
+            },
+        ],
+    },
+    bunker_chrys_compartment_03c: {
+        type: "building",
+        map: { display: false, color: 0x665a4e, scale: 1 },
+        terrain: { grass: true, beach: false },
+        zIdx: 2,
+        floor: {
+            surfaces: [
+                {
+                    type: "bunker",
+                    collision: [
+                        collider.createAabbExtents(v2.create(0, -1), v2.create(10, 14)),
+                    ],
+                },
+                {
+                    type: "grass",
+                    collision: [
+                        collider.createAabbExtents(v2.create(0, 11), v2.create(10, 4)),
+                        collider.createAabbExtents(v2.create(-7, -3), v2.create(3, 3)),
+                        collider.createAabbExtents(v2.create(8, -3), v2.create(2, 3)),
+                    ],
+                },
+            ],
+            imgs: [
+                {
+                    sprite: "map-bunker-chrys-compartment-floor-03a.img",
+                    pos: v2.create(0, 0),
+                    scale: 0.5,
+                    alpha: 1,
+                    tint: 0xffffff,
+                },
+            ],
+        },
+        ceiling: {
+            zoomRegions: [
+                {
+                    zoomIn: collider.createAabbExtents(
+                        v2.create(0, 0),
+                        v2.create(10, 13),
+                    ),
+                },
+            ],
+            imgs: [
+                {
+                    sprite: "map-bunker-chrys-compartment-ceiling-03a.img",
+                    pos: v2.create(0, -9.5),
+                    scale: 1,
+                    alpha: 1,
+                    tint: 0x5e574b,
+                    rot: 0,
+                },
+                {
+                    sprite: "map-bunker-chrys-compartment-ceiling-03b.img",
+                    pos: v2.create(0, 3),
+                    scale: 1,
+                    alpha: 1,
+                    tint: 0x5e574b,
+                    rot: 0,
+                },
+            ],
+        },
+        mapObjects: [
+            {
+                type: "metal_wall_ext_thicker_5",
+                pos: v2.create(-7.5, -8),
+                scale: 1,
+                ori: 0,
+            },
+            {
+                type: "metal_wall_ext_thicker_5",
+                pos: v2.create(7.5, -8),
+                scale: 1,
+                ori: 0,
+            },
+            {
+                type: "metal_wall_ext_thicker_4",
+                pos: v2.create(-11, -7),
+                scale: 1,
+                ori: 1,
+            },
+            {
+                type: "metal_wall_ext_thicker_4",
+                pos: v2.create(11, -7),
+                scale: 1,
+                ori: 1,
+            },
+            {
+                type: "metal_wall_ext_thicker_20",
+                pos: v2.create(-11.5, 4.5),
+                scale: 1,
+                ori: 0,
+            },
+            {
+                type: "metal_wall_ext_thicker_20",
+                pos: v2.create(11.5, 4.5),
+                scale: 1,
+                ori: 0,
+            },
+            {
+                type: "metal_wall_ext_thicker_20",
+                pos: v2.create(0, 13),
+                scale: 1,
+                ori: 1,
+            },
+            {
+                type: "crate_01",
+                pos: v2.create(0, 4.75),
+                scale: 0.9,
+                ori: 0,
+            },
+            {
+                type: "crate_01",
+                pos: v2.create(3, 0.5),
+                scale: 0.9,
+                ori: 0,
+            },
+            {
+                type: "crate_01",
+                pos: v2.create(-3, 0.5),
+                scale: 0.9,
+                ori: 0,
+            },
+            {
+                type: "wheel_02",
+                pos: v2.create(0, 9.1),
+                scale: 1,
+                ori: 0,
+            },
+            {
+                type: "wheel_03",
+                pos: v2.create(-7.6, 1),
+                scale: 1,
+                ori: 1,
+            },
+            {
+                type: "wheel_03",
+                pos: v2.create(7.6, 1),
+                scale: 1,
+                ori: 3,
+            },
+            {
+                type: "case_06",
                 pos: v2.create(0, -5.5),
                 scale: 1,
                 ori: 0,

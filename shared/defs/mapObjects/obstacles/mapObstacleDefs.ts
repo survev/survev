@@ -990,6 +990,22 @@ export const MapObstacleDefs: Record<string, ObstacleDef> = {
             autoLoot("2xscope", 1),
         ],
     }),
+    stone_02fx: createStone({
+        map: { display: false, color: 0x9ca2a8, scale: 1 },
+        img: {
+            sprite: "map-stone-01x.img",
+            residue: "map-stone-res-01x.img",
+            tint: 0xe5e5e5,
+        },
+        loot: [
+            tierLoot("tier_surviv", 1, 1),
+            autoLoot("ak47", 1),
+            autoLoot("helmet02", 1),
+            autoLoot("chest02", 1),
+            autoLoot("bandage", 5),
+            autoLoot("2xscope", 1),
+        ],
+    }),
     stone_03: createRiverStone({}),
     stone_03b: createRiverStone({
         img: {
@@ -1531,6 +1547,17 @@ export const MapObstacleDefs: Record<string, ObstacleDef> = {
         map: { color: 0x73895f, scale: 2.5 },
         img: { sprite: "map-tree-10.img" },
     }),
+    tree_10f: createTree({
+        scale: { createMin: 1.15, createMax: 1.3 },
+        health: 200,
+        map: { color: 0x73895f, scale: 2.5 },
+        img: {
+            sprite: "map-tree-10f.img",
+            residue: "map-tree-res-01.img",
+            scale: 0.35,
+            zIdx: 801,
+        },
+    }),
     tree_11: createTree({
         collision: collider.createCircle(v2.create(0, 0), 1.25),
         scale: { createMin: 1, createMax: 1 },
@@ -1641,7 +1668,7 @@ export const MapObstacleDefs: Record<string, ObstacleDef> = {
     }),
     // Winter Factions tree
     tree_15: createTree({
-        scale: { createMin: 1.2, createMax: 1.6 },
+        scale: { createMin: 1.3, createMax: 1.6 },
         health: 250,
         terrain: {
             grass: true,
@@ -1653,8 +1680,32 @@ export const MapObstacleDefs: Record<string, ObstacleDef> = {
             sprite: "map-tree-15.img",
             residue: "map-tree-res-01.img",
             scale: 0.35,
-            zIdx: 801,
+            zIdx: 802,
         },
+    }),
+    // Winter Factions cache
+    tree_15f: createTree({
+        scale: { createMin: 1.3, createMax: 1.6 },
+        health: 250,
+        terrain: {
+            grass: true,
+            beach: false,
+            minDistanceFromSameType: 8,
+        },
+        map: { display: false, color: 0x5f6f6b, scale: 3 },
+        img: {
+            sprite: "map-tree-15.img",
+            residue: "map-tree-res-01.img",
+            scale: 0.35,
+            zIdx: 801,
+            tint: 0xb1b1b1,
+        },
+        loot: [
+            tierLoot("tier_surviv", 2, 3),
+            autoLoot("mosin", 1),
+            autoLoot("4xscope", 1),
+            autoLoot("helmet02", 1),
+        ],
     }),
     // XL Winter Factions Tree
     tree_16: createTree({
@@ -1670,7 +1721,7 @@ export const MapObstacleDefs: Record<string, ObstacleDef> = {
             sprite: "map-tree-16.img",
             residue: "map-tree-res-01.img",
             scale: 0.35,
-            zIdx: 801,
+            zIdx: 802,
         },
     }),
     woodpile_01: createWoodPile({}),

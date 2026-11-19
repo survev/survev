@@ -1607,7 +1607,7 @@ export class GameMap {
                     "bunker_structure_03", // storm bunker
 
                     // Winter
-                    "greenhouse_02",
+                    "greenhouse_02f",
                     "camp_01f_red",
                     "camp_01f_blue",
                 ];

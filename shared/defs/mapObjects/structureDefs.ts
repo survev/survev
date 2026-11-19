@@ -1087,6 +1087,9 @@ export const StructureDefs: Record<string, StructureDef> = {
     bunker_structure_08b: createBunkerChrys({
         bunkerType: "bunker_chrys_sublevel_01b",
     }),
+    bunker_structure_08c: createBunkerChrys({
+        bunkerType: "bunker_chrys_sublevel_01c",
+    }),
     bunker_structure_09: {
         type: "structure",
         terrain: { grass: true, beach: false },
