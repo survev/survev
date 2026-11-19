@@ -1,4 +1,4 @@
-import { FactionTeam, type InventoryItem } from "../../gameConfig.ts";
+import { FactionTeam, HasteType, type InventoryItem } from "../../gameConfig.ts";
 import { type DeepPartial, util } from "../../utils/util.ts";
 import type { MapIndicatorDef } from "./itemTypes.ts";
 
@@ -55,6 +55,18 @@ export interface RoleDef {
         alive: string;
         dead?: string;
     };
+
+    assignEffects?: {
+        health?: number;
+        adrenaline?: number;
+        haste?: {
+            type: Exclude<HasteType, HasteType.None | HasteType.Count>;
+            duration: number;
+            speed: number;
+        };
+        scale?: number;
+    };
+
     defaultItems?: DefaultItems;
     perks?: (string | (() => string))[];
     mapIndicator?: MapIndicatorDef;
@@ -121,6 +133,7 @@ export const RoleDefs: Record<string, RoleDef> = {
             alive: "player-star.img",
             dead: "skull-leader.img",
         },
+        assignEffects: { health: 100 },
         perks: ["leadership"],
         defaultItems: createDefaultItems({
             weapons: [
@@ -167,6 +180,10 @@ export const RoleDefs: Record<string, RoleDef> = {
         mapIcon: {
             alive: "player-captain.img",
         },
+        assignEffects: {
+            health: 100,
+            adrenaline: 100,
+        },
         perks: ["assume_leadership", "firepower"],
         defaultItems: createDefaultItems({
             weapons: [
@@ -197,6 +214,10 @@ export const RoleDefs: Record<string, RoleDef> = {
         announce: true,
         killFeed: { assign: true },
         sound: { assign: "lt_assigned_01" },
+        assignEffects: {
+            health: 100,
+            adrenaline: 50,
+        },
         perks: ["firepower"],
         defaultItems: createDefaultItems({
             weapons: [
@@ -232,6 +253,7 @@ export const RoleDefs: Record<string, RoleDef> = {
             alive: "player-medic.img",
             dead: "skull-leader.img",
         },
+        assignEffects: { health: 50 },
         perks: ["aoe_heal", "self_revive"],
         defaultItems: createDefaultItems({
             weapons: [
@@ -258,6 +280,7 @@ export const RoleDefs: Record<string, RoleDef> = {
         announce: true,
         killFeed: { assign: true },
         sound: { assign: "marksman_assigned_01" },
+        assignEffects: { health: 50 },
         perks: ["targeting"],
         defaultItems: createDefaultItems({
             weapons: [
@@ -293,6 +316,7 @@ export const RoleDefs: Record<string, RoleDef> = {
         announce: true,
         killFeed: { assign: true },
         sound: { assign: "recon_assigned_01" },
+        assignEffects: { health: 50 },
         perks: ["small_arms"],
         defaultItems: createDefaultItems({
             weapons: [
@@ -316,6 +340,7 @@ export const RoleDefs: Record<string, RoleDef> = {
         announce: true,
         killFeed: { assign: true },
         sound: { assign: "grenadier_assigned_01" },
+        assignEffects: { health: 50 },
         perks: ["flak_jacket"],
         defaultItems: createDefaultItems({
             weapons: [
@@ -340,6 +365,7 @@ export const RoleDefs: Record<string, RoleDef> = {
         announce: true,
         killFeed: { assign: true },
         sound: { assign: "bugler_assigned_01" },
+        assignEffects: { health: 50 },
         perks: ["inspiration", "final_bugle"],
         defaultItems: createDefaultItems({
             weapons: [
@@ -408,6 +434,15 @@ export const RoleDefs: Record<string, RoleDef> = {
         mapIcon: {
             alive: "player-last-man.img",
         },
+        assignEffects: {
+            health: 100,
+            adrenaline: 100,
+            haste: {
+                type: HasteType.Windwalk,
+                duration: 5,
+                speed: 4.8,
+            },
+        },
         perks: [
             "reinforced",
             () =>
@@ -471,6 +506,16 @@ export const RoleDefs: Record<string, RoleDef> = {
         },
         mapIcon: {
             alive: "player-renegade.img",
+        },
+        assignEffects: {
+            health: 100,
+            adrenaline: 100,
+            haste: {
+                type: HasteType.Takedown,
+                duration: 5,
+                speed: 4.8,
+            },
+            scale: 0.325,
         },
         perks: [ // TODO: perks
             "lifeline",
@@ -542,6 +587,7 @@ export const RoleDefs: Record<string, RoleDef> = {
             pulse: true,
             pulseTint: 0xff8400,
         },
+        assignEffects: { adrenaline: 33 },
         perks: ["hunted"],
     },
     healer: {
@@ -657,6 +703,7 @@ export const RoleDefs: Record<string, RoleDef> = {
         }),
         announce: false,
         sound: { assign: "spawn_01" },
+        assignEffects: { health: 33 },
         perks: [],
         visorImg: {
             baseSprite: "player-visor-classless.img",

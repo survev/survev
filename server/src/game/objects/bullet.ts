@@ -461,7 +461,11 @@ export class Bullet {
                     && v2.distance(this.pos, obj.pos) <= PerkProperties.windwalk.maxTriggerDistance
                     && this.player?.teamId !== obj.teamId // bullet shooter or its teammates cant give the shooter winwalk
                 ) {
-                    obj.giveHaste(GameConfig.HasteType.Windwalk, PerkProperties.windwalk.hasteDuration);
+                    obj.giveHaste(
+                        GameConfig.HasteType.Windwalk,
+                        PerkProperties.windwalk.hasteDuration,
+                        PerkProperties.windwalk.hasteSpeed,
+                    );
                 }
 
                 let panCollision = null;

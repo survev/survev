@@ -608,6 +608,7 @@ export class Player extends BaseGameObject {
     );
 
     scale = 1;
+    roleScale = 0;
 
     get rad(): number {
         return GameConfig.player.radius * this.scale;
@@ -970,6 +971,8 @@ export class Player extends BaseGameObject {
         }
 
         this.role = role;
+        this.roleScale = roleDef.assignEffects?.scale ?? 0;
+
         this.inventoryDirty = true;
         this.setDirty();
 
@@ -985,22 +988,23 @@ export class Player extends BaseGameObject {
         msg.playerId = this.__id;
         this.game.clientBarn.broadcastMsg(net.MsgType.RoleAnnouncement, msg);
 
-        switch (role) {
-            case "leader":
-                if (this.game.map.factionMode && !this.team!.leader) {
-                    this.team!.leader = this;
-                }
-                break;
-            case "last_man":
-                this.health = 100;
-                this.boost = 100;
-                this.giveHaste(GameConfig.HasteType.Windwalk, 5, PerkProperties.windwalk.hasteSpeed);
-                break;
-            case "renegade":
-                this.health = 100;
-                this.boost = 100;
-                this.giveHaste(GameConfig.HasteType.Takedown, 5, PerkProperties.takedown.hasteSpeed);
-                break;
+        const assignEffects = roleDef.assignEffects;
+
+        if (assignEffects?.health) {
+            this.health += assignEffects.health;
+        }
+
+        if (assignEffects?.adrenaline) {
+            this.boost += assignEffects.adrenaline;
+            this.boostDirty = true;
+        }
+
+        if (assignEffects?.haste) {
+            this.giveHaste(
+                assignEffects.haste.type,
+                assignEffects.haste.duration,
+                assignEffects.haste.speed,
+            );
         }
 
         // A list of the new perks to add must be built first
@@ -4831,10 +4835,7 @@ export class Player extends BaseGameObject {
             scale += PerkProperties.final_bugle.scaleOnDeath;
         }
 
-        if (this.role === "renegade") {
-            scale += 0.325;
-        }
-
+        scale += this.roleScale;
         scale += this.fatModifier;
 
         scale = math.clamp(
