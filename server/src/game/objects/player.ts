@@ -4781,7 +4781,7 @@ export class Player extends BaseGameObject {
 
     giveHaste(type: HasteType, duration: number, hasteSpeed: number): void {
         this.hasteType = type;
-        this.hasteSpeed += hasteSpeed;
+        this.hasteSpeed = hasteSpeed;
         this.hasteSeq++;
         this._hasteTicker = duration;
         this.setDirty();
