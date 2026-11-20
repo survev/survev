@@ -425,6 +425,7 @@ export function createBank(
                 pos: v2.create(-7.5, -7.25),
                 scale: 0.85,
                 ori: 0,
+                inheritOri: false,
             },
             {
                 type: "tree_01",
@@ -1460,6 +1461,7 @@ export function createBridgeLarge(overrides: DeepPartial<BuildingDef>): Building
                 pos: v2.create(-10, 5),
                 scale: 0.9,
                 ori: 0,
+                inheritOri: false,
             },
             {
                 type: "crate_01",
@@ -1480,6 +1482,7 @@ export function createBridgeLarge(overrides: DeepPartial<BuildingDef>): Building
                 pos: v2.create(10, -5),
                 scale: 0.9,
                 ori: 0,
+                inheritOri: false,
             },
             {
                 type: "sandbags_01",
@@ -1697,6 +1700,7 @@ function createBridgeXlarge(overrides: DeepPartial<BuildingDef>): BuildingDef {
                 pos: v2.create(-14, -8),
                 scale: 0.9,
                 ori: 0,
+                inheritOri: false,
             },
             {
                 type: "crate_01",
@@ -1739,12 +1743,14 @@ function createBridgeXlarge(overrides: DeepPartial<BuildingDef>): BuildingDef {
                 pos: v2.create(-27, -8),
                 scale: 1,
                 ori: 0,
+                inheritOri: false,
             },
             {
                 type: "crate_01",
                 pos: v2.create(27, -8),
                 scale: 1,
                 ori: 0,
+                inheritOri: false,
             },
             {
                 type: "sandbags_01",
@@ -1763,6 +1769,7 @@ function createBridgeXlarge(overrides: DeepPartial<BuildingDef>): BuildingDef {
                 pos: v2.create(14, -8),
                 scale: 0.9,
                 ori: 0,
+                inheritOri: false,
             },
         ],
     };
@@ -3250,12 +3257,14 @@ function createClub(overrides: DeepPartial<BuildingDef>): BuildingDef {
                 pos: v2.create(-13.75, 17),
                 scale: 1,
                 ori: 0,
+                inheritOri: false,
             },
             {
                 type: "barrel_01",
                 pos: v2.create(-10.25, 18.25),
                 scale: 1,
                 ori: 0,
+                inheritOri: false,
             },
             {
                 type: randomObstacleType({
@@ -4589,6 +4598,7 @@ export function createGreenhouse(
                 pos: v2.create(-15, 11),
                 scale: 0.9,
                 ori: 0,
+                inheritOri: false,
             },
             {
                 type: "sandbags_02",
@@ -4607,6 +4617,7 @@ export function createGreenhouse(
                 pos: v2.create(19.5, -7),
                 scale: 0.9,
                 ori: 0,
+                inheritOri: false,
             },
             {
                 type: "bunker_structure_08",
@@ -5394,6 +5405,7 @@ export function createMansion(
                 pos: v2.create(27, -4),
                 scale: 1,
                 ori: 0,
+                inheritOri: false,
             },
             {
                 type: params.tree || "tree_01",
@@ -5621,6 +5633,7 @@ export function createMansionCellar(
                 pos: v2.create(22.25, 14.25),
                 scale: 0.75,
                 ori: 0,
+                inheritOri: false,
                 ignoreMapSpawnReplacement: true,
             },
             {
@@ -5646,18 +5659,21 @@ export function createMansionCellar(
                 pos: v2.create(8.5, 1.5),
                 scale: 0.8,
                 ori: 0,
+                inheritOri: false,
             },
             {
                 type: "barrel_01",
                 pos: v2.create(11.5, 1.5),
                 scale: 0.8,
                 ori: 0,
+                inheritOri: false,
             },
             {
                 type: params.mid_obs_01 || "barrel_02",
                 pos: v2.create(14.5, 1.5),
                 scale: 0.8,
                 ori: 0,
+                inheritOri: false,
             },
             {
                 type: params.decoration_02 || "",
@@ -6032,12 +6048,14 @@ export function createTeaHouseComplex(
                 pos: v2.create(12, 11),
                 scale: 1,
                 ori: 0,
+                inheritOri: false,
             },
             {
                 type: "barrel_02",
                 pos: v2.create(-16, -6),
                 scale: 1,
                 ori: 0,
+                inheritOri: false,
             },
             {
                 type: params.tree_small || "tree_07sp",
@@ -6762,12 +6780,14 @@ export function createPoliceStation(overrides: DeepPartial<BuildingDef>): Buildi
                 pos: v2.create(-30.5, -18),
                 scale: 0.9,
                 ori: 0,
+                inheritOri: false,
             },
             {
                 type: "barrel_01",
                 pos: v2.create(-20.5, -10.5),
                 scale: 0.9,
                 ori: 0,
+                inheritOri: false,
             },
             {
                 type: "tree_01",
@@ -7726,6 +7746,7 @@ export function createShack3(overrides: DeepPartial<BuildingDef>): BuildingDef {
                 pos: v2.create(-4.75, -5.75),
                 scale: 0.9,
                 ori: 0,
+                inheritOri: false,
             },
             {
                 type: "crate_20",
@@ -7845,6 +7866,7 @@ export function createShack2(overrides: DeepPartial<BuildingDef>): BuildingDef {
                 pos: v2.create(7.45, -0.9),
                 scale: 0.85,
                 ori: 0,
+                inheritOri: false,
             },
             {
                 type: randomObstacleType({ loot_tier_2: 1 }),
@@ -7954,6 +7976,7 @@ export function createShack(overrides: DeepPartial<BuildingDef>): BuildingDef {
                 pos: v2.create(4, -4.5),
                 scale: 0.8,
                 ori: 0,
+                inheritOri: false,
             },
             {
                 type: randomObstacleType({ loot_tier_1: 1 }),
@@ -8123,6 +8146,7 @@ export function createWarehouse(
                 pos: v2.create(-16.5, -8.75),
                 scale: 0.9,
                 ori: 0,
+                inheritOri: false,
             },
             {
                 type: params.topRightObs,
@@ -8137,6 +8161,7 @@ export function createWarehouse(
                 pos: v2.create(16.5, 8.75),
                 scale: 0.9,
                 ori: 0,
+                inheritOri: false,
             },
             {
                 type: "crate_04",
@@ -8340,6 +8365,7 @@ export function createWarehouse2(overrides: DeepPartial<BuildingDef>): BuildingD
                 pos: v2.create(-14, 8.75),
                 scale: 0.9,
                 ori: 0,
+                inheritOri: false,
             },
             {
                 type: "crate_06",
@@ -8378,6 +8404,7 @@ export function createWarehouse2(overrides: DeepPartial<BuildingDef>): BuildingD
                 pos: v2.create(14, -8.75),
                 scale: 0.9,
                 ori: 0,
+                inheritOri: false,
             },
             {
                 type: randomObstacleType({ crate_08: 24, crate_09: 1 }),
@@ -8595,18 +8622,21 @@ export function createWarehouse3(
                 pos: v2.create(17, 9.25),
                 scale: 0.9,
                 ori: 0,
+                inheritOri: false,
             },
             {
                 type: "barrel_01",
                 pos: v2.create(4.5, 4),
                 scale: 0.9,
                 ori: 0,
+                inheritOri: false,
             },
             {
                 type: "barrel_01",
                 pos: v2.create(-27, 3),
                 scale: 0.9,
                 ori: 0,
+                inheritOri: false,
             },
             {
                 type: params.specialLoot || "case_08",
@@ -8619,6 +8649,7 @@ export function createWarehouse3(
                 pos: v2.create(21.25, 8.75),
                 scale: 1,
                 ori: 0,
+                inheritOri: false,
                 ignoreMapSpawnReplacement: true,
             },
             {
@@ -8634,6 +8665,7 @@ export function createWarehouse3(
                 pos: v2.create(-3, 8.75),
                 scale: 1,
                 ori: 0,
+                inheritOri: false,
                 ignoreMapSpawnReplacement: true,
             },
             {
@@ -8641,6 +8673,7 @@ export function createWarehouse3(
                 pos: v2.create(-8.25, -8.75),
                 scale: 1,
                 ori: 0,
+                inheritOri: false,
                 ignoreMapSpawnReplacement: true,
             },
             {
@@ -8648,6 +8681,7 @@ export function createWarehouse3(
                 pos: v2.create(-13, -8.75),
                 scale: 1,
                 ori: 0,
+                inheritOri: false,
                 ignoreMapSpawnReplacement: true,
             },
             {
@@ -9220,6 +9254,7 @@ export const BaseBuildingDefs: Record<string, BuildingDef> = {
                 pos: v2.create(3, 8.25),
                 scale: 0.75,
                 ori: 0,
+                inheritOri: false,
             },
         ],
     },
@@ -9363,6 +9398,7 @@ export const BaseBuildingDefs: Record<string, BuildingDef> = {
                 pos: v2.create(-15, 11),
                 scale: 0.9,
                 ori: 0,
+                inheritOri: false,
             },
             {
                 type: "sandbags_02",
@@ -9381,6 +9417,7 @@ export const BaseBuildingDefs: Record<string, BuildingDef> = {
                 pos: v2.create(19.5, -7),
                 scale: 0.9,
                 ori: 0,
+                inheritOri: false,
             },
             {
                 type: "bunker_structure_08b",
@@ -10137,6 +10174,7 @@ export const BaseBuildingDefs: Record<string, BuildingDef> = {
                 pos: v2.create(84, -15.5),
                 scale: 1,
                 ori: 0,
+                inheritOri: false,
             },
             {
                 type: randomObstacleType({
@@ -10244,12 +10282,14 @@ export const BaseBuildingDefs: Record<string, BuildingDef> = {
                 pos: v2.create(-26.5, 54.75),
                 scale: 1,
                 ori: 0,
+                inheritOri: false,
             },
             {
                 type: "barrel_01",
                 pos: v2.create(-23.5, 57),
                 scale: 1,
                 ori: 0,
+                inheritOri: false,
             },
             {
                 type: "crate_01",
