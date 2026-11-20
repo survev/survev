@@ -528,6 +528,7 @@ function createLoggingComplex(
                 pos: v2.create(-2, 14.5),
                 scale: 0.9,
                 ori: 0,
+                inheritOri: false,
             },
             {
                 type: "warehouse_02",
@@ -732,12 +733,14 @@ function createLoggingComplex(
                 pos: v2.create(-36.5, -9),
                 scale: 0.9,
                 ori: 0,
+                inheritOri: false,
             },
             {
                 type: "barrel_01",
                 pos: v2.create(-34, -11.5),
                 scale: 0.9,
                 ori: 0,
+                inheritOri: false,
             },
             {
                 type: "outhouse_01",
@@ -812,12 +815,14 @@ function createLoggingComplex(
                 pos: v2.create(-2.5, -35.75),
                 scale: 0.9,
                 ori: 0,
+                inheritOri: false,
             },
             {
                 type: "barrel_01",
                 pos: v2.create(0.75, -37.5),
                 scale: 0.9,
                 ori: 0,
+                inheritOri: false,
             },
             {
                 type: "tree_07",
@@ -919,12 +924,14 @@ function createLoggingComplex2(
                 pos: v2.create(23.5, -9.25),
                 scale: 1,
                 ori: 0,
+                inheritOri: false,
             },
             {
                 type: "barrel_01",
                 pos: v2.create(20, -11),
                 scale: 1,
                 ori: 0,
+                inheritOri: false,
             },
         ],
     };
@@ -986,6 +993,7 @@ function createLoggingComplex3(
                 pos: v2.create(-2.75, 2.25),
                 scale: 1,
                 ori: 0,
+                inheritOri: false,
             },
         ],
     };
@@ -1062,6 +1070,7 @@ function createOasis(
                 pos: v2.create(3, 5),
                 scale: 1,
                 ori: 0,
+                inheritOri: false,
             },
 
             //
@@ -1091,18 +1100,21 @@ function createOasis(
                 pos: v2.create(22, 21),
                 scale: 1,
                 ori: 0,
+                inheritOri: false,
             },
             {
                 type: "crate_01",
                 pos: v2.create(-17, 25),
                 scale: 1,
                 ori: 0,
+                inheritOri: false,
             },
             {
                 type: "crate_01",
                 pos: v2.create(-14, -20),
                 scale: 1,
                 ori: 0,
+                inheritOri: false,
             },
             {
                 type: randomObstacleType({ tree_13: 1, tree_14: 1 }),
@@ -1133,6 +1145,7 @@ function createOasis(
                 pos: v2.create(-28, 9),
                 scale: 1,
                 ori: 0,
+                inheritOri: false,
             },
             {
                 type: randomObstacleType({ tree_13: 1, tree_14: 1 }),
@@ -1163,12 +1176,14 @@ function createOasis(
                 pos: v2.create(32, 0),
                 scale: 1,
                 ori: 0,
+                inheritOri: false,
             },
             {
                 type: randomObstacleType({ barrel_02: 3, barrel_05: 1 }),
                 pos: v2.create(30, 3.5),
                 scale: 1,
                 ori: 0,
+                inheritOri: false,
             },
             {
                 type: randomObstacleType({ tree_13: 1, tree_14: 1 }),
@@ -1211,6 +1226,7 @@ function createOasis(
                 pos: v2.create(20, -23),
                 scale: 1,
                 ori: 0,
+                inheritOri: false,
             },
             {
                 type: randomObstacleType({ tree_13: 1, tree_14: 1 }),
@@ -1223,6 +1239,7 @@ function createOasis(
                 pos: v2.create(-20, -20),
                 scale: 1,
                 ori: 0,
+                inheritOri: false,
             },
             {
                 type: "bush_03",
@@ -2159,12 +2176,14 @@ function createReserve(overrides: DeepPartial<BuildingDef>): BuildingDef {
                 pos: v2.create(-22.75, 17.5),
                 scale: 1,
                 ori: 1,
+                inheritOri: false,
             },
             {
                 type: randomObstacleType({ barrel_02: 1, barrel_05: 1 }),
                 pos: v2.create(-32, -1.5),
                 scale: 1,
                 ori: 0,
+                inheritOri: false,
             },
             {
                 type: "crate_03",
@@ -2254,6 +2273,7 @@ function createReserve(overrides: DeepPartial<BuildingDef>): BuildingDef {
                 pos: v2.create(-27, -14),
                 scale: 1,
                 ori: 0,
+                inheritOri: false,
             },
 
             //
@@ -2414,12 +2434,14 @@ function createReserve(overrides: DeepPartial<BuildingDef>): BuildingDef {
                 pos: v2.create(-5, 17.5),
                 scale: 1,
                 ori: 0,
+                inheritOri: false,
             },
             {
                 type: "barrel_02",
                 pos: v2.create(-7, 20.5),
                 scale: 1,
                 ori: 0,
+                inheritOri: false,
             },
             {
                 type: "decal_web_01",
@@ -2474,12 +2496,14 @@ function createReserve(overrides: DeepPartial<BuildingDef>): BuildingDef {
                 pos: v2.create(-13, 3),
                 scale: 1,
                 ori: 0,
+                inheritOri: false,
             },
             {
                 type: "crate_01",
                 pos: v2.create(-12.5, -1.5),
                 scale: 1,
                 ori: 0,
+                inheritOri: false,
             },
             {
                 type: "couch_01",
@@ -2516,6 +2540,7 @@ function createReserve(overrides: DeepPartial<BuildingDef>): BuildingDef {
                 pos: v2.create(26.5, 20),
                 scale: 1,
                 ori: 0,
+                inheritOri: false,
             },
             {
                 type: "sandbags_02",
@@ -2622,6 +2647,7 @@ function createReserve(overrides: DeepPartial<BuildingDef>): BuildingDef {
                 pos: v2.create(41.5, 9),
                 scale: 1,
                 ori: 0,
+                inheritOri: false,
             },
             {
                 type: "table_03",
@@ -2646,6 +2672,7 @@ function createReserve(overrides: DeepPartial<BuildingDef>): BuildingDef {
                 pos: v2.create(39, -14.5),
                 scale: 1,
                 ori: 1,
+                inheritOri: false,
             },
             {
                 type: randomObstacleType({ locker_01: 9, locker_02: 1 }),
@@ -2730,6 +2757,7 @@ function createReserve(overrides: DeepPartial<BuildingDef>): BuildingDef {
                 pos: v2.create(33.75, 33.5),
                 scale: 1,
                 ori: 0,
+                inheritOri: false,
             },
             {
                 type: "sandbags_01",
@@ -2754,6 +2782,7 @@ function createReserve(overrides: DeepPartial<BuildingDef>): BuildingDef {
                 pos: v2.create(13, 25.75),
                 scale: 1,
                 ori: 0,
+                inheritOri: false,
             },
             {
                 type: "crate_06",
@@ -3131,6 +3160,7 @@ function createReserveBasement(overrides: DeepPartial<BuildingDef>): BuildingDef
                 pos: v2.create(-6.5, 28.75),
                 scale: 0.9,
                 ori: 1,
+                inheritOri: false,
             },
             {
                 type: randomObstacleType({ barrel_01: 1, barrel_02: 1 }),
@@ -3167,12 +3197,14 @@ function createReserveBasement(overrides: DeepPartial<BuildingDef>): BuildingDef
                 pos: v2.create(1.5, -14.5),
                 scale: 1,
                 ori: 0,
+                inheritOri: false,
             },
             {
                 type: "crate_01",
                 pos: v2.create(4, -9.5),
                 scale: 1,
                 ori: 0,
+                inheritOri: false,
             },
             {
                 type: "crate_05",
@@ -3204,6 +3236,7 @@ function createReserveBasement(overrides: DeepPartial<BuildingDef>): BuildingDef
                 pos: v2.create(-13.5, -18.5),
                 scale: 1,
                 ori: 0,
+                inheritOri: false,
             },
 
             //
@@ -3234,6 +3267,7 @@ function createReserveBasement(overrides: DeepPartial<BuildingDef>): BuildingDef
                 pos: v2.create(54, 2),
                 scale: 1,
                 ori: 0,
+                inheritOri: false,
             },
             {
                 type: "sandbags_02",
@@ -3252,12 +3286,14 @@ function createReserveBasement(overrides: DeepPartial<BuildingDef>): BuildingDef
                 pos: v2.create(31, -18),
                 scale: 1,
                 ori: 0,
+                inheritOri: false,
             },
             {
                 type: "barrel_01",
                 pos: v2.create(49.5, -18.5),
                 scale: 1,
                 ori: 0,
+                inheritOri: false,
             },
             {
                 type: "sandbags_02",
@@ -3627,6 +3663,7 @@ function createReserveSecurity(overrides: DeepPartial<BuildingDef>): BuildingDef
                 pos: v2.create(-11.5, -1.5),
                 scale: 1,
                 ori: 0,
+                inheritOri: false,
             },
             {
                 type: "refrigerator_01",
@@ -5010,6 +5047,7 @@ function createWorkshop(
                 pos: v2.create(-5.25, -11),
                 scale: 1,
                 ori: 0,
+                inheritOri: false,
             },
             {
                 type: "bed_sm_01",
@@ -5041,6 +5079,7 @@ function createWorkshop(
                 pos: v2.create(21, -11.5),
                 scale: 1,
                 ori: 0,
+                inheritOri: false,
                 ignoreMapSpawnReplacement: true,
             },
             {
@@ -5048,6 +5087,7 @@ function createWorkshop(
                 pos: v2.create(-4.75, -15.5),
                 scale: 1,
                 ori: 0,
+                inheritOri: false,
                 ignoreMapSpawnReplacement: true,
             },
             {
@@ -5215,6 +5255,7 @@ function createWorkshopComplex(overrides: DeepPartial<BuildingDef>): BuildingDef
                 pos: v2.create(22, -23),
                 scale: 1,
                 ori: 0,
+                inheritOri: false,
             },
             {
                 type: "tree_02",
@@ -5497,6 +5538,7 @@ export const ModeBuildingDefs: Record<string, BuildingDef> = {
                 pos: v2.create(-6.75, 71),
                 scale: 0.9,
                 ori: 0,
+                inheritOri: false,
             },
             {
                 type: "sandbags_02",
@@ -5515,12 +5557,14 @@ export const ModeBuildingDefs: Record<string, BuildingDef> = {
                 pos: v2.create(-4, 44),
                 scale: 0.9,
                 ori: 0,
+                inheritOri: false,
             },
             {
                 type: "barrel_01",
                 pos: v2.create(-1.5, 46.5),
                 scale: 0.9,
                 ori: 0,
+                inheritOri: false,
             },
             {
                 type: "crate_18",
@@ -5534,6 +5578,7 @@ export const ModeBuildingDefs: Record<string, BuildingDef> = {
                 pos: v2.create(-21, 31.5),
                 scale: 0.9,
                 ori: 0,
+                inheritOri: false,
             },
             {
                 type: "sandbags_01",
@@ -5558,6 +5603,7 @@ export const ModeBuildingDefs: Record<string, BuildingDef> = {
                 pos: v2.create(-7.25, -12.5),
                 scale: 0.9,
                 ori: 0,
+                inheritOri: false,
             },
             {
                 type: "sandbags_01",
@@ -5577,12 +5623,14 @@ export const ModeBuildingDefs: Record<string, BuildingDef> = {
                 pos: v2.create(-1.5, -59),
                 scale: 0.9,
                 ori: 0,
+                inheritOri: false,
             },
             {
                 type: "barrel_01",
                 pos: v2.create(1.5, -61),
                 scale: 0.9,
                 ori: 0,
+                inheritOri: false,
             },
             {
                 type: "sandbags_01",
@@ -5745,6 +5793,7 @@ export const ModeBuildingDefs: Record<string, BuildingDef> = {
                 pos: v2.create(-56, -21),
                 scale: 1,
                 ori: 0,
+                inheritOri: false,
             },
             {
                 type: "bush_03",
@@ -5759,6 +5808,7 @@ export const ModeBuildingDefs: Record<string, BuildingDef> = {
                 pos: v2.create(73, -26),
                 scale: 0.9,
                 ori: 0,
+                inheritOri: false,
             },
             {
                 type: "sandbags_02",
@@ -5777,6 +5827,7 @@ export const ModeBuildingDefs: Record<string, BuildingDef> = {
                 pos: v2.create(-25.5, 10),
                 scale: 1,
                 ori: 0,
+                inheritOri: false,
             },
             {
                 type: "sandbags_01",
@@ -5795,6 +5846,7 @@ export const ModeBuildingDefs: Record<string, BuildingDef> = {
                 pos: v2.create(67.5, 8),
                 scale: 0.9,
                 ori: 0,
+                inheritOri: false,
             },
             {
                 type: "sandbags_02",
@@ -5825,6 +5877,7 @@ export const ModeBuildingDefs: Record<string, BuildingDef> = {
                 pos: v2.create(-60, 3),
                 scale: 1,
                 ori: 0,
+                inheritOri: false,
             },
             {
                 type: "crate_18",
@@ -5838,12 +5891,14 @@ export const ModeBuildingDefs: Record<string, BuildingDef> = {
                 pos: v2.create(9, -1),
                 scale: 0.9,
                 ori: 0,
+                inheritOri: false,
             },
             {
                 type: "barrel_01",
                 pos: v2.create(12.5, -3),
                 scale: 0.9,
                 ori: 0,
+                inheritOri: false,
             },
         ],
     },
@@ -6484,6 +6539,7 @@ export const ModeBuildingDefs: Record<string, BuildingDef> = {
                 pos: v2.create(-17.5, 17.5),
                 scale: 1,
                 ori: 0,
+                inheritOri: false,
                 puzzlePiece: "barrel",
             },
             {
@@ -6513,12 +6569,14 @@ export const ModeBuildingDefs: Record<string, BuildingDef> = {
                 pos: v2.create(-3, -7),
                 scale: 0.9,
                 ori: 0,
+                inheritOri: false,
             },
             {
                 type: "barrel_02",
                 pos: v2.create(-0.5, -4.5),
                 scale: 0.9,
                 ori: 0,
+                inheritOri: false,
             },
             {
                 type: "stove_02",
@@ -6559,6 +6617,7 @@ export const ModeBuildingDefs: Record<string, BuildingDef> = {
                 pos: v2.create(11, 17),
                 scale: 0.9,
                 ori: 0,
+                inheritOri: false,
             },
             {
                 type: "bottle_02y",
@@ -6573,6 +6632,7 @@ export const ModeBuildingDefs: Record<string, BuildingDef> = {
                 pos: v2.create(-23, 11.5),
                 scale: 0.9,
                 ori: 0,
+                inheritOri: false,
             },
             {
                 type: "bush_01",
@@ -6585,6 +6645,7 @@ export const ModeBuildingDefs: Record<string, BuildingDef> = {
                 pos: v2.create(-23, -5),
                 scale: 0.9,
                 ori: 0,
+                inheritOri: false,
             },
             {
                 type: "saloon_column_1",
@@ -6597,6 +6658,7 @@ export const ModeBuildingDefs: Record<string, BuildingDef> = {
                 pos: v2.create(-10, -16.5),
                 scale: 0.9,
                 ori: 0,
+                inheritOri: false,
             },
             {
                 type: "bottle_02o",
@@ -6624,6 +6686,7 @@ export const ModeBuildingDefs: Record<string, BuildingDef> = {
                 pos: v2.create(16.5, 9),
                 scale: 0.9,
                 ori: 0,
+                inheritOri: false,
             },
             {
                 type: "saloon_column_1",
@@ -6997,12 +7060,14 @@ export const ModeBuildingDefs: Record<string, BuildingDef> = {
                 pos: v2.create(-111.25, 32.25),
                 scale: 1,
                 ori: 0,
+                inheritOri: false,
             },
             {
                 type: "crate_01",
                 pos: v2.create(-108, 27.25),
                 scale: 1,
                 ori: 0,
+                inheritOri: false,
             },
             {
                 type: "statue_structure_01",
@@ -7702,6 +7767,7 @@ export const ModeBuildingDefs: Record<string, BuildingDef> = {
                 pos: v2.create(-15, 11),
                 scale: 0.9,
                 ori: 0,
+                inheritOri: false,
             },
             {
                 type: "sandbags_02",
@@ -7720,6 +7786,7 @@ export const ModeBuildingDefs: Record<string, BuildingDef> = {
                 pos: v2.create(19.5, -7),
                 scale: 0.9,
                 ori: 0,
+                inheritOri: false,
             },
             {
                 type: "bunker_structure_08b",
@@ -8047,6 +8114,7 @@ export const ModeBuildingDefs: Record<string, BuildingDef> = {
                 pos: v2.create(2, 2),
                 scale: 1,
                 ori: 0,
+                inheritOri: false,
             },
             {
                 type: randomObstacleType({
@@ -8243,6 +8311,7 @@ export const ModeBuildingDefs: Record<string, BuildingDef> = {
                 pos: v2.create(-2, -2),
                 scale: 1,
                 ori: 0,
+                inheritOri: false,
             },
             {
                 type: randomObstacleType({
@@ -8429,6 +8498,7 @@ export const ModeBuildingDefs: Record<string, BuildingDef> = {
                 pos: v2.create(-2, -2),
                 scale: 1,
                 ori: 0,
+                inheritOri: false,
             },
             {
                 type: randomObstacleType({
@@ -9437,6 +9507,7 @@ export const ModeBuildingDefs: Record<string, BuildingDef> = {
                 pos: v2.create(11, -4),
                 scale: 1,
                 ori: 0,
+                inheritOri: false,
             },
             {
                 type: randomObstacleType({ tree_07sp: 2, "": 1 }),
@@ -9585,6 +9656,7 @@ export const ModeBuildingDefs: Record<string, BuildingDef> = {
                 pos: v2.create(22, -23),
                 scale: 1,
                 ori: 0,
+                inheritOri: false,
             },
             {
                 type: "tree_02",

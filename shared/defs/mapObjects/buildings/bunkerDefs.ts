@@ -286,18 +286,21 @@ export const BunkerDefs: Record<string, BuildingDef> = {
                 pos: v2.create(0.5, -16.5),
                 scale: 0.9,
                 ori: 0,
+                inheritOri: false,
             },
             {
                 type: "crate_01",
                 pos: v2.create(12, -9.5),
                 scale: 0.8,
                 ori: 0,
+                inheritOri: false,
             },
             {
                 type: "crate_01",
                 pos: v2.create(12, -13.5),
                 scale: 0.8,
                 ori: 0,
+                inheritOri: false,
             },
             {
                 type: "couch_01",
@@ -472,12 +475,14 @@ export const BunkerDefs: Record<string, BuildingDef> = {
                 pos: v2.create(0.5, -16.5),
                 scale: 0.9,
                 ori: 0,
+                inheritOri: false,
             },
             {
                 type: "crate_01",
                 pos: v2.create(12, -9.5),
                 scale: 0.8,
                 ori: 0,
+                inheritOri: false,
                 ignoreMapSpawnReplacement: true,
             },
             {
@@ -485,6 +490,7 @@ export const BunkerDefs: Record<string, BuildingDef> = {
                 pos: v2.create(12, -13.5),
                 scale: 0.8,
                 ori: 0,
+                inheritOri: false,
                 ignoreMapSpawnReplacement: true,
             },
             {
@@ -1299,12 +1305,14 @@ export const BunkerDefs: Record<string, BuildingDef> = {
                 pos: v2.create(3, 0.5),
                 scale: 0.9,
                 ori: 0,
+                inheritOri: false,
             },
             {
                 type: "crate_01",
                 pos: v2.create(-3, 0.5),
                 scale: 0.9,
                 ori: 0,
+                inheritOri: false,
             },
             {
                 type: "wheel_03",
@@ -1440,18 +1448,21 @@ export const BunkerDefs: Record<string, BuildingDef> = {
                 pos: v2.create(0, 4.75),
                 scale: 0.9,
                 ori: 0,
+                inheritOri: false,
             },
             {
                 type: "crate_01",
                 pos: v2.create(3, 0.5),
                 scale: 0.9,
                 ori: 0,
+                inheritOri: false,
             },
             {
                 type: "crate_01",
                 pos: v2.create(-3, 0.5),
                 scale: 0.9,
                 ori: 0,
+                inheritOri: false,
             },
             {
                 type: "wheel_03",
@@ -2040,6 +2051,7 @@ export const BunkerDefs: Record<string, BuildingDef> = {
                 pos: v2.create(4.5, 33),
                 scale: 1,
                 ori: 0,
+                inheritOri: false,
             },
             {
                 type: "sandbags_02",
@@ -2052,6 +2064,7 @@ export const BunkerDefs: Record<string, BuildingDef> = {
                 pos: v2.create(-8, 33.5),
                 scale: 1,
                 ori: 0,
+                inheritOri: false,
             },
             {
                 type: "crate_06",
@@ -2111,12 +2124,14 @@ export const BunkerDefs: Record<string, BuildingDef> = {
                 pos: v2.create(-34.5, -8),
                 scale: 1,
                 ori: 0,
+                inheritOri: false,
             },
             {
                 type: "barrel_01",
                 pos: v2.create(-35, -12.25),
                 scale: 1,
                 ori: 0,
+                inheritOri: false,
             },
             {
                 type: "crate_03",
@@ -2181,7 +2196,6 @@ export const BunkerDefs: Record<string, BuildingDef> = {
                 pos: v2.create(1.25, -39.75),
                 scale: 1,
                 ori: 0,
-                inheritOri: false,
             },
             {
                 type: "crate_01",
@@ -2227,6 +2241,7 @@ export const BunkerDefs: Record<string, BuildingDef> = {
                 pos: v2.create(-30, 9),
                 scale: 0.8,
                 ori: 1,
+                inheritOri: false,
             },
 
             //
@@ -2299,6 +2314,7 @@ export const BunkerDefs: Record<string, BuildingDef> = {
                 pos: v2.create(-20.5, -22),
                 scale: 1,
                 ori: 0,
+                inheritOri: false,
             },
 
             //
@@ -2369,12 +2385,14 @@ export const BunkerDefs: Record<string, BuildingDef> = {
                 pos: v2.create(-5, -11),
                 scale: 1,
                 ori: 0,
+                inheritOri: false,
             },
             {
                 type: "crate_01",
                 pos: v2.create(7.5, 1),
                 scale: 1,
                 ori: 0,
+                inheritOri: false,
             },
             {
                 type: "loot_tier_1",
@@ -2710,6 +2728,7 @@ export const BunkerDefs: Record<string, BuildingDef> = {
                 pos: v2.create(-7, -11),
                 scale: 0.9,
                 ori: 0,
+                inheritOri: false,
             },
         ],
     },
@@ -2830,6 +2849,7 @@ export const BunkerDefs: Record<string, BuildingDef> = {
                 pos: v2.create(-7, -11),
                 scale: 0.9,
                 ori: 0,
+                inheritOri: false,
             },
         ],
     },
@@ -2950,6 +2970,7 @@ export const BunkerDefs: Record<string, BuildingDef> = {
                 pos: v2.create(-7, -11),
                 scale: 0.9,
                 ori: 0,
+                inheritOri: false,
             },
         ],
     },
@@ -3467,6 +3488,7 @@ export const BunkerDefs: Record<string, BuildingDef> = {
                 pos: v2.create(10.25, -2.75),
                 scale: 0.9,
                 ori: 0,
+                inheritOri: false,
                 ignoreMapSpawnReplacement: true,
             },
             {
@@ -3474,6 +3496,7 @@ export const BunkerDefs: Record<string, BuildingDef> = {
                 pos: v2.create(10.25, 9.75),
                 scale: 0.9,
                 ori: 0,
+                inheritOri: false,
                 ignoreMapSpawnReplacement: true,
             },
             {
@@ -3481,6 +3504,7 @@ export const BunkerDefs: Record<string, BuildingDef> = {
                 pos: v2.create(-3.5, -3),
                 scale: 0.9,
                 ori: 0,
+                inheritOri: false,
             },
             {
                 type: "metal_wall_ext_thicker_23",
@@ -3983,6 +4007,7 @@ export const BunkerDefs: Record<string, BuildingDef> = {
                 pos: v2.create(-17.5, 7.75),
                 scale: 1,
                 ori: 0,
+                inheritOri: false,
                 ignoreMapSpawnReplacement: true,
             },
             {
@@ -4020,6 +4045,7 @@ export const BunkerDefs: Record<string, BuildingDef> = {
                 pos: v2.create(12.5, 7.75),
                 scale: 1,
                 ori: 0,
+                inheritOri: false,
                 ignoreMapSpawnReplacement: true,
             },
             {
@@ -4151,6 +4177,7 @@ export const BunkerDefs: Record<string, BuildingDef> = {
                 pos: v2.create(-6.5, -1.5),
                 scale: 1,
                 ori: 0,
+                inheritOri: false,
                 ignoreMapSpawnReplacement: true,
             },
             {
@@ -4158,6 +4185,7 @@ export const BunkerDefs: Record<string, BuildingDef> = {
                 pos: v2.create(-1.75, 2),
                 scale: 1,
                 ori: 0,
+                inheritOri: false,
                 ignoreMapSpawnReplacement: true,
             },
             {
@@ -4165,6 +4193,7 @@ export const BunkerDefs: Record<string, BuildingDef> = {
                 pos: v2.create(-2, -2),
                 scale: 0.9,
                 ori: 0,
+                inheritOri: false,
             },
             {
                 type: "case_03",
@@ -4321,6 +4350,7 @@ export const BunkerDefs: Record<string, BuildingDef> = {
                 pos: v2.create(1.45, 17.7),
                 scale: 0.85,
                 ori: 0,
+                inheritOri: false,
             },
             {
                 type: "decal_vent_01",
@@ -4508,6 +4538,7 @@ export const BunkerDefs: Record<string, BuildingDef> = {
                 pos: v2.create(-6.5, 1.5),
                 scale: 1,
                 ori: 0,
+                inheritOri: false,
                 ignoreMapSpawnReplacement: true,
             },
             {
@@ -4563,6 +4594,7 @@ export const BunkerDefs: Record<string, BuildingDef> = {
                 pos: v2.create(-7, -11),
                 scale: 0.9,
                 ori: 0,
+                inheritOri: false,
             },
         ],
     },
@@ -4695,12 +4727,14 @@ export const BunkerDefs: Record<string, BuildingDef> = {
                 pos: v2.create(24, 9),
                 scale: 1,
                 ori: 0,
+                inheritOri: false,
             },
             {
                 type: "crate_01",
                 pos: v2.create(18, -2),
                 scale: 1,
                 ori: 0,
+                inheritOri: false,
                 ignoreMapSpawnReplacement: true,
             },
             {
@@ -4726,6 +4760,7 @@ export const BunkerDefs: Record<string, BuildingDef> = {
                 pos: v2.create(47, -27),
                 scale: 1,
                 ori: 0,
+                inheritOri: false,
                 ignoreMapSpawnReplacement: true,
             },
             {
@@ -4733,6 +4768,7 @@ export const BunkerDefs: Record<string, BuildingDef> = {
                 pos: v2.create(40, -37),
                 scale: 1,
                 ori: 0,
+                inheritOri: false,
             },
             {
                 type: "decal_vent_03",
@@ -5126,6 +5162,7 @@ export const BunkerDefs: Record<string, BuildingDef> = {
                 pos: v2.create(7.5, 6.25),
                 scale: 1,
                 ori: 0,
+                inheritOri: false,
                 ignoreMapSpawnReplacement: true,
             },
             {
@@ -5153,6 +5190,7 @@ export const BunkerDefs: Record<string, BuildingDef> = {
                 pos: v2.create(-7.5, -9.5),
                 scale: 1,
                 ori: 0,
+                inheritOri: false,
                 ignoreMapSpawnReplacement: true,
             },
             {
@@ -5160,6 +5198,7 @@ export const BunkerDefs: Record<string, BuildingDef> = {
                 pos: v2.create(3.5, -9.5),
                 scale: 1,
                 ori: 0,
+                inheritOri: false,
                 ignoreMapSpawnReplacement: true,
             },
             {
@@ -5472,6 +5511,7 @@ export const BunkerDefs: Record<string, BuildingDef> = {
                 pos: v2.create(-4.5, 29),
                 scale: 0.8,
                 ori: 0,
+                inheritOri: false,
             },
             {
                 type: "concrete_wall_ext_6",
@@ -5568,6 +5608,7 @@ export const BunkerDefs: Record<string, BuildingDef> = {
                 pos: v2.create(4.5, -23),
                 scale: 0.8,
                 ori: 0,
+                inheritOri: false,
             },
             {
                 type: "crate_06",
@@ -5844,12 +5885,14 @@ export const BunkerDefs: Record<string, BuildingDef> = {
                 pos: v2.create(-5, 10.25),
                 scale: 0.8,
                 ori: 0,
+                inheritOri: false,
             },
             {
                 type: "barrel_01",
                 pos: v2.create(-3.25, 12.5),
                 scale: 0.8,
                 ori: 0,
+                inheritOri: false,
             },
             {
                 type: "locker_01",
@@ -5880,6 +5923,7 @@ export const BunkerDefs: Record<string, BuildingDef> = {
                 pos: v2.create(-5, -6.25),
                 scale: 0.8,
                 ori: 0,
+                inheritOri: false,
                 ignoreMapSpawnReplacement: true,
             },
             {
@@ -5887,6 +5931,7 @@ export const BunkerDefs: Record<string, BuildingDef> = {
                 pos: v2.create(-3, -2.5),
                 scale: 0.9,
                 ori: 0,
+                inheritOri: false,
             },
             {
                 type: "vending_01",
@@ -5935,6 +5980,7 @@ export const BunkerDefs: Record<string, BuildingDef> = {
                 pos: v2.create(-23.5, -4.5),
                 scale: 0.8,
                 ori: 0,
+                inheritOri: false,
                 ignoreMapSpawnReplacement: true,
             },
             {
@@ -5948,6 +5994,7 @@ export const BunkerDefs: Record<string, BuildingDef> = {
                 pos: v2.create(-23.5, -14),
                 scale: 0.8,
                 ori: 0,
+                inheritOri: false,
                 ignoreMapSpawnReplacement: true,
             },
             {
@@ -6100,6 +6147,7 @@ export const BunkerDefs: Record<string, BuildingDef> = {
                 pos: v2.create(1.45, 17.7),
                 scale: 0.85,
                 ori: 0,
+                inheritOri: false,
             },
             {
                 type: "decal_vent_01",
@@ -6245,12 +6293,14 @@ export const BunkerDefs: Record<string, BuildingDef> = {
                 pos: v2.create(-5, 0.5),
                 scale: 0.9,
                 ori: 0,
+                inheritOri: false,
             },
             {
                 type: "crate_01",
                 pos: v2.create(6.75, -10.75),
                 scale: 0.85,
                 ori: 0,
+                inheritOri: false,
                 ignoreMapSpawnReplacement: true,
             },
             {
@@ -6424,6 +6474,7 @@ export const BunkerDefs: Record<string, BuildingDef> = {
                 pos: v2.create(1.5, -0.5),
                 scale: 0.9,
                 ori: 0,
+                inheritOri: false,
             },
             {
                 type: "fire_ext_01",
@@ -6442,6 +6493,7 @@ export const BunkerDefs: Record<string, BuildingDef> = {
                 pos: v2.create(-7, 8.5),
                 scale: 0.85,
                 ori: 0,
+                inheritOri: false,
                 ignoreMapSpawnReplacement: true,
             },
         ],
@@ -6588,6 +6640,7 @@ export const BunkerDefs: Record<string, BuildingDef> = {
                 pos: v2.create(-1.25, 0.5),
                 scale: 0.85,
                 ori: 0,
+                inheritOri: false,
                 ignoreMapSpawnReplacement: true,
             },
             {
@@ -6595,6 +6648,7 @@ export const BunkerDefs: Record<string, BuildingDef> = {
                 pos: v2.create(2.75, -1.75),
                 scale: 0.85,
                 ori: 0,
+                inheritOri: false,
                 ignoreMapSpawnReplacement: true,
             },
             {
@@ -6608,6 +6662,7 @@ export const BunkerDefs: Record<string, BuildingDef> = {
                 pos: v2.create(-7.5, 11),
                 scale: 0.85,
                 ori: 0,
+                inheritOri: false,
                 ignoreMapSpawnReplacement: true,
             },
             {
@@ -6772,6 +6827,7 @@ export const BunkerDefs: Record<string, BuildingDef> = {
                 pos: v2.create(-16, -5),
                 scale: 0.85,
                 ori: 0,
+                inheritOri: false,
                 ignoreMapSpawnReplacement: true,
             },
             {
@@ -6779,6 +6835,7 @@ export const BunkerDefs: Record<string, BuildingDef> = {
                 pos: v2.create(3, -0.5),
                 scale: 0.85,
                 ori: 0,
+                inheritOri: false,
                 ignoreMapSpawnReplacement: true,
             },
             {
@@ -6804,12 +6861,14 @@ export const BunkerDefs: Record<string, BuildingDef> = {
                 pos: v2.create(-7, 6.75),
                 scale: 0.9,
                 ori: 0,
+                inheritOri: false,
             },
             {
                 type: "barrel_01",
                 pos: v2.create(-11, 5.5),
                 scale: 0.9,
                 ori: 0,
+                inheritOri: false,
             },
         ],
     },
@@ -7586,12 +7645,14 @@ export const BunkerDefs: Record<string, BuildingDef> = {
                 pos: v2.create(-10, -8),
                 scale: 0.9,
                 ori: 0,
+                inheritOri: false,
             },
             {
                 type: "barrel_01",
                 pos: v2.create(-13, -6),
                 scale: 0.9,
                 ori: 0,
+                inheritOri: false,
             },
             {
                 type: "recorder_14",
@@ -7616,12 +7677,14 @@ export const BunkerDefs: Record<string, BuildingDef> = {
                 pos: v2.create(10, 8),
                 scale: 0.9,
                 ori: 0,
+                inheritOri: false,
             },
             {
                 type: "barrel_01",
                 pos: v2.create(13, 6),
                 scale: 0.9,
                 ori: 0,
+                inheritOri: false,
             },
             {
                 type: "bunker_twins_compartment_01",
