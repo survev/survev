@@ -182,10 +182,10 @@ export const Animations: Record<
             frame(0, { [Bones.HandR]: new Pose(v2.create(14, 12.25)) }),
             frame(def("fists").attack.damageTimes[0], {
                 [Bones.HandR]: new Pose(v2.create(29.75, 1.75)),
-            }),
+            }, math.easeInOutSine),
             frame(def("fists").attack.cooldownTime, {
                 [Bones.HandR]: new Pose(v2.create(14, 12.25)),
-            }),
+            }, math.easeInSine),
         ],
         effects: [
             effect(0, "animPlaySound", { sound: "swing" }),
@@ -226,6 +226,24 @@ export const Animations: Record<
             effect(def("fists").attack.damageTimes[0], "animMeleeCollision", {}),
         ],
     },
+    cutlassCut: {
+        keyframes: [
+            frame(0, { [Bones.HandR]: new Pose(v2.create(6, 16)) }),
+            frame(def("cutlass").attack.damageTimes[0] * 0.25, {
+                [Bones.HandR]: new Pose(v2.create(18, 12.25)).rotate(-Math.PI * 0.35),
+            }, math.easeOutSine),
+            frame(def("cutlass").attack.damageTimes[0] * 1.25, {
+                [Bones.HandR]: new Pose(v2.create(18, 12.25)).rotate(Math.PI * 0.35),
+            }, math.easeInOutSine),
+            frame(def("cutlass").attack.cooldownTime, {
+                [Bones.HandR]: new Pose(v2.create(6, 16)),
+            }, math.easeInSine),
+        ],
+        effects: [
+            effect(0, "animPlaySound", { sound: "swing" }),
+            effect(def("cutlass").attack.damageTimes[0], "animMeleeCollision", {}),
+        ],
+    },
     cutReverse: {
         keyframes: [
             frame(0, { [Bones.HandR]: new Pose(v2.create(1, 17.75)) }),
@@ -242,6 +260,24 @@ export const Animations: Record<
         effects: [
             effect(0, "animPlaySound", { sound: "swing" }),
             effect(def("fists").attack.damageTimes[0], "animMeleeCollision", {}),
+        ],
+    },
+    cutlassCutReverse: {
+        keyframes: [
+            frame(0, { [Bones.HandR]: new Pose(v2.create(6, 16)) }),
+            frame(def("cutlass").attack.damageTimes[0] * 0.4, {
+                [Bones.HandR]: new Pose(v2.create(25, 6.25)).rotate(Math.PI * 0.3),
+            }, math.easeOutSine),
+            frame(def("cutlass").attack.damageTimes[0] * 1.4, {
+                [Bones.HandR]: new Pose(v2.create(25, 6.25)).rotate(-Math.PI * 0.5),
+            }, math.easeInOutSine),
+            frame(def("cutlass").attack.cooldownTime, {
+                [Bones.HandR]: new Pose(v2.create(6, 16)),
+            }, math.easeInSine),
+        ],
+        effects: [
+            effect(0, "animPlaySound", { sound: "swing" }),
+            effect(def("cutlass").attack.damageTimes[0], "animMeleeCollision", {}),
         ],
     },
     thrust: {
@@ -271,11 +307,11 @@ export const Animations: Record<
             frame(def("fists").attack.damageTimes[0], {
                 [Bones.HandL]: new Pose(v2.create(6, -22.25)),
                 [Bones.HandR]: new Pose(v2.create(6, 20.25)).rotate(-Math.PI * 0.6),
-            }),
+            }, math.easeInOutSine),
             frame(def("fists").attack.cooldownTime, {
                 [Bones.HandL]: new Pose(v2.create(18, -8.25)),
                 [Bones.HandR]: new Pose(v2.create(6, 20.25)).rotate(0),
-            }),
+            }, math.easeInSine),
         ],
         effects: [
             effect(0, "animPlaySound", { sound: "swing" }),
@@ -306,13 +342,15 @@ export const Animations: Record<
     pan: {
         keyframes: [
             frame(0, { [Bones.HandR]: new Pose(v2.create(14, 12.25)) }),
-            frame(0.15, {
+            frame(def("pan").attack.cooldownTime * 0.3, {
                 [Bones.HandR]: new Pose(v2.create(22, -8.25)).rotate(-Math.PI * 0.2),
             }),
-            frame(0.25, {
+            frame(def("pan").attack.cooldownTime * 0.5, {
                 [Bones.HandR]: new Pose(v2.create(28, -8.25)).rotate(Math.PI * 0.5),
-            }),
-            frame(0.55, { [Bones.HandR]: new Pose(v2.create(14, 12.25)) }),
+            }, math.easeInOutSine),
+            frame(def("pan").attack.cooldownTime, {
+                [Bones.HandR]: new Pose(v2.create(14, 12.25)),
+            }, math.easeInSine),
         ],
         effects: [
             effect(0, "animPlaySound", { sound: "swing" }),
@@ -328,11 +366,11 @@ export const Animations: Record<
             frame(def("woodaxe").attack.damageTimes[0] * 0.4, {
                 [Bones.HandL]: new Pose(v2.create(9, -14.25)).rotate(Math.PI * 0.4),
                 [Bones.HandR]: new Pose(v2.create(18, 6.25)).rotate(Math.PI * 0.4),
-            }),
+            }, math.easeOutSine),
             frame(def("woodaxe").attack.damageTimes[0], {
                 [Bones.HandL]: new Pose(v2.create(9, -14.25)).rotate(-Math.PI * 0.4),
                 [Bones.HandR]: new Pose(v2.create(18, 6.25)).rotate(-Math.PI * 0.4),
-            }),
+            }, math.easeInOutSine),
             frame(def("woodaxe").attack.cooldownTime, {
                 [Bones.HandL]: new Pose(v2.create(10.5, -14.25)),
                 [Bones.HandR]: new Pose(v2.create(18, 6.25)),
@@ -380,15 +418,15 @@ export const Animations: Record<
             frame(def("katana").attack.damageTimes[0] * 0.3, {
                 [Bones.HandL]: new Pose(v2.create(8.5, 13.25)).rotate(Math.PI * 0.2),
                 [Bones.HandR]: new Pose(v2.create(-3, 17.75)).rotate(Math.PI * 0.2),
-            }),
+            }, math.easeOutSine),
             frame(def("katana").attack.damageTimes[0] * 0.9, {
                 [Bones.HandL]: new Pose(v2.create(8.5, 13.25)).rotate(-Math.PI * 1.2),
                 [Bones.HandR]: new Pose(v2.create(-3, 17.75)).rotate(-Math.PI * 1.2),
-            }),
+            }, math.easeInOutSine),
             frame(def("katana").attack.cooldownTime, {
                 [Bones.HandL]: new Pose(v2.create(8.5, 13.25)),
                 [Bones.HandR]: new Pose(v2.create(-3, 17.75)),
-            }),
+            }, math.easeInSine),
         ],
         effects: [
             effect(def("katana").attack.damageTimes[0], "animPlaySound", {
@@ -406,11 +444,11 @@ export const Animations: Record<
             frame(def("naginata").attack.damageTimes[0] * 0.3, {
                 [Bones.HandL]: new Pose(v2.create(19, -7.25)).rotate(Math.PI * 0.3),
                 [Bones.HandR]: new Pose(v2.create(8.5, 24.25)).rotate(Math.PI * 0.3),
-            }),
+            }, math.easeOutSine),
             frame(def("naginata").attack.damageTimes[0] * 0.9, {
                 [Bones.HandL]: new Pose(v2.create(19, -7.25)).rotate(-Math.PI * 0.85),
                 [Bones.HandR]: new Pose(v2.create(8.5, 24.25)).rotate(-Math.PI * 0.85),
-            }),
+            }, math.easeInOutSine),
             frame(def("naginata").attack.cooldownTime, {
                 [Bones.HandL]: new Pose(v2.create(19, -7.25)),
                 [Bones.HandR]: new Pose(v2.create(8.5, 24.25)),
@@ -431,7 +469,7 @@ export const Animations: Record<
             }),
             frame(def("saw").attack.damageTimes[0], {
                 [Bones.HandR]: new Pose(v2.create(25, 6.25)).rotate(-Math.PI * 0.3),
-            }),
+            }, math.easeOutSine),
             frame(def("saw").attack.damageTimes[1] - 0.1, {
                 [Bones.HandR]: new Pose(v2.create(25, 17.75)).rotate(-Math.PI * 0.25),
             }),
@@ -874,5 +912,123 @@ export const Animations: Record<
         effects: [
             effect(0.25, "animPlaySound", { sound: "idle" }),
         ],
+    },
+
+    // Non-Cosmetic Deploy Animations
+    // Most of these are simpler, to avoid visual clarity issues.
+
+    machete_deploy: {
+        keyframes: [
+            frame(0, {
+                [Bones.HandR]: new Pose(v2.create(1, 17.75)).rotate(Math.PI * 0.35),
+                [Bones.MeleeR]: new Pose(v2.create(0, 0)).rotate(Math.PI * 0.85).offset(v2.create(0, 0)),
+            }),
+            frame(0.35, {
+                [Bones.HandR]: new Pose(v2.create(1, 17.75)).rotate(Math.PI * -0.15),
+                [Bones.MeleeR]: new Pose(v2.create(0, 0)).rotate(Math.PI * -0.1).offset(v2.create(0, 0)),
+            }, math.easeOutSine),
+            frame(0.45, {
+                [Bones.HandR]: new Pose(v2.create(1, 17.75)),
+                [Bones.MeleeR]: new Pose(v2.create(0, 0)).rotate(0).offset(v2.create(0, 0)),
+            }, math.easeInOutSine),
+        ],
+        effects: [
+            effect(0, "animPlaySound", { sound: "deploy" }),
+        ],
+    },
+    meleeTwoHanded_deploy: {
+        keyframes: [
+            frame(0, {
+                [Bones.HandL]: new Pose(v2.create(10.5, -14.25)).rotate(Math.PI * -0.15),
+                [Bones.HandR]: new Pose(v2.create(18, 6.25)),
+                [Bones.MeleeR]: new Pose(v2.create(12, 24.25)).rotate(Math.PI * -1.4).offset(v2.create(55, 0)),
+            }),
+            frame(0.35, {
+                [Bones.HandL]: new Pose(v2.create(10.5, -14.25)),
+                [Bones.HandR]: new Pose(v2.create(18, 6.25)),
+                [Bones.MeleeR]: new Pose(v2.create(8, 20.25)).rotate(0).offset(v2.create(55, 0)),
+            }, math.easeInSine),
+            frame(0.425, {
+                [Bones.HandR]: new Pose(v2.create(13, 7.25)),
+                [Bones.MeleeR]: new Pose(v2.create(3, 21.25)).rotate(Math.PI * 0.1).offset(v2.create(62, 0)),
+            }, math.easeOutSine),
+            frame(0.5, {
+                [Bones.HandR]: new Pose(v2.create(18, 6.25)),
+                [Bones.MeleeR]: new Pose(v2.create(8, 20.25)).rotate(0).offset(v2.create(62, 0)),
+            }, math.easeInOutSine),
+        ],
+        effects: [
+            effect(0, "animPlaySound", { sound: "deploy" }),
+        ],
+    },
+    cutlass_unsheathe: {
+        keyframes: [
+            frame(0, {
+                [Bones.HandL]: new Pose(v2.create(14, -12.25)).rotate(Math.PI * -0.2),
+                [Bones.HandR]: new Pose(v2.create(18, -6)),
+                [Bones.MeleeR]: new Pose(v2.create(0, 0)).rotate(Math.PI * 1.1),
+            }),
+            frame(0.35, {
+                [Bones.HandL]: new Pose(v2.create(14, -12.25)).rotate(Math.PI * -0.25),
+                [Bones.HandR]: new Pose(v2.create(35, 20)),
+                [Bones.MeleeR]: new Pose(v2.create(0, 0)).rotate(Math.PI * 1.25),
+            }, math.easeInExpo),
+            frame(0.55, {
+                [Bones.HandL]: new Pose(v2.create(14, -12.25)),
+                [Bones.HandR]: new Pose(v2.create(6, 16)),
+                [Bones.MeleeR]: new Pose(v2.create(0, 0)).rotate(Math.PI * 2),
+            }, math.easeOutSine),
+        ],
+        effects: [effect(0, "animPlaySound", { sound: "deploy" })],
+    },
+    katana_unsheathe_01: {
+        keyframes: [
+            frame(0, {
+                [Bones.HandL]: new Pose(v2.create(8.5, 13.25)).rotate(Math.PI * -0.75),
+                [Bones.HandR]: new Pose(v2.create(18, -6)),
+                [Bones.MeleeR]: new Pose(v2.create(0, 0)).rotate(Math.PI * 0.31),
+            }),
+            frame(0.3, {
+                [Bones.HandL]: new Pose(v2.create(8.5, 13.25)).rotate(Math.PI * -0.8),
+                [Bones.HandR]: new Pose(v2.create(45, 28)),
+                [Bones.MeleeR]: new Pose(v2.create(0, 0)).rotate(Math.PI * 0.29),
+            }, math.easeInExpo),
+            frame(0.4, {
+                [Bones.HandL]: new Pose(v2.create(8.5, 13.25)).rotate(Math.PI * -0.8),
+                [Bones.HandR]: new Pose(v2.create(28, 15)),
+                [Bones.MeleeR]: new Pose(v2.create(0, 0)).rotate(Math.PI * 0.5),
+            }, math.easeOutSine),
+            frame(0.425, {
+                [Bones.HandL]: new Pose(v2.create(8.5, 13.25)).rotate(Math.PI * -0.8),
+                [Bones.HandR]: new Pose(v2.create(28, 15)),
+                [Bones.MeleeR]: new Pose(v2.create(0, 0)).rotate(Math.PI * 0.5),
+            }),
+            frame(0.75, {
+                [Bones.HandL]: new Pose(v2.create(8.5, 13.25)),
+                [Bones.HandR]: new Pose(v2.create(-3, 17.75)),
+                [Bones.MeleeR]: new Pose(v2.create(0, 0)).rotate(Math.PI * 2),
+            }, math.easeInSine),
+        ],
+        effects: [effect(0, "animPlaySound", { sound: "deploy" })],
+    },
+    katana_unsheathe_02: {
+        keyframes: [
+            frame(0, {
+                [Bones.HandL]: new Pose(v2.create(8.5, 13.25)).rotate(Math.PI * -0.75),
+                [Bones.HandR]: new Pose(v2.create(18, -6)),
+                [Bones.MeleeR]: new Pose(v2.create(0, 0)).rotate(Math.PI * 0.31),
+            }),
+            frame(0.325, {
+                [Bones.HandL]: new Pose(v2.create(8.5, 13.25)).rotate(Math.PI * -0.8),
+                [Bones.HandR]: new Pose(v2.create(40, 24)),
+                [Bones.MeleeR]: new Pose(v2.create(0, 0)).rotate(Math.PI * 0.29),
+            }, math.easeInExpo),
+            frame(0.75, {
+                [Bones.HandL]: new Pose(v2.create(8.5, 13.25)),
+                [Bones.HandR]: new Pose(v2.create(-3, 17.75)),
+                [Bones.MeleeR]: new Pose(v2.create(0, 0)).rotate(Math.PI * 2),
+            }, math.easeOutSine),
+        ],
+        effects: [effect(0, "animPlaySound", { sound: "deploy" })],
     },
 };
