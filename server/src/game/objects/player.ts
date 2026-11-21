@@ -463,9 +463,7 @@ export class PlayerBarn {
     }
 
     getAliveGroups(): Group[] {
-        return [...this.groups.values()].filter(
-            (group) => group.livingPlayers.length > 0,
-        );
+        return this.groups.filter((group) => group.livingPlayers.length > 0);
     }
 
     getAliveTeams(): Team[] {
@@ -581,11 +579,6 @@ export class Player extends BaseGameObject {
 
     get rad(): number {
         return GameConfig.player.radius * this.scale;
-    }
-
-    set rad(rad: number) {
-        this.collider.rad = rad;
-        this.rad = rad;
     }
 
     get playerId() {
@@ -1165,8 +1158,6 @@ export class Player extends BaseGameObject {
         return this._perks;
     }
 
-    private _perkTypes: string[] = [];
-
     addPerk(
         type: string,
         droppable = false,
@@ -1179,7 +1170,6 @@ export class Player extends BaseGameObject {
             replaceOnDeath,
             isFromRole,
         });
-        this._perkTypes.push(type);
 
         switch (type) {
             case "trick_m9": {
@@ -1209,7 +1199,6 @@ export class Player extends BaseGameObject {
         const idx = this._perks.findIndex((perk) => perk.type === type);
         if (idx === -1) return;
         this._perks.splice(idx, 1);
-        this._perkTypes.splice(this._perkTypes.indexOf(type), 1);
 
         switch (type) {
             case "trick_m9": {
@@ -1252,7 +1241,7 @@ export class Player extends BaseGameObject {
     }
 
     hasPerk(type: string) {
-        return this._perkTypes.includes(type);
+        return this._perks.some((perk) => perk.type === type);
     }
 
     hasActivePan() {
@@ -2500,14 +2489,10 @@ export class Player extends BaseGameObject {
                     this.lastStandEffect = true;
                     this.lastStandEffectTicker = 1;
                     this.setDirty();
-                } else {
-                    // If the perk cannot mitigate, kill the player
-                    finalDamage = this.health;
                 }
-            } else {
-                // If the player lacks the perk, kill the player
-                finalDamage = this.health;
             }
+
+            finalDamage = math.min(finalDamage, this.health);
         }
 
         this.damageTaken += finalDamage;
@@ -2676,10 +2661,6 @@ export class Player extends BaseGameObject {
             util.removeFrom(this.team.livingPlayers, this);
         }
 
-        if (this.weaponManager.cookingThrowable) {
-            this.weaponManager.throwThrowable(true);
-        }
-
         //
         // Send kill msg
         //
@@ -2731,33 +2712,14 @@ export class Player extends BaseGameObject {
                     for (let i = 0; i < count; i++) {
                         const item = this.game.lootBarn.getLootTable(PerkProperties.pirate.tier);
                         if (!item) continue;
-
-                        this.game.lootBarn.addLoot(
-                            item.name,
-                            this.pos,
-                            this.layer,
-                            item.count,
-                            {
-                                pushSpeed: util.random(7.5, 11),
-                                dir: v2.randomUnit(),
-                            },
-                        );
+                        this.dropDeathLoot(item.name, item.count);
                     }
 
                     // rare gun
                     if (Math.random() < PerkProperties.pirate.rareChance) {
                         const item = this.game.lootBarn.getLootTable(PerkProperties.pirate.rareTier);
                         if (item) {
-                            this.game.lootBarn.addLoot(
-                                item.name,
-                                this.pos,
-                                this.layer,
-                                item.count,
-                                {
-                                    pushSpeed: util.random(7.5, 11),
-                                    dir: v2.randomUnit(),
-                                },
-                            );
+                            this.dropDeathLoot(item.name, item.count);
                         }
                     }
                 }
@@ -2926,10 +2888,7 @@ export class Player extends BaseGameObject {
                     break;
                 case "melee":
                     if (def.noDropOnDeath || weap.type === "fists") break;
-                    this.game.lootBarn.addLoot(weap.type, this.pos, this.layer, 1, {
-                        pushSpeed: util.random(7.5, 11),
-                        dir: v2.randomUnit(),
-                    });
+                    this.dropDeathLoot(weap.type, 1);
                     weap.type = "fists";
                     break;
                 case "throwable":
@@ -2946,10 +2905,7 @@ export class Player extends BaseGameObject {
 
             const amount = this.invManager.get(item);
             if (amount > 0) {
-                this.game.lootBarn.addLoot(item, this.pos, this.layer, amount, {
-                    pushSpeed: util.random(7.5, 11),
-                    dir: v2.randomUnit(),
-                });
+                this.dropDeathLoot(item, amount);
             }
         }
 
@@ -2958,39 +2914,22 @@ export class Player extends BaseGameObject {
             if (!type) continue;
             const def = GameObjectDefs.typeToDef(type) as HelmetDef | ChestDef | BackpackDef;
             if (!!(def as ChestDef).noDrop || def.level < 1) continue;
-            this.game.lootBarn.addLoot(type, this.pos, this.layer, 1, {
-                pushSpeed: util.random(7.5, 11),
-                dir: v2.randomUnit(),
-            });
+            this.dropDeathLoot(type, 1);
         }
 
         if (this.outfit) {
             const def = GameObjectDefs.typeToDef(this.outfit, "outfit");
             if (!def.noDropOnDeath && !def.noDrop && this.outfit !== this.loadout.outfit) {
-                this.game.lootBarn.addLoot(this.outfit, this.pos, this.layer, 1, {
-                    pushSpeed: util.random(7.5, 11),
-                    dir: v2.randomUnit(),
-                });
+                this.dropDeathLoot(this.outfit, 1);
             }
         }
 
-        for (let i = this.perks.length - 1; i >= 0; i--) {
-            const perk = this.perks[i];
+        for (const perk of this.perks) {
             if (perk.droppable || perk.replaceOnDeath) {
-                this.game.lootBarn.addLoot(
-                    perk.replaceOnDeath || perk.type,
-                    this.pos,
-                    this.layer,
-                    1,
-                    {
-                        pushSpeed: util.random(7.5, 11),
-                        dir: v2.randomUnit(),
-                    },
-                );
+                this.dropDeathLoot(perk.replaceOnDeath || perk.type, 1);
             }
         }
         this._perks.length = 0;
-        this._perkTypes.length = 0;
 
         // Wipe inventory
         this.invManager.wipeInventory();
@@ -3140,13 +3079,9 @@ export class Player extends BaseGameObject {
         const normalRevive = this.actionType == GameConfig.Action.Revive && this.action.targetId == 0;
         if (normalRevive) return true;
 
-        const numMedics = this.game.playerBarn.aoeHealPlayers.length;
-        if (numMedics) {
-            return this.game.playerBarn.aoeHealPlayers.some((medic) => {
-                return medic != this && medic.isReviving() && this.isAffectedByAOE(medic);
-            });
-        }
-        return false;
+        return this.game.playerBarn.aoeHealPlayers.some((medic) =>
+            medic != this && medic.isReviving() && this.isAffectedByAOE(medic)
+        );
     }
 
     /** returns player to revive if can revive */
@@ -3468,11 +3403,6 @@ export class Player extends BaseGameObject {
                         if (interactable.__type === ObjectType.Player && canRevive) {
                             this.revive(playerToRevive);
                             ignoreCancel = true;
-                        } else if (
-                            interactable.__type === ObjectType.Loot
-                            && !this.downed
-                        ) {
-                            this.interactWith(interactable);
                         } else {
                             this.interactWith(interactable);
                         }
@@ -3557,10 +3487,8 @@ export class Player extends BaseGameObject {
                 this.useBoostItem(msg.useItem);
                 break;
             case "scope":
-                if (this.invManager.has(msg.useItem)) {
-                    this.scope = msg.useItem;
-                    this.inventoryDirty = true;
-                }
+                this.scope = msg.useItem;
+                this.inventoryDirty = true;
                 break;
         }
     }
@@ -3577,16 +3505,12 @@ export class Player extends BaseGameObject {
             const loot = objs[i];
             if (loot.__type !== ObjectType.Loot) continue;
             if (loot.destroyed) continue;
-            if (
-                util.sameLayer(loot.layer, this.layer)
-                && (loot.ownerId == 0 || loot.ownerId == this.__id)
-            ) {
-                const pos = loot.pos;
+            if (!util.sameLayer(loot.layer, this.layer)) continue;
+            if (loot.ownerId == 0 || loot.ownerId == this.__id) {
                 const rad = this.isMobile
                     ? this.rad + loot.rad * GameConfig.player.touchLootRadMult
                     : this.rad + loot.rad;
-                const toPlayer = v2.sub(this.pos, pos);
-                const distSq = v2.lengthSqr(toPlayer);
+                const distSq = v2.lengthSqr(v2.sub(this.pos, loot.pos));
                 if (distSq < rad * rad && distSq < closestDist) {
                     closestDist = distSq;
                     closestLoot = loot;
@@ -4159,6 +4083,13 @@ export class Player extends BaseGameObject {
         });
     }
 
+    dropDeathLoot(type: string, count: number) {
+        this.game.lootBarn.addLoot(type, this.pos, this.layer, count, {
+            pushSpeed: util.random(7.5, 11),
+            dir: v2.neg(this.dir),
+        });
+    }
+
     dropArmor(item: string): boolean {
         const armorDef = GameObjectDefs.typeToDef(item);
         if (armorDef.type != "chest" && armorDef.type != "helmet") return false;
@@ -4338,12 +4269,10 @@ export class Player extends BaseGameObject {
         }
     }
 
-    emoteFromMsg(msg: net.EmoteMsg) {
+    emoteFromMsg(emoteMsg: net.EmoteMsg) {
         if (this.dead) return;
         if (this.game.map.perkMode && !this.role) return;
         if (this.emoteHardTicker > 0) return;
-
-        const emoteMsg = msg as net.EmoteMsg;
 
         const emoteIdx = this.loadout.emotes.indexOf(emoteMsg.type);
         const emoteDef = GameObjectDefs.typeToDefSafe(emoteMsg.type);
@@ -4351,7 +4280,7 @@ export class Player extends BaseGameObject {
 
         if (emoteMsg.isPing) {
             if (this.debug.teleportToPings) {
-                v2.set(this.pos, msg.pos);
+                v2.set(this.pos, emoteMsg.pos);
                 this.setPartDirty();
                 this.game.grid.updateObject(this);
             }
