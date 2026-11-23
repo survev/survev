@@ -624,9 +624,8 @@ export class WeaponManager {
     }
 
     dropGun(weapIdx: number): void {
-        const def = GameObjectDefs.typeToDefSafe(this.weapons[weapIdx].type);
-        if (!def || def.type !== "gun") return;
-        if (def.noDrop) return;
+        const def = GameObjectDefs.typeToDefSafe(this.weapons[weapIdx].type) as GunDef | undefined;
+        if (def?.noDrop) return;
 
         this._dropGun(weapIdx);
         this.setWeapon(weapIdx, "", 0);

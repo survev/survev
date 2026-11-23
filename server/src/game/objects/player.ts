@@ -4215,6 +4215,7 @@ export class Player extends BaseGameObject {
                 break;
             }
             case "gun":
+                if (GameConfig.WeaponType[dropMsg.weapIdx] !== "gun") break;
                 if (this.weaponManager.canDropFlare(dropMsg.weapIdx)) {
                     this.weaponManager.dropGun(dropMsg.weapIdx);
                 }
