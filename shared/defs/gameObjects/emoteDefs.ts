@@ -1654,6 +1654,16 @@ export const EmotesDefs: Record<string, EmoteDef> = {
         teamOnly: false,
         category: EmoteCategory.Flags,
     },
+    emote_flagmoldova: {
+        type: "emote",
+        name: "Flag Moldova",
+        rarity: Rarity.Common,
+        texture: "flag-moldova.img",
+        sound: "emote_01",
+        channel: "ui",
+        teamOnly: false,
+        category: EmoteCategory.Flags,
+    },
     emote_flagtransgender: {
         type: "emote",
         name: "Flag Transgender",
