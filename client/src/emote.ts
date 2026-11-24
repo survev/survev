@@ -71,6 +71,7 @@ interface TeamPingSelector {
     ping: string;
     emote: string;
     ammoEmote?: boolean;
+    fragEmote?: boolean;
     displayCloseIcon?: boolean;
     texture?: string;
 }
@@ -155,7 +156,7 @@ export class EmoteBarn {
     emoteButtonElem = $("#ui-emote-button");
 
     emoteWheels = $("#ui-emotes, #ui-team-pings");
-    teamEmotes = $(".ui-emote-bottom-left, .ui-emote-top-left");
+    teamEmotes = $(".ui-emote-left-1, .ui-emote-left-2, .ui-emote-left-3, .ui-emote-left-4");
 
     // Emotes
     emoteWheel = $("#ui-emotes");
@@ -381,6 +382,7 @@ export class EmoteBarn {
                 emote: string;
                 displayCloseIcon?: boolean;
                 ammoEmote?: boolean;
+                fragEmote?: boolean;
             }
         > = {
             middle: {
@@ -391,41 +393,56 @@ export class EmoteBarn {
                 emote: "",
                 displayCloseIcon: true,
             },
-            top: {
-                parent: $("#ui-team-ping-top"),
-                vA: v2.create(-1, 1),
-                vC: v2.create(1, 1),
+            "right-1": {
+                parent: $("#ui-team-ping-right-1"),
+                vA: v2.create(0, 1),
+                vC: v2.create(0.866, 0.5),
                 ping: "ping_danger",
                 emote: "",
             },
-            right: {
-                parent: $("#ui-team-ping-right"),
-                vA: v2.create(1, 1),
-                vC: v2.create(1, -1),
+            "right-2": {
+                parent: $("#ui-team-ping-right-2"),
+                vA: v2.create(0.866, 0.5),
+                vC: v2.create(0.866, -0.5),
                 ping: "ping_coming",
                 emote: "",
             },
-            bottom: {
-                parent: $("#ui-team-ping-bottom"),
-                vA: v2.create(1, -1),
-                vC: v2.create(-1, -1),
+            "right-3": {
+                parent: $("#ui-team-ping-right-3"),
+                vA: v2.create(0.866, -0.5),
+                vC: v2.create(0, -1),
                 ping: "ping_help",
                 emote: "",
             },
-            "bottom-left": {
-                parent: $("#ui-team-ping-bottom-left"),
-                vA: v2.create(-1, -1),
+            "left-1": {
+                parent: $("#ui-team-ping-left-1"),
+                vA: v2.create(-0.707, 0.707),
+                vC: v2.create(0, 1),
+                ping: "",
+                emote: "emote_ammo",
+                ammoEmote: true,
+            },
+            "left-2": {
+                parent: $("#ui-team-ping-left-2"),
+                vA: v2.create(-1, 0),
+                vC: v2.create(-0.707, 0.707),
+                ping: "",
+                emote: "emote_throwable_frag",
+                fragEmote: true,
+            },
+            "left-3": {
+                parent: $("#ui-team-ping-left-3"),
+                vA: v2.create(-0.707, -0.707),
                 vC: v2.create(-1, 0),
                 ping: "",
                 emote: "emote_medical",
             },
-            "top-left": {
-                parent: $("#ui-team-ping-top-left"),
-                vA: v2.create(-1, 0),
-                vC: v2.create(-1, 1),
+            "left-4": {
+                parent: $("#ui-team-ping-left-4"),
+                vA: v2.create(0, -1),
+                vC: v2.create(-0.707, -0.707),
                 ping: "",
-                emote: "emote_ammo",
-                ammoEmote: true,
+                emote: "emote_adrenaline",
             },
         };
 
@@ -444,6 +461,7 @@ export class EmoteBarn {
                     ping: pingData.ping,
                     emote: pingData.emote,
                     ammoEmote: pingData?.ammoEmote,
+                    fragEmote: pingData?.fragEmote,
                     displayCloseIcon: pingData?.displayCloseIcon,
                 });
             }
@@ -983,6 +1001,38 @@ export class EmoteBarn {
 
                                 if (oldEmote != s.emote) {
                                     // Change the image background to our chosen emotes
+                                    const imageElem = s.parent.find(".ui-emote-image");
+                                    const imgUrl = getImgUrlFromSelector(s);
+                                    imageElem.css("background-image", `url(${imgUrl})`);
+                                }
+                            }
+
+                            if (s.fragEmote) {
+                                const equippedWeapon = player.m_localData.m_weapons[player.m_localData.m_curWeapIdx];
+                                const weapDef = GameObjectDefs.typeToDefSafe(equippedWeapon?.type) as
+                                    | ThrowableDef
+                                    | undefined;
+                                let fragType = "";
+                                if (weapDef && weapDef.type === "throwable") {
+                                    fragType = equippedWeapon.type;
+                                }
+
+                                const FragTypeToEmote: Record<string, string> = {
+                                    frag: "emote_throwable_frag",
+                                    mirv: "emote_throwable_mirv",
+                                    smoke: "emote_throwable_smoke",
+                                    strobe: "emote_throwable_strobe",
+                                    snowball: "emote_throwable_snowball",
+                                    potato: "emote_throwable_potato",
+                                    coconut: "emote_throwable_coconut",
+                                    tomato: "emote_throwable_tomato",
+                                };
+
+                                const oldEmote = s.emote;
+                                s.emote = FragTypeToEmote[fragType] || "emote_throwable_frag";
+                                s.texture = EmotesDefs[s.emote].texture;
+
+                                if (oldEmote != s.emote) {
                                     const imageElem = s.parent.find(".ui-emote-image");
                                     const imgUrl = getImgUrlFromSelector(s);
                                     imageElem.css("background-image", `url(${imgUrl})`);
