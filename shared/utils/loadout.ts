@@ -77,10 +77,27 @@ export const loadout = {
         };
 
         const defaultEmotes = GameConfig.defaultEmoteLoadout.slice();
+        let inputEmotes = mergedLoadout.emotes;
+        if (Array.isArray(inputEmotes) && inputEmotes.length > 0 && inputEmotes.length < GameConfig.EmoteSlot.Count) {
+            const winIdx = inputEmotes.length - 2;
+            const deathIdx = inputEmotes.length - 1;
+            const count = Math.max(0, inputEmotes.length - 2);
+
+            const out: string[] = [];
+            for (let i = 0; i < GameConfig.EmoteSlot.Win; i++) {
+                out[i] = (i < count && inputEmotes[i]) ? inputEmotes[i] : defaultEmotes[i];
+            }
+            out[GameConfig.EmoteSlot.Win] = inputEmotes[winIdx] || "";
+            out[GameConfig.EmoteSlot.Death] = inputEmotes[deathIdx] || "";
+            inputEmotes = out;
+        }
+
+        const hasEmotesInput = Array.isArray(inputEmotes) && inputEmotes.length > 0;
         for (let i = 0; i < GameConfig.EmoteSlot.Count; i++) {
-            const inputEmote = i < mergedLoadout.emotes.length ? mergedLoadout.emotes[i] : "";
+            const inputEmote = inputEmotes?.[i] || "";
+            const defaultValue = hasEmotesInput ? "" : defaultEmotes[i];
             validatedLoadout.emotes.push(
-                getGameType("emote", inputEmote, defaultEmotes[i]),
+                getGameType("emote", inputEmote, defaultValue),
             );
         }
         return validatedLoadout;
